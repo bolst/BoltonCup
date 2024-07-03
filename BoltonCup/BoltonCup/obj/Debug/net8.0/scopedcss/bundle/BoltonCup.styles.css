@@ -1,0 +1,17 @@
+/* _content/BoltonCup/Components/Layout/ThemeColorSelector.razor.rz.scp.css */
+.demo-theme-color-item[b-oelkewb8ou] {
+    display: table-cell;
+    width: 36px;
+    height: 36px;
+    vertical-align: top;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+}
+
+    .demo-theme-color-item .material-icons[b-oelkewb8ou] {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+    }

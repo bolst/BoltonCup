@@ -1,0 +1,65 @@
+@namespace BoltonCup.Components
+@using System.Timers
+
+
+@if (TimeUntil != null)
+{
+    <Grid>
+    <Column>
+        @TimeUnitComponent(TimeUntil?.Days ?? 0, "DAYS")
+    </Column>
+    <Column>
+        @TimeUnitComponent(TimeUntil?.Hours ?? 0, "HOURS")
+    </Column>
+    <Column>
+        @TimeUnitComponent(TimeUntil?.Minutes ?? 0, "MIN")
+    </Column>
+    <Column>
+        @TimeUnitComponent(TimeUntil?.Seconds ?? 0, "SEC")
+    </Column>
+</Grid>
+
+}
+
+
+@code {
+
+    RenderFragment TimeUnitComponent(int value, string label) => __builder =>
+    {
+        <Heading TextWeight="TextWeight.Bold">@value</Heading>
+        <Heading TextSize="TextSize.Small">@label</Heading>
+    };
+
+    static Timer myTimer;
+    DateTime TournamentStart = new DateTime(2024, 08, 23, 7 + 12, 00, 00); // august 23 7:00pm
+    TimeSpan? TimeUntil = null;
+    TimeSpan dt = new TimeSpan(0, 0, 1);
+
+    protected override void OnInitialized()
+    {
+        var timeUtc = DateTime.UtcNow;
+        TimeZoneInfo est = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+        DateTime estTimeNow = TimeZoneInfo.ConvertTimeFromUtc(timeUtc, est);
+        TimeUntil = TournamentStart - estTimeNow;
+        StartTimer();
+    }
+    void StartTimer()
+    {
+        myTimer = new Timer(1000);
+        myTimer.Elapsed += CountDownTimer;
+        myTimer.Enabled = true;
+    }
+
+    public void CountDownTimer(Object source, ElapsedEventArgs e)
+    {
+        if (TimeUntil != null)
+        {
+            TimeUntil = TimeUntil?.Subtract(dt);
+        }
+        else
+        {
+            myTimer.Enabled = false;
+        }
+        InvokeAsync(StateHasChanged);
+    }
+}
