@@ -41,3 +41,4 @@
 /Users/nic/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.pdb
 /Users/nic/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.genruntimeconfig.cache
 /Users/nic/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/ref/BoltonCup.dll
+/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.sourcelink.json
