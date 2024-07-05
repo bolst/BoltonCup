@@ -1,21 +1,39 @@
 ﻿@using Blazorise.Localization
 
-<Bar Breakpoint="Breakpoint.Desktop" Background="Background.Primary" ThemeContrast="ThemeContrast.Light">
+<Bar Breakpoint="Breakpoint.Desktop" Background="Background.Primary" ThemeContrast="ThemeContrast.Light" Visible=false>
     <BarBrand>
         <BarItem>
             <BarLink To="">
                 <BarIcon Margin="Margin.Is2.FromEnd" IconName="IconName.Dashboard" />
-                BoltonCup
+                Bolton Cup
             </BarLink>
         </BarItem>
     </BarBrand>
     <BarToggler />
     <BarMenu>
         <BarStart>
-            
+            <BarItem Padding="Padding.Is2.OnX">
+                <MyBarLink To="/">HOME</MyBarLink>
+            </BarItem>
+            <BarItem Padding="Padding.Is2.OnX">
+                <MyBarLink To="/info">INFO</MyBarLink>
+            </BarItem>
+            <BarItem Padding="Padding.Is2.OnX">
+                <MyBarLink To="/teams">TEAMS</MyBarLink>
+            </BarItem>
+            <BarItem Padding="Padding.Is2.OnX">
+                <MyBarLink To="/schedule">SCHEDULE</MyBarLink>
+            </BarItem>
         </BarStart>
         <BarEnd>
-           
+            <BarItem Padding="Padding.Is2.OnX">
+                <MyBarLink To="@registrationLink" LinkTarget="Target.Blank">REGISTER</MyBarLink>
+            </BarItem>
         </BarEnd>
     </BarMenu>
 </Bar>
+
+@code {
+    string registrationLink =
+    "https://forms.office.com/Pages/ResponsePage.aspx?id=szP5EmE9GUuaTWiQId6MydfmFVKM4gFNi5kb75G_wgVURFhNTjdaU0JOMzlWVk9IUlNCNUlTNElXVy4u";
+}

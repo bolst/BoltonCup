@@ -1,0 +1,10 @@
+@namespace BoltonCup.Components
+
+<Heading TextSize="TextSize.Heading1" TextColor="TextColor.Secondary" TextWeight="TextWeight.Bold"
+    Padding="@TextPadding">@ChildContent
+</Heading>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public IFluentSpacing TextPadding { get; set; } = Padding.Is0;
+}

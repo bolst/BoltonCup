@@ -1,0 +1,13 @@
+@namespace BoltonCup.Components
+
+<BarLink To="@To" Target="@LinkTarget">
+    <Heading Margin="Margin.IsAuto" TextSize="TextSize.Heading4" TextWeight="TextWeight.SemiBold"
+        TextColor="TextColor.White" Italic>@ChildContent
+    </Heading>
+</BarLink>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string To { get; set; } = "";
+    [Parameter] public Target LinkTarget { get; set; } = Target.Default;
+}

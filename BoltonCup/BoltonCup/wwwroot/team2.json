@@ -1,0 +1,12 @@
+{
+    "id": 2,
+    "name": "Team 2",
+    "logo": "team2-logo.png",
+    "players": [
+        {
+            "name": "Nic Bolton",
+            "birth year": "2002",
+            "position": "d"
+        }
+    ]
+}

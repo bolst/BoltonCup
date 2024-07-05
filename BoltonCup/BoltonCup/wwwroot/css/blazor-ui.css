@@ -26,3 +26,19 @@
 .blazor-error-boundary::after {
     content: "An error has occurred."
 }
+
+@font-face {
+    font-family: "Lato";
+    src: url('fonts/Lato-Regular.ttf');
+}
+
+@font-face {
+    font-family: "Lato-Bold";
+    src: url('fonts/Lato-Bold.ttf');
+    font-weight: bold;
+}
+
+html,
+body {
+    font-family: 'Lato', 'sans-serif';
+}

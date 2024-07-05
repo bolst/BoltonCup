@@ -1,0 +1,12 @@
+{
+    "id": 3,
+    "name": "Team 3",
+    "logo": "team3-logo.png",
+    "players": [
+        {
+            "name": "Landon Prince",
+            "birth year": "2004",
+            "position": "d"
+        }
+    ]
+}

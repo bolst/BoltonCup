@@ -1,0 +1,17 @@
+@page "/teams"
+
+<br>
+<br>
+
+<Grid RowColumns="RowColumns.Are2.OnTablet.Are1.OnMobile" Padding="Padding.Is4">
+    <Column ColumnSize="ColumnSize.Is6.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+        <TeamCard ImageSource="team1-logo.png" LineColor="Background.Danger" To="/team?id=1">TEAM 1</TeamCard>
+        <br>
+        <TeamCard ImageSource="team2-logo.png" LineColor="Background.Info" To="/team?id=2">TEAM 2</TeamCard>
+    </Column>
+    <Column ColumnSize="ColumnSize.Is6.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+        <TeamCard ImageSource="team3-logo.png" LineColor="Background.Warning" To="/team?id=3">TEAM 3</TeamCard>
+        <br>
+        <TeamCard ImageSource="team4-logo.png" LineColor="Background.Primary" To="/team?id=4">TEAM 4</TeamCard>
+    </Column>
+</Grid>

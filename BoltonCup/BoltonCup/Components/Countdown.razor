@@ -4,20 +4,21 @@
 
 @if (TimeUntil != null)
 {
-    <Grid>
-    <Column>
-        @TimeUnitComponent(TimeUntil?.Days ?? 0, "DAYS")
-    </Column>
-    <Column>
-        @TimeUnitComponent(TimeUntil?.Hours ?? 0, "HOURS")
-    </Column>
-    <Column>
-        @TimeUnitComponent(TimeUntil?.Minutes ?? 0, "MIN")
-    </Column>
-    <Column>
-        @TimeUnitComponent(TimeUntil?.Seconds ?? 0, "SEC")
-    </Column>
-</Grid>
+    <Grid RowColumns="RowColumns.Are4.OnTablet.Are3.OnMobile" Padding="Padding.Is4.OnY"
+        TextAlignment="TextAlignment.Center">
+        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile">
+            @TimeUnitComponent(TimeUntil?.Days ?? 0, "DAYS")
+        </Column>
+        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
+            @TimeUnitComponent(TimeUntil?.Hours ?? 0, "HOURS")
+        </Column>
+        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
+            @TimeUnitComponent(TimeUntil?.Minutes ?? 0, "MINUTES")
+        </Column>
+        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
+            @TimeUnitComponent(TimeUntil?.Seconds ?? 0, "SECONDS")
+        </Column>
+    </Grid>
 
 }
 
@@ -26,12 +27,13 @@
 
     RenderFragment TimeUnitComponent(int value, string label) => __builder =>
     {
-        <Heading TextWeight="TextWeight.Bold">@value</Heading>
-        <Heading TextSize="TextSize.Small">@label</Heading>
+        <DisplayHeading Size="DisplayHeadingSize.Is1" TextColor="TextColor.Secondary" Italic>@value
+        </DisplayHeading>
+        <Heading TextSize="TextSize.Small" TextColor="TextColor.Secondary">@label</Heading>
     };
 
     static Timer myTimer;
-    DateTime TournamentStart = new DateTime(2024, 08, 23, 7 + 12, 00, 00); // august 23 7:00pm
+    DateTime TournamentStart = new DateTime(2024, 08, 02, 7 + 12, 00, 00); // august 2 7:00pm
     TimeSpan? TimeUntil = null;
     TimeSpan dt = new TimeSpan(0, 0, 1);
 

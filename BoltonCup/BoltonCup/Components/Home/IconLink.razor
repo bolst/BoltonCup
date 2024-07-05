@@ -1,0 +1,25 @@
+@namespace BoltonCup.Components
+
+<Column Margin="Margin.IsAuto" TextAlignment="TextAlignment.Center" Width="Width.Is50">
+    <Blazorise.Link To="@LinkTo" Unstyled>
+        <Row Padding="Padding.Is2.OnY" Margin="Margin.IsAuto">
+            <Icon Name="@Icon" IconSize="IconSize.x5" />
+        </Row>
+        <Row Width="Width.Is50" Margin="Margin.IsAuto">
+            <Divider Margin="Margin.IsAuto" />
+        </Row>
+        <Row Width="Width.Is50" Margin="Margin.IsAuto">
+            <Divider Margin="Margin.IsAuto" />
+        </Row>
+        <Row Padding="Padding.Is2.OnY" Margin="Margin.IsAuto">
+            <Heading>@ChildContent</Heading>
+        </Row>
+    </Blazorise.Link>
+</Column>
+
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public IconName Icon { get; set; } = IconName.QuestionCircle;
+    [Parameter] public string LinkTo { get; set; } = "";
+}

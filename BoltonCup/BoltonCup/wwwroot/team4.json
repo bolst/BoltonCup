@@ -1,0 +1,12 @@
+{
+    "id": 4,
+    "name": "Team 4",
+    "logo": "team4-logo.png",
+    "players": [
+        {
+            "name": "Connor Kelly",
+            "birth year": "2003",
+            "position": "f"
+        }
+    ]
+}

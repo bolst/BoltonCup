@@ -1,13 +1,33 @@
 ﻿@page "/"
 
-<Grid RowColumns="RowColumns.Are3.OnTablet.Are1.OnMobile">
-    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile">
-        <Heading>Hey</Heading>
-    </Column>
-    <Column ColumnSize="ColumnSize.Is6.OnTablet.Is12.OnMobile" TextAlignment="TextAlignment.Center">
-        <Image Source="poster.png" Fluid />
-    </Column>
-    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile">
+<Grid RowColumns="RowColumns.Are1" Width="Width.Is100" Background="Background.Dark" Padding="Padding.Is4.OnY">
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <Column ColumnSize="ColumnSize.Is12" Margin="Margin.IsAuto">
         <Countdown />
+    </Column>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+</Grid>
+
+<br>
+<br>
+
+<Grid RowColumns="RowColumns.Are3.OnTablet.Are1.OnMobile" Width="Width.Is75" Shadow="Shadow.Default"
+    Margin="Margin.IsAuto" Padding="Padding.Is4.OnY" Border="Border.Rounded">
+    <Column ColumnSize="ColumnSize.Is4.OnFullHD.Is12.OnMobile">
+        <IconLink Icon="IconName.InfoCircle" LinkTo="info">Info</IconLink>
+    </Column>
+    <Column ColumnSize="ColumnSize.Is4.OnFullHD.Is12.OnMobile">
+        <IconLink Icon="IconName.Users" LinkTo="teams">Teams</IconLink>
+    </Column>
+    <Column ColumnSize="ColumnSize.Is4.OnFullHD.Is12.OnMobile">
+        <IconLink Icon="IconName.CalendarDay" LinkTo="schedule">Schedule</IconLink>
     </Column>
 </Grid>
