@@ -15,9 +15,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Blazorise"					Version="1.5.*" />
-		<PackageReference Include="Blazorise.Bootstrap5"		Version="1.5.*" />
+		<PackageReference Include="Blazorise" Version="1.5.*" />
+		<PackageReference Include="Blazorise.Bootstrap5" Version="1.5.*" />
 		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.5.*" />
+		<PackageReference Include="Stripe.net" Version="45.1.0" />
 	</ItemGroup>
 
 </Project>

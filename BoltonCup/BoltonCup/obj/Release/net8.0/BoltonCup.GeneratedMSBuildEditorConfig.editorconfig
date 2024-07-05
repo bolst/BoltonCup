@@ -1,0 +1,119 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = BoltonCup
+build_property.RootNamespace = BoltonCup
+build_property.ProjectDir = C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Countdown.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDb3VudGRvd24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Home/HomeBanner.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXEhvbWVCYW5uZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Home/IconLink.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXEljb25MaW5rLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Info/InfoBanner.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xJbmZvXEluZm9CYW5uZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Info/InfoHeading.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xJbmZvXEluZm9IZWFkaW5nLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Info/InfoList.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xJbmZvXEluZm9MaXN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Info/InfoListItem.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xJbmZvXEluZm9MaXN0SXRlbS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Info/InfoParagraph.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xJbmZvXEluZm9QYXJhZ3JhcGgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Layout/FooterMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcRm9vdGVyTWVudS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Layout/MyBarLink.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTXlCYXJMaW5rLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Layout/TopMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcVG9wTWVudS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Schedule/DateHeading.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTY2hlZHVsZVxEYXRlSGVhZGluZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Schedule/MatchupCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTY2hlZHVsZVxNYXRjaHVwQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Teams/TeamCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xUZWFtc1xUZWFtQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Layouts/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0c1xNYWluTGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Pages/Info.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5mby5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Pages/Schedule.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2NoZWR1bGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Pages/TeamPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGVhbVBhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Pages/Teams.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGVhbXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Pages/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

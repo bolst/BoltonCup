@@ -86,3 +86,16 @@ C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\obj\Debug\net8.0\refint\BoltonC
 C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\obj\Debug\net8.0\BoltonCup.pdb
 C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\obj\Debug\net8.0\BoltonCup.genruntimeconfig.cache
 C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\obj\Debug\net8.0\ref\BoltonCup.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\Stripe.net.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\System.Drawing.Common.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\System.Security.Permissions.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\System.Windows.Extensions.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
