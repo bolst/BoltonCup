@@ -25,6 +25,10 @@
       "PackagePath": "staticwebassets\\home-banner.jpg"
     },
     {
+      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\logo.png",
+      "PackagePath": "staticwebassets\\logo.png"
+    },
+    {
       "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\placeholder.png",
       "PackagePath": "staticwebassets\\placeholder.png"
     },

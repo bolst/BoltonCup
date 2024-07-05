@@ -26,8 +26,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDb3VudGRvd24ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Home/HomeBanner.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXEhvbWVCYW5uZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Home/IconLink.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXEljb25MaW5rLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Info/InfoBanner.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xJbmZvXEluZm9CYW5uZXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Info/InfoHeading.razor]

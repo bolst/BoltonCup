@@ -1,39 +1,51 @@
 ﻿@using Blazorise.Localization
 
-<Bar Breakpoint="Breakpoint.Desktop" Background="Background.Primary" ThemeContrast="ThemeContrast.Light" Visible=false>
+<Bar Breakpoint="Breakpoint.Desktop" Background="Background.Primary" ThemeContrast="ThemeContrast.Light"
+    @bind-Visible="@barVisible">
     <BarBrand>
         <BarItem>
             <BarLink To="">
-                <BarIcon Margin="Margin.Is2.FromEnd" IconName="IconName.Dashboard" />
-                Bolton Cup
+                <Div Width="Width.Rem(8)" Padding="Padding.Is4">
+                    <Image Source="logo.png" Margin="Margin.Is4.FromTop" Fluid />
+                </Div>
             </BarLink>
         </BarItem>
     </BarBrand>
-    <BarToggler />
     <BarMenu>
         <BarStart>
-            <BarItem Padding="Padding.Is2.OnX">
+            <BarItem Padding="Padding.Is2.OnX" @onclick="() => barVisible = false">
                 <MyBarLink To="/">HOME</MyBarLink>
             </BarItem>
-            <BarItem Padding="Padding.Is2.OnX">
+            <BarItem Padding="Padding.Is2.OnX" @onclick="() => barVisible = false">
                 <MyBarLink To="/info">INFO</MyBarLink>
             </BarItem>
-            <BarItem Padding="Padding.Is2.OnX">
+            <BarItem Padding="Padding.Is2.OnX" @onclick="() => barVisible = false">
                 <MyBarLink To="/teams">TEAMS</MyBarLink>
             </BarItem>
-            <BarItem Padding="Padding.Is2.OnX">
+            <BarItem Padding="Padding.Is2.OnX" @onclick="() => barVisible = false">
                 <MyBarLink To="/schedule">SCHEDULE</MyBarLink>
             </BarItem>
         </BarStart>
         <BarEnd>
-            <BarItem Padding="Padding.Is2.OnX">
+            <BarItem Padding="Padding.Is2.OnX" @onclick="() => barVisible = false">
                 <MyBarLink To="@registrationLink" LinkTarget="Target.Blank">REGISTER</MyBarLink>
             </BarItem>
         </BarEnd>
     </BarMenu>
+    <Button Display="Display.None.OnTablet.Block.OnMobile" Clicked="ToggleBar" Position="Position.Fixed.End">
+        <Icon Name="IconName.Bars" />
+    </Button>
 </Bar>
 
 @code {
+
+
+    public bool barVisible { get; set; } = false;
+    Task ToggleBar()
+    {
+        barVisible = !barVisible;
+        return Task.CompletedTask;
+    }
     string registrationLink =
     "https://forms.office.com/Pages/ResponsePage.aspx?id=szP5EmE9GUuaTWiQId6MydfmFVKM4gFNi5kb75G_wgVURFhNTjdaU0JOMzlWVk9IUlNCNUlTNElXVy4u";
 }
