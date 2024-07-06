@@ -13,11 +13,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Megabit")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright 2018-2024 Megabit")]
-[assembly: System.Reflection.AssemblyDescriptionAttribute("\n\t\t\tThis is a Blazorise Template for a Blazor Server Application.\n\t\t\tBlazorise is" +
-    " a component library built on top of Blazor and CSS frameworks like Bootstrap, F" +
-    "luentUI2, Tailwind, Bulma and Material.\n\t\t")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute("\r\n\t\t\tThis is a Blazorise Template for a Blazor Server Application.\r\n\t\t\tBlazorise " +
+    "is a component library built on top of Blazor and CSS frameworks like Bootstrap," +
+    " FluentUI2, Tailwind, Bulma and Material.\r\n\t\t")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.5.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.5+32d4ce5389b71cfaf0f76710370b3c5c713ee88b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.5+c62dfd2a9651ea324590bd7c3f50dee33715af2f")]
 [assembly: System.Reflection.AssemblyProductAttribute("BoltonCup")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BoltonCup")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.5.0.0")]

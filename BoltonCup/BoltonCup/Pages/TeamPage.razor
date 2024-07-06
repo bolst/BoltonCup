@@ -73,6 +73,6 @@
         Uri uri = new Uri(navManager.Uri);
         string teamID = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("id") ?? "1";
 
-        teamData = Api.TeamService.GetTeamByID(teamID);
+        teamData = Api.TeamService.Instance().GetTeamByID(teamID);
     }
 }

@@ -2,25 +2,47 @@ using System.Text.Json;
 
 namespace BoltonCup.Api
 {
-    public static class TeamService
+    public class TeamService
     {
-        public static TeamData? GetTeamByID(string id)
+        private static TeamService? instance = null;
+        public TeamService()
         {
+            TeamDataList = new();
             try
             {
-                using (var stream = new StreamReader($"wwwroot/team{id}.json"))
+                for (int id = 1; id <= 4; id++)
                 {
-                    string fileContent = stream.ReadToEnd();
-                    TeamData? data = JsonSerializer.Deserialize<TeamData>(fileContent);
-                    return data;
+                    using (var stream = new StreamReader($"wwwroot/team{id}.json"))
+                    {
+                        string fileContent = stream.ReadToEnd();
+                        TeamData? data = JsonSerializer.Deserialize<TeamData>(fileContent);
+                        if (data != null) { TeamDataList.Add(data); }
+                    }
                 }
             }
             catch (Exception exc)
             {
                 Console.WriteLine("GetTeamByID:");
                 Console.WriteLine(exc.ToString());
-                return null;
             }
+        }
+        public static TeamService Instance()
+        {
+            if (instance == null) { instance = new TeamService(); }
+            return instance;
+        }
+
+        private List<TeamData> TeamDataList { get; set; }
+
+        public TeamData? GetTeamByID(string id)
+        {
+            int intId = int.Parse(id);
+            return TeamDataList[intId - 1];
+        }
+
+        public List<TeamData> GetTeams()
+        {
+            return TeamDataList;
         }
     }
 }

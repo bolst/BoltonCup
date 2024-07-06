@@ -1,39 +1,40 @@
 @namespace BoltonCup.Components
 
-<Grid RowColumns="RowColumns.Are5.OnTablet.Are1.OnMobile" Background="Background.Light" Margin="Margin.Is4.FromBottom"
-    Padding="Padding.Is4">
-    <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
-        <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold">@HomeTeamName</Heading>
-    </Column>
+@if (HomeTeam is not null && AwayTeam is not null)
+{
+    <Grid RowColumns="RowColumns.Are5.OnTablet.Are1.OnMobile" Background="Background.Light" Margin="Margin.Is4.FromBottom"
+        Padding="Padding.Is4">
+        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+            <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold">@HomeTeam.Name.ToUpper()</Heading>
+        </Column>
 
-    <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile">
+        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile">
 
-        <Grid RowColumns="RowColumns.Are2">
-            <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.End">
-                <Image Source="@HomeLogoSource" Height="Height.Rem(3)" />
-            </Column>
-            <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.Start">
-                <Image Source="@AwayLogoSource" Height="Height.Rem(3)" />
-            </Column>
-        </Grid>
+            <Grid RowColumns="RowColumns.Are2">
+                <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.End">
+                    <Image Source="@HomeTeam.Logo" Height="Height.Rem(3)" />
+                </Column>
+                <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.Start">
+                    <Image Source="@AwayTeam.Logo" Height="Height.Rem(3)" />
+                </Column>
+            </Grid>
 
-    </Column>
+        </Column>
 
-    <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
-        <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold">@AwayTeamName</Heading>
-    </Column>
+        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+            <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold">@AwayTeam.Name.ToUpper()</Heading>
+        </Column>
 
-    <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
-        <Heading Size="HeadingSize.Is6">@TimeLabel</Heading>
-    </Column>
+        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+            <Heading Size="HeadingSize.Is6">@TimeLabel</Heading>
+        </Column>
 
-    <Column ColumnSize="ColumnSize.Is8.OnTablet.Is12.OnMobile"></Column>
-</Grid>
+        <Column ColumnSize="ColumnSize.Is8.OnTablet.Is12.OnMobile"></Column>
+    </Grid>
+}
 
 @code {
-    [Parameter] public string HomeTeamName { get; set; } = "Team 1";
-    [Parameter] public string AwayTeamName { get; set; } = "Team 2";
-    [Parameter] public string HomeLogoSource { get; set; } = "";
-    [Parameter] public string AwayLogoSource { get; set; } = "";
     [Parameter] public string TimeLabel { get; set; } = "12:00 AM";
+    [Parameter] public TeamData? HomeTeam { get; set; } = null;
+    [Parameter] public TeamData? AwayTeam { get; set; } = null;
 }

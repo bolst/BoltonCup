@@ -6,43 +6,49 @@
 <br>
 <br>
 
-<Grid RowColumns="RowColumns.Are1" Border="Border.Rounded" Margin="Margin.Is4.OnX" Shadow="Shadow.Default"
-    Padding="Padding.Is4.OnY">
-    <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.Is4.OnX.OnTablet.IsAuto.OnMobile">
+@if(TSInstance != null)
+{
+    <Grid RowColumns="RowColumns.Are1" Border="Border.Rounded" Margin="Margin.Is4.OnX" Shadow="Shadow.Default"
+        Padding="Padding.Is4.OnY">
+        <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.Is4.OnX.OnTablet.IsAuto.OnMobile">
 
-        <DateHeading>Friday, August 2</DateHeading>
-        <Divider />
+            <DateHeading>Friday, August 2</DateHeading>
+            <Divider />
 
-        <MatchupCard HomeTeamName="TEAM 1" AwayTeamName="TEAM 2" HomeLogoSource="team1-logo.png"
-            AwayLogoSource="team2-logo.png" TimeLabel="6:00 PM" />
-        <MatchupCard HomeTeamName="TEAM 3" AwayTeamName="TEAM 4" HomeLogoSource="team3-logo.png"
-            AwayLogoSource="team4-logo.png" TimeLabel="7:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("1")' AwayTeam='@TSInstance.GetTeamByID("2")' TimeLabel="6:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("3")' AwayTeam='@TSInstance.GetTeamByID("4")' TimeLabel="7:00 PM" />
 
-        <br>
-        <br>
+            <br>
+            <br>
 
-        <DateHeading>Saturday, August 3</DateHeading>
-        <Divider />
+            <DateHeading>Saturday, August 3</DateHeading>
+            <Divider />
 
-        <MatchupCard HomeTeamName="TEAM 3" AwayTeamName="TEAM 1" HomeLogoSource="team3-logo.png"
-            AwayLogoSource="team1-logo.png" TimeLabel="2:00 PM" />
-        <MatchupCard HomeTeamName="TEAM 4" AwayTeamName="TEAM 2" HomeLogoSource="team4-logo.png"
-            AwayLogoSource="team2-logo.png" TimeLabel="3:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("3")' AwayTeam='@TSInstance.GetTeamByID("1")' TimeLabel="2:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("4")' AwayTeam='@TSInstance.GetTeamByID("2")' TimeLabel="3:00 PM" />
 
-        <MatchupCard HomeTeamName="TEAM 1" AwayTeamName="TEAM 4" HomeLogoSource="team1-logo.png"
-            AwayLogoSource="team4-logo.png" TimeLabel="5:00 PM" />
-        <MatchupCard HomeTeamName="TEAM 2" AwayTeamName="TEAM 3" HomeLogoSource="team2-logo.png"
-            AwayLogoSource="team3-logo.png" TimeLabel="6:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("1")' AwayTeam='@TSInstance.GetTeamByID("4")' TimeLabel="5:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("2")' AwayTeam='@TSInstance.GetTeamByID("3")' TimeLabel="6:00 PM" />
 
-        <br>
-        <br>
+            <br>
+            <br>
 
 
-        <DateHeading>Sunday, August 4</DateHeading>
-        <Divider />
+            <DateHeading>Sunday, August 4</DateHeading>
+            <Divider />
 
-        <MatchupCard HomeTeamName="3rd" AwayTeamName="4th" HomeLogoSource="" AwayLogoSource="" TimeLabel="1:00 PM" />
-        <MatchupCard HomeTeamName="1st" AwayTeamName="2nd" HomeLogoSource="" AwayLogoSource="" TimeLabel="2:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("1")' AwayTeam='@TSInstance.GetTeamByID("2")' TimeLabel="1:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("3")' AwayTeam='@TSInstance.GetTeamByID("4")' TimeLabel="2:00 PM" />
 
-    </Column>
-</Grid>
+        </Column>
+    </Grid>
+}
+@code {
+
+    Api.TeamService? TSInstance = null;
+    protected override void OnInitialized()
+    {
+        TSInstance = Api.TeamService.Instance();
+    }
+
+}
