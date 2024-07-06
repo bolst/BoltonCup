@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Ms9PbKpyfCWR2JQVKqM1bZDupALs7Z1zG+4Pey5lQGs=",
+  "Hash": "SmD/OedF7BrozLSt3R4BrDkhh4Qy2OA00G6LPh/H4lk=",
   "Source": "BoltonCup",
   "BasePath": "_content/BoltonCup",
   "Mode": "Default",
@@ -1364,6 +1364,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\fonts\\Lato-Regular.ttf"
+    },
+    {
+      "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\css\\styles.css",
+      "SourceId": "BoltonCup",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\",
+      "BasePath": "_content/BoltonCup",
+      "RelativePath": "css/styles.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\styles.css"
     },
     {
       "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\favicon.ico",
