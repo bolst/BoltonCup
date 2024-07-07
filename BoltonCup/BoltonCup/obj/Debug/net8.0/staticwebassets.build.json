@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "hG35xP6uinY4eJECbKQkM/MMCSTGrQ9O5gBZbc31Rs0=",
+  "Hash": "S67WsxEqTFJNNUfaYFoeAaHeOwvyJa+mR2KvvcfF3Sc=",
   "Source": "BoltonCup",
   "BasePath": "_content/BoltonCup",
   "Mode": "Default",
@@ -1404,25 +1404,6 @@
       "OriginalItemSpec": "wwwroot\\favicon.ico"
     },
     {
-      "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\home-banner.jpg",
-      "SourceId": "BoltonCup",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\",
-      "BasePath": "_content/BoltonCup",
-      "RelativePath": "home-banner.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\home-banner.jpg"
-    },
-    {
       "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\logo.png",
       "SourceId": "BoltonCup",
       "SourceType": "Discovered",
@@ -1478,6 +1459,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\poster.png"
+    },
+    {
+      "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\scores.json",
+      "SourceId": "BoltonCup",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\",
+      "BasePath": "_content/BoltonCup",
+      "RelativePath": "scores.json",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\scores.json"
     },
     {
       "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team1-logo.png",

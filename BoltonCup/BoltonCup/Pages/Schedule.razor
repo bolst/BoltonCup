@@ -6,7 +6,7 @@
 <br>
 <br>
 
-@if(TSInstance != null)
+@if (TSInstance is not null && GSInstance is not null)
 {
     <Grid RowColumns="RowColumns.Are1" Border="Border.Rounded" Margin="Margin.Is4.OnX" Shadow="Shadow.Default"
         Padding="Padding.Is4.OnY">
@@ -15,8 +15,10 @@
             <DateHeading>Friday, August 2</DateHeading>
             <Divider />
 
-            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("1")' AwayTeam='@TSInstance.GetTeamByID("2")' TimeLabel="6:00 PM" />
-            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("3")' AwayTeam='@TSInstance.GetTeamByID("4")' TimeLabel="7:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("1")' AwayTeam='@TSInstance.GetTeamByID("2")' TimeLabel="6:00 PM"
+                Score='@GSInstance.GetScore(0)' />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("3")' AwayTeam='@TSInstance.GetTeamByID("4")' TimeLabel="7:00 PM"
+                Score='@GSInstance.GetScore(1)' />
 
             <br>
             <br>
@@ -24,11 +26,15 @@
             <DateHeading>Saturday, August 3</DateHeading>
             <Divider />
 
-            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("3")' AwayTeam='@TSInstance.GetTeamByID("1")' TimeLabel="2:00 PM" />
-            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("4")' AwayTeam='@TSInstance.GetTeamByID("2")' TimeLabel="3:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("3")' AwayTeam='@TSInstance.GetTeamByID("1")' TimeLabel="2:00 PM"
+                Score='@GSInstance.GetScore(2)' />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("4")' AwayTeam='@TSInstance.GetTeamByID("2")' TimeLabel="3:00 PM"
+                Score='@GSInstance.GetScore(3)' />
 
-            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("1")' AwayTeam='@TSInstance.GetTeamByID("4")' TimeLabel="5:00 PM" />
-            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("2")' AwayTeam='@TSInstance.GetTeamByID("3")' TimeLabel="6:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("1")' AwayTeam='@TSInstance.GetTeamByID("4")' TimeLabel="5:00 PM"
+                Score='@GSInstance.GetScore(4)' />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("2")' AwayTeam='@TSInstance.GetTeamByID("3")' TimeLabel="6:00 PM"
+                Score='@GSInstance.GetScore(5)' />
 
             <br>
             <br>
@@ -37,8 +43,10 @@
             <DateHeading>Sunday, August 4</DateHeading>
             <Divider />
 
-            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("1")' AwayTeam='@TSInstance.GetTeamByID("2")' TimeLabel="1:00 PM" />
-            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("3")' AwayTeam='@TSInstance.GetTeamByID("4")' TimeLabel="2:00 PM" />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("1")' AwayTeam='@TSInstance.GetTeamByID("2")' TimeLabel="1:00 PM"
+                Score='@GSInstance.GetScore(6)' />
+            <MatchupCard HomeTeam='@TSInstance.GetTeamByID("3")' AwayTeam='@TSInstance.GetTeamByID("4")' TimeLabel="2:00 PM"
+                Score='@GSInstance.GetScore(7)' />
 
         </Column>
     </Grid>
@@ -46,9 +54,11 @@
 @code {
 
     Api.TeamService? TSInstance = null;
+    Api.GameService? GSInstance = null;
     protected override void OnInitialized()
     {
         TSInstance = Api.TeamService.Instance();
+        GSInstance = Api.GameService.Instance();
     }
 
 }

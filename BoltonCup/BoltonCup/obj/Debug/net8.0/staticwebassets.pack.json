@@ -25,10 +25,6 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\home-banner.jpg",
-      "PackagePath": "staticwebassets\\home-banner.jpg"
-    },
-    {
       "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\logo.png",
       "PackagePath": "staticwebassets\\logo.png"
     },
@@ -39,6 +35,10 @@
     {
       "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\poster.png",
       "PackagePath": "staticwebassets\\poster.png"
+    },
+    {
+      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\scores.json",
+      "PackagePath": "staticwebassets\\scores.json"
     },
     {
       "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team1-logo.png",

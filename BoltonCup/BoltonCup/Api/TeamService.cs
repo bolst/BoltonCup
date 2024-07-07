@@ -22,7 +22,7 @@ namespace BoltonCup.Api
             }
             catch (Exception exc)
             {
-                Console.WriteLine("GetTeamByID:");
+                Console.WriteLine("TeamService:");
                 Console.WriteLine(exc.ToString());
             }
         }

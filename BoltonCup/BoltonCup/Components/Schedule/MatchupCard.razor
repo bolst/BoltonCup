@@ -29,7 +29,11 @@
             <Heading Size="HeadingSize.Is6">@TimeLabel</Heading>
         </Column>
 
-        <Column ColumnSize="ColumnSize.Is8.OnTablet.Is12.OnMobile"></Column>
+
+        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+            <Heading Size="HeadingSize.Is6">@Score</Heading>
+        </Column>
+        <Column ColumnSize="ColumnSize.Is7.OnTablet.Is12.OnMobile"></Column>
     </Grid>
 }
 
@@ -37,4 +41,5 @@
     [Parameter] public string TimeLabel { get; set; } = "12:00 AM";
     [Parameter] public TeamData? HomeTeam { get; set; } = null;
     [Parameter] public TeamData? AwayTeam { get; set; } = null;
+    [Parameter] public string Score { get; set; } = "0-0";
 }
