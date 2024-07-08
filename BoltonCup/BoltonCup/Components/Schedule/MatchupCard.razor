@@ -4,11 +4,11 @@
 {
     <Grid RowColumns="RowColumns.Are5.OnTablet.Are1.OnMobile" Background="Background.Light" Margin="Margin.Is4.FromBottom"
         Padding="Padding.Is4">
-        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+        <Column ColumnSize="ColumnSize.Is2.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
             <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold">@HomeTeam.Name.ToUpper()</Heading>
         </Column>
 
-        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile">
+        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto.OnY">
 
             <Grid RowColumns="RowColumns.Are2">
                 <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.End">
@@ -21,7 +21,7 @@
 
         </Column>
 
-        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+        <Column ColumnSize="ColumnSize.Is2.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
             <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold">@AwayTeam.Name.ToUpper()</Heading>
         </Column>
 
@@ -33,7 +33,7 @@
         <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
             <Heading Size="HeadingSize.Is6">@Score</Heading>
         </Column>
-        <Column ColumnSize="ColumnSize.Is7.OnTablet.Is12.OnMobile"></Column>
+        <Column ColumnSize="ColumnSize.Is5.OnTablet.Is12.OnMobile"></Column>
     </Grid>
 }
 

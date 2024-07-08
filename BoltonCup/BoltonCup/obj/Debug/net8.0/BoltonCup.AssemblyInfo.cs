@@ -14,10 +14,10 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright 2018-2024 Megabit")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("\n\t\t\tThis is a Blazorise Template for a Blazor Server Application.\n\t\t\tBlazorise is" +
-    " a component library built on top of Blazor and CSS frameworks like Bootstrap, F" +
-    "luentUI2, Tailwind, Bulma and Material.\n\t\t")]
+    " a component library built on top of Blazor and CSS frameworks like\n\t\t\tBootstrap" +
+    ", FluentUI2, Tailwind, Bulma and Material.\n\t\t")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.5.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.5+94b82dc2a0ec18b3ec6dae59180aa617aea117c9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.5+f84a2ca79a942922c6280514b343093c37f15457")]
 [assembly: System.Reflection.AssemblyProductAttribute("BoltonCup")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BoltonCup")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.5.0.0")]

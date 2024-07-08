@@ -28,8 +28,8 @@
             </BarItem>
         </BarStart>
         <BarEnd>
-            <BarItem Padding="Padding.Is2.OnX" @onclick="() => InitRegistration()">
-                <MyBarLink>REGISTER</MyBarLink>
+            <BarItem Padding="Padding.Is2.OnX" @onclick="() => barVisible = false">
+                <MyBarLink To="/register">REGISTER</MyBarLink>
             </BarItem>
         </BarEnd>
     </BarMenu>
@@ -46,45 +46,5 @@
     {
         barVisible = !barVisible;
         return Task.CompletedTask;
-    }
-    string registrationLink =
-    "https://forms.office.com/Pages/ResponsePage.aspx?id=szP5EmE9GUuaTWiQId6MydfmFVKM4gFNi5kb75G_wgVURVlQWjNWSDVTNDM4ODhHUlVHSzAyN1lQSy4u";
-
-    void InitRegistration()
-    {
-
-        Stripe.StripeConfiguration.ApiKey = Api.Payments.STRIPE_KEY;
-
-        string prod_id = Api.Payments.PROD_ID;
-
-
-        var options = new Stripe.Checkout.SessionCreateOptions
-            {
-                LineItems = new List<Stripe.Checkout.SessionLineItemOptions>
-{
-new Stripe.Checkout.SessionLineItemOptions
-{
-Price = prod_id,
-Quantity = 1,
-},
-},
-                Mode = "payment",
-                SuccessUrl = registrationLink,
-                CancelUrl = navManager.BaseUri + "",
-            };
-        try
-        {
-
-            var service = new Stripe.Checkout.SessionService();
-
-            Stripe.Checkout.Session session = service.Create(options);
-            navManager.NavigateTo(session.Url);
-
-        }
-        catch (Exception exc)
-        {
-            Console.WriteLine("Payment auth error:");
-            Console.WriteLine(exc.ToString());
-        }
     }
 }

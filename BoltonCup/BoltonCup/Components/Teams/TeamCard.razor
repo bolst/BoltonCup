@@ -3,17 +3,19 @@
 @if (Team is not null)
 {
     <Blazorise.Link To="@LinkTo" Unstyled>
-        <Grid Shadow="Shadow.Default" RowColumns="RowColumns.Are2" Margin="@CardMargin" Style="min-height: 15vw;">
+        <Grid Shadow="Shadow.Default" RowColumns="RowColumns.Are4" Margin="@CardMargin" Style="min-height: 15vw;">
             <Column ColumnSize="ColumnSize.Is1"></Column>
             <Column ColumnSize="ColumnSize.Is4" Margin="Margin.IsAuto">
                 <Image Source="@Team.Logo" Padding="Padding.Is4" Fluid />
             </Column>
             <Column ColumnSize="ColumnSize.Is1" Background="@LineColor"></Column>
             <Column ColumnSize="ColumnSize.Is5" Margin="Margin.IsAuto">
-                <Heading TextSize="TextSize.Heading2" TextWeight="TextWeight.Bold" Margin="Margin.IsAuto">
+                <Heading TextSize="TextSize.Heading2" TextWeight="TextWeight.Bold" Margin="Margin.IsAuto"
+                    Padding="Padding.Is1.OnY">
                     @Team.Name!.ToUpper()
                 </Heading>
             </Column>
+            <Column ColumnSize="ColumnSize.Is1"></Column>
         </Grid>
     </Blazorise.Link>
 }

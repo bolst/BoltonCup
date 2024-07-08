@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "S67WsxEqTFJNNUfaYFoeAaHeOwvyJa+mR2KvvcfF3Sc=",
+  "Hash": "RKENODkYPkG8nxRwqfT12u/JHfWTCBEMzlrLxrHIl7A=",
   "Source": "BoltonCup",
   "BasePath": "_content/BoltonCup",
   "Mode": "Default",
@@ -1518,25 +1518,6 @@
       "OriginalItemSpec": "wwwroot\\team1.json"
     },
     {
-      "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team2-logo.png",
-      "SourceId": "BoltonCup",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\",
-      "BasePath": "_content/BoltonCup",
-      "RelativePath": "team2-logo.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\team2-logo.png"
-    },
-    {
       "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team2.json",
       "SourceId": "BoltonCup",
       "SourceType": "Discovered",
@@ -1554,6 +1535,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\team2.json"
+    },
+    {
+      "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team2logo.png",
+      "SourceId": "BoltonCup",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\",
+      "BasePath": "_content/BoltonCup",
+      "RelativePath": "team2logo.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\team2logo.png"
     },
     {
       "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team3-logo.png",
@@ -1594,25 +1594,6 @@
       "OriginalItemSpec": "wwwroot\\team3.json"
     },
     {
-      "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team4-logo.png",
-      "SourceId": "BoltonCup",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\",
-      "BasePath": "_content/BoltonCup",
-      "RelativePath": "team4-logo.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\team4-logo.png"
-    },
-    {
       "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team4.json",
       "SourceId": "BoltonCup",
       "SourceType": "Discovered",
@@ -1630,6 +1611,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\team4.json"
+    },
+    {
+      "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team4logo.png",
+      "SourceId": "BoltonCup",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\",
+      "BasePath": "_content/BoltonCup",
+      "RelativePath": "team4logo.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\team4logo.png"
     }
   ]
 }

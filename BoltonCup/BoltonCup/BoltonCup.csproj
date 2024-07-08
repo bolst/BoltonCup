@@ -9,7 +9,8 @@
 		<Company>Megabit</Company>
 		<Description>
 			This is a Blazorise Template for a Blazor Server Application.
-			Blazorise is a component library built on top of Blazor and CSS frameworks like Bootstrap, FluentUI2, Tailwind, Bulma and Material.
+			Blazorise is a component library built on top of Blazor and CSS frameworks like
+			Bootstrap, FluentUI2, Tailwind, Bulma and Material.
 		</Description>
 		<Copyright>Copyright 2018-2024 Megabit</Copyright>
 	</PropertyGroup>

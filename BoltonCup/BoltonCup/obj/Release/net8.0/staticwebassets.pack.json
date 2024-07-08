@@ -25,10 +25,6 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\home-banner.jpg",
-      "PackagePath": "staticwebassets\\home-banner.jpg"
-    },
-    {
       "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\logo.png",
       "PackagePath": "staticwebassets\\logo.png"
     },
@@ -41,6 +37,10 @@
       "PackagePath": "staticwebassets\\poster.png"
     },
     {
+      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\scores.json",
+      "PackagePath": "staticwebassets\\scores.json"
+    },
+    {
       "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team1-logo.png",
       "PackagePath": "staticwebassets\\team1-logo.png"
     },
@@ -49,12 +49,12 @@
       "PackagePath": "staticwebassets\\team1.json"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team2-logo.png",
-      "PackagePath": "staticwebassets\\team2-logo.png"
-    },
-    {
       "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team2.json",
       "PackagePath": "staticwebassets\\team2.json"
+    },
+    {
+      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team2logo.png",
+      "PackagePath": "staticwebassets\\team2logo.png"
     },
     {
       "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team3-logo.png",
@@ -65,12 +65,12 @@
       "PackagePath": "staticwebassets\\team3.json"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team4-logo.png",
-      "PackagePath": "staticwebassets\\team4-logo.png"
-    },
-    {
       "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team4.json",
       "PackagePath": "staticwebassets\\team4.json"
+    },
+    {
+      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team4logo.png",
+      "PackagePath": "staticwebassets\\team4logo.png"
     },
     {
       "Id": "obj\\Release\\net8.0\\staticwebassets\\msbuild.BoltonCup.Microsoft.AspNetCore.StaticWebAssets.props",
