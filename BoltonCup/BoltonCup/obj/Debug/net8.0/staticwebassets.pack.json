@@ -1,10 +1,6 @@
 {
   "Files": [
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/brand-logo.png",
-      "PackagePath": "staticwebassets/brand-logo.png"
-    },
-    {
       "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/css/blazor-ui.css",
       "PackagePath": "staticwebassets/css/blazor-ui.css"
     },
@@ -19,10 +15,6 @@
     {
       "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/css/styles.css",
       "PackagePath": "staticwebassets/css/styles.css"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/favicon.ico",
-      "PackagePath": "staticwebassets/favicon.ico"
     },
     {
       "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/logo.png",
@@ -49,24 +41,20 @@
       "PackagePath": "staticwebassets/team1logo.png"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team1logo.png~",
-      "PackagePath": "staticwebassets/team1logo.png~"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team2-logo.png",
+      "PackagePath": "staticwebassets/team2-logo.png"
     },
     {
       "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team2.json",
       "PackagePath": "staticwebassets/team2.json"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team2logo.png",
-      "PackagePath": "staticwebassets/team2logo.png"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team3-logo.png",
-      "PackagePath": "staticwebassets/team3-logo.png"
-    },
-    {
       "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team3.json",
       "PackagePath": "staticwebassets/team3.json"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team3logo.png",
+      "PackagePath": "staticwebassets/team3logo.png"
     },
     {
       "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team4.json",
