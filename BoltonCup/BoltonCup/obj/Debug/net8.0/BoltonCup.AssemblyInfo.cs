@@ -17,7 +17,7 @@ using System.Reflection;
     " a component library built on top of Blazor and CSS frameworks like\n\t\t\tBootstrap" +
     ", FluentUI2, Tailwind, Bulma and Material.\n\t\t")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.5.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.5+f8a861c4460998f56292a5b970cbe0bc9136bab1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.5+bf002b2705624cc66917bd4f12a31090e760c23c")]
 [assembly: System.Reflection.AssemblyProductAttribute("BoltonCup")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BoltonCup")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.5.0.0")]
