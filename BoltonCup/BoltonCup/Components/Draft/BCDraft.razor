@@ -1,0 +1,90 @@
+@namespace BoltonCup.Components
+
+
+@if (draftService == null)
+{
+    <Grid RowColumns="RowColumns.Are1" Margin="Margin.Is4" Border="Border.Rounded" Shadow="Shadow.Default"
+        Padding="Padding.Is4">
+        <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.IsAuto">
+            <FileEdit Changed="@OnChanged" />
+        </Column>
+    </Grid>
+}
+else
+{
+    <Div Padding="Padding.Is4" TextAlignment="TextAlignment.Center">
+        <Heading Size="HeadingSize.Is4" Margin="Margin.IsAuto" Padding="Padding.Is4.FromBottom">
+            ROUND @currentRound PICK @currentPick: @ts.GetTeamByID("1").Name
+        </Heading>
+        <Button Color="Color.Secondary">MAKE PICK</Button>
+    </Div>
+
+    <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@((string name) => selectedTab = name)">
+        <Items>
+            <Tab Name="players">PLAYERS</Tab>
+            <Tab Name="rosters">ROSTERS</Tab>
+        </Items>
+        <Content>
+            <TabPanel Name="players">
+                @if (allPlayers != null)
+                {
+                    <AllPlayersTable Players="@allPlayers" />
+                }
+            </TabPanel>
+            <TabPanel Name="rosters">
+                <Grid RowColumns="RowColumns.Are4" Margin="Margin.Is4.OnTablet.Is0.OnMobile" Border="Border.Rounded"
+                    Shadow="Shadow.Default" Padding="Padding.Is4">
+                    <Column ColumnSize="ColumnSize.IsQuarter" Margin="Margin.IsAuto">
+                        Content for ROSTERS.
+                    </Column>
+                </Grid>
+            </TabPanel>
+        </Content>
+    </Tabs>
+}
+
+@code {
+    string selectedTab = "players";
+    List<PlayerDraftData>? allPlayers = null;
+
+    int currentRound = 1;
+    int currentPick = 1;
+
+    Api.TeamService? ts = Api.TeamService.Instance();
+    TeamData currentTeam = Api.TeamService.Instance().GetTeamByID("1");
+
+    Api.DraftService? draftService = null;
+
+    async Task OnChanged(FileChangedEventArgs e)
+    {
+        try
+        {
+            var file = e.Files.FirstOrDefault();
+            if (file == null)
+            {
+                return;
+            }
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                await file.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+                stream.Seek(0, SeekOrigin.Begin);
+                var reader = new StreamReader(stream);
+
+                draftService = new(reader.ReadToEnd());
+                allPlayers = draftService.GetPlayers();
+                currentRound = draftService.GetCurrentRound();
+                currentPick = draftService.GetCurrentPick();
+                currentTeam = draftService.GetCurrentTeam();
+            }
+        }
+        catch (Exception exc)
+        {
+            Console.WriteLine(exc.Message);
+        }
+        finally
+        {
+            this.StateHasChanged();
+        }
+    }
+}

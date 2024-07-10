@@ -1,0 +1,41 @@
+@namespace BoltonCup.Components
+
+<Table Striped Margin="Margin.Is4">
+    <TableHeader>
+        <TableRow TextAlignment="TextAlignment.Center">
+            <TableHeaderCell>TEAM</TableHeaderCell>
+            <TableHeaderCell>NAME</TableHeaderCell>
+            <TableHeaderCell>BIRTH YEAR</TableHeaderCell>
+            <TableHeaderCell>POSITION</TableHeaderCell>
+            <TableHeaderCell>HIGHEST LEVEL PLAYED</TableHeaderCell>
+            <TableHeaderCell>PLAYING G1</TableHeaderCell>
+            <TableHeaderCell>PLAYING G2</TableHeaderCell>
+            <TableHeaderCell>PLAYING G3</TableHeaderCell>
+            <TableHeaderCell>PLAYING FINAL</TableHeaderCell>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+        @if (Players != null)
+        {
+            foreach (var p in Players)
+            {
+                PlayerDraftData player = p;
+                <TableRow TextAlignment="TextAlignment.Center">
+                    <TableRowHeader>@p.Team</TableRowHeader>
+                    <TableRowHeader>@p.Name</TableRowHeader>
+                    <TableRowHeader>@p.DOB.Substring(0, 4)</TableRowHeader>
+                    <TableRowHeader>@p.Position</TableRowHeader>
+                    <TableRowHeader>@p.HighestLvl</TableRowHeader>
+                    <TableRowHeader>@p.CanPlayGame1</TableRowHeader>
+                    <TableRowHeader>@p.CanPlayGame2</TableRowHeader>
+                    <TableRowHeader>@p.CanPlayGame3</TableRowHeader>
+                    <TableRowHeader>@p.CanPlayGame4</TableRowHeader>
+                </TableRow>
+            }
+        }
+    </TableBody>
+</Table>
+
+@code {
+    [Parameter] public List<PlayerDraftData>? Players { get; set; } = null;
+}
