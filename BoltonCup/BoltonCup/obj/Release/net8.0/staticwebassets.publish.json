@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "ZtjlWZBzMb6eZ1RO3CSZLRUFQd5g6G/KcFivqPVcn+0=",
+  "Hash": "rXHmEqZezJ+5IMUQO/2RqZuohY6dIV1ubWdiJS+c5mM=",
   "Source": "BoltonCup",
   "BasePath": "_content/BoltonCup",
   "Mode": "Default",
@@ -1290,25 +1290,6 @@
       "OriginalItemSpec": "/Users/nic/.nuget/packages/blazorise/1.5.3/staticwebassets/vendors/sha512.js"
     },
     {
-      "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/brand-logo.png",
-      "SourceId": "BoltonCup",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/",
-      "BasePath": "_content/BoltonCup",
-      "RelativePath": "brand-logo.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/brand-logo.png"
-    },
-    {
       "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/css/blazor-ui.css",
       "SourceId": "BoltonCup",
       "SourceType": "Discovered",
@@ -1383,25 +1364,6 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/css/styles.css"
-    },
-    {
-      "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/favicon.ico",
-      "SourceId": "BoltonCup",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/",
-      "BasePath": "_content/BoltonCup",
-      "RelativePath": "favicon.ico",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/favicon.ico"
     },
     {
       "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/logo.png",
@@ -1518,12 +1480,12 @@
       "OriginalItemSpec": "wwwroot/team1logo.png"
     },
     {
-      "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team1logo.png~",
+      "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team2-logo.png",
       "SourceId": "BoltonCup",
       "SourceType": "Discovered",
       "ContentRoot": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/",
       "BasePath": "_content/BoltonCup",
-      "RelativePath": "team1logo.png~",
+      "RelativePath": "team2-logo.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -1534,7 +1496,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/team1logo.png~"
+      "OriginalItemSpec": "wwwroot/team2-logo.png"
     },
     {
       "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team2.json",
@@ -1556,44 +1518,6 @@
       "OriginalItemSpec": "wwwroot/team2.json"
     },
     {
-      "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team2logo.png",
-      "SourceId": "BoltonCup",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/",
-      "BasePath": "_content/BoltonCup",
-      "RelativePath": "team2logo.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/team2logo.png"
-    },
-    {
-      "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team3-logo.png",
-      "SourceId": "BoltonCup",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/",
-      "BasePath": "_content/BoltonCup",
-      "RelativePath": "team3-logo.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/team3-logo.png"
-    },
-    {
       "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team3.json",
       "SourceId": "BoltonCup",
       "SourceType": "Discovered",
@@ -1611,6 +1535,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/team3.json"
+    },
+    {
+      "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team3logo.png",
+      "SourceId": "BoltonCup",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/",
+      "BasePath": "_content/BoltonCup",
+      "RelativePath": "team3logo.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/team3logo.png"
     },
     {
       "Identity": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team4.json",
