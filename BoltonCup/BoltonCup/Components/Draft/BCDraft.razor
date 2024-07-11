@@ -104,12 +104,17 @@ else
 
     RenderFragment PlayerList(TeamData team, IFluentBorderWithAll border) => __builder =>
     {
+        int g1c = GetGamePlayerCount(allPlayers.Where(p => p.Team == team.Name).ToList(), 1);
+        int g2c = GetGamePlayerCount(allPlayers.Where(p => p.Team == team.Name).ToList(), 2);
+        int g3c = GetGamePlayerCount(allPlayers.Where(p => p.Team == team.Name).ToList(), 3);
+        int g4c = GetGamePlayerCount(allPlayers.Where(p => p.Team == team.Name).ToList(), 4);
         int fc = team.Players.Where(p => Char.ToLower(p.Position.First()).Equals('f')).ToList().Count;
         int dc = team.Players.Where(p => Char.ToLower(p.Position.First()).Equals('d')).ToList().Count;
         int gc = team.Players.Where(p => Char.ToLower(p.Position.First()).Equals('g')).ToList().Count;
         <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
             <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold">@team.Name</Heading>
-            <Heading Size="HeadingSize.Is6" Border="@border">@($"{fc}F {dc}D {gc}G")</Heading>
+            <Heading Size="HeadingSize.Is6">@($"{fc}F {dc}D {gc}G")</Heading>
+            <Heading Size="HeadingSize.Is6" Border="@border">@($"{g1c}-{g2c}-{g3c}-{g4c}")</Heading>
             @foreach (var p in team.Players)
             {
                 TeamPlayer player = p;
@@ -180,5 +185,22 @@ else
     {
         Api.TeamService.Instance().Save();
         //Api.TeamService.Instance().Fetch();
+    }
+
+    int GetGamePlayerCount(List<DraftPlayer> players, int gameNum)
+    {
+        switch (gameNum)
+        {
+            case 1:
+                return players.Where(p => p.CanPlayGame1 == "Yes").Count();
+            case 2:
+                return players.Where(p => p.CanPlayGame2 == "Yes").Count();
+            case 3:
+                return players.Where(p => p.CanPlayGame3 == "Yes").Count();
+            case 4:
+                return players.Where(p => p.CanPlayGame4 == "Yes").Count();
+            default:
+                return 0;
+        }
     }
 }

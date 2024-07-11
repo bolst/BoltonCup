@@ -1,0 +1,12 @@
+{
+    "id": 1,
+    "name": "Palestine Pirates",
+    "logo": "team1logo.png",
+    "players": [
+        {
+            "name": "Chris Bolton",
+            "birth year": "2004",
+            "position": "f"
+        }
+    ]
+}
