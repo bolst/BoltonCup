@@ -6,25 +6,27 @@
 @if (draftService == null)
 {
     <Grid RowColumns="RowColumns.Are1" Margin="Margin.Is4" Border="Border.Rounded" Shadow="Shadow.Default"
-        Padding="Padding.Is4">
-        <Switch TValue="bool" @bind-Checked="@useSnake">Snake</Switch>
-        <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.IsAuto">
-            <FileEdit Changed="@OnChanged" />
-        </Column>
-    </Grid>
+    Padding="Padding.Is4">
+    <Switch TValue="bool" @bind-Checked="@useSnake">Snake</Switch>
+    <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.IsAuto">
+        <FileEdit Changed="@OnChanged" />
+    </Column>
+</Grid>
 }
 else
 {
     <Div Padding="Padding.Is4" TextAlignment="TextAlignment.Center">
-        <Heading Size="HeadingSize.Is4" Margin="Margin.IsAuto" Padding="Padding.Is4.FromBottom">
-            ROUND @currentRound PICK @currentPick: @currentTeam.Name
-        </Heading>
-        <Button Color="Color.Secondary" Clicked="ShowModal">MAKE PICK</Button>
-        @if (draftService.GetAvailablePlayers().Count == 1)
+    <Heading Size="HeadingSize.Is4" Margin="Margin.IsAuto" Padding="Padding.Is4.FromBottom">
+        ROUND @currentRound PICK @currentPick: @currentTeam.Name
+    </Heading>
+    <Button Color="Color.Secondary" Clicked="ShowModal">MAKE PICK</Button>
+    @if (draftService.GetAvailablePlayers().Count == 1)
         {
             <Button Color="Color.Success" Clicked="EndDraft" Margin="Margin.Is4.OnX">END DRAFT</Button>
         }
-    </Div>
+        </Div>
+
+
 
     <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@((string name) => selectedTab = name)">
         <Items>
@@ -35,16 +37,21 @@ else
             <TabPanel Name="players">
                 @if (allPlayers != null)
                 {
-                    <AllPlayersTable Players="@allPlayers" />
+                    <Grid RowColumns="RowColumns.Are4" Margin="Margin.Is4.OnTablet.Is0.OnMobile" Border="Border.Rounded"
+                        Shadow="Shadow.Default" Padding="Padding.Is4">
+                        <Column ColumnSize="ColumnSize.Is12">
+                            <AllPlayersTable Players="@allPlayers" />
+                        </Column>
+                    </Grid>
                 }
             </TabPanel>
             <TabPanel Name="rosters">
                 <Grid RowColumns="RowColumns.Are4" Margin="Margin.Is4.OnTablet.Is0.OnMobile" Border="Border.Rounded"
                     Shadow="Shadow.Default" Padding="Padding.Is4">
-                    @PlayerList(ts.GetTeamByID("1"), Border.Is2.Primary.OnBottom)
-                    @PlayerList(ts.GetTeamByID("2"), Border.Is2.Secondary.OnBottom)
-                    @PlayerList(ts.GetTeamByID("3"), Border.Is2.Warning.OnBottom)
-                    @PlayerList(ts.GetTeamByID("4"), Border.Is2.Info.OnBottom)
+                    @PlayerList(Api.TeamService.Instance().GetTeamByID("1"), Border.Is2.Primary.OnBottom)
+                    @PlayerList(Api.TeamService.Instance().GetTeamByID("2"), Border.Is2.Secondary.OnBottom)
+                    @PlayerList(Api.TeamService.Instance().GetTeamByID("3"), Border.Is2.Warning.OnBottom)
+                    @PlayerList(Api.TeamService.Instance().GetTeamByID("4"), Border.Is2.Info.OnBottom)
                 </Grid>
             </TabPanel>
         </Content>
@@ -97,9 +104,12 @@ else
 
     RenderFragment PlayerList(TeamData team, IFluentBorderWithAll border) => __builder =>
     {
+        int fc = team.Players.Where(p => Char.ToLower(p.Position.First()).Equals('f')).ToList().Count;
+        int dc = team.Players.Where(p => Char.ToLower(p.Position.First()).Equals('d')).ToList().Count;
+        int gc = team.Players.Where(p => Char.ToLower(p.Position.First()).Equals('g')).ToList().Count;
         <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
-            <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold" Border="@border">
-                @team.Name</Heading>
+            <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold">@team.Name</Heading>
+            <Heading Size="HeadingSize.Is6" Border="@border">@($"{fc}F {dc}D {gc}G")</Heading>
             @foreach (var p in team.Players)
             {
                 TeamPlayer player = p;
@@ -116,7 +126,6 @@ else
     int currentRound = 1;
     int currentPick = 1;
 
-    Api.TeamService ts = Api.TeamService.Instance();
     TeamData currentTeam = Api.TeamService.Instance().GetTeamByID("1")!;
 
     Api.DraftService? draftService = null;
@@ -158,7 +167,6 @@ else
 
     void DraftPlayer()
     {
-        Console.WriteLine("Trying to add " + selectedPlayer);
         draftService!.MakePick(currentTeam, selectedPlayer);
         currentRound = draftService.GetCurrentRound();
         currentPick = draftService.GetCurrentPick();
@@ -171,6 +179,6 @@ else
     async Task EndDraft()
     {
         Api.TeamService.Instance().Save();
-        Api.TeamService.Instance().Fetch();
+        //Api.TeamService.Instance().Fetch();
     }
 }

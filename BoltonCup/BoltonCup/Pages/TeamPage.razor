@@ -12,7 +12,7 @@
         <Divider />
         @if (teamData is not null)
         {
-            @PlayerSection(teamData.Players!, "f")
+            @PlayerSection(teamData.Players!, 'f')
         }
 
         <br>
@@ -23,7 +23,7 @@
         <Divider />
         @if (teamData is not null)
         {
-            @PlayerSection(teamData.Players!, "d")
+            @PlayerSection(teamData.Players!, 'd')
         }
 
         <br>
@@ -33,25 +33,22 @@
         <Divider />
         @if (teamData is not null)
         {
-            @PlayerSection(teamData.Players!, "g")
+            @PlayerSection(teamData.Players!, 'g')
         }
 
         <br>
-
-
-
 
     </Column>
 </Grid>
 
 @code {
 
-    RenderFragment PlayerSection(List<TeamPlayer> playerData, string positionFlag) => __builder =>
+    RenderFragment PlayerSection(List<TeamPlayer> playerData, char positionFlag) => __builder =>
     {
         foreach (var p in playerData)
         {
             var player = p;
-            if (player.Position!.ToLower().Equals(positionFlag))
+            if (player.Position!.ToLower().First() == positionFlag)
             {
                 <Grid RowColumns="RowColumns.Are3.OnTablet.Are2.OnMobile" Background="Background.Light"
                     Padding="Padding.Is4.OnX.Is2.OnY">
