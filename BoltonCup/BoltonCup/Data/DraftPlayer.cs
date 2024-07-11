@@ -2,7 +2,7 @@ using System.Text;
 
 namespace BoltonCup.Data
 {
-    public class PlayerDraftData
+    public class DraftPlayer
     {
         public string Team { get; set; }
         public string Name { get; set; }

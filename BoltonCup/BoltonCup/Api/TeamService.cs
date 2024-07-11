@@ -44,5 +44,10 @@ namespace BoltonCup.Api
         {
             return TeamDataList;
         }
+
+        public void AddPlayerToTeam(int id, PlayerData player)
+        {
+            if (id < TeamDataList.Count) TeamDataList[id].Players.Add(player);
+        }
     }
 }

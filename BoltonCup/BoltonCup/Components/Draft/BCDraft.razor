@@ -4,20 +4,20 @@
 @if (draftService == null)
 {
     <Grid RowColumns="RowColumns.Are1" Margin="Margin.Is4" Border="Border.Rounded" Shadow="Shadow.Default"
-        Padding="Padding.Is4">
-        <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.IsAuto">
-            <FileEdit Changed="@OnChanged" />
-        </Column>
-    </Grid>
+    Padding="Padding.Is4">
+    <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.IsAuto">
+        <FileEdit Changed="@OnChanged" />
+    </Column>
+</Grid>
 }
 else
 {
     <Div Padding="Padding.Is4" TextAlignment="TextAlignment.Center">
-        <Heading Size="HeadingSize.Is4" Margin="Margin.IsAuto" Padding="Padding.Is4.FromBottom">
-            ROUND @currentRound PICK @currentPick: @ts.GetTeamByID("1").Name
-        </Heading>
-        <Button Color="Color.Secondary">MAKE PICK</Button>
-    </Div>
+    <Heading Size="HeadingSize.Is4" Margin="Margin.IsAuto" Padding="Padding.Is4.FromBottom">
+        ROUND @currentRound PICK @currentPick: @ts.GetTeamByID("1").Name
+    </Heading>
+    <Button Color="Color.Secondary" Clicked="MakePick">MAKE PICK</Button>
+</Div>
 
     <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@((string name) => selectedTab = name)">
         <Items>
@@ -34,9 +34,7 @@ else
             <TabPanel Name="rosters">
                 <Grid RowColumns="RowColumns.Are4" Margin="Margin.Is4.OnTablet.Is0.OnMobile" Border="Border.Rounded"
                     Shadow="Shadow.Default" Padding="Padding.Is4">
-                    <Column ColumnSize="ColumnSize.IsQuarter" Margin="Margin.IsAuto">
-                        Content for ROSTERS.
-                    </Column>
+                    <Rosters />
                 </Grid>
             </TabPanel>
         </Content>
@@ -45,7 +43,7 @@ else
 
 @code {
     string selectedTab = "players";
-    List<PlayerDraftData>? allPlayers = null;
+    List<DraftPlayer>? allPlayers = null;
 
     int currentRound = 1;
     int currentPick = 1;
@@ -76,6 +74,7 @@ else
                 currentRound = draftService.GetCurrentRound();
                 currentPick = draftService.GetCurrentPick();
                 currentTeam = draftService.GetCurrentTeam();
+
             }
         }
         catch (Exception exc)
@@ -86,5 +85,10 @@ else
         {
             this.StateHasChanged();
         }
+    }
+
+    void MakePick()
+    {
+
     }
 }

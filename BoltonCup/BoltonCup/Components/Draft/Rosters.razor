@@ -1,0 +1,38 @@
+@namespace BoltonCup.Components
+
+<Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
+    <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold" Border="Border.Is2.Primary.OnBottom">
+        @ts.GetTeamByID("1").Name</Heading>
+</Column>
+<Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
+    <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold" Border="Border.Is2.Primary.OnBottom">
+        @ts.GetTeamByID("2").Name</Heading>
+</Column>
+<Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
+    <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold" Border="Border.Is2.Primary.OnBottom">
+        @ts.GetTeamByID("3").Name</Heading>
+</Column>
+<Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
+    <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold" Border="Border.Is2.Primary.OnBottom">
+        @ts.GetTeamByID("4").Name</Heading>
+</Column>
+
+
+@code {
+
+    RenderFragment PlayerList(List<PlayerData> playerData) => __builder =>
+    {
+        foreach (var p in playerData)
+        {
+            PlayerData player = p;
+            <Heading Size="HeadingSize.Is6">@player.Name</Heading>
+        }
+    };
+
+    Api.TeamService? ts = Api.TeamService.Instance();
+
+    protected override void OnInitialized()
+    {
+
+    }
+}

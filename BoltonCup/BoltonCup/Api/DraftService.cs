@@ -6,7 +6,7 @@ namespace BoltonCup.Api
     {
         public readonly static string DRAFT_KEY = Environment.GetEnvironmentVariable("BC_DRAFT_KEY") ?? "";
 
-        private List<PlayerDraftData> playerDraftData;
+        private List<DraftPlayer> draftPlayers;
 
         int round;
         int pick;
@@ -17,11 +17,11 @@ namespace BoltonCup.Api
             lines.RemoveAt(0); // headers
             lines.RemoveAt(lines.Count - 1); // last empty entry
 
-            playerDraftData = new List<PlayerDraftData>();
+            draftPlayers = new List<DraftPlayer>();
             foreach (var line in lines)
             {
                 var columns = line.Split(',');
-                PlayerDraftData player = new()
+                DraftPlayer player = new()
                 {
                     Team = "",
                     Name = columns[6],
@@ -34,7 +34,7 @@ namespace BoltonCup.Api
                     CanPlayGame4 = columns[13],
                     PrefBeer = columns[14],
                 };
-                playerDraftData.Add(player);
+                draftPlayers.Add(player);
             }
 
             round = 1;
@@ -61,11 +61,11 @@ namespace BoltonCup.Api
             }
         }
 
-        public List<PlayerDraftData> GetPlayers() { return playerDraftData; }
+        public List<DraftPlayer> GetPlayers() { return draftPlayers; }
 
-        public List<PlayerDraftData> GetAvailablePlayers()
+        public List<DraftPlayer> GetAvailablePlayers()
         {
-            return playerDraftData.Where(x => x.Team.IsNullOrEmpty()).ToList();
+            return draftPlayers.Where(x => x.Team.IsNullOrEmpty()).ToList();
         }
 
         public void MakePick(string playerName)
