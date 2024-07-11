@@ -13,21 +13,21 @@
 else
 {
     <Grid RowColumns="RowColumns.Are1" Width="Width.Is75" Margin="Margin.IsAuto" Border="Border.Rounded"
-        Shadow="Shadow.Default">
-        <Column ColumnSize="ColumnSize.IsFull" Padding="Padding.Is4">
-            <Row Margin="Margin.IsAuto" Width="Width.Is50.OnTablet.Is100.OnMobile" Padding="Padding.Is2.OnY">
-                <TextEdit Placeholder="Password" @bind-Text="@InputText" @onkeydown="@OnKeyDown" />
-            </Row>
-            <Row Margin="Margin.IsAuto" Width="Width.Is50.OnTablet.Is100.OnMobile" Padding="Padding.Is2.OnY">
-                <Button Color="Color.Secondary" Clicked="Verify">Enter Draft</Button>
-            </Row>
-        </Column>
-    </Grid>
+    Shadow="Shadow.Default">
+    <Column ColumnSize="ColumnSize.IsFull" Padding="Padding.Is4">
+        <Row Margin="Margin.IsAuto" Width="Width.Is50.OnTablet.Is100.OnMobile" Padding="Padding.Is2.OnY">
+            <TextEdit Placeholder="Password" @bind-Text="@InputText" @onkeydown="@OnKeyDown" />
+        </Row>
+        <Row Margin="Margin.IsAuto" Width="Width.Is50.OnTablet.Is100.OnMobile" Padding="Padding.Is2.OnY">
+            <Button Color="Color.Secondary" Clicked="Verify">Enter Draft</Button>
+        </Row>
+    </Column>
+</Grid>
 }
 
 @code {
     string InputText = "";
-    bool Verified = true;
+    bool Verified = false;
 
     void Verify()
     {
