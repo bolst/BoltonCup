@@ -20,6 +20,7 @@
             foreach (var p in Players)
             {
                 DraftPlayer player = p;
+                if (player.Position.Length == 0) continue;
                 <TableRow TextAlignment="TextAlignment.Center">
                     <TableRowHeader>@p.Team</TableRowHeader>
                     <TableRowHeader>@p.Name</TableRowHeader>

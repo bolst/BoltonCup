@@ -8,8 +8,8 @@ namespace BoltonCup.Api
 
         private List<DraftPlayer> draftPlayers;
 
-        int round;
-        int pick;
+        private int round;
+        private int pick;
 
         public DraftService(string strCsvData)
         {
@@ -36,6 +36,22 @@ namespace BoltonCup.Api
                 };
                 draftPlayers.Add(player);
             }
+
+            // adding empty player
+            DraftPlayer emptyPlayer = new()
+            {
+                Team = "",
+                Name = "",
+                DOB = "0000-00-00",
+                Position = "",
+                HighestLvl = "",
+                CanPlayGame1 = "",
+                CanPlayGame2 = "",
+                CanPlayGame3 = "",
+                CanPlayGame4 = "",
+                PrefBeer = "",
+            };
+            draftPlayers.Add(emptyPlayer);
 
             round = 1;
             pick = 1;
@@ -68,9 +84,42 @@ namespace BoltonCup.Api
             return draftPlayers.Where(x => x.Team.IsNullOrEmpty()).ToList();
         }
 
-        public void MakePick(string playerName)
+        public void MakePick(TeamData team, string playerName)
         {
-            // TODO:
+            int index = draftPlayers.FindIndex(x => x.Name == playerName);
+
+            // if player was not found or is not available and was somehow selected
+            if (index == -1)
+            {
+                Console.WriteLine($"Player not found (index = {index})");
+                return;
+            }
+            if (!draftPlayers[index].Team.IsNullOrEmpty())
+            {
+                Console.WriteLine($"Player {draftPlayers[index].Name} is already on {draftPlayers[index].Team}");
+                return;
+            }
+
+            draftPlayers[index].Team = team.Name;
+
+            TeamService.Instance().AddPlayerToTeam(team.Id ?? 0, draftPlayers[index].ToTeamPlayer());
+
+            Console.WriteLine(draftPlayers[index].Name + " is now on " + draftPlayers[index].Team);
+
+            NextPick();
+        }
+
+        private void NextPick()
+        {
+            if (pick >= 4)
+            {
+                pick = 1;
+                round += 1;
+            }
+            else
+            {
+                pick += 1;
+            }
         }
 
     }

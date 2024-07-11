@@ -5,7 +5,14 @@ namespace BoltonCup.Api
     public class TeamService
     {
         private static TeamService? instance = null;
-        public TeamService()
+        public TeamService() { Fetch(); }
+        public static TeamService Instance()
+        {
+            if (instance == null) { instance = new TeamService(); }
+            return instance;
+        }
+
+        public void Fetch()
         {
             TeamDataList = new();
             try
@@ -26,11 +33,6 @@ namespace BoltonCup.Api
                 Console.WriteLine(exc.ToString());
             }
         }
-        public static TeamService Instance()
-        {
-            if (instance == null) { instance = new TeamService(); }
-            return instance;
-        }
 
         private List<TeamData> TeamDataList { get; set; }
 
@@ -45,9 +47,18 @@ namespace BoltonCup.Api
             return TeamDataList;
         }
 
-        public void AddPlayerToTeam(int id, PlayerData player)
+        public void AddPlayerToTeam(int id, TeamPlayer player)
         {
-            if (id < TeamDataList.Count) TeamDataList[id].Players.Add(player);
+            if (id <= TeamDataList.Count) TeamDataList[id - 1].Players.Add(player);
+        }
+
+        public void Save()
+        {
+            foreach (var team in TeamDataList)
+            {
+                string json = JsonSerializer.Serialize(team);
+                File.WriteAllText($"wwwroot/team{team.Id}.json", json);
+            }
         }
     }
 }

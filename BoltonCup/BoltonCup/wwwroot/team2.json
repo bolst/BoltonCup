@@ -1,12 +1,1 @@
-{
-    "id": 2,
-    "name": "Nipple Ticklers",
-    "logo": "team2-logo.png",
-    "players": [
-        {
-            "name": "Nic Bolton",
-            "birth year": "2002",
-            "position": "d"
-        }
-    ]
-}
+{"id":2,"name":"Nipple Ticklers","logo":"team2-logo.png","players":[{"name":"Nic Bolton","birth year":"2002","position":"d"},{"name":"Tyler fuhr","birth year":"2004","position":"Forward"},{"name":"Landon prince 4","birth year":"2024","position":"Defenseman"}]}

@@ -1,23 +1,30 @@
 @namespace BoltonCup.Components
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navManager
 
 
 @if (draftService == null)
 {
     <Grid RowColumns="RowColumns.Are1" Margin="Margin.Is4" Border="Border.Rounded" Shadow="Shadow.Default"
-    Padding="Padding.Is4">
-    <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.IsAuto">
-        <FileEdit Changed="@OnChanged" />
-    </Column>
-</Grid>
+        Padding="Padding.Is4">
+        <Switch TValue="bool" @bind-Checked="@useSnake">Snake</Switch>
+        <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.IsAuto">
+            <FileEdit Changed="@OnChanged" />
+        </Column>
+    </Grid>
 }
 else
 {
     <Div Padding="Padding.Is4" TextAlignment="TextAlignment.Center">
-    <Heading Size="HeadingSize.Is4" Margin="Margin.IsAuto" Padding="Padding.Is4.FromBottom">
-        ROUND @currentRound PICK @currentPick: @ts.GetTeamByID("1").Name
-    </Heading>
-    <Button Color="Color.Secondary" Clicked="MakePick">MAKE PICK</Button>
-</Div>
+        <Heading Size="HeadingSize.Is4" Margin="Margin.IsAuto" Padding="Padding.Is4.FromBottom">
+            ROUND @currentRound PICK @currentPick: @currentTeam.Name
+        </Heading>
+        <Button Color="Color.Secondary" Clicked="ShowModal">MAKE PICK</Button>
+        @if (draftService.GetAvailablePlayers().Count == 1)
+        {
+            <Button Color="Color.Success" Clicked="EndDraft" Margin="Margin.Is4.OnX">END DRAFT</Button>
+        }
+    </Div>
 
     <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@((string name) => selectedTab = name)">
         <Items>
@@ -34,22 +41,83 @@ else
             <TabPanel Name="rosters">
                 <Grid RowColumns="RowColumns.Are4" Margin="Margin.Is4.OnTablet.Is0.OnMobile" Border="Border.Rounded"
                     Shadow="Shadow.Default" Padding="Padding.Is4">
-                    <Rosters />
+                    @PlayerList(ts.GetTeamByID("1"), Border.Is2.Primary.OnBottom)
+                    @PlayerList(ts.GetTeamByID("2"), Border.Is2.Secondary.OnBottom)
+                    @PlayerList(ts.GetTeamByID("3"), Border.Is2.Warning.OnBottom)
+                    @PlayerList(ts.GetTeamByID("4"), Border.Is2.Info.OnBottom)
                 </Grid>
             </TabPanel>
         </Content>
     </Tabs>
+
+
+
+
+    <Modal @ref="modalRef">
+        <ModalContent Centered>
+            <ModalHeader>
+                <ModalTitle>@($"R{currentRound}P{currentPick}: {currentTeam.Name}")</ModalTitle>
+                <CloseButton />
+            </ModalHeader>
+            <ModalBody>
+                <Field>
+                    <FieldLabel>Selection</FieldLabel>
+                    <Select @bind-SelectedValue="@selectedPlayer">
+                        @foreach (var p in draftService.GetAvailablePlayers())
+                        {
+                            DraftPlayer player = p;
+                            <SelectItem Value="@player.Name">@player.Name</SelectItem>
+                        }
+                    </Select>
+                </Field>
+            </ModalBody>
+            <ModalFooter>
+                <Button Color="Color.Secondary" Clicked="@DraftPlayer">DRAFT PLAYER</Button>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
 }
 
+
+
+
+
+
 @code {
+
+    #region Modal
+
+    private Modal modalRef;
+
+    private Task ShowModal() { return modalRef.Show(); }
+    private Task HideModal() { return modalRef.Hide(); }
+    string selectedPlayer;
+
+    #endregion
+
+    RenderFragment PlayerList(TeamData team, IFluentBorderWithAll border) => __builder =>
+    {
+        <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
+            <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold" Border="@border">
+                @team.Name</Heading>
+            @foreach (var p in team.Players)
+            {
+                TeamPlayer player = p;
+                <Heading Size="HeadingSize.Is6">@player.Name</Heading>
+            }
+        </Column>
+    };
+
     string selectedTab = "players";
     List<DraftPlayer>? allPlayers = null;
+
+    bool useSnake = true;
 
     int currentRound = 1;
     int currentPick = 1;
 
-    Api.TeamService? ts = Api.TeamService.Instance();
-    TeamData currentTeam = Api.TeamService.Instance().GetTeamByID("1");
+    Api.TeamService ts = Api.TeamService.Instance();
+    TeamData currentTeam = Api.TeamService.Instance().GetTeamByID("1")!;
 
     Api.DraftService? draftService = null;
 
@@ -73,8 +141,9 @@ else
                 allPlayers = draftService.GetPlayers();
                 currentRound = draftService.GetCurrentRound();
                 currentPick = draftService.GetCurrentPick();
-                currentTeam = draftService.GetCurrentTeam();
-
+                currentTeam = useSnake ? draftService.GetCurrentTeamSnake() : draftService.GetCurrentTeam();
+                selectedPlayer = "";
+                Api.TeamService.Instance().Fetch();
             }
         }
         catch (Exception exc)
@@ -87,8 +156,21 @@ else
         }
     }
 
-    void MakePick()
+    void DraftPlayer()
     {
+        Console.WriteLine("Trying to add " + selectedPlayer);
+        draftService!.MakePick(currentTeam, selectedPlayer);
+        currentRound = draftService.GetCurrentRound();
+        currentPick = draftService.GetCurrentPick();
+        currentTeam = useSnake ? draftService.GetCurrentTeamSnake() : draftService.GetCurrentTeam();
+        selectedPlayer = "";
+        HideModal();
+        StateHasChanged();
+    }
 
+    async Task EndDraft()
+    {
+        Api.TeamService.Instance().Save();
+        Api.TeamService.Instance().Fetch();
     }
 }

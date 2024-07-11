@@ -29,5 +29,15 @@ namespace BoltonCup.Data
             sb.AppendLine($"Preferred Beer: {PrefBeer}");
             return sb.ToString();
         }
+
+        public TeamPlayer ToTeamPlayer()
+        {
+            return new TeamPlayer()
+            {
+                Name = this.Name,
+                BirthYear = this.DOB.Substring(0, 4),
+                Position = this.Position,
+            };
+        }
     }
 }
