@@ -1,27 +1,19 @@
 ﻿@page "/"
 
-<Grid RowColumns="RowColumns.Are1" Width="Width.Is100" Shadow="Shadow.Default"
-    Margin="Margin.IsAuto" Border="Border.Rounded">
-    <Column ColumnSize="ColumnSize.Is12">
-    <PlayerSpotlight />
-    </Column>
-</Grid>
+<Div Class="home-banner-background">
+    <Grid RowColumns="RowColumns.Are1" Width="Width.Is100" Shadow="Shadow.Default" Margin="Margin.IsAuto"
+        Border="Border.Rounded" Background="Background.Transparent">
+        <Column ColumnSize="ColumnSize.Is12">
+            <PlayerSpotlight />
+        </Column>
+    </Grid>
 
-<HomeBanner>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <Column ColumnSize="ColumnSize.Is12" Margin="Margin.IsAuto">
-        <Countdown />
-    </Column>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-</HomeBanner>
+    <Grid RowColumns="RowColumns.Are1" Width="Width.Is100" Padding="Padding.Is4.OnY" Height="Height.Rem(40)">
+        <Column ColumnSize="ColumnSize.Is12" Margin="Margin.IsAuto">
+            <Countdown />
+        </Column>
+    </Grid>
+</Div>
 
 <br>
 <br>

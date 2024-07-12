@@ -22,10 +22,6 @@ build_property._RazorSourceGeneratorDebug =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Countdown.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDb3VudGRvd24ucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Draft/AllPlayersTable.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xEcmFmdFxBbGxQbGF5ZXJzVGFibGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -38,8 +34,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xEcmFmdFxEcmFmdFBpY2tDYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Home/HomeBanner.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXEhvbWVCYW5uZXIucmF6b3I=
+[C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Home/Countdown.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXENvdW50ZG93bi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/nicbo/git/BoltonCup/BoltonCup/BoltonCup/Components/Home/IconLink.razor]
