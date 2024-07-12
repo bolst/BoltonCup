@@ -1,0 +1,22 @@
+@namespace BoltonCup.Components
+
+<Carousel @bind-SelectedSlide="@selectedSlide" Autoplay="true" ShowControls=false Padding="Padding.Is4.FromTop.OnMobile">
+    
+    <CarouselSlide Name="Connor Kelly">
+        <PlayerSpotlightSlide ImgSource="ConnorKelly_Profile.jpg" Name="Connor Kelly" Age="21" Hometown="Tecumseh, ON" FavBeer="OV" />
+    </CarouselSlide>
+    <CarouselSlide Name="Landon Prince" >
+      <PlayerSpotlightSlide ImgSource="LandonPrince_Profile.jpg" Name="Landon Prince" Age="19" Hometown="Tecumseh, ON" FavBeer="Bud light" />
+    </CarouselSlide>
+    <CarouselSlide Name="Liam Prince" >
+      <PlayerSpotlightSlide ImgSource="LiamPrince_Profile.jpg" Name="Liam Prince" Age="20" Hometown="Tecumseh, ON" FavBeer="Bud light" />
+    </CarouselSlide>
+    <CarouselSlide Name="Tyler Fuhr" >
+      <PlayerSpotlightSlide ImgSource="TylerFuhr_Profile.jpg" Name="Tyler Fuhr" Age="20" Hometown="Tecumseh, ON" FavBeer="Russian stouts" />
+    </CarouselSlide>
+
+</Carousel>
+
+@code{
+    private string selectedSlide = "Connor Kelly";
+}
