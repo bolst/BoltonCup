@@ -53,7 +53,7 @@ namespace BoltonCup.Api
             };
             draftPlayers.Add(emptyPlayer);
 
-            round = 1;
+            round = 0;
             pick = 1;
         }
 
@@ -66,7 +66,7 @@ namespace BoltonCup.Api
 
         public TeamData GetCurrentTeamSnake()
         {
-            if (round % 2 == 0)
+            if (round % 2 == 0 && round != 0)
             {
                 int p = 5 - pick;
                 return TeamService.Instance().GetTeamByID(p.ToString())!;
