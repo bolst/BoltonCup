@@ -6,10 +6,12 @@ namespace BoltonCup.Api
     {
         public readonly static string DRAFT_KEY = Environment.GetEnvironmentVariable("BC_DRAFT_KEY") ?? "";
 
-        private List<DraftPlayer> draftPlayers;
+        public List<DraftPlayer> draftPlayers { get; }
 
         private int round;
         private int pick;
+
+        public List<DraftPick> picks { get; }
 
         public DraftService(string strCsvData)
         {
@@ -55,6 +57,7 @@ namespace BoltonCup.Api
 
             round = 0;
             pick = 1;
+            picks = new();
         }
 
         public int GetCurrentRound() { return round; }
@@ -77,35 +80,35 @@ namespace BoltonCup.Api
             }
         }
 
-        public List<DraftPlayer> GetPlayers() { return draftPlayers; }
-
-        public List<DraftPlayer> GetAvailablePlayers()
-        {
-            return draftPlayers.Where(x => x.Team.IsNullOrEmpty()).ToList();
-        }
+        public List<DraftPlayer> GetAvailablePlayers() { return draftPlayers.Where(x => x.Team.IsNullOrEmpty()).ToList(); }
 
         public void MakePick(TeamData team, string playerName)
         {
             int index = draftPlayers.FindIndex(x => x.Name == playerName);
 
-            // if player was not found or is not available and was somehow selected
+            // if player was not found
             if (index == -1)
             {
                 Console.WriteLine($"Player not found (index = {index})");
                 return;
             }
+            // if player was somehow already selected
             if (!draftPlayers[index].Team.IsNullOrEmpty())
             {
                 Console.WriteLine($"Player {draftPlayers[index].Name} is already on {draftPlayers[index].Team}");
                 return;
             }
 
-            draftPlayers[index].Team = team.Name;
+            draftPlayers[index].Team = team.Name!;
 
             TeamService.Instance().AddPlayerToTeam(team.Id ?? 0, draftPlayers[index].ToTeamPlayer());
 
             Console.WriteLine(draftPlayers[index].Name + " is now on " + draftPlayers[index].Team);
 
+            if (round != 0)
+            {
+                picks.Add(new DraftPick(draftPlayers[index], team, round, pick));
+            }
             NextPick();
         }
 
@@ -121,6 +124,7 @@ namespace BoltonCup.Api
                 pick += 1;
             }
         }
+
 
     }
 

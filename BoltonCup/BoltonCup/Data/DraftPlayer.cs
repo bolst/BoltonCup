@@ -39,5 +39,11 @@ namespace BoltonCup.Data
                 Position = this.Position,
             };
         }
+
+        public string PosAbbrev()
+        {
+            return Position.Contains("/") ? "F/D" : Position.First().ToString();
+        }
+
     }
 }

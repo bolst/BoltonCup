@@ -39,17 +39,17 @@
             {
                 DraftPlayer player = p;
                 if (player.Position.Length == 0) continue;
-                <TableRow TextAlignment="TextAlignment.Center">
-                    <TableRowCell>@p.Team</TableRowCell>
-                    <TableRowCell>@p.Name</TableRowCell>
-                    <TableRowCell>@p.DOB.Substring(0, 4)</TableRowCell>
-                    <TableRowCell>@p.Position.First()</TableRowCell>
-                    <TableRowCell>@p.HighestLvl</TableRowCell>
+                        <TableRow TextAlignment="TextAlignment.Center">
+                            <TableRowCell>@p.Team</TableRowCell>
+                            <TableRowCell>@p.Name</TableRowCell>
+                            <TableRowCell>@p.DOB.Substring(0, 4)</TableRowCell>
+                            <TableRowCell>@p.PosAbbrev()</TableRowCell>
+                            <TableRowCell>@p.HighestLvl</TableRowCell>
                     @CanPlayTableRowCell(p.CanPlayGame1)
                     @CanPlayTableRowCell(p.CanPlayGame2)
                     @CanPlayTableRowCell(p.CanPlayGame3)
                     @CanPlayTableRowCell(p.CanPlayGame4)
-                </TableRow>
+                        </TableRow>
             }
         }
     </TableBody>
@@ -64,7 +64,7 @@
         IFluentBorderWithAll border = Border.Is4.Success.OnBottom;
         if (status == "No") { border = Border.Is4.Danger.OnBottom; }
         else if (status == "Maybe") { border = Border.Is4.Info.OnBottom; }
-        <TableRowCell Border="@border">@status</TableRowCell>
+                <TableRowCell Border="@border">@status</TableRowCell>
 
     };
     [Parameter] public List<DraftPlayer>? Players { get; set; } = null;
