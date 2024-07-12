@@ -50,16 +50,16 @@
             var player = p;
             if (player.Position!.ToLower().First() == positionFlag)
             {
-                <Grid RowColumns="RowColumns.Are3.OnTablet.Are2.OnMobile" Background="Background.Light"
-                    Padding="Padding.Is4.OnX.Is2.OnY">
-                    <Column ColumnSize="ColumnSize.Is2.OnTablet.IsHalf.OnMobile" Margin="Margin.IsAuto"
-                        TextWeight="TextWeight.SemiBold">
-                        @player.Name</Column>
-                    <Column ColumnSize="ColumnSize.Is2.OnTablet.IsHalf.OnMobile" Margin="Margin.IsAuto"
-                        TextWeight="TextWeight.SemiBold">
+                                <Grid RowColumns="RowColumns.Are3.OnTablet.Are2.OnMobile" Background="Background.Light"
+                                    Padding="Padding.Is4.OnX.Is2.OnY">
+                                    <Column ColumnSize="ColumnSize.Is2.OnTablet.IsHalf.OnMobile" Margin="Margin.IsAuto"
+                                        TextWeight="TextWeight.SemiBold">
+                        @player.Name @(player.Position.Contains("/") ? "(F/D)" : "")</Column>
+                                    <Column ColumnSize="ColumnSize.Is2.OnTablet.IsHalf.OnMobile" Margin="Margin.IsAuto"
+                                        TextWeight="TextWeight.SemiBold">
                         @player.BirthYear</Column>
-                    <Column ColumnSize="ColumnSize.Is8" Margin="Margin.IsAuto"></Column>
-                </Grid>
+                                    <Column ColumnSize="ColumnSize.Is8" Margin="Margin.IsAuto"></Column>
+                                </Grid>
             }
         }
     };
