@@ -2,11 +2,5 @@
     "id": 4,
     "name": "South West Sausages",
     "logo": "team4logo.png",
-    "players": [
-        {
-            "name": "Connor Kelly",
-            "birth year": "2003",
-            "position": "f"
-        }
-    ]
+    "players": []
 }
