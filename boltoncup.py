@@ -1,20 +1,20 @@
 games = 8
-ppt = 15  # players per team
+ppt = 16                 # players per team
 teams = 4
-include_jerseys = 0 # 0 for no 1 for yes
-ice_rate = 217.73
-prize_per_player_first = 60
+include_jerseys = 0      # 0 for no, 1 for yes
+ice = 1868.36
+ppp1 = 60                # prize per player on 1st place team
 time_keeper_rate = 15
-ref_rate = 30
+ref_rate = 35
 
 print('\n\n')
 
 expenses = {
-            "ice rentals": ice_rate * games,
+            "ice rentals": ice,
             "referees": ref_rate * games,
             "timekeepers": time_keeper_rate * games,
             "jerseys": 35*ppt*teams * include_jerseys,
-            "prize pool": prize_per_player_first * ppt 
+            "prize pool": ppp1 * ppt 
         }
 
 for expense in expenses:
