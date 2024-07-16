@@ -1,0 +1,32 @@
+@namespace BoltonCup.Components
+
+@if (Goals is not null)
+{
+    <Table Narrow>
+        <TableHeader>
+            <TableRow>
+                <TableHeaderCell>#</TableHeaderCell>
+                <TableHeaderCell>A</TableHeaderCell>
+                <TableHeaderCell>A</TableHeaderCell>
+                <TableHeaderCell TextAlignment="TextAlignment.Center">Period</TableHeaderCell>
+                <TableHeaderCell>Time</TableHeaderCell>
+            </TableRow>
+        </TableHeader>
+        <TableBody>
+            @foreach (ScoresheetGoal goal in Goals)
+            {
+                <TableRow>
+                    <TableRowHeader>@goal.PlayerNumber</TableRowHeader>
+                    <TableRowCell>@goal.Assist1</TableRowCell>
+                    <TableRowCell>@goal.Assist2</TableRowCell>
+                    <TableRowCell TextAlignment="TextAlignment.Center">@goal.Period</TableRowCell>
+                    <TableRowCell>@goal.Time</TableRowCell>
+                </TableRow>
+            }
+        </TableBody>
+    </Table>
+}
+
+@code {
+    [Parameter] public List<ScoresheetGoal>? Goals { get; set; } = null;
+}

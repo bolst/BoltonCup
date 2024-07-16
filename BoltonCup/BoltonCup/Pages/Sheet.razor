@@ -1,0 +1,44 @@
+@page "/sheet"
+@inject NavigationManager navManager
+
+<br>
+<br>
+
+@if (Stats != null)
+{
+    <Div Padding="Padding.Is4.FromTop.Is4.OnX">
+        <Heading TextWeight="TextWeight.Bold">@Stats.HomeTeam.ToUpper() - @Stats.HomeGoals.Count()</Heading>
+    </Div>
+    <Grid RowColumns="RowColumns.Are2" Padding="Padding.Is4.FromBottom.Is4.OnX">
+        <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
+            <GoalTable Goals="@Stats.HomeGoals" />
+        </Column>
+        <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
+            <PenaltyTable Penalties="@Stats.HomePenalties" />
+        </Column>
+    </Grid>
+
+    <Div Padding="Padding.Is4.FromTop.Is4.OnX">
+        <Heading TextWeight="TextWeight.Bold">@Stats.AwayTeam.ToUpper() - @Stats.AwayGoals.Count()</Heading>
+    </Div>
+    <Grid RowColumns="RowColumns.Are2" Padding="Padding.Is4">
+        <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
+            <GoalTable Goals="@Stats.AwayGoals" />
+        </Column>
+        <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
+            <PenaltyTable Penalties="@Stats.AwayPenalties" />
+        </Column>
+    </Grid>
+}
+
+@code {
+
+    ScoresheetGame? Stats = null;
+    protected override void OnInitialized()
+    {
+        Uri uri = new Uri(navManager.Uri);
+        string teamName = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("game") ?? "Game 1";
+
+        Stats = Api.StatService.Instance().Stats(teamName);
+    }
+}

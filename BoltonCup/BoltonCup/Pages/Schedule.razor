@@ -6,19 +6,18 @@
 <br>
 <br>
 
-@if (TSInstance is not null && GSInstance is not null)
-{
-    <Grid RowColumns="RowColumns.Are1" Border="Border.Rounded" Margin="Margin.Is4.OnX" Shadow="Shadow.Default"
+<Grid RowColumns="RowColumns.Are1" Border="Border.Rounded" Margin="Margin.Is4.OnX" Shadow="Shadow.Default"
     Padding="Padding.Is4.OnY">
     <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.Is4.OnX.OnTablet.IsAuto.OnMobile">
 
         <DateHeading>Friday, August 2</DateHeading>
         <Divider />
 
-        <MatchupCard HomeTeam='@TSInstance.GetTeamByID("1")' AwayTeam='@TSInstance.GetTeamByID("4")' TimeLabel="5:30 PM"
-            Score='@GSInstance.GetScore(0)' />
-        <MatchupCard HomeTeam='@TSInstance.GetTeamByID("2")' AwayTeam='@TSInstance.GetTeamByID("3")' TimeLabel="6:30 PM"
-            Score='@GSInstance.GetScore(1)' />
+        @for (int i = 0; i < 2; i++)
+        {
+            int j = i;
+            <MatchupCard matchup="@Api.ScheduleService.Instance().Matchups()[j]" />
+        }
 
         <br>
         <br>
@@ -26,15 +25,11 @@
         <DateHeading>Saturday, August 3</DateHeading>
         <Divider />
 
-        <MatchupCard HomeTeam='@TSInstance.GetTeamByID("4")' AwayTeam='@TSInstance.GetTeamByID("1")' TimeLabel="3:30 PM"
-            Score='@GSInstance.GetScore(2)' />
-        <MatchupCard HomeTeam='@TSInstance.GetTeamByID("3")' AwayTeam='@TSInstance.GetTeamByID("2")' TimeLabel="4:30 PM"
-            Score='@GSInstance.GetScore(3)' />
-
-        <MatchupCard HomeTeam='@TSInstance.GetTeamByID("3")' AwayTeam='@TSInstance.GetTeamByID("1")' TimeLabel="5:30 PM"
-            Score='@GSInstance.GetScore(4)' />
-        <MatchupCard HomeTeam='@TSInstance.GetTeamByID("2")' AwayTeam='@TSInstance.GetTeamByID("4")' TimeLabel="6:30 PM"
-            Score='@GSInstance.GetScore(5)' />
+        @for (int i = 2; i < 6; i++)
+        {
+            int j = i;
+            <MatchupCard matchup="@Api.ScheduleService.Instance().Matchups()[j]" />
+        }
 
         <br>
         <br>
@@ -43,20 +38,11 @@
         <DateHeading>Sunday, August 4</DateHeading>
         <Divider />
 
-        <MatchupCard TimeLabel="1:00 PM" Score='@GSInstance.GetScore(6)' />
-        <MatchupCard TimeLabel="2:00 PM" Score='@GSInstance.GetScore(7)' />
+        @for (int i = 6; i < 8; i++)
+        {
+            int j = i;
+            <MatchupCard matchup="@Api.ScheduleService.Instance().Matchups()[j]" />
+        }
 
     </Column>
 </Grid>
-}
-@code {
-
-    Api.TeamService? TSInstance = null;
-    Api.GameService? GSInstance = null;
-    protected override void OnInitialized()
-    {
-        TSInstance = Api.TeamService.Instance();
-        GSInstance = Api.GameService.Instance();
-    }
-
-}

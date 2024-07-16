@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "XYYc8tBmVvjemL53oHA9m8z42gzILsSCwOgX21p2QJE=",
+  "Hash": "r9BfzudblQSKWu57RWAPAic53vSwKWLzQRsTGM7IwmM=",
   "Source": "BoltonCup",
   "BasePath": "_content/BoltonCup",
   "Mode": "Default",
@@ -1402,6 +1402,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\styles.css"
+    },
+    {
+      "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\game-stats.json",
+      "SourceId": "BoltonCup",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\",
+      "BasePath": "_content/BoltonCup",
+      "RelativePath": "game-stats.json",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\game-stats.json"
     },
     {
       "Identity": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\LandonPrince_Profile.jpg",
