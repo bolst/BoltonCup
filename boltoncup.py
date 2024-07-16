@@ -1,29 +1,38 @@
 games = 8
-ppt = 16                 # players per team
+ppt = 15                 # players per team
 teams = 4
-include_jerseys = 0      # 0 for no, 1 for yes
 ice = 1868.36
-ppp1 = 60                # prize per player on 1st place team
 time_keeper_rate = 15
 ref_rate = 35
+win_ratio = 3/4 # ratio of 1st place winnings
+player_rate = 50
+goalie_rate = 25
 
 print('\n\n')
 
 expenses = {
             "ice rentals": ice,
             "referees": ref_rate * games,
-            "timekeepers": time_keeper_rate * games,
-            "jerseys": 35*ppt*teams * include_jerseys,
-            "prize pool": ppp1 * ppt 
+            "timekeepers": time_keeper_rate * games
+        }
+revenue = {
+            "players": ppt*4*player_rate,
+            "goalies": 1*4*goalie_rate
         }
 
 for expense in expenses:
     print(expense, '\t\t', expenses[expense])
 
-total = sum(expenses.values())
+e = sum(expenses.values())
+r = sum(revenue.values())
+
 print('======================================')
-print(f'Total Cost: \t\t {total}')
-print(f'Cost/player ({ppt*teams}): \t {total/ppt//teams}')
+print(f'Total Cost:  \t\t {"%.2f" % e}')
+print(f'Player Fees: \t\t {"%.2f" % r}')
+print('')
+print(f'Remaining:   \t\t {"%.2f" % (r-e)}')
+print(f'1st place:   \t\t {"%.2f" % ((r-e)/ppt * win_ratio)}')
+print(f'2nd place:   \t\t {"%.2f" % ((r-e)/ppt * (1-win_ratio))}')
 
 print('\n\n')
 
