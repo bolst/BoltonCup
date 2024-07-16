@@ -1,4 +1,4 @@
-@page "/draft"
+@page "/upload"
 @inject NavigationManager navManager
 
 <br>
@@ -8,7 +8,7 @@
 
 @if (Verified)
 {
-    <BCDraft />
+    <ScoresheetUpload />
 }
 else
 {
@@ -19,7 +19,7 @@ else
                 <TextEdit Placeholder="Password" @bind-Text="@InputText" @onkeydown="@OnKeyDown" />
             </Row>
             <Row Margin="Margin.IsAuto" Width="Width.Is50.OnTablet.Is100.OnMobile" Padding="Padding.Is2.OnY">
-                <Button Color="Color.Secondary" Clicked="Verify">Enter Draft</Button>
+                <Button Color="Color.Secondary" Clicked="Verify">Submit</Button>
             </Row>
         </Column>
     </Grid>

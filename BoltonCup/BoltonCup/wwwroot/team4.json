@@ -1,6 +1,1 @@
-{
-    "id": 4,
-    "name": "South West Sausages",
-    "logo": "team4logo.png",
-    "players": []
-}
+{"id":4,"name":"South West Sausages","logo":"team4logo.png","players":[{"name":"Liam Prince","birth year":"2003","position":"Forward"},{"name":"Liam Godwin ","birth year":"2005","position":"Goalie"},{"name":"Tyler fuhr","birth year":"2004","position":"Forward"}]}

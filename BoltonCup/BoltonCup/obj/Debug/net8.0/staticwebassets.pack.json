@@ -37,6 +37,10 @@
       "PackagePath": "staticwebassets\\css\\styles.css"
     },
     {
+      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\game-stats.json",
+      "PackagePath": "staticwebassets\\game-stats.json"
+    },
+    {
       "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\logo.png",
       "PackagePath": "staticwebassets\\logo.png"
     },

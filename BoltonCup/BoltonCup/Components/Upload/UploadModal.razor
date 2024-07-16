@@ -1,0 +1,77 @@
+@namespace BoltonCup.Components
+
+<Button Color="Color.Primary" Margin="Margin.Is4.FromStart" Clicked="() => ShowModal()">Upload Scoresheet</Button>
+
+<Modal @ref="modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Upload Scoresheet for @GameTitle</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Field>
+                <FieldLabel>Selection</FieldLabel>
+                <FileEdit Changed="@OnChanged" Filter=".json" />
+            </Field>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Primary" Clicked="UploadScoresheet">Upload Scoresheet</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@code {
+
+    [Parameter] public string GameTitle { get; set; } = "Game 1";
+
+    #region modal
+    private Modal modalRef;
+
+    private Task ShowModal() { return modalRef.Show(); }
+
+    private Task HideModal() { return modalRef.Hide(); }
+    #endregion
+
+    IFileEntry? file = null;
+    Task OnChanged(FileChangedEventArgs e)
+    {
+        try
+        {
+            file = e.Files.FirstOrDefault();
+            if (file == null)
+            {
+                return Task.CompletedTask;
+            }
+        }
+        catch (Exception exc)
+        {
+            Console.WriteLine(exc.Message);
+
+        }
+        finally
+        {
+            this.StateHasChanged();
+        }
+        return Task.CompletedTask;
+    }
+
+    async Task UploadScoresheet()
+    {
+        if (file == null)
+        {
+            return;
+        }
+        using (MemoryStream stream = new MemoryStream())
+        {
+
+            await file.OpenReadStream(long.MaxValue).CopyToAsync(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+            var reader = new StreamReader(stream);
+
+            ScoresheetGame game = System.Text.Json.JsonSerializer.Deserialize<ScoresheetGame>(reader.ReadToEnd());
+            Api.StatService.Instance().AddScoresheet(GameTitle, game);
+
+            await HideModal();
+        }
+    }
+}
