@@ -1,9 +1,9 @@
 @namespace BoltonCup.Components
 
-<Carousel @bind-SelectedSlide="@selectedSlide" Autoplay="true" ShowControls=false Padding="Padding.Is4.FromTop.OnMobile"
+<Carousel Autoplay="true" ShowControls=false Padding="Padding.Is4.FromTop.OnMobile"
   Interval="4000">
 
-  <CarouselSlide Name="Connor Kelly">
+  @* <CarouselSlide Name="Connor Kelly">
     <PlayerSpotlightSlide ImgSource="ConnorKelly_Profile.jpg" Name="Connor Kelly" Age="21" Hometown="Tecumseh, ON"
       FavBeer="OV" />
   </CarouselSlide>
@@ -28,10 +28,17 @@
     <PlayerSpotlightSlide
       ImgSource="https://cdn.vox-cdn.com/thumbor/w6h8Nixs_ABBAthBxFpcKP6UqJw=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/23270114/usa_today_16796836.jpg"
       Name="Nic Bolton" Age="22" Hometown="Tecumseh, ON" FavBeer="Miller lite" />
-  </CarouselSlide>
+  </CarouselSlide> *@
+
+  @foreach(var s in Api.SpotlightService.Instance().Spotlights)
+  {
+    Spotlight spotlight = s;
+    <CarouselSlide Name="@spotlight.Name">
+      <PlayerSpotlightSlide
+        ImgSource="@spotlight.Image"
+        Name="@spotlight.Name" Age="@spotlight.Age" Hometown="@spotlight.Hometown" FavBeer="@spotlight.FavBeer" />
+    </CarouselSlide>
+  }
 
 </Carousel>
 
-@code {
-  private string selectedSlide = "Connor Kelly";
-}
