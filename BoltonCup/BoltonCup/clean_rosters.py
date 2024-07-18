@@ -1,6 +1,6 @@
 import json
 
-def team_file(n:int) -> str: return f'team{n}.json'
+def team_file(n:int) -> str: return f'wwwroot/team{n}.json'
 
 def read_file(n:int) -> dict:
     with open(team_file(n), 'r') as rf:
