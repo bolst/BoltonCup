@@ -1,107 +1,111 @@
 {
   "Files": [
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\ConnorKelly_Profile.jpg",
-      "PackagePath": "staticwebassets\\ConnorKelly_Profile.jpg"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/ConnorKelly_Profile.jpg",
+      "PackagePath": "staticwebassets/ConnorKelly_Profile.jpg"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\LandonPrince_Profile.jpg",
-      "PackagePath": "staticwebassets\\LandonPrince_Profile.jpg"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/LandonPrince_Profile.jpg",
+      "PackagePath": "staticwebassets/LandonPrince_Profile.jpg"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\LiamPrince_Profile.jpg",
-      "PackagePath": "staticwebassets\\LiamPrince_Profile.jpg"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/LiamPrince_Profile.jpg",
+      "PackagePath": "staticwebassets/LiamPrince_Profile.jpg"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\TylerFuhr_Profile.jpg",
-      "PackagePath": "staticwebassets\\TylerFuhr_Profile.jpg"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/TylerFuhr_Profile.jpg",
+      "PackagePath": "staticwebassets/TylerFuhr_Profile.jpg"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\chris-doey.jpg",
-      "PackagePath": "staticwebassets\\chris-doey.jpg"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/chris-doey.jpg",
+      "PackagePath": "staticwebassets/chris-doey.jpg"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\css\\blazor-ui.css",
-      "PackagePath": "staticwebassets\\css\\blazor-ui.css"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/clean_rosters.py",
+      "PackagePath": "staticwebassets/clean_rosters.py"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\css\\fonts\\Lato-Bold.ttf",
-      "PackagePath": "staticwebassets\\css\\fonts\\Lato-Bold.ttf"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/css/blazor-ui.css",
+      "PackagePath": "staticwebassets/css/blazor-ui.css"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\css\\fonts\\Lato-Regular.ttf",
-      "PackagePath": "staticwebassets\\css\\fonts\\Lato-Regular.ttf"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/css/fonts/Lato-Bold.ttf",
+      "PackagePath": "staticwebassets/css/fonts/Lato-Bold.ttf"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\css\\styles.css",
-      "PackagePath": "staticwebassets\\css\\styles.css"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/css/fonts/Lato-Regular.ttf",
+      "PackagePath": "staticwebassets/css/fonts/Lato-Regular.ttf"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\game-stats.json",
-      "PackagePath": "staticwebassets\\game-stats.json"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/css/styles.css",
+      "PackagePath": "staticwebassets/css/styles.css"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\logo.png",
-      "PackagePath": "staticwebassets\\logo.png"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/game-stats.json",
+      "PackagePath": "staticwebassets/game-stats.json"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\placeholder.png",
-      "PackagePath": "staticwebassets\\placeholder.png"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/logo.png",
+      "PackagePath": "staticwebassets/logo.png"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\poster.png",
-      "PackagePath": "staticwebassets\\poster.png"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/placeholder.png",
+      "PackagePath": "staticwebassets/placeholder.png"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\scores.json",
-      "PackagePath": "staticwebassets\\scores.json"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/poster.png",
+      "PackagePath": "staticwebassets/poster.png"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team1.json",
-      "PackagePath": "staticwebassets\\team1.json"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/scores.json",
+      "PackagePath": "staticwebassets/scores.json"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team1logo.png",
-      "PackagePath": "staticwebassets\\team1logo.png"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team1.json",
+      "PackagePath": "staticwebassets/team1.json"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team2-logo.png",
-      "PackagePath": "staticwebassets\\team2-logo.png"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team1logo.png",
+      "PackagePath": "staticwebassets/team1logo.png"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team2.json",
-      "PackagePath": "staticwebassets\\team2.json"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team2-logo.png",
+      "PackagePath": "staticwebassets/team2-logo.png"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team3.json",
-      "PackagePath": "staticwebassets\\team3.json"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team2.json",
+      "PackagePath": "staticwebassets/team2.json"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team3logo.png",
-      "PackagePath": "staticwebassets\\team3logo.png"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team3.json",
+      "PackagePath": "staticwebassets/team3.json"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team4.json",
-      "PackagePath": "staticwebassets\\team4.json"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team3logo.png",
+      "PackagePath": "staticwebassets/team3logo.png"
     },
     {
-      "Id": "C:\\Users\\nicbo\\git\\BoltonCup\\BoltonCup\\BoltonCup\\wwwroot\\team4logo.png",
-      "PackagePath": "staticwebassets\\team4logo.png"
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team4.json",
+      "PackagePath": "staticwebassets/team4.json"
     },
     {
-      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.BoltonCup.Microsoft.AspNetCore.StaticWebAssets.props",
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team4logo.png",
+      "PackagePath": "staticwebassets/team4logo.png"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.BoltonCup.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },
     {
-      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.BoltonCup.props",
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.BoltonCup.props",
       "PackagePath": "build\\BoltonCup.props"
     },
     {
-      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.BoltonCup.props",
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.BoltonCup.props",
       "PackagePath": "buildMultiTargeting\\BoltonCup.props"
     },
     {
-      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.BoltonCup.props",
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.BoltonCup.props",
       "PackagePath": "buildTransitive\\BoltonCup.props"
     }
   ],
