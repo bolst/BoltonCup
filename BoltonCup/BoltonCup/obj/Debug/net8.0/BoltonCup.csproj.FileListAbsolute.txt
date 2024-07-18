@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.csproj.AssemblyReference.cache
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.GeneratedMSBuildEditorConfig.editorconfig
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.AssemblyInfoInputs.cache
@@ -10,6 +11,8 @@
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.dll
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/refint/BoltonCup.dll
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.pdb
+=======
+>>>>>>> 18ddb184521929b76481ef25566f88e1e681343f
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/bin/Debug/net8.0/appsettings.Development.json
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/bin/Debug/net8.0/appsettings.json
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/bin/Debug/net8.0/BoltonCup.staticwebassets.runtime.json
@@ -44,6 +47,15 @@
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/bin/Debug/net8.0/runtimes/win/lib/net6.0/System.Drawing.Common.dll
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/bin/Debug/net8.0/runtimes/win/lib/net6.0/System.Security.Cryptography.ProtectedData.dll
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/bin/Debug/net8.0/runtimes/win/lib/net6.0/System.Windows.Extensions.dll
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.csproj.AssemblyReference.cache
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.GeneratedMSBuildEditorConfig.editorconfig
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.AssemblyInfoInputs.cache
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.AssemblyInfo.cs
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.csproj.CoreCompileInputs.cache
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.MvcApplicationPartsAssemblyInfo.cache
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.RazorAssemblyInfo.cache
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.RazorAssemblyInfo.cs
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.sourcelink.json
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/staticwebassets.build.json
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/staticwebassets.development.json
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/staticwebassets/msbuild.BoltonCup.Microsoft.AspNetCore.StaticWebAssets.props
@@ -53,8 +65,12 @@
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/staticwebassets.pack.json
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/scopedcss/bundle/BoltonCup.styles.css
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.csproj.Up2Date
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.dll
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/refint/BoltonCup.dll
+/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.pdb
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/BoltonCup.genruntimeconfig.cache
 /Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/obj/Debug/net8.0/ref/BoltonCup.dll
+<<<<<<< HEAD
 /Users/nic/git/BoltonCup/BoltonCup/BoltonCup/bin/Debug/net8.0/appsettings.Development.json
 /Users/nic/git/BoltonCup/BoltonCup/BoltonCup/bin/Debug/net8.0/appsettings.json
 /Users/nic/git/BoltonCup/BoltonCup/BoltonCup/bin/Debug/net8.0/BoltonCup.staticwebassets.runtime.json
@@ -169,3 +185,5 @@ C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\obj\Debug\net8.0\refint\BoltonC
 C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\obj\Debug\net8.0\BoltonCup.pdb
 C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\obj\Debug\net8.0\BoltonCup.genruntimeconfig.cache
 C:\Users\nicbo\git\BoltonCup\BoltonCup\BoltonCup\obj\Debug\net8.0\ref\BoltonCup.dll
+=======
+>>>>>>> 18ddb184521929b76481ef25566f88e1e681343f
