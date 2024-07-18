@@ -1,7 +1,7 @@
 games = 8
 ppt = 15                 # players per team
 teams = 4
-ice = 1868.36
+ice = 1868.36 + 204
 time_keeper_rate = 15
 ref_rate = 35
 win_ratio = 3/4 # ratio of 1st place winnings
