@@ -1,0 +1,79 @@
+[
+    {
+        "image": "spotlight/ConnorKelly_Profile.webp",
+        "name": "Connor Kelly",
+        "hometown": "Tecumseh, ON",
+        "age": "21",
+        "favourite beer": "OV"
+    },
+    {
+        "image": "https://lscluster.hockeytech.com/download.php?client_code=pjhlon&file_path=media/ee1f503644bd34dc0f96f4690375e78c.png",
+        "name": "Landon Prince",
+        "hometown":"Tecumseh, ON",
+        "age": "19",
+        "favourite beer": "Bud light"
+    },
+    {
+        "image": "spotlight/LiamPrince_Profile.webp",
+        "name": "Liam Prince",
+        "hometown": "Tecumseh, ON",
+        "age": "20",
+        "favourite beer": "Bud light"
+    },
+    {
+        "image": "spotlight/TylerFuhr_Profile.webp",
+        "name": "Tyler Fuhr",
+        "hometown": "Tecumseh, ON",
+        "age": "20",
+        "favourite beer": "Russian Stouts"
+    },
+    {
+        "image": "spotlight/ChrisBolton_Profile.webp",
+        "name": "Chris Bolton",
+        "hometown": "Tecumseh, ON",
+        "age": "20",
+        "favourite beer": "Coors Banquet"
+    },
+    {
+        "image": "spotlight/NicBolton_Profile.webp",
+        "name": "Nic Bolton",
+        "hometown": "Tecumseh, ON",
+        "age": "22",
+        "favourite beer": "Miller Lite"
+    },
+    {
+        "image": "spotlight/ColtonKrz_Profile.webp",
+        "name": "Colton Krzeminski",
+        "hometown": "Tecumseh, ON",
+        "age": "23",
+        "favourite beer": "Water"
+    },
+    {
+        "image": "spotlight/RyanSterling_Profile.webp",
+        "name": "Ryan Sterling",
+        "hometown": "Windsor, ON",
+        "age": "23",
+        "favourite beer": "Coors"
+    },
+    {
+        "image": "spotlight/MatteoFrat_Profile.webp",
+        "name": "Matteo Frattaroli",
+        "hometown": "Tecumseh, ON",
+        "age": "21",
+        "favourite beer": "Bud light"
+    },
+    {
+        "image": "spotlight/BrandonLeblanc_Profile.webp",
+        "name": "Brandon Leblanc",
+        "hometown": "Lasalle, ON",
+        "age":"20",
+        "favourite beer": "OV"
+    },
+    {
+        "image": "spotlight/LiamGodwin_Profile.webp",
+        "name": "Liam Godwin",
+        "hometown": "Tecumseh, ON",
+        "age": "19",
+        "favourite beer" :"Miller Lite"
+     }
+]

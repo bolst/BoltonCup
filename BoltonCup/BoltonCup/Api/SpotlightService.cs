@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace BoltonCup.Api
 {
     public class SpotlightService
@@ -12,28 +14,36 @@ namespace BoltonCup.Api
             return instance;
         }
 
+        private const string FILE_PATH = "wwwroot/spotlight.json";
+
         public SpotlightService()
         {
-            Spotlights = GenerateSpotlights();
+            Spotlights = GetSavedSpotlights();
             RandomizeSpotlights();
         }
 
-        public List<Spotlight> GenerateSpotlights()
+        private List<Spotlight> GetSavedSpotlights()
         {
-            return new()
-        {
-            new Spotlight("spotlight/ConnorKelly_Profile.webp", "Connor Kelly", "Tecumseh, ON", "21", "OV"),
-            new Spotlight("https://lscluster.hockeytech.com/download.php?client_code=pjhlon&file_path=media/ee1f503644bd34dc0f96f4690375e78c.png", "Landon Prince", "Tecumseh, ON", "19", "Bud light"),
-            new Spotlight("spotlight/LiamPrince_Profile.webp", "Liam Prince", "Tecumseh, ON", "20", "Bud light"),
-            new Spotlight("spotlight/TylerFuhr_Profile.webp", "Tyler Fuhr", "Tecumseh, ON", "20", "Russian Stouts"),
-            new Spotlight("spotlight/ChrisBolton_Profile.webp", "Chris Bolton", "Tecumseh, ON", "20", "Coors Banquet"),
-            new Spotlight("spotlight/NicBolton_Profile.webp", "Nic Bolton", "Tecumseh, ON", "22", "Miller Lite"),
-            new Spotlight("spotlight/ColtonKrz_Profile.webp", "Colton Krzeminski", "Tecumseh, ON", "23", "Water"),
-            new Spotlight("spotlight/RyanSterling_Profile.webp", "Ryan Sterling", "Windsor, ON", "23", "Coors"),
-            new Spotlight("spotlight/MatteoFrat_Profile.webp", "Matteo Frattaroli", "Tecumseh, ON", "21", "Bud light"),
-            new Spotlight("spotlight/BrandonLeblanc_Profile.webp", "Brandon Leblanc", "Lasalle, ON","20" , "OV"),
-            new Spotlight("spotlight/LiamGodwin_Profile.webp", "Liam Godwin", "Tecumseh, ON", "19", "Miller Lite")
-        };
+            List<Spotlight> res = new();
+            try
+            {
+                using (var stream = new StreamReader(FILE_PATH))
+                {
+                    string fileContent = stream.ReadToEnd();
+                    res = JsonSerializer.Deserialize<List<Spotlight>>(fileContent);
+                    if (res is null)
+                    {
+                        res = new();
+                    }
+                }
+            }
+            catch(Exception exc)
+            {
+                Console.WriteLine("GetSavedSpotlights:");
+                Console.WriteLine(exc.ToString());
+            }
+
+            return res;
         }
 
         public List<Spotlight> Spotlights { get; }

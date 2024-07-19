@@ -1,12 +1,16 @@
+using System.Text.Json.Serialization;
+
 namespace BoltonCup.Data
 {
     public class Spotlight
     {
-        public string Image {get;}
-        public string Name {get;}
-        public string Hometown {get;}
-        public string Age {get;}
-        public string FavBeer {get;}
+        [JsonPropertyName("image")] public string Image {get; set;}
+        [JsonPropertyName("name")] public string Name {get; set;}
+        [JsonPropertyName("hometown")] public string Hometown {get; set;}
+        [JsonPropertyName("age")] public string Age {get; set;}
+        [JsonPropertyName("favourite beer")] public string FavBeer {get; set;}
+
+        [JsonConstructor] public Spotlight() { }
 
         public Spotlight(string image, string name, string ht, string age, string beer)
         {
