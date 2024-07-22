@@ -4,7 +4,7 @@
         "name": "Connor Kelly",
         "hometown": "Tecumseh, ON",
         "age": "21",
-        "favourite beer": "OV"
+        "favourite beer": "Michelob"
     },
     {
         "image": "https://lscluster.hockeytech.com/download.php?client_code=pjhlon&file_path=media/ee1f503644bd34dc0f96f4690375e78c.png",
@@ -75,5 +75,173 @@
         "hometown": "Tecumseh, ON",
         "age": "19",
         "favourite beer" :"Miller Lite"
+     },
+
+     {
+        "image": "spotlight/EastonForrest_Profile.webp",
+        "name": "Easton Forrest",
+        "hometown": "Tecumseh, ON",
+        "age": "20",
+        "favourite beer" :"Stella Artois"
+     },
+     {
+        "image": "spotlight/JakeGaudario_Profile.webp",
+        "name": "Jake Gaudario",
+        "hometown": "Tecumseh, ON",
+        "age": "20",
+        "favourite beer" :"Bud Light"
+     },
+     {
+        "image": "spotlight/QuinnThoms_Profile.webp",
+        "name": "Quinn Thoms",
+        "hometown": "Tecumseh, ON",
+        "age": "19",
+        "favourite beer" :"Coors Light"
+     },
+     {
+        "image": "spotlight/AndrewStratichuk_Profile.webp",
+        "name": "Andrew",
+        "hometown": "Tecumseh, ON",
+        "age": "20",
+        "favourite beer" :"Ultra"
+     },
+     {
+        "image": "spotlight/JonasColumbus_Profile.webp",
+        "name": "Jonas Columbus",
+        "hometown": "The concrete site",
+        "age": "20",
+        "favourite beer" :"Rum and Coke"
+     },
+     {
+        "image": "spotlight/AnthonyDerose_Profile.webp",
+        "name": "Anthony Derose",
+        "hometown": "Tecumseh, ON",
+        "age": "20",
+        "favourite beer" :"OV"
+     },
+     {
+        "image": "spotlight/BrandonAllen_Profile.webp",
+        "name": "Brandon Allen",
+        "hometown": "Tecumseh, ON",
+        "age": "20",
+        "favourite beer" :"Alexander Keiths"
+     },{
+        "image": "spotlight/QuinnOneil_Profile.webp",
+        "name": "Quinn Oneil",
+        "hometown": "Lakeshore, ON",
+        "age": "20",
+        "favourite beer" :"Miller High Life"
+     },
+     {
+        "image": "spotlight/ConnorFabel_Profile.webp",
+        "name": "Connor Fabel",
+        "hometown": "Windsor, ON",
+        "age": "23",
+        "favourite beer" :"Miller"
+     },
+     {
+        "image": "spotlight/ConorCostello_Profile.webp",
+        "name": "Conor Costello",
+        "hometown": "Lasalle, ON",
+        "age": "19",
+        "favourite beer" :"Ultra and Landshark"
+     },
+     {
+        "image": "spotlight/CooperTremblett_Profile.webp",
+        "name": "Cooper Tremblett",
+        "hometown": "Lakeshore, ON",
+        "age": "22",
+        "favourite beer" :"Anything chilly"
+     },
+     {
+        "image": "spotlight/LucasStoy_Profile.webp",
+        "name": "Lucas Stoy",
+        "hometown": "Tecumseh, ON",
+        "age": "21",
+        "favourite beer" :"Landshark"
+     },
+     {
+        "image": "spotlight/ReillyBond_Profile.webp",
+        "name": "Reilly Bond",
+        "hometown": "Tecumseh, ON",
+        "age": "19",
+        "favourite beer" : "Water"
+     },
+     {
+        "image": "spotlight/KyleBleau_Profile.webp",
+        "name": "Kyle Bleau",
+        "hometown": "Essex, ON",
+        "age": "20",
+        "favourite beer" :"Busch light"
+     },
+     {
+        "image": "spotlight/AedanSullivan_Profile.webp",
+        "name": "Aedan Sullivan",
+        "hometown": "Lasalle, ON",
+        "age": "20",
+        "favourite beer" :"Michelob Ultra"
+     },
+     {
+        "image": "spotlight/JonathanSexsmith_Profile.webp",
+        "name": "Jonathan Sexsmith",
+        "hometown": "Windsor, ON",
+        "age": "20",
+        "favourite beer" :"Miller Lite"
+     },
+     {
+        "image": "spotlight/BenMueller_Profile.webp",
+        "name": "Ben Mueller",
+        "hometown": "Tecumseh, ON",
+        "age": "18",
+        "favourite beer" :"Michelob Ultra"
+     },
+     {
+        "image": "spotlight/EthanGalvan_Profile.webp",
+        "name": "Ethan Galvan",
+        "hometown": "Lasalle, ON",
+        "age": "20",
+        "favourite beer" :"All of them"
+     },
+     {
+        "image": "spotlight/OwenFindlay_Profile.webp",
+        "name": "Owen Findlay",
+        "hometown": "Lasalle, ON",
+        "age": "20",
+        "favourite beer" :"Any"
+     },
+     {
+        "image": "spotlight/RyanPatterson_Profile.webp",
+        "name": "Ryan Patterson",
+        "hometown": "Windsor, ON",
+        "age": "23",
+        "favourite beer" :"Coors Light"
+     },
+     {
+        "image": "spotlight/TylerTrealout_Profile.webp",
+        "name": "Tyler Trealout",
+        "hometown": "Lasalle, ON",
+        "age": "20",
+        "favourite beer" :"Bud Light"
+     },
+     {
+        "image": "spotlight/JesseMercier_Profile.webp",
+        "name": "Jesse Mercier",
+        "hometown": "Lakeshore, ON",
+        "age": "19",
+        "favourite beer" :"OV"
+     },
+     {
+        "image": "spotlight/Cujo_Profile.webp",
+        "name": "Curtis-Joseph Jackson",
+        "hometown": "Windsor, ON",
+        "age": "23",
+        "favourite beer" :"Busch Heavy"
+     },
+     {
+        "image": "spotlight/RomanoLiburdi_Profile.webp",
+        "name": "Romano Librudi",
+        "hometown": "Lakeshore, ON",
+        "age": "23",
+        "favourite beer" :"Nose beers"
      }
 ]
