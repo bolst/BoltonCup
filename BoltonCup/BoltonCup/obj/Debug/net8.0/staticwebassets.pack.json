@@ -45,6 +45,26 @@
       "PackagePath": "staticwebassets/spotlight.json"
     },
     {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/AedanSullivan_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/AedanSullivan_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/AndrewStratichuk_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/AndrewStratichuk_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/AnthonyDerose_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/AnthonyDerose_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/BenMueller_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/BenMueller_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/BrandonAllen_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/BrandonAllen_Profile.webp"
+    },
+    {
       "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/BrandonLeblanc_Profile.webp",
       "PackagePath": "staticwebassets/spotlight/BrandonLeblanc_Profile.webp"
     },
@@ -57,8 +77,52 @@
       "PackagePath": "staticwebassets/spotlight/ColtonKrz_Profile.webp"
     },
     {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/ConnorFabel_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/ConnorFabel_Profile.webp"
+    },
+    {
       "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/ConnorKelly_Profile.webp",
       "PackagePath": "staticwebassets/spotlight/ConnorKelly_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/ConorCostello_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/ConorCostello_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/CooperTremblett_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/CooperTremblett_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/Cujo_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/Cujo_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/EastonForrest_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/EastonForrest_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/EthanGalvan_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/EthanGalvan_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/JakeGaudario_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/JakeGaudario_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/JesseMercier_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/JesseMercier_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/JonasColumbus_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/JonasColumbus_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/JonathanSexsmith_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/JonathanSexsmith_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/KyleBleau_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/KyleBleau_Profile.webp"
     },
     {
       "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/LiamGodwin_Profile.webp",
@@ -69,6 +133,10 @@
       "PackagePath": "staticwebassets/spotlight/LiamPrince_Profile.webp"
     },
     {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/LucasStoy_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/LucasStoy_Profile.webp"
+    },
+    {
       "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/MatteoFrat_Profile.webp",
       "PackagePath": "staticwebassets/spotlight/MatteoFrat_Profile.webp"
     },
@@ -77,12 +145,40 @@
       "PackagePath": "staticwebassets/spotlight/NicBolton_Profile.webp"
     },
     {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/OwenFindlay_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/OwenFindlay_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/QuinnOneil_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/QuinnOneil_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/QuinnThoms_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/QuinnThoms_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/ReillyBond_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/ReillyBond_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/RomanoLiburdi_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/RomanoLiburdi_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/RyanPatterson_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/RyanPatterson_Profile.webp"
+    },
+    {
       "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/RyanSterling_Profile.webp",
       "PackagePath": "staticwebassets/spotlight/RyanSterling_Profile.webp"
     },
     {
       "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/TylerFuhr_Profile.webp",
       "PackagePath": "staticwebassets/spotlight/TylerFuhr_Profile.webp"
+    },
+    {
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/spotlight/TylerTrealout_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/TylerTrealout_Profile.webp"
     },
     {
       "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup/BoltonCup/wwwroot/team1.json",
