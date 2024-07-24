@@ -37,7 +37,7 @@ namespace BoltonCup.Api
                 new Matchup("Game 5", ti.GetTeamByID("1"), ti.GetTeamByID("3"), new DateTime(2024,08,03,05 + 12 ,30,00)),
                 new Matchup("Game 6", ti.GetTeamByID("4"), ti.GetTeamByID("2"), new DateTime(2024,08,03,06 + 12 ,30,00)),
                 new Matchup("Finals (Bronze)", ft("Finals (3rd)"), ft("Finals (4th)"), new DateTime(2024,08,04,01 + 12 ,00,00)),
-                new Matchup("Finals (Gold)", ft("Finals (1st)"), ft("Finals (2nd)"), new DateTime(2024,08,04,02 + 12 ,00,00)),
+                new Matchup("Finals (Gold)", ft("Finals (1st)"), ft("Finals (2nd)"), new DateTime(2024,08,04,02 + 12 ,30,00)),
             };
             return res;
         }
