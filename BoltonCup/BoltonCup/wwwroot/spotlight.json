@@ -243,5 +243,54 @@
       "hometown": "Lakeshore, ON",
       "age": "23",
       "favourite beer": "Beer"
+   },
+   {
+      "image": "spotlight/LukasBoudreau.webp",
+      "name": "Lukas Boudreau",
+      "hometown": "Tecumseh, ON",
+      "age": "19",
+      "favourite beer": "Stella Artois"
+   },
+   {
+      "image": "spotlight/Ginny_Profile.webp",
+      "name": "Carson Mcginnis",
+      "hometown": "Tecumseh, ON",
+      "age": "21",
+      "favourite beer": "Ultra"
+   },
+   {
+      "image": "spotlight/AD_Profile.webp",
+      "name": "Allan Djordjevic",
+      "hometown": "Arius",
+      "age": "20",
+      "favourite beer": "Strawberry Daiquiri"
+   },
+   {
+      "image": "spotlight/MichaelRohrer_Profile.webp",
+      "name": "Michael Rohrer",
+      "hometown": "Tecumseh, ON",
+      "age": "21",
+      "favourite beer": "Heavy lagers"
+   },
+   {
+      "image": "spotlight/RyanCronheimer_Profile.webp",
+      "name": "Ryan Cronheimer",
+      "hometown": "Wheatley, ON",
+      "age": "19",
+      "favourite beer": "Miller Lite"
+   },
+   {
+      "image": "spotlight/NateDowling_Profile.webp",
+      "name": "Nate Dowling",
+      "hometown": "Tecumseh, ON",
+      "age": "20",
+      "favourite beer": "Miller Lite"
+   },
+   {
+      "image": "spotlight/SethMartineau_Profile.webp",
+      "name": "Seth Martineau",
+      "hometown": "Tecumseh, ON",
+      "age": "20",
+      "favourite beer": "Michelob Ultra"
    }
 ]
