@@ -11,9 +11,11 @@ namespace BoltonCup.Api
         private int round;
         private int pick;
 
+        private Dictionary<string, string> order;
+
         public List<DraftPick> picks { get; }
 
-        public DraftService(string strCsvData)
+        public DraftService(string strCsvData, Dictionary<string, string> _order)
         {
             var lines = strCsvData.Split(Environment.NewLine).ToList();
             lines.RemoveAt(0); // headers
@@ -58,13 +60,16 @@ namespace BoltonCup.Api
             round = 0;
             pick = 1;
             picks = new();
+            order = _order;
         }
+
 
         public int GetCurrentRound() { return round; }
         public int GetCurrentPick() { return pick; }
         public TeamData GetCurrentTeam()
         {
-            return TeamService.Instance().GetTeamByID(pick.ToString())!;
+            string teamID = order[pick.ToString()];
+            return TeamService.Instance().GetTeamByID(teamID)!;
         }
 
         public TeamData GetCurrentTeamSnake()
@@ -72,7 +77,8 @@ namespace BoltonCup.Api
             if (round % 2 == 0 && round != 0)
             {
                 int p = 5 - pick;
-                return TeamService.Instance().GetTeamByID(p.ToString())!;
+                string teamID = order[p.ToString()];
+                return TeamService.Instance().GetTeamByID(teamID)!;
             }
             else
             {
