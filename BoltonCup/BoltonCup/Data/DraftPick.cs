@@ -17,7 +17,7 @@ namespace BoltonCup.Data
             Pick = pick;
             switch (team.Name)
             {
-                case "Palestine Pirates":
+                case "Just the Tip":
                     BgColor = "#294a7d";
                     Bg = Background.Primary;
                     break;
