@@ -12,6 +12,8 @@
         <InfoHeading>REGISTRATION</InfoHeading>
         <Divider />
 
+        @if(RegistrationOpen)
+        {
         <InfoParagraph>To register, you can click the link below which will bring you to the payment page. Note there is
             an extra $2 fee for the service charge of online payment. Once you pay you will be redirected to fill out a
             registration form.</InfoParagraph>
@@ -24,10 +26,18 @@
                 <Heading TextWeight="TextWeight.Bold" Margin="Margin.IsAuto" Italic>REGISTER</Heading>
             </Button>
         </Row>
+        }
+        else
+        {
+            <InfoParagraph>Registration is closed.</InfoParagraph>
+        }
     </Column>
 </Grid>
 
 @code {
+
+    const bool RegistrationOpen = false;
+
     string registrationLink =
     "https://forms.office.com/Pages/ResponsePage.aspx?id=szP5EmE9GUuaTWiQId6MydfmFVKM4gFNi5kb75G_wgVUNDBZTThPMjRSUFhJOTJTMFBQMTMzTTJUOS4u";
 
