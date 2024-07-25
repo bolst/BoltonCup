@@ -292,5 +292,96 @@
       "hometown": "Tecumseh, ON",
       "age": "20",
       "favourite beer": "Michelob Ultra"
+   },
+   {
+      "image": "https://assets.leaguestat.com/pjhlon/240x240/590.jpg",
+      "name": "Jack Lewis",
+      "hometown": "Tecumseh, ON",
+      "age": "18",
+      "favourite beer": "Coors"
+   },
+   {
+      "image": "https://lscluster.hockeytech.com/download.php?client_code=gojhl&file_path=media/6769ccf483d177d581b24e899e17ad3a.jpg",
+      "name": "Ashton Anderson",
+      "hometown": "Riverside, ON",
+      "age": "20",
+      "favourite beer": "Corona"
+   },
+   {
+      "image": "spotlight/MaxSiebs_Profile.webp",
+      "name": "Max Sieberer",
+      "hometown": "Windsor, ON",
+      "age": "24",
+      "favourite beer": "Busch"
+   },
+   {
+      "image": "spotlight/EvanFenech_Profile.webp",
+      "name": "Evan Fenech",
+      "hometown": "Lakeshore, ON",
+      "age": "18",
+      "favourite beer": "A cold one"
+   },
+   {
+      "image": "spotlight/KeeganCarswell_Profile.webp",
+      "name": "Keegan Carswell",
+      "hometown": "Windsor, ON",
+      "age": "17",
+      "favourite beer": "Gatorade"
+   },
+   {
+      "image": "https://lscluster.hockeytech.com/download.php?client_code=gojhl&file_path=media/33283431d92d74603a9a3a43adc00b19.jpg",
+      "name": "Connor Tucker",
+      "hometown": "Belle River, ON",
+      "age": "19",
+      "favourite beer": "Miller Lite"
+   },
+   {
+      "image": "spotlight/KarsonBeuglet_Profile.webp",
+      "name": "Karson Beuglet",
+      "hometown": "Belle River, ON",
+      "age": "21",
+      "favourite beer": "Bud Lite"
+   },
+   {
+      "image": "spotlight/Saliba_Profile.webp",
+      "name": "Alixe Saliba",
+      "hometown": "Windsor, ON",
+      "age": "26",
+      "favourite beer": "Busch"
+   },
+   {
+      "image": "spotlight/JakeRogers_Profile.webp",
+      "name": "Jake Rogers",
+      "hometown": "Windsor, ON",
+      "age": "20",
+      "favourite beer": "Bud Light"
+   },
+   {
+      "image": "spotlight/RomanFalsetta_Profile.webp",
+      "name": "Roman Falsetta",
+      "hometown": "Tecumseh, ON",
+      "age": "21",
+      "favourite beer": "Sleeman Clear 2.0"
+   },
+   {
+      "image": "spotlight/EvanMacPherson_Profile.webp",
+      "name": "Evan MacPherson",
+      "hometown": "Tecumseh, ON",
+      "age": "17",
+      "favourite beer": "Miller Lite"
+   },
+   {
+      "image": "spotlight/SpencerHiggz_Profile.webp",
+      "name": "Spencer Higgz",
+      "hometown": "Ze Linkz",
+      "age": "22",
+      "favourite beer": "OVs Retsy"
+   },
+   {
+      "image": "spotlight/DeanAlbano_Profile.webp",
+      "name": "Dean Albano",
+      "hometown": "Windsor, ON",
+      "age": "23",
+      "favourite beer": "Bush Light"
    }
 ]
