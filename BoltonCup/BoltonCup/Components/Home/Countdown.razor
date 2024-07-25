@@ -5,20 +5,20 @@
 @if (TimeUntil != null)
 {
     <Grid RowColumns="RowColumns.Are4.OnTablet.Are3.OnMobile" Padding="Padding.Is4.OnY"
-        TextAlignment="TextAlignment.Center">
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile">
-            @TimeUnitComponent(TimeUntil?.Days ?? 0, "DAYS")
-        </Column>
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
-            @TimeUnitComponent(TimeUntil?.Hours ?? 0, "HOURS")
-        </Column>
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
-            @TimeUnitComponent(TimeUntil?.Minutes ?? 0, "MINUTES")
-        </Column>
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
-            @TimeUnitComponent(TimeUntil?.Seconds ?? 0, "SECONDS")
-        </Column>
-    </Grid>
+    TextAlignment="TextAlignment.Center">
+    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile">
+        @TimeUnitComponent(TimeUntil?.Days ?? 0, "DAYS")
+    </Column>
+    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
+        @TimeUnitComponent(TimeUntil?.Hours ?? 0, "HOURS")
+    </Column>
+    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
+        @TimeUnitComponent(TimeUntil?.Minutes ?? 0, "MINUTES")
+    </Column>
+    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
+        @TimeUnitComponent(TimeUntil?.Seconds ?? 0, "SECONDS")
+    </Column>
+</Grid>
 }
 
 
@@ -32,7 +32,8 @@
     };
 
     static Timer myTimer;
-    DateTime TournamentStart = new DateTime(2024, 08, 02, 5 + 12, 30, 00); // august 2 5:30pm
+    //DateTime TournamentStart = new DateTime(2024, 08, 02, 5 + 12, 30, 00); // august 2 5:30pm
+    DateTime TournamentStart = new DateTime(2024, 07, 25, 10, 02, 00); // august 2 5:30pm
     TimeSpan? TimeUntil = null;
     TimeSpan dt = new TimeSpan(0, 0, 1);
 
@@ -42,6 +43,10 @@
         TimeZoneInfo est = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
         DateTime estTimeNow = TimeZoneInfo.ConvertTimeFromUtc(timeUtc, est);
         TimeUntil = TournamentStart - estTimeNow;
+        if (TimeUntil < TimeSpan.Zero)
+        {
+            TimeUntil = TimeSpan.Zero;
+        }
         StartTimer();
     }
     void StartTimer()
@@ -55,7 +60,14 @@
     {
         if (TimeUntil != null)
         {
-            TimeUntil = TimeUntil?.Subtract(dt);
+            if (TimeUntil <= TimeSpan.Zero)
+            {
+                myTimer.Enabled = false;
+            }
+            else
+            {
+                TimeUntil = TimeUntil?.Subtract(dt);
+            }
         }
         else
         {
