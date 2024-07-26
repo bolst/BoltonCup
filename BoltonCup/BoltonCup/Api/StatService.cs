@@ -63,6 +63,10 @@ namespace BoltonCup.Api
             }
         }
 
+        public List<StatType?> TeamGames(string teamName)
+        {
+            return stats.Where(s => (s.Value.HomeTeam == teamName) || (s.Value.AwayTeam == teamName)).ToDictionary(s => s.Key, s => s.Value).Values.ToList();
+        }
 
     }
 }

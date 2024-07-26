@@ -40,7 +40,7 @@
             <Heading Size="HeadingSize.Is6"><b>Favourite Beer: </b>Water</Heading>
         </Column>
         <Column ColumnSize="ColumnSize.Is8.OnFullHD.IsFull.OnMobile" Margin="Margin.IsAuto">
-            <PlayerStatInfo Player="@player" />
+            <PlayerStatTotals Player="@player" Team="@playerTeam"/>
         </Column>
     </Grid>
 
@@ -52,7 +52,7 @@
         <Heading Size="HeadingSize.Is2" TextWeight="TextWeight.Bold">Game by Game</Heading>
     </Div>
     <Div Padding="Padding.Is4.OnX">
-        <PlayerGameByGame Player="@player" />
+        <PlayerGameByGame Player="@player" Team="@playerTeam" />
     </Div>
 
 }

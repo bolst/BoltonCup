@@ -1,1 +1,51 @@
-{"Game 2":{"title":"Game 1","home team":"Nipple Ticklers","away team":"Tecumseh Titty Twisters","date":"2024-08-02T17:30:00","home penalties":[{"player number":"92","infraction":"Fighting","minutes":"5:00","time":"06:12","period":"2"}],"home goals":[{"player number":"15","assist1":"77","assist2":"","time":"09:08","period":"3"},{"player number":"20","assist1":"","assist2":"","time":"04:07","period":"4"}],"away penalties":[{"player number":"05","infraction":"Fighting","minutes":"5:00","time":"06:12","period":"2"}],"away goals":[{"player number":"05","assist1":"","assist2":"","time":"02:01","period":"3"}]}}
+{
+    "Game 2": {
+        "title": "Game 1",
+        "home team": "Nipple Ticklers",
+        "away team": "Tecumseh Titty Twisters",
+        "date": "2024-08-02T17:30:00",
+        "home penalties": [
+            {
+                "player number": "92",
+                "infraction": "Fighting",
+                "minutes": "5:00",
+                "time": "06:12",
+                "period": "2"
+            }
+        ],
+        "home goals": [
+            {
+                "player number": "15",
+                "assist1": "77",
+                "assist2": "",
+                "time": "09:08",
+                "period": "3"
+            },
+            {
+                "player number": "20",
+                "assist1": "",
+                "assist2": "",
+                "time": "04:07",
+                "period": "4"
+            }
+        ],
+        "away penalties": [
+            {
+                "player number": "05",
+                "infraction": "Fighting",
+                "minutes": "5:00",
+                "time": "06:12",
+                "period": "2"
+            }
+        ],
+        "away goals": [
+            {
+                "player number": "05",
+                "assist1": "",
+                "assist2": "",
+                "time": "02:01",
+                "period": "3"
+            }
+        ]
+    }
+}
