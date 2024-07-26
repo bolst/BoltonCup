@@ -2,27 +2,52 @@
 @using System.Timers
 
 
-@if (TimeUntil != null)
+@if (TimeUntil is not null)
 {
-    <Grid RowColumns="RowColumns.Are4.OnTablet.Are3.OnMobile" Padding="Padding.Is4.OnY"
-        TextAlignment="TextAlignment.Center">
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile">
-            @TimeUnitComponent(TimeUntil?.Days ?? 0, "DAYS")
-        </Column>
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
-            @TimeUnitComponent(TimeUntil?.Hours ?? 0, "HOURS")
-        </Column>
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
-            @TimeUnitComponent(TimeUntil?.Minutes ?? 0, "MINUTES")
-        </Column>
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
-            @TimeUnitComponent(TimeUntil?.Seconds ?? 0, "SECONDS")
-        </Column>
-    </Grid>
+    if (TimeUntil > TimeSpan.Zero)
+    {
+        <Grid RowColumns="RowColumns.Are4.OnTablet.Are3.OnMobile" Padding="Padding.Is4.OnY"
+    TextAlignment="TextAlignment.Center">
+    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile">
+        @TimeUnitComponent(TimeUntil?.Days ?? 0, "DAYS")
+    </Column>
+    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
+        @TimeUnitComponent(TimeUntil?.Hours ?? 0, "HOURS")
+    </Column>
+    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
+        @TimeUnitComponent(TimeUntil?.Minutes ?? 0, "MINUTES")
+    </Column>
+    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is4.OnMobile">
+        @TimeUnitComponent(TimeUntil?.Seconds ?? 0, "SECONDS")
+    </Column>
+</Grid>
+    }
+    else
+    {
+        <Div Padding="Padding.Is4">
+            <Grid RowColumns="RowColumns.Are2.OnTablet.Are1.OnMobile" Padding="Padding.Is4.OnTablet.Is2.FromBottom.OnMobile">
+                <Column ColumnSize="ColumnSize.IsHalf.OnTablet.IsFull.OnMobile" Padding="Padding.Is4.OnX" >
+                    @TeamStatCard(Api.TeamService.Instance().GetTeamByID("1"), Border.Is1.Rounded.Primary)
+                </Column>
+                <Column ColumnSize="ColumnSize.IsHalf.OnTablet.IsFull.OnMobile" Padding="Padding.Is4.OnX">
+                    @TeamStatCard(Api.TeamService.Instance().GetTeamByID("3"), Border.Is1.Rounded.Warning)
+                </Column>
+            </Grid>
+            <Grid RowColumns="RowColumns.Are2.OnTablet.Are1.OnMobile" Padding="Padding.Is4.OnTablet.Is2.FromTop.OnMobile">
+                <Column ColumnSize="ColumnSize.IsHalf.OnTablet.IsFull.OnMobile" Padding="Padding.Is4.OnX">
+                    @TeamStatCard(Api.TeamService.Instance().GetTeamByID("2"), Border.Is1.Rounded.Secondary)
+                </Column>
+                <Column ColumnSize="ColumnSize.IsHalf.OnTablet.IsFull.OnMobile" Padding="Padding.Is4.OnX">
+                    @TeamStatCard(Api.TeamService.Instance().GetTeamByID("4"), Border.Is1.Rounded.Info)
+                </Column>
+            </Grid>
+        </Div>
+    }
 }
 
 
 @code {
+    #region Countdown
 
     RenderFragment TimeUnitComponent(int value, string label) => __builder =>
     {
@@ -33,6 +58,7 @@
 
     static Timer myTimer;
     DateTime TournamentStart = new DateTime(2024, 08, 02, 5 + 12, 30, 00); // august 2 5:30pm
+    //DateTime TournamentStart = new DateTime(2024, 07, 25, 10, 02, 00); // august 2 5:30pm
     TimeSpan? TimeUntil = null;
     TimeSpan dt = new TimeSpan(0, 0, 1);
 
@@ -42,6 +68,10 @@
         TimeZoneInfo est = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
         DateTime estTimeNow = TimeZoneInfo.ConvertTimeFromUtc(timeUtc, est);
         TimeUntil = TournamentStart - estTimeNow;
+        if (TimeUntil < TimeSpan.Zero)
+        {
+            TimeUntil = TimeSpan.Zero;
+        }
         StartTimer();
     }
     void StartTimer()
@@ -53,9 +83,16 @@
 
     public void CountDownTimer(Object source, ElapsedEventArgs e)
     {
-        if (TimeUntil != null)
+        if (TimeUntil is not null)
         {
-            TimeUntil = TimeUntil?.Subtract(dt);
+            if (TimeUntil <= TimeSpan.Zero)
+            {
+                myTimer.Enabled = false;
+            }
+            else
+            {
+                TimeUntil = TimeUntil?.Subtract(dt);
+            }
         }
         else
         {
@@ -63,4 +100,25 @@
         }
         InvokeAsync(StateHasChanged);
     }
+    #endregion
+
+    #region Team Stats
+
+    RenderFragment TeamStatCard(TeamData? Team, IFluentBorder border) => __builder =>
+    {
+        if (Team is not null)
+        {
+            
+            <Grid RowColumns="RowColumns.Are2" Background="Background.Transparent" Padding="Padding.Is1.OnY" Border="@border">
+                <Column ColumnSize="ColumnSize.Is3.OnTablet.IsHalf.OnMobile" Margin="Margin.IsAuto.OnY.Is4.OnX">
+                    <Image Source="@Team.Logo" Fluid />
+                </Column>
+                <Column ColumnSize="ColumnSize.Is9.OnTablet.IsHalf.OnMobile" Margin="Margin.IsAuto.OnY.Is4.OnX" TextAlignment="TextAlignment.Center">
+                    <Heading TextColor="TextColor.White">0-0-0</Heading>
+                </Column>
+            </Grid>
+        }
+    };
+
+    #endregion
 }

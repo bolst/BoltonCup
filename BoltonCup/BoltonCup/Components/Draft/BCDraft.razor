@@ -6,49 +6,49 @@
 
 @if (draftService == null)
 {
-    <Div Margin="Margin.Is4" Border="Border.Rounded" Shadow="Shadow.Default" Padding="Padding.Is4">
-        <Grid RowColumns="RowColumns.Are1" Padding="Padding.Is4.OnY">
-            <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.IsAuto">
-                <Switch TValue="bool" @bind-Checked="@useSnake">Snake</Switch>
-            </Column>
-        </Grid>
+        <Div Margin="Margin.Is4" Border="Border.Rounded" Shadow="Shadow.Default" Padding="Padding.Is4">
+            <Grid RowColumns="RowColumns.Are1" Padding="Padding.Is4.OnY">
+                <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.IsAuto">
+                    <Switch TValue="bool" @bind-Checked="@useSnake">Snake</Switch>
+                </Column>
+            </Grid>
 
-        <Grid RowColumns="RowColumns.Are4" Padding="Padding.Is4.OnY">
-            <Column ColumnSize="ColumnSize.IsQuarter" Margin="Margin.IsAuto" TextAlignment="TextAlignment.Center">
+            <Grid RowColumns="RowColumns.Are4" Padding="Padding.Is4.OnY">
+                <Column ColumnSize="ColumnSize.IsQuarter" Margin="Margin.IsAuto" TextAlignment="TextAlignment.Center">
                 @TeamSelectComponent("1")
-            </Column>
-            <Column ColumnSize="ColumnSize.IsQuarter" Margin="Margin.IsAuto" TextAlignment="TextAlignment.Center">
+                </Column>
+                <Column ColumnSize="ColumnSize.IsQuarter" Margin="Margin.IsAuto" TextAlignment="TextAlignment.Center">
                 @TeamSelectComponent("2")
-            </Column>
-            <Column ColumnSize="ColumnSize.IsQuarter" Margin="Margin.IsAuto" TextAlignment="TextAlignment.Center">
+                </Column>
+                <Column ColumnSize="ColumnSize.IsQuarter" Margin="Margin.IsAuto" TextAlignment="TextAlignment.Center">
                 @TeamSelectComponent("3")
-            </Column>
-            <Column ColumnSize="ColumnSize.IsQuarter" Margin="Margin.IsAuto" TextAlignment="TextAlignment.Center">
+                </Column>
+                <Column ColumnSize="ColumnSize.IsQuarter" Margin="Margin.IsAuto" TextAlignment="TextAlignment.Center">
                 @TeamSelectComponent("4")
-            </Column>
-        </Grid>
+                </Column>
+            </Grid>
 
-        <Grid RowColumns="RowColumns.Are1" Padding="Padding.Is4.OnY">
-            <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.IsAuto">
-                <FileEdit Changed="@OnChanged" />
-            </Column>
-        </Grid>
-    </Div>
+            <Grid RowColumns="RowColumns.Are1" Padding="Padding.Is4.OnY">
+                <Column ColumnSize="ColumnSize.IsFull" Margin="Margin.IsAuto">
+                    <FileEdit Changed="@OnChanged" />
+                </Column>
+            </Grid>
+        </Div>
 }
 else
 {
-    <Div Padding="Padding.Is4" TextAlignment="TextAlignment.Center">
-        <Heading Size="HeadingSize.Is4" Margin="Margin.IsAuto" Padding="Padding.Is4.FromBottom">
-            ROUND @currentRound PICK @currentPick: @currentTeam.Name
-        </Heading>
-        <Button Color="Color.Secondary" Clicked="ShowModal">MAKE PICK</Button>
+        <Div Padding="Padding.Is4" TextAlignment="TextAlignment.Center">
+            <Heading Size="HeadingSize.Is4" Margin="Margin.IsAuto" Padding="Padding.Is4.FromBottom">
+                ROUND @currentRound PICK @currentPick: @currentTeam.Name
+            </Heading>
+            <Button Color="Color.Secondary" Clicked="ShowModal">MAKE PICK</Button>
         @if (draftService.GetAvailablePlayers().Count == 1)
         {
-            <Button Color="Color.Success" Clicked="EndDraft" Margin="Margin.Is4.OnX">END DRAFT</Button>
+                    <Button Color="Color.Success" Clicked="EndDraft" Margin="Margin.Is4.OnX">END DRAFT</Button>
         }
-    </Div>
+        </Div>
 
-    <Grid RowColumns="RowColumns.Are3">
+        <Grid RowColumns="RowColumns.Are3">
         <Column ColumnSize="ColumnSize.Is4"></Column>
 
         <Column ColumnSize="ColumnSize.Is4" TextAlignment="TextAlignment.Center">
@@ -60,37 +60,37 @@ else
 
 
 
-    <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@((string name) => selectedTab = name)">
-        <Items>
-            <Tab Name="players">PLAYERS</Tab>
-            <Tab Name="rosters">ROSTERS</Tab>
-            <Tab Name="picks">PICKS</Tab>
-        </Items>
-        <Content>
-            <TabPanel Name="players">
-                @if (allPlayers != null)
+        <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@((string name) => selectedTab = name)">
+            <Items>
+                <Tab Name="players">PLAYERS</Tab>
+                <Tab Name="rosters">ROSTERS</Tab>
+                <Tab Name="picks">PICKS</Tab>
+            </Items>
+            <Content>
+                <TabPanel Name="players">
+                @if (allPlayers is not null)
                 {
+                            <Grid RowColumns="RowColumns.Are4" Margin="Margin.Is4.OnTablet.Is0.OnMobile" Border="Border.Rounded"
+                                Shadow="Shadow.Default" Padding="Padding.Is4">
+                                <Column ColumnSize="ColumnSize.Is12">
+                                    <AllPlayersTable Players="@allPlayers" />
+                                </Column>
+                            </Grid>
+                }
+                </TabPanel>
+                <TabPanel Name="rosters">
                     <Grid RowColumns="RowColumns.Are4" Margin="Margin.Is4.OnTablet.Is0.OnMobile" Border="Border.Rounded"
                         Shadow="Shadow.Default" Padding="Padding.Is4">
-                        <Column ColumnSize="ColumnSize.Is12">
-                            <AllPlayersTable Players="@allPlayers" />
-                        </Column>
-                    </Grid>
-                }
-            </TabPanel>
-            <TabPanel Name="rosters">
-                <Grid RowColumns="RowColumns.Are4" Margin="Margin.Is4.OnTablet.Is0.OnMobile" Border="Border.Rounded"
-                    Shadow="Shadow.Default" Padding="Padding.Is4">
                     @PlayerList(Api.TeamService.Instance().GetTeamByID("1"), Border.Is2.Primary.OnBottom)
                     @PlayerList(Api.TeamService.Instance().GetTeamByID("2"), Border.Is2.Secondary.OnBottom)
                     @PlayerList(Api.TeamService.Instance().GetTeamByID("3"), Border.Is2.Warning.OnBottom)
                     @PlayerList(Api.TeamService.Instance().GetTeamByID("4"), Border.Is2.Info.OnBottom)
-                </Grid>
-            </TabPanel>
-            <TabPanel Name="picks">
-                <Grid RowColumns="RowColumns.Are4" Margin="Margin.Is4.OnTablet.Is0.OnMobile" Border="Border.Rounded"
-                    Shadow="Shadow.Default" Padding="Padding.Is4">
-                    <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
+                    </Grid>
+                </TabPanel>
+                <TabPanel Name="picks">
+                    <Grid RowColumns="RowColumns.Are4" Margin="Margin.Is4.OnTablet.Is0.OnMobile" Border="Border.Rounded"
+                        Shadow="Shadow.Default" Padding="Padding.Is4">
+                        <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
                         @for (int i = 0; i < 4; i++)
                         {
                             int j = i;
@@ -99,16 +99,16 @@ else
                             {
                                 if (!roundDisplayed)
                                 {
-                                    <Heading Size="HeadingSize.Is6">ROUND @(1 + 4 * j)</Heading>
+                                                    <Heading Size="HeadingSize.Is6">ROUND @(1 + 4 * j)</Heading>
                                     roundDisplayed = true;
                                 }
                                 DraftPick pick = p;
-                                <DraftPickCard Pick="@pick" />
+                                            <DraftPickCard Pick="@pick" />
                             }
-                            <br>
+                                    <br>
                         }
-                    </Column>
-                    <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
+                        </Column>
+                        <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
                         @for (int i = 0; i < 4; i++)
                         {
                             int j = i;
@@ -117,17 +117,17 @@ else
                             {
                                 if (!roundDisplayed)
                                 {
-                                    <Heading Size="HeadingSize.Is6">ROUND @(2 + 4 * j)</Heading>
+                                                    <Heading Size="HeadingSize.Is6">ROUND @(2 + 4 * j)</Heading>
                                     roundDisplayed = true;
                                 }
                                 DraftPick pick = p;
-                                <DraftPickCard Pick="@pick" />
+                                            <DraftPickCard Pick="@pick" />
                             }
-                            <br>
+                                    <br>
                         }
-                        <DraftPickCard />
-                    </Column>
-                    <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
+                            <DraftPickCard />
+                        </Column>
+                        <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
                         @for (int i = 0; i < 4; i++)
                         {
                             int j = i;
@@ -136,16 +136,16 @@ else
                             {
                                 if (!roundDisplayed)
                                 {
-                                    <Heading Size="HeadingSize.Is6">ROUND @(3 + 4 * j)</Heading>
+                                                    <Heading Size="HeadingSize.Is6">ROUND @(3 + 4 * j)</Heading>
                                     roundDisplayed = true;
                                 }
                                 DraftPick pick = p;
-                                <DraftPickCard Pick="@pick" />
+                                            <DraftPickCard Pick="@pick" />
                             }
-                            <br>
+                                    <br>
                         }
-                    </Column>
-                    <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
+                        </Column>
+                        <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
                         @for (int i = 0; i < 3; i++)
                         {
                             int j = i;
@@ -154,24 +154,24 @@ else
                             {
                                 if (!roundDisplayed)
                                 {
-                                    <Heading Size="HeadingSize.Is6">ROUND @(4 + 4 * j)</Heading>
+                                                    <Heading Size="HeadingSize.Is6">ROUND @(4 + 4 * j)</Heading>
                                     roundDisplayed = true;
                                 }
                                 DraftPick pick = p;
-                                <DraftPickCard Pick="@pick" />
+                                            <DraftPickCard Pick="@pick" />
                             }
-                            <br>
+                                    <br>
                         }
-                    </Column>
-                </Grid>
-            </TabPanel>
-        </Content>
-    </Tabs>
+                        </Column>
+                    </Grid>
+                </TabPanel>
+            </Content>
+        </Tabs>
 
 
 
 
-    <Modal @ref="modalRef">
+        <Modal @ref="modalRef">
         <ModalContent Centered>
             <ModalHeader>
                 <ModalTitle>@($"R{currentRound}P{currentPick}: {currentTeam.Name}")</ModalTitle>
@@ -184,16 +184,16 @@ else
                         @foreach (var p in draftService.GetAvailablePlayers())
                         {
                             DraftPlayer player = p;
-                            <SelectItem Value="@player.Name">@player.Name</SelectItem>
+                                    <SelectItem Value="@player.Name">@player.Name</SelectItem>
                         }
-                    </Select>
-                </Field>
-            </ModalBody>
-            <ModalFooter>
-                <Button Color="Color.Secondary" Clicked="@DraftPlayer">DRAFT PLAYER</Button>
-            </ModalFooter>
-        </ModalContent>
-    </Modal>
+                        </Select>
+                    </Field>
+                </ModalBody>
+                <ModalFooter>
+                    <Button Color="Color.Secondary" Clicked="@DraftPlayer">DRAFT PLAYER</Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
 }
 
 
@@ -225,13 +225,13 @@ else
         {
             heading = "FOURTH";
         }
-        <Heading Size="HeadingSize.Is5">@heading</Heading>
-        <Select @bind-SelectedValue="@order[pick]">
-            <SelectItem Value=@("1")>@Api.TeamService.Instance().GetTeamByID("1").Name</SelectItem>
-            <SelectItem Value=@("2")>@Api.TeamService.Instance().GetTeamByID("2").Name</SelectItem>
-            <SelectItem Value=@("3")>@Api.TeamService.Instance().GetTeamByID("3").Name</SelectItem>
-            <SelectItem Value=@("4")>@Api.TeamService.Instance().GetTeamByID("4").Name</SelectItem>
-        </Select>
+                <Heading Size="HeadingSize.Is5">@heading</Heading>
+                <Select @bind-SelectedValue="@order[pick]">
+                    <SelectItem Value=@("1")>@Api.TeamService.Instance().GetTeamByID("1").Name</SelectItem>
+                    <SelectItem Value=@("2")>@Api.TeamService.Instance().GetTeamByID("2").Name</SelectItem>
+                    <SelectItem Value=@("3")>@Api.TeamService.Instance().GetTeamByID("3").Name</SelectItem>
+                    <SelectItem Value=@("4")>@Api.TeamService.Instance().GetTeamByID("4").Name</SelectItem>
+                </Select>
     };
 
     #endregion
@@ -286,16 +286,16 @@ else
         int fdc = team.Players.Where(p => p.PosAbbrev() == "F/D").ToList().Count;
         int dc = team.Players.Where(p => p.PosAbbrev() == "D").ToList().Count;
         int gc = team.Players.Where(p => p.PosAbbrev() == "G").ToList().Count;
-        <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
-            <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold">@team.Name</Heading>
-            <Heading Size="HeadingSize.Is6">@($"{fc}F {dc}D {gc}G {fdc}F/D")</Heading>
-            <Heading Size="HeadingSize.Is6" Border="@border">@($"{g1c}-{g2c}-{g3c}-{g4c}")</Heading>
+                <Column ColumnSize="ColumnSize.Is3" TextAlignment="TextAlignment.Center">
+                    <Heading Size="HeadingSize.Is5" TextWeight="TextWeight.Bold">@team.Name</Heading>
+                    <Heading Size="HeadingSize.Is6">@($"{fc}F {dc}D {gc}G {fdc}F/D")</Heading>
+                    <Heading Size="HeadingSize.Is6" Border="@border">@($"{g1c}-{g2c}-{g3c}-{g4c}")</Heading>
             @foreach (var p in team.Players)
             {
                 TeamPlayer player = p;
-                <Heading Size="HeadingSize.Is6">@player.Name</Heading>
+                            <Heading Size="HeadingSize.Is6">@player.Name</Heading>
             }
-        </Column>
+                </Column>
     };
 
     string selectedTab = "players";

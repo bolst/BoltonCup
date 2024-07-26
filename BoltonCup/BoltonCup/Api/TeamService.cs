@@ -23,7 +23,7 @@ namespace BoltonCup.Api
                     {
                         string fileContent = stream.ReadToEnd();
                         TeamData? data = JsonSerializer.Deserialize<TeamData>(fileContent);
-                        if (data != null) { TeamDataList.Add(data); }
+                        if (data is not null) { TeamDataList.Add(data); }
                     }
                 }
             }
