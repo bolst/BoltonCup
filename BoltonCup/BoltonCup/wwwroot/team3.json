@@ -6,82 +6,98 @@
         {
             "name": "Landon prince",
             "birth year": "2004",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "Jack Sexsmith",
             "birth year": "2004",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "Spencer Higginbottom",
             "birth year": "2002",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Curtis-Joseph Jackson",
             "birth year": "2001",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Jonas Columbus ",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Andrew Stratichuk",
             "birth year": "2004",
-            "position": "Forward/Defenseman"
+            "position": "Forward/Defenseman",
+            "number": "00"
         },
         {
             "name": "Evan Fenech",
             "birth year": "2006",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "Ryan Sterling",
             "birth year": "2001",
-            "position": "Forward/Defenseman"
+            "position": "Forward/Defenseman",
+            "number": "00"
         },
         {
             "name": "Kyle Bleau",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Liam Prince",
             "birth year": "2003",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Max Sieberer",
             "birth year": "2000",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Evan MacPherson",
             "birth year": "2007",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Michael Rohrer ",
             "birth year": "2003",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "Kaleb Simpson",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Tyler Burton",
             "birth year": "2006",
-            "position": "Goalie"
+            "position": "Goalie",
+            "number": "00"
         },
         {
             "name": "Romano Liburdi ",
             "birth year": "2001",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         }
     ]
 }

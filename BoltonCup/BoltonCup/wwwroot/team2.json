@@ -6,82 +6,98 @@
         {
             "name": "Nic Bolton",
             "birth year": "2002",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "15"
         },
         {
             "name": "Colton Krzeminski",
             "birth year": "2001",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "07"
         },
         {
             "name": "Dean Albano",
             "birth year": "2001",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "92"
         },
         {
             "name": "Ethan Galvan",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Defenseman",
+            "number": "44"
         },
         {
             "name": "Roman Falsetta",
             "birth year": "2002",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "28"
         },
         {
             "name": "Keegan Carswell",
             "birth year": "2007",
-            "position": "Goalie"
+            "position": "Goalie",
+            "number": "32"
         },
         {
-            "name": "Nate dowling",
+            "name": "Nate Dowling",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "21"
         },
         {
             "name": "Aedan Sullivan",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "11"
         },
         {
             "name": "Brandon Leblanc",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "22"
         },
         {
             "name": "Davon Geddes",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Evan Eansor",
             "birth year": "2002",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "Lucas Stoyanovich",
             "birth year": "2002",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "14"
         },
         {
             "name": "Conor Costello",
             "birth year": "2005",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "06"
         },
         {
             "name": "Jack lewis",
             "birth year": "2005",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "97"
         },
         {
             "name": "Quinn O\u2019Neill",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Defenseman",
+            "number": "10"
         },
         {
             "name": "Jake Gaudario",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "77"
         }
     ]
 }
