@@ -1,5 +1,6 @@
 @namespace BoltonCup.Components
 
+<Heading TextWeight="TextWeight.Bold" Size="HeadingSize.Is6">PENALTIES</Heading>
 @if (Penalties is not null)
 {
     <Table Narrow>
@@ -16,7 +17,9 @@
             @foreach (ScoresheetPenalty pen in Penalties)
             {
                 <TableRow>
-                    <TableRowHeader>@pen.PlayerNumber</TableRowHeader>
+                    <TableRowHeader>
+                        <PlayerNameLink Player="@Api.TeamService.Instance().GetPlayerByNumber(pen.PlayerNumber, TeamName)" />
+                    </TableRowHeader>
                     <TableRowCell>@pen.Minutes</TableRowCell>
                     <TableRowCell>@pen.Infraction</TableRowCell>
                     <TableRowCell TextAlignment="TextAlignment.Center">@pen.Period</TableRowCell>
@@ -29,4 +32,5 @@
 
 @code {
     [Parameter] public List<ScoresheetPenalty>? Penalties { get; set; } = null;
+    [Parameter] public string TeamName { get; set; } = "";
 }

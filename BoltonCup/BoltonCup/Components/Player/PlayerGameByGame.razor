@@ -1,0 +1,31 @@
+@namespace BoltonCup.Components
+
+@if (Player is not null)
+{
+    <Table Striped>
+        <TableHeader>
+            <TableRow>
+                <TableHeaderCell>Date</TableHeaderCell>
+                <TableHeaderCell>Opp</TableHeaderCell>
+                <TableHeaderCell>G</TableHeaderCell>
+                <TableHeaderCell>A</TableHeaderCell>
+                <TableHeaderCell>P</TableHeaderCell>
+                <TableHeaderCell>PIM</TableHeaderCell>
+            </TableRow>
+        </TableHeader>
+        <TableBody>
+            <TableRow>
+                <TableRowHeader>Aug 2/24</TableRowHeader>
+                <TableRowCell>vs TTT</TableRowCell>
+                <TableRowCell>1</TableRowCell>
+                <TableRowCell>0</TableRowCell>
+                <TableRowCell>1</TableRowCell>
+                <TableRowCell>2</TableRowCell>
+            </TableRow>
+        </TableBody>
+    </Table>
+}
+
+@code {
+    [Parameter] public TeamPlayer? Player { get; set; } = null;
+}

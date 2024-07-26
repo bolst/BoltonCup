@@ -60,5 +60,42 @@ namespace BoltonCup.Api
                 File.WriteAllText($"wwwroot/team{team.Id}.json", json);
             }
         }
+
+        public TeamData? GetTeamByName(string name)
+        {
+            return TeamDataList.Where(t => t.Name == name).First();
+        }
+
+        public TeamPlayer? GetPlayerByNumber(string num, string teamName)
+        {
+            TeamData? team = GetTeamByName(teamName);
+            if (team is null) return null;
+            var players = team.Players!.Where(p => p.Number == num);
+            if (players.Count() == 0) return new TeamPlayer();
+            return players.First();
+        }
+
+        public List<TeamPlayer> GetPlayers()
+        {
+            List<TeamPlayer> res = new();
+            foreach (var team in TeamDataList)
+            {
+                var players = team.Players;
+                res.AddRange(players);
+            }
+            return res;
+        }
+
+        public TeamPlayer? GetPlayerByName(string name)
+        {
+            var players = GetPlayers().Where(p => p.Name == name);
+            if (players.Count() == 0) return new TeamPlayer();
+            return players.First();
+        }
+
+        public TeamData GetPlayerTeam(TeamPlayer player)
+        {
+            return TeamDataList.Where(t => t.Players.Any(p => p.Name == player.Name)).FirstOrDefault();
+        }
     }
 }
