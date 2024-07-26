@@ -6,7 +6,7 @@
         {
             "name": "Nic Bolton",
             "birth year": "2002",
-            "position": "Forward/Defenseman"
+            "position": "Defenseman"
         },
         {
             "name": "Colton Krzeminski",
@@ -14,13 +14,18 @@
             "position": "Forward"
         },
         {
-            "name": "Ethan Galvan",
-            "birth year": "2004",
-            "position": "Forward/Defenseman"
+            "name": "Dean Albano",
+            "birth year": "2001",
+            "position": "Defenseman"
         },
         {
-            "name": "Jonathan sexsmith ",
+            "name": "Ethan Galvan",
             "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Roman Falsetta",
+            "birth year": "2002",
             "position": "Defenseman"
         },
         {
@@ -71,17 +76,12 @@
         {
             "name": "Quinn O\u2019Neill",
             "birth year": "2004",
-            "position": "Forward/Defenseman"
+            "position": "Forward"
         },
         {
             "name": "Jake Gaudario",
             "birth year": "2004",
             "position": "Forward"
-        },
-        {
-            "name": "Andrew Stratichuk",
-            "birth year": "2004",
-            "position": "Forward/Defenseman"
         }
     ]
 }

@@ -9,6 +9,11 @@
             "position": "Defenseman"
         },
         {
+            "name": "Jack Sexsmith",
+            "birth year": "2004",
+            "position": "Defenseman"
+        },
+        {
             "name": "Spencer Higginbottom",
             "birth year": "2002",
             "position": "Forward"
@@ -24,9 +29,9 @@
             "position": "Forward"
         },
         {
-            "name": "Dean Albano",
-            "birth year": "2001",
-            "position": "Defenseman"
+            "name": "Andrew Stratichuk",
+            "birth year": "2004",
+            "position": "Forward/Defenseman"
         },
         {
             "name": "Evan Fenech",
@@ -64,14 +69,9 @@
             "position": "Defenseman"
         },
         {
-            "name": "Roman Falsetta",
-            "birth year": "2002",
-            "position": "Forward/Defenseman"
-        },
-        {
             "name": "Kaleb Simpson",
             "birth year": "2004",
-            "position": "Forward/Defenseman"
+            "position": "Forward"
         },
         {
             "name": "Tyler Burton",
