@@ -1,1 +1,87 @@
-{"id": 2, "name": "Nipple Ticklers", "logo": "team2logo.png", "players": []}
+{
+    "id": 2,
+    "name": "Nipple Ticklers",
+    "logo": "team2logo.png",
+    "players": [
+        {
+            "name": "Nic Bolton",
+            "birth year": "2002",
+            "position": "Forward/Defenseman"
+        },
+        {
+            "name": "Colton Krzeminski",
+            "birth year": "2001",
+            "position": "Forward"
+        },
+        {
+            "name": "Ethan Galvan",
+            "birth year": "2004",
+            "position": "Forward/Defenseman"
+        },
+        {
+            "name": "Jonathan sexsmith ",
+            "birth year": "2004",
+            "position": "Defenseman"
+        },
+        {
+            "name": "Keegan Carswell",
+            "birth year": "2007",
+            "position": "Goalie"
+        },
+        {
+            "name": "Nate dowling",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Aedan Sullivan",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Brandon Leblanc",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Davon Geddes",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Evan Eansor",
+            "birth year": "2002",
+            "position": "Defenseman"
+        },
+        {
+            "name": "Lucas Stoyanovich",
+            "birth year": "2002",
+            "position": "Forward"
+        },
+        {
+            "name": "Conor Costello",
+            "birth year": "2005",
+            "position": "Forward"
+        },
+        {
+            "name": "Jack lewis",
+            "birth year": "2005",
+            "position": "Forward"
+        },
+        {
+            "name": "Quinn O\u2019Neill",
+            "birth year": "2004",
+            "position": "Forward/Defenseman"
+        },
+        {
+            "name": "Jake Gaudario",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Andrew Stratichuk",
+            "birth year": "2004",
+            "position": "Forward/Defenseman"
+        }
+    ]
+}

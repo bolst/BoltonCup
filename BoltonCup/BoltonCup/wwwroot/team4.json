@@ -1,1 +1,87 @@
-{"id": 4, "name": "South West Sausages", "logo": "team4logo.png", "players": []}
+{
+    "id": 4,
+    "name": "South West Sausages",
+    "logo": "team4logo.png",
+    "players": [
+        {
+            "name": "Connor Kelly ",
+            "birth year": "2003",
+            "position": "Forward"
+        },
+        {
+            "name": "Owen findlay",
+            "birth year": "2004",
+            "position": "Defenseman"
+        },
+        {
+            "name": "Karson Beuglet",
+            "birth year": "2003",
+            "position": "Forward/Defenseman"
+        },
+        {
+            "name": "Alixe Saliba",
+            "birth year": "1998",
+            "position": "Forward"
+        },
+        {
+            "name": "Matteo Frattaroli",
+            "birth year": "2003",
+            "position": "Forward"
+        },
+        {
+            "name": "Dallas Anderson ",
+            "birth year": "2000",
+            "position": "Forward"
+        },
+        {
+            "name": "Cooper Tremblett",
+            "birth year": "2002",
+            "position": "Forward"
+        },
+        {
+            "name": "Liam Godwin ",
+            "birth year": "2005",
+            "position": "Goalie"
+        },
+        {
+            "name": "Owen Bentley ",
+            "birth year": "2006",
+            "position": "Forward"
+        },
+        {
+            "name": "Lukas Boudreau",
+            "birth year": "2005",
+            "position": "Forward"
+        },
+        {
+            "name": "Tyler fuhr",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Ryan Cronheimer ",
+            "birth year": "2005",
+            "position": "Forward/Defenseman"
+        },
+        {
+            "name": "Jake Rogers",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Brandon Allen",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Quinn Thoms",
+            "birth year": "2005",
+            "position": "Defenseman"
+        },
+        {
+            "name": "Reilly Bond",
+            "birth year": "2004",
+            "position": "Forward"
+        }
+    ]
+}

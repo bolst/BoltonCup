@@ -1,1 +1,87 @@
-{"id": 1, "name": "Just the Tip", "logo": "team1logo.png", "players": []}
+{
+    "id": 1,
+    "name": "Just the Tip",
+    "logo": "team1logo.png",
+    "players": [
+        {
+            "name": "Chris Bolton",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Connor Tucker",
+            "birth year": "2005",
+            "position": "Forward"
+        },
+        {
+            "name": "Seth Martineau",
+            "birth year": "2004",
+            "position": "Forward/Defenseman"
+        },
+        {
+            "name": "Connor Fabel",
+            "birth year": "2001",
+            "position": "Defenseman"
+        },
+        {
+            "name": "ashton anderson",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Tyler Trealout",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Allan Djordjevic",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Easton Forrest",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Noah Taylor",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Ryan Patterson",
+            "birth year": "2001",
+            "position": "Forward"
+        },
+        {
+            "name": "Carson Mcginnis",
+            "birth year": "2003",
+            "position": "Defenseman"
+        },
+        {
+            "name": "Jesse mercier",
+            "birth year": "2005",
+            "position": "Forward/Defenseman"
+        },
+        {
+            "name": "Anthony derose",
+            "birth year": "2004",
+            "position": "Defenseman"
+        },
+        {
+            "name": "Logan Nagy",
+            "birth year": "2005",
+            "position": "Forward/Defenseman"
+        },
+        {
+            "name": "Ben Mueller",
+            "birth year": "2005",
+            "position": "Defenseman"
+        },
+        {
+            "name": "Noah spadotto",
+            "birth year": "2006",
+            "position": "Goalie"
+        }
+    ]
+}
