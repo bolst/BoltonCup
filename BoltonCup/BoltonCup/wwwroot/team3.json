@@ -1,1 +1,87 @@
-{"id": 3, "name": "Tecumseh Titty Twisters", "logo": "team3logo.png", "players": []}
+{
+    "id": 3,
+    "name": "Tecumseh Titty Twisters",
+    "logo": "team3logo.png",
+    "players": [
+        {
+            "name": "Landon prince",
+            "birth year": "2004",
+            "position": "Defenseman"
+        },
+        {
+            "name": "Spencer Higginbottom",
+            "birth year": "2002",
+            "position": "Forward"
+        },
+        {
+            "name": "Curtis-Joseph Jackson",
+            "birth year": "2001",
+            "position": "Forward"
+        },
+        {
+            "name": "Jonas Columbus ",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Dean Albano",
+            "birth year": "2001",
+            "position": "Defenseman"
+        },
+        {
+            "name": "Evan Fenech",
+            "birth year": "2006",
+            "position": "Defenseman"
+        },
+        {
+            "name": "Ryan Sterling",
+            "birth year": "2001",
+            "position": "Forward/Defenseman"
+        },
+        {
+            "name": "Kyle Bleau",
+            "birth year": "2004",
+            "position": "Forward"
+        },
+        {
+            "name": "Liam Prince",
+            "birth year": "2003",
+            "position": "Forward"
+        },
+        {
+            "name": "Max Sieberer",
+            "birth year": "2000",
+            "position": "Forward"
+        },
+        {
+            "name": "Evan MacPherson",
+            "birth year": "2007",
+            "position": "Forward"
+        },
+        {
+            "name": "Michael Rohrer ",
+            "birth year": "2003",
+            "position": "Defenseman"
+        },
+        {
+            "name": "Roman Falsetta",
+            "birth year": "2002",
+            "position": "Forward/Defenseman"
+        },
+        {
+            "name": "Kaleb Simpson",
+            "birth year": "2004",
+            "position": "Forward/Defenseman"
+        },
+        {
+            "name": "Tyler Burton",
+            "birth year": "2006",
+            "position": "Goalie"
+        },
+        {
+            "name": "Romano Liburdi ",
+            "birth year": "2001",
+            "position": "Forward"
+        }
+    ]
+}
