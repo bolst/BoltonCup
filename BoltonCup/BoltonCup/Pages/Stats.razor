@@ -1,0 +1,41 @@
+@page "/stats"
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<Div Border="Border.Rounded" Margin="Margin.Is4.OnX" Shadow="Shadow.Default" Padding="Padding.Is4">
+    <Table Striped>
+        <TableHeader>
+            <TableRow>
+                <TableHeaderCell></TableHeaderCell>
+                <TableHeaderCell>Player</TableHeaderCell>
+                <TableHeaderCell>Pos</TableHeaderCell>
+                <TableHeaderCell>G</TableHeaderCell>
+                <TableHeaderCell>A</TableHeaderCell>
+                <TableHeaderCell>P</TableHeaderCell>
+                <TableHeaderCell>PIM</TableHeaderCell>
+            </TableRow>
+        </TableHeader>
+        <TableBody>
+            @foreach (var (player, playerStat) in Api.StatService.Instance().OrderedPlayerTotals())
+            {
+                <TableRow>
+                    <TableRowHeader>@player.Number</TableRowHeader>
+                    <TableRowCell>@player.Name</TableRowCell>
+                    <TableRowCell>@player.Position</TableRowCell>
+                    <TableRowCell>@playerStat.Goals</TableRowCell>
+                    <TableRowCell>@playerStat.Assists</TableRowCell>
+                    <TableRowCell>@(playerStat.Goals + playerStat.Assists)</TableRowCell>
+                    <TableRowCell>@(playerStat.PIMs)</TableRowCell>
+                </TableRow>
+            }
+        </TableBody>
+    </Table>
+</Div>
+
+@code {
+
+}

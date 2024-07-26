@@ -68,5 +68,49 @@ namespace BoltonCup.Api
             return stats.Where(s => (s.Value.HomeTeam == teamName) || (s.Value.AwayTeam == teamName)).ToDictionary(s => s.Key, s => s.Value).Values.ToList();
         }
 
+        public PlayerStat PlayerTotals(TeamPlayer player, TeamData team)
+        {
+            var games = TeamGames(team.Name);
+            PlayerStat res = new(0, 0, 0);
+            foreach (var game in games)
+            {
+                if (game.HomeTeam == team.Name)
+                {
+                    res.Goals += game.HomeGoals.Where(hg => hg.PlayerNumber == player.Number).Count();
+                    res.Assists += game.HomeGoals.Where(hg => hg.Assist1 == player.Number || hg.Assist2 == player.Number).Count();
+                    res.PIMs += game.HomePenalties.Where(hp => hp.PlayerNumber == player.Number).ToList().Sum(p =>
+                    Convert.ToInt32(p.Minutes.Split(":")[0]));
+                }
+                else if (game.AwayTeam == team.Name)
+                {
+                    res.Goals += game.AwayGoals.Where(ag => ag.PlayerNumber == player.Number).Count();
+                    res.Assists += game.AwayGoals.Where(ag => ag.Assist1 == player.Number || ag.Assist2 == player.Number).Count();
+                    res.PIMs += game.AwayPenalties.Where(ap => ap.PlayerNumber == player.Number).ToList().Sum(p =>
+                    Convert.ToInt32(p.Minutes.Split(":")[0]));
+                }
+            }
+            return res;
+        }
+
+        public List<(TeamPlayer, PlayerStat)> UnorderedPlayerTotals()
+        {
+            List<(TeamPlayer, PlayerStat)> res = new(64);
+            foreach (var team in Api.TeamService.Instance().GetTeams())
+            {
+                foreach (var player in team.Players)
+                {
+                    res.Add((player, PlayerTotals(player, team)));
+                }
+            }
+            return res;
+        }
+
+        public List<(TeamPlayer, PlayerStat)> OrderedPlayerTotals()
+        {
+            var unordered = UnorderedPlayerTotals();
+            var ordered = unordered.OrderBy(s => (s.Item2.Goals + s.Item2.Assists)).ToList();
+            ordered.Reverse();
+            return ordered;
+        }
     }
 }

@@ -1,24 +1,24 @@
 @namespace BoltonCup.Components
 
-@if (Player is not null && Team is not null)
+@if (Player is not null && Team is not null && Stats is not null)
 {
 
     <Div Background="Background.Light" Padding="Padding.Is4.OnX.Is2.OnY" Display="Display.Flex" Border="Border.Rounded">
         <Div Padding="Padding.Is4.OnX" TextAlignment="TextAlignment.Center" Border="Border.Is2.OnEnd">
             <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">G</Heading>
-            <Heading Size="HeadingSize.Is2" TextWeight="TextWeight.Bold">@goals</Heading>
+            <Heading Size="HeadingSize.Is2" TextWeight="TextWeight.Bold">@Stats.Goals</Heading>
         </Div>
         <Div Padding="Padding.Is4.OnX" TextAlignment="TextAlignment.Center">
             <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">A</Heading>
-            <Heading Size="HeadingSize.Is2" TextWeight="TextWeight.Bold">@assists</Heading>
+            <Heading Size="HeadingSize.Is2" TextWeight="TextWeight.Bold">@Stats.Assists</Heading>
         </Div>
         <Div Padding="Padding.Is4.OnX" TextAlignment="TextAlignment.Center" Border="Border.Is2.OnStart">
             <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">P</Heading>
-            <Heading Size="HeadingSize.Is2" TextWeight="TextWeight.Bold">@(goals + assists)</Heading>
+            <Heading Size="HeadingSize.Is2" TextWeight="TextWeight.Bold">@(Stats.Goals + Stats.Assists)</Heading>
         </Div>
         <Div Padding="Padding.Is4.OnX" TextAlignment="TextAlignment.Center" Border="Border.Is2.OnStart.Is2.OnEnd">
             <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">PIM</Heading>
-            <Heading Size="HeadingSize.Is2" TextWeight="TextWeight.Bold">@pims</Heading>
+            <Heading Size="HeadingSize.Is2" TextWeight="TextWeight.Bold">@Stats.PIMs</Heading>
         </Div>
     </Div>
 }
@@ -28,31 +28,12 @@
     [Parameter] public TeamData? Team { get; set; } = null;
 
 
-    int goals = 0;
-    int assists = 0;
-    int pims = 0;
+    PlayerStat? Stats = null;
     protected override void OnInitialized()
     {
-        var games = Api.StatService.Instance().TeamGames(Team.Name);
-        goals = 0;
-        assists = 0;
-        pims = 0;
-        foreach (var game in games)
+        if (Player is not null && Team is not null)
         {
-            if (game.HomeTeam == Team.Name)
-            {
-                goals += game.HomeGoals.Where(hg => hg.PlayerNumber == Player.Number).Count();
-                assists += game.HomeGoals.Where(hg => hg.Assist1 == Player.Number || hg.Assist2 == Player.Number).Count();
-                pims += game.HomePenalties.Where(hp => hp.PlayerNumber == Player.Number).ToList().Sum(p =>
-                Convert.ToInt32(p.Minutes.Split(":")[0]));
-            }
-            else if (game.AwayTeam == Team.Name)
-            {
-                goals += game.AwayGoals.Where(ag => ag.PlayerNumber == Player.Number).Count();
-                assists += game.AwayGoals.Where(ag => ag.Assist1 == Player.Number || ag.Assist2 == Player.Number).Count();
-                pims += game.AwayPenalties.Where(ap => ap.PlayerNumber == Player.Number).ToList().Sum(p =>
-                Convert.ToInt32(p.Minutes.Split(":")[0]));
-            }
+            Stats = Api.StatService.Instance().PlayerTotals(Player, Team);
         }
     }
 }
