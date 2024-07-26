@@ -31,17 +31,22 @@
     <br>
 
     <Grid RowColumns="RowColumns.Are2.OnFullHD.Are1.OnMobile">
+        @{
+            
+            var spotlightList = Api.SpotlightService.Instance().Spotlights.Where(s => s.Name.ToLower() == player.Name.ToLower()).ToList();
+            var spotlight = spotlightList.Count() == 0 ? (new Spotlight()) : spotlightList.First();
         <Column ColumnSize="ColumnSize.Is2.OnFullHD.IsFull.OnMobile" Margin="Margin.IsAuto">
-            <Image Source="spotlight/AD_Profile.webp" Fluid />
+            <Image Source="@spotlight.Image" Fluid />
         </Column>
         <Column ColumnSize="ColumnSize.Is2.OnFullHD.IsFull.OnMobile" Margin="Margin.IsAuto" Padding="Padding.Is4.OnX" Border="Border.Is2.OnStart.Is2.OnEnd">
             <Heading Size="HeadingSize.Is6"><b>Birth Year: </b>@player.BirthYear</Heading>
-            <Heading Size="HeadingSize.Is6"><b>Hometown: </b>Tecumseh, ON</Heading>
-            <Heading Size="HeadingSize.Is6"><b>Favourite Beer: </b>Water</Heading>
+            <Heading Size="HeadingSize.Is6"><b>Hometown: </b>@spotlight.Hometown</Heading>
+            <Heading Size="HeadingSize.Is6"><b>Favourite Beer: </b>@spotlight.FavBeer</Heading>
         </Column>
         <Column ColumnSize="ColumnSize.Is8.OnFullHD.IsFull.OnMobile" Margin="Margin.IsAuto">
             <PlayerStatTotals Player="@player" Team="@playerTeam"/>
         </Column>
+        }
     </Grid>
 
     <br>
