@@ -57,9 +57,8 @@
                         @player.Number
                     </Column>
 
-                    <Column ColumnSize="ColumnSize.Is2.OnTablet.Is7.OnMobile" Margin="Margin.IsAuto.OnY"
-                        TextWeight="TextWeight.SemiBold">
-                        @player.Name @(player.Position.Contains("/") ? "(F/D)" : "")
+                    <Column ColumnSize="ColumnSize.Is2.OnTablet.Is7.OnMobile" Margin="Margin.IsAuto.OnY" TextWeight="TextWeight.Bold">
+                        <PlayerNameLink Player="@player" />
                     </Column>
 
                     <Column ColumnSize="ColumnSize.Is2.OnTablet.Is4.OnMobile" Margin="Margin.IsAuto.OnY"

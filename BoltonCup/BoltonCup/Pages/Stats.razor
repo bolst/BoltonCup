@@ -30,7 +30,7 @@
                     <TableRowCell>
                         <PlayerNameLink Player="@player" />
                     </TableRowCell>
-                    <TableRowCell>@player.Position</TableRowCell>
+                    <TableRowCell>@player.Position.First()</TableRowCell>
                     <TableRowCell>@playerStat.Goals</TableRowCell>
                     <TableRowCell>@playerStat.Assists</TableRowCell>
                     <TableRowCell>@(playerStat.Goals + playerStat.Assists)</TableRowCell>
