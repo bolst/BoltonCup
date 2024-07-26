@@ -24,7 +24,9 @@
             {
                 <TableRow>
                     <TableRowHeader>@player.Number</TableRowHeader>
-                    <TableRowCell>@player.Name</TableRowCell>
+                    <TableRowCell>
+                        <PlayerNameLink Player="@player" />
+                    </TableRowCell>
                     <TableRowCell>@player.Position</TableRowCell>
                     <TableRowCell>@playerStat.Goals</TableRowCell>
                     <TableRowCell>@playerStat.Assists</TableRowCell>
