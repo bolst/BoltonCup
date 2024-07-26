@@ -6,82 +6,98 @@
         {
             "name": "Connor Kelly ",
             "birth year": "2003",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "18"
         },
         {
             "name": "Owen findlay",
             "birth year": "2004",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "Karson Beuglet",
             "birth year": "2003",
-            "position": "Forward/Defenseman"
+            "position": "Forward/Defenseman",
+            "number": "00"
         },
         {
             "name": "Alixe Saliba",
             "birth year": "1998",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Matteo Frattaroli",
             "birth year": "2003",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Dallas Anderson ",
             "birth year": "2000",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Cooper Tremblett",
             "birth year": "2002",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Liam Godwin ",
             "birth year": "2005",
-            "position": "Goalie"
+            "position": "Goalie",
+            "number": "00"
         },
         {
             "name": "Owen Bentley ",
             "birth year": "2006",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Lukas Boudreau",
             "birth year": "2005",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Tyler fuhr",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Ryan Cronheimer ",
             "birth year": "2005",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "Jake Rogers",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Brandon Allen",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Quinn Thoms",
             "birth year": "2005",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "Reilly Bond",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         }
     ]
 }

@@ -6,82 +6,98 @@
         {
             "name": "Chris Bolton",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Connor Tucker",
             "birth year": "2005",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Seth Martineau",
             "birth year": "2004",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "Connor Fabel",
             "birth year": "2001",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "ashton anderson",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Tyler Trealout",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Allan Djordjevic",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Easton Forrest",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Noah Taylor",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Ryan Patterson",
             "birth year": "2001",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Carson Mcginnis",
             "birth year": "2003",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "Jesse mercier",
             "birth year": "2005",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Anthony derose",
             "birth year": "2004",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Logan Nagy",
             "birth year": "2005",
-            "position": "Forward"
+            "position": "Forward",
+            "number": "00"
         },
         {
             "name": "Ben Mueller",
             "birth year": "2005",
-            "position": "Defenseman"
+            "position": "Defenseman",
+            "number": "00"
         },
         {
             "name": "Noah spadotto",
             "birth year": "2006",
-            "position": "Goalie"
+            "position": "Goalie",
+            "number": "00"
         }
     ]
 }
