@@ -4,31 +4,31 @@
 <br>
 <br>
 
-@if (Stats != null)
+@if (Stats is not null)
 {
-    <Div Padding="Padding.Is4.FromTop.Is4.OnX">
-        <Heading TextWeight="TextWeight.Bold">@Stats.HomeTeam.ToUpper() - @Stats.HomeGoals.Count()</Heading>
-    </Div>
-    <Grid RowColumns="RowColumns.Are2" Padding="Padding.Is4.FromBottom.Is4.OnX">
-        <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
-            <GoalTable Goals="@Stats.HomeGoals" />
-        </Column>
-        <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
-            <PenaltyTable Penalties="@Stats.HomePenalties" />
-        </Column>
-    </Grid>
+        <Div Padding="Padding.Is4.FromTop.Is4.OnX">
+            <Heading TextWeight="TextWeight.Bold">@Stats.HomeTeam.ToUpper() - @Stats.HomeGoals.Count()</Heading>
+        </Div>
+        <Grid RowColumns="RowColumns.Are2" Padding="Padding.Is4.FromBottom.Is4.OnX">
+            <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
+                <GoalTable Goals="@Stats.HomeGoals" />
+            </Column>
+            <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
+                <PenaltyTable Penalties="@Stats.HomePenalties" />
+            </Column>
+        </Grid>
 
-    <Div Padding="Padding.Is4.FromTop.Is4.OnX">
+        <Div Padding="Padding.Is4.FromTop.Is4.OnX">
         <Heading TextWeight="TextWeight.Bold">@Stats.AwayTeam.ToUpper() - @Stats.AwayGoals.Count()</Heading>
     </Div>
-    <Grid RowColumns="RowColumns.Are2" Padding="Padding.Is4">
-        <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
-            <GoalTable Goals="@Stats.AwayGoals" />
-        </Column>
-        <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
-            <PenaltyTable Penalties="@Stats.AwayPenalties" />
-        </Column>
-    </Grid>
+        <Grid RowColumns="RowColumns.Are2" Padding="Padding.Is4">
+            <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
+                <GoalTable Goals="@Stats.AwayGoals" />
+            </Column>
+            <Column ColumnSize="ColumnSize.IsHalf" Padding="Padding.Is4">
+                <PenaltyTable Penalties="@Stats.AwayPenalties" />
+            </Column>
+        </Grid>
 }
 
 @code {

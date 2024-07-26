@@ -1,7 +1,7 @@
 @namespace BoltonCup.Components
 
 
-@if (Pick != null)
+@if (Pick is not null)
 {
     <Grid RowColumns="RowColumns.Are4" style='@($"background-color: {Pick.BgColor}")' Border="@border">
         <Column ColumnSize="ColumnSize.Is2" Margin="Margin.IsAuto">
