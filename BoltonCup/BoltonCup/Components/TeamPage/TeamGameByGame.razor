@@ -1,0 +1,44 @@
+@namespace BoltonCup.Components
+@inject NavigationManager navManager
+
+@if (Team is not null)
+{
+    <Table Striped>
+    <TableHeader>
+        <TableRow>
+            <TableHeaderCell>Date</TableHeaderCell>
+            <TableHeaderCell>Opp</TableHeaderCell>
+            <TableHeaderCell>Score</TableHeaderCell>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+        @foreach (var (gameKey, stat) in Api.StatService.Instance().Stats())
+            {
+                string winloss = "L";
+                string opponent = stat.HomeTeam;
+                int homeGoals = stat.HomeGoals.Count();
+                int awayGoals = stat.AwayGoals.Count();
+                if (stat.HomeTeam == Team.Name)
+                {
+                    winloss = (homeGoals == awayGoals) ? "T" : ((homeGoals < awayGoals) ? "L" : "W");
+                    opponent = stat.AwayTeam;
+                }
+                else if (stat.AwayTeam == Team.Name)
+                {
+                    winloss = (homeGoals == awayGoals) ? "T" : ((homeGoals > awayGoals) ? "L" : "W");
+                    opponent = stat.HomeTeam;
+                }
+                <TableRow style="cursor: pointer" @onclick='() => navManager.NavigateTo($"/sheet?game={gameKey}")'>
+                    <TableRowHeader>@stat.Date?.ToString("MMM dd/yy").Replace("-", "/")</TableRowHeader>
+                    <TableRowCell>@opponent</TableRowCell>
+                    <TableRowCell>@homeGoals - @awayGoals @winloss</TableRowCell>
+                </TableRow>
+            }
+        </TableBody>
+    </Table>
+}
+
+
+@code {
+    [Parameter] public TeamData? Team { get; set; } = null;
+}
