@@ -6,7 +6,11 @@
 
 @if (Stats is not null)
 {
+    <Div Border="Border.Rounded" Margin="Margin.Is4.OnX.OnTablet" Shadow="Shadow.Default" Padding="Padding.Is4.OnY">
     <Div Padding="Padding.Is4.FromTop.Is4.OnX">
+        <Figure Size="FigureSize.Is48x48">
+            <FigureImage Source="@Api.TeamService.Instance().GetTeamByName(Stats.HomeTeam).Logo" />
+        </Figure>
         <Heading TextWeight="TextWeight.Bold">@Stats.HomeTeam.ToUpper() - @Stats.HomeGoals.Count()</Heading>
     </Div>
     <Grid RowColumns="RowColumns.Are2.OnFullHD.Are1.OnMobile" Padding="Padding.Is4.FromBottom.Is4.OnX">
@@ -19,6 +23,9 @@
     </Grid>
 
     <Div Padding="Padding.Is4.FromTop.Is4.OnX">
+        <Figure Size="FigureSize.Is48x48">
+            <FigureImage Source="@Api.TeamService.Instance().GetTeamByName(Stats.AwayTeam).Logo" />
+        </Figure>
         <Heading TextWeight="TextWeight.Bold">@Stats.AwayTeam.ToUpper() - @Stats.AwayGoals.Count()</Heading>
     </Div>
     <Grid RowColumns="RowColumns.Are2.OnFullHD.Are1.OnMobile" Padding="Padding.Is4.FromBottom.Is4.OnX">
@@ -29,6 +36,7 @@
             <PenaltyTable Penalties="@Stats.AwayPenalties" TeamName="@Stats.AwayTeam" />
         </Column>
     </Grid>
+</Div>
 }
 
 @code {

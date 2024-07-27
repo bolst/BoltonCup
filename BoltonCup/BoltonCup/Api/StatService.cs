@@ -105,12 +105,37 @@ namespace BoltonCup.Api
             return res;
         }
 
-        public List<(TeamPlayer, PlayerStat)> OrderedPlayerTotals()
+        public List<(TeamPlayer, PlayerStat)> OrderedPlayerTotals(string? sortRule = null)
         {
             var unordered = UnorderedPlayerTotals();
-            var ordered = unordered.OrderBy(s => (s.Item2.Goals + s.Item2.Assists)).ToList();
-            ordered.Reverse();
-            return ordered;
+            if (sortRule is null || sortRule == "points")
+            {
+                var ordered = unordered.OrderBy(s => s.Item2.Goals + s.Item2.Assists).ToList();
+                ordered.Reverse();
+                return ordered;
+            }
+            else if (sortRule == "goals")
+            {
+                var ordered = unordered.OrderBy(s => s.Item2.Goals).ToList();
+                ordered.Reverse();
+                return ordered;
+            }
+            else if (sortRule == "assists")
+            {
+                var ordered = unordered.OrderBy(s => s.Item2.Assists).ToList();
+                ordered.Reverse();
+                return ordered;
+            }
+            else if (sortRule == "pims")
+            {
+                var ordered = unordered.OrderBy(s => s.Item2.PIMs).ToList();
+                ordered.Reverse();
+                return ordered;
+            }
+            else
+            {
+                return unordered;
+            }
         }
     }
 }
