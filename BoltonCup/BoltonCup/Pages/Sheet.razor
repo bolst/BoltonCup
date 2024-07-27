@@ -45,8 +45,8 @@
     protected override void OnInitialized()
     {
         Uri uri = new Uri(navManager.Uri);
-        string teamName = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("game") ?? "Game 1";
+        string gameKey = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("game") ?? "Game 1";
 
-        Stats = Api.StatService.Instance().Stats(teamName);
+        Stats = Api.StatService.Instance().Stats(gameKey);
     }
 }

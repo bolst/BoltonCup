@@ -31,10 +31,16 @@
 
 
     <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
-        <Heading Size="HeadingSize.Is6"></Heading>
-    </Column>
-    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
         @{
+                var stats = Api.StatService.Instance().Stats(matchup.Title);
+                if (stats is not null)
+                {
+                    <Heading Size="HeadingSize.Is6">@stats.HomeGoals.Count() - @stats.AwayGoals.Count()</Heading>
+                }
+            }
+        </Column>
+        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+            @{
                 var stats = Api.StatService.Instance().Stats(matchup.Title);
                 if (stats is not null)
                 {

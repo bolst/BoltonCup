@@ -33,8 +33,6 @@
 
         <br>
 
-
-
         <Heading TextWeight="TextWeight.Bold" Size="HeadingSize.Is5">Defensemen</Heading>
         <Divider />
         @if (teamData is not null)
@@ -43,7 +41,6 @@
         }
 
         <br>
-
 
         <Heading TextWeight="TextWeight.Bold" Size="HeadingSize.Is5">Goalies</Heading>
         <Divider />
@@ -56,6 +53,15 @@
 
     </Column>
 </Div>
+
+@if (teamData is not null)
+{
+    <Div Padding="Padding.Is4">
+    <Column ColumnSize="ColumnSize.IsFull" Shadow="Shadow.Default" Padding="Padding.Is4">
+        <TeamGameByGame Team="@teamData" />
+    </Column>
+</Div>
+}
 
 @code {
 
