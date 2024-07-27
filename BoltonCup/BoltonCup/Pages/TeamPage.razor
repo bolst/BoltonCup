@@ -1,11 +1,27 @@
 @page "/team"
 @inject NavigationManager navManager
 
-<Grid RowColumns="RowColumns.Are1" Padding="Padding.Is4">
+
+<Div Padding="Padding.Is4">
     <Column ColumnSize="ColumnSize.IsFull" Shadow="Shadow.Default" Padding="Padding.Is4">
 
-        <Heading TextWeight="TextWeight.Bold" Size="HeadingSize.Is1" Padding="Padding.Is4.OnY">Roster - @teamData.Name
-        </Heading>
+        <Grid RowColumns="RowColumns.Are2.OnTablet.Are1.OnMobile">
+            <Column ColumnSize="ColumnSize.IsHalf.OnTablet.IsFull.OnMobile">
+                <Heading TextWeight="TextWeight.Bold" Size="HeadingSize.Is1" Margin="Margin.IsAuto"
+                    Padding="Padding.Is4.OnY.OnTablet.Is4.OnY.OnMobile">Roster -
+                    @teamData.Name
+                </Heading>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsHalf.OnTablet.IsFull.OnMobile">
+                <Select TValue="string" Margin="Margin.IsAuto.OnTablet.IsAuto.OnX.Is4.FromBottom.OnMobile"
+                    SelectedValue="SelectedTeamName" SelectedValueChanged="@OnSelectedTeamNameChanged">
+                    @foreach (var team in Api.TeamService.Instance().GetTeams())
+                    {
+                        <SelectItem Value="@team.Name">@team.Name</SelectItem>
+                    }
+                </Select>
+            </Column>
+        </Grid>
 
 
         <Heading TextWeight="TextWeight.Bold" Size="HeadingSize.Is5">Forwards</Heading>
@@ -39,40 +55,42 @@
         <br>
 
     </Column>
-</Grid>
+</Div>
 
 @code {
 
     RenderFragment PlayerSection(List<TeamPlayer> playerData, char positionFlag) => __builder =>
     {
-        foreach (var p in playerData)
-        {
-            var player = p;
-            if (player.Position!.ToLower().First() == positionFlag)
-            {
-                <Grid RowColumns="RowColumns.Are4.OnTablet.Are3.OnMobile" Background="Background.Light"
-                    Padding="Padding.Is2.OnMobile.Is4.OnX.Is3.OnY.OnTablet">
-
-                    <Column ColumnSize="ColumnSize.Is1" Margin="Margin.IsAuto.OnY" TextWeight="TextWeight.SemiBold">
-                        @player.Number
-                    </Column>
-
-                    <Column ColumnSize="ColumnSize.Is2.OnTablet.Is7.OnMobile" Margin="Margin.IsAuto.OnY" TextWeight="TextWeight.Bold">
-                        <PlayerNameLink Player="@player" />
-                    </Column>
-
-                    <Column ColumnSize="ColumnSize.Is2.OnTablet.Is4.OnMobile" Margin="Margin.IsAuto.OnY"
-                        TextWeight="TextWeight.SemiBold">
-                        @player.BirthYear
-                    </Column>
-
-                    <Column ColumnSize="ColumnSize.Is6.OnTablet" Margin="Margin.IsAuto"></Column>
-                </Grid>
-            }
-        }
+        <Table Borderless>
+            <TableBody>
+                @foreach (var p in playerData)
+                {
+                    var player = p;
+                    if (player.Position!.ToLower().First() == positionFlag)
+                    {
+                        <TableRow>
+                            <TableRowHeader>@player.Number</TableRowHeader>
+                            <TableRowCell>
+                                <PlayerNameLink Player="@player" />
+                            </TableRowCell>
+                            <TableRowCell>@player.BirthYear</TableRowCell>
+                        </TableRow>
+                    }
+                }
+            </TableBody>
+        </Table>
     };
 
     TeamData? teamData = null;
+
+    string SelectedTeamName = "";
+
+    Task OnSelectedTeamNameChanged(string value)
+    {
+        SelectedTeamName = value;
+        teamData = Api.TeamService.Instance().GetTeamByName(SelectedTeamName);
+        return Task.CompletedTask;
+    }
 
     protected override void OnInitialized()
     {
@@ -80,5 +98,6 @@
         string teamID = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("id") ?? "1";
 
         teamData = Api.TeamService.Instance().GetTeamByID(teamID);
+        SelectedTeamName = teamData.Name;
     }
 }
