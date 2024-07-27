@@ -4,42 +4,42 @@
 @if (matchup is not null)
 {
     <Grid RowColumns="RowColumns.Are5.OnTablet.Are1.OnMobile" Background="Background.Light" Margin="Margin.Is4.FromBottom"
-        Padding="Padding.Is4">
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile" TextAlignment="TextAlignment.End" Margin="Margin.IsAuto">
-            <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">@matchup.HomeTeam.Name!.ToUpper()</Heading>
-        </Column>
+    Padding="Padding.Is4">
+    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile" TextAlignment="TextAlignment.End" Margin="Margin.IsAuto">
+        <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">@matchup.HomeTeam.Name!.ToUpper()</Heading>
+    </Column>
 
-        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto.OnY">
-            <Grid RowColumns="RowColumns.Are2">
-                <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.End">
-                    <Image Source="@matchup.HomeTeam.Logo" Height="Height.Rem(3)" />
-                </Column>
-                <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.Start">
-                    <Image Source="@matchup.AwayTeam.Logo" Height="Height.Rem(3)" />
-                </Column>
-            </Grid>
-        </Column>
+    <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto.OnY">
+        <Grid RowColumns="RowColumns.Are2">
+            <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.End">
+                <Image Source="@matchup.HomeTeam.Logo" Height="Height.Rem(3)" />
+            </Column>
+            <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.Start">
+                <Image Source="@matchup.AwayTeam.Logo" Height="Height.Rem(3)" />
+            </Column>
+        </Grid>
+    </Column>
 
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile" TextAlignment="TextAlignment.Start"
-            Margin="Margin.IsAuto">
-            <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">@matchup.AwayTeam.Name!.ToUpper()</Heading>
-        </Column>
+    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile" TextAlignment="TextAlignment.Start"
+        Margin="Margin.IsAuto">
+        <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">@matchup.AwayTeam.Name!.ToUpper()</Heading>
+    </Column>
 
-        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
-            <Heading Size="HeadingSize.Is6">@matchup.Date.ToString("h:mm tt")</Heading>
-        </Column>
+    <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+        <Heading Size="HeadingSize.Is6">@matchup.Date.ToString("h:mm tt")</Heading>
+    </Column>
 
 
-        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
-            <Heading Size="HeadingSize.Is6"></Heading>
-        </Column>
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile">
-            @{
+    <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+        <Heading Size="HeadingSize.Is6"></Heading>
+    </Column>
+    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+        @{
                 var stats = Api.StatService.Instance().Stats(matchup.Title);
                 if (stats is not null)
                 {
                     <Button Color="Color.Dark" Clicked='() => navManager.NavigateTo($"/sheet?game={matchup.Title}")'>
-                        <Icon Name="IconName.List" />
+                        <Icon Name="IconName.Receipt" />
                     </Button>
                 }
             }

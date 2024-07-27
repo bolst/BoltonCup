@@ -4,17 +4,17 @@
 @if (Penalties is not null)
 {
     <Table Narrow>
-        <TableHeader>
-            <TableRow>
-                <TableHeaderCell>#</TableHeaderCell>
-                <TableHeaderCell>Minutes</TableHeaderCell>
-                <TableHeaderCell>Infraction</TableHeaderCell>
-                <TableHeaderCell TextAlignment="TextAlignment.Center">Period</TableHeaderCell>
-                <TableHeaderCell>Time</TableHeaderCell>
-            </TableRow>
-        </TableHeader>
-        <TableBody>
-            @foreach (ScoresheetPenalty pen in Penalties)
+    <TableHeader>
+        <TableRow>
+            <TableHeaderCell>Player</TableHeaderCell>
+            <TableHeaderCell>Min</TableHeaderCell>
+            <TableHeaderCell>Infraction</TableHeaderCell>
+            <TableHeaderCell TextAlignment="TextAlignment.Center">Period</TableHeaderCell>
+            <TableHeaderCell>Time</TableHeaderCell>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+        @foreach (ScoresheetPenalty pen in Penalties)
             {
                 <TableRow>
                     <TableRowHeader>

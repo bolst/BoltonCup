@@ -4,17 +4,17 @@
 @if (Goals is not null)
 {
     <Table Narrow>
-        <TableHeader>
-            <TableRow>
-                <TableHeaderCell>#</TableHeaderCell>
-                <TableHeaderCell>A</TableHeaderCell>
-                <TableHeaderCell>A</TableHeaderCell>
-                <TableHeaderCell TextAlignment="TextAlignment.Center">Period</TableHeaderCell>
-                <TableHeaderCell>Time</TableHeaderCell>
-            </TableRow>
-        </TableHeader>
-        <TableBody>
-            @foreach (ScoresheetGoal goal in Goals)
+    <TableHeader>
+        <TableRow>
+            <TableHeaderCell>Player</TableHeaderCell>
+            <TableHeaderCell>A</TableHeaderCell>
+            <TableHeaderCell>A</TableHeaderCell>
+            <TableHeaderCell TextAlignment="TextAlignment.Center">Period</TableHeaderCell>
+            <TableHeaderCell>Time</TableHeaderCell>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+        @foreach (ScoresheetGoal goal in Goals)
             {
                 <TableRow>
                     <TableRowHeader>

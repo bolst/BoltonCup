@@ -13,6 +13,8 @@
                     Clicked='() => sortRule = "highest"'>HIGHEST PLAYED</Button>
                 <Button Color='@(sortRule.Equals("year") ? Color.Primary : Color.Light)'
                     Clicked='() => sortRule = "year"'>YEAR</Button>
+                <Button Color='@(sortRule.Equals("pos") ? Color.Primary : Color.Light)'
+                    Clicked='() => sortRule = "pos"'>POSITION</Button>
             </Buttons>
         </Buttons>
     </Column>
@@ -39,17 +41,17 @@
             {
                 DraftPlayer player = p;
                 if (player.Position.Length == 0) continue;
-                                <TableRow TextAlignment="TextAlignment.Center">
-                                    <TableRowCell>@p.Team</TableRowCell>
-                                    <TableRowCell>@p.Name</TableRowCell>
-                                    <TableRowCell>@p.DOB.Substring(0, 4)</TableRowCell>
-                                    <TableRowCell>@p.PosAbbrev()</TableRowCell>
-                                    <TableRowCell>@p.HighestLvl</TableRowCell>
+                <TableRow TextAlignment="TextAlignment.Center">
+                    <TableRowCell>@p.Team</TableRowCell>
+                    <TableRowCell>@p.Name</TableRowCell>
+                    <TableRowCell>@p.DOB.Substring(0, 4)</TableRowCell>
+                    <TableRowCell>@p.PosAbbrev()</TableRowCell>
+                    <TableRowCell>@p.HighestLvl</TableRowCell>
                     @CanPlayTableRowCell(p.CanPlayGame1)
                     @CanPlayTableRowCell(p.CanPlayGame2)
                     @CanPlayTableRowCell(p.CanPlayGame3)
                     @CanPlayTableRowCell(p.CanPlayGame4)
-                                </TableRow>
+                </TableRow>
             }
         }
     </TableBody>
@@ -64,7 +66,7 @@
         IFluentBorderWithAll border = Border.Is4.Success.OnBottom;
         if (status == "No") { border = Border.Is4.Danger.OnBottom; }
         else if (status == "Maybe") { border = Border.Is4.Info.OnBottom; }
-                        <TableRowCell Border="@border">@status</TableRowCell>
+        <TableRowCell Border="@border">@status</TableRowCell>
 
     };
     [Parameter] public List<DraftPlayer>? Players { get; set; } = null;
@@ -110,6 +112,30 @@
         else if (key == "year")
         {
             retval = players.OrderBy(p => int.Parse(p.DOB.Substring(0, 4))).ToList();
+        }
+        else if (key == "pos")
+        {
+            var comparer = (string pos) =>
+            {
+                if (pos.Equals("F"))
+                {
+                    return 0;
+                }
+                else if (pos.Equals("F/D"))
+                {
+                    return 1;
+                }
+                else if (pos.Equals("D"))
+                {
+                    return 2;
+                }
+                else
+                {
+                    return 3;
+                }
+            };
+
+            retval = players.OrderBy(p => p.PosAbbrev()).ToList();
         }
 
         return retval;
