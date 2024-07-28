@@ -226,7 +226,7 @@
    {
       "image": "spotlight/JesseMercier_Profile.webp",
       "name": "Jesse Mercier",
-      "hometown": "Lakeshore, ON",
+      "hometown": "Belle River, ON",
       "age": "19",
       "favourite beer": "OV"
    },
@@ -383,5 +383,68 @@
       "hometown": "Windsor, ON",
       "age": "23",
       "favourite beer": "Bush Light"
+   },
+   {
+      "image": "spotlight/NoahTaylor_Profile.jpg",
+      "name": "Noah Taylor",
+      "hometown": "Windsor, ON",
+      "age": "18",
+      "favourite beer": "Ultra"
+   },
+   {
+      "image": "spotlight/LoganNagy_Profile.jpg",
+      "name": "Logan Nagy",
+      "hometown": "Windsor, ON",
+      "age": "18",
+      "favourite beer": "Coors"
+   },
+   {
+      "image": "spotlight/DavonGeddes_Profile.jpg",
+      "name": "Davon Geddes",
+      "hometown": "Portland, OR",
+      "age": "20",
+      "favourite beer": "Heineken"
+   },
+   {
+      "image": "https://cksn.ca/wp-content/uploads/2020/09/dallas-anderson.jpg",
+      "name": "Dallas Anderson",
+      "hometown": "Windsor, ON",
+      "age": "24",
+      "favourite beer": ""
+   },
+   {
+      "image": "spotlight/EvanEansor_Profile.jpg",
+      "name": "Evan Eansor",
+      "hometown": "Tecumseh, ON",
+      "age": "21",
+      "favourite beer": "Corona"
+   },
+   {
+      "image": "spotlight/KalebSimpson_Profile.jpg",
+      "name": "Kaleb Simpson",
+      "hometown": "Belle River, ON",
+      "age": "20",
+      "favourite beer": "Coors"
+   },
+   {
+      "image": "spotlight/OwenBentley_Profile.jpg",
+      "name": "Owen Bentley",
+      "hometown": "Windsor, ON",
+      "age": "18",
+      "favourite beer": "Corona"
+   },
+   {
+      "image": "spotlight/TylerBurton_Profile.jpg",
+      "name": "Tyler Burton",
+      "hometown": "Tecumseh, ON",
+      "age": "18",
+      "favourite beer": "Busch"
+   },
+   {
+      "image": "spotlight/NoahSpadotto_Profile.jpg",
+      "name": "Noah Spadotto",
+      "hometown": "Windsor, ON",
+      "age": "18",
+      "favourite beer": "Corona"
    }
 ]
