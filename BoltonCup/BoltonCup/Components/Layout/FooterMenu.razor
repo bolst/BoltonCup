@@ -1,26 +1,7 @@
 ﻿@namespace BoltonCup.Components
 
-<Bar Padding="Padding.Is1" Background="Background.White">
-    <Grid RowColumns="RowColumns.Are4">
-        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is3.OnMobile" Padding="Padding.Is4">
-            <Blazorise.Link Unstyled To="https://protoplastics.ca" Target="Target.Blank">
-                <Image Source="https://protoplastics.ca/proto-logo-black.svg" Fluid />
-            </Blazorise.Link>
-        </Column>
-        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is3.OnMobile" Padding="Padding.Is4">
-            <Blazorise.Link Unstyled To="https://imaginecinemas.com/cinema/lakeshore/" Target="Target.Blank">
-                <Image
-                    Source="https://yt3.googleusercontent.com/6_pC_vNN5lqLk3b3p2H7x4O1bwilR7KFPWvUWuJ3nZAolNfVW5boCb-060AGFs_Z1Eng2vzjXw=s900-c-k-c0x00ffffff-no-rj"
-                    Fluid />
-            </Blazorise.Link>
-        </Column>
-        <Column ColumnSize="ColumnSize.Is9.OnTablet.Is3.OnMobile"></Column>
-        <Column ColumnSize="ColumnSize.Is1.OnTablet.Is3.OnMobile" Padding="Padding.Is4">
-            <Blazorise.Link Unstyled To="https://instagram.com/bolton_cup" Target="Target.Blank">
-                <Image
-                    Source="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/2048px-Instagram_icon.png"
-                    Fluid />
-            </Blazorise.Link>
-        </Column>
-    </Grid>
+<Bar Padding="Padding.Is4.FromTop" Background="Background.White">
+    <Blazorise.Link To="/upload" Unstyled Width="Width.Is100" TextAlignment="TextAlignment.Center">
+        <Text TextSize="TextSize.ExtraSmall">Gamesheets</Text>
+    </Blazorise.Link>
 </Bar>
