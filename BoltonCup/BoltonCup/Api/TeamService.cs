@@ -97,5 +97,10 @@ namespace BoltonCup.Api
         {
             return TeamDataList.Where(t => t.Players.Any(p => p.Name == player.Name)).FirstOrDefault();
         }
+
+        public static string TeamAbbrev(string teamName)
+        {
+            return string.Join("", teamName.Split(" ").Select(o => o.ToUpper().First()).ToList());
+        }
     }
 }
