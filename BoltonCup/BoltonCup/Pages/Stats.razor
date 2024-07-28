@@ -1,4 +1,5 @@
 @page "/stats"
+@inject NavigationManager navManager
 
 <br>
 <br>
@@ -24,7 +25,7 @@
             Clicked='() => sortRule = "pims"'>PIM</Button>
     </Buttons>
 
-    <Table Striped>
+    <Table Striped Hoverable>
         <TableHeader>
             <TableRow>
                 <TableHeaderCell></TableHeaderCell>
@@ -39,10 +40,10 @@
         <TableBody>
             @foreach (var (player, playerStat) in Api.StatService.Instance().OrderedPlayerTotals(sortRule))
             {
-                <TableRow>
+                <TableRow style="cursor: pointer" @onclick='() => navManager.NavigateTo($"/player?name={player.Name}")'>
                     <TableRowHeader>@player.Number</TableRowHeader>
                     <TableRowCell>
-                        <PlayerNameLink Player="@player" />
+                        @player.Name
                         <Figure Size="FigureSize.Is16x16" Margin="Margin.IsAuto">
                             <FigureImage Source="@Api.TeamService.Instance().GetPlayerTeam(player).Logo" />
                         </Figure>

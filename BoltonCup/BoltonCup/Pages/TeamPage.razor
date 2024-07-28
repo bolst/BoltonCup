@@ -57,17 +57,17 @@
 @if (teamData is not null)
 {
     <Div Padding="Padding.Is4">
-    <Column ColumnSize="ColumnSize.IsFull" Shadow="Shadow.Default" Padding="Padding.Is4">
-        <TeamGameByGame Team="@teamData" />
-    </Column>
-</Div>
+        <Column ColumnSize="ColumnSize.IsFull" Shadow="Shadow.Default" Padding="Padding.Is4">
+            <TeamGameByGame Team="@teamData" />
+        </Column>
+    </Div>
 }
 
 @code {
 
     RenderFragment PlayerSection(List<TeamPlayer> playerData, char positionFlag) => __builder =>
     {
-        <Table Borderless>
+        <Table Borderless Hoverable>
             <TableBody>
                 @foreach (var p in playerData)
                 {
@@ -94,7 +94,8 @@
     Task OnSelectedTeamNameChanged(string value)
     {
         SelectedTeamName = value;
-        teamData = Api.TeamService.Instance().GetTeamByName(SelectedTeamName);
+        int teamId = Api.TeamService.Instance().GetTeamByName(SelectedTeamName).Id ?? 1;
+        navManager.NavigateTo($"/team?id={teamId}", true);
         return Task.CompletedTask;
     }
 
