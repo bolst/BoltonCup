@@ -74,10 +74,10 @@
                     var player = p;
                     if (player.Position!.ToLower().First() == positionFlag)
                     {
-                        <TableRow>
+                        <TableRow style="cursor: pointer" @onclick='() => navManager.NavigateTo($"/player?name={player.Name}")'>
                             <TableRowHeader>@player.Number</TableRowHeader>
                             <TableRowCell>
-                                <PlayerNameLink Player="@player" />
+                                @player.Name
                             </TableRowCell>
                             <TableRowCell>@player.BirthYear</TableRowCell>
                         </TableRow>
