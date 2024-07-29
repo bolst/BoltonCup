@@ -20,24 +20,29 @@ namespace BoltonCup.Api
 
         private List<Matchup> GetMatchupSchedule()
         {
-            var ti = TeamService.Instance();
-            var ft = (string n) => new TeamData
+            var teamInst = TeamService.Instance();
+            var placeholder = (string n) => new TeamData
             {
                 Id = 0,
                 Name = n,
                 Logo = "logo.png",
                 Players = new(),
             };
+            var jtt = teamInst.GetTeamByID("1") ?? placeholder(""); // Just the Tip
+            var nt = teamInst.GetTeamByID("2") ?? placeholder(""); // Nipple Ticklers
+            var ttt = teamInst.GetTeamByID("3") ?? placeholder(""); // Tecumseh Titty Twisters
+            var sws = teamInst.GetTeamByID("4") ?? placeholder(""); // South West Sausages
+
             var res = new List<Matchup>
             {
-                new Matchup("Game 1", ti.GetTeamByID("1"), ti.GetTeamByID("4"), new DateTime(2024,08,02,05 + 12 ,30,00)),
-                new Matchup("Game 2", ti.GetTeamByID("2"), ti.GetTeamByID("3"), new DateTime(2024,08,02,06 + 12 ,30,00)),
-                new Matchup("Game 3", ti.GetTeamByID("1"), ti.GetTeamByID("2"), new DateTime(2024,08,03,03 + 12 ,30,00)),
-                new Matchup("Game 4", ti.GetTeamByID("3"), ti.GetTeamByID("4"), new DateTime(2024,08,03,04 + 12 ,30,00)),
-                new Matchup("Game 5", ti.GetTeamByID("1"), ti.GetTeamByID("3"), new DateTime(2024,08,03,05 + 12 ,30,00)),
-                new Matchup("Game 6", ti.GetTeamByID("4"), ti.GetTeamByID("2"), new DateTime(2024,08,03,06 + 12 ,30,00)),
-                new Matchup("Finals (Bronze)", ft("Finals (3rd)"), ft("Finals (4th)"), new DateTime(2024,08,04,01 + 12 ,00,00)),
-                new Matchup("Finals (Gold)", ft("Finals (1st)"), ft("Finals (2nd)"), new DateTime(2024,08,04,02 + 12 ,30,00)),
+                new Matchup("Game 1", jtt, sws, new DateTime(2024,08,02,05 + 12 ,30,00)),
+                new Matchup("Game 2", nt, ttt, new DateTime(2024,08,02,06 + 12 ,30,00)),
+                new Matchup("Game 3", sws, ttt, new DateTime(2024,08,03,03 + 12 ,30,00)),
+                new Matchup("Game 4", jtt, nt, new DateTime(2024,08,03,04 + 12 ,30,00)),
+                new Matchup("Game 5", sws, nt, new DateTime(2024,08,03,05 + 12 ,30,00)),
+                new Matchup("Game 6", ttt, jtt, new DateTime(2024,08,03,06 + 12 ,30,00)),
+                new Matchup("Finals (Bronze)", placeholder("Finals (3rd)"), placeholder("Finals (4th)"), new DateTime(2024,08,04,01 + 12 ,00,00)),
+                new Matchup("Finals (Gold)", placeholder("Finals (1st)"), placeholder("Finals (2nd)"), new DateTime(2024,08,04,02 + 12 ,30,00)),
             };
             return res;
         }
