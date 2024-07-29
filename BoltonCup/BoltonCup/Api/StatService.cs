@@ -1,9 +1,7 @@
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace BoltonCup.Api
 {
-    using StatType = ScoresheetGame;
     public class StatService
     {
         #region singleton
@@ -20,19 +18,19 @@ namespace BoltonCup.Api
         }
         private const string FILE_PATH = "wwwroot/game-stats.json";
 
-        private Dictionary<string, StatType?> stats;
+        private Dictionary<string, ScoresheetGame?> stats;
 
-        public void AddScoresheet(string gameTitle, StatType stat)
+        public void AddScoresheet(string gameTitle, ScoresheetGame stat)
         {
             stats[gameTitle] = stat;
             SaveData();
         }
 
-        public Dictionary<string, StatType?> Stats()
+        public Dictionary<string, ScoresheetGame?> Stats()
         {
             return stats;
         }
-        public StatType? Stats(string key)
+        public ScoresheetGame? Stats(string key)
         {
             if (!stats.ContainsKey(key)) return null;
             return stats[key];
@@ -44,15 +42,14 @@ namespace BoltonCup.Api
             File.WriteAllText(FILE_PATH, json);
         }
 
-        private Dictionary<string, StatType?> SavedStats()
+        private Dictionary<string, ScoresheetGame?> SavedStats()
         {
-
             try
             {
                 using (StreamReader reader = new StreamReader(FILE_PATH))
                 {
                     string json = reader.ReadToEnd();
-                    var res = JsonSerializer.Deserialize<Dictionary<string, StatType?>>(json) ?? new();
+                    var res = JsonSerializer.Deserialize<Dictionary<string, ScoresheetGame?>>(json) ?? new();
                     return res;
                 }
             }
@@ -63,7 +60,7 @@ namespace BoltonCup.Api
             }
         }
 
-        public List<StatType?> TeamGames(string teamName)
+        public List<ScoresheetGame?> TeamGames(string teamName)
         {
             return stats.Where(s => (s.Value.HomeTeam == teamName) || (s.Value.AwayTeam == teamName)).ToDictionary(s => s.Key, s => s.Value).Values.ToList();
         }
@@ -136,6 +133,32 @@ namespace BoltonCup.Api
             {
                 return unordered;
             }
+        }
+
+        public (int, int, int) GetTeamWLT(TeamData team)
+        {
+            int wins = 0;
+            int losses = 0;
+            int ties = 0;
+            foreach (var stat in TeamGames(team.Name!))
+            {
+                int homeGoals = stat.HomeGoals.Count();
+                int awayGoals = stat.AwayGoals.Count();
+
+                if (stat.HomeTeam == team.Name)
+                {
+                    if (homeGoals > awayGoals) wins++;
+                    else if (homeGoals < awayGoals) losses++;
+                    else ties++;
+                }
+                else
+                {
+                    if (homeGoals > awayGoals) losses++;
+                    else if (homeGoals < awayGoals) wins++;
+                    else ties++;
+                }
+            }
+            return (wins, losses, ties);
         }
     }
 }

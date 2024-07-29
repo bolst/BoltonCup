@@ -108,13 +108,17 @@
     {
         if (Team is not null)
         {
+            var wlt = Api.StatService.Instance().GetTeamWLT(Team);
+            int wins = wlt.Item1;
+            int losses = wlt.Item2;
+            int ties = wlt.Item3;
             <Grid RowColumns="RowColumns.Are2" Background="Background.Transparent" Padding="Padding.Is1.OnY" Border="@border">
                 <Column ColumnSize="ColumnSize.Is3.OnTablet.IsHalf.OnMobile" Margin="Margin.IsAuto.OnY.Is4.OnX">
                     <Image Source="@Team.Logo" Fluid />
                 </Column>
                 <Column ColumnSize="ColumnSize.Is9.OnTablet.IsHalf.OnMobile" Margin="Margin.IsAuto.OnY.Is4.OnX"
                     TextAlignment="TextAlignment.Center">
-                    <Heading TextColor="TextColor.White">0-0-0</Heading>
+                    <Heading TextColor="TextColor.White">@wins-@losses-@ties</Heading>
                 </Column>
             </Grid>
         }
