@@ -42,7 +42,7 @@ namespace BoltonCup.Api
                 new Matchup("Game 5", sws, nt, new DateTime(2024,08,03,05 + 12 ,30,00)),
                 new Matchup("Game 6", ttt, jtt, new DateTime(2024,08,03,06 + 12 ,30,00)),
                 new Matchup("Finals (Bronze)", placeholder("Finals (3rd)"), placeholder("Finals (4th)"), new DateTime(2024,08,04,01 + 12 ,00,00)),
-                new Matchup("Finals (Gold)", placeholder("Finals (1st)"), placeholder("Finals (2nd)"), new DateTime(2024,08,04,02 + 12 ,30,00)),
+                new Matchup("Finals (Gold)", placeholder("Finals (1st)"), placeholder("Finals (2nd)"), new DateTime(2024,08,04,02 + 12 ,15,00)),
             };
             return res;
         }
