@@ -3,13 +3,13 @@
 
 @if (matchup is not null)
 {
-    <Grid RowColumns="RowColumns.Are5.OnTablet.Are1.OnMobile" Background="Background.Light" Margin="Margin.Is4.FromBottom"
+    <Grid RowColumns="RowColumns.Are7.OnFullHD.Are1.OnMobile" Background="Background.Light" Margin="Margin.Is4.FromBottom"
     Padding="Padding.Is4">
-    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile" TextAlignment="TextAlignment.End" Margin="Margin.IsAuto">
+    <Column ColumnSize="ColumnSize.Is3.OnFullHD.Is12.OnMobile" TextAlignment="TextAlignment.End" Margin="Margin.IsAuto">
         <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">@matchup.HomeTeam.Name!.ToUpper()</Heading>
     </Column>
 
-    <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto.OnY">
+    <Column ColumnSize="ColumnSize.Is1.OnFullHD.Is12.OnMobile" Margin="Margin.IsAuto.OnY">
         <Grid RowColumns="RowColumns.Are2">
             <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.End">
                 <Image Source="@matchup.HomeTeam.Logo" Height="Height.Rem(3)" />
@@ -20,17 +20,21 @@
         </Grid>
     </Column>
 
-    <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile" TextAlignment="TextAlignment.Start"
+    <Column ColumnSize="ColumnSize.Is3.OnFullHD.Is12.OnMobile" TextAlignment="TextAlignment.Start"
         Margin="Margin.IsAuto">
         <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">@matchup.AwayTeam.Name!.ToUpper()</Heading>
     </Column>
 
-    <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+    <Column ColumnSize="ColumnSize.Is1.OnFullHD.Is12.OnMobile" Margin="Margin.IsAuto">
         <Heading Size="HeadingSize.Is6">@matchup.Date.ToString("h:mm tt")</Heading>
     </Column>
 
+    <Column ColumnSize="ColumnSize.Is1.OnFullHD.Is12.OnMobile" Margin="Margin.IsAuto">
+        <Heading Size="HeadingSize.Is6">@matchup.Location</Heading>
+    </Column>
 
-    <Column ColumnSize="ColumnSize.Is1.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+
+    <Column ColumnSize="ColumnSize.Is1.OnFullHD.Is12.OnMobile" Margin="Margin.IsAuto">
         @{
                 var stats = Api.StatService.Instance().Stats(matchup.Title);
                 if (stats is not null)
@@ -39,7 +43,7 @@
                 }
             }
         </Column>
-        <Column ColumnSize="ColumnSize.Is3.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+        <Column ColumnSize="ColumnSize.Is2.OnFullHD.Is12.OnMobile" Margin="Margin.IsAuto">
             @{
                 var stats = Api.StatService.Instance().Stats(matchup.Title);
                 if (stats is not null)
