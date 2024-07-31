@@ -35,14 +35,14 @@ namespace BoltonCup.Api
 
             var res = new List<Matchup>
             {
-                new Matchup("Game 1", jtt, sws, new DateTime(2024,08,02,05 + 12 ,30,00)),
-                new Matchup("Game 2", nt, ttt, new DateTime(2024,08,02,06 + 12 ,30,00)),
-                new Matchup("Game 3", sws, ttt, new DateTime(2024,08,03,03 + 12 ,30,00)),
-                new Matchup("Game 4", jtt, nt, new DateTime(2024,08,03,04 + 12 ,30,00)),
-                new Matchup("Game 5", sws, nt, new DateTime(2024,08,03,05 + 12 ,30,00)),
-                new Matchup("Game 6", ttt, jtt, new DateTime(2024,08,03,06 + 12 ,30,00)),
-                new Matchup("Finals (Bronze)", placeholder("Finals (3rd)"), placeholder("Finals (4th)"), new DateTime(2024,08,04,01 + 12 ,00,00)),
-                new Matchup("Finals (Gold)", placeholder("Finals (1st)"), placeholder("Finals (2nd)"), new DateTime(2024,08,04,02 + 12 ,15,00)),
+                new Matchup("Game 1", jtt, sws, new DateTime(2024,08,02,05 + 12 ,30,00), "Rink C"),
+                new Matchup("Game 2", nt, ttt, new DateTime(2024,08,02,06 + 12 ,30,00), "Rink C"),
+                new Matchup("Game 3", sws, ttt, new DateTime(2024,08,03,03 + 12 ,30,00), "Shuren"),
+                new Matchup("Game 4", jtt, nt, new DateTime(2024,08,03,04 + 12 ,30,00), "Shuren"),
+                new Matchup("Game 5", sws, nt, new DateTime(2024,08,03,05 + 12 ,30,00), "Shuren"),
+                new Matchup("Game 6", ttt, jtt, new DateTime(2024,08,03,06 + 12 ,30,00), "Shuren"),
+                new Matchup("Finals (Bronze)", placeholder("Finals (3rd)"), placeholder("Finals (4th)"), new DateTime(2024,08,04,01 + 12 ,00,00), "Shuren"),
+                new Matchup("Finals (Gold)", placeholder("Finals (1st)"), placeholder("Finals (2nd)"), new DateTime(2024,08,04,02 + 12 ,15,00), "Shuren"),
             };
             return res;
         }
