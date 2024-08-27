@@ -1,7 +1,7 @@
 @namespace BoltonCup.Components
 @inject NavigationManager navManager
 
-@if (Player is not null)
+@if (Player is not null && Team is not null)
 {
     <Table Striped Hoverable>
         <TableHeader>
@@ -15,37 +15,37 @@
             </TableRow>
         </TableHeader>
         <TableBody>
-            @foreach (var game in Api.StatService.Instance().TeamGames(Team.Name))
+            @foreach (var game in Api.StatService.Instance().TeamGames(Team.Name!))
             {
-                var goals = game.HomeGoals;
+                var goals = game!.HomeGoals;
                 var penalties = game.HomePenalties;
-                string opponent = game.AwayTeam;
+                string opponent = game.AwayTeam!;
                 if (game.HomeTeam == Team.Name)
                 {
                     goals = game.HomeGoals;
                     penalties = game.HomePenalties;
-                    opponent = game.AwayTeam;
+                    opponent = game.AwayTeam!;
                 }
                 else if (game.AwayTeam == Team.Name)
                 {
                     goals = game.AwayGoals;
                     penalties = game.AwayPenalties;
-                    opponent = game.HomeTeam;
+                    opponent = game.HomeTeam!;
                 }
-                int g = goals.Where(hg => hg.PlayerNumber == Player.Number).Count();
-                int a = goals.Where(hg => hg.Assist1 == Player.Number || hg.Assist2 == Player.Number).Count();
+                int g = goals!.Where(hg => hg.PlayerNumber == Player.Number).Count();
+                int a = goals!.Where(hg => hg.Assist1 == Player.Number || hg.Assist2 == Player.Number).Count();
                 string opponentAbbrev = Api.TeamService.TeamAbbrev(opponent);
                 <TableRow style="cursor: pointer" @onclick='() => navManager.NavigateTo($"/sheet?game={game.Title}")'>
                     <TableRowHeader>@String.Format("{0:MMM dd/yy}", game.Date).Replace("-", "/")</TableRowHeader>
                     <TableRowCell>vs @opponentAbbrev <Figure Size="FigureSize.Is24x24" Margin="Margin.IsAuto">
-                            <FigureImage Source="@Api.TeamService.Instance().GetTeamByName(opponent).Logo" />
+                            <FigureImage Source="@Api.TeamService.Instance().GetTeamByName(opponent)!.Logo" />
                         </Figure>
                     </TableRowCell>
                     <TableRowCell>@g</TableRowCell>
                     <TableRowCell>@a</TableRowCell>
                     <TableRowCell>@(g + a)</TableRowCell>
-                    <TableRowCell>@penalties.Where(hg => hg.PlayerNumber == Player.Number).ToList().Sum(p =>
-                       Convert.ToInt32(p.Minutes.Split(":")[0]))
+                    <TableRowCell>@penalties!.Where(hg => hg.PlayerNumber == Player.Number).ToList().Sum(p =>
+                       Convert.ToInt32(p.Minutes!.Split(":")[0]))
                     </TableRowCell>
                 </TableRow>
             }

@@ -48,7 +48,7 @@
                             <FigureImage Source="@Api.TeamService.Instance().GetPlayerTeam(player).Logo" />
                         </Figure>
                     </TableRowCell>
-                    <TableRowCell>@player.Position.First()</TableRowCell>
+                    <TableRowCell>@player.Position!.First()</TableRowCell>
                     <TableRowCell>@playerStat.Goals</TableRowCell>
                     <TableRowCell>@playerStat.Assists</TableRowCell>
                     <TableRowCell>@(playerStat.Goals + playerStat.Assists)</TableRowCell>

@@ -62,28 +62,28 @@ namespace BoltonCup.Api
 
         public List<ScoresheetGame?> TeamGames(string teamName)
         {
-            return stats.Where(s => (s.Value.HomeTeam == teamName) || (s.Value.AwayTeam == teamName)).ToDictionary(s => s.Key, s => s.Value).Values.ToList();
+            return stats.Where(s => (s.Value!.HomeTeam == teamName) || (s.Value!.AwayTeam == teamName)).ToDictionary(s => s.Key, s => s.Value).Values.ToList();
         }
 
         public PlayerStat PlayerTotals(TeamPlayer player, TeamData team)
         {
-            var games = TeamGames(team.Name);
+            var games = TeamGames(team.Name!);
             PlayerStat res = new(0, 0, 0);
             foreach (var game in games)
             {
-                if (game.HomeTeam == team.Name)
+                if (game!.HomeTeam == team.Name)
                 {
-                    res.Goals += game.HomeGoals.Where(hg => hg.PlayerNumber == player.Number).Count();
-                    res.Assists += game.HomeGoals.Where(hg => hg.Assist1 == player.Number || hg.Assist2 == player.Number).Count();
-                    res.PIMs += game.HomePenalties.Where(hp => hp.PlayerNumber == player.Number).ToList().Sum(p =>
-                    Convert.ToInt32(p.Minutes.Split(":")[0]));
+                    res.Goals += game.HomeGoals!.Where(hg => hg.PlayerNumber == player.Number).Count();
+                    res.Assists += game.HomeGoals!.Where(hg => hg.Assist1 == player.Number || hg.Assist2 == player.Number).Count();
+                    res.PIMs += game.HomePenalties!.Where(hp => hp.PlayerNumber == player.Number).ToList().Sum(p =>
+                    Convert.ToInt32(p.Minutes!.Split(":")[0]));
                 }
                 else if (game.AwayTeam == team.Name)
                 {
-                    res.Goals += game.AwayGoals.Where(ag => ag.PlayerNumber == player.Number).Count();
-                    res.Assists += game.AwayGoals.Where(ag => ag.Assist1 == player.Number || ag.Assist2 == player.Number).Count();
-                    res.PIMs += game.AwayPenalties.Where(ap => ap.PlayerNumber == player.Number).ToList().Sum(p =>
-                    Convert.ToInt32(p.Minutes.Split(":")[0]));
+                    res.Goals += game.AwayGoals!.Where(ag => ag.PlayerNumber == player.Number).Count();
+                    res.Assists += game.AwayGoals!.Where(ag => ag.Assist1 == player.Number || ag.Assist2 == player.Number).Count();
+                    res.PIMs += game.AwayPenalties!.Where(ap => ap.PlayerNumber == player.Number).ToList().Sum(p =>
+                    Convert.ToInt32(p.Minutes!.Split(":")[0]));
                 }
             }
             return res;
@@ -94,7 +94,7 @@ namespace BoltonCup.Api
             List<(TeamPlayer, PlayerStat)> res = new(64);
             foreach (var team in Api.TeamService.Instance().GetTeams())
             {
-                foreach (var player in team.Players)
+                foreach (var player in team.Players!)
                 {
                     res.Add((player, PlayerTotals(player, team)));
                 }
@@ -142,8 +142,8 @@ namespace BoltonCup.Api
             int ties = 0;
             foreach (var stat in TeamGames(team.Name!))
             {
-                int homeGoals = stat.HomeGoals.Count();
-                int awayGoals = stat.AwayGoals.Count();
+                int homeGoals = stat!.HomeGoals!.Count();
+                int awayGoals = stat!.AwayGoals!.Count();
 
                 if (stat.HomeTeam == team.Name)
                 {

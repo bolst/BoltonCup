@@ -30,11 +30,7 @@ namespace BoltonCup.Api
                 using (var stream = new StreamReader(FILE_PATH))
                 {
                     string fileContent = stream.ReadToEnd();
-                    res = JsonSerializer.Deserialize<List<Spotlight>>(fileContent);
-                    if (res is null)
-                    {
-                        res = new();
-                    }
+                    res = JsonSerializer.Deserialize<List<Spotlight>>(fileContent) ?? new();
                 }
             }
             catch(Exception exc)

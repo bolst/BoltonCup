@@ -18,7 +18,7 @@
             {
                 <TableRow>
                     <TableRowHeader>
-                        <PlayerNameLink Player="@Api.TeamService.Instance().GetPlayerByNumber(pen.PlayerNumber, TeamName)" />
+                        <PlayerNameLink Player="@Api.TeamService.Instance().GetPlayerByNumber(pen.PlayerNumber!, TeamName)" />
                     </TableRowHeader>
                     <TableRowCell>@pen.Minutes</TableRowCell>
                     <TableRowCell>@pen.Infraction</TableRowCell>

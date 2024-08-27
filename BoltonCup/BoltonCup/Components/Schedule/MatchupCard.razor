@@ -6,23 +6,23 @@
     <Grid RowColumns="RowColumns.Are7.OnFullHD.Are1.OnMobile" Background="Background.Light" Margin="Margin.Is4.FromBottom"
     Padding="Padding.Is4">
     <Column ColumnSize="ColumnSize.Is3.OnFullHD.Is12.OnMobile" TextAlignment="TextAlignment.End" Margin="Margin.IsAuto">
-        <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">@matchup.HomeTeam.Name!.ToUpper()</Heading>
+        <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">@matchup.HomeTeam!.Name!.ToUpper()</Heading>
     </Column>
 
     <Column ColumnSize="ColumnSize.Is1.OnFullHD.Is12.OnMobile" Margin="Margin.IsAuto.OnY">
         <Grid RowColumns="RowColumns.Are2">
             <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.End">
-                <Image Source="@matchup.HomeTeam.Logo" Height="Height.Rem(3)" />
+                <Image Source="@matchup.HomeTeam!.Logo" Height="Height.Rem(3)" />
             </Column>
             <Column ColumnSize="ColumnSize.IsHalf" TextAlignment="TextAlignment.Start">
-                <Image Source="@matchup.AwayTeam.Logo" Height="Height.Rem(3)" />
+                <Image Source="@matchup.AwayTeam!.Logo" Height="Height.Rem(3)" />
             </Column>
         </Grid>
     </Column>
 
     <Column ColumnSize="ColumnSize.Is3.OnFullHD.Is12.OnMobile" TextAlignment="TextAlignment.Start"
         Margin="Margin.IsAuto">
-        <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">@matchup.AwayTeam.Name!.ToUpper()</Heading>
+        <Heading Size="HeadingSize.Is6" TextWeight="TextWeight.Bold">@matchup.AwayTeam!.Name!.ToUpper()</Heading>
     </Column>
 
     <Column ColumnSize="ColumnSize.Is1.OnFullHD.Is12.OnMobile" Margin="Margin.IsAuto">
@@ -39,7 +39,7 @@
                 var stats = Api.StatService.Instance().Stats(matchup.Title);
                 if (stats is not null)
                 {
-                    <Heading Size="HeadingSize.Is6">@stats.HomeGoals.Count() - @stats.AwayGoals.Count()</Heading>
+                    <Heading Size="HeadingSize.Is6">@stats.HomeGoals!.Count() - @stats.AwayGoals!.Count()</Heading>
                 }
             }
         </Column>
