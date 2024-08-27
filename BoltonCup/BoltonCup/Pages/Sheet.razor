@@ -4,14 +4,14 @@
 <br>
 <br>
 
-@if (Stats is not null)
+@if (Stats is not null && Stats.HomeTeam is not null && Stats.AwayTeam is not null)
 {
     <Div Border="Border.Rounded" Margin="Margin.Is4.OnX.OnTablet" Shadow="Shadow.Default" Padding="Padding.Is4.OnY">
     <Div Padding="Padding.Is4.FromTop.Is4.OnX">
         <Figure Size="FigureSize.Is48x48">
-            <FigureImage Source="@Api.TeamService.Instance().GetTeamByName(Stats.HomeTeam).Logo" />
+            <FigureImage Source="@Api.TeamService.Instance().GetTeamByName(Stats.HomeTeam)!.Logo" />
         </Figure>
-        <Heading TextWeight="TextWeight.Bold">@Stats.HomeTeam.ToUpper() - @Stats.HomeGoals.Count()</Heading>
+        <Heading TextWeight="TextWeight.Bold">@Stats.HomeTeam.ToUpper() - @Stats.HomeGoals!.Count()</Heading>
     </Div>
     <Grid RowColumns="RowColumns.Are2.OnFullHD.Are1.OnMobile" Padding="Padding.Is4.FromBottom.Is4.OnX">
         <Column ColumnSize="ColumnSize.IsHalf.OnFullHD.IsFull.OnMobile" Padding="Padding.Is4.OnY">
@@ -24,9 +24,9 @@
 
     <Div Padding="Padding.Is4.FromTop.Is4.OnX">
         <Figure Size="FigureSize.Is48x48">
-            <FigureImage Source="@Api.TeamService.Instance().GetTeamByName(Stats.AwayTeam).Logo" />
+            <FigureImage Source="@Api.TeamService.Instance().GetTeamByName(Stats.AwayTeam)!.Logo" />
         </Figure>
-        <Heading TextWeight="TextWeight.Bold">@Stats.AwayTeam.ToUpper() - @Stats.AwayGoals.Count()</Heading>
+        <Heading TextWeight="TextWeight.Bold">@Stats.AwayTeam.ToUpper() - @Stats.AwayGoals!.Count()</Heading>
     </Div>
     <Grid RowColumns="RowColumns.Are2.OnFullHD.Are1.OnMobile" Padding="Padding.Is4.FromBottom.Is4.OnX">
         <Column ColumnSize="ColumnSize.IsHalf.OnFullHD.IsFull.OnMobile" Padding="Padding.Is4.OnY">

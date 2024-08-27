@@ -5,7 +5,11 @@ namespace BoltonCup.Api
     public class TeamService
     {
         private static TeamService? instance = null;
-        public TeamService() { Fetch(); }
+        public TeamService()
+        {
+            TeamDataList = new();
+            Fetch();
+        }
         public static TeamService Instance()
         {
             if (instance == null) { instance = new TeamService(); }
@@ -14,7 +18,6 @@ namespace BoltonCup.Api
 
         public void Fetch()
         {
-            TeamDataList = new();
             try
             {
                 for (int id = 1; id <= 4; id++)
@@ -49,7 +52,7 @@ namespace BoltonCup.Api
 
         public void AddPlayerToTeam(int id, TeamPlayer player)
         {
-            if (id <= TeamDataList.Count) TeamDataList[id - 1].Players.Add(player);
+            if (id <= TeamDataList.Count) TeamDataList[id - 1].Players!.Add(player);
         }
 
         public void Save()
@@ -81,7 +84,7 @@ namespace BoltonCup.Api
             foreach (var team in TeamDataList)
             {
                 var players = team.Players;
-                res.AddRange(players);
+                res.AddRange(players!);
             }
             return res;
         }
@@ -95,7 +98,7 @@ namespace BoltonCup.Api
 
         public TeamData GetPlayerTeam(TeamPlayer player)
         {
-            return TeamDataList.Where(t => t.Players.Any(p => p.Name == player.Name)).FirstOrDefault();
+            return TeamDataList.Where(t => t.Players!.Any(p => p.Name == player.Name)).FirstOrDefault()!;
         }
 
         public static string TeamAbbrev(string teamName)

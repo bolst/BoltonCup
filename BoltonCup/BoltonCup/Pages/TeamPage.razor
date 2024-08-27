@@ -9,7 +9,7 @@
             <Column ColumnSize="ColumnSize.IsHalf.OnTablet.IsFull.OnMobile">
                 <Heading TextWeight="TextWeight.Bold" Size="HeadingSize.Is1" Margin="Margin.IsAuto"
                     Padding="Padding.Is4.OnY.OnTablet.Is4.OnY.OnMobile">Roster -
-                    @teamData.Name
+                    @teamData!.Name
                 </Heading>
             </Column>
             <Column ColumnSize="ColumnSize.IsHalf.OnTablet.IsFull.OnMobile">
@@ -94,7 +94,7 @@
     Task OnSelectedTeamNameChanged(string value)
     {
         SelectedTeamName = value;
-        int teamId = Api.TeamService.Instance().GetTeamByName(SelectedTeamName).Id ?? 1;
+        int teamId = Api.TeamService.Instance().GetTeamByName(SelectedTeamName)!.Id ?? 1;
         navManager.NavigateTo($"/team?id={teamId}", true);
         return Task.CompletedTask;
     }
@@ -105,6 +105,6 @@
         string teamID = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("id") ?? "1";
 
         teamData = Api.TeamService.Instance().GetTeamByID(teamID);
-        SelectedTeamName = teamData.Name;
+        SelectedTeamName = teamData!.Name!;
     }
 }

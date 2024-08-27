@@ -3,18 +3,22 @@
 <br>
 <br>
 
-<Grid RowColumns="RowColumns.Are2.OnTablet.Are1.OnMobile" Padding="Padding.Is4">
-    <Column ColumnSize="ColumnSize.Is6.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
-        <TeamCard LineColor="Background.Primary" Team="@teamDataList[0]" />
-        <br>
-        <TeamCard LineColor="Background.Secondary" Team="@teamDataList[1]" />
-    </Column>
-    <Column ColumnSize="ColumnSize.Is6.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
-        <TeamCard LineColor="Background.Warning" Team="@teamDataList[2]" />
-        <br>
-        <TeamCard LineColor="Background.Info" Team="@teamDataList[3]" />
-    </Column>
-</Grid>
+@if (teamDataList is not null && teamDataList.Count >= 3)
+{
+    <Grid RowColumns="RowColumns.Are2.OnTablet.Are1.OnMobile" Padding="Padding.Is4">
+        <Column ColumnSize="ColumnSize.Is6.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+            <TeamCard LineColor="Background.Primary" Team="@teamDataList[0]" />
+            <br>
+            <TeamCard LineColor="Background.Secondary" Team="@teamDataList[1]" />
+        </Column>
+        <Column ColumnSize="ColumnSize.Is6.OnTablet.Is12.OnMobile" Margin="Margin.IsAuto">
+            <TeamCard LineColor="Background.Warning" Team="@teamDataList[2]" />
+            <br>
+            <TeamCard LineColor="Background.Info" Team="@teamDataList[3]" />
+        </Column>
+    </Grid>
+}
+
 
 @code {
 

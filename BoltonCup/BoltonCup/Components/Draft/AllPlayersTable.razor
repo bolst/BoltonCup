@@ -40,17 +40,17 @@
             foreach (var p in SortBy(Players, sortRule))
             {
                 DraftPlayer player = p;
-                if (player.Position.Length == 0) continue;
+                if (player.Position!.Length == 0) continue;
                 <TableRow TextAlignment="TextAlignment.Center">
                     <TableRowCell>@p.Team</TableRowCell>
                     <TableRowCell>@p.Name</TableRowCell>
-                    <TableRowCell>@p.DOB.Substring(0, 4)</TableRowCell>
+                    <TableRowCell>@p.DOB!.Substring(0, 4)</TableRowCell>
                     <TableRowCell>@p.PosAbbrev()</TableRowCell>
                     <TableRowCell>@p.HighestLvl</TableRowCell>
-                    @CanPlayTableRowCell(p.CanPlayGame1)
-                    @CanPlayTableRowCell(p.CanPlayGame2)
-                    @CanPlayTableRowCell(p.CanPlayGame3)
-                    @CanPlayTableRowCell(p.CanPlayGame4)
+                    @CanPlayTableRowCell(p.CanPlayGame1 ?? "No")
+                    @CanPlayTableRowCell(p.CanPlayGame2 ?? "No")
+                    @CanPlayTableRowCell(p.CanPlayGame3 ?? "No")
+                    @CanPlayTableRowCell(p.CanPlayGame4 ?? "No")
                 </TableRow>
             }
         }
@@ -77,8 +77,8 @@
 
         if (key == "available")
         {
-            retval.AddRange(players.Where(p => p.Team.Length == 0).ToList());
-            retval.AddRange(players.Where(p => p.Team.Length != 0).ToList());
+            retval.AddRange(players.Where(p => p.Team!.Length == 0).ToList());
+            retval.AddRange(players.Where(p => p.Team!.Length != 0).ToList());
         }
         else if (key == "highest")
         {
@@ -107,11 +107,11 @@
                 return 5;
             };
 
-            retval = players.OrderBy(p => comparer(p.HighestLvl)).ToList();
+            retval = players.OrderBy(p => comparer(p.HighestLvl!)).ToList();
         }
         else if (key == "year")
         {
-            retval = players.OrderBy(p => int.Parse(p.DOB.Substring(0, 4))).ToList();
+            retval = players.OrderBy(p => int.Parse(p.DOB!.Substring(0, 4))).ToList();
         }
         else if (key == "pos")
         {

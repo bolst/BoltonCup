@@ -33,7 +33,7 @@
     <Grid RowColumns="RowColumns.Are2.OnFullHD.Are1.OnMobile">
         @{
             
-            var spotlightList = Api.SpotlightService.Instance().Spotlights.Where(s => s.Name.ToLower() == player.Name.ToLower()).ToList();
+            var spotlightList = Api.SpotlightService.Instance().Spotlights.Where(s => s.Name!.ToLower() == player.Name!.ToLower()).ToList();
             var spotlight = spotlightList.Count() == 0 ? (new Spotlight()) : spotlightList.First();
         <Column ColumnSize="ColumnSize.Is2.OnFullHD.IsFull.OnMobile" Margin="Margin.IsAuto">
             <Image Source="@spotlight.Image" Fluid />
@@ -71,6 +71,6 @@
         Uri uri = new Uri(navManager.Uri);
         string playerName = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("name") ?? "Chris Bolton";
         player = Api.TeamService.Instance().GetPlayerByName(playerName);
-        playerTeam = Api.TeamService.Instance().GetPlayerTeam(player);
+        playerTeam = Api.TeamService.Instance().GetPlayerTeam(player!);
     }
 }
