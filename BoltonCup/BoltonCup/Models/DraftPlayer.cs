@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace BoltonCup.Data
+namespace BoltonCup.Models
 {
     public class DraftPlayer
     {
