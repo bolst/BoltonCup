@@ -1,2 +1,2 @@
 ﻿global using Blazorise;
-global using BoltonCup.Data;
+global using BoltonCup.Models;

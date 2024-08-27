@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace BoltonCup.Data
+namespace BoltonCup.Models
 {
     public class TeamPlayer
     {

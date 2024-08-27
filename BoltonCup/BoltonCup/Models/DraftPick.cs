@@ -1,4 +1,4 @@
-namespace BoltonCup.Data
+namespace BoltonCup.Models
 {
     public class DraftPick
     {
