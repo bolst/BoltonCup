@@ -1,0 +1,59 @@
+@page "/stats"
+
+@inject Data.IBCData BCData
+
+<MudPaper Class="pa-10 ma-5" Elevation="0">
+    <MudText Typo="Typo.h5"><b>Statistics</b></MudText>
+    <MudDivider Class="mb-10" />
+
+    <MudGrid Spacing="0">
+        <MudItem xs="6">
+            <MudText Typo="Typo.h5"><b>Skaters</b></MudText>
+        </MudItem>
+        <MudItem xs="6">
+            <MudText Typo="Typo.h5"><b>Goalies</b></MudText>
+        </MudItem>
+
+        <MudItem xs="6">
+            @if (skaterStats is not null)
+            {
+                <MudTabs Rounded="true">
+                    <MudTabPanel Text="Points">
+                        <TopSkaters Skaters="@skaterStats" Label="Points" StatValue="x => x.Goals + x.Assists" />
+                    </MudTabPanel>
+                    <MudTabPanel Text="Goals">
+                        <TopSkaters Skaters="@skaterStats" Label="Goals" StatValue="x => x.Goals" />
+                    </MudTabPanel>
+                    <MudTabPanel Text="Assists">
+                        <TopSkaters Skaters="@skaterStats" Label="Assists" StatValue="x => x.Assists" />
+                    </MudTabPanel>
+                </MudTabs>
+            }
+        </MudItem>
+        <MudItem xs="6">
+            @if (goalieStats is not null)
+            {
+                <MudTabs Rounded="true">
+                    <MudTabPanel Text="GAA">
+                        <TopGoalies Goalies="@goalieStats" Label="GAA" StatValue="x => x.GAA" />
+                    </MudTabPanel>
+                    <MudTabPanel Text="Shutouts">
+                        <TopGoalies Goalies="@goalieStats" Label="Shutouts" StatValue="x => x.Shutouts" />
+                    </MudTabPanel>
+                </MudTabs>
+            }
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@code {
+
+    private IEnumerable<Data.PlayerStatline>? skaterStats;
+    private IEnumerable<Data.GoalieStatline>? goalieStats;
+
+    protected override async Task OnInitializedAsync()
+    {
+        skaterStats = await BCData.GetPlayerStats();
+        goalieStats = await BCData.GetGoalieStats();
+    }
+}

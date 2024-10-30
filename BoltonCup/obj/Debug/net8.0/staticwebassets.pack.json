@@ -1,0 +1,313 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/css/fonts/Lato-Bold.ttf",
+      "PackagePath": "staticwebassets/css/fonts/Lato-Bold.ttf"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/css/fonts/Lato-Regular.ttf",
+      "PackagePath": "staticwebassets/css/fonts/Lato-Regular.ttf"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/css/styles.css",
+      "PackagePath": "staticwebassets/css/styles.css"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/favicon.ico",
+      "PackagePath": "staticwebassets/favicon.ico"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/images/bc-2024.webp",
+      "PackagePath": "staticwebassets/images/bc-2024.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/images/chris-doey.webp",
+      "PackagePath": "staticwebassets/images/chris-doey.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/images/scisoc.webp",
+      "PackagePath": "staticwebassets/images/scisoc.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/logos/logo-1.png",
+      "PackagePath": "staticwebassets/logos/logo-1.png"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/logos/logo-2.png",
+      "PackagePath": "staticwebassets/logos/logo-2.png"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/logos/logo-3.png",
+      "PackagePath": "staticwebassets/logos/logo-3.png"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/logos/logo-4.png",
+      "PackagePath": "staticwebassets/logos/logo-4.png"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/AD_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/AD_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/AedanSullivan_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/AedanSullivan_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/AndrewStratichuk_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/AndrewStratichuk_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/AnthonyDerose_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/AnthonyDerose_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/BenMueller_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/BenMueller_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/BrandonAllen_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/BrandonAllen_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/BrandonLeblanc_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/BrandonLeblanc_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/ChrisBolton_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/ChrisBolton_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/ColtonKrz_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/ColtonKrz_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/ConnorFabel_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/ConnorFabel_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/ConnorKelly_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/ConnorKelly_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/ConorCostello_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/ConorCostello_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/CooperTremblett_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/CooperTremblett_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/Cujo_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/Cujo_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/DavonGeddes_Profile.jpg",
+      "PackagePath": "staticwebassets/spotlight/DavonGeddes_Profile.jpg"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/DeanAlbano_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/DeanAlbano_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/EastonForrest_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/EastonForrest_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/EthanGalvan_Profile.jpg",
+      "PackagePath": "staticwebassets/spotlight/EthanGalvan_Profile.jpg"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/EthanGalvan_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/EthanGalvan_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/EvanEansor_Profile.jpg",
+      "PackagePath": "staticwebassets/spotlight/EvanEansor_Profile.jpg"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/EvanFenech_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/EvanFenech_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/EvanMacPherson_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/EvanMacPherson_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/Ginny_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/Ginny_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/Gunner_Profile.jpg",
+      "PackagePath": "staticwebassets/spotlight/Gunner_Profile.jpg"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/JakeGaudario_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/JakeGaudario_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/JakeRogers_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/JakeRogers_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/JesseMercier_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/JesseMercier_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/JonasColumbus_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/JonasColumbus_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/JonathanSexsmith_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/JonathanSexsmith_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/KalebSimpson_Profile.jpg",
+      "PackagePath": "staticwebassets/spotlight/KalebSimpson_Profile.jpg"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/KarsonBeuglet_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/KarsonBeuglet_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/KeeganCarswell_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/KeeganCarswell_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/KyleBleau_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/KyleBleau_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/LiamGodwin_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/LiamGodwin_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/LiamPrince_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/LiamPrince_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/LoganNagy_Profile.jpg",
+      "PackagePath": "staticwebassets/spotlight/LoganNagy_Profile.jpg"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/LucasStoy_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/LucasStoy_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/LukasBoudreau.webp",
+      "PackagePath": "staticwebassets/spotlight/LukasBoudreau.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/MatteoFrat_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/MatteoFrat_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/MaxSiebs_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/MaxSiebs_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/MichaelRohrer_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/MichaelRohrer_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/NateDowling_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/NateDowling_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/NicBolton_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/NicBolton_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/NoahSpadotto_Profile.jpg",
+      "PackagePath": "staticwebassets/spotlight/NoahSpadotto_Profile.jpg"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/NoahTaylor_Profile.jpg",
+      "PackagePath": "staticwebassets/spotlight/NoahTaylor_Profile.jpg"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/OwenBentley_Profile.jpg",
+      "PackagePath": "staticwebassets/spotlight/OwenBentley_Profile.jpg"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/OwenFindlay_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/OwenFindlay_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/QuinnOneil_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/QuinnOneil_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/QuinnThoms_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/QuinnThoms_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/ReillyBond_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/ReillyBond_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/RomanFalsetta_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/RomanFalsetta_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/RomanoLiburdi_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/RomanoLiburdi_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/RyanCronheimer_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/RyanCronheimer_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/RyanPatterson_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/RyanPatterson_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/RyanSterling_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/RyanSterling_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/Saliba_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/Saliba_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/SethMartineau_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/SethMartineau_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/SpencerHiggz_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/SpencerHiggz_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/TylerBurton_Profile.jpg",
+      "PackagePath": "staticwebassets/spotlight/TylerBurton_Profile.jpg"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/TylerFuhr_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/TylerFuhr_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/TylerTrealout_Profile.webp",
+      "PackagePath": "staticwebassets/spotlight/TylerTrealout_Profile.webp"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCupM/BoltonCup/wwwroot/spotlight/default.jpg",
+      "PackagePath": "staticwebassets/spotlight/default.jpg"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.BoltonCup.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.BoltonCup.props",
+      "PackagePath": "build\\BoltonCup.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.BoltonCup.props",
+      "PackagePath": "buildMultiTargeting\\BoltonCup.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.BoltonCup.props",
+      "PackagePath": "buildTransitive\\BoltonCup.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

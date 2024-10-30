@@ -1,0 +1,29 @@
+@inject NavigationManager Navigation
+
+@if (Team is not null)
+{
+    <MudPaper Class="px-5 ma-5 team-card" Style="@containerStyle" Elevation="5" onclick=@(() =>
+    Navigation.NavigateTo($"/team/{Team.Id}"))>
+    <MudStack Class="d-flex align-center" Style="height: 10vh" Row="true">
+        <MudImage Src=@($"logos/logo-{Team.Id}.png") Style="max-height: 100%" />
+        <MudText Class="team-name" Style="@textStyle" Typo="Typo.h5"><b>@Team.ShortName.ToUpper()</b></MudText>
+    </MudStack>
+</MudPaper>
+}
+
+<style>
+    .team-card {}
+
+    .team-card:hover {
+        text-decoration: underline;
+    }
+</style>
+
+@code {
+
+    [Parameter] public Data.Team? Team { get; set; }
+
+    public string containerStyle => $"background-color: {Team?.PrimaryHex}55; cursor: pointer;";
+    public string textStyle => $"color: {Team?.PrimaryHex}";
+
+}

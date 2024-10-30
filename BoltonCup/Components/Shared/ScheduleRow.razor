@@ -1,0 +1,76 @@
+@inject Data.IBCData BCData
+@inject NavigationManager Navigation
+
+@if (Game is not null && homeTeam is not null && awayTeam is not null)
+{
+    <MudPaper Class="py-8" Style="@RowStyle" Elevation="5" @onclick="OnRowClick">
+    <MudStack Class="d-flex align-center" Row="true">
+        <MudItem Class="d-flex justify-end border-r-8" Style=@($"border-color: {homeTeam.PrimaryHex}") xs="1">
+            <MudImage Class="invisible" Src=@($"logos/logo-{homeTeam.Id}.png") Width="@logoWidth"
+                Height="@logoHeight" />
+        </MudItem>
+        <MudItem Class="d-flex justify-end border-l-8" Style=@($"border-color: {homeTeam.PrimaryHex}") xs="1">
+            <MudImage Src=@($"logos/logo-{homeTeam.Id}.png") Width="@logoWidth" Height="@logoHeight" />
+        </MudItem>
+        <MudItem xs="1">
+            <MudText Class="d-flex justify-start" Typo="Typo.h6">@homeTeam.ShortName</MudText>
+        </MudItem>
+        <MudItem Class="d-flex justify-center" xs="6">
+            <MudStack Class="d-flex align-center flex-grow-1" StretchItems="StretchItems.Middle" Row="true">
+                @if (gameScore is not null)
+                    {
+                        <MudText Class="d-flex justify-start" Typo="Typo.h4">@gameScore.HomeScore</MudText>
+                    }
+                    <MudStack Class="d-flex justify-center flex-grow-1" Spacing="0">
+                        <MudText Class="d-flex justify-center" Typo="Typo.subtitle2">@Game.Date.ToString("MM/dd/yyyy")
+                        </MudText>
+                        <MudText Class="d-flex justify-center" Typo="Typo.subtitle2">@Game.Date.ToString("h:mmtt")</MudText>
+                        <MudText Class="d-flex justify-center" Typo="Typo.subtitle2">@Game.Location (@Game.Rink)</MudText>
+                    </MudStack>
+                    @if (gameScore is not null)
+                    {
+                        <MudText Class="d-flex justify-end" Typo="Typo.h4">@gameScore.AwayScore</MudText>
+                    }
+                </MudStack>
+            </MudItem>
+            <MudItem xs="1">
+                <MudText Class="d-flex justify-end" Typo="Typo.h6">@awayTeam.ShortName</MudText>
+            </MudItem>
+            <MudItem Class="d-flex justify-start border-r-8" Style=@($"border-color: {awayTeam.PrimaryHex}") xs="1">
+                <MudImage Src=@($"logos/logo-{awayTeam.Id}.png") Width="@logoWidth" Height="@logoHeight" />
+            </MudItem>
+            <MudItem Class="d-flex justify-end border-l-8" Style=@($"border-color: {awayTeam.PrimaryHex}") xs="1">
+                <MudImage Class="invisible" Src=@($"logos/logo-{awayTeam.Id}.png") Width="@logoWidth"
+                    Height="@logoHeight" />
+            </MudItem>
+        </MudStack>
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public Data.ScheduledGame? Game { get; set; }
+    [Parameter] public bool Clickable { get; set; } = true;
+    private Data.Team? homeTeam { get; set; }
+    private Data.Team? awayTeam { get; set; }
+    private Data.GameScore? gameScore { get; set; }
+
+    private readonly int? logoWidth = 75;
+    private readonly int? logoHeight = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Game is not null)
+        {
+            homeTeam = await BCData.GetTeamById(Game.HomeTeamId);
+            awayTeam = await BCData.GetTeamById(Game.AwayTeamId);
+            gameScore = await BCData.GetGameScoreById(Game.GameId);
+        }
+    }
+
+    private void OnRowClick()
+    {
+        if (Clickable && Game is not null) Navigation.NavigateTo($"game/{Game.GameId}");
+    }
+
+    private string RowStyle => Clickable ? "cursor: pointer" : "";
+}

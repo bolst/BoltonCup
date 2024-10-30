@@ -1,0 +1,68 @@
+@page "/player/{id:int}"
+
+@inject Data.IBCData BCData
+@inject NavigationManager Navigation
+
+<MudPaper Class="pa-10 ma-5">
+
+    @if (profile is not null && profilePicture is not null)
+    {
+        <MudStack Class="d-flex align-center mb-10" Row="true">
+            <MudText Typo="Typo.h2">@profile.Name.ToUpper()</MudText>
+            <MudDivider Class="mx-2" Vertical="true" FlexItem="true" />
+            <MudImage Src=@($"logos/logo-{profile.CurrentTeamId}.png") Height="80" />
+            <MudDivider Class="mx-2" Vertical="true" FlexItem="true" />
+            <MudText Typo="Typo.h2">#@profile.JerseyNumber</MudText>
+            <MudDivider Class="mx-2" Vertical="true" FlexItem="true" />
+            <MudText Typo="Typo.h2">@profile.Position.ToUpper().First()</MudText>
+        </MudStack>
+        <MudStack Class="d-flex align-center mb-10" Row="true">
+            <MudImage Src="@profilePicture.Source" Height="200" />
+
+            <MudDivider Class="px-4" Vertical="true" FlexItem="true" />
+
+            <MudStack>
+                <MudText>Birth Year: @profile.Birthday.ToString("yyyy")</MudText>
+                @* <MudText>Hometown:</MudText> *@
+                <MudText>Favourite Beer: @profile.PreferredBeer</MudText>
+            </MudStack>
+
+            <MudDivider Class="px-4" Vertical="true" FlexItem="true" />
+
+            @if (profile.Position == "Goalie")
+            {
+                <GoalieStatSummary PlayerId="@Id" />
+            }
+            else
+            {
+                <PlayerStatSummary PlayerId="@Id" />
+            }
+
+        </MudStack>
+
+        <MudText Typo="Typo.h4">Game History</MudText>
+        <MudDivider />
+
+        @if (profile.Position == "Goalie")
+        {
+            <GoalieGameByGame PlayerId="@Id" />
+        }
+        else
+        {
+            <PlayerGameByGame PlayerId="@Id" />
+        }
+    }
+    </MudPaper>
+
+    @code {
+    [Parameter] public int Id { get; set; }
+
+    private Data.PlayerProfile? profile;
+    private Data.PlayerProfilePicture? profilePicture;
+
+    protected override async Task OnInitializedAsync()
+    {
+        profile = await BCData.GetPlayerProfileById(Id);
+        profilePicture = await BCData.GetPlayerProfilePictureById(Id);
+    }
+}

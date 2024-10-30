@@ -1,0 +1,81 @@
+@namespace BoltonCup.Components
+@using System.Timers
+
+
+@if (TimeUntil is not null)
+{
+    <MudStack Class="px-20 mx-10" Row="true" Wrap="Wrap.Wrap" Justify="Justify.SpaceEvenly">
+        <div class="d-flex justify-center">
+            @TimeUnitComponent(TimeUntil?.Days ?? 0, "DAYS")
+        </div>
+        <div class="d-flex justify-center">
+            @TimeUnitComponent(TimeUntil?.Hours ?? 0, "HOURS")
+        </div>
+        <div class="d-flex justify-center">
+            @TimeUnitComponent(TimeUntil?.Minutes ?? 0, "MINUTES")
+        </div>
+        <div class="d-flex justify-center">
+            @TimeUnitComponent(TimeUntil?.Seconds ?? 0, "SECONDS")
+        </div>
+    </MudStack>
+}
+
+
+@code {
+    #region Countdown
+
+    RenderFragment TimeUnitComponent(int value, string label) => __builder =>
+    {
+        <MudStack Class="px-1" AlignItems="AlignItems.Center">
+            <MudText Color="Color.Secondary" Typo="Typo.h1" HtmlTag="i"><b>@value</b></MudText>
+            <MudText Color="Color.Secondary" Typo="Typo.h6" HtmlTag="i">@label</MudText>
+        </MudStack>
+    };
+
+    static Timer myTimer = new Timer(1000) { Enabled = false };
+    DateTime TournamentStart = new DateTime(2025, 08, 01, 5 + 12, 30, 00); // august 2 5:30pm
+
+    TimeSpan? TimeUntil = null;
+    TimeSpan dt = new TimeSpan(0, 0, 1);
+
+    protected override void OnInitialized()
+    {
+        var timeUtc = DateTime.UtcNow;
+        var x = TimeZoneInfo.GetSystemTimeZones();
+        TimeZoneInfo est = TimeZoneInfo.FindSystemTimeZoneById("America/Toronto");
+        DateTime estTimeNow = TimeZoneInfo.ConvertTimeFromUtc(timeUtc, est);
+        TimeUntil = TournamentStart - estTimeNow;
+        if (TimeUntil < TimeSpan.Zero)
+        {
+            TimeUntil = TimeSpan.Zero;
+        }
+        StartTimer();
+    }
+    void StartTimer()
+    {
+        myTimer = new Timer(1000);
+        myTimer.Elapsed += CountDownTimer!;
+        myTimer.Enabled = true;
+    }
+
+    public void CountDownTimer(Object source, ElapsedEventArgs e)
+    {
+        if (TimeUntil is not null)
+        {
+            if (TimeUntil <= TimeSpan.Zero)
+            {
+                myTimer.Enabled = false;
+            }
+            else
+            {
+                TimeUntil = TimeUntil?.Subtract(dt);
+            }
+        }
+        else
+        {
+            myTimer.Enabled = false;
+        }
+        InvokeAsync(StateHasChanged);
+    }
+    #endregion
+}
