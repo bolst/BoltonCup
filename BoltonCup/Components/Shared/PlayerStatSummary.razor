@@ -1,0 +1,35 @@
+@inject NavigationManager Navigation
+@inject Data.IBCData BCData
+
+@if (playerGameByGame is not null)
+{
+    <MudPaper Class="pa-2 ml-4" Elevation="3">
+    <MudStack Class="d-flex align-center" Row="true">
+        <MudText Class="mx-10" Typo="Typo.h6">2024</MudText>
+        <MudDivider Vertical="true" FlexItem="true" />
+
+        @StatColumnRF("GP", playerGameByGame.Count())
+        @StatColumnRF("G", playerGameByGame.Sum(x => x.Goals))
+        @StatColumnRF("A", playerGameByGame.Sum(x => x.Assists))
+        @StatColumnRF("P", playerGameByGame.Sum(x => x.Goals + x.Assists))
+    </MudStack>
+</MudPaper>
+}
+
+@code {
+    [Parameter] public int PlayerId { get; set; }
+    private IEnumerable<Data.PlayerGameSummary>? playerGameByGame;
+
+    private RenderFragment StatColumnRF(string title, int value) => __builder =>
+    {
+        <MudStack Class="px-10 d-flex justify-center">
+            <MudText Class="d-flex justify-center" Typo="Typo.subtitle2">@title</MudText>
+            <MudText Class="d-flex justify-center" Typo="Typo.h4">@value</MudText>
+        </MudStack>
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        playerGameByGame = await BCData.GetPlayerGameByGame(PlayerId);
+    }
+}

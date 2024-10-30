@@ -1,0 +1,64 @@
+@page "/team/{id:int}"
+
+@inject Data.IBCData BCData
+@inject NavigationManager Navigation
+
+<MudPaper Class="pa-10 ma-5" Elevation="5">
+    @if (team is not null && roster is not null)
+    {
+        <MudStack Class="mb-6 d-flex align-center" Row="true">
+            <MudText Typo="Typo.h2">@team.ShortName.ToUpper()</MudText>
+            <MudImage Src=@($"logos/logo-{Id}.png") Height="150" />
+        </MudStack>
+
+        <MudText Typo="Typo.h6">Forwards</MudText>
+        <MudDivider />
+        @PlayerTable(roster.Where(p => p.Position.ToLower() == "forward"))
+
+
+        <MudText Typo="Typo.h6">Defensemen</MudText>
+        <MudDivider />
+        @PlayerTable(roster.Where(p => p.Position.ToLower() == "defenseman"))
+
+        <MudText Typo="Typo.h6">Goalies</MudText>
+        <MudDivider />
+        @PlayerTable(roster.Where(p => p.Position.ToLower() == "goalie"))
+    }
+    </MudPaper>
+
+    @code {
+    [Parameter] public int Id { get; set; }
+
+    private Data.Team? team { get; set; }
+    private IEnumerable<Data.TeamPlayer>? roster { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        team = await BCData.GetTeamById(Id);
+        roster = await BCData.GetRosterByTeamId(Id);
+    }
+
+    private RenderFragment PlayerTable(IEnumerable<Data.TeamPlayer> players) => __builder =>
+    {
+        <MudSimpleTable Class="mb-6" Hover="true" Dense="true" Striped="true" Elevation="0">
+            <thead>
+                <tr>
+                    <th><b>#</b></th>
+                    <th><b>NAME</b></th>
+                    <th><b>BIRTH YEAR</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Data.TeamPlayer player in players)
+                {
+                    <tr style="cursor: pointer" onclick=@(() => Navigation.NavigateTo($"player/{player.PlayerId}"))>
+                        <th>@player.JerseyNumber.ToString("D2")</th>
+                        <th>@player.Name</th>
+                        <th>@player.Birthday.ToString("yyyy")</th>
+                    </tr>
+                }
+            </tbody>
+        </MudSimpleTable>
+    };
+
+}

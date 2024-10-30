@@ -1,0 +1,75 @@
+@inject Data.IBCData BCData
+@inject NavigationManager Navigation
+
+@if (Goalies is not null && StatValue is not null && selectedGoalie is not null && profilePictures is not null)
+{
+    <MudGrid Class="pa-6">
+    <MudItem Class="d-flex justify-center" xs="6">
+        <MudPaper Class="d-flex justify-center align-center flex-grow-1">
+            <MudStack Class="d-flex align-center">
+                <MudAvatar Style="height: 120px; width: 120px; cursor: pointer" @onclick=@(() =>
+                    Navigation.NavigateTo($"player/{selectedGoalie.PlayerId}"))>
+                    <MudImage Src="@profilePictures.Where(p => p.PlayerId == selectedGoalie.PlayerId).First().Source"
+                        Height="200" />
+                </MudAvatar>
+
+                <MudText Class="d-flex justify-center" Style="cursor: pointer" @onclick=@(() =>
+                    Navigation.NavigateTo($"player/{selectedGoalie.PlayerId}")) Typo="Typo.h5">
+                    <b>@selectedGoalie.Name.ToUpper()</b>
+                </MudText>
+
+                <MudStack Class="d-flex align-center" Row="true">
+                    <MudImage Src=@($"logos/logo-{selectedGoalie.TeamId}.png") Height="50" />
+                    <MudDivider Vertical="true" FlexItem="true" />
+                    <MudText Typo="Typo.body1">#@selectedGoalie.PlayerNumber</MudText>
+                    <MudDivider Vertical="true" FlexItem="true" />
+                    <MudText Typo="Typo.body1">G</MudText>
+                </MudStack>
+
+                <MudText Class="d-flex justify-center" Typo="Typo.h6">@Label.ToUpper()</MudText>
+                <MudText Class="d-flex justify-center" Typo="Typo.h2">@StatValue(selectedGoalie)</MudText>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+    <MudItem Class="d-flex justify-center" Style="height: 60vh;" xs="6">
+        <MudStack>
+            @{
+                    int rank = 1;
+                    foreach (Data.GoalieStatline goalie in Goalies.OrderBy(s => StatValue(s)).Reverse())
+                    {
+                        int playerRank = rank;
+                        <MudButton OnClick="() => selectedGoalie = goalie" Color="@goalieButtonColor(goalie)"
+                            Variant="@goalieButtonVariant(goalie)">
+                            <MudStack Class="d-flex flex-grow-1" Row="true">
+                                <MudText>@playerRank</MudText>
+                                <MudText Class="d-flex flex-grow-1">@goalie.Name.ToUpper()</MudText>
+                                <MudText>@StatValue(goalie)</MudText>
+                            </MudStack>
+                        </MudButton>
+                        rank++;
+                    }
+                }
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    [Parameter] public IEnumerable<Data.GoalieStatline>? Goalies { get; set; }
+    [Parameter] public Func<Data.GoalieStatline, double> StatValue { get; set; }
+    [Parameter] public string Label { get; set; } = "";
+
+    private Data.GoalieStatline? selectedGoalie;
+    private IEnumerable<Data.PlayerProfilePicture>? profilePictures;
+
+    protected override async Task OnInitializedAsync()
+    {
+        selectedGoalie = Goalies?.OrderBy(s => StatValue(s)).Reverse().First();
+        profilePictures = await BCData.GetPlayerProfilePictures();
+    }
+
+    private Variant goalieButtonVariant(Data.GoalieStatline goalie) => (goalie.PlayerId == selectedGoalie.PlayerId) ?
+    Variant.Filled : Variant.Outlined;
+    private Color goalieButtonColor(Data.GoalieStatline goalie) => (goalie.PlayerId == selectedGoalie.PlayerId) ?
+    Color.Primary : Color.Default;
+}

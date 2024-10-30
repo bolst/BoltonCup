@@ -1,0 +1,23 @@
+@page "/schedule"
+
+@inject Data.IBCData BCData
+
+@if (schedule is not null)
+{
+    foreach (var game in schedule)
+    {
+        <div class="my-5 mx-20">
+    <ScheduleRow Game="game" />
+</div>
+    }
+}
+
+@code {
+
+    public IEnumerable<Data.ScheduledGame>? schedule;
+
+    protected override async Task OnInitializedAsync()
+    {
+        schedule = await BCData.GetSchedule();
+    }
+}

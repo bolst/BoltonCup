@@ -1,8 +1,0 @@
-@namespace BoltonCup.Components
-
-<Paragraph Padding="@TextPadding">@ChildContent</Paragraph>
-
-@code {
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public IFluentSpacing TextPadding { get; set; } = Padding.Is0;
-}
