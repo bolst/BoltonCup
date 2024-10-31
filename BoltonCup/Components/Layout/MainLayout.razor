@@ -6,7 +6,7 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Color="Color.Primary">
+    <MudAppBar Class="d-none d-sm-flex" Color="Color.Primary">
         <MudButton Class="mud-theme-primary" Href="/" Variant="Variant.Text" Size="Size.Large">HOME</MudButton>
         <MudButton Class="mud-theme-primary" Href="/info" Variant="Variant.Text" Size="Size.Large">INFO</MudButton>
         <MudButton Class="mud-theme-primary" Href="/teams" Variant="Variant.Text" Size="Size.Large">TEAMS</MudButton>
@@ -18,6 +18,20 @@
 
         <MudButton Class="mud-theme-primary" Href="/register" Variant="Variant.Text" Size="Size.Large">REGISTER
         </MudButton>
+    </MudAppBar>
+    <MudAppBar Class="d-flex d-sm-none" Color="Color.Primary">
+        <SmallMenu />
+        @* <MudButton Class="mud-theme-primary" Href="/" Variant="Variant.Text" Size="Size.Large">HOME</MudButton>
+        <MudButton Class="mud-theme-primary" Href="/info" Variant="Variant.Text" Size="Size.Large">INFO</MudButton>
+        <MudButton Class="mud-theme-primary" Href="/teams" Variant="Variant.Text" Size="Size.Large">TEAMS</MudButton>
+        <MudButton Class="mud-theme-primary" Href="/schedule" Variant="Variant.Text" Size="Size.Large">SCHEDULE
+        </MudButton>
+        <MudButton Class="mud-theme-primary" Href="/stats" Variant="Variant.Text" Size="Size.Large">STATS</MudButton>
+
+        <MudSpacer />
+
+        <MudButton Class="mud-theme-primary" Href="/register" Variant="Variant.Text" Size="Size.Large">REGISTER
+        </MudButton> *@
     </MudAppBar>
 
     <MudMainContent>
