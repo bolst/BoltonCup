@@ -6,8 +6,8 @@
 <MudPaper Class="pa-10 ma-5" Elevation="5">
     @if (team is not null && roster is not null)
     {
-        <MudStack Class="mb-6 d-flex align-center" Row="true">
-            <MudText Typo="Typo.h2">@team.ShortName.ToUpper()</MudText>
+        <MudStack Class="mb-6 d-flex align-center" Row="true" Wrap="Wrap.Wrap">
+            <MudText Typo="Typo.h3">@team.ShortName.ToUpper()</MudText>
             <MudImage Src=@($"logos/logo-{Id}.png") Height="150" />
         </MudStack>
 
