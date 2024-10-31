@@ -5,7 +5,7 @@
 {
     <MudPaper Class="pa-2 ml-4" Elevation="3">
     <MudStack Class="d-flex align-center" Row="true">
-        <MudText Class="mx-10" Typo="Typo.h6">2024</MudText>
+        <MudText Class="mx-4 mx-sm-10" Typo="Typo.h6">2024</MudText>
         <MudDivider Vertical="true" FlexItem="true" />
 
         @StatColumnRF("GP", goalieGameByGame.Count())
@@ -21,7 +21,7 @@
 
     private RenderFragment StatColumnRF(string title, double value) => __builder =>
     {
-        <MudStack Class="px-10 d-flex justify-center">
+        <MudStack Class="px-2 px-sm-10 d-flex justify-center">
             <MudText Class="d-flex justify-center" Typo="Typo.subtitle2">@title</MudText>
             <MudText Class="d-flex justify-center" Typo="Typo.h4">@value</MudText>
         </MudStack>

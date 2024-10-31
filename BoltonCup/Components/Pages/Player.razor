@@ -3,31 +3,35 @@
 @inject Data.IBCData BCData
 @inject NavigationManager Navigation
 
-<MudPaper Class="pa-10 ma-5">
+<MudPaper Class="py-10 my-5 mx-2 px-2 px-sm-10 mx-sm-5">
 
     @if (profile is not null && profilePicture is not null)
     {
-        <MudStack Class="d-flex align-center mb-10" Row="true">
-            <MudText Typo="Typo.h2">@profile.Name.ToUpper()</MudText>
-            <MudDivider Class="mx-2" Vertical="true" FlexItem="true" />
+        <MudStack Class="d-flex align-center mb-10" Wrap="Wrap.Wrap" Row="true">
+            <MudText Typo="Typo.h3">@profile.Name.ToUpper()</MudText>
+            <MudDivider Class="d-none d-sm-flex mx-2" Vertical="true" FlexItem="true" />
             <MudImage Src=@($"logos/logo-{profile.CurrentTeamId}.png") Height="80" />
             <MudDivider Class="mx-2" Vertical="true" FlexItem="true" />
             <MudText Typo="Typo.h2">#@profile.JerseyNumber</MudText>
             <MudDivider Class="mx-2" Vertical="true" FlexItem="true" />
             <MudText Typo="Typo.h2">@profile.Position.ToUpper().First()</MudText>
         </MudStack>
-        <MudStack Class="d-flex align-center mb-10" Row="true">
-            <MudImage Src="@profilePicture.Source" Height="200" />
+        <MudStack Class="d-flex align-center mb-10" Wrap="Wrap.Wrap" Row="true">
+            <div class="d-flex align-center mb-10">
 
-            <MudDivider Class="px-4" Vertical="true" FlexItem="true" />
+                <MudImage Src="@profilePicture.Source" Height="200" />
 
-            <MudStack>
-                <MudText>Birth Year: @profile.Birthday.ToString("yyyy")</MudText>
-                @* <MudText>Hometown:</MudText> *@
-                <MudText>Favourite Beer: @profile.PreferredBeer</MudText>
-            </MudStack>
+                <MudDivider Class="d-none d-sm-flex px-4" Vertical="true" FlexItem="true" />
 
-            <MudDivider Class="px-4" Vertical="true" FlexItem="true" />
+                <MudStack Class="mx-2">
+                    <MudText>Birth Year: @profile.Birthday.ToString("yyyy")</MudText>
+                    @* <MudText>Hometown:</MudText> *@
+                    <MudText>Favourite Beer: @profile.PreferredBeer</MudText>
+                </MudStack>
+
+                <MudDivider Class="d-none d-sm-flex px-4" Vertical="true" FlexItem="true" />
+            </div>
+
 
             @if (profile.Position == "Goalie")
             {
