@@ -7,9 +7,9 @@
     <ScheduleRow Game="@currGame" Clickable="false" />
 }
 
-<MudPaper Class="pa-10 ma-5">
+<MudPaper Class="py-10 my-5 mx-2 px-2 px-sm-10 mx-sm-5">
     <MudGrid>
-        <MudItem xs="8">
+        <MudItem xs="12" sm="8">
             <MudText Class="mb-4" Typo="Typo.h5"><b>Scoring</b></MudText>
             @if (gameGoals is not null)
             {
@@ -83,7 +83,7 @@
             }
 
         </MudItem>
-        <MudItem xs="4">
+        <MudItem xs="12" sm="4">
             <MudPaper Class="pa-4">
                 <MudText Typo="Typo.h5"><b>Linescore</b></MudText>
                 <MudDivider />
