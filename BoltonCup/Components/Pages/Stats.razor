@@ -2,21 +2,20 @@
 
 @inject Data.IBCData BCData
 
-<MudPaper Class="pa-10 ma-5" Elevation="0">
+<MudPaper Class="pa-sm-10 ma-2 ma-sm-5" Elevation="0">
     <MudText Typo="Typo.h5"><b>Statistics</b></MudText>
     <MudDivider Class="mb-10" />
 
     <MudGrid Spacing="0">
-        <MudItem xs="6">
-            <MudText Typo="Typo.h5"><b>Skaters</b></MudText>
+        @* <MudItem xs="12" sm="6">
         </MudItem>
-        <MudItem xs="6">
-            <MudText Typo="Typo.h5"><b>Goalies</b></MudText>
-        </MudItem>
+        <MudItem xs="12" sm="6">
+        </MudItem> *@
 
-        <MudItem xs="6">
+        <MudItem xs="12" sm="6">
             @if (skaterStats is not null)
             {
+                <MudText Typo="Typo.h5"><b>Skaters</b></MudText>
                 <MudTabs Rounded="true">
                     <MudTabPanel Text="Points">
                         <TopSkaters Skaters="@skaterStats" Label="Points" StatValue="x => x.Goals + x.Assists" />
@@ -30,7 +29,8 @@
                 </MudTabs>
             }
         </MudItem>
-        <MudItem xs="6">
+        <MudItem xs="12" sm="6">
+            <MudText Typo="Typo.h5"><b>Goalies</b></MudText>
             @if (goalieStats is not null)
             {
                 <MudTabs Rounded="true">
