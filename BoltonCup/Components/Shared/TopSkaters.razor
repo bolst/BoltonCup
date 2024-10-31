@@ -53,6 +53,17 @@
         </MudItem>
     </MudGrid>
 }
+else
+{
+    <MudGrid Class="px-sm-6 py-6">
+    <MudItem Class="d-flex justify-center" xs="6">
+        <MudSkeleton SkeletonType="SkeletonType.Circle" Height="120px" Width="120px" />
+    </MudItem>
+    <MudItem Class="d-flex justify-center" Style="min-height: 60vh;" xs="6">
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="60vh" Width="100%" />
+    </MudItem>
+</MudGrid>
+}
 
 @code {
     [Parameter] public IEnumerable<Data.PlayerStatline>? Skaters { get; set; }

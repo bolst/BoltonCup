@@ -56,6 +56,16 @@
             <PlayerGameByGame PlayerId="@Id" />
         }
     }
+    else
+    {
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="70vw" Height="10vh" />
+        <MudStack Class="my-10" Row="true">
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="20vw" Height="30vh" />
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="20vw" Height="30vh" />
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="20vw" Height="30vh" />
+        </MudStack>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="80vw" Height="25vh" />
+    }
     </MudPaper>
 
     @code {

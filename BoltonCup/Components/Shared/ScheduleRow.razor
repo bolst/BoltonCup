@@ -33,6 +33,23 @@
         <td>@Game.Location (@Game.Rink)</td>
     </tr>
 }
+else
+{
+    <tr>
+    <td>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" />
+    </td>
+    <td>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" />
+    </td>
+    <td>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" />
+    </td>
+    <td>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" />
+    </td>
+</tr>
+}
 
 @code {
     [Parameter] public Data.ScheduledGame? Game { get; set; }

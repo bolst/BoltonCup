@@ -24,6 +24,13 @@
         <MudDivider />
         @PlayerTable(roster.Where(p => p.Position.ToLower() == "goalie"))
     }
+    else
+    {
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="30vw" Height="10vh" />
+        <MudSkeleton Class="my-5" SkeletonType="SkeletonType.Rectangle" Width="70vw" Height="40vh" />
+        <MudSkeleton Class="my-5" SkeletonType="SkeletonType.Rectangle" Width="70vw" Height="40vh" />
+        <MudSkeleton Class="my-5" SkeletonType="SkeletonType.Rectangle" Width="70vw" Height="20vh" />
+    }
     </MudPaper>
 
     @code {
