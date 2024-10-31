@@ -56,6 +56,14 @@
                     }
                 }
             }
+            else
+            {
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+            }
 
             <MudText Class="mt-12 mb-4" Typo="Typo.h5"><b>Penalties</b></MudText>
             @if (gamePenalties is not null)
@@ -81,6 +89,12 @@
                     <GamePenaltiesTable Penalties="@gamePenalties.Where(p => p.Period == 3)" />
                 }
             }
+            else
+            {
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+            }
 
         </MudItem>
         <MudItem xs="12" sm="4">
@@ -90,6 +104,10 @@
                 @if (gameGoals is not null)
                 {
                     <GameLineScore GameId="@Id" />
+                }
+                else
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="20vh" />
                 }
             </MudPaper>
         </MudItem>
