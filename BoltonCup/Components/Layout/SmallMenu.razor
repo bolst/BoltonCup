@@ -1,0 +1,35 @@
+@inject NavigationManager Navigation
+
+<div>
+    <MudFab DropShadow="false" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Menu" OnClick="@ToggleOpen" />
+</div>
+
+<MudOverlay Visible="@isOpen" DarkBackground AutoClose="true" OnClosed="@OnClosed">
+    <MudPaper Class="pa-20 gray darken-4">
+        <MudStack>
+            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/">HOME
+            </MudButton>
+            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/info">INFO
+            </MudButton>
+            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/teams">TEAMS
+            </MudButton>
+            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/schedule">
+                SCHEDULE
+            </MudButton>
+            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/stats">STATS
+            </MudButton>
+            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/register">
+                REGISTER
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+</MudOverlay>
+
+@code {
+
+    private bool isOpen = false;
+
+    private void ToggleOpen() => isOpen = !isOpen;
+    private void OnClosed() => isOpen = false;
+
+}
