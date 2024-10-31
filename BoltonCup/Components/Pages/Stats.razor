@@ -13,9 +13,9 @@
         </MudItem> *@
 
         <MudItem xs="12" sm="6">
+            <MudText Typo="Typo.h5"><b>Skaters</b></MudText>
             @if (skaterStats is not null)
             {
-                <MudText Typo="Typo.h5"><b>Skaters</b></MudText>
                 <MudTabs Rounded="true">
                     <MudTabPanel Text="Points">
                         <TopSkaters Skaters="@skaterStats" Label="Points" StatValue="x => x.Goals + x.Assists" />
@@ -35,7 +35,7 @@
             {
                 <MudTabs Rounded="true">
                     <MudTabPanel Text="GAA">
-                        <TopGoalies Goalies="@goalieStats" Label="GAA" StatValue="x => x.GAA" />
+                        <TopGoalies Goalies="@goalieStats" Label="GAA" StatValue="x => x.GAA" Ascending="true" />
                     </MudTabPanel>
                     <MudTabPanel Text="Shutouts">
                         <TopGoalies Goalies="@goalieStats" Label="Shutouts" StatValue="x => x.Shutouts" />

@@ -1,33 +1,33 @@
 @inject Data.IBCData BCData
 @inject NavigationManager Navigation
 
-@if (Skaters is not null && StatValue is not null && selectedPlayer is not null && profilePictures is not null)
+@if (orderedSkaters is not null && StatValue is not null && selectedSkater is not null && profilePictures is not null)
 {
     <MudGrid Class="px-sm-6 py-6">
     <MudItem Class="d-flex justify-center" xs="6">
         <MudPaper Class="d-flex justify-center align-center flex-grow-1">
             <MudStack Class="d-flex align-center">
                 <MudAvatar Style="height: 120px; width: 120px; cursor: pointer" @onclick=@(() =>
-                    Navigation.NavigateTo($"player/{selectedPlayer.PlayerId}"))>
-                    <MudImage Src="@profilePictures.Where(p => p.PlayerId == selectedPlayer.PlayerId).First().Source"
+                    Navigation.NavigateTo($"player/{selectedSkater.PlayerId}"))>
+                    <MudImage Src="@profilePictures.Where(p => p.PlayerId == selectedSkater.PlayerId).First().Source"
                         Height="200" />
                 </MudAvatar>
 
                 <MudText Class="d-flex justify-center" Style="cursor: pointer" @onclick=@(() =>
-                    Navigation.NavigateTo($"player/{selectedPlayer.PlayerId}")) Typo="Typo.h5">
-                    <b>@selectedPlayer.Name.ToUpper()</b>
+                    Navigation.NavigateTo($"player/{selectedSkater.PlayerId}")) Typo="Typo.h5">
+                    <b>@selectedSkater.Name.ToUpper()</b>
                 </MudText>
 
                 <MudStack Class="d-flex align-center" Row="true">
-                    <MudImage Src=@($"logos/logo-{selectedPlayer.TeamId}.png") Height="50" />
+                    <MudImage Src=@($"logos/logo-{selectedSkater.TeamId}.png") Height="50" />
                     <MudDivider Vertical="true" FlexItem="true" />
-                    <MudText Typo="Typo.body1">#@selectedPlayer.PlayerNumber</MudText>
+                    <MudText Typo="Typo.body1">#@selectedSkater.PlayerNumber</MudText>
                     <MudDivider Vertical="true" FlexItem="true" />
-                    <MudText Typo="Typo.body1">@selectedPlayer.Position.First()</MudText>
+                    <MudText Typo="Typo.body1">@selectedSkater.Position.First()</MudText>
                 </MudStack>
 
                 <MudText Class="d-flex justify-center" Typo="Typo.h6">@Label.ToUpper()</MudText>
-                <MudText Class="d-flex justify-center" Typo="Typo.h2">@StatValue(selectedPlayer)</MudText>
+                <MudText Class="d-flex justify-center" Typo="Typo.h2">@StatValue(selectedSkater)</MudText>
             </MudStack>
         </MudPaper>
     </MudItem>
@@ -35,10 +35,10 @@
         <MudStack>
             @{
                     int rank = 1;
-                    foreach (Data.PlayerStatline skater in Skaters.OrderBy(s => StatValue(s)).Reverse().Take(6))
+                    foreach (Data.PlayerStatline skater in orderedSkaters.Take(6))
                     {
                         int playerRank = rank;
-                        <MudButton OnClick="() => selectedPlayer = skater" Color="@skaterButtonColor(skater)"
+                        <MudButton OnClick="() => selectedSkater = skater" Color="@skaterButtonColor(skater)"
                             Variant="@skaterButtonVariant(skater)">
                             <MudStack Class="d-flex flex-grow-1" Row="true">
                                 <MudText>@playerRank</MudText>
@@ -58,19 +58,26 @@
     [Parameter] public IEnumerable<Data.PlayerStatline>? Skaters { get; set; }
     [Parameter] public Func<Data.PlayerStatline, int> StatValue { get; set; }
     [Parameter] public string Label { get; set; } = "";
+    [Parameter] public bool Ascending { get; set; } = false;
 
-    private Data.PlayerStatline? selectedPlayer;
+    private IEnumerable<Data.PlayerStatline>? orderedSkaters { get; set; }
+    private Data.PlayerStatline? selectedSkater;
     private IEnumerable<Data.PlayerProfilePicture>? profilePictures;
 
 
     protected override async Task OnInitializedAsync()
     {
-        selectedPlayer = Skaters?.OrderBy(s => StatValue(s)).Reverse().First();
+        orderedSkaters = Skaters?.OrderBy(s => StatValue(s));
+        if (!Ascending)
+        {
+            orderedSkaters = orderedSkaters?.Reverse();
+        }
+        selectedSkater = orderedSkaters?.First();
         profilePictures = await BCData.GetPlayerProfilePictures();
     }
 
-    private Variant skaterButtonVariant(Data.PlayerStatline skater) => (skater.PlayerId == selectedPlayer.PlayerId) ?
+    private Variant skaterButtonVariant(Data.PlayerStatline skater) => (skater.PlayerId == selectedSkater.PlayerId) ?
     Variant.Filled : Variant.Outlined;
-    private Color skaterButtonColor(Data.PlayerStatline skater) => (skater.PlayerId == selectedPlayer.PlayerId) ?
+    private Color skaterButtonColor(Data.PlayerStatline skater) => (skater.PlayerId == selectedSkater.PlayerId) ?
     Color.Primary : Color.Default;
 }
