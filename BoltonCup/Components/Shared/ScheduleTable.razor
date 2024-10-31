@@ -1,0 +1,34 @@
+@inject Data.IBCData BCData
+@inject NavigationManager Navigation
+
+
+<MudSimpleTable Elevation="0" Striped="true" Hover="true">
+    <thead>
+        <tr>
+            <th class="d-flex justify-center">Matchup</th>
+            <th>Result</th>
+            <th>Time</th>
+            <th>Location</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Games is not null)
+        {
+            @foreach (Data.ScheduledGame game in Games)
+            {
+                <ScheduleRow Game="@game" />
+            }
+        }
+    </tbody>
+</MudSimpleTable>
+
+@code {
+    [Parameter] public IEnumerable<Data.ScheduledGame>? Games { get; set; }
+
+    private readonly int? logoWidth = 75;
+    private readonly int? logoHeight = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+}

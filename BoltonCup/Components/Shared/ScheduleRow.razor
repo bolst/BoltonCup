@@ -3,60 +3,43 @@
 
 @if (Game is not null && homeTeam is not null && awayTeam is not null)
 {
-    <MudPaper Class="py-8" Style="@RowStyle" Elevation="5" @onclick="OnRowClick">
-    <MudStack Class="d-flex align-center" Row="true" Wrap="Wrap.Wrap">
-        <MudItem Class="d-flex justify-end border-r-8" Style=@($"border-color: {homeTeam.PrimaryHex}") xs="3" sm="1">
-            <MudImage Class="invisible" Src=@($"logos/logo-{homeTeam.Id}.png") Width="@logoWidth"
-                Height="@logoHeight" />
-        </MudItem>
-        <MudItem Class="d-flex justify-end border-l-8" Style=@($"border-color: {homeTeam.PrimaryHex}") xs="3" sm="1">
-            <MudImage Src=@($"logos/logo-{homeTeam.Id}.png") Width="@logoWidth" Height="@logoHeight" />
-        </MudItem>
-        <MudItem xs="3" sm="1">
-            <MudText Class="d-flex justify-start" Typo="Typo.h6">@homeTeam.ShortName</MudText>
-        </MudItem>
-        <MudItem Class="d-flex justify-center px-xs-10" xs="6">
-            <MudStack Class="d-flex align-center justify-center flex-grow-1" StretchItems="StretchItems.Middle"
-                Wrap="Wrap.Wrap" Row="true">
-                @if (gameScore is not null)
-                    {
-                        <MudText Class="d-flex justify-start" Typo="Typo.h4">@gameScore.HomeScore</MudText>
-                    }
-                    <MudStack Class="d-flex justify-center flex-grow-1" Spacing="0">
-                        <MudText Class="d-flex justify-center" Typo="Typo.subtitle2">@Game.Date.ToString("MM/dd/yyyy")
-                        </MudText>
-                        <MudText Class="d-flex justify-center" Typo="Typo.subtitle2">@Game.Date.ToString("h:mmtt")</MudText>
-                        <MudText Class="d-flex justify-center" Typo="Typo.subtitle2">@Game.Location (@Game.Rink)</MudText>
-                    </MudStack>
-                    @if (gameScore is not null)
-                    {
-                        <MudText Class="d-flex justify-end" Typo="Typo.h4">@gameScore.AwayScore</MudText>
-                    }
-                </MudStack>
+    <tr>
+    <td>
+        <MudGrid Spacing="1" Style="@RowStyle" @onclick=@(()=> Navigation.NavigateTo($"game/{Game.GameId}"))>
+            <MudItem Class="d-none d-md-flex align-center justify-end" xs="12" sm="2">
+                <MudText>@homeTeam.ShortName</MudText>
             </MudItem>
-            <MudItem xs="4" sm="1">
-                <MudText Class="d-flex justify-end" Typo="Typo.h6">@awayTeam.ShortName</MudText>
+            <MudItem Class="d-flex align-center justify-center justify-md-start" xs="12" sm="5" md="3">
+                <MudImage Src=@($"logos/logo-{homeTeam.Id}.png") Width="75" />
             </MudItem>
-            <MudItem Class="d-flex justify-start border-r-8" Style=@($"border-color: {awayTeam.PrimaryHex}") xs="4" sm="1">
-                <MudImage Src=@($"logos/logo-{awayTeam.Id}.png") Width="@logoWidth" Height="@logoHeight" />
+            <MudItem Class="d-flex align-center justify-center" xs="12" sm="2">
+                <MudText>vs.</MudText>
             </MudItem>
-            <MudItem Class="d-flex justify-end border-l-8" Style=@($"border-color: {awayTeam.PrimaryHex}") xs="4" sm="1">
-                <MudImage Class="invisible" Src=@($"logos/logo-{awayTeam.Id}.png") Width="@logoWidth"
-                    Height="@logoHeight" />
+            <MudItem Class="d-flex align-center justify-center justify-md-end" xs="12" sm="5" md="3">
+                <MudImage Src=@($"logos/logo-{awayTeam.Id}.png") Width="75" />
             </MudItem>
-        </MudStack>
-    </MudPaper>
+            <MudItem Class="d-none d-md-flex align-center justify-start" xs="12" sm="2">
+                <MudText>@awayTeam.ShortName</MudText>
+            </MudItem>
+        </MudGrid>
+    </td>
+    <td>
+        @if (gameScore is not null)
+            {
+                <MudText Typo="Typo.body1"><b>@gameScore.HomeScore - @gameScore.AwayScore</b></MudText>
+            }
+        </td>
+        <td>@Game.Date.ToString("hh:mmtt")</td>
+        <td>@Game.Location (@Game.Rink)</td>
+    </tr>
 }
 
 @code {
     [Parameter] public Data.ScheduledGame? Game { get; set; }
-    [Parameter] public bool Clickable { get; set; } = true;
-    private Data.Team? homeTeam { get; set; }
-    private Data.Team? awayTeam { get; set; }
-    private Data.GameScore? gameScore { get; set; }
 
-    private readonly int? logoWidth = 75;
-    private readonly int? logoHeight = null;
+    private Data.Team? homeTeam;
+    private Data.Team? awayTeam;
+    private Data.GameScore? gameScore;
 
     protected override async Task OnInitializedAsync()
     {
@@ -68,10 +51,5 @@
         }
     }
 
-    private void OnRowClick()
-    {
-        if (Clickable && Game is not null) Navigation.NavigateTo($"game/{Game.GameId}");
-    }
-
-    private string RowStyle => Clickable ? "cursor: pointer" : "";
+    public string RowStyle => (gameScore is null) ? "" : "cursor: pointer";
 }
