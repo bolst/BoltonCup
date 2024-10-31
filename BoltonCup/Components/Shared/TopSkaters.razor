@@ -3,7 +3,7 @@
 
 @if (Skaters is not null && StatValue is not null && selectedPlayer is not null && profilePictures is not null)
 {
-    <MudGrid Class="pa-6">
+    <MudGrid Class="px-sm-6 py-6">
     <MudItem Class="d-flex justify-center" xs="6">
         <MudPaper Class="d-flex justify-center align-center flex-grow-1">
             <MudStack Class="d-flex align-center">
@@ -31,11 +31,11 @@
             </MudStack>
         </MudPaper>
     </MudItem>
-    <MudItem Class="d-flex justify-center" Style="height: 60vh;" xs="6">
+    <MudItem Class="d-flex justify-center" Style="min-height: 60vh;" xs="6">
         <MudStack>
             @{
                     int rank = 1;
-                    foreach (Data.PlayerStatline skater in Skaters.OrderBy(s => StatValue(s)).Reverse().Take(10))
+                    foreach (Data.PlayerStatline skater in Skaters.OrderBy(s => StatValue(s)).Reverse().Take(6))
                     {
                         int playerRank = rank;
                         <MudButton OnClick="() => selectedPlayer = skater" Color="@skaterButtonColor(skater)"

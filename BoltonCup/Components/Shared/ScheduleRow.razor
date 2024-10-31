@@ -4,19 +4,20 @@
 @if (Game is not null && homeTeam is not null && awayTeam is not null)
 {
     <MudPaper Class="py-8" Style="@RowStyle" Elevation="5" @onclick="OnRowClick">
-    <MudStack Class="d-flex align-center" Row="true">
-        <MudItem Class="d-flex justify-end border-r-8" Style=@($"border-color: {homeTeam.PrimaryHex}") xs="1">
+    <MudStack Class="d-flex align-center" Row="true" Wrap="Wrap.Wrap">
+        <MudItem Class="d-flex justify-end border-r-8" Style=@($"border-color: {homeTeam.PrimaryHex}") xs="3" sm="1">
             <MudImage Class="invisible" Src=@($"logos/logo-{homeTeam.Id}.png") Width="@logoWidth"
                 Height="@logoHeight" />
         </MudItem>
-        <MudItem Class="d-flex justify-end border-l-8" Style=@($"border-color: {homeTeam.PrimaryHex}") xs="1">
+        <MudItem Class="d-flex justify-end border-l-8" Style=@($"border-color: {homeTeam.PrimaryHex}") xs="3" sm="1">
             <MudImage Src=@($"logos/logo-{homeTeam.Id}.png") Width="@logoWidth" Height="@logoHeight" />
         </MudItem>
-        <MudItem xs="1">
+        <MudItem xs="3" sm="1">
             <MudText Class="d-flex justify-start" Typo="Typo.h6">@homeTeam.ShortName</MudText>
         </MudItem>
-        <MudItem Class="d-flex justify-center" xs="6">
-            <MudStack Class="d-flex align-center flex-grow-1" StretchItems="StretchItems.Middle" Row="true">
+        <MudItem Class="d-flex justify-center px-xs-10" xs="6">
+            <MudStack Class="d-flex align-center justify-center flex-grow-1" StretchItems="StretchItems.Middle"
+                Wrap="Wrap.Wrap" Row="true">
                 @if (gameScore is not null)
                     {
                         <MudText Class="d-flex justify-start" Typo="Typo.h4">@gameScore.HomeScore</MudText>
@@ -33,13 +34,13 @@
                     }
                 </MudStack>
             </MudItem>
-            <MudItem xs="1">
+            <MudItem xs="4" sm="1">
                 <MudText Class="d-flex justify-end" Typo="Typo.h6">@awayTeam.ShortName</MudText>
             </MudItem>
-            <MudItem Class="d-flex justify-start border-r-8" Style=@($"border-color: {awayTeam.PrimaryHex}") xs="1">
+            <MudItem Class="d-flex justify-start border-r-8" Style=@($"border-color: {awayTeam.PrimaryHex}") xs="4" sm="1">
                 <MudImage Src=@($"logos/logo-{awayTeam.Id}.png") Width="@logoWidth" Height="@logoHeight" />
             </MudItem>
-            <MudItem Class="d-flex justify-end border-l-8" Style=@($"border-color: {awayTeam.PrimaryHex}") xs="1">
+            <MudItem Class="d-flex justify-end border-l-8" Style=@($"border-color: {awayTeam.PrimaryHex}") xs="4" sm="1">
                 <MudImage Class="invisible" Src=@($"logos/logo-{awayTeam.Id}.png") Width="@logoWidth"
                     Height="@logoHeight" />
             </MudItem>
