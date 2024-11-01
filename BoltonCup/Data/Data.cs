@@ -213,7 +213,7 @@ public class BCData : IBCData
                                 COALESCE(P.assist2_jerseynum, -1) AS assist2_jerseynum
                             FROM ""Points"" P
                             RIGHT OUTER JOIN games_played GP ON P.game_id = GP.game_id
-                            AND GP.team_id IN (GP.home_team_id, GP.away_team_id)
+                            AND ((GP.team_id = GP.home_team_id AND P.is_hometeam = TRUE) OR (GP.team_id = GP.away_team_id AND P.is_hometeam = FALSE))
                         )
                         SELECT
                         SUM(
