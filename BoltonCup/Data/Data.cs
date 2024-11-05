@@ -51,7 +51,7 @@ public class BCData : IBCData
                           T.tertiary_color_hex as TertiaryHex,
                           T.logo_url as LogoUrl
                         FROM
-                          ""Teams"" T";
+                          teams T";
             await using var connection = new NpgsqlConnection(connectionString);
             return await connection.QueryAsync<Team>(sql);
         }, cacheDuration);
@@ -72,7 +72,7 @@ public class BCData : IBCData
                             T.tertiary_color_hex AS TertiaryHex,
                             T.logo_url as LogoUrl
                         FROM
-                            ""Teams"" T
+                            teams T
                         WHERE
                             T.id = @TeamId";
             await using var connection = new NpgsqlConnection(connectionString);
@@ -96,7 +96,7 @@ public class BCData : IBCData
                                 G.location as Location,
                                 G.rink as Rink
                             FROM
-                                ""Games"" G
+                                games G
                             ORDER BY G.date ASC";
             await using var connection = new NpgsqlConnection(connectionString);
             return await connection.QueryAsync<ScheduledGame>(sql);
@@ -118,7 +118,7 @@ public class BCData : IBCData
                             G.location as Location,
                             G.rink as Rink
                             FROM
-                            ""Games"" G
+                            games G
                             WHERE G.id = @GameId";
             await using var connection = new NpgsqlConnection(connectionString);
             return await connection.QueryFirstOrDefaultAsync<ScheduledGame>(sql, new { GameId = id });
@@ -139,8 +139,8 @@ public class BCData : IBCData
                                 R.position AS Position,
                                 R.team_id AS TeamId
                             FROM
-                                ""Rosters"" R
-                            INNER JOIN ""Players"" P ON R.player_id = P.id
+                                rosters R
+                            INNER JOIN players P ON R.player_id = P.id
                                 AND R.team_id = @TeamId";
 
             await using var connection = new NpgsqlConnection(connectionString);
@@ -158,7 +158,7 @@ public class BCData : IBCData
                         P.dob AS Birthday,
                         P.preferred_beer AS PreferredBeer
                     FROM
-                        ""Players"" P
+                        players P
                     WHERE
                         P.id = @PlayerId";
 
@@ -179,8 +179,8 @@ public class BCData : IBCData
                         R.player_number AS JerseyNumber,
                         R.position AS Position
                     FROM
-                        ""Players"" P
-                    JOIN ""Rosters"" R ON P.id = R.player_id
+                        players P
+                    JOIN rosters R ON P.id = R.player_id
                     WHERE P.id = @PlayerId";
 
         using var connection = new NpgsqlConnection(connectionString);
@@ -194,7 +194,7 @@ public class BCData : IBCData
         string sql = @"WITH
                         current_team AS (
                             SELECT R.team_id, R.player_number
-                            FROM ""Rosters"" R
+                            FROM rosters R
                             WHERE R.player_id = @PlayerId
                         ),
                         games_played AS (
@@ -203,7 +203,7 @@ public class BCData : IBCData
                                     WHEN C.team_id != G.home_team_id THEN G.home_team_id
                                     ELSE G.away_team_id
                                 END AS opponent_team_id, G.date, G.type, G.location, G.rink, G.home_team_id, G.away_team_id, C.*
-                            FROM ""Games"" G
+                            FROM games G
                             INNER JOIN current_team C on C.team_id IN (G.home_team_id, G.away_team_id)
                         ),
                         team_points AS (
@@ -211,7 +211,7 @@ public class BCData : IBCData
                                 COALESCE(P.player_jerseynum, -1) AS player_jerseynum,
                                 COALESCE(P.assist1_jerseynum, -1) AS assist1_jerseynum,
                                 COALESCE(P.assist2_jerseynum, -1) AS assist2_jerseynum
-                            FROM ""Points"" P
+                            FROM points P
                             RIGHT OUTER JOIN games_played GP ON P.game_id = GP.game_id
                             AND ((GP.team_id = GP.home_team_id AND P.is_hometeam = TRUE) OR (GP.team_id = GP.away_team_id AND P.is_hometeam = FALSE))
                         )
@@ -246,13 +246,13 @@ public class BCData : IBCData
         string sql = @"WITH
                         goalie_data AS (
                             SELECT P.id AS player_id, P.name, R.player_number, R.position, R.team_id
-                            FROM ""Players"" P
-                            INNER JOIN ""Rosters"" R ON R.player_id = P.id AND R.position = 'Goalie'
+                            FROM players P
+                            INNER JOIN rosters R ON R.player_id = P.id AND R.position = 'Goalie'
                         ),
                         goalie_games_played AS (
                             SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date
                             FROM goalie_data P
-                            RIGHT OUTER JOIN ""Games"" G ON P.team_id IN (G.home_team_id, G.away_team_id)
+                            RIGHT OUTER JOIN games G ON P.team_id IN (G.home_team_id, G.away_team_id)
                         ),
                         goalie_game_scores AS (
                             SELECT GP.game_id, GP.player_id,  GP.team_id, GP.date,
@@ -276,7 +276,7 @@ public class BCData : IBCData
                             ) GP
                             LEFT JOIN LATERAL (
                                 SELECT *
-                                FROM ""Points"" P
+                                FROM points P
                                 WHERE P.game_id = GP.game_id
                             ) game_scores ON TRUE
                             GROUP BY GP.game_id, GP.player_id, opponent_team_id, GP.team_id, GP.date
@@ -322,17 +322,17 @@ public class BCData : IBCData
                                     WHEN p.is_hometeam = true THEN home_team_id
                                     WHEN p.is_hometeam = false THEN away_team_id
                                 END AS team_id
-                                FROM ""Points"" p
-                                INNER JOIN ""Games"" g ON g.id = p.game_id
+                                FROM points p
+                                INNER JOIN games g ON g.id = p.game_id
                                 WHERE g.id = @GameId
                                 ORDER BY time desc
                             ) points
-                            LEFT JOIN ""Rosters"" r1 ON points.player_jerseynum = r1.player_number AND points.team_id = r1.team_id
-                            LEFT JOIN ""Rosters"" r2 ON points.assist1_jerseynum = r2.player_number AND points.team_id = r2.team_id
-                            LEFT JOIN ""Rosters"" r3 ON points.assist2_jerseynum = r3.player_number AND points.team_id = r3.team_id
-                            LEFT JOIN ""Players"" p1 ON r1.player_id = p1.id
-                            LEFT JOIN ""Players"" p2 ON r2.player_id = p2.id
-                            LEFT JOIN ""Players"" p3 ON r3.player_id = p3.id
+                            LEFT JOIN rosters r1 ON points.player_jerseynum = r1.player_number AND points.team_id = r1.team_id
+                            LEFT JOIN rosters r2 ON points.assist1_jerseynum = r2.player_number AND points.team_id = r2.team_id
+                            LEFT JOIN rosters r3 ON points.assist2_jerseynum = r3.player_number AND points.team_id = r3.team_id
+                            LEFT JOIN players p1 ON r1.player_id = p1.id
+                            LEFT JOIN players p2 ON r2.player_id = p2.id
+                            LEFT JOIN players p3 ON r3.player_id = p3.id
                             ORDER BY points.period asc, points.time desc";
 
             await using var connection = new NpgsqlConnection(connectionString);
@@ -362,13 +362,13 @@ public class BCData : IBCData
                                     WHEN p.is_hometeam = true THEN home_team_id
                                     WHEN p.is_hometeam = false THEN away_team_id
                                 END AS team_id
-                                FROM ""Penalties"" p
-                                INNER JOIN ""Games"" g ON g.id = p.game_id
+                                FROM penalties p
+                                INNER JOIN games g ON g.id = p.game_id
                                 WHERE g.id = @GameId
                                 ORDER BY time desc
                             ) penalties
-                            LEFT JOIN ""Rosters"" r1 ON penalties.player_jerseynum = r1.player_number AND penalties.team_id = r1.team_id
-                            LEFT JOIN ""Players"" p1 ON r1.player_id = p1.id
+                            LEFT JOIN rosters r1 ON penalties.player_jerseynum = r1.player_number AND penalties.team_id = r1.team_id
+                            LEFT JOIN players p1 ON r1.player_id = p1.id
                             ORDER BY penalties.period asc, penalties.time desc";
 
             await using var connection = new NpgsqlConnection(connectionString);
@@ -385,8 +385,8 @@ public class BCData : IBCData
             string sql = @"WITH
                             player_data AS (
                                 SELECT P.id AS player_id, P.name, R.player_number, R.position, R.team_id
-                                FROM ""Players"" P
-                                INNER JOIN ""Rosters"" R ON R.player_id = P.id
+                                FROM players P
+                                INNER JOIN rosters R ON R.player_id = P.id
                             ),
                             points_with_teams AS (
                                 SELECT G.id AS game_id, P.player_jerseynum, P.assist1_jerseynum, P.assist2_jerseynum,
@@ -394,8 +394,8 @@ public class BCData : IBCData
                                     WHEN is_hometeam = TRUE THEN home_team_id
                                     ELSE away_team_id
                                 END AS team_id
-                                FROM ""Points"" P
-                                LEFT OUTER JOIN ""Games"" G ON G.id = P.game_id
+                                FROM points P
+                                LEFT OUTER JOIN games G ON G.id = P.game_id
                             ),
                             points_with_players AS (
                                 SELECT
@@ -452,13 +452,13 @@ public class BCData : IBCData
             string sql = @"WITH
                             goalie_data AS (
                                 SELECT P.id AS player_id, P.name, R.player_number, R.position, R.team_id
-                                FROM ""Players"" P
-                                INNER JOIN ""Rosters"" R ON R.player_id = P.id AND R.position = 'Goalie'
+                                FROM players P
+                                INNER JOIN rosters R ON R.player_id = P.id AND R.position = 'Goalie'
                             ),
                             goalie_games_played AS (
                                 SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date
                                 FROM goalie_data P
-                                RIGHT OUTER JOIN ""Games"" G ON P.team_id IN (G.home_team_id, G.away_team_id)
+                                RIGHT OUTER JOIN games G ON P.team_id IN (G.home_team_id, G.away_team_id)
                             ),
                             goalie_game_scores AS (
                                 SELECT GP.game_id, GP.player_id,  GP.name, GP.player_number, GP.team_id, GP.date,
@@ -489,7 +489,7 @@ public class BCData : IBCData
                                 ) GP
                                 LEFT JOIN LATERAL (
                                     SELECT *
-                                    FROM ""Points"" P
+                                    FROM points P
                                     WHERE P.game_id = GP.game_id
                                 ) game_scores ON TRUE
                                 GROUP BY GP.game_id, GP.player_id, GP.name, GP.player_number, opponent_team_id, GP.team_id, GP.date
@@ -529,8 +529,8 @@ public class BCData : IBCData
                                 WHEN is_hometeam = FALSE THEN 1
                                 END
                             ) AS AwayScore
-                            FROM ""Points"" P
-                            JOIN ""Games"" G ON G.id = P.game_id
+                            FROM points P
+                            JOIN games G ON G.id = P.game_id
                             WHERE P.game_id = @GameId
                             GROUP BY game_id, G.home_team_id, G.away_team_id";
             await using var connection = new NpgsqlConnection(connectionString);
