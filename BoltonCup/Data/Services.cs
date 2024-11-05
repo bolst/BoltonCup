@@ -19,7 +19,7 @@ public class CacheService : ICacheService
 
     public async Task<T> GetOrAddAsync<T>(string cacheKey, Func<Task<T>> factory, TimeSpan cacheDuration)
     {
-        if (!memoryCache.TryGetValue(cacheKey, out T cacheEntry))
+        if (!memoryCache.TryGetValue(cacheKey, out T? cacheEntry))
         {
             cacheEntry = await factory();
 
@@ -32,7 +32,7 @@ public class CacheService : ICacheService
             memoryCache.Set(cacheKey, cacheEntry, cacheOptions);
         }
 
-        return cacheEntry;
+        return cacheEntry!;
     }
 
     public void Clear()

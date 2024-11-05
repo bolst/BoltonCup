@@ -67,7 +67,7 @@ else
 
 @code {
     [Parameter] public IEnumerable<Data.PlayerStatline>? Skaters { get; set; }
-    [Parameter] public Func<Data.PlayerStatline, int> StatValue { get; set; }
+    [Parameter] public Func<Data.PlayerStatline, int>? StatValue { get; set; }
     [Parameter] public string Label { get; set; } = "";
     [Parameter] public bool Ascending { get; set; } = false;
 
@@ -78,7 +78,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        orderedSkaters = Skaters?.OrderBy(s => StatValue(s));
+        orderedSkaters = StatValue is null ? Skaters : Skaters?.OrderBy(s => StatValue(s));
         if (!Ascending)
         {
             orderedSkaters = orderedSkaters?.Reverse();
@@ -87,8 +87,8 @@ else
         profilePictures = await BCData.GetPlayerProfilePictures();
     }
 
-    private Variant skaterButtonVariant(Data.PlayerStatline skater) => (skater.PlayerId == selectedSkater.PlayerId) ?
+    private Variant skaterButtonVariant(Data.PlayerStatline skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
     Variant.Filled : Variant.Outlined;
-    private Color skaterButtonColor(Data.PlayerStatline skater) => (skater.PlayerId == selectedSkater.PlayerId) ?
+    private Color skaterButtonColor(Data.PlayerStatline skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
     Color.Primary : Color.Default;
 }
