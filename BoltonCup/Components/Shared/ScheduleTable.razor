@@ -1,7 +1,6 @@
 @inject Data.IBCData BCData
 @inject NavigationManager Navigation
 
-
 <MudSimpleTable Elevation="0" Striped="true" Hover="true">
     <thead>
         <tr>
@@ -24,11 +23,4 @@
 
 @code {
     [Parameter] public IEnumerable<Data.ScheduledGame>? Games { get; set; }
-
-    private readonly int? logoWidth = 75;
-    private readonly int? logoHeight = null;
-
-    protected override async Task OnInitializedAsync()
-    {
-    }
 }

@@ -5,10 +5,10 @@ namespace BoltonCup.Data;
 public class Team
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string ShortName { get; set; }
-    public string PrimaryHex { get; set; }
-    public string SecondaryHex { get; set; }
+    public required string Name { get; set; }
+    public string ShortName { get; set; } = "";
+    public required string PrimaryHex { get; set; }
+    public required string SecondaryHex { get; set; }
     public string? TertiaryHex { get; set; } = "";
     public string? LogoUrl { get; set; } = "";
 }
@@ -19,16 +19,16 @@ public class ScheduledGame
     public int HomeTeamId { get; set; }
     public int AwayTeamId { get; set; }
     public DateTime Date { get; set; }
-    public string GameType { get; set; }
-    public string Location { get; set; }
-    public string Rink { get; set; }
+    public string GameType { get; set; } = "";
+    public string Location { get; set; } = "";
+    public string Rink { get; set; } = "";
 }
 
 public class TeamPlayer
 {
-    public string Name { get; set; }
+    public required string Name { get; set; }
     public DateTime Birthday { get; set; }
-    public string Position { get; set; }
+    public string Position { get; set; } = "";
     public int JerseyNumber { get; set; }
     public int PlayerId { get; set; }
     public int TeamId { get; set; }
@@ -38,18 +38,18 @@ public class TeamPlayer
 public class Player
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
     public DateTime Birthday { get; set; }
-    public string PreferredBeer { get; set; }
+    public string PreferredBeer { get; set; } = "";
 }
 
 public class PlayerProfile
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
     public DateTime Birthday { get; set; }
-    public string PreferredBeer { get; set; }
-    public string Position { get; set; }
+    public string PreferredBeer { get; set; } = "";
+    public string Position { get; set; } = "";
     public int JerseyNumber { get; set; }
     public int CurrentTeamId { get; set; }
     public int Goals { get; set; }

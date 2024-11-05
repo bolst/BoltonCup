@@ -67,7 +67,7 @@ else
 
 @code {
     [Parameter] public IEnumerable<Data.GoalieStatline>? Goalies { get; set; }
-    [Parameter] public Func<Data.GoalieStatline, double> StatValue { get; set; }
+    [Parameter] public Func<Data.GoalieStatline, double>? StatValue { get; set; }
     [Parameter] public string Label { get; set; } = "";
     [Parameter] public bool Ascending { get; set; } = false;
 
@@ -77,7 +77,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        orderedGoalies = Goalies?.OrderBy(s => StatValue(s));
+        orderedGoalies = StatValue is null ? Goalies : Goalies?.OrderBy(s => StatValue(s));
         if (!Ascending)
         {
             orderedGoalies = orderedGoalies?.Reverse();
@@ -87,8 +87,8 @@ else
 
     }
 
-    private Variant goalieButtonVariant(Data.GoalieStatline goalie) => (goalie.PlayerId == selectedGoalie.PlayerId) ?
+    private Variant goalieButtonVariant(Data.GoalieStatline goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
     Variant.Filled : Variant.Outlined;
-    private Color goalieButtonColor(Data.GoalieStatline goalie) => (goalie.PlayerId == selectedGoalie.PlayerId) ?
+    private Color goalieButtonColor(Data.GoalieStatline goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
     Color.Primary : Color.Default;
 }
