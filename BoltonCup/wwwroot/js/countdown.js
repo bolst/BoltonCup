@@ -8,7 +8,7 @@ function countdown(dateEnd) {
         return;
     }
 
-    timer = setInterval(calculate, 1000);
+    timer = setInterval(calculate);
 
     function calculate() {
         var dateStart = new Date();
@@ -38,5 +38,3 @@ function countdown(dateEnd) {
         }
     }
 }
-
-// countdown('01/19/2038 03:14:07 AM');
