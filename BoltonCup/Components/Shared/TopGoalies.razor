@@ -7,13 +7,13 @@
     <MudItem Class="d-flex justify-center" xs="6">
         <MudPaper Class="d-flex justify-center align-center flex-grow-1">
             <MudStack Class="d-flex align-center">
-                <MudAvatar Style="height: 120px; width: 120px; cursor: pointer" @onclick=@(() =>
+                <MudAvatar Class="clickable" Style="height: 120px; width: 120px;" @onclick=@(() =>
                     Navigation.NavigateTo($"player/{selectedGoalie.PlayerId}"))>
                     <MudImage Src="@profilePictures.Where(p => p.PlayerId == selectedGoalie.PlayerId).First().Source"
                         Height="200" />
                 </MudAvatar>
 
-                <MudText Class="d-flex justify-center" Style="cursor: pointer" @onclick=@(() =>
+                <MudText Class="d-flex justify-center clickable" @onclick=@(() =>
                     Navigation.NavigateTo($"player/{selectedGoalie.PlayerId}")) Typo="Typo.h5">
                     <b>@selectedGoalie.Name.ToUpper()</b>
                 </MudText>
