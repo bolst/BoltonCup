@@ -15,7 +15,7 @@
     <tbody>
         @foreach (Data.GoalieGameSummary summary in goalieGameByGame)
             {
-                <tr style="cursor: pointer" onclick=@(() => Navigation.NavigateTo($"game/{summary.GameId}"))>
+                <tr class="clickable" onclick=@(() => Navigation.NavigateTo($"game/{summary.GameId}"))>
                     <th>@summary.GameDate.ToString("MMM dd/yy")</th>
                     <th>
                         <MudStack Class="d-flex align-center" Row="true">

@@ -9,8 +9,7 @@
 
 <MudLayout>
     <MudAppBar Class="d-none d-sm-flex" Color="Color.Primary">
-        <MudImage Class="mt-4 pr-4" Style="cursor: pointer" @onclick="@NavToHome" Src="logos/boltoncup.png"
-            Height="75" />
+        <MudImage Class="mt-4 pr-4 clickable" @onclick="@NavToHome" Src="logos/boltoncup.png" Height="75" />
         <MudButton Class="mud-theme-primary" Href="/" Variant="Variant.Text" Size="Size.Large">HOME</MudButton>
         <MudButton Class="mud-theme-primary" Href="/info" Variant="Variant.Text" Size="Size.Large">INFO</MudButton>
         <MudButton Class="mud-theme-primary" Href="/teams" Variant="Variant.Text" Size="Size.Large">TEAMS
@@ -26,8 +25,7 @@
         </MudButton>
     </MudAppBar>
     <MudAppBar Class="d-flex d-sm-none" Color="Color.Primary">
-        <MudImage Class="mt-8 pr-4" Style="cursor: pointer" @onclick="@NavToHome" Src="logos/boltoncup.png"
-            Height="75" />
+        <MudImage Class="mt-8 pr-4 clickable" @onclick="@NavToHome" Src="logos/boltoncup.png" Height="75" />
         <MudSpacer />
         <SmallMenu />
         @* <MudButton Class="mud-theme-primary" Href="/" Variant="Variant.Text" Size="Size.Large">HOME</MudButton>

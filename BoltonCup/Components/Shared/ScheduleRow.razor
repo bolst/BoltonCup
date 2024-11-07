@@ -5,7 +5,7 @@
 {
     <tr>
     <td>
-        <MudGrid Spacing="1" Style="@RowStyle" @onclick=@(()=> Navigation.NavigateTo($"game/{Game.GameId}"))>
+        <MudGrid Class="@RowClass" Spacing="1" @onclick=@(()=> Navigation.NavigateTo($"game/{Game.GameId}"))>
             <MudItem Class="d-none d-md-flex align-center justify-end" xs="12" sm="2">
                 <MudText>@homeTeam.ShortName</MudText>
             </MudItem>
@@ -68,5 +68,5 @@ else
         }
     }
 
-    public string RowStyle => (gameScore is null) ? "" : "cursor: pointer";
+    public string RowClass => (gameScore is null) ? "" : "clickable";
 }
