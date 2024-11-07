@@ -10,7 +10,7 @@
         </MudAvatar>
 
         <MudStack Class="py-1" Spacing="0">
-            <MudText Style="cursor: pointer" Typo="Typo.body1" @onclick=@(() =>
+            <MudText Class="clickable" Typo="Typo.body1" @onclick=@(() =>
                 Navigation.NavigateTo($"player/{Goal.ScorerId}"))>
                 <b>@Goal.ScorerName</b>
             </MudText>

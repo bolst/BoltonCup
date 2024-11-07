@@ -14,12 +14,6 @@ body {
     font-family: 'Lato', 'sans-serif';
 }
 
-.timer-background {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url("https://images.immediate.co.uk/production/volatile/sites/3/2023/05/Stanley-Cup-Finals-TV-78a5e50.jpg?quality=90&resize=980,654");
-    background-size: cover;
-    background-position: center center;
-}
-
 .home-banner-background {
     background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url("../images/bc-2024.webp");
     background-size: cover;
@@ -34,4 +28,8 @@ body {
 
 #components-reconnect-modal {
     display: none !important;
+}
+
+.clickable {
+    cursor: pointer;
 }
