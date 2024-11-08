@@ -162,7 +162,7 @@ public class BCData : IBCData
                     WHERE
                         P.id = @PlayerId";
 
-        using var connection = new NpgsqlConnection(connectionString);
+        await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryFirstOrDefaultAsync<Player>(sql, new { PlayerId = id });
     }
 
@@ -183,7 +183,7 @@ public class BCData : IBCData
                     JOIN rosters R ON P.id = R.player_id
                     WHERE P.id = @PlayerId";
 
-        using var connection = new NpgsqlConnection(connectionString);
+        await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryFirstOrDefaultAsync<PlayerProfile>(sql, new { PlayerId = id });
     }
 
@@ -235,7 +235,7 @@ public class BCData : IBCData
                         FROM team_points
                         GROUP BY game_id, opponent_team_id, team_id, date";
 
-        using var connection = new NpgsqlConnection(connectionString);
+        await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryAsync<PlayerGameSummary>(sql, new { PlayerId = id });
     }
 
@@ -291,7 +291,7 @@ public class BCData : IBCData
                         FROM goalie_game_scores G
                         WHERE G.player_id = @PlayerId";
 
-        using var connection = new NpgsqlConnection(connectionString);
+        await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryAsync<GoalieGameSummary>(sql, new { PlayerId = id });
     }
 
