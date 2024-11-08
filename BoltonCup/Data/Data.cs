@@ -177,10 +177,12 @@ public class BCData : IBCData
                         P.preferred_beer AS PreferredBeer,
                         R.team_id AS CurrentTeamId,
                         R.player_number AS JerseyNumber,
-                        R.position AS Position
+                        R.position AS Position,
+                        CASE WHEN T.winning_team_id IS NOT NULL THEN true ELSE false END AS IsWinner
                     FROM
                         players P
-                    JOIN rosters R ON P.id = R.player_id
+                        JOIN rosters R ON P.id = R.player_id
+                        LEFT OUTER JOIN tournaments T ON T.winning_team_id = R.team_id
                     WHERE P.id = @PlayerId";
 
         await using var connection = new NpgsqlConnection(connectionString);

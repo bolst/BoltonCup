@@ -9,6 +9,11 @@
     {
         <MudStack Class="d-flex align-center mb-10" Wrap="Wrap.Wrap" Row="true">
             <MudText Typo="Typo.h3">@profile.Name.ToUpper()</MudText>
+            @if (profile.IsWinner)
+            {
+                <MudIcon Icon="@Icons.Material.Outlined.EmojiEvents" Size="Size.Large" Color="Color.Warning"></MudIcon>
+                
+            }
             <MudDivider Class="d-none d-sm-flex mx-2" Vertical="true" FlexItem="true" />
             <MudImage Src=@($"logos/logo-{profile.CurrentTeamId}.png") Height="80" />
             <MudDivider Class="mx-2" Vertical="true" FlexItem="true" />
