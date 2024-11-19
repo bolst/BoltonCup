@@ -7,27 +7,23 @@
 <MudOverlay Visible="@isOpen" DarkBackground AutoClose="true" OnClosed="@OnClosed">
     <MudPaper Class="pa-20 gray darken-4">
         <MudStack>
-            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/">HOME
-            </MudButton>
-            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/info">INFO
-            </MudButton>
-            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/teams">TEAMS
-            </MudButton>
-            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/schedule">
-                SCHEDULE
-            </MudButton>
-            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/stats">STATS
-            </MudButton>
-            <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="/register">
-                REGISTER
-            </MudButton>
+            @navButton("HOME", "/")
+            @navButton("INFO", "/info")
+            @navButton("TEAMS", "/teams")
+            @navButton("SCHEDULE", "/schedule")
+            @navButton("STATS", "/stats")
+            <SignInView />
         </MudStack>
     </MudPaper>
 </MudOverlay>
 
 @code {
-
     private bool isOpen = false;
+
+    private RenderFragment navButton(string title, string href) => __builder =>
+    {
+        <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="@href">@title</MudButton>
+    };
 
     private void ToggleOpen() => isOpen = !isOpen;
     private void OnClosed() => isOpen = false;

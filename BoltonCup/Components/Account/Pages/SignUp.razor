@@ -1,0 +1,11 @@
+@page "/auth/signup"
+
+@inject NavigationManager Navigation
+
+<div class="my-5 d-flex justify-center align-center" style="height: 60vh">
+    <MudStack AlignItems="AlignItems.Center">
+        <MudImage Class="mb-20 pr-4 clickable" Src="logos/boltoncup.png" Width="120"
+            @onclick="@(() => Navigation.NavigateTo("/"))" />
+        <MudText Typo="Typo.h4">Registration is closed. Check back Spring 2025!</MudText>
+    </MudStack>
+</div>
