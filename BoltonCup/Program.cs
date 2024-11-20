@@ -3,6 +3,8 @@ using BoltonCup.Components;
 using BoltonCup.Data;
 using Blazored.LocalStorage;
 using Microsoft.Extensions.Caching.Memory;
+using Supabase;
+using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,13 @@ builder.Services.AddScoped<IBCData>(sp =>
     var connectionString = Environment.GetEnvironmentVariable("SB_CSTRING");
     var cacheService = sp.GetRequiredService<ICacheService>();
     return new BCData(connectionString!, cacheService);
+});
+
+builder.Services.AddScoped<BCAuth>(sp =>
+{
+    var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
+    var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+    return new BCAuth(url, key);
 });
 
 var app = builder.Build();
