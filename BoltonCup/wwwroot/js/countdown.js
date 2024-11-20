@@ -1,4 +1,4 @@
-function countdown(dateEnd) {
+window.countdown = (dateEnd) => {
     var timer, days, hours, minutes, seconds;
 
     dateEnd = new Date(dateEnd);
@@ -29,10 +29,17 @@ function countdown(dateEnd) {
             timeRemaining = (timeRemaining % 60);
             seconds = parseInt(timeRemaining);
 
-            document.getElementById("days").innerHTML = parseInt(days, 10);
-            document.getElementById("hours").innerHTML = ("0" + hours).slice(-2);
-            document.getElementById("minutes").innerHTML = ("0" + minutes).slice(-2);
-            document.getElementById("seconds").innerHTML = ("0" + seconds).slice(-2);
+            if (document.getElementById("days"))
+                document.getElementById("days").innerHTML = parseInt(days, 10);
+
+            if (document.getElementById("hours"))
+                document.getElementById("hours").innerHTML = ("0" + hours).slice(-2);
+
+            if (document.getElementById("minutes"))
+                document.getElementById("minutes").innerHTML = ("0" + minutes).slice(-2);
+
+            if (document.getElementById("seconds"))
+                document.getElementById("seconds").innerHTML = ("0" + seconds).slice(-2);
         } else {
             return;
         }
