@@ -1,0 +1,9 @@
+@page "/auth/signin"
+
+<AuthorizeView>
+    <NotAuthorized>
+        <div class="my-5 d-flex justify-center align-center" style="height: 80vh">
+            <SignInCard />
+        </div>
+    </NotAuthorized>
+</AuthorizeView>

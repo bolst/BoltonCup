@@ -2,21 +2,42 @@ using MudBlazor.Services;
 using BoltonCup.Components;
 using BoltonCup.Data;
 using Blazored.LocalStorage;
-using Microsoft.Extensions.Caching.Memory;
 using Supabase;
-using System.Diagnostics;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
+builder.Services
+    .AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddCascadingAuthenticationState();
+
+// Add services to the container.
 builder.Services.AddMemoryCache();
+builder.Services.AddBlazoredLocalStorage();
+
+builder.Services.AddScoped<Supabase.Client>(sp =>
+{
+    var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
+    var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+    var localStorage = sp.GetRequiredService<ILocalStorageService>();
+    var options = new SupabaseOptions
+    {
+        AutoRefreshToken = true,
+        AutoConnectRealtime = true,
+        SessionHandler = new CustomSupabaseSessionHandler(localStorage),
+    };
+    return new Supabase.Client(url, key, options);
+});
+
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+builder.Services.AddScoped<SupabaseAuthStateProvider>(sp => new SupabaseAuthStateProvider(sp.GetRequiredService<Client>()));
+builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<SupabaseAuthStateProvider>());
 
 builder.Services.AddSingleton<ICacheService, CacheService>();
 
@@ -27,12 +48,6 @@ builder.Services.AddScoped<IBCData>(sp =>
     return new BCData(connectionString!, cacheService);
 });
 
-builder.Services.AddScoped<BCAuth>(sp =>
-{
-    var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
-    var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
-    return new BCAuth(url, key);
-});
 
 var app = builder.Build();
 
@@ -40,13 +55,15 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()

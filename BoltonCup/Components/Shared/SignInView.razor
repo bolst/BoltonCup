@@ -1,2 +1,11 @@
-<MudButton Class="mud-theme-primary" Href="/auth/signin" Variant="Variant.Text" Size="Size.Large">SIGN IN
-</MudButton>
+<AuthorizeView>
+    <Authorized>
+        <MudButton Class="mud-theme-primary" Href="/auth/callback/signout" Variant="Variant.Text" Size="Size.Large">SIGN
+            OUT
+        </MudButton>
+    </Authorized>
+    <NotAuthorized>
+        <MudButton Class="mud-theme-primary" Href="/auth/signin" Variant="Variant.Text" Size="Size.Large">SIGN IN
+        </MudButton>
+    </NotAuthorized>
+</AuthorizeView>

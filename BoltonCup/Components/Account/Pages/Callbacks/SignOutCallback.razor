@@ -1,0 +1,15 @@
+@page "/auth/callback/signout"
+
+@inject Supabase.Client SBClient
+@inject NavigationManager Navigation
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await SBClient.Auth.SignOut();
+            Navigation.NavigateTo("/", true);
+        }
+    }
+}

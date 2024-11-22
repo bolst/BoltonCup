@@ -1,5 +1,8 @@
+@using Supabase.Gotrue
 @using System.ComponentModel.DataAnnotations
 @inject NavigationManager Navigation
+@inject Supabase.Client SBClient
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
 <MudForm @ref="form" Model="@model">
     <MudCard Class="pa-5" Style="min-width: 30vw">
@@ -40,9 +43,14 @@
             <MudText Class="d-flex justify-center">Don't have an account? <MudLink Class="px-2" Href="/auth/signup">Sign
                     Up</MudLink>
             </MudText>
+
+            <MudDivider Class="py-5" />
+
+            <GoogleSignInButton />
         </MudCardContent>
     </MudCard>
 </MudForm>
+
 
 @code {
     private MudForm form;
@@ -64,10 +72,6 @@
 
     private async Task OnContinueClicked()
     {
-        submittedAndInvalid = false;
-        loading = true;
-
-        await form.Validate();
         if (form.IsValid)
         {
             await Task.Delay(3000);
