@@ -18,7 +18,11 @@ public class CustomSupabaseSessionHandler : IGotrueSessionPersistence<Session>
     public async void DestroySession()
     {
         //_logger.LogInformation("------------------- SessionDestroyer -------------------");
-        await _localStorage.RemoveItemAsync(SessionKey);
+        try
+        {
+            await _localStorage.RemoveItemAsync(SessionKey);
+        }
+        catch  { }
     }
 
     public async void SaveSession(Session session)

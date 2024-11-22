@@ -9,7 +9,7 @@ namespace BoltonCup.Data;
 /// Creates a link between <see cref="Supabase"/> and <see cref="AuthenticatedState"/> to provide support for using
 /// Gotrue with Blazor's built in Authentication handler.
 /// </summary>
-public class SupabaseAuthStateProvider : AuthenticationStateProvider, IDisposable
+public class CustomAuthenticationStateProvider : AuthenticationStateProvider, IDisposable
 {
     private Supabase.Client _Supabase { get; }
 
@@ -38,9 +38,9 @@ public class SupabaseAuthStateProvider : AuthenticationStateProvider, IDisposabl
         }
     }
 
-    public SupabaseAuthStateProvider(Supabase.Client supabase)
+    public CustomAuthenticationStateProvider(Supabase.Client supabase)
     {
-        Console.WriteLine($"{nameof(SupabaseAuthStateProvider)} initialized.");
+        Console.WriteLine($"{nameof(CustomAuthenticationStateProvider)} initialized.");
         _Supabase = supabase;
         _Supabase.Auth.AddStateChangedListener(SupabaseAuthStateChanged);
     }
@@ -70,8 +70,8 @@ public class SupabaseAuthStateProvider : AuthenticationStateProvider, IDisposabl
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        await _Supabase.InitializeAsync();
-
+        await Task.Run(() => _Supabase.Auth.LoadSession());
+        
         if (_Supabase.Auth.CurrentUser == null)
         {
             Console.WriteLine("An authenticated user not found, returning as anonymous.");
