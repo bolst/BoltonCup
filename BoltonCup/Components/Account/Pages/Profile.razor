@@ -1,0 +1,12 @@
+@page "/auth/profile"
+
+@layout Layout.MainLayout
+
+<AuthorizeView>
+    <Authorized>
+
+    </Authorized>
+    <NotAuthorized>
+        <AuthRedirect />
+    </NotAuthorized>
+</AuthorizeView>
