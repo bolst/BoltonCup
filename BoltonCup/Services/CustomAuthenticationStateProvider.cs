@@ -40,7 +40,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
         {
             case Constants.AuthState.SignedIn:
                 {
-                    BCUser? user = await UserService.LookupUserInDatabase(SBClient.Auth.CurrentUser!.Email ?? "");
+                    BCUser? user = await UserService.LookupUserInDatabase(SBClient.Auth.CurrentUser!.Email);
                     if (user is null)
                     {
                         NotifyAuthenticationStateChanged(Task.FromResult(AnonymousState));
@@ -70,7 +70,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
         var currentUser = SBClient.Auth.CurrentUser;
         if (currentUser is null) return AnonymousState;
 
-        BCUser? user = await UserService.LookupUserInDatabase(currentUser!.Email ?? "");
+        BCUser? user = await UserService.LookupUserInDatabase(currentUser!.Email);
         if (user == null) return AnonymousState;
 
         var principal = user.ToClaimsPrincipal();
