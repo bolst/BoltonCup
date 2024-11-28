@@ -1,5 +1,8 @@
 @page "/auth/signin"
 
+@inject Data.CustomAuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
 <AuthorizeView>
     <NotAuthorized>
         <div class="my-5 d-flex justify-center align-center" style="height: 80vh">
@@ -7,3 +10,14 @@
         </div>
     </NotAuthorized>
 </AuthorizeView>
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && await AuthStateProvider.IsAuthenticated())
+        {
+            Navigation.NavigateTo("/auth/profile", true);
+        }
+    }
+}

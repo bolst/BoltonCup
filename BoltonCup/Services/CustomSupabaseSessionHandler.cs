@@ -22,7 +22,7 @@ public class CustomSupabaseSessionHandler : IGotrueSessionPersistence<Session>
         {
             await _localStorage.RemoveItemAsync(SessionKey);
         }
-        catch  { }
+        catch { }
     }
 
     public async void SaveSession(Session session)

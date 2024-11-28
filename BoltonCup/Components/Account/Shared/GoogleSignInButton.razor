@@ -2,6 +2,7 @@
 @inject Supabase.Client SBClient
 @inject NavigationManager Navigation
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject Data.CustomUserService UserService
 
 <MudButton Class="pa-2" Style="background-color: #4285F4; color: white;" StartIcon="@Icons.Custom.Brands.Google"
     OnClick="GoogleSignIn" FullWidth>
@@ -10,20 +11,6 @@
 @code {
     private async Task GoogleSignIn()
     {
-        var state = await SBClient.Auth.SignIn(Constants.Provider.Google, new SignInOptions
-            {
-                FlowType = Constants.OAuthFlowType.PKCE,
-                RedirectTo = $"{Navigation.BaseUri}auth/callback/googlesignin",
-            });
-
-        if (state.PKCEVerifier is not null)
-        {
-            await LocalStorage.SetItemAsStringAsync("verifier", state.PKCEVerifier);
-            Navigation.NavigateTo(state.Uri.ToString());
-        }
-        else
-        {
-            Navigation.NavigateTo("/auth/signin");
-        }
+        await UserService.SignInWithGoogle();
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace BoltonCup.Data;
 
@@ -139,4 +140,37 @@ public class PlayerProfilePicture
 {
     public int PlayerId { get; set; }
     public string Source { get; set; } = "spotlight/default.jpg";
+}
+
+public class BCUser
+{
+    public int UserId { get; set; }
+    public string Email { get; set; } = "";
+    public int PlayerId { get; set; }
+    public string Name { get; set; } = "";
+    public DateTime Birthday { get; set; }
+    public string PreferredBeer { get; set; } = "";
+    public string HighestLevel { get; set; } = "";
+    public string Position { get; set; } = "";
+    public int? PreferredNum1 { get; set; }
+    public int? PreferredNum2 { get; set; }
+    public int? PreferredNum3 { get; set; }
+
+    public ClaimsPrincipal ToClaimsPrincipal()
+    {
+        return new(new ClaimsIdentity(new Claim[]
+            {
+                new (ClaimTypes.Name, Name),
+                new (ClaimTypes.Sid, UserId.ToString()),
+                new (ClaimTypes.Email, Email),
+                new (ClaimTypes.Role, "User")
+            }, "supabase"));
+    }
+}
+
+public class FileUpload
+{
+    public string FileName { get; set; } = "";
+    public string ContentType { get; set; } = "";
+    public required byte[] Data { get; set; }
 }

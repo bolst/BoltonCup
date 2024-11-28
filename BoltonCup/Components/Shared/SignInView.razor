@@ -1,11 +1,76 @@
+@inject Data.CustomAuthenticationStateProvider AuthStateProvider
+@inject Data.IBCData BCData
+
 <AuthorizeView>
     <Authorized>
-        <MudButton Class="mud-theme-primary" Href="/auth/callback/signout" Variant="Variant.Text" Size="Size.Large">SIGN
-            OUT
-        </MudButton>
+        <MudAvatar Class="clickable" onclick="@(() => { drawerOpen = !drawerOpen; })">
+            <MudImage Src="@profilePic.Source" />
+        </MudAvatar>
+
+        <MudDrawer Class="mud-theme-dark" @bind-Open="@drawerOpen" Elevation="1" Anchor="Anchor.End"
+            Variant="DrawerVariant.Temporary">
+            <MudDrawerHeader>
+                <MudStack>
+                    <MudText>@userName</MudText>
+                    <MudText Typo="Typo.body2">@email</MudText>
+                </MudStack>
+            </MudDrawerHeader>
+            <MudNavMenu>
+                @if (currentUser is not null)
+                {
+                    <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/auth/profile">Profile</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Filled.SportsHockey" Href="@($"/player/{currentUser.PlayerId}")">Your
+                        Stats</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Filled.Sports" Href="/schedule">Your Games</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Filled.Settings" Href="/stats">Settings</MudNavLink>
+                }
+                else
+                {
+                    <MudNavLink Class="mud-theme-primary" Icon="@Icons.Material.Filled.IncompleteCircle"
+                        IconColor="Color.Surface" Href="/auth/profile/complete">Complete
+                        Profile</MudNavLink>
+                }
+                <MudNavLink Icon="@Icons.Material.Filled.Logout" OnClick="SignOut">Sign Out</MudNavLink>
+            </MudNavMenu>
+        </MudDrawer>
+
     </Authorized>
     <NotAuthorized>
         <MudButton Class="mud-theme-primary" Href="/auth/signin" Variant="Variant.Text" Size="Size.Large">SIGN IN
         </MudButton>
     </NotAuthorized>
 </AuthorizeView>
+
+@code {
+
+    private Data.BCUser? currentUser;
+    private Data.PlayerProfilePicture profilePic = new();
+    private bool popoverOpen = false;
+    private bool drawerOpen = false;
+    private string userName => (currentUser is null) ? "" : currentUser.Name;
+    private string email = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var state = await AuthStateProvider.GetAuthenticationStateAsync();
+            if (state.User.Identity is not null && state.User.Identity.IsAuthenticated)
+            {
+                email = state.User.Claims.First(claim => claim.Type == System.Security.Claims.ClaimTypes.Email).Value;
+                currentUser = await BCData.GetUserByEmail(email);
+                if (currentUser is not null)
+                {
+                    profilePic = await BCData.GetPlayerProfilePictureById(currentUser.PlayerId);
+                }
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task SignOut()
+    {
+        await AuthStateProvider.SignOutAsync();
+    }
+}

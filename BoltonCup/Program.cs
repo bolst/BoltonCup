@@ -36,9 +36,11 @@ builder.Services.AddScoped<Supabase.Client>(sp =>
 
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<CustomAuthenticationStateProvider>(sp => new CustomAuthenticationStateProvider(sp.GetRequiredService<Client>()));
+builder.Services.AddScoped<CustomUserService>();
+builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<CustomAuthenticationStateProvider>());
 
+builder.Services.AddScoped<OTPLogin>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
 
 builder.Services.AddScoped<IBCData>(sp =>

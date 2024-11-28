@@ -11,43 +11,22 @@ namespace BoltonCup.Data;
 /// </summary>
 public class CustomAuthenticationStateProvider : AuthenticationStateProvider, IDisposable
 {
-    private Supabase.Client _Supabase { get; }
+    private readonly Supabase.Client SBClient;
+    private readonly CustomUserService UserService;
 
     private AuthenticationState AnonymousState => new(new ClaimsPrincipal(new ClaimsIdentity()));
 
-    /// <summary>
-    /// Creates an <see cref="AuthenticationState"/> that is either Anonymous or Authenticated if Gotrue has a current user.
-    /// </summary>
-    private AuthenticationState AuthenticatedState
-    {
-        get
-        {
-            var user = _Supabase.Auth.CurrentUser;
-
-            if (user == null)
-                return AnonymousState;
-
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.Email, user.Email!),
-                new(ClaimTypes.Role, user.Role!),
-                new(ClaimTypes.Authentication, "supabase")
-            };
-
-            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "supabase")));
-        }
-    }
-
-    public CustomAuthenticationStateProvider(Supabase.Client supabase)
+    public CustomAuthenticationStateProvider(Supabase.Client _SBClient, CustomUserService _userService)
     {
         Console.WriteLine($"{nameof(CustomAuthenticationStateProvider)} initialized.");
-        _Supabase = supabase;
-        _Supabase.Auth.AddStateChangedListener(SupabaseAuthStateChanged);
+        SBClient = _SBClient;
+        UserService = _userService;
+        SBClient.Auth.AddStateChangedListener(SupabaseAuthStateChanged);
     }
 
     public void Dispose()
     {
-        _Supabase.Auth.RemoveStateChangedListener(SupabaseAuthStateChanged);
+        SBClient.Auth.RemoveStateChangedListener(SupabaseAuthStateChanged);
     }
 
     /// <summary>
@@ -55,13 +34,23 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="state"></param>
-    private void SupabaseAuthStateChanged(IGotrueClient<User, Session> sender, Constants.AuthState state)
+    private async void SupabaseAuthStateChanged(IGotrueClient<User, Session> sender, Constants.AuthState state)
     {
         switch (state)
         {
             case Constants.AuthState.SignedIn:
-                NotifyAuthenticationStateChanged(Task.FromResult(AuthenticatedState));
-                break;
+                {
+                    BCUser? user = await UserService.LookupUserInDatabase(SBClient.Auth.CurrentUser!.Email ?? "");
+                    if (user is null)
+                    {
+                        NotifyAuthenticationStateChanged(Task.FromResult(AnonymousState));
+                    }
+                    else
+                    {
+                        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user.ToClaimsPrincipal())));
+                    }
+                    break;
+                }
             case Constants.AuthState.SignedOut:
                 NotifyAuthenticationStateChanged(Task.FromResult(AnonymousState));
                 break;
@@ -70,14 +59,33 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        await Task.Run(() => _Supabase.Auth.LoadSession());
-        
-        if (_Supabase.Auth.CurrentUser == null)
+        await Task.Run(() => SBClient.Auth.LoadSession());
+
+        if (SBClient.Auth.CurrentUser == null)
         {
             Console.WriteLine("An authenticated user not found, returning as anonymous.");
             return AnonymousState;
         }
 
-        return AuthenticatedState;
+        var currentUser = SBClient.Auth.CurrentUser;
+        if (currentUser is null) return AnonymousState;
+
+        BCUser? user = await UserService.LookupUserInDatabase(currentUser!.Email ?? "");
+        if (user == null) return AnonymousState;
+
+        var principal = user.ToClaimsPrincipal();
+
+        return new AuthenticationState(principal);
+    }
+
+    public async Task<bool> IsAuthenticated()
+    {
+        var state = await GetAuthenticationStateAsync();
+        return state.User.Identity is not null && state.User.Identity.IsAuthenticated;
+    }
+
+    public async Task SignOutAsync()
+    {
+        await SBClient.Auth.SignOut();
     }
 }

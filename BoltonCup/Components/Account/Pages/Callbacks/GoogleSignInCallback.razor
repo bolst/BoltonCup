@@ -3,7 +3,7 @@
 @inject Supabase.Client SBClient
 @inject NavigationManager Navigation
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
-@inject Data.CustomAuthenticationStateProvider AuthStateProvider
+@inject Data.CustomUserService UserService
 
 @code {
 
@@ -14,17 +14,7 @@
     {
         if (firstRender)
         {
-            string? verifier = await LocalStorage.GetItemAsStringAsync("verifier");
-            if (!string.IsNullOrEmpty(Code) && !string.IsNullOrEmpty(verifier))
-            {
-                var session = await SBClient.Auth.ExchangeCodeForSession(verifier, Code);
-                await LocalStorage.RemoveItemAsync("verifier");
-                Navigation.NavigateTo("/");
-            }
-            else
-            {
-                Navigation.NavigateTo("/auth/signin", options: new() { ReplaceHistoryEntry = true });
-            }
+            await UserService.VerifyOAuthCode(Code);
         }
     }
 }

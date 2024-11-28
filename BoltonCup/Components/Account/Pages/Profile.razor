@@ -1,12 +1,218 @@
+@layout Layout.MainLayout
 @page "/auth/profile"
 
-@layout Layout.MainLayout
+@inject Data.CustomAuthenticationStateProvider AuthStateProvider
+@inject Data.CustomUserService CustomUserService
+@inject Data.IBCData BCData
+@inject NavigationManager Navigation
 
 <AuthorizeView>
     <Authorized>
+        @if (currentUser is not null)
+        {
+            <MudGrid Class="mt-8 px-8 px-sm-20">
+                <MudItem Class="px-0" xs="12" sm="3">
+                    <MudGrid>
+                        <MudItem xs="4" sm="12">
+                            <MudAvatar Style="height:auto; width:100%; max-width: 240px;">
+                                <MudImage Src="@profilePic.Source" />
+                            </MudAvatar>
+                        </MudItem>
+                        <MudItem xs="8" sm="12">
+                            <MudText Typo="Typo.h5">@currentUser.Name</MudText>
+                            <MudButton Class="my-4" OnClick="@(() => { uploadDialogOpen = true; })" Color="Color.Primary"
+                                Variant="Variant.Filled" FullWidth>Change Photo</MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+                <MudItem xs="12" sm="9">
+                    <MudPaper Class="pa-8">
+                        <MudStack Class="mb-8" Spacing="8">
+                            <MudTextField @bind-Value="@currentUser.Email" Label="Email" Variant="Variant.Outlined"
+                                Disabled="true" />
+                            <MudTextField @bind-Value="@currentUser.Birthday" Label="Birthday" Variant="Variant.Outlined"
+                                Disabled="true" />
+                            <MudTextField @bind-Value="@currentUser.HighestLevel" Label="Highest Level Played"
+                                Variant="Variant.Outlined" Disabled="true" />
+                            <MudTextField @bind-Value="@currentUser.PreferredBeer" Label="Preferred Beer"
+                                Variant="Variant.Outlined" />
+                            <MudSelect @bind-Value="@currentUser.Position" Label="Position" Variant="Variant.Outlined">
+                                <MudSelectItem Value=@("Forward")>Forward</MudSelectItem>
+                                <MudSelectItem Value=@("Defense")>Defense</MudSelectItem>
+                                <MudSelectItem Value=@("Forward/Defense")>Forward/Defense</MudSelectItem>
+                                <MudSelectItem Value=@("Goalie")>Goalie</MudSelectItem>
+                            </MudSelect>
 
+                            <div>
+                                <MudText Typo="Typo.body2">Preferred Jersey Numbers</MudText>
+                                <MudStack Row="true" Justify="Justify.SpaceAround">
+                                    <MudNumericField @bind-Value="@currentUser.PreferredNum1" Label="#1"
+                                        Variant="Variant.Outlined" Min="0" Max="99" HideSpinButtons />
+                                    <MudNumericField @bind-Value="@currentUser.PreferredNum2" Label="#2"
+                                        Variant="Variant.Outlined" Min="0" Max="99" HideSpinButtons />
+                                    <MudNumericField @bind-Value="@currentUser.PreferredNum3" Label="#3"
+                                        Variant="Variant.Outlined" Min="0" Max="99" HideSpinButtons />
+                                </MudStack>
+                            </div>
+                        </MudStack>
+
+
+                        <MudButton OnClick="@UpdateProfile" Color="Color.Primary" Variant="Variant.Filled">Update Profile
+                        </MudButton>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+
+            <MudOverlay @bind-Visible="@uploadDialogOpen" DarkBackground AutoClose="true" OnClosed="@ResetData">
+                <MudPaper Class="pa-20 gray darken-4">
+                    <MudStack AlignItems="AlignItems.Center">
+                        @if (imageUploadSuccess is null)
+                        {
+                            @if (fileUploading || sendingImage)
+                            {
+                                <MudProgressCircular Color="Color.Dark" Indeterminate/>
+                            }
+                            @if (fileToSend is not null && !sendingImage)
+                            {
+                                <MudImage Src="@($"data:image/*;base64, {Convert.ToBase64String(new MemoryStream(fileToSend.Data).ToArray())}")" Width="200"/>
+                            }
+                            <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Accept="image/*">
+                                <ActivatorContent>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.CloudUpload" FullWidth>
+                                        Upload Files
+                                    </MudButton>
+                                </ActivatorContent>
+                            </MudFileUpload>
+                            @if (fileToSend is not null)
+                            {
+                                <MudButton Class="my-4" OnClick="@ChangeProfilePic" Variant="Variant.Filled" Color="Color.Success"
+                                           StartIcon="@Icons.Material.Filled.Check" FullWidth>
+                                    Confirm
+                                </MudButton>
+                            }
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" />
+                        }
+                    </MudStack>
+                </MudPaper>
+            </MudOverlay>
+
+        }
     </Authorized>
     <NotAuthorized>
         <AuthRedirect />
     </NotAuthorized>
 </AuthorizeView>
+
+@code {
+
+    private Data.BCUser? currentUser;
+    private Data.PlayerProfilePicture profilePic = new();
+    private Data.FileUpload? fileToSend;
+    private bool uploadDialogOpen = false;
+    private bool fileUploading = false;
+    private bool sendingImage = false;
+    private bool? imageUploadSuccess;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (await AuthStateProvider.IsAuthenticated())
+            {
+                var state = await AuthStateProvider.GetAuthenticationStateAsync();
+                string email = state.User.Claims.First(claim => claim.Type == System.Security.Claims.ClaimTypes.Email).Value;
+                currentUser = await BCData.GetUserByEmail(email);
+
+                if (currentUser is null)
+                {
+                    Navigation.NavigateTo("/auth/profile/complete", true);
+                }
+
+                profilePic = await BCData.GetPlayerProfilePictureById(currentUser!.PlayerId);
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task UpdateProfile()
+    {
+
+    }
+
+    private async Task UploadFiles(IBrowserFile file)
+    {
+        fileUploading = true;
+        byte[]? bytes = null;
+
+        // verify file is image
+        if (file.ContentType.StartsWith("image/"))
+        {
+            // resize to limit (800KB)
+            try
+            {
+                var readStream = file.OpenReadStream(file.Size);
+                bytes = await Data.ImageResizerSkia.ResizeImageToApproxSizeAsync(readStream, 800);
+            }
+            catch
+            {
+                bytes = null;
+            }
+        }
+        else
+        {
+            // TODO: handle non-images
+        }
+
+        fileToSend = new Data.FileUpload
+            {
+                FileName = $"{currentUser!.Name.Replace(' ', '-')}.jpg",
+                ContentType = file.ContentType,
+                Data = bytes,
+            };
+
+        fileUploading = false;
+    }
+
+    private async Task ChangeProfilePic()
+    {
+        if (fileToSend is not null)
+        {
+            sendingImage = true;
+            StateHasChanged();
+            
+            string? result = await CustomUserService.UpdateProfilePicture(fileToSend);
+            
+            sendingImage = false;
+
+            if (result is null)
+            {
+                imageUploadSuccess = true;
+            }
+            else
+            {
+                // TODO: display upload error message to user
+                imageUploadSuccess = false;
+            }
+            StateHasChanged();
+            
+            await Task.Delay(2000);
+            uploadDialogOpen = false;
+            
+            ResetData();
+            StateHasChanged();
+        }
+    }
+
+    private void ResetData()
+    {
+        fileToSend = null;
+        fileUploading = false;
+        sendingImage = false;
+        imageUploadSuccess = null;
+    }
+}

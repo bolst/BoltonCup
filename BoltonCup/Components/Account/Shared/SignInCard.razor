@@ -3,79 +3,78 @@
 @inject NavigationManager Navigation
 @inject Supabase.Client SBClient
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject Data.OTPLogin OTPLogin
 
-<MudForm @ref="form" Model="@model">
-    <MudCard Class="pa-5" Style="min-width: 30vw">
-        <MudCardHeader>
-            <MudCardContent>
-                <MudStack AlignItems="AlignItems.Center">
-                    <MudImage Class="mt-4 pr-4 clickable" Src="logos/boltoncup.png" Width="80"
-                        @onclick="@(() => Navigation.NavigateTo("/"))" />
-
-                    <MudDivider Class="my-6" />
-                    <MudText Class="d-flex justify-center" Typo="Typo.h4"><b>Welcome back</b></MudText>
-                </MudStack>
-            </MudCardContent>
-        </MudCardHeader>
+<MudCard Class="pa-5" Style="min-width: 30vw">
+    <MudCardHeader>
         <MudCardContent>
-            @if (submittedAndInvalid)
+            <MudStack AlignItems="AlignItems.Center">
+                <MudImage Class="mt-4 pr-4 clickable" Src="logos/boltoncup.png" Width="80"
+                    @onclick="@(() => Navigation.NavigateTo("/"))" />
+
+                <MudDivider Class="my-6" />
+                <MudText Class="d-flex justify-center" Typo="Typo.h4"><b>Welcome back</b></MudText>
+            </MudStack>
+        </MudCardContent>
+    </MudCardHeader>
+    <MudCardContent>
+        @if (!sentOTP)
+        {
+            <MudForm @ref="emailForm">
+                <MudTextField @bind-Value="@emailInput" Label="Email" Variant="Variant.Outlined" AutoFocus
+                    OnlyValidateIfDirty />
+            </MudForm>
+        }
+        else
+        {
+            <MudForm @ref="otpForm">
+                <MudTextField @bind-Value="@otpInput" Label="OTP" Variant="Variant.Outlined" InputType="InputType.Password"
+                    OnlyValidateIfDirty />
+            </MudForm>
+        }
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="@onSendOTP">
+            @if (loading)
             {
-                <MudText Color="Color.Error">Couldn't find an account with those credentials</MudText>
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" />
             }
-            <MudTextField @bind-Value="@model.Email" For="(() => model.Email)" Variant="Variant.Outlined" AutoFocus
-                Required OnlyValidateIfDirty />
-            <MudTextField @bind-Value="@model.Password" For="(() => model.Password)" Variant="Variant.Outlined"
-                InputType="InputType.Password" Required OnlyValidateIfDirty />
-        </MudCardContent>
-        <MudCardActions>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="@OnContinueClicked">
-                @if (loading)
-                {
-                    <MudProgressCircular Size="Size.Small" Indeterminate="true" />
-                }
-                else
-                {
-                    <MudText>Continue</MudText>
-                }
-            </MudButton>
-        </MudCardActions>
-        <MudCardContent>
-            <MudText Class="d-flex justify-center">Don't have an account? <MudLink Class="px-2" Href="/auth/signup">Sign
-                    Up</MudLink>
-            </MudText>
+            else
+            {
+                <MudText>Continue</MudText>
+            }
+        </MudButton>
+    </MudCardActions>
+    <MudCardContent>
+        <MudText Class="d-flex justify-center">Don't have an account? <MudLink Class="px-2" Href="/auth/signup">Sign
+                Up</MudLink>
+        </MudText>
 
-            <MudDivider Class="py-5" />
+        <MudDivider Class="py-5" />
 
-            <GoogleSignInButton />
-        </MudCardContent>
-    </MudCard>
-</MudForm>
+        <GoogleSignInButton />
+    </MudCardContent>
+</MudCard>
 
 
 @code {
-    private MudForm form;
-    private SignInAccountForm model = new();
+    private MudForm emailForm;
+    private MudForm otpForm;
+    private string emailInput;
+    private string otpInput;
     private bool loading = false;
     private bool submittedAndInvalid = false;
+    private bool sentOTP = false;
 
-    public class SignInAccountForm
+    private async Task onSendOTP()
     {
-        [Required]
-        [EmailAddress]
-        [Label("Email Address")]
-        public string Email { get; set; }
-
-        [Required]
-        [Label("Password")]
-        public string Password { get; set; }
-    }
-
-    private async Task OnContinueClicked()
-    {
-        if (form.IsValid)
+        if (emailForm.IsValid)
         {
-            await Task.Delay(3000);
+            //await Task.Delay(3000);
             submittedAndInvalid = true;
+
+            await OTPLogin.SendOTPToken(emailInput);
+            sentOTP = true;
         }
 
         loading = false;

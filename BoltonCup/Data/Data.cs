@@ -21,6 +21,7 @@ public interface IBCData
     Task<GameScore?> GetGameScoreById(int gameId);
     Task<IEnumerable<PlayerProfilePicture>> GetPlayerProfilePictures();
     Task<PlayerProfilePicture> GetPlayerProfilePictureById(int playerId);
+    Task<BCUser?> GetUserByEmail(string email);
 }
 
 public class BCData : IBCData
@@ -567,6 +568,16 @@ public class BCData : IBCData
             await using var connection = new NpgsqlConnection(connectionString);
             return await connection.QueryFirstOrDefaultAsync<PlayerProfilePicture>(sql, new { PlayerId = id }) ?? new();
         }, cacheDuration);
+    }
+
+    public async Task<BCUser?> GetUserByEmail(string email)
+    {
+        string sql = @"SELECT U.user_id AS UserId, U.email AS Email, U.player_id AS PlayerId, P.name AS Name, P.dob AS Birthday, P.preferred_beer AS PreferredBeer, P.highest_level AS HighestLevel, P.p_position AS Position, P.p_num1 AS PreferredNum1, P.p_num2 AS PreferredNum2, P.p_num3 AS PreferredNum3
+                    FROM users U
+                    JOIN players P ON U.player_id = P.id
+                    WHERE U.email = @Email";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryFirstOrDefaultAsync<BCUser>(sql, new { Email = email });
     }
 
 
