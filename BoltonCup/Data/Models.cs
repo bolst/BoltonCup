@@ -55,6 +55,7 @@ public class PlayerProfile
     public int Goals { get; set; }
     public int Assists { get; set; }
     public int PIMs { get; set; }
+    public bool IsWinner { get; set; } = true;
 }
 
 public class PlayerGameSummary
