@@ -1,0 +1,31 @@
+@inject NavigationManager Navigation
+
+<div>
+    <MudFab DropShadow="false" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Menu" OnClick="@ToggleOpen" />
+</div>
+
+<MudOverlay Visible="@isOpen" DarkBackground AutoClose="true" OnClosed="@OnClosed">
+    <MudPaper Class="pa-20 gray darken-4">
+        <MudStack>
+            @navButton("HOME", "/")
+            @navButton("INFO", "/info")
+            @navButton("TEAMS", "/teams")
+            @navButton("SCHEDULE", "/schedule")
+            @navButton("STATS", "/stats")
+            <SignInView />
+        </MudStack>
+    </MudPaper>
+</MudOverlay>
+
+@code {
+    private bool isOpen = false;
+
+    private RenderFragment navButton(string title, string href) => __builder =>
+    {
+        <MudButton Variant="Variant.Text" Size="Size.Large" Color="Color.Primary" Href="@href">@title</MudButton>
+    };
+
+    private void ToggleOpen() => isOpen = !isOpen;
+    private void OnClosed() => isOpen = false;
+
+}

@@ -1,0 +1,44 @@
+@inject NavigationManager Navigation
+@inject Data.IBCData BCData
+
+@if (playerGameByGame is not null)
+{
+    <MudSimpleTable Class="mb-6" Hover="true" Dense="true" Striped="true" Elevation="0">
+    <thead>
+        <tr>
+            <th><b>DATE</b></th>
+            <th><b>MATCHUP</b></th>
+            <th><b>G</b></th>
+            <th><b>A</b></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Data.PlayerGameSummary summary in playerGameByGame)
+            {
+                <tr class="clickable" onclick=@(() => Navigation.NavigateTo($"game/{summary.GameId}"))>
+                    <th>@summary.GameDate.ToString("MMM dd/yy")</th>
+                    <th>
+                        <MudStack Class="d-flex align-center" Row="true">
+                            <MudImage Src=@($"logos/logo-{summary.TeamId}.png") Height="30" />
+                            vs.
+                            <MudImage Src=@($"logos/logo-{summary.OpponentTeamId}.png") Height="30" />
+                        </MudStack>
+                    </th>
+                    <th>@summary.Goals</th>
+                    <th>@summary.Assists</th>
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
+}
+
+
+@code {
+    [Parameter] public int PlayerId { get; set; }
+    private IEnumerable<Data.PlayerGameSummary>? playerGameByGame;
+
+    protected override async Task OnInitializedAsync()
+    {
+        playerGameByGame = await BCData.GetPlayerGameByGame(PlayerId);
+    }
+}
