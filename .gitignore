@@ -1,4 +1,4 @@
 .DS_STORE
-BoltonCup/bin
-BoltonCup/obj
+bin
+obj
 .idea
