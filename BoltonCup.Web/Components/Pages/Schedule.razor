@@ -1,0 +1,42 @@
+@page "/schedule"
+
+@inject Data.IBCData BCData
+
+<div class="my-5 mx-2 mx-md-20">
+    @if (schedule is not null && gameDays is not null)
+    {
+        @foreach (DateTime day in gameDays)
+        {
+            <MudText Class="mt-10" Typo="Typo.h4">@day.ToString("dddd, MMMM dd")</MudText>
+            <MudDivider />
+            <ScheduleTable
+                Games="schedule.Where(g => g.Date.Year == day.Date.Year && g.Date.Month == day.Date.Month && g.Date.Day == day.Date.Day)" />
+        }
+    }
+</div>
+
+@code {
+
+    public IEnumerable<Data.ScheduledGame>? schedule;
+    private IEnumerable<DateTime>? gameDays;
+
+    protected override async Task OnInitializedAsync()
+    {
+        schedule = await BCData.GetSchedule();
+        gameDays = schedule is null ? null : parseScheduleDays(schedule);
+    }
+
+    static IEnumerable<DateTime> parseScheduleDays(IEnumerable<Data.ScheduledGame> games)
+    {
+        List<DateTime> retval = new();
+        foreach (var game in games)
+        {
+            DateTime day = new(game.Date.Year, game.Date.Month, game.Date.Day);
+            if (!retval.Contains(day))
+            {
+                retval.Add(day);
+            }
+        }
+        return retval;
+    }
+}
