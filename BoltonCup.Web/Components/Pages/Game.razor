@@ -1,6 +1,6 @@
 @page "/game/{id:int}"
 
-@inject Data.IBCData BCData
+@inject IBCData BCData
 
 @if (currGame is not null)
 {
@@ -118,9 +118,9 @@
 @code {
     [Parameter] public int Id { get; set; }
 
-    private Data.ScheduledGame? currGame;
-    private IEnumerable<Data.GameGoal>? gameGoals;
-    private IEnumerable<Data.GamePenalty>? gamePenalties;
+    private ScheduledGame? currGame;
+    private IEnumerable<GameGoal>? gameGoals;
+    private IEnumerable<GamePenalty>? gamePenalties;
 
     protected override async Task OnInitializedAsync()
     {

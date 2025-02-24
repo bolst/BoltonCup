@@ -1,0 +1,29 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/background.png",
+      "PackagePath": "staticwebassets/background.png"
+    },
+    {
+      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/exampleJsInterop.js",
+      "PackagePath": "staticwebassets/exampleJsInterop.js"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.BoltonCup.Shared.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.BoltonCup.Shared.props",
+      "PackagePath": "build\\BoltonCup.Shared.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.BoltonCup.Shared.props",
+      "PackagePath": "buildMultiTargeting\\BoltonCup.Shared.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.BoltonCup.Shared.props",
+      "PackagePath": "buildTransitive\\BoltonCup.Shared.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

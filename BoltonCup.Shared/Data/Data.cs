@@ -1,7 +1,6 @@
-namespace BoltonCup.Web.Data;
+namespace BoltonCup.Shared.Data;
 using Dapper;
 using Npgsql;
-using Blazored.LocalStorage;
 
 public interface IBCData
 {

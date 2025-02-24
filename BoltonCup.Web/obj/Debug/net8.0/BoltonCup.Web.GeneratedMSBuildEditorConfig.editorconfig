@@ -89,66 +89,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Sb3V0ZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/Countdown.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvQ291bnRkb3duLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/GameGoalCard.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvR2FtZUdvYWxDYXJkLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/GameLineScore.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvR2FtZUxpbmVTY29yZS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/GamePenaltiesTable.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvR2FtZVBlbmFsdGllc1RhYmxlLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/GoalieGameByGame.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvR29hbGllR2FtZUJ5R2FtZS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/GoalieStatSummary.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvR29hbGllU3RhdFN1bW1hcnkucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/InfoHeader.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvSW5mb0hlYWRlci5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/PlayerGameByGame.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvUGxheWVyR2FtZUJ5R2FtZS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/PlayerStatSummary.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvUGxheWVyU3RhdFN1bW1hcnkucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/ScheduleRow.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvU2NoZWR1bGVSb3cucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/ScheduleTable.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvU2NoZWR1bGVUYWJsZS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/SignInView.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvU2lnbkluVmlldy5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/TeamCard.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvVGVhbUNhcmQucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/TopGoalies.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvVG9wR29hbGllcy5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Shared/TopSkaters.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvVG9wU2thdGVycy5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
 [/Users/nic/git/BoltonCup/BoltonCup.Web/Components/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9fSW1wb3J0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 

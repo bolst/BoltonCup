@@ -1,4 +1,4 @@
-namespace BoltonCup.Web.Data;
+namespace BoltonCup.Shared.Data;
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;

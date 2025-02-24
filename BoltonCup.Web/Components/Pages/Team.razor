@@ -1,6 +1,6 @@
 @page "/team/{id:int}"
 
-@inject Data.IBCData BCData
+@inject IBCData BCData
 @inject NavigationManager Navigation
 
 <MudPaper Class="pa-10 ma-5" Elevation="5">
@@ -36,8 +36,8 @@
     @code {
     [Parameter] public int Id { get; set; }
 
-    private Data.Team? team { get; set; }
-    private IEnumerable<Data.TeamPlayer>? roster { get; set; }
+    private BoltonCup.Shared.Data.Team? team { get; set; }
+    private IEnumerable<TeamPlayer>? roster { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -45,7 +45,7 @@
         roster = await BCData.GetRosterByTeamId(Id);
     }
 
-    private RenderFragment PlayerTable(IEnumerable<Data.TeamPlayer> players) => __builder =>
+    private RenderFragment PlayerTable(IEnumerable<TeamPlayer> players) => __builder =>
     {
         <MudSimpleTable Class="mb-6" Hover="true" Dense="true" Striped="true" Elevation="0">
             <thead>
@@ -56,7 +56,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (Data.TeamPlayer player in players)
+                @foreach (TeamPlayer player in players)
                 {
                     <tr class="clickable" onclick=@(() => Navigation.NavigateTo($"player/{player.PlayerId}"))>
                         <th>@player.JerseyNumber.ToString("D2")</th>

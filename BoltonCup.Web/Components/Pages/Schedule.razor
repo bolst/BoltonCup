@@ -1,6 +1,6 @@
 @page "/schedule"
 
-@inject Data.IBCData BCData
+@inject IBCData BCData
 
 <div class="my-5 mx-2 mx-md-20">
     @if (schedule is not null && gameDays is not null)
@@ -17,7 +17,7 @@
 
 @code {
 
-    public IEnumerable<Data.ScheduledGame>? schedule;
+    public IEnumerable<ScheduledGame>? schedule;
     private IEnumerable<DateTime>? gameDays;
 
     protected override async Task OnInitializedAsync()
@@ -26,7 +26,7 @@
         gameDays = schedule is null ? null : parseScheduleDays(schedule);
     }
 
-    static IEnumerable<DateTime> parseScheduleDays(IEnumerable<Data.ScheduledGame> games)
+    static IEnumerable<DateTime> parseScheduleDays(IEnumerable<ScheduledGame> games)
     {
         List<DateTime> retval = new();
         foreach (var game in games)

@@ -4,14 +4,14 @@
     "/Users/nic/git/BoltonCup/BoltonCup.Web/BoltonCup.Web.csproj": {}
   },
   "projects": {
-    "/Users/nic/git/BoltonCup/BoltonCup.Web/BoltonCup.Web.csproj": {
+    "/Users/nic/git/BoltonCup/BoltonCup.Shared/BoltonCup.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/nic/git/BoltonCup/BoltonCup.Web/BoltonCup.Web.csproj",
-        "projectName": "BoltonCup.Web",
-        "projectPath": "/Users/nic/git/BoltonCup/BoltonCup.Web/BoltonCup.Web.csproj",
+        "projectUniqueName": "/Users/nic/git/BoltonCup/BoltonCup.Shared/BoltonCup.Shared.csproj",
+        "projectName": "BoltonCup.Shared",
+        "projectPath": "/Users/nic/git/BoltonCup/BoltonCup.Shared/BoltonCup.Shared.csproj",
         "packagesPath": "/Users/nic/.nuget/packages/",
-        "outputPath": "/Users/nic/git/BoltonCup/BoltonCup.Web/obj/",
+        "outputPath": "/Users/nic/git/BoltonCup/BoltonCup.Shared/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/nic/.nuget/NuGet/NuGet.Config"
@@ -43,21 +43,93 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
-            "Blazored.LocalStorage": {
-              "target": "Package",
-              "version": "[4.5.0, )"
-            },
             "Dapper": {
               "target": "Package",
-              "version": "[2.1.35, )"
+              "version": "[2.1.66, )"
+            },
+            "Microsoft.AspNetCore.Components.Web": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Microsoft.Extensions.Caching.Memory": {
+              "target": "Package",
+              "version": "[8.0.1, )"
             },
             "MudBlazor": {
               "target": "Package",
-              "version": "[7.*, )"
+              "version": "[7.16.0, )"
             },
             "Npgsql": {
               "target": "Package",
-              "version": "[8.0.5, )"
+              "version": "[8.0.6, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/nic/git/BoltonCup/BoltonCup.Web/BoltonCup.Web.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/nic/git/BoltonCup/BoltonCup.Web/BoltonCup.Web.csproj",
+        "projectName": "BoltonCup.Web",
+        "projectPath": "/Users/nic/git/BoltonCup/BoltonCup.Web/BoltonCup.Web.csproj",
+        "packagesPath": "/Users/nic/.nuget/packages/",
+        "outputPath": "/Users/nic/git/BoltonCup/BoltonCup.Web/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/nic/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/nic/git/BoltonCup/BoltonCup.Shared/BoltonCup.Shared.csproj": {
+                "projectPath": "/Users/nic/git/BoltonCup/BoltonCup.Shared/BoltonCup.Shared.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "MudBlazor": {
+              "target": "Package",
+              "version": "[7.*, )"
             }
           },
           "imports": [

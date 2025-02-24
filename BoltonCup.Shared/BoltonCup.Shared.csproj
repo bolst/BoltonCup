@@ -12,7 +12,29 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Dapper" Version="2.1.66" />
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.11"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+        <PackageReference Include="MudBlazor" Version="7.16.0" />
+        <PackageReference Include="Npgsql" Version="8.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Countdown.razor" />
+      <AdditionalFiles Include="Components\GameGoalCard.razor" />
+      <AdditionalFiles Include="Components\GameLineScore.razor" />
+      <AdditionalFiles Include="Components\GamePenaltiesTable.razor" />
+      <AdditionalFiles Include="Components\GoalieGameByGame.razor" />
+      <AdditionalFiles Include="Components\GoalieStatSummary.razor" />
+      <AdditionalFiles Include="Components\InfoHeader.razor" />
+      <AdditionalFiles Include="Components\PlayerGameByGame.razor" />
+      <AdditionalFiles Include="Components\PlayerStatSummary.razor" />
+      <AdditionalFiles Include="Components\ScheduleRow.razor" />
+      <AdditionalFiles Include="Components\ScheduleTable.razor" />
+      <AdditionalFiles Include="Components\SignInView.razor" />
+      <AdditionalFiles Include="Components\TeamCard.razor" />
+      <AdditionalFiles Include="Components\TopGoalies.razor" />
+      <AdditionalFiles Include="Components\TopSkaters.razor" />
     </ItemGroup>
 
 </Project>
