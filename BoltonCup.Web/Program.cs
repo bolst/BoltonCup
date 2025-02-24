@@ -1,8 +1,6 @@
 using MudBlazor.Services;
 using BoltonCup.Web.Components;
-using BoltonCup.Web.Data;
-using Blazored.LocalStorage;
-using Microsoft.Extensions.Caching.Memory;
+using BoltonCup.Shared.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +11,6 @@ builder.Services.AddMudServices();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddMemoryCache();
 
 builder.Services.AddSingleton<ICacheService, CacheService>();

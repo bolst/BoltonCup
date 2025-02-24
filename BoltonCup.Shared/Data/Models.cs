@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BoltonCup.Web.Data;
+namespace BoltonCup.Shared.Data;
 
 public class Team
 {

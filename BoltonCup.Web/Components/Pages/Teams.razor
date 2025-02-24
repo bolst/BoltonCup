@@ -1,6 +1,6 @@
 @page "/teams"
 
-@inject Data.IBCData BCData
+@inject IBCData BCData
 
 @if (teams is not null)
 {
@@ -16,7 +16,7 @@
 
 @code {
 
-    private IEnumerable<Data.Team>? teams;
+    private IEnumerable<BoltonCup.Shared.Data.Team>? teams;
 
     protected override async Task OnInitializedAsync()
     {

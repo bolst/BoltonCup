@@ -6,7 +6,6 @@
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Web.runtimeconfig.json
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Web.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Web.pdb
-/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Blazored.LocalStorage.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Dapper.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.AspNetCore.Authorization.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.AspNetCore.Components.dll
@@ -42,3 +41,8 @@
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/BoltonCup.Web.pdb
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/BoltonCup.Web.genruntimeconfig.cache
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/ref/BoltonCup.Web.dll
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Shared.staticwebassets.runtime.json
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.dll
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Shared.dll
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Shared.pdb
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.Extensions.Caching.Memory.dll

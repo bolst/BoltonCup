@@ -1,12 +1,31 @@
 {
   "Version": 1,
-  "Hash": "e2gW75NpphlHnmOrxzHcavib9htJvu1vZJNZXBveCUE=",
+  "Hash": "cv1ImjVG1VhIZqPbJL9iu7fPwdNonbeSNoFrBzBVB9g=",
   "Source": "BoltonCup.Web",
   "BasePath": "_content/BoltonCup.Web",
   "Mode": "Default",
   "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [],
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "/Users/nic/git/BoltonCup/BoltonCup.Shared/BoltonCup.Shared.csproj",
+      "Version": 2,
+      "Source": "BoltonCup.Shared",
+      "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained"
+    }
+  ],
   "DiscoveryPatterns": [
+    {
+      "Name": "BoltonCup.Shared/wwwroot",
+      "Source": "BoltonCup.Shared",
+      "ContentRoot": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/",
+      "BasePath": "_content/BoltonCup.Shared",
+      "Pattern": "**"
+    },
     {
       "Name": "BoltonCup.Web/wwwroot",
       "Source": "BoltonCup.Web",
@@ -53,6 +72,44 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/Users/nic/.nuget/packages/mudblazor/7.16.0/staticwebassets/MudBlazor.min.js"
+    },
+    {
+      "Identity": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/background.png",
+      "SourceId": "BoltonCup.Shared",
+      "SourceType": "Project",
+      "ContentRoot": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/",
+      "BasePath": "_content/BoltonCup.Shared",
+      "RelativePath": "background.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/background.png"
+    },
+    {
+      "Identity": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/exampleJsInterop.js",
+      "SourceId": "BoltonCup.Shared",
+      "SourceType": "Project",
+      "ContentRoot": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/",
+      "BasePath": "_content/BoltonCup.Shared",
+      "RelativePath": "exampleJsInterop.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/exampleJsInterop.js"
     },
     {
       "Identity": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/css/fonts/Lato-Bold.ttf",

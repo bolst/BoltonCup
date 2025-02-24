@@ -1,6 +1,6 @@
 @page "/stats"
 
-@inject Data.IBCData BCData
+@inject IBCData BCData
 
 <MudPaper Class="pa-sm-10 ma-2 ma-sm-5" Elevation="0">
     <MudText Typo="Typo.h5"><b>Statistics</b></MudText>
@@ -48,8 +48,8 @@
 
 @code {
 
-    private IEnumerable<Data.PlayerStatline>? skaterStats;
-    private IEnumerable<Data.GoalieStatline>? goalieStats;
+    private IEnumerable<PlayerStatline>? skaterStats;
+    private IEnumerable<GoalieStatline>? goalieStats;
 
     protected override async Task OnInitializedAsync()
     {

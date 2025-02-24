@@ -8,9 +8,30 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
-    <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="MudBlazor" Version="7.*" />
-    <PackageReference Include="Npgsql" Version="8.0.5" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\BoltonCup.Shared\BoltonCup.Shared.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Shared\Countdown.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\GameGoalCard.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\GameLineScore.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\GamePenaltiesTable.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\GoalieGameByGame.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\GoalieStatSummary.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\InfoHeader.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\PlayerGameByGame.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\PlayerStatSummary.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\ScheduleRow.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\ScheduleTable.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\SignInView.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\TeamCard.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\TopGoalies.razor" />
+    <_ContentIncludedByDefault Remove="Components\Shared\TopSkaters.razor" />
   </ItemGroup>
 </Project>
