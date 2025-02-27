@@ -33,5 +33,17 @@
     <_ContentIncludedByDefault Remove="Components\Shared\TeamCard.razor" />
     <_ContentIncludedByDefault Remove="Components\Shared\TopGoalies.razor" />
     <_ContentIncludedByDefault Remove="Components\Shared\TopSkaters.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Game.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Home.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Info.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Player.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Schedule.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Stats.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Team.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Teams.razor" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\countdown.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\bc-2024.webp" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\chris-doey.webp" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\scisoc.webp" />
   </ItemGroup>
 </Project>

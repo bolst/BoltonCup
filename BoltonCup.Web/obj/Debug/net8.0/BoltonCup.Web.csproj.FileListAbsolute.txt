@@ -1,3 +1,4 @@
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Shared.staticwebassets.runtime.json
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/appsettings.Development.json
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/appsettings.json
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Web.staticwebassets.runtime.json
@@ -12,6 +13,8 @@
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.AspNetCore.Components.Forms.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.AspNetCore.Components.Web.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.AspNetCore.Metadata.dll
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.Extensions.Caching.Memory.dll
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.Extensions.Localization.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.Extensions.Localization.Abstractions.dll
@@ -20,6 +23,8 @@
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.JSInterop.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/MudBlazor.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Npgsql.dll
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Shared.dll
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Shared.pdb
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/BoltonCup.Web.csproj.AssemblyReference.cache
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/BoltonCup.Web.GeneratedMSBuildEditorConfig.editorconfig
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/BoltonCup.Web.AssemblyInfoInputs.cache
@@ -41,8 +46,3 @@
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/BoltonCup.Web.pdb
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/BoltonCup.Web.genruntimeconfig.cache
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/ref/BoltonCup.Web.dll
-/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Shared.staticwebassets.runtime.json
-/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.dll
-/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Shared.dll
-/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Shared.pdb
-/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.Extensions.Caching.Memory.dll
