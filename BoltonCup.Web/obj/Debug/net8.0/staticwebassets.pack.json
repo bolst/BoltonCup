@@ -1,60 +1,8 @@
 {
   "Files": [
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/css/fonts/Lato-Bold.ttf",
-      "PackagePath": "staticwebassets/css/fonts/Lato-Bold.ttf"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/css/fonts/Lato-Regular.ttf",
-      "PackagePath": "staticwebassets/css/fonts/Lato-Regular.ttf"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/css/styles.css",
-      "PackagePath": "staticwebassets/css/styles.css"
-    },
-    {
       "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/favicon.ico",
       "PackagePath": "staticwebassets/favicon.ico"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/images/bc-2024.webp",
-      "PackagePath": "staticwebassets/images/bc-2024.webp"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/images/chris-doey.webp",
-      "PackagePath": "staticwebassets/images/chris-doey.webp"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/images/scisoc.webp",
-      "PackagePath": "staticwebassets/images/scisoc.webp"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/js/countdown.js",
-      "PackagePath": "staticwebassets/js/countdown.js"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/logos/boltoncup.png",
-      "PackagePath": "staticwebassets/logos/boltoncup.png"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/logos/logo-1.png",
-      "PackagePath": "staticwebassets/logos/logo-1.png"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/logos/logo-2.png",
-      "PackagePath": "staticwebassets/logos/logo-2.png"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/logos/logo-3.png",
-      "PackagePath": "staticwebassets/logos/logo-3.png"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/logos/logo-4.png",
-      "PackagePath": "staticwebassets/logos/logo-4.png"
-    },
-    {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Web/wwwroot/spotlight/default.jpg",
-      "PackagePath": "staticwebassets/spotlight/default.jpg"
     },
     {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.BoltonCup.Web.Microsoft.AspNetCore.StaticWebAssets.props",
