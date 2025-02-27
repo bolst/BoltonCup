@@ -11,16 +11,7 @@ builder.Services.AddMudServices();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddMemoryCache();
-
-builder.Services.AddSingleton<ICacheService, CacheService>();
-
-builder.Services.AddScoped<IBCData>(sp =>
-{
-    var connectionString = Environment.GetEnvironmentVariable("SB_CSTRING");
-    var cacheService = sp.GetRequiredService<ICacheService>();
-    return new BCData(connectionString!, cacheService);
-});
+builder.Services.AddBoltonCupServices();
 
 var app = builder.Build();
 

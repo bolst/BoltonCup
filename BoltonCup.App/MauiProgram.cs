@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using BoltonCup.Shared.Data;
+using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 
 namespace BoltonCup.App;
@@ -16,6 +17,8 @@ public static class MauiProgram
 			});
 
 		builder.Services.AddMauiBlazorWebView();
+
+		builder.Services.AddBoltonCupServices();
 
 		builder.Services.AddMudServices();
 

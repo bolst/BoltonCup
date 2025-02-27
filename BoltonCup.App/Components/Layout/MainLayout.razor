@@ -9,6 +9,13 @@
     <MudMainContent Class="pa-0">
         @Body
     </MudMainContent>
+    <MudAppBar ToolBarClass="d-flex justify-space-between" Color="Color.Primary" Bottom Fixed>
+        <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Home" Href="/" />
+        <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Info" Href="/info" />
+        <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.People" Href="/teams" />
+        <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.CalendarMonth" Href="/schedule" />
+        <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.BarChart" Href="/stats" />
+    </MudAppBar>
 </MudLayout>
 
 @code {
