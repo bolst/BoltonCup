@@ -68,8 +68,4 @@
       <ProjectReference Include="..\BoltonCup.Shared\BoltonCup.Shared.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Components\Pages\" />
-    </ItemGroup>
-
 </Project>
