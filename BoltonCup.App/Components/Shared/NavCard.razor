@@ -1,0 +1,27 @@
+
+<MudPaper Class="pa-2 home-banner-background rounded-lg">
+    <div style="height: 35vh">&nbsp;</div>
+    
+    @if (NavCardContent is not null)
+    {
+        <div class="d-flex flex-row-reverse" style="color: white;">
+            @NavCardContent
+        </div>
+    }
+    
+    <div class="d-flex flex-row-reverse">
+        <MudButton Style="color: white;" EndIcon="@Icons.Material.Filled.ArrowRight" Size="Size.Large" Href="@To"><b>@Title</b></MudButton>
+    </div>
+</MudPaper>
+
+@code{
+
+    [Parameter] 
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter] 
+    public string To { get; set; } = "/";
+    
+    [Parameter]
+    public RenderFragment? NavCardContent { get; set; }
+}
