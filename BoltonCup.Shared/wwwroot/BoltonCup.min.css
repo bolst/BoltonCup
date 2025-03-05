@@ -33,18 +33,3 @@ body {
 .clickable {
     cursor: pointer;
 }
-
-.carousel-cell {
-    width: 80%;
-    margin-right: 10px;
-    border-radius: 5px;
-}
-
-/* cell number */
-.carousel-cell:before {
-    display: block;
-    text-align: center;
-    line-height: 200px;
-    font-size: 80px;
-    color: white;
-}
