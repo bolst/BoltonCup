@@ -1,6 +1,6 @@
 @inject IJSRuntime JSRuntime
 
-<div class="main-carousel">
+<div class="@Class">
     @ChildContent
 </div>
 
@@ -8,12 +8,15 @@
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
-    
+
+    [Parameter] 
+    public string Class { get; set; } = "main-carousel";
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("initCarousel");
+            await JSRuntime.InvokeVoidAsync("initCarousel", Class);
         }
     }
 

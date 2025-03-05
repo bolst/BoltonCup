@@ -1,0 +1,23 @@
+<MudPaper Class="pa-2 rounded-lg" Elevation="10" Style="height: 100%;">
+    <MudText Color="Color.Secondary"><b>@StatType</b></MudText>
+
+    <MudGrid>
+        <MudItem xs="2">
+            <MudAvatar>G</MudAvatar>
+        </MudItem>
+        <MudItem xs="8">
+            Leader name
+        </MudItem>
+        <MudItem xs="2">
+            93
+        </MudItem>
+    </MudGrid>
+    
+</MudPaper>
+
+@code{
+
+    [Parameter] 
+    public string StatType { get; set; } = "points";
+
+}
