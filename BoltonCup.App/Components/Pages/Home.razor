@@ -3,7 +3,7 @@
 <PageTitle>Home</PageTitle>
 
 <div class="pa-6" style="width: 100%;">
-    <CardCarousel>
+    <CardCarousel Class="spotlight-carousel">
         <CardCarouselItem>
             <NavCard Title="Register" To="register" ImgSrc="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//bc-2024.webp">
                 <NavCardContent>
@@ -26,6 +26,25 @@
                     <MudText Align="Align.End" Typo="Typo.h5"><b>Tournament begins Aug. 10: See when your team is playing</b></MudText>
                 </NavCardContent>
             </NavCard>
+        </CardCarouselItem>
+    </CardCarousel>
+    
+    <MudText Class="mt-10" Typo="Typo.h6"><b>2024 Leaders</b></MudText>
+    <CardCarousel Class="leader-carousel">
+        <CardCarouselItem>
+            <LeaderCard StatType="Points" />
+        </CardCarouselItem>        
+        <CardCarouselItem>
+            <LeaderCard StatType="Goals" />
+        </CardCarouselItem>
+        <CardCarouselItem>
+            <LeaderCard StatType="Assists" />
+        </CardCarouselItem>
+        <CardCarouselItem>
+            <LeaderCard StatType="Goals Against Average" />
+        </CardCarouselItem>
+        <CardCarouselItem>
+            <LeaderCard StatType="Save Percentage" />
         </CardCarouselItem>
     </CardCarousel>
 </div>
