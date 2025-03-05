@@ -2,3 +2,6 @@
 bin
 obj
 .idea
+
+BoltonCup.Shared/obj
+BoltonCup.Web/obj
