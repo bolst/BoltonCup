@@ -1,0 +1,48 @@
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <MudStack>
+        <MudTextField Label="First Name" @bind-Value="model.FirstName" For="@(() => model.FirstName)" />
+        
+        <MudTextField Label="Last Name" @bind-Value="model.LastName" For="@(() => model.LastName)" />
+        
+        <MudTextField Label="Email" @bind-Value="model.Email" For="@(() => model.Email)" />
+        
+        <MudDatePicker Label="Birthday" @bind-Date="model.Birthday" For="@(() => model.Birthday)" MaxDate="DateTime.Today" OpenTo="OpenTo.Year" />
+        
+        <MudSelect Label="Position" @bind-Value="model.Position" For="@(() => model.Position)">
+            <MudSelectItem Value=@("forward")>Forward</MudSelectItem>
+            <MudSelectItem Value=@("defense")>Defense</MudSelectItem>
+            <MudSelectItem Value=@("goalie")>Goalie</MudSelectItem>
+        </MudSelect>
+        
+        <MudSelect Label="Highest level played" @bind-Value="model.HighestLevel" For="@(() => model.HighestLevel)">
+            <MudSelectItem Value=@("House league")>House league</MudSelectItem>
+            <MudSelectItem Value=@("A/AA")>A/AA</MudSelectItem>
+            <MudSelectItem Value=@("AAA")>AAA</MudSelectItem>
+            <MudSelectItem Value=@("Jr. C")>Jr. C</MudSelectItem>
+            <MudSelectItem Value=@("Jr. B")>Jr. B</MudSelectItem>
+            <MudSelectItem Value=@("Jr. A or higher")>Jr.A or higher</MudSelectItem>
+        </MudSelect>
+
+        <div class="d-flex align-center justify-space-between">
+            <MudCheckBox T="bool" Label="I agree!" Required="true" />
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+        </div>
+    </MudStack>
+</EditForm>
+
+@code{
+    
+    [Parameter]
+    public EventCallback<RegisterFormModel> OnSubmit { get; set; }
+
+    RegisterFormModel model = new();
+
+    private void OnValidSubmit(EditContext editContext)
+    {
+        OnSubmit.InvokeAsync(editContext.Model as RegisterFormModel);
+    }
+
+}
