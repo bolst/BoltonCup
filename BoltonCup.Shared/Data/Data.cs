@@ -20,6 +20,7 @@ public interface IBCData
     Task<GameScore?> GetGameScoreById(int gameId);
     Task<IEnumerable<PlayerProfilePicture>> GetPlayerProfilePictures();
     Task<PlayerProfilePicture> GetPlayerProfilePictureById(int playerId);
+    Task<string> SubmitRegistration(RegisterFormModel form);
 }
 
 public class BCData : IBCData
@@ -568,6 +569,19 @@ public class BCData : IBCData
             await using var connection = new NpgsqlConnection(connectionString);
             return await connection.QueryFirstOrDefaultAsync<PlayerProfilePicture>(sql, new { PlayerId = id }) ?? new();
         }, cacheDuration);
+    }
+
+    public async Task<string> SubmitRegistration(RegisterFormModel form)
+    {
+        string sql = @"INSERT INTO
+                          registration (firstname, lastname, email, birthday, position, highestlevel)
+                        VALUES
+                          (@FirstName, @LastName, @Email, @Birthday, @Position, @HighestLevel)";
+
+        await using var connection = new NpgsqlConnection(connectionString);
+        var rowsAffected = await connection.ExecuteAsync(sql, form);
+
+        return rowsAffected == 0 ? "Something went wrong" : string.Empty;
     }
 
 

@@ -2,6 +2,7 @@ namespace BoltonCup.Shared.Data;
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
+using Blazored.LocalStorage;
 
 public interface ICacheService
 {
@@ -41,7 +42,25 @@ public class CacheService : ICacheService
         resetCacheToken.Dispose();
         resetCacheToken = new CancellationTokenSource();
     }
+}
 
+public class RegistrationStateService
+{
+    private ILocalStorageService _localStorageService;
 
+    public RegistrationStateService(ILocalStorageService localStorageService)
+    {
+        _localStorageService = localStorageService;
+    }
 
+    public async Task SetBrowserRegistered(bool state)
+    {
+        await _localStorageService.SetItemAsync("reg", state);
+    }
+
+    public async Task<bool> GetBrowserRegistered()
+    {
+        return await _localStorageService.GetItemAsync<bool>("reg");
+    }
+    
 }

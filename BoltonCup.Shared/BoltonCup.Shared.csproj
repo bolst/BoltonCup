@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
         <PackageReference Include="Dapper" Version="2.1.66" />
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.11"/>
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
@@ -21,13 +22,14 @@
 
     <ItemGroup>
       <AdditionalFiles Include="Components\Pages\Game.razor" />
-      <AdditionalFiles Include="Components\Pages\Home.razor" />
       <AdditionalFiles Include="Components\Pages\Info.razor" />
       <AdditionalFiles Include="Components\Pages\Player.razor" />
+      <AdditionalFiles Include="Components\Pages\Register.razor" />
       <AdditionalFiles Include="Components\Pages\Schedule.razor" />
       <AdditionalFiles Include="Components\Pages\Stats.razor" />
       <AdditionalFiles Include="Components\Pages\Team.razor" />
       <AdditionalFiles Include="Components\Pages\Teams.razor" />
+      <AdditionalFiles Include="Components\Shared\RegisterForm.razor" />
     </ItemGroup>
 
     <ItemGroup>
