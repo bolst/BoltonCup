@@ -45,5 +45,9 @@
     <_ContentIncludedByDefault Remove="wwwroot\images\bc-2024.webp" />
     <_ContentIncludedByDefault Remove="wwwroot\images\chris-doey.webp" />
     <_ContentIncludedByDefault Remove="wwwroot\images\scisoc.webp" />
+    <_ContentIncludedByDefault Remove="Components\Account\Pages\Auth.razor" />
+    <_ContentIncludedByDefault Remove="Components\Account\Pages\SignUp.razor" />
+    <_ContentIncludedByDefault Remove="Components\Account\Pages\_Imports.razor" />
+    <_ContentIncludedByDefault Remove="Components\Account\Shared\SignInCard.razor" />
   </ItemGroup>
 </Project>
