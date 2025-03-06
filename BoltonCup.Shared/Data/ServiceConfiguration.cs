@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Blazored.LocalStorage;
 
 namespace BoltonCup.Shared.Data;
 
@@ -8,7 +9,11 @@ public static class ServiceConfiguration
         this IServiceCollection services)
     {
         services.AddMemoryCache();
+        services.AddBlazoredLocalStorage();
+        
         services.AddSingleton<ICacheService, CacheService>();
+
+        services.AddScoped<RegistrationStateService>();
 
         services.AddScoped<IBCData>(sp =>
         {

@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "US8361TdSMw=",
+  "dgSpecHash": "k8BZcfXZABs=",
   "success": true,
   "projectFilePath": "/Users/nic/git/BoltonCup/BoltonCup.Shared/BoltonCup.Shared.csproj",
   "expectedPackageFiles": [
+    "/Users/nic/.nuget/packages/blazored.localstorage/4.5.0/blazored.localstorage.4.5.0.nupkg.sha512",
     "/Users/nic/.nuget/packages/dapper/2.1.66/dapper.2.1.66.nupkg.sha512",
     "/Users/nic/.nuget/packages/microsoft.aspnetcore.authorization/8.0.11/microsoft.aspnetcore.authorization.8.0.11.nupkg.sha512",
     "/Users/nic/.nuget/packages/microsoft.aspnetcore.components/8.0.11/microsoft.aspnetcore.components.8.0.11.nupkg.sha512",
