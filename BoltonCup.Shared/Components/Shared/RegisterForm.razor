@@ -7,7 +7,7 @@
         
         <MudTextField Label="Last Name" @bind-Value="model.LastName" For="@(() => model.LastName)" />
         
-        <MudTextField Label="Email" @bind-Value="model.Email" For="@(() => model.Email)" />
+        <MudTextField Label="Email" @bind-Value="model.Email" For="@(() => model.Email)" InputMode="InputMode.email" />
         
         <MudDatePicker Label="Birthday" @bind-Date="model.Birthday" For="@(() => model.Birthday)" MaxDate="DateTime.Today" OpenTo="OpenTo.Year" />
         
