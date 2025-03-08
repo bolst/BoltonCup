@@ -8,41 +8,32 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Class="d-none d-sm-flex" Color="Color.Primary">
-        <MudImage Class="mt-4 pr-4 clickable" @onclick="@NavToHome" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//boltoncup.png" Height="75" />
-        <MudButton Class="mud-theme-primary" Href="/" Variant="Variant.Text" Size="Size.Large">HOME</MudButton>
-        <MudButton Class="mud-theme-primary" Href="/info" Variant="Variant.Text" Size="Size.Large">INFO</MudButton>
-        <MudButton Class="mud-theme-primary" Href="/teams" Variant="Variant.Text" Size="Size.Large">TEAMS
-        </MudButton>
-        <MudButton Class="mud-theme-primary" Href="/schedule" Variant="Variant.Text" Size="Size.Large">SCHEDULE
-        </MudButton>
-        <MudButton Class="mud-theme-primary" Href="/stats" Variant="Variant.Text" Size="Size.Large">STATS
-        </MudButton>
+    <MudAppBar Color="Color.Primary">
         
-        <MudSpacer />
+        <MudImage Class="mt-4 pr-4 clickable" @onclick="@NavToHome" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//boltoncup.png" Height="75"/>
 
-        <MudButton Class="mud-theme-primary" Href="/register" Variant="Variant.Text" Size="Size.Large">REGISTER
-        </MudButton>
+        <div class="d-none d-md-block">
+            <MudButton Class="mud-theme-primary" Href="/" Variant="Variant.Text" Size="Size.Large">HOME</MudButton>
+            <MudButton Class="mud-theme-primary" Href="/info" Variant="Variant.Text" Size="Size.Large">INFO</MudButton>
+            <MudButton Class="mud-theme-primary" Href="/teams" Variant="Variant.Text" Size="Size.Large">TEAMS
+            </MudButton>
+            <MudButton Class="mud-theme-primary" Href="/schedule" Variant="Variant.Text" Size="Size.Large">SCHEDULE
+            </MudButton>
+            <MudButton Class="mud-theme-primary" Href="/stats" Variant="Variant.Text" Size="Size.Large">STATS
+            </MudButton>
+        </div>
+
+        <MudSpacer/>
+
+        <div class="d-block d-md-none">
+            <NavDrawer/>
+        </div>
+
+        <div class="d-none d-md-block">
+            <MudButton Class="mud-theme-primary" Href="/register" Variant="Variant.Text" Size="Size.Large">REGISTER</MudButton>
+        </div>
     </MudAppBar>
-    <MudAppBar Class="d-flex d-sm-none" Color="Color.Primary">
-        <MudImage Class="mt-8 pr-4 clickable" @onclick="@NavToHome" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//boltoncup.png" Height="75" />
-        <MudSpacer />
-        <SmallMenu />
-        @* <MudButton Class="mud-theme-primary" Href="/" Variant="Variant.Text" Size="Size.Large">HOME</MudButton>
-        <MudButton Class="mud-theme-primary" Href="/info" Variant="Variant.Text" Size="Size.Large">INFO</MudButton>
-        <MudButton Class="mud-theme-primary" Href="/teams" Variant="Variant.Text"
-        Size="Size.Large">TEAMS</MudButton>
-        <MudButton Class="mud-theme-primary" Href="/schedule" Variant="Variant.Text" Size="Size.Large">SCHEDULE
-        </MudButton>
-        <MudButton Class="mud-theme-primary" Href="/stats" Variant="Variant.Text"
-        Size="Size.Large">STATS</MudButton>
-
-        <MudSpacer />
-
-        <MudButton Class="mud-theme-primary" Href="/register" Variant="Variant.Text" Size="Size.Large">REGISTER
-        </MudButton> *@
-    </MudAppBar>
-
+        
     <MudMainContent>
         @Body
     </MudMainContent>
