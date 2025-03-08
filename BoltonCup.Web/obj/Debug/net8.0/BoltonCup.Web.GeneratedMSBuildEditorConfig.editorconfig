@@ -29,8 +29,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvTWFpbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Layout/SmallMenu.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvU21hbGxNZW51LnJhem9y
+[/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Layout/NavDrawer.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvTmF2RHJhd2VyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/nic/git/BoltonCup/BoltonCup.Web/Components/Pages/Home.razor]
