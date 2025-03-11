@@ -1,0 +1,102 @@
+@page "/admin"
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+@inject IBCData BCData
+
+<AuthorizeView Context="authContext">
+    <div class="py-10 px-6">
+        <MudTabs Centered>
+            <MudTabPanel Text="Pending">
+                @if (registrations is not null && registrationDetailsOpen is not null)
+                {
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Text">@ForwardRegCount F</MudChip>
+                    <MudChip T="string" Color="Color.Secondary" Variant="Variant.Text">@DefenseRegCount D</MudChip>
+                    <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieRegCount G</MudChip>
+                
+                    <MudDataGrid Items="@registrations" Hover>
+                        <Columns>
+                            <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
+                            <PropertyColumn Title="Email" Property="x => x.Email"/>
+                            <PropertyColumn Title="Position" Property="x => x.Position" />
+                            <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel"/>
+                            <TemplateColumn>
+                                <CellTemplate>
+                                    <ConfirmButton Color="Color.Success" OnClick="@(() => OnAdmit(context.Item))">Admit</ConfirmButton>
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                    </MudDataGrid>
+                }
+            </MudTabPanel>
+            <MudTabPanel Text="Admitted">
+                @if (accounts is not null)
+                {
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Text">@ForwardAccCount F</MudChip>
+                    <MudChip T="string" Color="Color.Secondary" Variant="Variant.Text">@DefenseAccCount D</MudChip>
+                    <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieAccCount G</MudChip>
+                    
+                    <MudDataGrid Items="@accounts" Hover>
+                        <Columns>
+                            <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
+                            <PropertyColumn Title="Email" Property="x => x.Email"/>
+                            <PropertyColumn Title="Position" Property="x => x.Position" />
+                            <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel"/>
+                            <TemplateColumn>
+                                <CellTemplate>
+                                    <ConfirmButton Color="Color.Error" ConfirmColor="Color.Error" OnClick="@(() => OnRemove(context.Item))">Remove</ConfirmButton>
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                    </MudDataGrid>
+                }
+            </MudTabPanel>
+        </MudTabs>
+    </div>
+</AuthorizeView>
+
+
+@code{
+
+    private IEnumerable<RegisterFormModel>? registrations;
+    private Dictionary<string, bool>? registrationDetailsOpen;
+
+    private IEnumerable<BCAccount>? accounts;
+
+    private int ForwardRegCount => registrations is null ? 0 : registrations.Count(r => r.Position == "forward");
+    private int DefenseRegCount => registrations is null ? 0 : registrations.Count(r => r.Position == "defense");
+    private int GoalieRegCount => registrations is null ? 0 : registrations.Count(r => r.Position == "goalie");    
+    
+    private int ForwardAccCount => accounts is null ? 0 : accounts.Count(r => r.Position == "forward");
+    private int DefenseAccCount => accounts is null ? 0 : accounts.Count(r => r.Position == "defense");
+    private int GoalieAccCount => accounts is null ? 0 : accounts.Count(r => r.Position == "goalie");
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (state.User.Identity is null || !state.User.Identity.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+
+        accounts = await BCData.GetAccountsAsync();
+        
+        registrations = (await BCData.GetRegistrationsAsync()).Where(r => accounts.All(a => a.Email != r.Email));
+        registrations = registrations.OrderBy(r => r.LastName);
+
+        registrationDetailsOpen = registrations.ToDictionary(r => r.Email, r => false);
+
+    }
+
+    private async Task OnAdmit(RegisterFormModel form)
+    {
+        string errorMessage = await BCData.AdmitUserAsync(form);
+    }
+
+    private async Task OnRemove(BCAccount account)
+    {
+        // string errorMessage = await BCData.RemoveAccountAsync(form);
+    }
+
+}

@@ -7,7 +7,7 @@
         
         <MudTextField Label="Last Name" @bind-Value="model.LastName" For="@(() => model.LastName)" />
         
-        <MudTextField Label="Email" @bind-Value="model.Email" For="@(() => model.Email)" InputMode="InputMode.email" />
+        <MudTextField Label="Email" @bind-Value="model.Email" For="@(() => model.Email)" InputType="InputType.Email" />
         
         <MudDatePicker Label="Birthday" @bind-Date="model.Birthday" For="@(() => model.Birthday)" MaxDate="DateTime.Today" OpenTo="OpenTo.Year" />
         
@@ -38,7 +38,7 @@
     [Parameter]
     public EventCallback<RegisterFormModel> OnSubmit { get; set; }
 
-    RegisterFormModel model = new();
+    private RegisterFormModel model = new();
 
     private void OnValidSubmit(EditContext editContext)
     {

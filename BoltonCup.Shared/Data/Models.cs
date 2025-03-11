@@ -162,3 +162,27 @@ public class RegisterFormModel
     [Required(ErrorMessage="This is required")] 
     public string HighestLevel { get; set; }
 }
+
+public class LoginFormModel
+{
+    [Required(ErrorMessage="Email is required")] 
+    public string Email { get; set; }
+
+    [Required(ErrorMessage="Password is required")] 
+    public string Password { get; set; }
+}
+
+public class BCAccount
+{
+    public string FirstName { get; set; }
+        
+    public string LastName { get; set; }
+        
+    public string Email { get; set; }
+        
+    public DateTime? Birthday { get; set; }
+        
+    public string Position { get; set; }
+        
+    public string HighestLevel { get; set; }
+}

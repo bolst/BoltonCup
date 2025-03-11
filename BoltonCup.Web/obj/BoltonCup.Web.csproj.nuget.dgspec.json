@@ -56,6 +56,10 @@
               "target": "Package",
               "version": "[8.0.11, )"
             },
+            "Microsoft.AspNetCore.DataProtection": {
+              "target": "Package",
+              "version": "[8.0.13, )"
+            },
             "Microsoft.Extensions.Caching.Memory": {
               "target": "Package",
               "version": "[8.0.1, )"
@@ -67,6 +71,10 @@
             "Npgsql": {
               "target": "Package",
               "version": "[8.0.6, )"
+            },
+            "Supabase": {
+              "target": "Package",
+              "version": "[1.1.1, )"
             }
           },
           "imports": [

@@ -21,6 +21,10 @@ public interface IBCData
     Task<IEnumerable<PlayerProfilePicture>> GetPlayerProfilePictures();
     Task<PlayerProfilePicture> GetPlayerProfilePictureById(int playerId);
     Task<string> SubmitRegistration(RegisterFormModel form);
+    Task<IEnumerable<RegisterFormModel>> GetRegistrationsAsync();
+    Task<string> AdmitUserAsync(RegisterFormModel form);
+    Task<IEnumerable<BCAccount>> GetAccountsAsync();
+
 }
 
 public class BCData : IBCData
@@ -573,6 +577,10 @@ public class BCData : IBCData
 
     public async Task<string> SubmitRegistration(RegisterFormModel form)
     {
+        form.FirstName = form.FirstName.ToLower();
+        form.LastName = form.LastName.ToLower();
+        form.Email = form.Email.ToLower();
+        
         string sql = @"INSERT INTO
                           registration (firstname, lastname, email, birthday, position, highestlevel)
                         VALUES
@@ -584,7 +592,45 @@ public class BCData : IBCData
         return rowsAffected == 0 ? "Something went wrong" : string.Empty;
     }
 
+    public async Task<IEnumerable<RegisterFormModel>> GetRegistrationsAsync()
+    {
+        string sql = @"SELECT
+                          *
+                        FROM
+                          registration";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<RegisterFormModel>(sql);
+    }
 
+    public async Task<string> AdmitUserAsync(RegisterFormModel form)
+    {
+        // check if user exists: if yes then do not admit
+        string checkSql = @"SELECT * FROM account WHERE email = @Email";
+        await using var connection = new NpgsqlConnection(connectionString);
+        var users = await connection.QueryAsync<RegisterFormModel>(checkSql, new { Email = form.Email });
+        if (users.Count() > 0)
+        {
+            return "User already admitted";
+        }
+        
+        string sql = @"INSERT INTO
+                          account (firstname, lastname, email, birthday, position, highestlevel)
+                        VALUES (@FirstName, @LastName, @Email, @Birthday, @Position, @HighestLevel)";
+        
+        var rowsAffected = await connection.ExecuteAsync(sql, form);
+
+        return rowsAffected == 0 ? "Something went wrong" : string.Empty;
+    }
+
+    public async Task<IEnumerable<BCAccount>> GetAccountsAsync()
+    {
+        string sql = @"SELECT
+                          *
+                        FROM
+                          account";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCAccount>(sql);
+    }
 }
 
 
