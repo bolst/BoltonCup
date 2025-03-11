@@ -46,21 +46,21 @@ public class CacheService : ICacheService
 
 public class RegistrationStateService
 {
-    private ILocalStorageService _localStorageService;
+    private readonly ICustomLocalStorageProvider _customLocalStorageProvider;
 
-    public RegistrationStateService(ILocalStorageService localStorageService)
+    public RegistrationStateService(ICustomLocalStorageProvider customLocalStorageService)
     {
-        _localStorageService = localStorageService;
+        _customLocalStorageProvider = customLocalStorageService;
     }
 
     public async Task SetBrowserRegistered(bool state)
     {
-        await _localStorageService.SetItemAsync("reg", state);
+        await _customLocalStorageProvider.SetAsync("reg", state);
     }
 
     public async Task<bool> GetBrowserRegistered()
     {
-        return await _localStorageService.GetItemAsync<bool>("reg");
+        return await _customLocalStorageProvider.GetAsync<bool>("reg");
     }
     
 }

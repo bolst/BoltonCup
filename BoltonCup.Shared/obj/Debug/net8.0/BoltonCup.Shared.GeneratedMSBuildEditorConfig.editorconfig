@@ -75,6 +75,10 @@ build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvUmVnaXN0ZXJG
 build_metadata.AdditionalFiles.CssScope = 
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Shared/ConfirmButton.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvQ29uZmlybUJ1dHRvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Shared/Countdown.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvQ291bnRkb3duLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 

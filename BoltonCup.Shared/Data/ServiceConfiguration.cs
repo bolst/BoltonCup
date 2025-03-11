@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Blazored.LocalStorage;
+using Supabase;
 
 namespace BoltonCup.Shared.Data;
 
@@ -9,11 +9,20 @@ public static class ServiceConfiguration
         this IServiceCollection services)
     {
         services.AddMemoryCache();
-        services.AddBlazoredLocalStorage();
         
         services.AddSingleton<ICacheService, CacheService>();
-
         services.AddScoped<RegistrationStateService>();
+        
+        services.AddScoped(provider =>
+        {
+            var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
+            var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+            
+            return new Supabase.Client(url, key, new SupabaseOptions
+            {
+                AutoConnectRealtime = true,
+            });
+        });
 
         services.AddScoped<IBCData>(sp =>
         {
