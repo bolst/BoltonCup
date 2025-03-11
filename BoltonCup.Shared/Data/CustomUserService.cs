@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.DataProtection;
-using Newtonsoft.Json;
 
 namespace BoltonCup.Shared.Data;
 
@@ -7,12 +6,10 @@ public class CustomUserService
 {
 
     private readonly ICustomLocalStorageProvider _customLocalStorageProvider;
-    private readonly IDataProtector _dataProtector;
 
-    public CustomUserService(ICustomLocalStorageProvider customLocalStorageProvider, IDataProtectionProvider dataProtectionProvider)
+    public CustomUserService(ICustomLocalStorageProvider customLocalStorageProvider)
     {
-        _customLocalStorageProvider = customLocalStorageProvider;
-        _dataProtector = dataProtectionProvider.CreateProtector("creds");
+        _customLocalStorageProvider = customLocalStorageProvider; 
     }
 
     public async Task PersistSessionToBrowserAsync(Supabase.Gotrue.Session session)
@@ -25,8 +22,8 @@ public class CustomUserService
                 return;
             }
             
-            await _customLocalStorageProvider.SetAsync("access", _dataProtector.Protect(session.AccessToken));
-            await _customLocalStorageProvider.SetAsync("refresh", _dataProtector.Protect(session.RefreshToken));
+            await _customLocalStorageProvider.SetAsync("access", session.AccessToken);
+            await _customLocalStorageProvider.SetAsync("refresh", session.RefreshToken);
         }
         catch (Exception e)
         {
@@ -46,9 +43,6 @@ public class CustomUserService
                 Console.WriteLine("No tokens found");
                 return (string.Empty, string.Empty);
             }
-
-            accessToken = _dataProtector.Unprotect(accessToken);
-            refreshToken = _dataProtector.Unprotect(refreshToken);
 
             return (accessToken, refreshToken);
         }
