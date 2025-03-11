@@ -13,10 +13,6 @@
       "PackagePath": "staticwebassets/background.png"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/exampleJsInterop.js",
-      "PackagePath": "staticwebassets/exampleJsInterop.js"
-    },
-    {
       "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/fonts/Lato-Bold.ttf",
       "PackagePath": "staticwebassets/fonts/Lato-Bold.ttf"
     },

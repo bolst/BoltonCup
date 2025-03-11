@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "MObGG/VAs4C3hclnCycfzwIIk/t+cyuyrlEd/yRgC9c=",
+  "Hash": "2NrtpEZEAwpkxrhdmGKll2tIFbWFIF9evqB9TCVdnV0=",
   "Source": "BoltonCup.Shared",
   "BasePath": "_content/BoltonCup.Shared",
   "Mode": "Default",
@@ -110,25 +110,6 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/BoltonCup.min.js"
-    },
-    {
-      "Identity": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/exampleJsInterop.js",
-      "SourceId": "BoltonCup.Shared",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/",
-      "BasePath": "_content/BoltonCup.Shared",
-      "RelativePath": "exampleJsInterop.js",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/exampleJsInterop.js"
     },
     {
       "Identity": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/fonts/Lato-Bold.ttf",

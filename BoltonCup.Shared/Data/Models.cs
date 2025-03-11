@@ -174,15 +174,11 @@ public class LoginFormModel
 
 public class BCAccount
 {
-    public string FirstName { get; set; }
-        
-    public string LastName { get; set; }
-        
-    public string Email { get; set; }
-        
+    public required string FirstName { get; set; }
+    public required string LastName { get; set; }
+    public required string Email { get; set; }
     public DateTime? Birthday { get; set; }
-        
-    public string Position { get; set; }
-        
-    public string HighestLevel { get; set; }
+    public required string Position { get; set; }
+    public required string HighestLevel { get; set; }
+    public required string ProfilePicture { get; set; }
 }

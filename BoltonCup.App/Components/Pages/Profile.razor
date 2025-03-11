@@ -9,7 +9,39 @@
 <div class="px-4 py-10">
     @if (account is not null)
     {
-        <MudText>@account.FirstName @account.LastName</MudText>
+    
+        <MudStack Justify="Justify.FlexEnd" Row>
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" />
+        </MudStack>
+    
+        <MudStack AlignItems="AlignItems.Start" Row>
+            <MudBadge BadgeClass="mt-n3 ml-n3" Origin="Origin.BottomRight" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Overlap>
+                <MudAvatar Class="clickable" Style="height: 100px; width: 100px;" @onclick="@OnEditProfilePicture">
+                    <MudImage Src="@account.ProfilePicture" Height="200"/>
+                </MudAvatar>
+            </MudBadge>
+
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6"><b>@account.FirstName @account.LastName</b></MudText>
+                <MudText Typo="Typo.caption">free agent</MudText>
+            </MudStack>
+        </MudStack>
+        
+        <MudStack Class="mt-5 mb-2" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Row>
+            <MudText Typo="Typo.subtitle1"><b>Games</b></MudText>
+            <MudLink Typo="Typo.caption"><b>Set Availability</b></MudLink>
+        </MudStack>
+
+        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="2">
+            <MudAvatar Style="height: 150px; width: 150px" Elevation="4" Rounded >
+                <MudIcon Icon="@Icons.Material.Filled.SportsHockey" Style="font-size: 4rem;" />
+            </MudAvatar>
+        
+            <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                <MudText Typo="Typo.subtitle2">No games yet</MudText>
+                <MudText Typo="Typo.caption">When you get drafted, your games will show up here</MudText>
+            </MudStack>
+        </MudStack>
         
         <ConfirmButton Color="Color.Error" ConfirmColor="Color.Error" OnClick="OnLogout">Log out</ConfirmButton>
     }
@@ -18,6 +50,7 @@
 @code {
 
     private BCAccount? account;
+    private PlayerProfilePicture? profilePicture;
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -31,6 +64,8 @@
             }
 
             var claim = state.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
+            if (claim is null) return;
+            
             account = await BCData.GetAccountByEmailAsync(claim.Value);
             
             StateHasChanged();
@@ -41,6 +76,10 @@
     {
         await CustomAuthenticationStateProvider.LogoutAsync();
         Navigation.NavigateTo("/");
+    }
+
+    private void OnEditProfilePicture()
+    {
     }
 
 }
