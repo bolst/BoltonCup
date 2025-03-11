@@ -24,6 +24,7 @@ public interface IBCData
     Task<IEnumerable<RegisterFormModel>> GetRegistrationsAsync();
     Task<string> AdmitUserAsync(RegisterFormModel form);
     Task<IEnumerable<BCAccount>> GetAccountsAsync();
+    Task<BCAccount?> GetAccountByEmailAsync(string email);
 
 }
 
@@ -630,6 +631,18 @@ public class BCData : IBCData
                           account";
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryAsync<BCAccount>(sql);
+    }
+
+    public async Task<BCAccount?> GetAccountByEmailAsync(string email)
+    {
+        string sql = @"SELECT
+                          *
+                        FROM
+                          account
+                        WHERE
+                          email = @Email";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryFirstOrDefaultAsync<BCAccount>(sql, new { Email = email });
     }
 }
 

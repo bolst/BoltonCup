@@ -1,0 +1,46 @@
+@page "/profile"
+
+@attribute [Authorize]
+
+@inject NavigationManager Navigation
+@inject CustomAuthenticationStateProvider CustomAuthenticationStateProvider
+@inject IBCData BCData
+
+<div class="px-4 py-10">
+    @if (account is not null)
+    {
+        <MudText>@account.FirstName @account.LastName</MudText>
+        
+        <ConfirmButton Color="Color.Error" ConfirmColor="Color.Error" OnClick="OnLogout">Log out</ConfirmButton>
+    }
+</div>
+
+@code {
+
+    private BCAccount? account;
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var state = await CustomAuthenticationStateProvider.GetAuthenticationStateAsync();
+
+            if (state.User.Identity is null || !state.User.Identity.IsAuthenticated || !state.User.HasClaim(x => x.Type == ClaimTypes.Email))
+            {
+                return;
+            }
+
+            var claim = state.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
+            account = await BCData.GetAccountByEmailAsync(claim.Value);
+            
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnLogout()
+    {
+        await CustomAuthenticationStateProvider.LogoutAsync();
+        Navigation.NavigateTo("/");
+    }
+
+}

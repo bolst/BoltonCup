@@ -2,7 +2,6 @@ using Blazored.LocalStorage;
 using MudBlazor.Services;
 using BoltonCup.Web.Components;
 using BoltonCup.Shared.Data;
-using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,13 +18,6 @@ builder.Services.AddScoped<ICustomLocalStorageProvider, BoltonCup.Web.Data.Custo
 
 // Core services
 builder.Services.AddBoltonCupServices();
-
-// Authorization
-builder.Services.AddAuthorization();
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<CustomUserService>();
-builder.Services.AddScoped<CustomAuthenticationStateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
 
 var app = builder.Build();
 

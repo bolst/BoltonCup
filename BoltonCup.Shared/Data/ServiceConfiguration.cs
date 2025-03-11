@@ -12,17 +12,6 @@ public static class ServiceConfiguration
         
         services.AddSingleton<ICacheService, CacheService>();
         services.AddScoped<RegistrationStateService>();
-        
-        services.AddScoped(provider =>
-        {
-            var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
-            var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
-            
-            return new Supabase.Client(url, key, new SupabaseOptions
-            {
-                AutoConnectRealtime = true,
-            });
-        });
 
         services.AddScoped<IBCData>(sp =>
         {
