@@ -10,31 +10,43 @@
 @* </AuthorizeView> *@
 
 <MudLayout>
+    <MudAppBar ToolBarClass="d-flex justify-space-between mt-8" Color="Color.Primary" Fixed>
+        <AuthorizeView>
+            <Authorized>
+                @* <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Person" Href="/profile" /> *@
+                <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Person" OnClick="@(() => drawerOpen = true)" />
+            </Authorized>
+            <NotAuthorized>
+                <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Login" Href="/login" />
+            </NotAuthorized>
+        </AuthorizeView>    
+    </MudAppBar>
+        <AuthorizeView>
+            <ProfileDrawer @bind-Open="drawerOpen" />
+        </AuthorizeView>
+    
     <MudMainContent Class="py-14" Style="height: 100vh;">
+        <div class="py-1">&nbsp;</div>
+
+        
         @Body
         
         <div class="py-10">&nbsp;</div>
     </MudMainContent>
+    
     <MudAppBar ToolBarClass="d-flex justify-space-between mb-4" Color="Color.Primary" Bottom Fixed>
         <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Home" Href="/"/>
         <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Info" Href="/info"/>
         <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.People" Href="/teams"/>
         <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.CalendarMonth" Href="/schedule"/>
         <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.BarChart" Href="/stats"/>
-        <AuthorizeView>
-            <Authorized>
-                <MudIconButton Color="Color.Secondary" Variant="Variant.Text" Icon="@Icons.Material.Filled.Person" Href="/profile" />
-            </Authorized>
-            <NotAuthorized>
-                <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Login" Href="/login" />
-            </NotAuthorized>
-        </AuthorizeView>
     </MudAppBar>
 </MudLayout>
 
 @code {
     private bool _isDarkMode = false;
     private MudTheme? _theme = null;
+    private bool drawerOpen;
 
     protected override void OnInitialized()
     {

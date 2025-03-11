@@ -1,0 +1,27 @@
+
+<MudDrawer @bind-Open="@DrawerOpen" Class="pt-20" Elevation="1" OverlayAutoClose>
+    <MudNavMenu>
+        <MudNavLink Match="NavLinkMatch.All" Href="/profile">Profile</MudNavLink>
+    </MudNavMenu>
+</MudDrawer>
+
+@code{
+    
+    [Parameter]
+    public bool Open { get; set; }
+
+    [Parameter] 
+    public EventCallback<bool> OpenChanged { get; set; }
+
+    private bool DrawerOpen
+    {
+        get => Open;
+        set
+        {
+            Open = value;
+            OpenChanged.InvokeAsync(value);
+        }
+    }
+    
+    
+}
