@@ -1,0 +1,62 @@
+<MudDrawer @bind-Open="@DrawerOpen" Width="100%" Anchor="Anchor.End" Variant="DrawerVariant.Temporary" Color="Color.Primary">
+    <MudDrawerHeader>
+        <MudGrid Class="mt-8">
+            <MudItem Class="d-flex align-center" xs="2">
+                <MudIconButton Color="Color.Inherit" Icon="@Icons.Material.Filled.ArrowBackIosNew" OnClick="@(() => DrawerOpen = false)" Size="Size.Small" />
+            </MudItem>
+            <MudItem Class="d-flex align-center justify-center" xs="8">
+                <MudText Typo="Typo.subtitle1"><b>Edit Profile Picture</b></MudText>
+            </MudItem>
+            <MudItem xs="2">
+                &nbsp;
+            </MudItem>
+        </MudGrid>
+    </MudDrawerHeader>
+    <div class="px-4">
+
+        <MudStack AlignItems="AlignItems.Center">
+            <MudAvatar Style="height: 100px; width: 100px;">
+                <MudImage Src="@ImageSrc" Height="200"/>
+            </MudAvatar>
+        </MudStack>
+
+        <MudStack Class="mt-10" AlignItems="AlignItems.Start">
+            <MudButton StartIcon="@Icons.Material.Filled.PhotoLibrary" Color="Color.Inherit" OnClick="OnUploadFromLibrary">Choose from library</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.PhotoCamera" Color="Color.Inherit" OnClick="OnTakePhoto">Take Photo</MudButton>
+        </MudStack>
+
+    </div>
+</MudDrawer>
+
+@code{
+
+    [Parameter]
+    public bool Open { get; set; }
+    
+    [Parameter]
+    public EventCallback<bool> OpenChanged { get; set; }
+
+    [Parameter] 
+    public string ImageSrc { get; set; } = string.Empty;
+
+    private bool DrawerOpen
+    {
+        get => Open;
+        set
+        {
+            Open = value;
+            OpenChanged.InvokeAsync(value);
+        }
+    }
+
+    private async Task OnUploadFromLibrary()
+    {
+        
+    }
+
+    private async Task OnTakePhoto()
+    {
+        
+    }
+
+}
