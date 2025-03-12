@@ -9,14 +9,15 @@
 <div class="px-4 py-10">
     @if (account is not null)
     {
-    
+        <EditProfilePictureDrawer @bind-Open="drawerOpen" ImageSrc="@account.ProfilePicture" />
+
         <MudStack Justify="Justify.FlexEnd" Row>
             <MudIconButton Icon="@Icons.Material.Filled.Settings" />
         </MudStack>
     
         <MudStack AlignItems="AlignItems.Start" Row>
             <MudBadge BadgeClass="mt-n3 ml-n3" Origin="Origin.BottomRight" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Overlap>
-                <MudAvatar Class="clickable" Style="height: 100px; width: 100px;" @onclick="@OnEditProfilePicture">
+                <MudAvatar Class="clickable" Style="height: 100px; width: 100px;" @onclick="@(() => drawerOpen = true)">
                     <MudImage Src="@account.ProfilePicture" Height="200"/>
                 </MudAvatar>
             </MudBadge>
@@ -51,6 +52,7 @@
 
     private BCAccount? account;
     private PlayerProfilePicture? profilePicture;
+    private bool drawerOpen;
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -76,10 +78,6 @@
     {
         await CustomAuthenticationStateProvider.LogoutAsync();
         Navigation.NavigateTo("/");
-    }
-
-    private void OnEditProfilePicture()
-    {
     }
 
 }
