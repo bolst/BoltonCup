@@ -20,6 +20,8 @@ build_property.SupportLocalizedComponentNames =
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
 build_property.MSBuildProjectDirectory = /Users/nic/git/BoltonCup/BoltonCup.Shared
 build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
 
 [/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Pages/Game.razor]
 build_metadata.AdditionalFiles.TargetPath = 

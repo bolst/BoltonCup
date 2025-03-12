@@ -16,6 +16,10 @@ public static class ServiceConfiguration
         services.AddScoped<IBCData>(sp =>
         {
             var connectionString = Environment.GetEnvironmentVariable("SB_CSTRING");
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException("SET YOUR ENV VARIABLES!\n");
+            }
             var cacheService = sp.GetRequiredService<ICacheService>();
             return new BCData(connectionString!, cacheService);
         });

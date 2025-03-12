@@ -1,4 +1,5 @@
-﻿using Blazored.LocalStorage;
+﻿using System.Diagnostics;
+using Blazored.LocalStorage;
 using BoltonCup.Shared.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;
@@ -31,6 +32,11 @@ public static class MauiProgram
 		{
 			var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
 			var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+
+			if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(key))
+			{
+				throw new InvalidOperationException("SET YOUR ENV VARIABLES!\n");
+			}
             
 			return new Supabase.Client(url, key, new SupabaseOptions
 			{

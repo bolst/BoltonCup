@@ -22,3 +22,6 @@
 /Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/ref/BoltonCup.Shared.dll
 /Users/nic/git/BoltonCup/BoltonCup.Shared/bin/Debug/net8.0/Microsoft.AspNetCore.Components.Authorization.dll
 /Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/BoltonCu.43B775AD.Up2Date
+/Users/nic/git/BoltonCup/BoltonCup.Shared/bin/Debug/net8.0/BoltonCup.Shared.staticwebassets.endpoints.json
+/Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/staticwebassets.build.endpoints.json
+/Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/staticwebassets/msbuild.BoltonCup.Shared.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
