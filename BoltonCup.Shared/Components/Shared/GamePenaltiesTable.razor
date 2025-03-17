@@ -1,3 +1,5 @@
+@inject IBCData BCData
+
 @if (Penalties is not null)
 {
     <MudSimpleTable Class="mb-6" Hover="true" Dense="true" Striped="true" Elevation="0">
@@ -12,7 +14,7 @@
         @foreach (Data.GamePenalty penalty in Penalties)
             {
                 <tr>
-                    <th><MudImage Src=@($"logos/logo-{penalty.TeamId}.png") Height="40" /></th>
+                    <th><MudImage Src="@(TeamLogoById(penalty.TeamId))" Height="40" /></th>
                     <th>@penalty.Time.ToString(@"hh\:mm")</th>
                     <th>@penalty.PlayerName - @penalty.Infraction</th>
                 </tr>
@@ -24,5 +26,14 @@
 
 @code {
     [Parameter] public IEnumerable<Data.GamePenalty>? Penalties { get; set; }
+    
+    private IEnumerable<Team>? teams;
 
+    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.Id == id)?.LogoUrl ?? string.Empty);
+
+    protected override async Task OnInitializedAsync()
+    {
+        teams = await BCData.GetTeams();
+    }
+    
 }

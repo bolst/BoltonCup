@@ -19,7 +19,7 @@
                 </MudText>
 
                 <MudStack Class="d-flex align-center" Row="true">
-                    <MudImage Src=@($"logos/logo-{selectedSkater.TeamId}.png") Height="50" />
+                    <MudImage Src="@(TeamLogoById(selectedSkater.TeamId))" Height="50" />
                     <MudDivider Vertical="true" FlexItem="true" />
                     <MudText Typo="Typo.body1">#@selectedSkater.PlayerNumber</MudText>
                     <MudDivider Vertical="true" FlexItem="true" />
@@ -74,9 +74,21 @@ else
     private IEnumerable<Data.PlayerStatline>? orderedSkaters { get; set; }
     private Data.PlayerStatline? selectedSkater;
     private IEnumerable<Data.PlayerProfilePicture>? profilePictures;
+    private IEnumerable<Team>? teams;
 
-
+    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.Id == id)?.LogoUrl ?? string.Empty);
+    
     protected override async Task OnInitializedAsync()
+    {
+        var profilePicTask = BCData.GetPlayerProfilePictures();
+        var teamsTask = BCData.GetTeams();
+        await Task.WhenAll(profilePicTask, teamsTask);
+        
+        profilePictures = profilePicTask.Result;
+        teams = teamsTask.Result;
+    }
+
+    protected override void OnParametersSet()
     {
         orderedSkaters = StatValue is null ? Skaters : Skaters?.OrderBy(s => StatValue(s));
         if (!Ascending)
@@ -84,7 +96,6 @@ else
             orderedSkaters = orderedSkaters?.Reverse();
         }
         selectedSkater = orderedSkaters?.First();
-        profilePictures = await BCData.GetPlayerProfilePictures();
     }
 
     private Variant skaterButtonVariant(Data.PlayerStatline skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?

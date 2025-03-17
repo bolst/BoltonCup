@@ -19,9 +19,9 @@
                     <th>@summary.GameDate.ToString("MMM dd/yy")</th>
                     <th>
                         <MudStack Class="d-flex align-center" Row="true">
-                            <MudImage Src=@($"logos/logo-{summary.TeamId}.png") Height="30" />
+                            <MudImage Src="@TeamLogoById(summary.TeamId)" Height="30" />
                             vs.
-                            <MudImage Src=@($"logos/logo-{summary.OpponentTeamId}.png") Height="30" />
+                            <MudImage Src="@TeamLogoById(summary.OpponentTeamId)" Height="30" />
                         </MudStack>
                     </th>
                     <th>@summary.Goals</th>
@@ -36,9 +36,13 @@
 @code {
     [Parameter] public int PlayerId { get; set; }
     private IEnumerable<Data.PlayerGameSummary>? playerGameByGame;
+    private IEnumerable<Team>? teams;
+
+    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.Id == id)?.LogoUrl ?? string.Empty);
 
     protected override async Task OnInitializedAsync()
     {
         playerGameByGame = await BCData.GetPlayerGameByGame(PlayerId);
+        teams = await BCData.GetTeams();
     }
 }

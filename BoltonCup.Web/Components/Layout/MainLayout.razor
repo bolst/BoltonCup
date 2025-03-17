@@ -8,18 +8,18 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Color="Color.Primary">
+    <MudAppBar>
         
         <MudImage Class="mt-4 pr-4 clickable" @onclick="@NavToHome" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//boltoncup.png" Height="75"/>
 
         <div class="d-none d-md-block">
-            <MudButton Class="mud-theme-primary" Href="/" Variant="Variant.Text" Size="Size.Large">HOME</MudButton>
-            <MudButton Class="mud-theme-primary" Href="/info" Variant="Variant.Text" Size="Size.Large">INFO</MudButton>
-            <MudButton Class="mud-theme-primary" Href="/teams" Variant="Variant.Text" Size="Size.Large">TEAMS
+            <MudButton Color="Color.Inherit" Href="/" Variant="Variant.Text" Size="Size.Large">HOME</MudButton>
+            <MudButton Color="Color.Inherit" Href="/info" Variant="Variant.Text" Size="Size.Large">INFO</MudButton>
+            <MudButton Color="Color.Inherit" Href="/teams" Variant="Variant.Text" Size="Size.Large">TEAMS
             </MudButton>
-            <MudButton Class="mud-theme-primary" Href="/schedule" Variant="Variant.Text" Size="Size.Large">SCHEDULE
+            <MudButton Color="Color.Inherit" Href="/schedule" Variant="Variant.Text" Size="Size.Large">SCHEDULE
             </MudButton>
-            <MudButton Class="mud-theme-primary" Href="/stats" Variant="Variant.Text" Size="Size.Large">STATS
+            <MudButton Color="Color.Inherit" Href="/stats" Variant="Variant.Text" Size="Size.Large">STATS
             </MudButton>
         </div>
 
@@ -30,7 +30,7 @@
         </div>
 
         <div class="d-none d-md-block">
-            <MudButton Class="mud-theme-primary" Href="/register" Variant="Variant.Text" Size="Size.Large">REGISTER</MudButton>
+            <MudButton Color="Color.Inherit" Href="/register" Variant="Variant.Text" Size="Size.Large">REGISTER</MudButton>
         </div>
     </MudAppBar>
         
@@ -41,19 +41,14 @@
 
 
 @code {
-    private bool _isDarkMode = false;
+    private bool _isDarkMode = true;
     private MudTheme? _theme = null;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        _theme = new()
-            {
-                PaletteLight = _lightPalette,
-                PaletteDark = _darkPalette,
-                LayoutProperties = new LayoutProperties()
-            };
+        _theme = new CustomThemeProvider().Theme;
     }
 
     private void DarkModeToggle()

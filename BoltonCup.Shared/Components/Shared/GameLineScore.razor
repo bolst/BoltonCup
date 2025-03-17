@@ -15,7 +15,7 @@
     <tbody>
         <tr>
             <th>
-                <MudImage Src=@($"logos/logo-{Game.HomeTeamId}.png") Height="50" />
+                <MudImage Src="@(TeamLogoById(Game.HomeTeamId))" Height="50" />
             </th>
             <th>@Goals.Where(g => g.TeamId == Game.HomeTeamId && g.Period == 1).Count()</th>
             <th>@Goals.Where(g => g.TeamId == Game.HomeTeamId && g.Period == 2).Count()</th>
@@ -24,7 +24,7 @@
         </tr>
         <tr>
             <th>
-                <MudImage Src=@($"logos/logo-{Game.AwayTeamId}.png") Height="50" />
+                <MudImage Src="@(TeamLogoById(Game.AwayTeamId))" Height="50" />
             </th>
             <th>@Goals.Where(g => g.TeamId == Game.AwayTeamId && g.Period == 1).Count()</th>
             <th>@Goals.Where(g => g.TeamId == Game.AwayTeamId && g.Period == 2).Count()</th>
@@ -40,10 +40,19 @@
 
     private Data.ScheduledGame? Game;
     private IEnumerable<Data.GameGoal>? Goals;
+    
+    private IEnumerable<Team>? teams;
+    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.Id == id)?.LogoUrl ?? string.Empty);
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        Game = await BCData.GetGameById(GameId);
-        Goals = await BCData.GetGameGoalsByGameId(GameId);
+        var gameTask = BCData.GetGameById(GameId);
+        var goalsTask = BCData.GetGameGoalsByGameId(GameId);
+        var teamsTask = BCData.GetTeams();
+        await Task.WhenAll(gameTask, goalsTask, teamsTask);
+        
+        Game = gameTask.Result;
+        Goals = goalsTask.Result;
+        teams = teamsTask.Result;
     }
 }

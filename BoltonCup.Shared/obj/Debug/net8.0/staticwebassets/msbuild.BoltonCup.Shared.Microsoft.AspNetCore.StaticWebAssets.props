@@ -48,8 +48,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>rk8kdv2j45</Fingerprint>
-      <Integrity>a1EaCVHQsvMnVaZHhM0hkBjJKDpTkRUp1HeDHms7LZA=</Integrity>
+      <Fingerprint>bjm10frrrd</Fingerprint>
+      <Integrity>qcv41bV5z1TNtKox+i3P2EVGOwzxhJF+XQ9Z6A4CNbU=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\BoltonCup.min.js'))</OriginalItemSpec>

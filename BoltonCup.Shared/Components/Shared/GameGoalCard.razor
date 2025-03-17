@@ -15,7 +15,7 @@
                 <b>@Goal.ScorerName</b>
             </MudText>
             <MudStack Class="d-flex align-center" Row="true" Spacing="0">
-                <MudImage Src=@($"logos/logo-{Goal.TeamId}.png") Height="40" />
+                <MudImage Src="@teamLogo" Height="40" />
                 <MudText Typo="Typo.body2">@assistLabel(Goal)</MudText>
             </MudStack>
         </MudStack>
@@ -25,7 +25,7 @@
         @if (ShowTime)
             {
 
-                <MudPaper Class="pa-2 gray lighten-2" Elevation="0">
+                <MudPaper Class="pa-2 mud-theme-surface" Elevation="0">
                     <MudStack Class="d-flex justify-center" Spacing="0">
                         <MudText Class="d-flex justify-center" Typo="Typo.body1"><b>@Goal.Time.ToString(@"hh\:mm")</b></MudText>
                         <MudText Class="d-flex justify-center" Typo="Typo.body2">Time</MudText>
@@ -42,10 +42,15 @@
     [Parameter] public bool ShowTime { get; set; } = true;
 
     private Data.PlayerProfilePicture? profilePicture;
-
-    protected override async Task OnInitializedAsync()
+    private string teamLogo = string.Empty;
+    
+    protected override async Task OnParametersSetAsync()
     {
-        if (Goal is not null) profilePicture = await BCData.GetPlayerProfilePictureById(Goal.ScorerId);
+        if (Goal is not null)
+        {
+            profilePicture = await BCData.GetPlayerProfilePictureById(Goal.ScorerId);
+            teamLogo = (await BCData.GetTeams()).FirstOrDefault(x => x.Id == Goal.TeamId)?.LogoUrl ?? string.Empty;
+        }
     }
 
     private string assistLabel(Data.GameGoal goal)

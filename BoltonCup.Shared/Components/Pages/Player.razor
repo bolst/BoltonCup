@@ -15,7 +15,7 @@
                 
             }
             <MudDivider Class="d-none d-sm-flex mx-2" Vertical="true" FlexItem="true" />
-            <MudImage Src=@($"logos/logo-{profile.CurrentTeamId}.png") Height="80" />
+            <MudImage Src="@TeamLogoById(profile.CurrentTeamId)" Height="80" />
             <MudDivider Class="mx-2" Vertical="true" FlexItem="true" />
             <MudText Typo="Typo.h2">#@profile.JerseyNumber</MudText>
             <MudDivider Class="mx-2" Vertical="true" FlexItem="true" />
@@ -78,10 +78,19 @@
 
     private PlayerProfile? profile;
     private PlayerProfilePicture? profilePicture;
+    private IEnumerable<Data.Team>? teams;
 
-    protected override async Task OnInitializedAsync()
+    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.Id == id)?.LogoUrl ?? string.Empty);
+
+    protected override async Task OnParametersSetAsync()
     {
-        profile = await BCData.GetPlayerProfileById(Id);
-        profilePicture = await BCData.GetPlayerProfilePictureById(Id);
+        var profileTask = BCData.GetPlayerProfileById(Id);
+        var profilePicTask = BCData.GetPlayerProfilePictureById(Id);
+        var teamsTask = BCData.GetTeams();
+        await Task.WhenAll(profileTask, profilePicTask, teamsTask);
+        
+        profile = profileTask.Result;
+        profilePicture = profilePicTask.Result;
+        teams = teamsTask.Result;
     }
 }

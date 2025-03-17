@@ -3,7 +3,7 @@
 
 @if (selectedSkater is not null && selectedGoalie is not null)
 {
-    <MudPaper Class="pa-2 rounded-lg" Style="height: 100%; background-color: var(--mud-palette-gray-light);">
+    <MudPaper Class="pa-2 rounded-lg" Style="height: 100%;" Color="Color.Surface">
         <MudText Color="Color.Secondary"><b>@StatType</b></MudText>
 
         <MudGrid Class="pb-2">
@@ -31,7 +31,7 @@
                 @foreach (var goalie in goalieStats!.Take(5))
                 {
                     int playerRank = ++rank;
-                    <MudButton OnClick=@(() => selectedGoalie = goalie) Variant="@goalieButtonVariant(goalie)">
+                    <MudButton Color="Color.Primary" OnClick=@(() => selectedGoalie = goalie) Variant="@goalieButtonVariant(goalie)">
                         <MudStack Class="d-flex flex-grow-1" Row="true">
                             <MudText>@playerRank</MudText>
                             <MudText Class="d-flex flex-grow-1">@goalie.Name</MudText>
@@ -48,7 +48,7 @@
                 @foreach (var skater in skaterStats!.Take(5))
                 {
                     int playerRank = ++rank;
-                    <MudButton Color="Color.Surface" OnClick=@(() => selectedSkater = skater) Variant="@skaterButtonVariant(skater)">
+                    <MudButton Color="Color.Primary" OnClick=@(() => selectedSkater = skater) Variant="@skaterButtonVariant(skater)">
                         <MudStack Class="d-flex flex-grow-1" Row="true">
                             <MudText>@playerRank</MudText>
                             <MudText Class="d-flex flex-grow-1">@skater.Name</MudText>
@@ -116,8 +116,12 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        skaterStats = await BCData.GetPlayerStats();
-        goalieStats = await BCData.GetGoalieStats();
+        var skaterStatTask = BCData.GetPlayerStats();
+        var goalieStatTask = BCData.GetGoalieStats();
+        await Task.WhenAll(skaterStatTask, goalieStatTask);
+        
+        skaterStats = skaterStatTask.Result;
+        goalieStats = goalieStatTask.Result;
 
         OrderStats();
 
@@ -148,7 +152,7 @@
     }
 
     private Variant skaterButtonVariant(BoltonCup.Shared.Data.PlayerStatline skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
-        Variant.Filled : Variant.Outlined;    
+        Variant.Filled : Variant.Text;    
     private Variant goalieButtonVariant(BoltonCup.Shared.Data.GoalieStatline goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
-        Variant.Filled : Variant.Outlined;
+        Variant.Filled : Variant.Text;
 }

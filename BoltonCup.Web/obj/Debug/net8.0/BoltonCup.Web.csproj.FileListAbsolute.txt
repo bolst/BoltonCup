@@ -72,3 +72,7 @@
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/System.Security.Cryptography.Pkcs.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/System.Security.Cryptography.Xml.dll
 /Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/runtimes/win/lib/net8.0/System.Security.Cryptography.Pkcs.dll
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Shared.staticwebassets.endpoints.json
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/BoltonCup.Web.staticwebassets.endpoints.json
+/Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/staticwebassets.build.endpoints.json
+/Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/staticwebassets/msbuild.BoltonCup.Web.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
