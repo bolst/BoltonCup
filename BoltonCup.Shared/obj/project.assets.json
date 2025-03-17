@@ -815,7 +815,7 @@
         }
       }
     },
-    "net8.0/iossimulator-arm64": {
+    "net8.0/ios-arm64": {
       "Blazored.LocalStorage/4.5.0": {
         "type": "package",
         "dependencies": {
@@ -2894,7 +2894,7 @@
       }
     },
     "runtimes": {
-      "iossimulator-arm64": {
+      "ios-arm64": {
         "#import": []
       }
     }

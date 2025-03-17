@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "pvWEpTvaX3jY4oZHCDIdSuAgU5VZmdu1h6Tp1EB1OIQ=",
+  "Hash": "dLtuLMUyDAo6Ea5/MMBNaqc+JvxZUGWF/0qATqvAlfo=",
   "Source": "BoltonCup.Shared",
   "BasePath": "_content/BoltonCup.Shared",
   "Mode": "Default",
@@ -115,8 +115,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "rk8kdv2j45",
-      "Integrity": "a1EaCVHQsvMnVaZHhM0hkBjJKDpTkRUp1HeDHms7LZA=",
+      "Fingerprint": "bjm10frrrd",
+      "Integrity": "qcv41bV5z1TNtKox+i3P2EVGOwzxhJF+XQ9Z6A4CNbU=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/BoltonCup.min.js"
@@ -511,6 +511,51 @@
       ]
     },
     {
+      "Route": "BoltonCup.min.bjm10frrrd.js",
+      "AssetFile": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1692"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"qcv41bV5z1TNtKox+i3P2EVGOwzxhJF+XQ9Z6A4CNbU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 17 Mar 2025 04:00:23 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "bjm10frrrd"
+        },
+        {
+          "Name": "label",
+          "Value": "BoltonCup.min.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-qcv41bV5z1TNtKox+i3P2EVGOwzxhJF+XQ9Z6A4CNbU="
+        }
+      ]
+    },
+    {
       "Route": "BoltonCup.min.css",
       "AssetFile": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.css",
       "Selectors": [],
@@ -558,7 +603,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1664"
+          "Value": "1692"
         },
         {
           "Name": "Content-Type",
@@ -566,11 +611,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"a1EaCVHQsvMnVaZHhM0hkBjJKDpTkRUp1HeDHms7LZA=\""
+          "Value": "\"qcv41bV5z1TNtKox+i3P2EVGOwzxhJF+XQ9Z6A4CNbU=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 12 Mar 2025 18:52:49 GMT"
+          "Value": "Mon, 17 Mar 2025 04:00:23 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -580,52 +625,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-a1EaCVHQsvMnVaZHhM0hkBjJKDpTkRUp1HeDHms7LZA="
-        }
-      ]
-    },
-    {
-      "Route": "BoltonCup.min.rk8kdv2j45.js",
-      "AssetFile": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.js",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1664"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/javascript"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"a1EaCVHQsvMnVaZHhM0hkBjJKDpTkRUp1HeDHms7LZA=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Wed, 12 Mar 2025 18:52:49 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "rk8kdv2j45"
-        },
-        {
-          "Name": "label",
-          "Value": "BoltonCup.min.js"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-a1EaCVHQsvMnVaZHhM0hkBjJKDpTkRUp1HeDHms7LZA="
+          "Value": "sha256-qcv41bV5z1TNtKox+i3P2EVGOwzxhJF+XQ9Z6A4CNbU="
         }
       ]
     },

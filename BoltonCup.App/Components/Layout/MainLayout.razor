@@ -9,55 +9,70 @@
 @*     <MudButton Class="mud-theme-primary" Href="/admin" Variant="Variant.Text" Size="Size.Large">Admin</MudButton> *@
 @* </AuthorizeView> *@
 
-<MudLayout>
-    <MudAppBar ToolBarClass="d-flex justify-space-between mt-8" Color="Color.Primary" Fixed>
-        <AuthorizeView>
-            <Authorized>
-                @* <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Person" Href="/profile" /> *@
-                <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Person" OnClick="@(() => drawerOpen = true)" />
-            </Authorized>
-            <NotAuthorized>
-                <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Login" Href="/login" />
-            </NotAuthorized>
-        </AuthorizeView>    
-    </MudAppBar>
-        <AuthorizeView>
-            <ProfileDrawer @bind-Open="drawerOpen" />
-        </AuthorizeView>
-    
-    <MudMainContent Class="py-14" Style="height: 100vh;">
-        <div class="py-1">&nbsp;</div>
 
+<CascadingValue Value="this">
+    <MudLayout>
+        <MudAppBar ToolBarClass="d-flex justify-space-between mt-4 pt-10" Fixed>
+            <AuthorizeView>
+                <Authorized>
+                    @if (profileLayout)
+                    {
+                        <MudSpacer />
+                        <MudIconButton Icon="@Icons.Material.Filled.Settings" OnClick="@(() => settingsDrawerOpen = true)" />
+                    }
+                    else
+                    {
+                        <MudIconButton Color="Color.Inherit" Icon="@Icons.Material.Filled.Person" ClickPropagation="false" OnClick="@(() => profileDrawerOpen = true)" />
+                    }
+                </Authorized>
+                <NotAuthorized>
+                    <MudIconButton Color="Color.Inherit" Icon="@Icons.Material.Filled.Login" ClickPropagation="false" Href="/login" />
+                </NotAuthorized>
+            </AuthorizeView>
+
+        </MudAppBar>
         
-        @Body
+        <AuthorizeView>
+            <ProfileDrawer @bind-Open="profileDrawerOpen" />
+            <SettingsDrawer @bind-Open="settingsDrawerOpen" />
+        </AuthorizeView>
         
-        <div class="py-10">&nbsp;</div>
-    </MudMainContent>
-    
-    <MudAppBar ToolBarClass="d-flex justify-space-between mb-4" Color="Color.Primary" Bottom Fixed>
-        <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Home" Href="/"/>
-        <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.Info" Href="/info"/>
-        <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.People" Href="/teams"/>
-        <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.CalendarMonth" Href="/schedule"/>
-        <MudIconButton Class="mud-theme-primary" Icon="@Icons.Material.Filled.BarChart" Href="/stats"/>
-    </MudAppBar>
-</MudLayout>
+        <MudMainContent Class="py-12" Style="height: 100vh;">
+            <div class="py-4">&nbsp;</div>
+
+            
+            @Body
+            
+            <div class="py-14">&nbsp;</div>
+        </MudMainContent>
+        
+        <MudAppBar ToolBarClass="d-flex justify-space-between" Bottom Fixed>
+            <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.Home" ClickPropagation="false" Href="/" />
+            <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.Info" ClickPropagation="false" Href="/info" />
+            <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.People" ClickPropagation="false" Href="/teams" />
+            <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.CalendarMonth" ClickPropagation="false" Href="/schedule" />
+            @* <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.BarChart" ClickPropagation="false" Href="/stats" /> *@
+        </MudAppBar>
+    </MudLayout>
+</CascadingValue>
 
 @code {
-    private bool _isDarkMode = false;
+    private bool _isDarkMode = true;
     private MudTheme? _theme = null;
-    private bool drawerOpen;
+    private bool profileDrawerOpen;
+    private bool settingsDrawerOpen;
+
+    public bool profileLayout = false;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        _theme = new()
-            {
-                PaletteLight = _lightPalette,
-                PaletteDark = _darkPalette,
-                LayoutProperties = new LayoutProperties()
-            };
+        var layoutProperties = new LayoutProperties()
+        {
+            AppbarHeight = "100px"
+        };
+        _theme = new CustomThemeProvider(layoutProperties).Theme;
     }
 
     private void DarkModeToggle()
@@ -65,54 +80,6 @@
         _isDarkMode = !_isDarkMode;
         StateHasChanged();
     }
-
-    private readonly PaletteLight _lightPalette = new()
-        {
-            Primary = "#3364BE",
-            Secondary = "#EB443A",
-            Black = "#ffffff",
-            Tertiary = "#000000",
-            AppbarText = "#D1C4E9",
-            AppbarBackground = "#000000",
-            DrawerBackground = "#ffffff",
-            GrayLight = "#e8e8e8",
-            GrayLighter = "#f9f9f9",
-            Dark = "#e0e0e0",
-            DarkContrastText = "#2e2e2e"
-        };
-
-    private readonly PaletteDark _darkPalette = new()
-        {
-            Primary = "#1ef2e2",
-            Surface = "#1e1e2d",
-            Background = "#000000",
-            BackgroundGray = "#151521",
-            AppbarText = "#311B92",
-            AppbarBackground = "rgba(245,239,255,0.75)",
-            DrawerBackground = "#1a1a27",
-            ActionDefault = "#74718e",
-            ActionDisabled = "#9999994d",
-            ActionDisabledBackground = "#605f6d4d",
-            TextPrimary = "#b2b0bf",
-            TextSecondary = "#92929f",
-            TextDisabled = "#ffffff33",
-            DrawerIcon = "#92929f",
-            DrawerText = "#92929f",
-            GrayLight = "#2a2833",
-            GrayLighter = "#1e1e2d",
-            Info = "#4a86ff",
-            Success = "#3dcb6c",
-            Warning = "#ffb545",
-            Error = "#ff3f5f",
-            LinesDefault = "#33323e",
-            TableLines = "#33323e",
-            Divider = "#292838",
-            OverlayLight = "#1e1e2d80",
-            Tertiary = "#ffffff",
-            TertiaryContrastText = "#7e6fff",
-            Black = "#000000",
-            Dark = "#2e2e2e"
-        };
 
     public string DarkLightModeButtonIcon => _isDarkMode switch
     {
