@@ -1,8 +1,12 @@
+@inject CustomAuthenticationStateProvider CustomAuthenticationStateProvider
+@inject NavigationManager Navigation
+
 <MudDrawer @bind-Open="@DrawerOpen" Anchor="Anchor.End" Class="pt-20 px-4" Width="100%" Elevation="1" OverlayAutoClose>
     <MudStack Row>
         <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="@(() => DrawerOpen = false)" Size="Size.Large" />
     </MudStack>
-    
+
+    <ConfirmButton Color="Color.Error" ConfirmColor="Color.Error" OnClick="OnLogout">Log out</ConfirmButton>
     
 </MudDrawer>
 
@@ -22,6 +26,12 @@
             Open = value;
             OpenChanged.InvokeAsync(value);
         }
+    }
+    
+    private async Task OnLogout()
+    {
+        await CustomAuthenticationStateProvider.LogoutAsync();
+        Navigation.NavigateTo("/");
     }
     
     
