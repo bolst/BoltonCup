@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.DataProtection;
 
 namespace BoltonCup.Shared.Data;
@@ -6,10 +7,14 @@ public class CustomUserService
 {
 
     private readonly ICustomLocalStorageProvider _customLocalStorageProvider;
+    private readonly IBCData _bcData;
+    private readonly Supabase.Client _supabaseClient;
 
-    public CustomUserService(ICustomLocalStorageProvider customLocalStorageProvider)
+    public CustomUserService(ICustomLocalStorageProvider customLocalStorageProvider, IBCData bcData, Supabase.Client supabaseClient)
     {
         _customLocalStorageProvider = customLocalStorageProvider; 
+        _bcData = bcData;
+        _supabaseClient = supabaseClient;
     }
 
     public async Task PersistSessionToBrowserAsync(Supabase.Gotrue.Session session)
@@ -58,4 +63,35 @@ public class CustomUserService
     {
         await _customLocalStorageProvider.ClearAsync();
     }
+
+    public async Task<string> UpdateProfilePictureAsync(string email, byte[] imageBytes)
+    {
+        try
+        {
+            var account = await _bcData.GetAccountByEmailAsync(email);
+            if (account is null) return "Could not find an account with that email";
+
+            var filename = $"{account.FirstName}-{account.LastName}.png";
+            var options = new Supabase.Storage.FileOptions
+            {
+                ContentType = "data:image/*;base64",
+                Upsert = true,
+            };
+
+            await _supabaseClient.Storage.From("profile-pictures").Upload(imageBytes, filename, options);
+            var publicUrl = _supabaseClient.Storage.From("profile-pictures").GetPublicUrl(filename);
+            await _bcData.UpdateAccountProfilePictureAsync(account.Email, publicUrl);
+        }
+        catch (Supabase.Storage.Exceptions.SupabaseStorageException exc)
+        {
+            return "File is too large!";
+        }
+        catch (Exception e)
+        {
+            return "Something went wrong";
+        }
+        
+        return string.Empty;
+    }
+    
 }

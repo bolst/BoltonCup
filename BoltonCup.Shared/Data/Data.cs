@@ -25,7 +25,7 @@ public interface IBCData
     Task<string> AdmitUserAsync(RegisterFormModel form);
     Task<IEnumerable<BCAccount>> GetAccountsAsync();
     Task<BCAccount?> GetAccountByEmailAsync(string email);
-
+    Task UpdateAccountProfilePictureAsync(string email, string imagePath);
 }
 
 public class BCData : IBCData
@@ -643,6 +643,17 @@ public class BCData : IBCData
                           email = @Email";
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryFirstOrDefaultAsync<BCAccount>(sql, new { Email = email });
+    }
+
+    public async Task UpdateAccountProfilePictureAsync(string email, string imagePath)
+    {
+        string sql = @"UPDATE account
+                        SET
+                          profilepicture = @ImagePath
+                        WHERE
+                          email = @Email";
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.ExecuteAsync(sql, new { Email = email, ImagePath = imagePath });
     }
 }
 

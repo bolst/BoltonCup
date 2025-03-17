@@ -32,6 +32,7 @@ public class CustomThemeProvider
         AppbarText = "#ffffff",
         AppbarBackground = "#0f1014",
         DrawerBackground = "#232636",
+        DrawerText = "#ffffff",
         Background = "#191a21",
         GrayLight = "#e8e8e8",
         GrayLighter = "#f9f9f9",
