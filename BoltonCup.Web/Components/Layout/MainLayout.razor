@@ -57,54 +57,6 @@
         StateHasChanged();
     }
 
-    private readonly PaletteLight _lightPalette = new()
-        {
-            Primary = "#3364BE",
-            Secondary = "#EB443A",
-            Black = "#ffffff",
-            Tertiary = "#000000",
-            AppbarText = "#D1C4E9",
-            AppbarBackground = "#000000",
-            DrawerBackground = "#ffffff",
-            GrayLight = "#e8e8e8",
-            GrayLighter = "#f9f9f9",
-            Dark = "#e0e0e0",
-            DarkContrastText = "#2e2e2e"
-        };
-
-    private readonly PaletteDark _darkPalette = new()
-        {
-            Primary = "#1ef2e2",
-            Surface = "#1e1e2d",
-            Background = "#000000",
-            BackgroundGray = "#151521",
-            AppbarText = "#311B92",
-            AppbarBackground = "rgba(245,239,255,0.75)",
-            DrawerBackground = "#1a1a27",
-            ActionDefault = "#74718e",
-            ActionDisabled = "#9999994d",
-            ActionDisabledBackground = "#605f6d4d",
-            TextPrimary = "#b2b0bf",
-            TextSecondary = "#92929f",
-            TextDisabled = "#ffffff33",
-            DrawerIcon = "#92929f",
-            DrawerText = "#92929f",
-            GrayLight = "#2a2833",
-            GrayLighter = "#1e1e2d",
-            Info = "#4a86ff",
-            Success = "#3dcb6c",
-            Warning = "#ffb545",
-            Error = "#ff3f5f",
-            LinesDefault = "#33323e",
-            TableLines = "#33323e",
-            Divider = "#292838",
-            OverlayLight = "#1e1e2d80",
-            Tertiary = "#ffffff",
-            TertiaryContrastText = "#7e6fff",
-            Black = "#000000",
-            Dark = "#2e2e2e"
-        };
-
     public string DarkLightModeButtonIcon => _isDarkMode switch
     {
         true => Icons.Material.Rounded.AutoMode,

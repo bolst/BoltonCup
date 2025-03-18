@@ -3,7 +3,6 @@
 /Users/nic/git/BoltonCup/BoltonCup.Shared/bin/Debug/net8.0/BoltonCup.Shared.deps.json
 /Users/nic/git/BoltonCup/BoltonCup.Shared/bin/Debug/net8.0/BoltonCup.Shared.dll
 /Users/nic/git/BoltonCup/BoltonCup.Shared/bin/Debug/net8.0/BoltonCup.Shared.pdb
-/Users/nic/git/BoltonCup/BoltonCup.Shared/bin/Debug/net8.0/Microsoft.AspNetCore.Components.Authorization.dll
 /Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/BoltonCup.Shared.csproj.AssemblyReference.cache
 /Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/BoltonCup.Shared.GeneratedMSBuildEditorConfig.editorconfig
 /Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/BoltonCup.Shared.AssemblyInfoInputs.cache
@@ -20,7 +19,6 @@
 /Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.BoltonCup.Shared.props
 /Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.BoltonCup.Shared.props
 /Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/staticwebassets.pack.json
-/Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/BoltonCu.43B775AD.Up2Date
 /Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/BoltonCup.Shared.dll
 /Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/refint/BoltonCup.Shared.dll
 /Users/nic/git/BoltonCup/BoltonCup.Shared/obj/Debug/net8.0/BoltonCup.Shared.pdb

@@ -76,3 +76,4 @@
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/BoltonCup.Web.pdb
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/BoltonCup.Web.genruntimeconfig.cache
 /Users/nic/git/BoltonCup/BoltonCup.Web/obj/Debug/net8.0/ref/BoltonCup.Web.dll
+/Users/nic/git/BoltonCup/BoltonCup.Web/bin/Debug/net8.0/Microsoft.AspNetCore.Components.Authorization.dll
