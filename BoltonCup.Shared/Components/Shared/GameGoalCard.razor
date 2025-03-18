@@ -1,0 +1,63 @@
+@inject NavigationManager Navigation
+@inject Data.IBCData BCData
+
+@if (Goal is not null && profilePicture is not null)
+{
+    <MudPaper Class="pa-4 my-4">
+    <MudStack Class="d-flex align-center" Row="true">
+        <MudAvatar Size="Size.Large">
+            <MudImage Src="@profilePicture.Source" />
+        </MudAvatar>
+
+        <MudStack Class="py-1" Spacing="0">
+            <MudText Class="clickable" Typo="Typo.body1" @onclick=@(() =>
+                Navigation.NavigateTo($"player/{Goal.ScorerId}"))>
+                <b>@Goal.ScorerName</b>
+            </MudText>
+            <MudStack Class="d-flex align-center" Row="true" Spacing="0">
+                <MudImage Src="@teamLogo" Height="40" />
+                <MudText Typo="Typo.body2">@assistLabel(Goal)</MudText>
+            </MudStack>
+        </MudStack>
+
+        <MudSpacer />
+
+        @if (ShowTime)
+            {
+
+                <MudPaper Class="pa-2 mud-theme-surface" Elevation="0">
+                    <MudStack Class="d-flex justify-center" Spacing="0">
+                        <MudText Class="d-flex justify-center" Typo="Typo.body1"><b>@Goal.Time.ToString(@"hh\:mm")</b></MudText>
+                        <MudText Class="d-flex justify-center" Typo="Typo.body2">Time</MudText>
+                    </MudStack>
+                </MudPaper>
+            }
+        </MudStack>
+    </MudPaper>
+
+}
+
+@code {
+    [Parameter] public Data.GameGoal? Goal { get; set; }
+    [Parameter] public bool ShowTime { get; set; } = true;
+
+    private Data.PlayerProfilePicture? profilePicture;
+    private string teamLogo = string.Empty;
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Goal is not null)
+        {
+            profilePicture = await BCData.GetPlayerProfilePictureById(Goal.ScorerId);
+            teamLogo = (await BCData.GetTeams()).FirstOrDefault(x => x.Id == Goal.TeamId)?.LogoUrl ?? string.Empty;
+        }
+    }
+
+    private string assistLabel(Data.GameGoal goal)
+    {
+        if (goal.Assist1Name is null) return "Unassisted";
+        else if (goal.Assist2Name is null) return goal.Assist1Name;
+        else return $"{goal.Assist1Name}, {goal.Assist2Name}";
+    }
+
+}

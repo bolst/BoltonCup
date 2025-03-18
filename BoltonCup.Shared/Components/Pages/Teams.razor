@@ -1,0 +1,25 @@
+@page "/teams"
+
+@inject IBCData BCData
+
+@if (teams is not null)
+{
+    <div class="d-flex justify-center mt-20">
+    <MudStack>
+        @foreach (var team in teams)
+            {
+                <TeamCard Team="@team" />
+            }
+        </MudStack>
+    </div>
+}
+
+@code {
+
+    private IEnumerable<BoltonCup.Shared.Data.Team>? teams;
+
+    protected override async Task OnInitializedAsync()
+    {
+        teams = await BCData.GetTeams();
+    }
+}
