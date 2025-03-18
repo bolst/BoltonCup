@@ -6,5 +6,8 @@ obj
 BoltonCup.Shared/obj
 BoltonCup.Web/obj
 
+BoltonCup.Shared/bin
+BoltonCup.Web/bin
+
 Xcode
 
