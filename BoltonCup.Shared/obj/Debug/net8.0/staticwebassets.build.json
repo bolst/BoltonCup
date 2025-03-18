@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Y0iz2Pq2mt3S3ISa3QoceYa/P7/jcVENcLC8nFOtiEQ=",
+  "Hash": "e4kXZs5uyScdXK34UHzYSO6KItrmZsHnqK1AOH8acJs=",
   "Source": "BoltonCup.Shared",
   "BasePath": "_content/BoltonCup.Shared",
   "Mode": "Default",
@@ -94,8 +94,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "y69apfw30u",
-      "Integrity": "CmLMuBPsoMUhZaD2/kpLiN0VLfopmJdFocBjtskJpy0=",
+      "Fingerprint": "a1dmj37rv3",
+      "Integrity": "fvrLPsnb1qsTsoim+tYiQ8D6HUE/R8l7MOWDftHYqF8=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/BoltonCup.min.css"
@@ -511,6 +511,51 @@
       ]
     },
     {
+      "Route": "BoltonCup.min.a1dmj37rv3.css",
+      "AssetFile": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1011"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"fvrLPsnb1qsTsoim+tYiQ8D6HUE/R8l7MOWDftHYqF8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 18 Mar 2025 03:49:28 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "a1dmj37rv3"
+        },
+        {
+          "Name": "label",
+          "Value": "BoltonCup.min.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-fvrLPsnb1qsTsoim+tYiQ8D6HUE/R8l7MOWDftHYqF8="
+        }
+      ]
+    },
+    {
       "Route": "BoltonCup.min.bjm10frrrd.js",
       "AssetFile": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.js",
       "Selectors": [],
@@ -566,7 +611,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "744"
+          "Value": "1011"
         },
         {
           "Name": "Content-Type",
@@ -574,11 +619,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"CmLMuBPsoMUhZaD2/kpLiN0VLfopmJdFocBjtskJpy0=\""
+          "Value": "\"fvrLPsnb1qsTsoim+tYiQ8D6HUE/R8l7MOWDftHYqF8=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 18 Mar 2025 02:31:53 GMT"
+          "Value": "Tue, 18 Mar 2025 03:49:28 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -588,7 +633,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-CmLMuBPsoMUhZaD2/kpLiN0VLfopmJdFocBjtskJpy0="
+          "Value": "sha256-fvrLPsnb1qsTsoim+tYiQ8D6HUE/R8l7MOWDftHYqF8="
         }
       ]
     },
@@ -626,51 +671,6 @@
         {
           "Name": "integrity",
           "Value": "sha256-qcv41bV5z1TNtKox+i3P2EVGOwzxhJF+XQ9Z6A4CNbU="
-        }
-      ]
-    },
-    {
-      "Route": "BoltonCup.min.y69apfw30u.css",
-      "AssetFile": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "744"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"CmLMuBPsoMUhZaD2/kpLiN0VLfopmJdFocBjtskJpy0=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Tue, 18 Mar 2025 02:31:53 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "y69apfw30u"
-        },
-        {
-          "Name": "label",
-          "Value": "BoltonCup.min.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-CmLMuBPsoMUhZaD2/kpLiN0VLfopmJdFocBjtskJpy0="
         }
       ]
     },

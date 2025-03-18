@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "xBducHoDX5u4gh2UjTaKj/F82YLV0WuA5Ws5RVTN3dM=",
+  "Hash": "jCQXY+rPWvYYF2ToPces5IeUOdYP2/vKKUO2+5LkhYY=",
   "Source": "BoltonCup.Web",
   "BasePath": "_content/BoltonCup.Web",
   "Mode": "Default",
@@ -11,10 +11,10 @@
       "Version": 2,
       "Source": "BoltonCup.Shared",
       "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",
-      "AdditionalPublishProperties": "",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
       "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained",
       "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
-      "AdditionalBuildProperties": "",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
       "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained"
     }
   ],
@@ -113,8 +113,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "y69apfw30u",
-      "Integrity": "CmLMuBPsoMUhZaD2/kpLiN0VLfopmJdFocBjtskJpy0=",
+      "Fingerprint": "a1dmj37rv3",
+      "Integrity": "fvrLPsnb1qsTsoim+tYiQ8D6HUE/R8l7MOWDftHYqF8=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.css"
@@ -477,6 +477,51 @@
       ]
     },
     {
+      "Route": "_content/BoltonCup.Shared/BoltonCup.min.a1dmj37rv3.css",
+      "AssetFile": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1011"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"fvrLPsnb1qsTsoim+tYiQ8D6HUE/R8l7MOWDftHYqF8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 18 Mar 2025 03:49:28 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "a1dmj37rv3"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-fvrLPsnb1qsTsoim+tYiQ8D6HUE/R8l7MOWDftHYqF8="
+        },
+        {
+          "Name": "label",
+          "Value": "_content/BoltonCup.Shared/BoltonCup.min.css"
+        }
+      ]
+    },
+    {
       "Route": "_content/BoltonCup.Shared/BoltonCup.min.bjm10frrrd.js",
       "AssetFile": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.js",
       "Selectors": [],
@@ -536,7 +581,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "744"
+          "Value": "1011"
         },
         {
           "Name": "Content-Type",
@@ -544,17 +589,17 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"CmLMuBPsoMUhZaD2/kpLiN0VLfopmJdFocBjtskJpy0=\""
+          "Value": "\"fvrLPsnb1qsTsoim+tYiQ8D6HUE/R8l7MOWDftHYqF8=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 18 Mar 2025 02:31:53 GMT"
+          "Value": "Tue, 18 Mar 2025 03:49:28 GMT"
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-CmLMuBPsoMUhZaD2/kpLiN0VLfopmJdFocBjtskJpy0="
+          "Value": "sha256-fvrLPsnb1qsTsoim+tYiQ8D6HUE/R8l7MOWDftHYqF8="
         }
       ]
     },
@@ -592,51 +637,6 @@
         {
           "Name": "integrity",
           "Value": "sha256-qcv41bV5z1TNtKox+i3P2EVGOwzxhJF+XQ9Z6A4CNbU="
-        }
-      ]
-    },
-    {
-      "Route": "_content/BoltonCup.Shared/BoltonCup.min.y69apfw30u.css",
-      "AssetFile": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "744"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"CmLMuBPsoMUhZaD2/kpLiN0VLfopmJdFocBjtskJpy0=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Tue, 18 Mar 2025 02:31:53 GMT"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "y69apfw30u"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-CmLMuBPsoMUhZaD2/kpLiN0VLfopmJdFocBjtskJpy0="
-        },
-        {
-          "Name": "label",
-          "Value": "_content/BoltonCup.Shared/BoltonCup.min.css"
         }
       ]
     },
