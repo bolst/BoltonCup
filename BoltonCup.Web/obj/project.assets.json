@@ -820,6 +820,8 @@
         "dependencies": {
           "Blazored.LocalStorage": "4.5.0",
           "Dapper": "2.1.66",
+          "Microsoft.AspNetCore.Authorization": "8.0.11",
+          "Microsoft.AspNetCore.Components": "8.0.11",
           "Microsoft.AspNetCore.Components.Web": "8.0.11",
           "Microsoft.AspNetCore.DataProtection": "8.0.13",
           "Microsoft.Extensions.Caching.Memory": "8.0.1",

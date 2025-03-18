@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "C/zIlump6YI8Kg1MKLW+YGrcpiaUTe5Q4r8GvmUknEc=",
+  "Hash": "xBducHoDX5u4gh2UjTaKj/F82YLV0WuA5Ws5RVTN3dM=",
   "Source": "BoltonCup.Web",
   "BasePath": "_content/BoltonCup.Web",
   "Mode": "Default",
@@ -11,10 +11,10 @@
       "Version": 2,
       "Source": "BoltonCup.Shared",
       "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",
-      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishProperties": "",
       "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained",
       "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
-      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildProperties": "",
       "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained"
     }
   ],
