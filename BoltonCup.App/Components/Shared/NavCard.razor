@@ -1,0 +1,33 @@
+<MudPaper Class="pa-2 rounded-lg d-flex align-end" Style="@ContainerStyle">
+    
+    <MudStack Spacing="1">
+        @if (NavCardContent is not null)
+        {
+            <div class="d-flex flex-row-reverse" style="color: white;">
+                @NavCardContent
+            </div>
+        }
+        
+        <div class="d-flex flex-row-reverse">
+            <MudButton Style="color: white;" IconColor="Color.Secondary" EndIcon="@Icons.Material.Filled.ArrowRight" Size="Size.Large" Href="@To"><b>@Title</b></MudButton>
+        </div>
+    </MudStack>
+</MudPaper>
+
+@code{
+
+    [Parameter] 
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter] 
+    public string To { get; set; } = "/";
+    
+    [Parameter]
+    public RenderFragment? NavCardContent { get; set; }
+
+    [Parameter] 
+    public string ImgSrc { get; set; } = string.Empty;
+
+    private string ContainerStyle => $"height: 100%; background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url({ImgSrc}); background-size: cover; background-position: center center;";
+
+}

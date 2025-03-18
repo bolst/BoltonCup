@@ -1,0 +1,90 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="@_theme" IsDarkMode="@_isDarkMode" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@* <AuthorizeView> *@
+@*     <MudButton Class="mud-theme-primary" Href="/admin" Variant="Variant.Text" Size="Size.Large">Admin</MudButton> *@
+@* </AuthorizeView> *@
+
+
+<CascadingValue Value="this">
+    <MudLayout>
+        <MudAppBar ToolBarClass="d-flex justify-space-between mt-4 pt-10" Fixed>
+            <AuthorizeView>
+                <Authorized>
+                    @if (profileLayout)
+                    {
+                        <MudSpacer />
+                        <MudIconButton Icon="@Icons.Material.Filled.Settings" OnClick="@(() => settingsDrawerOpen = true)" />
+                    }
+                    else
+                    {
+                        <MudIconButton Color="Color.Inherit" Icon="@Icons.Material.Filled.Person" ClickPropagation="false" OnClick="@(() => profileDrawerOpen = true)" />
+                    }
+                </Authorized>
+                <NotAuthorized>
+                    <MudIconButton Color="Color.Inherit" Icon="@Icons.Material.Filled.Login" ClickPropagation="false" Href="/login" />
+                </NotAuthorized>
+            </AuthorizeView>
+
+        </MudAppBar>
+        
+        <AuthorizeView>
+            <ProfileDrawer @bind-Open="profileDrawerOpen" />
+            <SettingsDrawer @bind-Open="settingsDrawerOpen" />
+        </AuthorizeView>
+        
+        <MudMainContent Class="py-12" Style="height: 100vh;">
+            <div class="py-4">&nbsp;</div>
+
+            
+            @Body
+            
+            <div class="py-14">&nbsp;</div>
+        </MudMainContent>
+        
+        <MudAppBar ToolBarClass="d-flex justify-space-between" Bottom Fixed>
+            <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.Home" ClickPropagation="false" Href="/" />
+            <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.Info" ClickPropagation="false" Href="/info" />
+            <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.People" ClickPropagation="false" Href="/teams" />
+            <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.CalendarMonth" ClickPropagation="false" Href="/schedule" />
+            @* <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.BarChart" ClickPropagation="false" Href="/stats" /> *@
+        </MudAppBar>
+    </MudLayout>
+</CascadingValue>
+
+@code {
+    private bool _isDarkMode = true;
+    private MudTheme? _theme = null;
+    private bool profileDrawerOpen;
+    private bool settingsDrawerOpen;
+
+    public bool profileLayout = false;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        var layoutProperties = new LayoutProperties()
+        {
+            AppbarHeight = "100px"
+        };
+        _theme = new CustomThemeProvider(layoutProperties).Theme;
+    }
+
+    private void DarkModeToggle()
+    {
+        _isDarkMode = !_isDarkMode;
+        StateHasChanged();
+    }
+
+    public string DarkLightModeButtonIcon => _isDarkMode switch
+    {
+        true => Icons.Material.Rounded.AutoMode,
+        false => Icons.Material.Outlined.DarkMode,
+    };
+
+}

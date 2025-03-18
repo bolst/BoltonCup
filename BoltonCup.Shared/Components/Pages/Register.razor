@@ -1,0 +1,84 @@
+@page "/register"
+
+@inject IBCData BCData
+@inject RegistrationStateService RegStateService
+
+@if (hasRegistered is null)
+{
+    <div class="d-flex justify-center align-center" style="height: 100vh">
+        <MudProgressCircular Size="Size.Large" Indeterminate="true" />
+    </div>
+}
+else
+{
+    if (hasRegistered.Value)
+    {
+        <div class="d-flex justify-center px-4" style="height: 80vh">
+            <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
+                <MudText Align="Align.Center" Typo="Typo.h4"><b>Thank you for registering!</b></MudText>
+                <MudText Align="Align.Center" Typo="Typo.subtitle1">Note that by registering you are <b>not</b> guaranteed a spot for 2025 - if you are admitted you will receive an email with further instructions closer to the tournament date.</MudText>
+                <MudButton OnClick="OnFormBegin" Color="Color.Primary">Submit another</MudButton>
+            </MudStack>
+        </div>
+    }
+    else
+    {
+        <div class="pa-6 py-10 d-flex align-center" style="@ContainerStyle">
+            <MudGrid>
+                <MudItem xs="12" md="6" Class="d-flex align-center justify-center">
+                    &nbsp;<div>
+                        <MudText Typo="Typo.h3" Color="Color.Dark"><b>Register for Bolton Cup 2025</b></MudText>
+                    </div>
+                </MudItem>        
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="pa-6 px-10">
+                        <RegisterForm OnSubmit="OnFormSubmit" />
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </div>
+    }
+}
+
+@code{
+    
+    private readonly string ContainerStyle = "height: 85vh; background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//BOLTONCUP-86.webp'); background-size: cover; background-position: center center;";
+
+    private bool? hasRegistered;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            hasRegistered = await RegStateService.GetBrowserRegistered();
+            
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnFormBegin()
+    {
+        await RegStateService.SetBrowserRegistered(false);
+        hasRegistered = false;
+        
+        StateHasChanged();
+    }
+    
+    private async Task OnFormSubmit(RegisterFormModel form)
+    {
+        string errorMessage = await BCData.SubmitRegistration(form);
+
+        if (string.IsNullOrEmpty(errorMessage))
+        {
+            await RegStateService.SetBrowserRegistered(true);
+            hasRegistered = true;
+        }
+        else
+        {
+            // TODO: handle error message
+        }
+        
+        StateHasChanged();
+    }
+    
+}

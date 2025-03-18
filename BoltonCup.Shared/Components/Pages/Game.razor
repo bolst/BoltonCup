@@ -1,0 +1,131 @@
+@page "/game/{id:int}"
+
+@inject IBCData BCData
+
+@if (currGame is not null)
+{
+    @* <ScheduleRow Game="@currGame" Clickable="false" /> *@
+}
+
+<MudPaper Class="py-10 my-5 mx-2 px-2 px-sm-10 mx-sm-5">
+    <MudGrid>
+        <MudItem xs="12" sm="8">
+            <MudText Class="mb-4" Typo="Typo.h5"><b>Scoring</b></MudText>
+            @if (gameGoals is not null)
+            {
+                if (gameGoals.Any(goal => goal.Period == 1))
+                {
+                    <MudText Typo="Typo.h6">1st Period</MudText>
+                    foreach (var goal in gameGoals.Where(g => g.Period == 1))
+                    {
+                        <GameGoalCard Goal="@goal" />
+                    }
+                }
+
+                if (gameGoals.Any(goal => goal.Period == 2))
+                {
+                    <MudText Typo="Typo.h6">2nd Period</MudText>
+                    foreach (var goal in gameGoals.Where(g => g.Period == 2))
+                    {
+                        <GameGoalCard Goal="@goal" />
+                    }
+                }
+
+                if (gameGoals.Any(goal => goal.Period == 3))
+                {
+                    <MudText Typo="Typo.h6">3rd Period</MudText>
+                    foreach (var goal in gameGoals.Where(g => g.Period == 3))
+                    {
+                        <GameGoalCard Goal="@goal" />
+                    }
+                }
+                if (gameGoals.Any(goal => goal.Period == 4))
+                {
+                    <MudText Typo="Typo.h6">Overtime</MudText>
+                    foreach (var goal in gameGoals.Where(g => g.Period == 4))
+                    {
+                        <GameGoalCard Goal="@goal" />
+                    }
+                }
+                if (gameGoals.Any(goal => goal.Period == 5))
+                {
+                    <MudText Typo="Typo.h6">Shootout</MudText>
+                    foreach (var goal in gameGoals.Where(g => g.Period == 5))
+                    {
+                        <GameGoalCard Goal="@goal" ShowTime="false" />
+                    }
+                }
+            }
+            else
+            {
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+            }
+
+            <MudText Class="mt-12 mb-4" Typo="Typo.h5"><b>Penalties</b></MudText>
+            @if (gamePenalties is not null)
+            {
+                if (gamePenalties.Any(penalty => penalty.Period == 1))
+                {
+                    <MudText Typo="Typo.h6">1st Period</MudText>
+                    <MudDivider />
+                    <GamePenaltiesTable Penalties="@gamePenalties.Where(p => p.Period == 1)" />
+                }
+
+                if (gamePenalties.Any(penalty => penalty.Period == 2))
+                {
+                    <MudText Typo="Typo.h6">2nd Period</MudText>
+                    <MudDivider />
+                    <GamePenaltiesTable Penalties="@gamePenalties.Where(p => p.Period == 2)" />
+                }
+
+                if (gamePenalties.Any(penalty => penalty.Period == 3))
+                {
+                    <MudText Typo="Typo.h6">3rd Period</MudText>
+                    <MudDivider />
+                    <GamePenaltiesTable Penalties="@gamePenalties.Where(p => p.Period == 3)" />
+                }
+            }
+            else
+            {
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
+            }
+
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudPaper Class="pa-4">
+                <MudText Typo="Typo.h5"><b>Linescore</b></MudText>
+                <MudDivider />
+                @if (gameGoals is not null)
+                {
+                    <GameLineScore GameId="@Id" />
+                }
+                else
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="20vh" />
+                }
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private ScheduledGame? currGame;
+    private IEnumerable<GameGoal>? gameGoals;
+    private IEnumerable<GamePenalty>? gamePenalties;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currGame = await BCData.GetGameById(Id);
+        gameGoals = await BCData.GetGameGoalsByGameId(Id);
+        gamePenalties = await BCData.GetGamePenaltiesByGameId(Id);
+    }
+}

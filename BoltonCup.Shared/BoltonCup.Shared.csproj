@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <SupportedPlatform Include="browser"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+        <PackageReference Include="Dapper" Version="2.1.66" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.11"/>
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="8.0.13" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+        <PackageReference Include="MudBlazor" Version="7.16.0" />
+        <PackageReference Include="Npgsql" Version="8.0.6" />
+        <PackageReference Include="Supabase" Version="1.1.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Pages\Game.razor" />
+      <AdditionalFiles Include="Components\Pages\Info.razor" />
+      <AdditionalFiles Include="Components\Pages\Player.razor" />
+      <AdditionalFiles Include="Components\Pages\Register.razor" />
+      <AdditionalFiles Include="Components\Pages\Schedule.razor" />
+      <AdditionalFiles Include="Components\Pages\Stats.razor" />
+      <AdditionalFiles Include="Components\Pages\Team.razor" />
+      <AdditionalFiles Include="Components\Pages\Teams.razor" />
+      <AdditionalFiles Include="Components\Shared\RegisterForm.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AndroidAsset Include="wwwroot\countdown.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiAsset Include="wwwroot\countdown.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Components.Authorization">
+        <HintPath>..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.AspNetCore.App\8.0.11\Microsoft.AspNetCore.Components.Authorization.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

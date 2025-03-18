@@ -1,0 +1,58 @@
+@inject Data.IBCData BCData
+
+@if (Goals is not null && Game is not null)
+{
+    <MudSimpleTable Class="mb-6" Hover="true" Dense="true" Striped="true" Elevation="0">
+    <thead>
+        <tr>
+            <th><b></b></th>
+            <th><b>1st</b></th>
+            <th><b>2nd</b></th>
+            <th><b>3rd</b></th>
+            <th><b>T</b></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>
+                <MudImage Src="@(TeamLogoById(Game.HomeTeamId))" Height="50" />
+            </th>
+            <th>@Goals.Where(g => g.TeamId == Game.HomeTeamId && g.Period == 1).Count()</th>
+            <th>@Goals.Where(g => g.TeamId == Game.HomeTeamId && g.Period == 2).Count()</th>
+            <th>@Goals.Where(g => g.TeamId == Game.HomeTeamId && g.Period == 3).Count()</th>
+            <th>@Goals.Where(g => g.TeamId == Game.HomeTeamId).Count()</th>
+        </tr>
+        <tr>
+            <th>
+                <MudImage Src="@(TeamLogoById(Game.AwayTeamId))" Height="50" />
+            </th>
+            <th>@Goals.Where(g => g.TeamId == Game.AwayTeamId && g.Period == 1).Count()</th>
+            <th>@Goals.Where(g => g.TeamId == Game.AwayTeamId && g.Period == 2).Count()</th>
+            <th>@Goals.Where(g => g.TeamId == Game.AwayTeamId && g.Period == 3).Count()</th>
+            <th>@Goals.Where(g => g.TeamId == Game.AwayTeamId).Count()</th>
+        </tr>
+    </tbody>
+</MudSimpleTable>
+}
+
+@code {
+    [Parameter] public int GameId { get; set; }
+
+    private Data.ScheduledGame? Game;
+    private IEnumerable<Data.GameGoal>? Goals;
+    
+    private IEnumerable<Team>? teams;
+    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.Id == id)?.LogoUrl ?? string.Empty);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var gameTask = BCData.GetGameById(GameId);
+        var goalsTask = BCData.GetGameGoalsByGameId(GameId);
+        var teamsTask = BCData.GetTeams();
+        await Task.WhenAll(gameTask, goalsTask, teamsTask);
+        
+        Game = gameTask.Result;
+        Goals = goalsTask.Result;
+        teams = teamsTask.Result;
+    }
+}

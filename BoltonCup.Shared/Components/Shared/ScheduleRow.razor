@@ -1,0 +1,72 @@
+@inject Data.IBCData BCData
+@inject NavigationManager Navigation
+
+@if (Game is not null && homeTeam is not null && awayTeam is not null)
+{
+    <tr>
+    <td>
+        <MudGrid Class="@RowClass" Spacing="1" @onclick=@(()=> Navigation.NavigateTo($"game/{Game.GameId}"))>
+            <MudItem Class="d-none d-md-flex align-center justify-end" xs="12" sm="2">
+                <MudText>@homeTeam.ShortName</MudText>
+            </MudItem>
+            <MudItem Class="d-flex align-center justify-center justify-md-start" xs="12" sm="5" md="3">
+                <MudImage Src="@homeTeam.LogoUrl" Width="75" />
+            </MudItem>
+            <MudItem Class="d-flex align-center justify-center" xs="12" sm="2">
+                <MudText>vs.</MudText>
+            </MudItem>
+            <MudItem Class="d-flex align-center justify-center justify-md-end" xs="12" sm="5" md="3">
+                <MudImage Src="@awayTeam.LogoUrl" Width="75" />
+            </MudItem>
+            <MudItem Class="d-none d-md-flex align-center justify-start" xs="12" sm="2">
+                <MudText>@awayTeam.ShortName</MudText>
+            </MudItem>
+        </MudGrid>
+    </td>
+    <td>
+        @if (gameScore is not null)
+            {
+                <MudText Typo="Typo.body1"><b>@gameScore.HomeScore - @gameScore.AwayScore</b></MudText>
+            }
+        </td>
+        <td>@Game.Date.ToString("hh:mmtt")</td>
+        <td>@Game.Location (@Game.Rink)</td>
+    </tr>
+}
+else
+{
+    <tr>
+    <td>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" />
+    </td>
+    <td>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" />
+    </td>
+    <td>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" />
+    </td>
+    <td>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" />
+    </td>
+</tr>
+}
+
+@code {
+    [Parameter] public Data.ScheduledGame? Game { get; set; }
+
+    private Data.Team? homeTeam;
+    private Data.Team? awayTeam;
+    private Data.GameScore? gameScore;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Game is not null)
+        {
+            homeTeam = await BCData.GetTeamById(Game.HomeTeamId);
+            awayTeam = await BCData.GetTeamById(Game.AwayTeamId);
+            gameScore = await BCData.GetGameScoreById(Game.GameId);
+        }
+    }
+
+    public string RowClass => (gameScore is null) ? "" : "clickable";
+}
