@@ -68,6 +68,23 @@
           "buildTransitive/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets": {}
         }
       },
+      "Microsoft.AspNetCore.Components.Authorization/8.0.11": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Authorization": "8.0.11",
+          "Microsoft.AspNetCore.Components": "8.0.11"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.AspNetCore.Components.Authorization.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.AspNetCore.Components.Authorization.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.AspNetCore.Components.Forms/8.0.11": {
         "type": "package",
         "dependencies": {
@@ -900,6 +917,21 @@
         "buildTransitive/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
         "microsoft.aspnetcore.components.analyzers.8.0.11.nupkg.sha512",
         "microsoft.aspnetcore.components.analyzers.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.Components.Authorization/8.0.11": {
+      "sha512": "K1OES99Yj+nMg6ulpXOY+iAK/0RUXEMtdjVzM26IixYKaXFwcKHzMljgv/sZoU3TgQNgp4FD4f38JrUZXUvEgA==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.components.authorization/8.0.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.txt",
+        "lib/net8.0/Microsoft.AspNetCore.Components.Authorization.dll",
+        "lib/net8.0/Microsoft.AspNetCore.Components.Authorization.xml",
+        "microsoft.aspnetcore.components.authorization.8.0.11.nupkg.sha512",
+        "microsoft.aspnetcore.components.authorization.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Components.Forms/8.0.11": {
@@ -1973,6 +2005,7 @@
       "Dapper >= 2.1.66",
       "Microsoft.AspNetCore.Authorization >= 8.0.11",
       "Microsoft.AspNetCore.Components >= 8.0.11",
+      "Microsoft.AspNetCore.Components.Authorization >= 8.0.11",
       "Microsoft.AspNetCore.Components.Web >= 8.0.11",
       "Microsoft.AspNetCore.DataProtection >= 8.0.13",
       "Microsoft.Extensions.Caching.Memory >= 8.0.1",
@@ -2038,6 +2071,10 @@
             "version": "[8.0.11, )"
           },
           "Microsoft.AspNetCore.Components": {
+            "target": "Package",
+            "version": "[8.0.11, )"
+          },
+          "Microsoft.AspNetCore.Components.Authorization": {
             "target": "Package",
             "version": "[8.0.11, )"
           },
