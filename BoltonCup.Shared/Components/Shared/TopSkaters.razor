@@ -74,9 +74,9 @@ else
     private IEnumerable<Data.PlayerStatline>? orderedSkaters { get; set; }
     private Data.PlayerStatline? selectedSkater;
     private IEnumerable<Data.PlayerProfilePicture>? profilePictures;
-    private IEnumerable<Team>? teams;
+    private IEnumerable<BCTeam>? teams;
 
-    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.Id == id)?.LogoUrl ?? string.Empty);
+    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.id == id)?.logo_url ?? string.Empty);
     
     protected override async Task OnInitializedAsync()
     {

@@ -13,7 +13,7 @@
     <tbody>
         @if (Games is not null)
         {
-            @foreach (Data.ScheduledGame game in Games)
+            @foreach (Data.BCGame game in Games)
             {
                 <ScheduleRow Game="@game" />
             }
@@ -22,5 +22,5 @@
 </MudSimpleTable>
 
 @code {
-    [Parameter] public IEnumerable<Data.ScheduledGame>? Games { get; set; }
+    [Parameter] public IEnumerable<Data.BCGame>? Games { get; set; }
 }

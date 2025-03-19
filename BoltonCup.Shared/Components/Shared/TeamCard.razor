@@ -2,12 +2,12 @@
 
 @if (Team is not null)
 {
-    <MudPaper Class="px-5 ma-5 team-card clickable" Style="@($"background-color: {Team.PrimaryHex}55;")" Elevation="5"
-    onclick=@(() => Navigation.NavigateTo($"/team/{Team.Id}"))>
+    <MudPaper Class="px-5 ma-5 team-card clickable" Style="@($"background-color: {Team.primary_color_hex}55;")" Elevation="5"
+    onclick=@(() => Navigation.NavigateTo($"/team/{Team.id}"))>
     <MudStack Class="d-flex align-center" Style="height: 10vh" Row="true">
-        <MudImage Src="@Team.LogoUrl" Style="max-height: 100%" />
-        <MudText Class="team-name" Style="@($"color: {Team?.PrimaryHex}")" Typo="Typo.h5">
-            <b>@Team.ShortName.ToUpper()</b>
+        <MudImage Src="@Team.logo_url" Style="max-height: 100%" />
+        <MudText Class="team-name" Style="@($"color: {Team?.primary_color_hex}")" Typo="Typo.h5">
+            <b>@Team.name_short.ToUpper()</b>
         </MudText>
     </MudStack>
 </MudPaper>
@@ -27,6 +27,6 @@ else
 
 @code {
 
-    [Parameter] public Data.Team? Team { get; set; }
+    [Parameter] public Data.BCTeam? Team { get; set; }
 
 }
