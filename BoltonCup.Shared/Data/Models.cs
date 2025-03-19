@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace BoltonCup.Shared.Data;
 
@@ -174,6 +175,7 @@ public class LoginFormModel
 
 public class BCAccount
 {
+    public required string Roles { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
     public required string Email { get; set; }
@@ -181,4 +183,21 @@ public class BCAccount
     public required string Position { get; set; }
     public required string HighestLevel { get; set; }
     public required string ProfilePicture { get; set; }
+    public string FullName => $"{FirstName} {LastName}";
+
+    public ClaimsPrincipal ToClaimsPrincipal()
+    {
+        IEnumerable<Claim> claims =
+        [
+            new(ClaimTypes.Name, FullName),
+            new(ClaimTypes.Email, Email)
+        ];
+
+        foreach (var role in Roles.Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            claims = claims.Append(new Claim(ClaimTypes.Role, role));
+        }
+
+        return new(new ClaimsIdentity(claims, "BoltonCup"));
+    }
 }
