@@ -10,14 +10,14 @@
             <MudText Class="mt-10" Typo="Typo.h4">@day.ToString("dddd, MMMM dd")</MudText>
             <MudDivider />
             <ScheduleTable
-                Games="schedule.Where(g => g.Date.Year == day.Date.Year && g.Date.Month == day.Date.Month && g.Date.Day == day.Date.Day)" />
+                Games="schedule.Where(g => g.date.Year == day.Date.Year && g.date.Month == day.Date.Month && g.date.Day == day.Date.Day)" />
         }
     }
 </div>
 
 @code {
 
-    public IEnumerable<ScheduledGame>? schedule;
+    public IEnumerable<BCGame>? schedule;
     private IEnumerable<DateTime>? gameDays;
 
     protected override async Task OnInitializedAsync()
@@ -26,12 +26,12 @@
         gameDays = schedule is null ? null : parseScheduleDays(schedule);
     }
 
-    static IEnumerable<DateTime> parseScheduleDays(IEnumerable<ScheduledGame> games)
+    static IEnumerable<DateTime> parseScheduleDays(IEnumerable<BCGame> games)
     {
         List<DateTime> retval = new();
         foreach (var game in games)
         {
-            DateTime day = new(game.Date.Year, game.Date.Month, game.Date.Day);
+            DateTime day = new(game.date.Year, game.date.Month, game.date.Day);
             if (!retval.Contains(day))
             {
                 retval.Add(day);

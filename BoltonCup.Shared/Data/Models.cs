@@ -3,45 +3,41 @@ using System.Security.Claims;
 
 namespace BoltonCup.Shared.Data;
 
-public class Team
+public class BCTeam
 {
-    public int Id { get; set; }
-    public required string Name { get; set; }
-    public string ShortName { get; set; } = "";
-    public required string PrimaryHex { get; set; }
-    public required string SecondaryHex { get; set; }
-    public string? TertiaryHex { get; set; } = "";
-    public string? LogoUrl { get; set; } = "";
+    public int id { get; set; }
+    public required string name { get; set; }
+    public string name_short { get; set; } = "";
+    public required string primary_color_hex { get; set; }
+    public required string secondary_color_hex { get; set; }
+    public string? tertiary_color_hex { get; set; } = "";
+    public string? logo_url { get; set; } = "";
 }
 
-public class ScheduledGame
+public class BCGame
 {
-    public int GameId { get; set; }
-    public int HomeTeamId { get; set; }
-    public int AwayTeamId { get; set; }
-    public DateTime Date { get; set; }
-    public string GameType { get; set; } = "";
-    public string Location { get; set; } = "";
-    public string Rink { get; set; } = "";
+    public int id { get; set; }
+    public int home_team_id { get; set; }
+    public int away_team_id { get; set; }
+    public DateTime date { get; set; }
+    public string type { get; set; } = "";
+    public string location { get; set; } = "";
+    public string rink { get; set; } = "";
+    public int tournament_id { get; set; }
+    public int home_score { get; set; }
+    public int away_score { get; set; }
+    public required string state { get; set; }
 }
 
-public class TeamPlayer
+public class BCTeamPlayer
 {
-    public required string Name { get; set; }
-    public DateTime Birthday { get; set; }
-    public string Position { get; set; } = "";
-    public int JerseyNumber { get; set; }
-    public int PlayerId { get; set; }
-    public int TeamId { get; set; }
+    public required string name { get; set; }
+    public DateTime dob { get; set; }
+    public string position { get; set; } = "";
+    public int jersey_number { get; set; }
+    public int player_id { get; set; }
+    public int team_id { get; set; }
 
-}
-
-public class Player
-{
-    public int Id { get; set; }
-    public required string Name { get; set; }
-    public DateTime Birthday { get; set; }
-    public string PreferredBeer { get; set; } = "";
 }
 
 public class PlayerProfile
@@ -56,7 +52,7 @@ public class PlayerProfile
     public int Goals { get; set; }
     public int Assists { get; set; }
     public int PIMs { get; set; }
-    public bool IsWinner { get; set; } = true;
+    public bool IsWinner { get; set; }
 }
 
 public class PlayerGameSummary
