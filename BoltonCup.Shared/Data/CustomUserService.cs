@@ -17,6 +17,12 @@ public class CustomUserService
         _supabaseClient = supabaseClient;
     }
 
+    public async Task<BCAccount?> LookupAccountAsync(string email)
+    {
+        var account = await _bcData.GetAccountByEmailAsync(email);
+        return account;
+    }
+    
     public async Task PersistSessionToBrowserAsync(Supabase.Gotrue.Session session)
     {
         try

@@ -20,7 +20,11 @@
     }
     
     <MudNavMenu Class="mt-4">
-        <MudNavLink Match="NavLinkMatch.All" Href="/profile">Profile</MudNavLink>
+        <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person" Href="profile">Profile</MudNavLink>
+
+        <AuthorizeView Roles="admin" Context="innerContext">
+            <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" Href="admin">Admits</MudNavLink>
+        </AuthorizeView>
     </MudNavMenu>
 </MudDrawer>
 
