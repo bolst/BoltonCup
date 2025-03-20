@@ -1,4 +1,8 @@
 
+@if (!string.IsNullOrEmpty(Title))
+{
+    <PageTitle>@Title</PageTitle>
+}
 
 <MudText Class="ml-6 mt-20" Typo="Typo.h4"><b>@ChildContent</b></MudText>
 <MudDivider />
@@ -8,4 +12,7 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
+    [Parameter] 
+    public string? Title { get; set; }
+    
 }

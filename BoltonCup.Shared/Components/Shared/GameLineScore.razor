@@ -20,7 +20,7 @@
             <th>@Goals.Where(g => g.TeamId == Game.home_team_id && g.Period == 1).Count()</th>
             <th>@Goals.Where(g => g.TeamId == Game.home_team_id && g.Period == 2).Count()</th>
             <th>@Goals.Where(g => g.TeamId == Game.home_team_id && g.Period == 3).Count()</th>
-            <th>@Goals.Where(g => g.TeamId == Game.home_team_id).Count()</th>
+            <th><b>@Goals.Where(g => g.TeamId == Game.home_team_id).Count()</b></th>
         </tr>
         <tr>
             <th>
@@ -29,7 +29,7 @@
             <th>@Goals.Where(g => g.TeamId == Game.away_team_id && g.Period == 1).Count()</th>
             <th>@Goals.Where(g => g.TeamId == Game.away_team_id && g.Period == 2).Count()</th>
             <th>@Goals.Where(g => g.TeamId == Game.away_team_id && g.Period == 3).Count()</th>
-            <th>@Goals.Where(g => g.TeamId == Game.away_team_id).Count()</th>
+            <th><b>@Goals.Where(g => g.TeamId == Game.away_team_id).Count()</b></th>
         </tr>
     </tbody>
 </MudSimpleTable>

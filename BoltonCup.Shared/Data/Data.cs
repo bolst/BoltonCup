@@ -14,8 +14,8 @@ public interface IBCData
     Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int goalieId);
     Task<IEnumerable<GameGoal>> GetGameGoalsByGameId(int gameId);
     Task<IEnumerable<GamePenalty>> GetGamePenaltiesByGameId(int gameId);
-    Task<IEnumerable<PlayerStatline>> GetPlayerStats();
-    Task<IEnumerable<GoalieStatline>> GetGoalieStats();
+    Task<IEnumerable<PlayerStatLine>> GetPlayerStats();
+    Task<IEnumerable<GoalieStatLine>> GetGoalieStats();
     Task<IEnumerable<PlayerProfilePicture>> GetPlayerProfilePictures();
     Task<PlayerProfilePicture> GetPlayerProfilePictureById(int playerId);
     Task<string> SubmitRegistration(RegisterFormModel form);
@@ -331,7 +331,7 @@ public class BCData : IBCData
         }, cacheDuration);
     }
 
-    public async Task<IEnumerable<PlayerStatline>> GetPlayerStats()
+    public async Task<IEnumerable<PlayerStatLine>> GetPlayerStats()
     {
         string cacheKey = $"player_stats";
 
@@ -342,6 +342,7 @@ public class BCData : IBCData
                                 SELECT P.id AS player_id, P.name, R.jersey_number, R.position, R.team_id
                                 FROM players P
                                 INNER JOIN roster R ON R.player_id = P.id
+                                WHERE r.position != 'Goalie'
                             ),
                             points_with_teams AS (
                                 SELECT G.id AS game_id, P.player_jerseynum, P.assist1_jerseynum, P.assist2_jerseynum,
@@ -395,10 +396,10 @@ public class BCData : IBCData
                             ORDER BY goals + assists DESC";
 
             await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryAsync<PlayerStatline>(sql);
+            return await connection.QueryAsync<PlayerStatLine>(sql);
         }, cacheDuration);
     }
-    public async Task<IEnumerable<GoalieStatline>> GetGoalieStats()
+    public async Task<IEnumerable<GoalieStatLine>> GetGoalieStats()
     {
         string cacheKey = $"goalie_stats";
 
@@ -460,7 +461,7 @@ public class BCData : IBCData
                             GROUP BY G.player_id, G.name, G.jersey_number, G.team_id";
 
             await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryAsync<GoalieStatline>(sql);
+            return await connection.QueryAsync<GoalieStatLine>(sql);
         }, cacheDuration);
     }
 

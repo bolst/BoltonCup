@@ -3,15 +3,19 @@ using System.Security.Claims;
 
 namespace BoltonCup.Shared.Data;
 
-public class BCTeam
+public class BCTeam : IEquatable<BCTeam>
 {
-    public int id { get; set; }
+    public required int id { get; set; }
     public required string name { get; set; }
     public string name_short { get; set; } = "";
     public required string primary_color_hex { get; set; }
     public required string secondary_color_hex { get; set; }
     public string? tertiary_color_hex { get; set; } = "";
     public string? logo_url { get; set; } = "";
+
+    public bool Equals(BCTeam? other) => other is not null && other.id == id;
+    public override bool Equals(object? obj) => Equals(obj as BCTeam);
+    public override int GetHashCode() => id.GetHashCode();
 }
 
 public class BCGame
@@ -103,7 +107,7 @@ public class GamePenalty
     public string PlayerName { get; set; } = "";
 }
 
-public class PlayerStatline
+public class PlayerStatLine
 {
     public int PlayerId { get; set; }
     public string Name { get; set; } = "";
@@ -114,7 +118,7 @@ public class PlayerStatline
     public int Assists { get; set; }
 }
 
-public class GoalieStatline
+public class GoalieStatLine
 {
     public int PlayerId { get; set; }
     public string Name { get; set; } = "";

@@ -35,7 +35,7 @@
         <MudStack>
             @{
                     int rank = 1;
-                    foreach (Data.PlayerStatline skater in orderedSkaters.Take(6))
+                    foreach (Data.PlayerStatLine skater in orderedSkaters.Take(6))
                     {
                         int playerRank = rank;
                         <MudButton OnClick="() => selectedSkater = skater" Color="@skaterButtonColor(skater)"
@@ -66,13 +66,13 @@ else
 }
 
 @code {
-    [Parameter] public IEnumerable<Data.PlayerStatline>? Skaters { get; set; }
-    [Parameter] public Func<Data.PlayerStatline, int>? StatValue { get; set; }
+    [Parameter] public IEnumerable<Data.PlayerStatLine>? Skaters { get; set; }
+    [Parameter] public Func<Data.PlayerStatLine, int>? StatValue { get; set; }
     [Parameter] public string Label { get; set; } = "";
     [Parameter] public bool Ascending { get; set; } = false;
 
-    private IEnumerable<Data.PlayerStatline>? orderedSkaters { get; set; }
-    private Data.PlayerStatline? selectedSkater;
+    private IEnumerable<Data.PlayerStatLine>? orderedSkaters { get; set; }
+    private Data.PlayerStatLine? selectedSkater;
     private IEnumerable<Data.PlayerProfilePicture>? profilePictures;
     private IEnumerable<BCTeam>? teams;
 
@@ -98,8 +98,8 @@ else
         selectedSkater = orderedSkaters?.First();
     }
 
-    private Variant skaterButtonVariant(Data.PlayerStatline skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
+    private Variant skaterButtonVariant(Data.PlayerStatLine skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
     Variant.Filled : Variant.Outlined;
-    private Color skaterButtonColor(Data.PlayerStatline skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
+    private Color skaterButtonColor(Data.PlayerStatLine skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
     Color.Primary : Color.Default;
 }
