@@ -29,7 +29,10 @@
         </CardCarouselItem>
     </CardCarousel>
     
-    <MudText Class="mt-10" Typo="Typo.h6"><b>2024 Leaders</b></MudText>
+    <MudStack Class="mt-10" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Row>
+        <MudText Typo="Typo.h6"><b>2024 Leaders</b></MudText>
+        <MudButton Color="Color.Secondary" EndIcon="@Icons.Material.Filled.ArrowRight" Href="/stats">All stats</MudButton>
+    </MudStack>
     <CardCarousel Class="leader-carousel">
         <CardCarouselItem>
             <LeaderCard StatType="Points" />
