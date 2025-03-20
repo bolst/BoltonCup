@@ -6,11 +6,11 @@
 
 @if (teams is not null)
 {
-    <div class="d-flex justify-center mt-20 mx-md-20 mx-8">
-        <MudGrid>
+    <div class="d-flex justify-center mt-20 mx-md-20 mx-1">
+        <MudGrid Spacing="0">
             @foreach (var team in teams)
             {
-                <MudItem xs="12" md="6" Class="pa-2 px-md-10">
+                <MudItem xs="12" md="6" Class="py-2 px-md-10">
                     <TeamCard Team="@team" />
                 </MudItem>
             }

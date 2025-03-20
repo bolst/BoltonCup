@@ -1,21 +1,41 @@
 @page "/stats"
 
+@inject NavigationManager Navigation
 @inject IBCData BCData
 
 <PageHeader>Statistics</PageHeader>
 
 @if (teams is not null)
 {
-    <MudTabs Centered>
-        @if (skaterStats is not null)
+    <MudTabs @bind-ActivePanelIndex="activeTabIndex" Centered>
+        <MudStack Class="d-flex flex-grow-1 px-4 py-4" Style="background-color: var(--mud-palette-surface)" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Row>
+            <div style="width: 200px">
+                <MudSelect @bind-Value="selectedFilterTeam" Variant="Variant.Outlined" Margin="Margin.Dense" Placeholder="Team" Dense>
+                    <MudSelectItem Value="null as BCTeam">All</MudSelectItem>
+                    @foreach (var team in teams)
+                    {
+                        <MudSelectItem Value="team">
+                            <MudStack AlignItems="AlignItems.Center" Row>
+                                <MudImage Src="@team.logo_url" Height="20" Class="mr-1"/> 
+                                @team.name_short
+                            </MudStack>
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+            </div>
+            
+            <MudSpacer/>
+                        
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </MudStack>
+            
+        @if (renderedSkaterStats is not null)
         {
-            <MudTabPanel Text="Skaters" BadgeData="skaterStats.Count()">
-                <MudDataGrid Items="@skaterStats" QuickFilter="@_playerQuickFilter" Striped Dense>
+            <MudTabPanel Text="Skaters" BadgeData="renderedSkaterStats.Count()">
+                <MudDataGrid Items="@renderedSkaterStats" QuickFilter="@_playerQuickFilter" Height="65vh" FixedHeader Dense>
                     <ToolBarContent>
                         <MudText Typo="Typo.h6">Skaters</MudText>
-                        <MudSpacer/>
-                        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
                     </ToolBarContent>
                     <Columns>
                         <TemplateColumn Title="Player" Sortable="true" Filterable="true" StickyLeft>
@@ -24,41 +44,42 @@
                                     <MudAvatar>
                                         <MudImage Src="@profilePictures.First(x => x.PlayerId == context.Item.PlayerId).Source"/>
                                     </MudAvatar>
-                                    <MudText Typo="Typo.subtitle1">@context.Item.Name</MudText>
+                                    <MudLink Typo="Typo.subtitle1" Href=@($"/player/{context.Item.PlayerId}")>@context.Item.Name</MudLink>
+                                    <MudImage Src="@teams.First(x => x.id == context.Item.TeamId).logo_url" Height="30"/>
                                 </MudStack>
                             </CellTemplate>
                         </TemplateColumn>
-                        <PropertyColumn Property="x => x.PlayerNumber" Title="No"/>
+                        <PropertyColumn Property="x => x.PlayerNumber" Title="#"/>
                         <PropertyColumn Property="x => x.Position" Title="Pos"/>
+                        <PropertyColumn Property="x => x.Goals + x.Assists" Title="P" Sortable="true" Filterable="true" InitialDirection="SortDirection.Descending"/>
                         <PropertyColumn Property="x => x.Goals" Title="G" Sortable="true" Filterable="true"/>
                         <PropertyColumn Property="x => x.Assists" Title="A" Sortable="true" Filterable="true"/>
                     </Columns>
                 </MudDataGrid>
             </MudTabPanel>
         }
-        @if (goalieStats is not null)
+        @if (renderedGoalieStats is not null)
         {
-            <MudTabPanel Text="Goalies" BadgeData="goalieStats.Count()">
-                <MudDataGrid Items="@goalieStats" QuickFilter="@_goalieQuickFilter" Striped Dense>
+            <MudTabPanel Text="Goalies" BadgeData="renderedGoalieStats.Count()">
+                <MudDataGrid Items="@renderedGoalieStats" QuickFilter="@_goalieQuickFilter" Height="65vh" FixedHeader Dense>
                     <ToolBarContent>
-                        <MudText Typo="Typo.h6">Skaters</MudText>
-                        <MudSpacer/>
-                        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+                        <MudText Typo="Typo.h6">Goalies</MudText>
                     </ToolBarContent>
                     <Columns>
-                        <TemplateColumn Title="Player" Sortable="true" Filterable="true" StickyLeft>
+                        <TemplateColumn Title="Goalie" Sortable="true" Filterable="true" StickyLeft>
                             <CellTemplate>
                                 <MudStack AlignItems="AlignItems.Center" Row>
                                     <MudAvatar>
                                         <MudImage Src="@profilePictures.First(x => x.PlayerId == context.Item.PlayerId).Source"/>
                                     </MudAvatar>
-                                    <MudText Typo="Typo.subtitle1">@context.Item.Name</MudText>
+                                    <MudLink Typo="Typo.subtitle1" Href=@($"/player/{context.Item.PlayerId}")>@context.Item.Name</MudLink>
+                                    <MudImage Src="@teams.First(x => x.id == context.Item.TeamId).logo_url" Height="30"/>
                                 </MudStack>
                             </CellTemplate>
-                        </TemplateColumn> <PropertyColumn Property="x => x.PlayerNumber" Title="No"/>
+                        </TemplateColumn>
+                        <PropertyColumn Property="x => x.PlayerNumber" Title="#"/>
                         <PropertyColumn Property="x => 'G'" Title="Pos"/>
-                        <PropertyColumn Property="x => x.GAA" Title="GAA" Sortable="true" Filterable="true"/>
+                        <PropertyColumn Property="x => x.GAA" Title="GAA" Sortable="true" Filterable="true" InitialDirection="SortDirection.Ascending"/>
                         <PropertyColumn Property="x => x.Shutouts" Title="SO" Sortable="true" Filterable="true"/>
                     </Columns>
                 </MudDataGrid>
@@ -69,13 +90,52 @@
 
 
 @code {
-
-    private IEnumerable<PlayerStatline>? skaterStats;
-    private IEnumerable<GoalieStatline>? goalieStats;
+    
+    private IEnumerable<PlayerStatLine>? allSkaterStats;
+    private IEnumerable<GoalieStatLine>? allGoalieStats;
+    private IEnumerable<PlayerStatLine>? renderedSkaterStats;
+    private IEnumerable<GoalieStatLine>? renderedGoalieStats;
     private IEnumerable<BCTeam>? teams;
     private IEnumerable<PlayerProfilePicture>? profilePictures;
 
     private string searchString;
+
+    private BCTeam? _selectedFilterTeam;
+
+    private BCTeam? selectedFilterTeam
+    {
+        get => _selectedFilterTeam;
+        set
+        {
+            _selectedFilterTeam = value;
+
+            if (allSkaterStats is null || allGoalieStats is null) return;
+            
+            if (value is null)
+            {
+                renderedSkaterStats = allSkaterStats.OrderByDescending(x => x.Goals + x.Assists);
+                renderedGoalieStats = allGoalieStats.OrderBy(x => x.GAA);
+            }
+            else
+            {
+                renderedSkaterStats = allSkaterStats.Where(x => x.TeamId == value.id).OrderByDescending(x => x.Goals + x.Assists);
+                renderedGoalieStats = allGoalieStats.Where(x => x.TeamId == value.id).OrderBy(x => x.GAA);
+            }
+            
+            StateHasChanged();
+        }
+    }
+    
+    private int _activeTabIndex;
+    private int activeTabIndex
+    {
+        get => _activeTabIndex;
+        set
+        {
+            _activeTabIndex = value;
+            searchString = string.Empty;
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -85,26 +145,28 @@
         var profilePicTask = BCData.GetPlayerProfilePictures();
         await Task.WhenAll(skaterTask, goalieTask, teamTask, profilePicTask);
         
-        skaterStats = skaterTask.Result;
-        goalieStats = goalieTask.Result;
+        allSkaterStats = skaterTask.Result;
+        allGoalieStats = goalieTask.Result;
+        renderedSkaterStats = allSkaterStats.OrderByDescending(x => x.Goals + x.Assists);
+        renderedGoalieStats = allGoalieStats.OrderBy(x => x.GAA);
         teams = teamTask.Result;
         profilePictures = profilePicTask.Result;
     }
     
     // quick filter - filter globally across multiple columns with the same input
-    private Func<PlayerStatline, bool> _playerQuickFilter => x =>
+    private Func<PlayerStatLine, bool> _playerQuickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
         
         if (x.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-
+        
         return false;
     };    
     
     // quick filter - filter globally across multiple columns with the same input
-    private Func<GoalieStatline, bool> _goalieQuickFilter => x =>
+    private Func<GoalieStatLine, bool> _goalieQuickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;

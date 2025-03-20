@@ -35,7 +35,7 @@
         <MudStack>
             @{
                     int rank = 1;
-                    foreach (Data.GoalieStatline goalie in orderedGoalies)
+                    foreach (Data.GoalieStatLine goalie in orderedGoalies)
                     {
                         int playerRank = rank;
                         <MudButton OnClick="() => selectedGoalie = goalie" Color="@goalieButtonColor(goalie)"
@@ -66,13 +66,13 @@ else
 }
 
 @code {
-    [Parameter] public IEnumerable<Data.GoalieStatline>? Goalies { get; set; }
-    [Parameter] public Func<Data.GoalieStatline, double>? StatValue { get; set; }
+    [Parameter] public IEnumerable<Data.GoalieStatLine>? Goalies { get; set; }
+    [Parameter] public Func<Data.GoalieStatLine, double>? StatValue { get; set; }
     [Parameter] public string Label { get; set; } = "";
     [Parameter] public bool Ascending { get; set; } = false;
 
-    private IEnumerable<Data.GoalieStatline>? orderedGoalies { get; set; }
-    private Data.GoalieStatline? selectedGoalie;
+    private IEnumerable<Data.GoalieStatLine>? orderedGoalies { get; set; }
+    private Data.GoalieStatLine? selectedGoalie;
     private IEnumerable<Data.PlayerProfilePicture>? profilePictures;
     private IEnumerable<BCTeam>? teams;
 
@@ -97,8 +97,8 @@ else
         selectedGoalie = orderedGoalies?.First();
     }
 
-    private Variant goalieButtonVariant(Data.GoalieStatline goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
+    private Variant goalieButtonVariant(Data.GoalieStatLine goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
     Variant.Filled : Variant.Outlined;
-    private Color goalieButtonColor(Data.GoalieStatline goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
+    private Color goalieButtonColor(Data.GoalieStatLine goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
     Color.Primary : Color.Default;
 }

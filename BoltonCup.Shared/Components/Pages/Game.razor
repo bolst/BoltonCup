@@ -2,102 +2,23 @@
 
 @inject IBCData BCData
 
-@if (currGame is not null)
+
+@if (homeTeam is not null && awayTeam is not null)
 {
-    @* <ScheduleRow Game="@currGame" Clickable="false" /> *@
+    <PageHeader Title=@($"{@homeTeam.name_short} @ {awayTeam.name_short}")>
+        <MudStack AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap" Row>
+            Game - @homeTeam.name_short <img src="@homeTeam.logo_url" height="50"/> vs. @awayTeam.name_short <img src="@awayTeam.logo_url" height="50"/>
+        </MudStack>
+    </PageHeader>
+}
+else
+{
+    <PageHeader Title="Game">Game</PageHeader>
 }
 
-<MudPaper Class="py-10 my-5 mx-2 px-2 px-sm-10 mx-sm-5">
+<div class="mx-6 mt-6">
     <MudGrid>
-        <MudItem xs="12" sm="8">
-            <MudText Class="mb-4" Typo="Typo.h5"><b>Scoring</b></MudText>
-            @if (gameGoals is not null)
-            {
-                if (gameGoals.Any(goal => goal.Period == 1))
-                {
-                    <MudText Typo="Typo.h6">1st Period</MudText>
-                    foreach (var goal in gameGoals.Where(g => g.Period == 1))
-                    {
-                        <GameGoalCard Goal="@goal" />
-                    }
-                }
-
-                if (gameGoals.Any(goal => goal.Period == 2))
-                {
-                    <MudText Typo="Typo.h6">2nd Period</MudText>
-                    foreach (var goal in gameGoals.Where(g => g.Period == 2))
-                    {
-                        <GameGoalCard Goal="@goal" />
-                    }
-                }
-
-                if (gameGoals.Any(goal => goal.Period == 3))
-                {
-                    <MudText Typo="Typo.h6">3rd Period</MudText>
-                    foreach (var goal in gameGoals.Where(g => g.Period == 3))
-                    {
-                        <GameGoalCard Goal="@goal" />
-                    }
-                }
-                if (gameGoals.Any(goal => goal.Period == 4))
-                {
-                    <MudText Typo="Typo.h6">Overtime</MudText>
-                    foreach (var goal in gameGoals.Where(g => g.Period == 4))
-                    {
-                        <GameGoalCard Goal="@goal" />
-                    }
-                }
-                if (gameGoals.Any(goal => goal.Period == 5))
-                {
-                    <MudText Typo="Typo.h6">Shootout</MudText>
-                    foreach (var goal in gameGoals.Where(g => g.Period == 5))
-                    {
-                        <GameGoalCard Goal="@goal" ShowTime="false" />
-                    }
-                }
-            }
-            else
-            {
-                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
-                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
-                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
-                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
-                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
-            }
-
-            <MudText Class="mt-12 mb-4" Typo="Typo.h5"><b>Penalties</b></MudText>
-            @if (gamePenalties is not null)
-            {
-                if (gamePenalties.Any(penalty => penalty.Period == 1))
-                {
-                    <MudText Typo="Typo.h6">1st Period</MudText>
-                    <MudDivider />
-                    <GamePenaltiesTable Penalties="@gamePenalties.Where(p => p.Period == 1)" />
-                }
-
-                if (gamePenalties.Any(penalty => penalty.Period == 2))
-                {
-                    <MudText Typo="Typo.h6">2nd Period</MudText>
-                    <MudDivider />
-                    <GamePenaltiesTable Penalties="@gamePenalties.Where(p => p.Period == 2)" />
-                }
-
-                if (gamePenalties.Any(penalty => penalty.Period == 3))
-                {
-                    <MudText Typo="Typo.h6">3rd Period</MudText>
-                    <MudDivider />
-                    <GamePenaltiesTable Penalties="@gamePenalties.Where(p => p.Period == 3)" />
-                }
-            }
-            else
-            {
-                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
-                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
-                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh" />
-            }
-
-        </MudItem>
-        <MudItem xs="12" sm="4">
+        <MudItem xs="12" md="4">
             <MudPaper Class="pa-4">
                 <MudText Typo="Typo.h5"><b>Linescore</b></MudText>
                 <MudDivider />
@@ -111,8 +32,99 @@
                 }
             </MudPaper>
         </MudItem>
+        <MudItem xs="12" md="8">
+            <MudText Class="mb-4" Typo="Typo.h5"><b>Scoring</b></MudText>
+            @if (gameGoals is not null)
+            {
+                if (gameGoals.Any(goal => goal.Period == 1))
+                {
+                    <MudText Typo="Typo.h6">1st Period</MudText>
+                    foreach (var goal in gameGoals.Where(g => g.Period == 1))
+                    {
+                        <GameGoalCard Goal="@goal"/>
+                    }
+                }
+
+                if (gameGoals.Any(goal => goal.Period == 2))
+                {
+                    <MudText Typo="Typo.h6">2nd Period</MudText>
+                    foreach (var goal in gameGoals.Where(g => g.Period == 2))
+                    {
+                        <GameGoalCard Goal="@goal"/>
+                    }
+                }
+
+                if (gameGoals.Any(goal => goal.Period == 3))
+                {
+                    <MudText Typo="Typo.h6">3rd Period</MudText>
+                    foreach (var goal in gameGoals.Where(g => g.Period == 3))
+                    {
+                        <GameGoalCard Goal="@goal"/>
+                    }
+                }
+
+                if (gameGoals.Any(goal => goal.Period == 4))
+                {
+                    <MudText Typo="Typo.h6">Overtime</MudText>
+                    foreach (var goal in gameGoals.Where(g => g.Period == 4))
+                    {
+                        <GameGoalCard Goal="@goal"/>
+                    }
+                }
+
+                if (gameGoals.Any(goal => goal.Period == 5))
+                {
+                    <MudText Typo="Typo.h6">Shootout</MudText>
+                    foreach (var goal in gameGoals.Where(g => g.Period == 5))
+                    {
+                        <GameGoalCard Goal="@goal" ShowTime="false"/>
+                    }
+                }
+            }
+            else
+            {
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh"/>
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh"/>
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh"/>
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh"/>
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh"/>
+            }
+
+            @if (gamePenalties is not null && gamePenalties.Any())
+            {
+                <MudText Class="mt-12 mb-4" Typo="Typo.h5"><b>Penalties</b></MudText>
+                if (gamePenalties.Any(penalty => penalty.Period == 1))
+                {
+                    <MudText Typo="Typo.h6">1st Period</MudText>
+                    <MudDivider/>
+                    <GamePenaltiesTable Penalties="@gamePenalties.Where(p => p.Period == 1)"/>
+                }
+
+                if (gamePenalties.Any(penalty => penalty.Period == 2))
+                {
+                    <MudText Typo="Typo.h6">2nd Period</MudText>
+                    <MudDivider/>
+                    <GamePenaltiesTable Penalties="@gamePenalties.Where(p => p.Period == 2)"/>
+                }
+
+                if (gamePenalties.Any(penalty => penalty.Period == 3))
+                {
+                    <MudText Typo="Typo.h6">3rd Period</MudText>
+                    <MudDivider/>
+                    <GamePenaltiesTable Penalties="@gamePenalties.Where(p => p.Period == 3)"/>
+                }
+            }
+            else if (gamePenalties is null)
+            {
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh"/>
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh"/>
+                <MudSkeleton Class="my-2" SkeletonType="SkeletonType.Rectangle" Width="50vw" Height="10vh"/>
+            }
+
+        </MudItem>
+
     </MudGrid>
-</MudPaper>
+</div>
 
 
 @code {
@@ -121,11 +133,26 @@
     private BCGame? currGame;
     private IEnumerable<GameGoal>? gameGoals;
     private IEnumerable<GamePenalty>? gamePenalties;
+    private BCTeam? homeTeam;
+    private BCTeam? awayTeam;
 
     protected override async Task OnInitializedAsync()
     {
-        currGame = await BCData.GetGameById(Id);
-        gameGoals = await BCData.GetGameGoalsByGameId(Id);
-        gamePenalties = await BCData.GetGamePenaltiesByGameId(Id);
+        var gameTask = BCData.GetGameById(Id);
+        var goalsTask = BCData.GetGameGoalsByGameId(Id);
+        var pensTask = BCData.GetGamePenaltiesByGameId(Id);
+        await Task.WhenAll(gameTask, goalsTask, pensTask);
+
+        currGame = gameTask.Result;
+        gameGoals = goalsTask.Result;
+        gamePenalties = pensTask.Result;
+        
+
+        var homeTask = BCData.GetTeamById(currGame.home_team_id);
+        var awayTask = BCData.GetTeamById(currGame.away_team_id);
+        await Task.WhenAll(homeTask, awayTask);
+        
+        homeTeam = homeTask.Result;
+        awayTeam = awayTask.Result;
     }
 }

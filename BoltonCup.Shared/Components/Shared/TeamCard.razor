@@ -2,10 +2,9 @@
 
 @if (Team is not null)
 {
-    <MudPaper Class="px-5" Style="@BkgStyle" Elevation="3" Square>
-        <MudStack Class="d-flex align-center" Style="height: 20vh" Row="true">
-            <MudImage Src="@Team.logo_url" Style="max-height: 100%" />
-            
+    <MudPaper Style="@BkgStyle" Elevation="3" Square>
+        <MudStack Style="height: 20vh" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="0" Row>
+            <MudImage Src="@Team.logo_url" Style="max-height: 80%" />
             
             <MudLink Class="white-text" Typo="Typo.h4" Href=@($"/team/{Team.id}")>
                 <b>@Team.name</b>

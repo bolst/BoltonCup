@@ -67,13 +67,13 @@
     [Parameter] 
     public string StatType { get; set; } = "points";
     
-    private IEnumerable<BoltonCup.Shared.Data.PlayerStatline>? skaterStats;
-    private IEnumerable<BoltonCup.Shared.Data.GoalieStatline>? goalieStats;
+    private IEnumerable<BoltonCup.Shared.Data.PlayerStatLine>? skaterStats;
+    private IEnumerable<BoltonCup.Shared.Data.GoalieStatLine>? goalieStats;
     
     private IEnumerable<BoltonCup.Shared.Data.PlayerProfilePicture>? profilePictures;
 
-    private BoltonCup.Shared.Data.PlayerStatline? selectedSkater;
-    private BoltonCup.Shared.Data.GoalieStatline? selectedGoalie;
+    private BoltonCup.Shared.Data.PlayerStatLine? selectedSkater;
+    private BoltonCup.Shared.Data.GoalieStatLine? selectedGoalie;
     
     private bool IsGoalie => new[] { "goals against average", "shutouts" }.Contains(StatType.ToLower());
 
@@ -81,7 +81,7 @@
     private string LeaderDetails => IsGoalie ? $"#{selectedGoalie.PlayerNumber} | G" : $"#{selectedSkater.PlayerNumber} | {selectedSkater.Position.First()}";
     private string LeaderProfilePic => profilePictures?.Where(p => (IsGoalie ? p.PlayerId == selectedGoalie.PlayerId : p.PlayerId == selectedSkater.PlayerId)).First().Source;
     
-    private string PlayerStatValue(BoltonCup.Shared.Data.PlayerStatline player)
+    private string PlayerStatValue(BoltonCup.Shared.Data.PlayerStatLine player)
     {
         return StatType.ToLower() switch
         {
@@ -92,7 +92,7 @@
         };
     }    
     
-    private string PlayerStatValue(BoltonCup.Shared.Data.GoalieStatline goalie)
+    private string PlayerStatValue(BoltonCup.Shared.Data.GoalieStatLine goalie)
     {
         return StatType.ToLower() switch
         {
@@ -151,8 +151,8 @@
         };
     }
 
-    private Variant skaterButtonVariant(BoltonCup.Shared.Data.PlayerStatline skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
+    private Variant skaterButtonVariant(BoltonCup.Shared.Data.PlayerStatLine skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
         Variant.Filled : Variant.Text;    
-    private Variant goalieButtonVariant(BoltonCup.Shared.Data.GoalieStatline goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
+    private Variant goalieButtonVariant(BoltonCup.Shared.Data.GoalieStatLine goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
         Variant.Filled : Variant.Text;
 }
