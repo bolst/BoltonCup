@@ -147,8 +147,11 @@
         
         allSkaterStats = skaterTask.Result;
         allGoalieStats = goalieTask.Result;
+        
+        // TODO: investigate why default sort doesn't work on MAUI
         renderedSkaterStats = allSkaterStats.OrderByDescending(x => x.Goals + x.Assists);
         renderedGoalieStats = allGoalieStats.OrderBy(x => x.GAA);
+        
         teams = teamTask.Result;
         profilePictures = profilePicTask.Result;
     }
