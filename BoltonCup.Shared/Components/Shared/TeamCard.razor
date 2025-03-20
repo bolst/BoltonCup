@@ -2,31 +2,27 @@
 
 @if (Team is not null)
 {
-    <MudPaper Class="px-5 ma-5 team-card clickable" Style="@($"background-color: {Team.primary_color_hex}55;")" Elevation="5"
-    onclick=@(() => Navigation.NavigateTo($"/team/{Team.id}"))>
-    <MudStack Class="d-flex align-center" Style="height: 10vh" Row="true">
-        <MudImage Src="@Team.logo_url" Style="max-height: 100%" />
-        <MudText Class="team-name" Style="@($"color: {Team?.primary_color_hex}")" Typo="Typo.h5">
-            <b>@Team.name_short.ToUpper()</b>
-        </MudText>
-    </MudStack>
-</MudPaper>
+    <MudPaper Class="px-5" Style="@BkgStyle" Elevation="3" Square>
+        <MudStack Class="d-flex align-center" Style="height: 20vh" Row="true">
+            <MudImage Src="@Team.logo_url" Style="max-height: 100%" />
+            
+            
+            <MudLink Class="white-text" Typo="Typo.h4" Href=@($"/team/{Team.id}")>
+                <b>@Team.name</b>
+            </MudLink>
+        </MudStack>
+    </MudPaper>
 }
 else
 {
     <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="30vw" Height="10vh" />
 }
 
-<style>
-    .team-card {}
-
-    .team-card:hover {
-        text-decoration: underline;
-    }
-</style>
 
 @code {
 
     [Parameter] public Data.BCTeam? Team { get; set; }
+
+    private string BkgStyle => Team is null ? string.Empty : $"background: url({Team.logo_url}); background-size: cover; box-shadow: inset 0 0 0 2000px {Team.primary_color_hex}cc; background-position: center;";
 
 }

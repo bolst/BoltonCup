@@ -197,3 +197,12 @@ public class BCAccount
         return new(new ClaimsIdentity(claims, "BoltonCup"));
     }
 }
+
+public class BCTournament
+{
+    public required int tournament_id { get; set; }
+    public DateTime? start_date { get; set; }
+    public DateTime? end_date { get; set; }
+    public int? winning_team_id { get; set; }
+    public required string name { get; set; }
+}
