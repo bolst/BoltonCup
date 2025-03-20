@@ -24,6 +24,8 @@ public interface IBCData
     Task<IEnumerable<BCAccount>> GetAccountsAsync();
     Task<BCAccount?> GetAccountByEmailAsync(string email);
     Task UpdateAccountProfilePictureAsync(string email, string imagePath);
+    Task<IEnumerable<BCTournament>> GetTournamentsAsync();
+    Task<BCTournament?> GetTournamentByYearAsync(string year);
 }
 
 public class BCData : IBCData
@@ -571,6 +573,23 @@ public class BCData : IBCData
                           email = @Email";
         await using var connection = new NpgsqlConnection(connectionString);
         await connection.ExecuteAsync(sql, new { Email = email, ImagePath = imagePath });
+    }
+
+    public async Task<IEnumerable<BCTournament>> GetTournamentsAsync()
+    {
+        string sql = @"SELECT *
+                        FROM tournament";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCTournament>(sql);
+    }    
+    
+    public async Task<BCTournament?> GetTournamentByYearAsync(string year)
+    {
+        string sql = @"SELECT *
+                        FROM tournament
+                        WHERE EXTRACT(YEAR FROM start_date) = @Year";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryFirstOrDefaultAsync<BCTournament>(sql, new { Year = year });
     }
 }
 
