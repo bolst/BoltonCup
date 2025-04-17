@@ -41,7 +41,7 @@
 
 
 @code {
-    private bool _isDarkMode = true;
+    private bool _isDarkMode = false;
     private MudTheme? _theme = null;
 
     protected override void OnInitialized()
@@ -50,18 +50,6 @@
 
         _theme = new CustomThemeProvider().Theme;
     }
-
-    private void DarkModeToggle()
-    {
-        _isDarkMode = !_isDarkMode;
-        StateHasChanged();
-    }
-
-    public string DarkLightModeButtonIcon => _isDarkMode switch
-    {
-        true => Icons.Material.Rounded.AutoMode,
-        false => Icons.Material.Outlined.DarkMode,
-    };
 
     private void NavToHome() => Navigation.NavigateTo("");
 }
