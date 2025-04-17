@@ -507,10 +507,26 @@ public class BCData : IBCData
                         VALUES
                           (@FirstName, @LastName, @Email, @Birthday, @Position, @HighestLevel)";
 
-        await using var connection = new NpgsqlConnection(connectionString);
-        var rowsAffected = await connection.ExecuteAsync(sql, form);
+        try
+        {
+            await using var connection = new NpgsqlConnection(connectionString);
+            var rowsAffected = await connection.ExecuteAsync(sql, form);
 
-        return rowsAffected == 0 ? "Something went wrong" : string.Empty;
+            return rowsAffected == 0 ? "Something went wrong" : string.Empty;
+        }
+        catch (PostgresException ex)
+        {
+            if (ex.ConstraintName == "registration_email_key")
+            {
+                return "That email is already registered.";
+            }
+
+            return "Something went wrong...";
+        }
+        catch (Exception)
+        {
+            return "Something went wrong...";
+        }
     }
 
     public async Task<IEnumerable<RegisterFormModel>> GetRegistrationsAsync()

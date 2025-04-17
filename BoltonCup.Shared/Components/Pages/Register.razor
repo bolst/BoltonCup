@@ -32,7 +32,11 @@ else
                 </MudItem>        
                 <MudItem xs="12" md="6">
                     <MudPaper Class="pa-6 px-10">
-                        <RegisterForm OnSubmit="OnFormSubmit" />
+                        <RegisterForm OnSubmit="OnFormSubmit">
+                            <ErrorContent>
+                                <MudText Color="Color.Error">@errorMsg</MudText>
+                            </ErrorContent>
+                        </RegisterForm>
                     </MudPaper>
                 </MudItem>
             </MudGrid>
@@ -45,6 +49,7 @@ else
     private readonly string ContainerStyle = "height: 120vh; background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//BOLTONCUP-86.webp'); background-size: cover; background-position: center center;";
 
     private bool? hasRegistered;
+    private string errorMsg = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -75,7 +80,7 @@ else
         }
         else
         {
-            // TODO: handle error message
+            errorMsg = errorMessage;
         }
         
         StateHasChanged();

@@ -50,6 +50,11 @@
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
         </div>
         
+        @if (ErrorContent is not null)
+        {
+            @ErrorContent
+        }
+        
         <MudText Typo="Typo.caption">Registering does not guarantee your spot for Bolton Cup 2025</MudText>
     </MudStack>
 </EditForm>
@@ -58,6 +63,9 @@
     
     [Parameter]
     public EventCallback<RegisterFormModel> OnSubmit { get; set; }
+
+    [Parameter]
+    public RenderFragment ErrorContent { get; set; }
 
     private RegisterFormModel model = new();
 
