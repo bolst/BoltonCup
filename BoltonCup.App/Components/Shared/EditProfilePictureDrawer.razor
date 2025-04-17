@@ -3,33 +3,44 @@
 @inject IBCData BCData
 
 <MudDrawer @bind-Open="@DrawerOpen" Width="100%" Anchor="Anchor.End" Variant="DrawerVariant.Temporary" Color="Color.Primary">
-    <MudDrawerHeader>
-        <MudGrid Class="mt-8">
-            <MudItem Class="d-flex align-center" xs="2">
-                <MudIconButton Color="Color.Inherit" Icon="@Icons.Material.Filled.ArrowBackIosNew" OnClick="@(() => DrawerOpen = false)" Size="Size.Small" />
-            </MudItem>
-            <MudItem Class="d-flex align-center justify-center" xs="8">
-                <MudText Typo="Typo.subtitle1"><b>Edit Profile Picture</b></MudText>
-            </MudItem>
-            <MudItem xs="2">
-                &nbsp;
-            </MudItem>
-        </MudGrid>
-    </MudDrawerHeader>
-    <div class="px-4">
+    @if (loading)
+    {
+        <div class="px-4 mt-20">
+            <MudStack AlignItems="AlignItems.Center">
+                <MudProgressCircular Size="Size.Large" Indeterminate />
+            </MudStack>
+        </div>
+    }
+    else
+    {
+        <MudDrawerHeader>
+            <MudGrid Class="mt-8">
+                <MudItem Class="d-flex align-center" xs="2">
+                    <MudIconButton Color="Color.Inherit" Icon="@Icons.Material.Filled.ArrowBackIosNew" OnClick="@(() => DrawerOpen = false)" Size="Size.Small" />
+                </MudItem>
+                <MudItem Class="d-flex align-center justify-center" xs="8">
+                    <MudText Typo="Typo.subtitle1"><b>Edit Profile Picture</b></MudText>
+                </MudItem>
+                <MudItem xs="2">
+                    &nbsp;
+                </MudItem>
+            </MudGrid>
+        </MudDrawerHeader>
+        <div class="px-4">
 
-        <MudStack AlignItems="AlignItems.Center">
-            <MudAvatar Style="height: 100px; width: 100px;">
-                <MudImage Src="@ImageSrc" ObjectFit="ObjectFit.Cover" />
-            </MudAvatar>
-        </MudStack>
+            <MudStack AlignItems="AlignItems.Center">
+                <MudAvatar Style="height: 100px; width: 100px;">
+                    <MudImage Src="@ImageSrc" ObjectFit="ObjectFit.Cover" />
+                </MudAvatar>
+            </MudStack>
 
-        <MudStack Class="mt-10" AlignItems="AlignItems.Start">
-            <MudButton StartIcon="@Icons.Material.Filled.PhotoLibrary" Color="Color.Inherit" OnClick="OnUploadFromLibrary">Choose from library</MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.PhotoCamera" Color="Color.Inherit" OnClick="OnTakePhoto">Take Photo</MudButton>
-        </MudStack>
+            <MudStack Class="mt-10" AlignItems="AlignItems.Start">
+                <MudButton StartIcon="@Icons.Material.Filled.PhotoLibrary" Color="Color.Inherit" OnClick="OnUploadFromLibrary">Choose from library</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.PhotoCamera" Color="Color.Inherit" OnClick="OnTakePhoto">Take Photo</MudButton>
+            </MudStack>
 
-    </div>
+        </div>
+    }
 </MudDrawer>
 
 @code{
@@ -45,6 +56,21 @@
 
     [Parameter] 
     public EventCallback<byte[]> OnImageUpload { get; set; }
+
+    private bool _loading = false;
+
+    private bool loading
+    {
+        get => _loading;
+        set
+        {
+            if (value != _loading)
+            {
+                _loading = value;
+                StateHasChanged();
+            }
+        }
+    }
     
     private bool DrawerOpen
     {
@@ -89,7 +115,10 @@
         localFileStream.Dispose();
         var imageBytes = File.ReadAllBytes(localFilePath);
         ImageSrc = $"data:image/*;base64,{Convert.ToBase64String(imageBytes)}";
+
+        loading = true;
         await OnImageUpload.InvokeAsync(imageBytes);
+        loading = false;
         
         StateHasChanged();
     }
