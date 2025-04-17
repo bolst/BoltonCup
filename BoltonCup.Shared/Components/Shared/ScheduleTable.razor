@@ -1,7 +1,7 @@
 @inject Data.IBCData BCData
 @inject NavigationManager Navigation
 
-<MudSimpleTable Elevation="0" Striped="true" Hover="true">
+<MudSimpleTable Elevation="0" Striped="true" Hover="true" Dense>
     <thead>
         <tr>
             <th class="d-flex justify-center">Matchup</th>
@@ -13,7 +13,7 @@
     <tbody>
         @if (Games is not null)
         {
-            @foreach (Data.ScheduledGame game in Games)
+            @foreach (Data.BCGame game in Games)
             {
                 <ScheduleRow Game="@game" />
             }
@@ -22,5 +22,5 @@
 </MudSimpleTable>
 
 @code {
-    [Parameter] public IEnumerable<Data.ScheduledGame>? Games { get; set; }
+    [Parameter] public IEnumerable<Data.BCGame>? Games { get; set; }
 }

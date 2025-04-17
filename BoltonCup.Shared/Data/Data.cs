@@ -4,20 +4,18 @@ using Npgsql;
 
 public interface IBCData
 {
-    Task<IEnumerable<Team>> GetTeams();
-    Task<Team?> GetTeamById(int id);
-    Task<IEnumerable<ScheduledGame>> GetSchedule();
-    Task<ScheduledGame?> GetGameById(int id);
-    Task<IEnumerable<TeamPlayer>?> GetRosterByTeamId(int teamId);
-    Task<Player?> GetPlayerById(int playerId);
+    Task<IEnumerable<BCTeam>> GetTeams();
+    Task<BCTeam?> GetTeamById(int id);
+    Task<IEnumerable<BCGame>> GetSchedule();
+    Task<BCGame?> GetGameById(int id);
+    Task<IEnumerable<BCTeamPlayer>?> GetRosterByTeamId(int teamId);
     Task<PlayerProfile?> GetPlayerProfileById(int playerId);
     Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int playerId);
     Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int goalieId);
     Task<IEnumerable<GameGoal>> GetGameGoalsByGameId(int gameId);
     Task<IEnumerable<GamePenalty>> GetGamePenaltiesByGameId(int gameId);
-    Task<IEnumerable<PlayerStatline>> GetPlayerStats();
-    Task<IEnumerable<GoalieStatline>> GetGoalieStats();
-    Task<GameScore?> GetGameScoreById(int gameId);
+    Task<IEnumerable<PlayerStatLine>> GetPlayerStats();
+    Task<IEnumerable<GoalieStatLine>> GetGoalieStats();
     Task<IEnumerable<PlayerProfilePicture>> GetPlayerProfilePictures();
     Task<PlayerProfilePicture> GetPlayerProfilePictureById(int playerId);
     Task<string> SubmitRegistration(RegisterFormModel form);
@@ -26,6 +24,8 @@ public interface IBCData
     Task<IEnumerable<BCAccount>> GetAccountsAsync();
     Task<BCAccount?> GetAccountByEmailAsync(string email);
     Task UpdateAccountProfilePictureAsync(string email, string imagePath);
+    Task<IEnumerable<BCTournament>> GetTournamentsAsync();
+    Task<BCTournament?> GetTournamentByYearAsync(string year);
 }
 
 public class BCData : IBCData
@@ -41,134 +41,82 @@ public class BCData : IBCData
         cacheService = _cacheService;
     }
 
-    public async Task<IEnumerable<Team>> GetTeams()
+    public async Task<IEnumerable<BCTeam>> GetTeams()
     {
         string cacheKey = "teams";
 
         return await cacheService.GetOrAddAsync(cacheKey, async () =>
         {
-            string sql = @"SELECT
-                          T.id as Id,
-                          T.name as Name,
-                          T.name_short as ShortName,
-                          T.primary_color_hex as PrimaryHex,
-                          T.secondary_color_hex as SecondaryHex,
-                          T.tertiary_color_hex as TertiaryHex,
-                          T.logo_url as LogoUrl
+            string sql = @"SELECT *
                         FROM
-                          teams T";
+                          team T";
             await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryAsync<Team>(sql);
+            return await connection.QueryAsync<BCTeam>(sql);
         }, cacheDuration);
     }
 
-    public async Task<Team?> GetTeamById(int id)
+    public async Task<BCTeam?> GetTeamById(int id)
     {
         string cacheKey = $"team_{id}";
 
         return await cacheService.GetOrAddAsync(cacheKey, async () =>
         {
-            string sql = @"SELECT
-                            T.id AS Id,
-                            T.name AS Name,
-                            T.name_short as ShortName,
-                            T.primary_color_hex AS PrimaryHex,
-                            T.secondary_color_hex AS SecondaryHex,
-                            T.tertiary_color_hex AS TertiaryHex,
-                            T.logo_url as LogoUrl
+            string sql = @"SELECT *
                         FROM
-                            teams T
+                            team T
                         WHERE
                             T.id = @TeamId";
             await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryFirstOrDefaultAsync<Team>(sql, new { TeamId = id });
+            return await connection.QueryFirstOrDefaultAsync<BCTeam>(sql, new { TeamId = id });
         }, cacheDuration);
     }
 
-    public async Task<IEnumerable<ScheduledGame>> GetSchedule()
+    public async Task<IEnumerable<BCGame>> GetSchedule()
     {
         string cacheKey = "schedule";
 
         return await cacheService.GetOrAddAsync(cacheKey, async () =>
         {
 
-            string sql = @"SELECT
-                                G.id as GameId,
-                                G.home_team_id as HomeTeamId,
-                                G.away_team_id as AwayTeamId,
-                                G.date as Date,
-                                G.type as GameType,
-                                G.location as Location,
-                                G.rink as Rink
+            string sql = @"SELECT *
                             FROM
-                                games G
+                                game G
                             ORDER BY G.date ASC";
             await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryAsync<ScheduledGame>(sql);
+            return await connection.QueryAsync<BCGame>(sql);
         }, cacheDuration);
     }
 
-    public async Task<ScheduledGame?> GetGameById(int id)
+    public async Task<BCGame?> GetGameById(int id)
     {
         string cacheKey = $"game_{id}";
 
         return await cacheService.GetOrAddAsync(cacheKey, async () =>
         {
-            string sql = @"SELECT
-                            G.id as GameId,
-                            G.home_team_id as HomeTeamId,
-                            G.away_team_id as AwayTeamId,
-                            G.date as Date,
-                            G.type as GameType,
-                            G.location as Location,
-                            G.rink as Rink
+            string sql = @"SELECT *
                             FROM
-                            games G
-                            WHERE G.id = @GameId";
+                                game
+                            WHERE id = @GameId";
             await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryFirstOrDefaultAsync<ScheduledGame>(sql, new { GameId = id });
+            return await connection.QueryFirstOrDefaultAsync<BCGame>(sql, new { GameId = id });
         }, cacheDuration);
     }
 
-    public async Task<IEnumerable<TeamPlayer>?> GetRosterByTeamId(int id)
+    public async Task<IEnumerable<BCTeamPlayer>?> GetRosterByTeamId(int id)
     {
         string cacheKey = $"roster_{id}";
 
         return await cacheService.GetOrAddAsync(cacheKey, async () =>
         {
-            string sql = @"SELECT
-                                P.name AS Name,
-                                P.dob AS Birthday,
-                                R.player_number AS JerseyNumber,
-                                R.player_id AS PlayerId,
-                                R.position AS Position,
-                                R.team_id AS TeamId
+            string sql = @"SELECT *
                             FROM
-                                rosters R
+                                roster R
                             INNER JOIN players P ON R.player_id = P.id
                                 AND R.team_id = @TeamId";
 
             await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryAsync<TeamPlayer>(sql, new { TeamId = id });
+            return await connection.QueryAsync<BCTeamPlayer>(sql, new { TeamId = id });
         }, cacheDuration);
-    }
-
-    public async Task<Player?> GetPlayerById(int id)
-    {
-        string cacheKey = $"player_{id}";
-
-        string sql = @"SELECT
-                        P.id AS Id,
-                        P.name AS Name,
-                        P.dob AS Birthday,
-                        P.preferred_beer AS PreferredBeer
-                    FROM
-                        players P
-                    WHERE
-                        P.id = @PlayerId";
-
-        await using var connection = new NpgsqlConnection(connectionString);
-        return await connection.QueryFirstOrDefaultAsync<Player>(sql, new { PlayerId = id });
     }
 
     public async Task<PlayerProfile?> GetPlayerProfileById(int id)
@@ -181,13 +129,13 @@ public class BCData : IBCData
                         P.dob AS Birthday,
                         P.preferred_beer AS PreferredBeer,
                         R.team_id AS CurrentTeamId,
-                        R.player_number AS JerseyNumber,
+                        R.jersey_number AS JerseyNumber,
                         R.position AS Position,
                         CASE WHEN T.winning_team_id IS NOT NULL THEN true ELSE false END AS IsWinner
                     FROM
                         players P
-                        JOIN rosters R ON P.id = R.player_id
-                        LEFT OUTER JOIN tournaments T ON T.winning_team_id = R.team_id
+                        JOIN roster R ON P.id = R.player_id
+                        LEFT OUTER JOIN tournament T ON T.winning_team_id = R.team_id
                     WHERE P.id = @PlayerId";
 
         await using var connection = new NpgsqlConnection(connectionString);
@@ -200,8 +148,8 @@ public class BCData : IBCData
 
         string sql = @"WITH
                         current_team AS (
-                            SELECT R.team_id, R.player_number
-                            FROM rosters R
+                            SELECT R.team_id, R.jersey_number
+                            FROM roster R
                             WHERE R.player_id = @PlayerId
                         ),
                         games_played AS (
@@ -210,11 +158,11 @@ public class BCData : IBCData
                                     WHEN C.team_id != G.home_team_id THEN G.home_team_id
                                     ELSE G.away_team_id
                                 END AS opponent_team_id, G.date, G.type, G.location, G.rink, G.home_team_id, G.away_team_id, C.*
-                            FROM games G
+                            FROM game G
                             INNER JOIN current_team C on C.team_id IN (G.home_team_id, G.away_team_id)
                         ),
                         team_points AS (
-                            SELECT GP.game_id, GP.player_number, GP.opponent_team_id, GP.team_id, GP.date,
+                            SELECT GP.game_id, GP.jersey_number, GP.opponent_team_id, GP.team_id, GP.date,
                                 COALESCE(P.player_jerseynum, -1) AS player_jerseynum,
                                 COALESCE(P.assist1_jerseynum, -1) AS assist1_jerseynum,
                                 COALESCE(P.assist2_jerseynum, -1) AS assist2_jerseynum
@@ -225,13 +173,13 @@ public class BCData : IBCData
                         SELECT
                         SUM(
                             CASE
-                            WHEN player_number = player_jerseynum THEN 1
+                            WHEN jersey_number = player_jerseynum THEN 1
                             ELSE 0
                             END
                         ) AS goals,
                         SUM(
                             CASE
-                            WHEN player_number IN (assist1_jerseynum, assist2_jerseynum) THEN 1
+                            WHEN jersey_number IN (assist1_jerseynum, assist2_jerseynum) THEN 1
                             ELSE 0
                             END
                         ) AS assists,
@@ -252,14 +200,14 @@ public class BCData : IBCData
 
         string sql = @"WITH
                         goalie_data AS (
-                            SELECT P.id AS player_id, P.name, R.player_number, R.position, R.team_id
+                            SELECT P.id AS player_id, P.name, R.jersey_number, R.position, R.team_id
                             FROM players P
-                            INNER JOIN rosters R ON R.player_id = P.id AND R.position = 'Goalie'
+                            INNER JOIN roster R ON R.player_id = P.id AND R.position = 'Goalie'
                         ),
                         goalie_games_played AS (
                             SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date
                             FROM goalie_data P
-                            RIGHT OUTER JOIN games G ON P.team_id IN (G.home_team_id, G.away_team_id)
+                            RIGHT OUTER JOIN game G ON P.team_id IN (G.home_team_id, G.away_team_id)
                         ),
                         goalie_game_scores AS (
                             SELECT GP.game_id, GP.player_id,  GP.team_id, GP.date,
@@ -330,13 +278,13 @@ public class BCData : IBCData
                                     WHEN p.is_hometeam = false THEN away_team_id
                                 END AS team_id
                                 FROM points p
-                                INNER JOIN games g ON g.id = p.game_id
+                                INNER JOIN game g ON g.id = p.game_id
                                 WHERE g.id = @GameId
                                 ORDER BY time desc
                             ) points
-                            LEFT JOIN rosters r1 ON points.player_jerseynum = r1.player_number AND points.team_id = r1.team_id
-                            LEFT JOIN rosters r2 ON points.assist1_jerseynum = r2.player_number AND points.team_id = r2.team_id
-                            LEFT JOIN rosters r3 ON points.assist2_jerseynum = r3.player_number AND points.team_id = r3.team_id
+                            LEFT JOIN roster r1 ON points.player_jerseynum = r1.jersey_number AND points.team_id = r1.team_id
+                            LEFT JOIN roster r2 ON points.assist1_jerseynum = r2.jersey_number AND points.team_id = r2.team_id
+                            LEFT JOIN roster r3 ON points.assist2_jerseynum = r3.jersey_number AND points.team_id = r3.team_id
                             LEFT JOIN players p1 ON r1.player_id = p1.id
                             LEFT JOIN players p2 ON r2.player_id = p2.id
                             LEFT JOIN players p3 ON r3.player_id = p3.id
@@ -370,11 +318,11 @@ public class BCData : IBCData
                                     WHEN p.is_hometeam = false THEN away_team_id
                                 END AS team_id
                                 FROM penalties p
-                                INNER JOIN games g ON g.id = p.game_id
+                                INNER JOIN game g ON g.id = p.game_id
                                 WHERE g.id = @GameId
                                 ORDER BY time desc
                             ) penalties
-                            LEFT JOIN rosters r1 ON penalties.player_jerseynum = r1.player_number AND penalties.team_id = r1.team_id
+                            LEFT JOIN roster r1 ON penalties.player_jerseynum = r1.jersey_number AND penalties.team_id = r1.team_id
                             LEFT JOIN players p1 ON r1.player_id = p1.id
                             ORDER BY penalties.period asc, penalties.time desc";
 
@@ -383,7 +331,7 @@ public class BCData : IBCData
         }, cacheDuration);
     }
 
-    public async Task<IEnumerable<PlayerStatline>> GetPlayerStats()
+    public async Task<IEnumerable<PlayerStatLine>> GetPlayerStats()
     {
         string cacheKey = $"player_stats";
 
@@ -391,9 +339,10 @@ public class BCData : IBCData
         {
             string sql = @"WITH
                             player_data AS (
-                                SELECT P.id AS player_id, P.name, R.player_number, R.position, R.team_id
+                                SELECT P.id AS player_id, P.name, R.jersey_number, R.position, R.team_id
                                 FROM players P
-                                INNER JOIN rosters R ON R.player_id = P.id
+                                INNER JOIN roster R ON R.player_id = P.id
+                                WHERE r.position != 'Goalie'
                             ),
                             points_with_teams AS (
                                 SELECT G.id AS game_id, P.player_jerseynum, P.assist1_jerseynum, P.assist2_jerseynum,
@@ -402,23 +351,23 @@ public class BCData : IBCData
                                     ELSE away_team_id
                                 END AS team_id
                                 FROM points P
-                                LEFT OUTER JOIN games G ON G.id = P.game_id
+                                LEFT OUTER JOIN game G ON G.id = P.game_id
                             ),
                             points_with_players AS (
                                 SELECT
                                 P.*, D1.player_id AS scorer_id, D2.player_id AS assist1_id, D3.player_id AS assist2_id
                                 FROM points_with_teams P
                                 LEFT OUTER JOIN player_data D1 ON D1.team_id = P.team_id
-                                AND D1.player_number = P.player_jerseynum
+                                AND D1.jersey_number = P.player_jerseynum
                                 LEFT OUTER JOIN player_data D2 ON D2.team_id = P.team_id
-                                AND D2.player_number = P.assist1_jerseynum
+                                AND D2.jersey_number = P.assist1_jerseynum
                                 LEFT OUTER JOIN player_data D3 ON D3.team_id = P.team_id
-                                AND D3.player_number = P.assist2_jerseynum
+                                AND D3.jersey_number = P.assist2_jerseynum
                             )
                             SELECT
                             player_id AS PlayerId,
                             name AS Name,
-                            player_number AS PlayerNumber,
+                            jersey_number AS PlayerNumber,
                             position AS Position,
                             team_id AS TeamId,
                             goals AS Goals,
@@ -447,10 +396,10 @@ public class BCData : IBCData
                             ORDER BY goals + assists DESC";
 
             await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryAsync<PlayerStatline>(sql);
+            return await connection.QueryAsync<PlayerStatLine>(sql);
         }, cacheDuration);
     }
-    public async Task<IEnumerable<GoalieStatline>> GetGoalieStats()
+    public async Task<IEnumerable<GoalieStatLine>> GetGoalieStats()
     {
         string cacheKey = $"goalie_stats";
 
@@ -458,17 +407,17 @@ public class BCData : IBCData
         {
             string sql = @"WITH
                             goalie_data AS (
-                                SELECT P.id AS player_id, P.name, R.player_number, R.position, R.team_id
+                                SELECT P.id AS player_id, P.name, R.jersey_number, R.position, R.team_id
                                 FROM players P
-                                INNER JOIN rosters R ON R.player_id = P.id AND R.position = 'Goalie'
+                                INNER JOIN roster R ON R.player_id = P.id AND R.position = 'Goalie'
                             ),
                             goalie_games_played AS (
                                 SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date
                                 FROM goalie_data P
-                                RIGHT OUTER JOIN games G ON P.team_id IN (G.home_team_id, G.away_team_id)
+                                RIGHT OUTER JOIN game G ON P.team_id IN (G.home_team_id, G.away_team_id)
                             ),
                             goalie_game_scores AS (
-                                SELECT GP.game_id, GP.player_id,  GP.name, GP.player_number, GP.team_id, GP.date,
+                                SELECT GP.game_id, GP.player_id,  GP.name, GP.jersey_number, GP.team_id, GP.date,
                                 CASE WHEN GP.team_id != GP.home_team_id THEN GP.home_team_id ELSE GP.away_team_id END AS opponent_team_id,
                                 SUM(
                                     CASE
@@ -499,49 +448,20 @@ public class BCData : IBCData
                                     FROM points P
                                     WHERE P.game_id = GP.game_id
                                 ) game_scores ON TRUE
-                                GROUP BY GP.game_id, GP.player_id, GP.name, GP.player_number, opponent_team_id, GP.team_id, GP.date
+                                GROUP BY GP.game_id, GP.player_id, GP.name, GP.jersey_number, opponent_team_id, GP.team_id, GP.date
                             )
                             SELECT
                             G.player_id AS PlayerId,
                             G.name AS Name,
-                            G.player_number AS PlayerNumber,
+                            G.jersey_number AS PlayerNumber,
                             G.team_id AS TeamId,
                             AVG(G.goals_against) AS GAA,
                             SUM(CASE WHEN G.goals_against = 0 THEN 1 END) AS Shutouts
                             FROM goalie_game_scores G
-                            GROUP BY G.player_id, G.name, G.player_number, G.team_id";
+                            GROUP BY G.player_id, G.name, G.jersey_number, G.team_id";
 
             await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryAsync<GoalieStatline>(sql);
-        }, cacheDuration);
-    }
-
-    public async Task<GameScore?> GetGameScoreById(int id)
-    {
-        string cacheKey = $"game_score_{id}";
-
-        return await cacheService.GetOrAddAsync(cacheKey, async () =>
-        {
-            string sql = @"SELECT
-                            P.game_id AS GameId,
-                            G.home_team_id AS HomeTeamId,
-                            G.away_team_id AS AwayTeamId,
-                            SUM(
-                                CASE
-                                WHEN is_hometeam = TRUE THEN 1
-                                END
-                            ) AS HomeScore,
-                            SUM(
-                                CASE
-                                WHEN is_hometeam = FALSE THEN 1
-                                END
-                            ) AS AwayScore
-                            FROM points P
-                            JOIN games G ON G.id = P.game_id
-                            WHERE P.game_id = @GameId
-                            GROUP BY game_id, G.home_team_id, G.away_team_id";
-            await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryFirstOrDefaultAsync<GameScore>(sql, new { GameId = id });
+            return await connection.QueryAsync<GoalieStatLine>(sql);
         }, cacheDuration);
     }
 
@@ -654,6 +574,23 @@ public class BCData : IBCData
                           email = @Email";
         await using var connection = new NpgsqlConnection(connectionString);
         await connection.ExecuteAsync(sql, new { Email = email, ImagePath = imagePath });
+    }
+
+    public async Task<IEnumerable<BCTournament>> GetTournamentsAsync()
+    {
+        string sql = @"SELECT *
+                        FROM tournament";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCTournament>(sql);
+    }    
+    
+    public async Task<BCTournament?> GetTournamentByYearAsync(string year)
+    {
+        string sql = @"SELECT *
+                        FROM tournament
+                        WHERE EXTRACT(YEAR FROM start_date) = @Year";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryFirstOrDefaultAsync<BCTournament>(sql, new { Year = year });
     }
 }
 

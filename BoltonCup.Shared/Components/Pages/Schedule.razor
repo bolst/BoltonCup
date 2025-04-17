@@ -2,41 +2,80 @@
 
 @inject IBCData BCData
 
-<div class="my-5 mx-2 mx-md-20">
-    @if (schedule is not null && gameDays is not null)
-    {
-        @foreach (DateTime day in gameDays)
+<PageHeader>Schedule</PageHeader>
+
+<div class="mx-2 mx-md-2">
+    
+    <div class="pa-2 mb-4" style="max-width: 400px">
+        @if (tournaments is not null)
         {
-            <MudText Class="mt-10" Typo="Typo.h4">@day.ToString("dddd, MMMM dd")</MudText>
-            <MudDivider />
-            <ScheduleTable
-                Games="schedule.Where(g => g.Date.Year == day.Date.Year && g.Date.Month == day.Date.Month && g.Date.Day == day.Date.Day)" />
+            <MudSelect @bind-Value="@selectedTournament" Variant="Variant.Outlined" Label="Tournament" Dense>
+                @foreach (var tournament in tournaments)
+                {
+                    <MudSelectItem Value="tournament">@tournament.name</MudSelectItem>
+                }
+            </MudSelect>
         }
+        else
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="50px" Width="300px" />
+        }
+    </div>
+    
+    @if (renderedSchedule is not null)
+    {
+        if (renderedSchedule.Any())
+        {
+            foreach (var day in renderedSchedule.DistinctBy(x => x.date.Day).Select(x => x.date))
+            {
+                <MudText Typo="Typo.h4">@day.ToString("dddd, MMMM dd")</MudText>
+                <MudDivider/>
+                <ScheduleTable Games="renderedSchedule.Where(g => g.date.Date == day.Date)"/>
+            }
+        }
+        else
+        {
+            <MudText Typo="Typo.h6" Class="pa-6">No games scheduled yet.</MudText>
+        }
+    }
+    else
+    {
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="400px" Width="100%" />
     }
 </div>
 
 @code {
 
-    public IEnumerable<ScheduledGame>? schedule;
-    private IEnumerable<DateTime>? gameDays;
+    public IEnumerable<BCGame>? fullSchedule;
+    private IEnumerable<BCGame>? renderedSchedule;
+    private IEnumerable<BCTournament>? tournaments;
+
+    private BCTournament _selectedTournament;
+    private BCTournament selectedTournament
+    {
+        get => _selectedTournament;
+        set
+        {
+            _selectedTournament = value;
+            if (fullSchedule is not null)
+            {
+                renderedSchedule = fullSchedule.Where(x => x.tournament_id == value.tournament_id);
+                StateHasChanged();   
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        schedule = await BCData.GetSchedule();
-        gameDays = schedule is null ? null : parseScheduleDays(schedule);
+        tournaments = await BCData.GetTournamentsAsync();
+        if (tournaments is not null)
+            selectedTournament = tournaments.Last();
+        
+        fullSchedule = await BCData.GetSchedule();
+        if (fullSchedule is not null)
+        {
+            renderedSchedule = fullSchedule.Where(x => x.tournament_id == selectedTournament.tournament_id);
+        }
     }
 
-    static IEnumerable<DateTime> parseScheduleDays(IEnumerable<ScheduledGame> games)
-    {
-        List<DateTime> retval = new();
-        foreach (var game in games)
-        {
-            DateTime day = new(game.Date.Year, game.Date.Month, game.Date.Day);
-            if (!retval.Contains(day))
-            {
-                retval.Add(day);
-            }
-        }
-        return retval;
-    }
 }

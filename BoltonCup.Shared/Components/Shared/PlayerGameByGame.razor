@@ -36,9 +36,9 @@
 @code {
     [Parameter] public int PlayerId { get; set; }
     private IEnumerable<Data.PlayerGameSummary>? playerGameByGame;
-    private IEnumerable<Team>? teams;
+    private IEnumerable<BCTeam>? teams;
 
-    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.Id == id)?.LogoUrl ?? string.Empty);
+    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.id == id)?.logo_url ?? string.Empty);
 
     protected override async Task OnInitializedAsync()
     {

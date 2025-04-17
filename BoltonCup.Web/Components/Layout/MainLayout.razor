@@ -10,7 +10,7 @@
 <MudLayout>
     <MudAppBar>
         
-        <MudImage Class="mt-4 pr-4 clickable" @onclick="@NavToHome" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//boltoncup.png" Height="75"/>
+        <MudImage Class="mt-4 pr-4 clickable" @onclick="@NavToHome" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" Width="150"/>
 
         <div class="d-none d-md-block">
             <MudButton Color="Color.Inherit" Href="/" Variant="Variant.Text" Size="Size.Large">HOME</MudButton>
@@ -50,18 +50,6 @@
 
         _theme = new CustomThemeProvider().Theme;
     }
-
-    private void DarkModeToggle()
-    {
-        _isDarkMode = !_isDarkMode;
-        StateHasChanged();
-    }
-
-    public string DarkLightModeButtonIcon => _isDarkMode switch
-    {
-        true => Icons.Material.Rounded.AutoMode,
-        false => Icons.Material.Outlined.DarkMode,
-    };
 
     private void NavToHome() => Navigation.NavigateTo("");
 }

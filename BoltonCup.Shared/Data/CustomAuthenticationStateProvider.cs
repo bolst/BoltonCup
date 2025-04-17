@@ -59,12 +59,19 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="state"></param>
-    private void SupabaseAuthStateChanged(IGotrueClient<User, Session> sender, Constants.AuthState state)
+    private async void SupabaseAuthStateChanged(IGotrueClient<User, Session> sender, Constants.AuthState state)
     {
         switch (state)
         {
             case Constants.AuthState.SignedIn:
-                NotifyAuthenticationStateChanged(Task.FromResult(AuthenticatedState));
+                if (sender.CurrentUser?.Email is null)
+                {
+                    NotifyAuthenticationStateChanged(Task.FromResult(AnonymousState));
+                    break;
+                }
+                var account = await _customUserService.LookupAccountAsync(sender.CurrentUser.Email);
+                var authState = account is null ? AnonymousState : new AuthenticationState(account.ToClaimsPrincipal());
+                NotifyAuthenticationStateChanged(Task.FromResult(authState));
                 break;
             case Constants.AuthState.SignedOut:
                 NotifyAuthenticationStateChanged(Task.FromResult(AnonymousState));
@@ -75,9 +82,10 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         // check if supabase has a current user
-        if (_supabase.Auth.CurrentUser is not null)
+        if (_supabase.Auth.CurrentUser?.Email is not null)
         {
-            return AuthenticatedState;
+            var currentUser = await _customUserService.LookupAccountAsync(_supabase.Auth.CurrentUser.Email);
+            return currentUser is null ? AnonymousState : new AuthenticationState(currentUser.ToClaimsPrincipal());
         }
         
         // otherwise try to refresh the session
@@ -90,13 +98,14 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
 
         await _supabase.Auth.SetSession(access, refresh);
         
-        if (_supabase.Auth.CurrentUser == null)
+        if (_supabase.Auth.CurrentUser?.Email == null)
         {
             Console.WriteLine("An authenticated user not found, returning as anonymous.");
             return AnonymousState;
         }
 
-        return AuthenticatedState;
+        var account = await _customUserService.LookupAccountAsync(_supabase.Auth.CurrentUser.Email);
+        return account is null ? AnonymousState : new AuthenticationState(account.ToClaimsPrincipal());
     }
 
     public async Task<string> LoginAsync(LoginFormModel form)
