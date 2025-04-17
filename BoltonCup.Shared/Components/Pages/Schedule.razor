@@ -6,21 +6,7 @@
 
 <div class="mx-2 mx-md-2">
     
-    <div class="pa-2 mb-4" style="max-width: 400px">
-        @if (tournaments is not null)
-        {
-            <MudSelect @bind-Value="@selectedTournament" Variant="Variant.Outlined" Label="Tournament" Dense>
-                @foreach (var tournament in tournaments)
-                {
-                    <MudSelectItem Value="tournament">@tournament.name</MudSelectItem>
-                }
-            </MudSelect>
-        }
-        else
-        {
-            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="50px" Width="300px" />
-        }
-    </div>
+    <TournamentPicker @bind-SelectedTournament="selectedTournament" />
     
     @if (renderedSchedule is not null)
     {
@@ -48,7 +34,6 @@
 
     public IEnumerable<BCGame>? fullSchedule;
     private IEnumerable<BCGame>? renderedSchedule;
-    private IEnumerable<BCTournament>? tournaments;
 
     private BCTournament _selectedTournament;
     private BCTournament selectedTournament
@@ -67,10 +52,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        tournaments = await BCData.GetTournamentsAsync();
-        if (tournaments is not null)
-            selectedTournament = tournaments.Last();
-        
         fullSchedule = await BCData.GetSchedule();
         if (fullSchedule is not null)
         {
