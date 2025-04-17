@@ -26,18 +26,17 @@
             MaxDate="DateTime.Today" 
             OpenTo="OpenTo.Year" 
             TransformOrigin="Origin.BottomCenter" 
-            Mask="@(new DateMask("yyyy/MM/dd"))"
-            DateFormat="yyyy/MM/dd"
-            Placeholder="yyyy/MM/dd"
+            DateFormat="yyyy-MM-dd"
+            Placeholder="yyyy-MM-dd"
             Editable />
         
-        <MudSelect Label="Position" @bind-Value="model.Position" For="@(() => model.Position)">
+        <MudSelect Label="Position" @bind-Value="model.Position" For="@(() => model.Position)" TransformOrigin="Origin.BottomCenter">
             <MudSelectItem Value=@("forward")>Forward</MudSelectItem>
             <MudSelectItem Value=@("defense")>Defense</MudSelectItem>
             <MudSelectItem Value=@("goalie")>Goalie</MudSelectItem>
         </MudSelect>
         
-        <MudSelect Label="Highest level played" @bind-Value="model.HighestLevel" For="@(() => model.HighestLevel)">
+        <MudSelect Label="Highest level played" @bind-Value="model.HighestLevel" For="@(() => model.HighestLevel)" TransformOrigin="Origin.BottomCenter">
             <MudSelectItem Value=@("House league")>House league</MudSelectItem>
             <MudSelectItem Value=@("A/AA")>A/AA</MudSelectItem>
             <MudSelectItem Value=@("AAA")>AAA</MudSelectItem>
