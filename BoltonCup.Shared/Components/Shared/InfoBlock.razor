@@ -1,0 +1,19 @@
+
+<MudPaper Class="ma-8 pa-10" Elevation="1">
+    <div class="mb-4">
+        <MudText Color="Color.Secondary" Typo="Typo.h3"><b>@Label</b></MudText>
+    </div>
+
+    @ChildContent
+</MudPaper>
+
+@code{
+
+
+    [Parameter] 
+    public string Label { get; set; } = string.Empty;
+    
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+}

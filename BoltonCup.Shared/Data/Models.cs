@@ -1,46 +1,47 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace BoltonCup.Shared.Data;
 
-public class Team
+public class BCTeam : IEquatable<BCTeam>
 {
-    public int Id { get; set; }
-    public required string Name { get; set; }
-    public string ShortName { get; set; } = "";
-    public required string PrimaryHex { get; set; }
-    public required string SecondaryHex { get; set; }
-    public string? TertiaryHex { get; set; } = "";
-    public string? LogoUrl { get; set; } = "";
+    public required int id { get; set; }
+    public required string name { get; set; }
+    public string name_short { get; set; } = "";
+    public required string primary_color_hex { get; set; }
+    public required string secondary_color_hex { get; set; }
+    public string? tertiary_color_hex { get; set; } = "";
+    public string? logo_url { get; set; } = "";
+
+    public bool Equals(BCTeam? other) => other is not null && other.id == id;
+    public override bool Equals(object? obj) => Equals(obj as BCTeam);
+    public override int GetHashCode() => id.GetHashCode();
 }
 
-public class ScheduledGame
+public class BCGame
 {
-    public int GameId { get; set; }
-    public int HomeTeamId { get; set; }
-    public int AwayTeamId { get; set; }
-    public DateTime Date { get; set; }
-    public string GameType { get; set; } = "";
-    public string Location { get; set; } = "";
-    public string Rink { get; set; } = "";
+    public int id { get; set; }
+    public int home_team_id { get; set; }
+    public int away_team_id { get; set; }
+    public DateTime date { get; set; }
+    public string type { get; set; } = "";
+    public string location { get; set; } = "";
+    public string rink { get; set; } = "";
+    public int tournament_id { get; set; }
+    public int home_score { get; set; }
+    public int away_score { get; set; }
+    public required string state { get; set; }
 }
 
-public class TeamPlayer
+public class BCTeamPlayer
 {
-    public required string Name { get; set; }
-    public DateTime Birthday { get; set; }
-    public string Position { get; set; } = "";
-    public int JerseyNumber { get; set; }
-    public int PlayerId { get; set; }
-    public int TeamId { get; set; }
+    public required string name { get; set; }
+    public DateTime dob { get; set; }
+    public string position { get; set; } = "";
+    public int jersey_number { get; set; }
+    public int player_id { get; set; }
+    public int team_id { get; set; }
 
-}
-
-public class Player
-{
-    public int Id { get; set; }
-    public required string Name { get; set; }
-    public DateTime Birthday { get; set; }
-    public string PreferredBeer { get; set; } = "";
 }
 
 public class PlayerProfile
@@ -55,7 +56,7 @@ public class PlayerProfile
     public int Goals { get; set; }
     public int Assists { get; set; }
     public int PIMs { get; set; }
-    public bool IsWinner { get; set; } = true;
+    public bool IsWinner { get; set; }
 }
 
 public class PlayerGameSummary
@@ -106,7 +107,7 @@ public class GamePenalty
     public string PlayerName { get; set; } = "";
 }
 
-public class PlayerStatline
+public class PlayerStatLine
 {
     public int PlayerId { get; set; }
     public string Name { get; set; } = "";
@@ -117,7 +118,7 @@ public class PlayerStatline
     public int Assists { get; set; }
 }
 
-public class GoalieStatline
+public class GoalieStatLine
 {
     public int PlayerId { get; set; }
     public string Name { get; set; } = "";
@@ -174,6 +175,7 @@ public class LoginFormModel
 
 public class BCAccount
 {
+    public required string Roles { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
     public required string Email { get; set; }
@@ -181,4 +183,30 @@ public class BCAccount
     public required string Position { get; set; }
     public required string HighestLevel { get; set; }
     public required string ProfilePicture { get; set; }
+    public string FullName => $"{FirstName} {LastName}";
+
+    public ClaimsPrincipal ToClaimsPrincipal()
+    {
+        IEnumerable<Claim> claims =
+        [
+            new(ClaimTypes.Name, FullName),
+            new(ClaimTypes.Email, Email)
+        ];
+
+        foreach (var role in Roles.Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            claims = claims.Append(new Claim(ClaimTypes.Role, role));
+        }
+
+        return new(new ClaimsIdentity(claims, "BoltonCup"));
+    }
+}
+
+public class BCTournament
+{
+    public required int tournament_id { get; set; }
+    public DateTime? start_date { get; set; }
+    public DateTime? end_date { get; set; }
+    public int? winning_team_id { get; set; }
+    public required string name { get; set; }
 }

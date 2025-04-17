@@ -5,11 +5,6 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-@* <AuthorizeView> *@
-@*     <MudButton Class="mud-theme-primary" Href="/admin" Variant="Variant.Text" Size="Size.Large">Admin</MudButton> *@
-@* </AuthorizeView> *@
-
-
 <CascadingValue Value="this">
     <MudLayout>
         <MudAppBar ToolBarClass="d-flex justify-space-between mt-4 pt-10" Fixed>
@@ -51,7 +46,6 @@
             <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.Info" ClickPropagation="false" Href="/info" />
             <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.People" ClickPropagation="false" Href="/teams" />
             <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.CalendarMonth" ClickPropagation="false" Href="/schedule" />
-            @* <MudIconButton Class="mb-6" Icon="@Icons.Material.Filled.BarChart" ClickPropagation="false" Href="/stats" /> *@
         </MudAppBar>
     </MudLayout>
 </CascadingValue>

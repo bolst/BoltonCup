@@ -49,7 +49,7 @@
         if (Goal is not null)
         {
             profilePicture = await BCData.GetPlayerProfilePictureById(Goal.ScorerId);
-            teamLogo = (await BCData.GetTeams()).FirstOrDefault(x => x.Id == Goal.TeamId)?.LogoUrl ?? string.Empty;
+            teamLogo = (await BCData.GetTeams()).FirstOrDefault(x => x.id == Goal.TeamId)?.logo_url ?? string.Empty;
         }
     }
 

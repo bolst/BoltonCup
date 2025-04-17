@@ -7,22 +7,22 @@
     @if (team is not null && roster is not null)
     {
         <MudStack Class="mb-6 d-flex align-center" Row="true" Wrap="Wrap.Wrap">
-            <MudText Typo="Typo.h3">@team.ShortName.ToUpper()</MudText>
-            <MudImage Src="@team.LogoUrl" Height="150" />
+            <MudText Typo="Typo.h3">@team.name_short.ToUpper()</MudText>
+            <MudImage Src="@team.logo_url" Height="150" />
         </MudStack>
 
         <MudText Typo="Typo.h6">Forwards</MudText>
         <MudDivider />
-        @PlayerTable(roster.Where(p => p.Position.ToLower() == "forward"))
+        @PlayerTable(roster.Where(p => p.position.ToLower() == "forward"))
 
 
         <MudText Typo="Typo.h6">Defensemen</MudText>
         <MudDivider />
-        @PlayerTable(roster.Where(p => p.Position.ToLower() == "defenseman"))
+        @PlayerTable(roster.Where(p => p.position.ToLower() == "defenseman"))
 
         <MudText Typo="Typo.h6">Goalies</MudText>
         <MudDivider />
-        @PlayerTable(roster.Where(p => p.Position.ToLower() == "goalie"))
+        @PlayerTable(roster.Where(p => p.position.ToLower() == "goalie"))
     }
     else
     {
@@ -36,8 +36,8 @@
     @code {
     [Parameter] public int Id { get; set; }
 
-    private BoltonCup.Shared.Data.Team? team { get; set; }
-    private IEnumerable<TeamPlayer>? roster { get; set; }
+    private BoltonCup.Shared.Data.BCTeam? team { get; set; }
+    private IEnumerable<BCTeamPlayer>? roster { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -45,7 +45,7 @@
         roster = await BCData.GetRosterByTeamId(Id);
     }
 
-    private RenderFragment PlayerTable(IEnumerable<TeamPlayer> players) => __builder =>
+    private RenderFragment PlayerTable(IEnumerable<BCTeamPlayer> players) => __builder =>
     {
         <MudSimpleTable Class="mb-6" Hover="true" Dense="true" Striped="true" Elevation="0">
             <thead>
@@ -56,12 +56,12 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (TeamPlayer player in players)
+                @foreach (BCTeamPlayer player in players)
                 {
-                    <tr class="clickable" onclick=@(() => Navigation.NavigateTo($"player/{player.PlayerId}"))>
-                        <th>@player.JerseyNumber.ToString("D2")</th>
-                        <th>@player.Name</th>
-                        <th>@player.Birthday.ToString("yyyy")</th>
+                    <tr class="clickable" onclick=@(() => Navigation.NavigateTo($"player/{player.player_id}"))>
+                        <th>@player.jersey_number.ToString("D2")</th>
+                        <th>@player.name</th>
+                        <th>@player.dob.ToString("yyyy")</th>
                     </tr>
                 }
             </tbody>

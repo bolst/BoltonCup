@@ -2,21 +2,25 @@
 
 @inject IBCData BCData
 
+<PageHeader>Teams</PageHeader>
+
 @if (teams is not null)
 {
-    <div class="d-flex justify-center mt-20">
-    <MudStack>
-        @foreach (var team in teams)
+    <div class="d-flex justify-center my-20 mx-md-20 mx-1">
+        <MudGrid Spacing="0">
+            @foreach (var team in teams)
             {
-                <TeamCard Team="@team" />
+                <MudItem xs="12" md="6" Class="py-2 px-md-10">
+                    <TeamCard Team="@team" />
+                </MudItem>
             }
-        </MudStack>
+        </MudGrid>
     </div>
 }
 
 @code {
 
-    private IEnumerable<BoltonCup.Shared.Data.Team>? teams;
+    private IEnumerable<BCTeam>? teams;
 
     protected override async Task OnInitializedAsync()
     {
