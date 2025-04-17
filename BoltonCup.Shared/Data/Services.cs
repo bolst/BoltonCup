@@ -8,6 +8,7 @@ public interface ICacheService
 {
     Task<T> GetOrAddAsync<T>(string cacheKey, Func<Task<T>> factory, TimeSpan cacheDuration);
     void Clear();
+    void Clear(string cacheKey);
 }
 public class CacheService : ICacheService
 {
@@ -41,6 +42,11 @@ public class CacheService : ICacheService
         resetCacheToken.Cancel();
         resetCacheToken.Dispose();
         resetCacheToken = new CancellationTokenSource();
+    }
+
+    public void Clear(string cacheKey)
+    {
+        memoryCache.Remove(cacheKey);
     }
 }
 

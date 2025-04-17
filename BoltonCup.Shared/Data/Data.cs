@@ -590,6 +590,8 @@ public class BCData : IBCData
                           email = @Email";
         await using var connection = new NpgsqlConnection(connectionString);
         await connection.ExecuteAsync(sql, new { Email = email, ImagePath = imagePath });
+        
+        cacheService.Clear("player_profile_pics");
     }
 
     public async Task<IEnumerable<BCTournament>> GetTournamentsAsync()
