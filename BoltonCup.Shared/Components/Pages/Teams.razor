@@ -4,6 +4,8 @@
 
 <PageHeader>Teams</PageHeader>
 
+<TournamentPicker @bind-SelectedTournament="selectedTournament" />
+
 @if (teams is not null)
 {
     <div class="d-flex justify-center my-20 mx-md-20 mx-1">
@@ -20,10 +22,22 @@
 
 @code {
 
-    private IEnumerable<BCTeam>? teams;
+    private IEnumerable<BCTeam>? allTeams;
+
+    private IEnumerable<BCTeam>? teams
+    {
+        get
+        {
+            if (selectedTournament is null || allTeams is null) return allTeams;
+            
+            return allTeams.Where(x => x.tournament_id == selectedTournament.tournament_id);
+        }
+    }
+
+    private BCTournament? selectedTournament;
 
     protected override async Task OnInitializedAsync()
     {
-        teams = await BCData.GetTeams();
+        allTeams = await BCData.GetTeams();
     }
 }
