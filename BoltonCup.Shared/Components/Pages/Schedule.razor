@@ -16,20 +16,31 @@
                 }
             </MudSelect>
         }
+        else
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="50px" Width="300px" />
+        }
     </div>
     
-    @if (renderedSchedule is not null && renderedSchedule.Any())
+    @if (renderedSchedule is not null)
     {
-        foreach (var day in renderedSchedule.DistinctBy(x => x.date.Day).Select(x => x.date))
+        if (renderedSchedule.Any())
         {
-            <MudText Typo="Typo.h4">@day.ToString("dddd, MMMM dd")</MudText>
-            <MudDivider/>
-            <ScheduleTable Games="renderedSchedule.Where(g => g.date.Date == day.Date)"/>
+            foreach (var day in renderedSchedule.DistinctBy(x => x.date.Day).Select(x => x.date))
+            {
+                <MudText Typo="Typo.h4">@day.ToString("dddd, MMMM dd")</MudText>
+                <MudDivider/>
+                <ScheduleTable Games="renderedSchedule.Where(g => g.date.Date == day.Date)"/>
+            }
+        }
+        else
+        {
+            <MudText Typo="Typo.h6" Class="pa-6">No games scheduled yet.</MudText>
         }
     }
-    else if (renderedSchedule is not null && !renderedSchedule.Any())
+    else
     {
-        <MudText Typo="Typo.h6" Class="pa-6">No games scheduled yet.</MudText>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="400px" Width="100%" />
     }
 </div>
 
@@ -58,7 +69,7 @@
     {
         tournaments = await BCData.GetTournamentsAsync();
         if (tournaments is not null)
-            selectedTournament = tournaments.First();
+            selectedTournament = tournaments.Last();
         
         fullSchedule = await BCData.GetSchedule();
         if (fullSchedule is not null)

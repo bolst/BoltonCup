@@ -109,6 +109,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvSW5mb0Jsb2NrLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Shared/InfoItem.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvSW5mb0l0ZW0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Shared/PageHeader.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvUGFnZUhlYWRlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
