@@ -8,7 +8,7 @@
     
     <TournamentPicker @bind-SelectedTournament="selectedTournament" />
     
-    @if (renderedSchedule is not null)
+    @if (renderedSchedule is not null && selectedTournament is not null)
     {
         if (renderedSchedule.Any())
         {
@@ -33,30 +33,29 @@
 @code {
 
     public IEnumerable<BCGame>? fullSchedule;
-    private IEnumerable<BCGame>? renderedSchedule;
 
-    private BCTournament _selectedTournament;
-    private BCTournament selectedTournament
+    private IEnumerable<BCGame>? renderedSchedule
     {
-        get => _selectedTournament;
-        set
+        get
         {
-            _selectedTournament = value;
-            if (fullSchedule is not null)
+            if (fullSchedule is null) return null;
+            
+            var schedule = fullSchedule.ToList();
+
+            if (selectedTournament is not null)
             {
-                renderedSchedule = fullSchedule.Where(x => x.tournament_id == value.tournament_id);
-                StateHasChanged();   
+                schedule = schedule.Where(x => x.tournament_id == selectedTournament.tournament_id).ToList();
             }
+
+            return schedule;
         }
     }
+
+    private BCTournament? selectedTournament;
 
     protected override async Task OnInitializedAsync()
     {
         fullSchedule = await BCData.GetSchedule();
-        if (fullSchedule is not null)
-        {
-            renderedSchedule = fullSchedule.Where(x => x.tournament_id == selectedTournament.tournament_id);
-        }
     }
 
 }
