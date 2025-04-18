@@ -345,7 +345,7 @@ public class BCData : IBCData
                                 WHERE r.position != 'Goalie'
                             ),
                             points_with_teams AS (
-                                SELECT G.id AS game_id, P.player_jerseynum, P.assist1_jerseynum, P.assist2_jerseynum,
+                                SELECT G.id AS game_id, P.player_jerseynum, P.assist1_jerseynum, P.assist2_jerseynum, P.tournament_id,
                                 CASE
                                     WHEN is_hometeam = TRUE THEN home_team_id
                                     ELSE away_team_id
@@ -371,7 +371,8 @@ public class BCData : IBCData
                             position AS Position,
                             team_id AS TeamId,
                             goals AS Goals,
-                            assists AS Assists
+                            assists AS Assists,
+                            tournament_id AS TournamentId
                             FROM
                             (
                                 SELECT *
@@ -390,8 +391,10 @@ public class BCData : IBCData
                                     WHEN p.player_id IN (assist1_id, assist2_id) THEN 1
                                     ELSE 0
                                     END
-                                ) AS Assists
+                                ) AS Assists,
+                                tournament_id
                                 FROM points_with_players
+                                GROUP BY tournament_id
                             ) g ON TRUE
                             ORDER BY goals + assists DESC";
 
@@ -407,7 +410,7 @@ public class BCData : IBCData
         {
             string sql = @"WITH
                             goalie_data AS (
-                                SELECT P.id AS player_id, P.name, R.jersey_number, R.position, R.team_id
+                                SELECT P.id AS player_id, P.name, R.jersey_number, R.position, R.team_id, R.tournament_id
                                 FROM players P
                                 INNER JOIN roster R ON R.player_id = P.id AND R.position = 'Goalie'
                             ),
@@ -417,7 +420,7 @@ public class BCData : IBCData
                                 RIGHT OUTER JOIN game G ON P.team_id IN (G.home_team_id, G.away_team_id)
                             ),
                             goalie_game_scores AS (
-                                SELECT GP.game_id, GP.player_id,  GP.name, GP.jersey_number, GP.team_id, GP.date,
+                                SELECT GP.game_id, GP.player_id, GP.name, GP.jersey_number, GP.team_id, GP.date, GP.tournament_id,
                                 CASE WHEN GP.team_id != GP.home_team_id THEN GP.home_team_id ELSE GP.away_team_id END AS opponent_team_id,
                                 SUM(
                                     CASE
@@ -448,17 +451,18 @@ public class BCData : IBCData
                                     FROM points P
                                     WHERE P.game_id = GP.game_id
                                 ) game_scores ON TRUE
-                                GROUP BY GP.game_id, GP.player_id, GP.name, GP.jersey_number, opponent_team_id, GP.team_id, GP.date
+                                GROUP BY GP.game_id, GP.player_id, GP.name, GP.jersey_number, opponent_team_id, GP.team_id, GP.date, GP.tournament_id
                             )
                             SELECT
                             G.player_id AS PlayerId,
                             G.name AS Name,
                             G.jersey_number AS PlayerNumber,
                             G.team_id AS TeamId,
+                            G.tournament_id AS TournamentId,
                             AVG(G.goals_against) AS GAA,
                             SUM(CASE WHEN G.goals_against = 0 THEN 1 END) AS Shutouts
                             FROM goalie_game_scores G
-                            GROUP BY G.player_id, G.name, G.jersey_number, G.team_id";
+                            GROUP BY G.player_id, G.name, G.jersey_number, G.team_id, G.tournament_id";
 
             await using var connection = new NpgsqlConnection(connectionString);
             return await connection.QueryAsync<GoalieStatLine>(sql);
