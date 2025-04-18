@@ -9,9 +9,9 @@
         <MudDivider Vertical="true" FlexItem="true" />
 
         @StatColumnRF("GP", playerGameByGame.Count())
-        @StatColumnRF("G", playerGameByGame.Sum(x => x.Goals))
-        @StatColumnRF("A", playerGameByGame.Sum(x => x.Assists))
-        @StatColumnRF("P", playerGameByGame.Sum(x => x.Goals + x.Assists))
+        @StatColumnRF("G", playerGameByGame.Sum(x => x.goals))
+        @StatColumnRF("A", playerGameByGame.Sum(x => x.assists))
+        @StatColumnRF("P", playerGameByGame.Sum(x => x.goals + x.assists))
     </MudStack>
 </MudPaper>
 }
