@@ -24,6 +24,9 @@
     [Parameter]
     public EventCallback<BCTournament> SelectedTournamentChanged { get; set; }
 
+    [Parameter] 
+    public bool First { get; set; }
+
     private IEnumerable<BCTournament>? tournaments;
     private BCTournament selectedTournament
     {
@@ -39,7 +42,7 @@
     {
         tournaments = await BCData.GetTournamentsAsync();
         if (tournaments is not null)
-            selectedTournament = tournaments.Last();
+            selectedTournament = First ? tournaments.First() : tournaments.Last();
     }
     
 
