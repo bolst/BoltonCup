@@ -246,39 +246,31 @@ public class BCData : IBCData
 
         return await cacheService.GetOrAddAsync(cacheKey, async () =>
         {
-            string sql = @"SELECT
-                            points.game_id AS GameId,
-                            points.player_jerseynum AS ScorerJersey,
-                            points.assist1_jerseynum AS Assist1Jersey,
-                            points.assist2_jerseynum AS Assist2Jersey,
-                            points.time AS Time,
-                            points.period AS Period,
-                            points.team_id AS TeamId,
-                            r1.player_id AS ScorerId,
-                            r2.player_id AS Assist1Id,
-                            r3.player_id AS Assist2Id,
-                            p1.name AS ScorerName,
-                            p2.name AS Assist1Name,
-                            p3.name AS Assist2Name
-                            FROM
-                            (
-                                SELECT p.game_id, p.player_jerseynum, p.assist1_jerseynum, p.assist2_jerseynum, p.time, p.period,
-                                CASE
-                                    WHEN p.is_hometeam = true THEN home_team_id
-                                    WHEN p.is_hometeam = false THEN away_team_id
-                                END AS team_id
+            string sql = @"SELECT p.game_id           AS gameid,
+                                   p.scorer_id         AS scorerid,
+                                   p.assist1_player_id AS assist1id,
+                                   p.assist2_player_id AS assist2id,
+                                   g0.name             AS scorername,
+                                   a1.name             AS assist1name,
+                                   a2.name             AS assist2name,
+                                   p.player_jerseynum  AS scorerjersey,
+                                   p.assist1_jerseynum AS assist1jersey,
+                                   p.assist2_jerseynum AS assist2jersey,
+                                   p.time,
+                                   p.period,
+                                   CASE WHEN p.is_hometeam THEN g.home_team_id ELSE g.away_team_id END AS teamid,
+                                   a.uri               AS scorerprofilepic,
+                                   t.name              AS teamname,
+                                   t.logo_url          AS teamlogo
                                 FROM points p
-                                INNER JOIN game g ON g.id = p.game_id
-                                WHERE g.id = @GameId
-                                ORDER BY time desc
-                            ) points
-                            LEFT JOIN roster r1 ON points.player_jerseynum = r1.jersey_number AND points.team_id = r1.team_id
-                            LEFT JOIN roster r2 ON points.assist1_jerseynum = r2.jersey_number AND points.team_id = r2.team_id
-                            LEFT JOIN roster r3 ON points.assist2_jerseynum = r3.jersey_number AND points.team_id = r3.team_id
-                            LEFT JOIN players p1 ON r1.player_id = p1.id
-                            LEFT JOIN players p2 ON r2.player_id = p2.id
-                            LEFT JOIN players p3 ON r3.player_id = p3.id
-                            ORDER BY points.period asc, points.time desc";
+                                         JOIN game g ON p.game_id = g.id
+                                         JOIN players g0 ON g0.id = p.scorer_id
+                                         JOIN profile_pictures a ON a.player_id = g0.id
+                                         JOIN team t ON t.id = (CASE WHEN p.is_hometeam THEN g.home_team_id ELSE g.away_team_id END)
+                                         LEFT OUTER JOIN players a1 ON a1.id = p.assist1_player_id
+                                         LEFT OUTER JOIN players a2 ON a2.id = p.assist2_player_id
+                                WHERE p.game_id = @GameId
+                                ORDER BY p.period, time DESC";
 
             await using var connection = new NpgsqlConnection(connectionString);
             return await connection.QueryAsync<GameGoal>(sql, new { GameId = id });
