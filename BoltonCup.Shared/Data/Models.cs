@@ -117,6 +117,7 @@ public class PlayerStatLine
     public int TeamId { get; set; }
     public int Goals { get; set; }
     public int Assists { get; set; }
+    public int TournamentId { get; set; }
 }
 
 public class GoalieStatLine
@@ -127,6 +128,7 @@ public class GoalieStatLine
     public int TeamId { get; set; }
     public double GAA { get; set; }
     public int Shutouts { get; set; }
+    public int TournamentId { get; set; }
 }
 
 public class GameScore
@@ -203,11 +205,15 @@ public class BCAccount
     }
 }
 
-public class BCTournament
+public class BCTournament : IEquatable<BCTournament>
 {
     public required int tournament_id { get; set; }
     public DateTime? start_date { get; set; }
     public DateTime? end_date { get; set; }
     public int? winning_team_id { get; set; }
     public required string name { get; set; }
+    
+    public bool Equals(BCTournament? other) => other is not null && other.tournament_id == tournament_id;
+    public override bool Equals(object? obj) => Equals(obj as BCTournament);
+    public override int GetHashCode() => tournament_id.GetHashCode();
 }
