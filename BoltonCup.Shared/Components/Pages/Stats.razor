@@ -1,9 +1,10 @@
 @page "/stats"
 
-@inject NavigationManager Navigation
 @inject IBCData BCData
 
 <PageHeader>Statistics</PageHeader>
+
+<TournamentPicker @bind-SelectedTournament="selectedTournament" First />
 
 @if (teams is not null)
 {
@@ -42,10 +43,10 @@
                             <CellTemplate>
                                 <MudStack AlignItems="AlignItems.Center" Row>
                                     <MudAvatar>
-                                        <MudImage Src="@profilePictures.First(x => x.PlayerId == context.Item.PlayerId).Source"/>
+                                        <MudImage Src="@profilePictures.FirstOrDefault(x => x.PlayerId == context.Item.PlayerId)?.Source"/>
                                     </MudAvatar>
                                     <MudLink Typo="Typo.subtitle1" Href=@($"/player/{context.Item.PlayerId}")>@context.Item.Name</MudLink>
-                                    <MudImage Src="@teams.First(x => x.id == context.Item.TeamId).logo_url" Height="30"/>
+                                    <MudImage Src="@teams.FirstOrDefault(x => x.id == context.Item.TeamId)?.logo_url" Height="30"/>
                                 </MudStack>
                             </CellTemplate>
                         </TemplateColumn>
@@ -92,39 +93,67 @@
 @code {
     
     private IEnumerable<PlayerStatLine>? allSkaterStats;
-    private IEnumerable<GoalieStatLine>? allGoalieStats;
-    private IEnumerable<PlayerStatLine>? renderedSkaterStats;
-    private IEnumerable<GoalieStatLine>? renderedGoalieStats;
-    private IEnumerable<BCTeam>? teams;
-    private IEnumerable<PlayerProfilePicture>? profilePictures;
-
-    private string searchString;
-
-    private BCTeam? _selectedFilterTeam;
-
-    private BCTeam? selectedFilterTeam
+    private IEnumerable<PlayerStatLine>? renderedSkaterStats
     {
-        get => _selectedFilterTeam;
-        set
+        get
         {
-            _selectedFilterTeam = value;
+            if (allSkaterStats is null) return null;
+            
+            var skaterStats = allSkaterStats.ToList();
+            
+            if (selectedFilterTeam is not null)
+            {
+                skaterStats = skaterStats.Where(x => x.TeamId == selectedFilterTeam.id).ToList();
+            }
+            
+            if (selectedTournament is not null)
+            {
+                skaterStats = skaterStats.Where(x => x.TournamentId == selectedTournament.tournament_id).ToList();
+            }
 
-            if (allSkaterStats is null || allGoalieStats is null) return;
+            // TODO: investigate why default sort doesn't work on MAUI
+            return skaterStats.OrderByDescending(x => x.Goals + x.Assists).ToList();
+        }    
+    }
+    
+    private IEnumerable<GoalieStatLine>? allGoalieStats;
+    private IEnumerable<GoalieStatLine>? renderedGoalieStats
+    {
+        get
+        {
+            if (allGoalieStats is null) return null;
             
-            if (value is null)
+            var goalieStats = allGoalieStats.ToList();
+            
+            if (selectedFilterTeam is not null)
             {
-                renderedSkaterStats = allSkaterStats.OrderByDescending(x => x.Goals + x.Assists);
-                renderedGoalieStats = allGoalieStats.OrderBy(x => x.GAA);
-            }
-            else
-            {
-                renderedSkaterStats = allSkaterStats.Where(x => x.TeamId == value.id).OrderByDescending(x => x.Goals + x.Assists);
-                renderedGoalieStats = allGoalieStats.Where(x => x.TeamId == value.id).OrderBy(x => x.GAA);
+                goalieStats = goalieStats.Where(x => x.TeamId == selectedFilterTeam.id).ToList();
             }
             
-            StateHasChanged();
+            if (selectedTournament is not null)
+            {
+                goalieStats = goalieStats.Where(x => x.TournamentId == selectedTournament.tournament_id).ToList();
+            }
+            
+            // TODO: investigate why default sort doesn't work on MAUI
+            return goalieStats.OrderBy(x => x.GAA).ToList();
+        }  
+    }
+    private IEnumerable<PlayerProfilePicture>? profilePictures;
+    private string searchString;
+    
+    private IEnumerable<BCTeam>? allTeams;
+    private IEnumerable<BCTeam>? teams
+    {
+        get
+        {
+            if (selectedTournament is null || allTeams is null) return allTeams;
+            
+            return allTeams.Where(x => x.tournament_id == selectedTournament.tournament_id);
         }
     }
+
+    private BCTeam? selectedFilterTeam;
     
     private int _activeTabIndex;
     private int activeTabIndex
@@ -134,6 +163,29 @@
         {
             _activeTabIndex = value;
             searchString = string.Empty;
+        }
+    }
+
+    private BCTournament? _selectedTournament;
+    private BCTournament? selectedTournament
+    {
+        get => _selectedTournament;
+        set
+        {
+            if (value is null)
+            {
+                _selectedTournament = null;
+                selectedFilterTeam = null;
+                return;
+            }
+            
+            if (!value.Equals(_selectedTournament))
+            {
+                selectedFilterTeam = null;
+
+                _selectedTournament = value;
+                InvokeAsync(StateHasChanged);
+            }
         }
     }
 
@@ -147,12 +199,7 @@
         
         allSkaterStats = skaterTask.Result;
         allGoalieStats = goalieTask.Result;
-        
-        // TODO: investigate why default sort doesn't work on MAUI
-        renderedSkaterStats = allSkaterStats.OrderByDescending(x => x.Goals + x.Assists);
-        renderedGoalieStats = allGoalieStats.OrderBy(x => x.GAA);
-        
-        teams = teamTask.Result;
+        allTeams = teamTask.Result;
         profilePictures = profilePicTask.Result;
     }
     
