@@ -97,9 +97,12 @@ public class GameGoal
     public int ScorerId { get; set; }
     public int? Assist1Id { get; set; }
     public int? Assist2Id { get; set; }
-    public string ScorerName { get; set; } = "";
+    public string ScorerName { get; set; }
     public string? Assist1Name { get; set; }
     public string? Assist2Name { get; set; }
+    public string ScorerProfilePic { get; set; }
+    public string TeamName { get; set; }
+    public string TeamLogo { get; set; }
 }
 
 public class GamePenalty
