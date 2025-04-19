@@ -283,30 +283,21 @@ public class BCData : IBCData
 
         return await cacheService.GetOrAddAsync(cacheKey, async () =>
         {
-            string sql = @"SELECT
-                            penalties.game_id AS GameId,
-                            penalties.player_jerseynum AS PlayerJersey,
-                            penalties.time AS Time,
-                            penalties.period AS Period,
-                            penalties.team_id AS TeamId,
-                            penalties.infraction_name AS Infraction,
-                            r1.player_id AS PlayerId,
-                            p1.name AS PlayerName
-                            FROM
-                            (
-                                SELECT p.game_id, p.player_jerseynum, p.time, p.period, p.infraction_name,
-                                CASE
-                                    WHEN p.is_hometeam = true THEN home_team_id
-                                    WHEN p.is_hometeam = false THEN away_team_id
-                                END AS team_id
-                                FROM penalties p
-                                INNER JOIN game g ON g.id = p.game_id
-                                WHERE g.id = @GameId
-                                ORDER BY time desc
-                            ) penalties
-                            LEFT JOIN roster r1 ON penalties.player_jerseynum = r1.jersey_number AND penalties.team_id = r1.team_id
-                            LEFT JOIN players p1 ON r1.player_id = p1.id
-                            ORDER BY penalties.period asc, penalties.time desc";
+            string sql = @"SELECT x.game_id          AS gameid,
+                                   x.player_jerseynum AS playerjersey,
+                                   x.time,
+                                   x.period,
+                                   t.id               AS teamid,
+                                   x.infraction_name  AS infraction,
+                                   x.player_id        AS playerid,
+                                   p.name             AS playername,
+                                   t.logo_url         AS teamlogo
+                                FROM penalties x
+                                         JOIN players p ON p.id = x.player_id
+                                         JOIN game g ON g.id = x.game_id
+                                         JOIN team t ON t.id = (CASE WHEN x.is_hometeam THEN g.home_team_id ELSE g.away_team_id END)
+                                WHERE x.game_id = @GameId
+                                ORDER BY period, time DESC";
 
             await using var connection = new NpgsqlConnection(connectionString);
             return await connection.QueryAsync<GamePenalty>(sql, new { GameId = id });
