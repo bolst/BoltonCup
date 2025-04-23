@@ -20,12 +20,14 @@ public interface IBCData
     Task<PlayerProfilePicture> GetPlayerProfilePictureById(int playerId);
     Task<string> SubmitRegistration(RegisterFormModel form);
     Task<IEnumerable<RegisterFormModel>> GetRegistrationsAsync();
+    Task<RegisterFormModel?> GetRegistrationByEmailAsync(string email);
     Task<string> AdmitUserAsync(RegisterFormModel form);
     Task<IEnumerable<BCAccount>> GetAccountsAsync();
     Task<BCAccount?> GetAccountByEmailAsync(string email);
     Task UpdateAccountProfilePictureAsync(string email, string imagePath);
     Task<IEnumerable<BCTournament>> GetTournamentsAsync();
     Task<BCTournament?> GetTournamentByYearAsync(string year);
+    Task SetUserAsPayedAsync(string email);
 }
 
 public class BCData : IBCData
@@ -516,6 +518,16 @@ public class BCData : IBCData
         return await connection.QueryAsync<RegisterFormModel>(sql);
     }
 
+    public async Task<RegisterFormModel?> GetRegistrationByEmailAsync(string email)
+    {
+        string sql = @"SELECT *
+                        FROM registration
+                        WHERE email = @Email";
+
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryFirstOrDefaultAsync<RegisterFormModel>(sql, new { Email = email });
+    }
+
     public async Task<string> AdmitUserAsync(RegisterFormModel form)
     {
         // check if user exists: if yes then do not admit
@@ -587,6 +599,17 @@ public class BCData : IBCData
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryFirstOrDefaultAsync<BCTournament>(sql, new { Year = year });
     }
+
+    public async Task SetUserAsPayedAsync(string email)
+    {
+        string sql = @"UPDATE registration
+                        SET payed = true
+                        WHERE email = @Email";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.ExecuteAsync(sql, new { Email = email });
+    }
+
 }
 
 

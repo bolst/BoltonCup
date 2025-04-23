@@ -1,8 +1,9 @@
-namespace BoltonCup.Shared.Data;
-
+using Stripe;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
-using Blazored.LocalStorage;
+
+namespace BoltonCup.Shared.Data;
+
 
 public interface ICacheService
 {
@@ -67,6 +68,47 @@ public class RegistrationStateService
     public async Task<bool> GetBrowserRegistered()
     {
         return await _customLocalStorageProvider.GetAsync<bool>("reg");
+    }
+    
+}
+
+public class StripeServiceProvider
+{
+    private readonly IBCData _bcData;
+    
+    public StripeServiceProvider(string apiKey, IBCData bcData)
+    {
+        StripeConfiguration.ApiKey = apiKey;
+        _bcData = bcData;
+    }
+
+    public async Task<RegisterFormModel?> ProcessCheckoutAsync(string checkoutId)
+    {
+        try
+        {
+            var service = new Stripe.Checkout.SessionService();
+            Stripe.Checkout.Session session = service.Get(checkoutId);
+
+            var email = session.CustomerDetails.Email;
+            if (email is null)
+            {
+                return null;
+            }
+
+            var userData = await _bcData.GetRegistrationByEmailAsync(email);
+            if (userData is null)
+            {
+                return null;
+            }
+            
+            await _bcData.SetUserAsPayedAsync(email);
+
+            return userData;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
     
 }
