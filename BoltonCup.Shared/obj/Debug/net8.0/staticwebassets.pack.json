@@ -1,64 +1,60 @@
 {
   "Files": [
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.css",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.css",
       "PackagePath": "staticwebassets/BoltonCup.min.css"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.js",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/BoltonCup.min.js",
       "PackagePath": "staticwebassets/BoltonCup.min.js"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/background.png",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/background.png",
       "PackagePath": "staticwebassets/background.png"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/fonts/Lato-Bold.ttf",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/fonts/Lato-Bold.ttf",
       "PackagePath": "staticwebassets/fonts/Lato-Bold.ttf"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/fonts/Lato-Regular.ttf",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/fonts/Lato-Regular.ttf",
       "PackagePath": "staticwebassets/fonts/Lato-Regular.ttf"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/images/bc-2024.webp",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/images/bc-2024.webp",
       "PackagePath": "staticwebassets/images/bc-2024.webp"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/images/chris-doey.webp",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/images/chris-doey.webp",
       "PackagePath": "staticwebassets/images/chris-doey.webp"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/images/scisoc.webp",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/images/scisoc.webp",
       "PackagePath": "staticwebassets/images/scisoc.webp"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/logos/boltoncup.png",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/logos/boltoncup.png",
       "PackagePath": "staticwebassets/logos/boltoncup.png"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/logos/logo-1.png",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/logos/logo-1.png",
       "PackagePath": "staticwebassets/logos/logo-1.png"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/logos/logo-2.png",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/logos/logo-2.png",
       "PackagePath": "staticwebassets/logos/logo-2.png"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/logos/logo-3.png",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/logos/logo-3.png",
       "PackagePath": "staticwebassets/logos/logo-3.png"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/logos/logo-4.png",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/logos/logo-4.png",
       "PackagePath": "staticwebassets/logos/logo-4.png"
     },
     {
-      "Id": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/spotlight/default.jpg",
+      "Id": "/Users/chrisbolton/Desktop/stuff/git/BoltonCup/BoltonCup.Shared/wwwroot/spotlight/default.jpg",
       "PackagePath": "staticwebassets/spotlight/default.jpg"
-    },
-    {
-      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.BoltonCup.Shared.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
-      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
     },
     {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.BoltonCup.Shared.Microsoft.AspNetCore.StaticWebAssets.props",
