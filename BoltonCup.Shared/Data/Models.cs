@@ -62,12 +62,18 @@ public class PlayerProfile
 
 public class PlayerGameSummary
 {
-    public int GameId { get; set; }
-    public int TeamId { get; set; }
-    public int OpponentTeamId { get; set; }
-    public int Goals { get; set; }
-    public int Assists { get; set; }
-    public DateTime GameDate { get; set; }
+    public int game_id { get; set; }
+    public int tournament_id { get; set; }
+    public string location { get; set; }
+    public string rink { get; set; }
+    public string type { get; set; }
+    public int team_score { get; set; }
+    public int opponent_score { get; set; }
+    public int team_id { get; set; }
+    public int opponent_team_id { get; set; }
+    public int goals { get; set; }
+    public int assists { get; set; }
+    public DateTime date { get; set; }
 }
 public class GoalieGameSummary
 {
@@ -91,9 +97,12 @@ public class GameGoal
     public int ScorerId { get; set; }
     public int? Assist1Id { get; set; }
     public int? Assist2Id { get; set; }
-    public string ScorerName { get; set; } = "";
+    public string ScorerName { get; set; }
     public string? Assist1Name { get; set; }
     public string? Assist2Name { get; set; }
+    public string ScorerProfilePic { get; set; }
+    public string TeamName { get; set; }
+    public string TeamLogo { get; set; }
 }
 
 public class GamePenalty
@@ -103,9 +112,10 @@ public class GamePenalty
     public TimeSpan Time { get; set; }
     public int Period { get; set; }
     public int TeamId { get; set; }
-    public string Infraction { get; set; } = "";
+    public string Infraction { get; set; }
     public int PlayerId { get; set; }
-    public string PlayerName { get; set; } = "";
+    public string PlayerName { get; set; }
+    public string TeamLogo { get; set; }
 }
 
 public class PlayerStatLine
@@ -165,6 +175,7 @@ public class RegisterFormModel
         
     [Required(ErrorMessage="This is required")] 
     public string HighestLevel { get; set; }
+    public bool Payed { get; set; }
 }
 
 public class LoginFormModel

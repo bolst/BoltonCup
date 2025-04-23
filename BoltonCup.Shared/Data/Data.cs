@@ -20,12 +20,14 @@ public interface IBCData
     Task<PlayerProfilePicture> GetPlayerProfilePictureById(int playerId);
     Task<string> SubmitRegistration(RegisterFormModel form);
     Task<IEnumerable<RegisterFormModel>> GetRegistrationsAsync();
+    Task<RegisterFormModel?> GetRegistrationByEmailAsync(string email);
     Task<string> AdmitUserAsync(RegisterFormModel form);
     Task<IEnumerable<BCAccount>> GetAccountsAsync();
     Task<BCAccount?> GetAccountByEmailAsync(string email);
     Task UpdateAccountProfilePictureAsync(string email, string imagePath);
     Task<IEnumerable<BCTournament>> GetTournamentsAsync();
     Task<BCTournament?> GetTournamentByYearAsync(string year);
+    Task SetUserAsPayedAsync(string email);
 }
 
 public class BCData : IBCData
@@ -146,49 +148,39 @@ public class BCData : IBCData
     {
         string cacheKey = $"player_gbg_{id}";
 
-        string sql = @"WITH
-                        current_team AS (
-                            SELECT R.team_id, R.jersey_number
-                            FROM roster R
-                            WHERE R.player_id = @PlayerId
-                        ),
-                        games_played AS (
-                            SELECT G.id as game_id,
-                                CASE
-                                    WHEN C.team_id != G.home_team_id THEN G.home_team_id
-                                    ELSE G.away_team_id
-                                END AS opponent_team_id, G.date, G.type, G.location, G.rink, G.home_team_id, G.away_team_id, C.*
-                            FROM game G
-                            INNER JOIN current_team C on C.team_id IN (G.home_team_id, G.away_team_id)
-                        ),
-                        team_points AS (
-                            SELECT GP.game_id, GP.jersey_number, GP.opponent_team_id, GP.team_id, GP.date,
-                                COALESCE(P.player_jerseynum, -1) AS player_jerseynum,
-                                COALESCE(P.assist1_jerseynum, -1) AS assist1_jerseynum,
-                                COALESCE(P.assist2_jerseynum, -1) AS assist2_jerseynum
-                            FROM points P
-                            RIGHT OUTER JOIN games_played GP ON P.game_id = GP.game_id
-                            AND ((GP.team_id = GP.home_team_id AND P.is_hometeam = TRUE) OR (GP.team_id = GP.away_team_id AND P.is_hometeam = FALSE))
-                        )
-                        SELECT
-                        SUM(
-                            CASE
-                            WHEN jersey_number = player_jerseynum THEN 1
-                            ELSE 0
-                            END
-                        ) AS goals,
-                        SUM(
-                            CASE
-                            WHEN jersey_number IN (assist1_jerseynum, assist2_jerseynum) THEN 1
-                            ELSE 0
-                            END
-                        ) AS assists,
-                        game_id AS GameId,
-                        opponent_team_id AS OpponentTeamId,
-                        team_id AS TeamId,
-                        date AS GameDate
-                        FROM team_points
-                        GROUP BY game_id, opponent_team_id, team_id, date";
+        string sql = @"WITH player_teams AS (SELECT *
+                          FROM roster
+                          WHERE player_id = @PlayerId),
+                     player_games AS (SELECT g.*,
+                                             p.team_id,
+                                             CASE
+                                                 WHEN p.team_id = g.home_team_id THEN g.away_team_id
+                                                 ELSE g.home_team_id END AS opponent_team_id,
+                                             CASE
+                                                 WHEN p.team_id = g.home_team_id THEN g.home_score
+                                                 ELSE g.away_score END   AS team_score,
+                                             CASE
+                                                 WHEN p.team_id = g.home_team_id THEN g.away_score
+                                                 ELSE g.home_score END   AS opponent_score
+                                          FROM game g
+                                                   INNER JOIN player_teams p ON p.team_id IN (g.home_team_id, g.away_team_id)),
+                     player_points AS (SELECT * FROM points WHERE @PlayerId IN (scorer_id, assist1_player_id, assist2_player_id))
+                SELECT g.id AS game_id,
+                       g.tournament_id,
+                       g.date,
+                       g.location,
+                       g.rink,
+                       g.type,
+                       g.team_score,
+                       g.opponent_score,
+                       g.team_id,
+                       g.opponent_team_id,
+                       SUM(CASE WHEN @PlayerId = p.scorer_id THEN 1 ELSE 0 END)                                 AS goals,
+                       SUM(CASE WHEN @PlayerId IN (p.assist1_player_id, p.assist2_player_id) THEN 1 ELSE 0 END) AS assists
+                    FROM player_games g
+                             LEFT OUTER JOIN player_points p ON g.id = p.game_id
+                    GROUP BY g.id, g.tournament_id, g.date, g.location, g.rink, g.type, g.team_score, g.opponent_score, g.team_id,
+                             g.opponent_team_id";
 
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryAsync<PlayerGameSummary>(sql, new { PlayerId = id });
@@ -256,39 +248,31 @@ public class BCData : IBCData
 
         return await cacheService.GetOrAddAsync(cacheKey, async () =>
         {
-            string sql = @"SELECT
-                            points.game_id AS GameId,
-                            points.player_jerseynum AS ScorerJersey,
-                            points.assist1_jerseynum AS Assist1Jersey,
-                            points.assist2_jerseynum AS Assist2Jersey,
-                            points.time AS Time,
-                            points.period AS Period,
-                            points.team_id AS TeamId,
-                            r1.player_id AS ScorerId,
-                            r2.player_id AS Assist1Id,
-                            r3.player_id AS Assist2Id,
-                            p1.name AS ScorerName,
-                            p2.name AS Assist1Name,
-                            p3.name AS Assist2Name
-                            FROM
-                            (
-                                SELECT p.game_id, p.player_jerseynum, p.assist1_jerseynum, p.assist2_jerseynum, p.time, p.period,
-                                CASE
-                                    WHEN p.is_hometeam = true THEN home_team_id
-                                    WHEN p.is_hometeam = false THEN away_team_id
-                                END AS team_id
+            string sql = @"SELECT p.game_id           AS gameid,
+                                   p.scorer_id         AS scorerid,
+                                   p.assist1_player_id AS assist1id,
+                                   p.assist2_player_id AS assist2id,
+                                   g0.name             AS scorername,
+                                   a1.name             AS assist1name,
+                                   a2.name             AS assist2name,
+                                   p.player_jerseynum  AS scorerjersey,
+                                   p.assist1_jerseynum AS assist1jersey,
+                                   p.assist2_jerseynum AS assist2jersey,
+                                   p.time,
+                                   p.period,
+                                   CASE WHEN p.is_hometeam THEN g.home_team_id ELSE g.away_team_id END AS teamid,
+                                   a.uri               AS scorerprofilepic,
+                                   t.name              AS teamname,
+                                   t.logo_url          AS teamlogo
                                 FROM points p
-                                INNER JOIN game g ON g.id = p.game_id
-                                WHERE g.id = @GameId
-                                ORDER BY time desc
-                            ) points
-                            LEFT JOIN roster r1 ON points.player_jerseynum = r1.jersey_number AND points.team_id = r1.team_id
-                            LEFT JOIN roster r2 ON points.assist1_jerseynum = r2.jersey_number AND points.team_id = r2.team_id
-                            LEFT JOIN roster r3 ON points.assist2_jerseynum = r3.jersey_number AND points.team_id = r3.team_id
-                            LEFT JOIN players p1 ON r1.player_id = p1.id
-                            LEFT JOIN players p2 ON r2.player_id = p2.id
-                            LEFT JOIN players p3 ON r3.player_id = p3.id
-                            ORDER BY points.period asc, points.time desc";
+                                         JOIN game g ON p.game_id = g.id
+                                         JOIN players g0 ON g0.id = p.scorer_id
+                                         JOIN profile_pictures a ON a.player_id = g0.id
+                                         JOIN team t ON t.id = (CASE WHEN p.is_hometeam THEN g.home_team_id ELSE g.away_team_id END)
+                                         LEFT OUTER JOIN players a1 ON a1.id = p.assist1_player_id
+                                         LEFT OUTER JOIN players a2 ON a2.id = p.assist2_player_id
+                                WHERE p.game_id = @GameId
+                                ORDER BY p.period, time DESC";
 
             await using var connection = new NpgsqlConnection(connectionString);
             return await connection.QueryAsync<GameGoal>(sql, new { GameId = id });
@@ -301,30 +285,21 @@ public class BCData : IBCData
 
         return await cacheService.GetOrAddAsync(cacheKey, async () =>
         {
-            string sql = @"SELECT
-                            penalties.game_id AS GameId,
-                            penalties.player_jerseynum AS PlayerJersey,
-                            penalties.time AS Time,
-                            penalties.period AS Period,
-                            penalties.team_id AS TeamId,
-                            penalties.infraction_name AS Infraction,
-                            r1.player_id AS PlayerId,
-                            p1.name AS PlayerName
-                            FROM
-                            (
-                                SELECT p.game_id, p.player_jerseynum, p.time, p.period, p.infraction_name,
-                                CASE
-                                    WHEN p.is_hometeam = true THEN home_team_id
-                                    WHEN p.is_hometeam = false THEN away_team_id
-                                END AS team_id
-                                FROM penalties p
-                                INNER JOIN game g ON g.id = p.game_id
-                                WHERE g.id = @GameId
-                                ORDER BY time desc
-                            ) penalties
-                            LEFT JOIN roster r1 ON penalties.player_jerseynum = r1.jersey_number AND penalties.team_id = r1.team_id
-                            LEFT JOIN players p1 ON r1.player_id = p1.id
-                            ORDER BY penalties.period asc, penalties.time desc";
+            string sql = @"SELECT x.game_id          AS gameid,
+                                   x.player_jerseynum AS playerjersey,
+                                   x.time,
+                                   x.period,
+                                   t.id               AS teamid,
+                                   x.infraction_name  AS infraction,
+                                   x.player_id        AS playerid,
+                                   p.name             AS playername,
+                                   t.logo_url         AS teamlogo
+                                FROM penalties x
+                                         JOIN players p ON p.id = x.player_id
+                                         JOIN game g ON g.id = x.game_id
+                                         JOIN team t ON t.id = (CASE WHEN x.is_hometeam THEN g.home_team_id ELSE g.away_team_id END)
+                                WHERE x.game_id = @GameId
+                                ORDER BY period, time DESC";
 
             await using var connection = new NpgsqlConnection(connectionString);
             return await connection.QueryAsync<GamePenalty>(sql, new { GameId = id });
@@ -543,6 +518,16 @@ public class BCData : IBCData
         return await connection.QueryAsync<RegisterFormModel>(sql);
     }
 
+    public async Task<RegisterFormModel?> GetRegistrationByEmailAsync(string email)
+    {
+        string sql = @"SELECT *
+                        FROM registration
+                        WHERE email = @Email";
+
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryFirstOrDefaultAsync<RegisterFormModel>(sql, new { Email = email });
+    }
+
     public async Task<string> AdmitUserAsync(RegisterFormModel form)
     {
         // check if user exists: if yes then do not admit
@@ -614,6 +599,17 @@ public class BCData : IBCData
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryFirstOrDefaultAsync<BCTournament>(sql, new { Year = year });
     }
+
+    public async Task SetUserAsPayedAsync(string email)
+    {
+        string sql = @"UPDATE registration
+                        SET payed = true
+                        WHERE email = @Email";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.ExecuteAsync(sql, new { Email = email });
+    }
+
 }
 
 

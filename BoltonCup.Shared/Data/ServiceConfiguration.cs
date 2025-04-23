@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Supabase;
 
 namespace BoltonCup.Shared.Data;
 
@@ -24,6 +23,18 @@ public static class ServiceConfiguration
             return new BCData(connectionString!, cacheService);
         });
 
+        services.AddScoped<StripeServiceProvider>(sp =>
+        {
+            var apiKey = Environment.GetEnvironmentVariable("STRIPE_API_KEY");
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new InvalidOperationException("SET YOUR (Stripe) ENV VARIABLES!\n");
+            }
+            
+            var bcData = sp.GetRequiredService<IBCData>();
+            return new StripeServiceProvider(apiKey, bcData);
+        });
+        
         return services;
     }
 }

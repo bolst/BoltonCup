@@ -14,7 +14,7 @@
         @foreach (Data.GamePenalty penalty in Penalties)
             {
                 <tr>
-                    <th><MudImage Src="@(TeamLogoById(penalty.TeamId))" Height="40" /></th>
+                    <th><MudImage Src="@penalty.TeamLogo" Height="40" /></th>
                     <th>@penalty.Time.ToString(@"hh\:mm")</th>
                     <th>@penalty.PlayerName - @penalty.Infraction</th>
                 </tr>
@@ -25,15 +25,7 @@
 }
 
 @code {
+    
     [Parameter] public IEnumerable<Data.GamePenalty>? Penalties { get; set; }
-    
-    private IEnumerable<BCTeam>? teams;
 
-    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.id == id)?.logo_url ?? string.Empty);
-
-    protected override async Task OnInitializedAsync()
-    {
-        teams = await BCData.GetTeams();
-    }
-    
 }
