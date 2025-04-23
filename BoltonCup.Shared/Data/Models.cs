@@ -228,3 +228,12 @@ public class BCTournament : IEquatable<BCTournament>
     public override bool Equals(object? obj) => Equals(obj as BCTournament);
     public override int GetHashCode() => tournament_id.GetHashCode();
 }
+
+public class BCDraftPick
+{
+    public required int id { get; set; }
+    public required int draft_id { get; set; }
+    public required int round { get; set; }
+    public required int pick { get; set; }
+    public required int player_id { get; set; }
+}

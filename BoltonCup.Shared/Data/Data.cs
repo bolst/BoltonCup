@@ -9,6 +9,7 @@ public interface IBCData
     Task<IEnumerable<BCGame>> GetSchedule();
     Task<BCGame?> GetGameById(int id);
     Task<IEnumerable<BCTeamPlayer>?> GetRosterByTeamId(int teamId);
+    Task<IEnumerable<PlayerProfile>> GetAllPlayerProfiles();
     Task<PlayerProfile?> GetPlayerProfileById(int playerId);
     Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int playerId);
     Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int goalieId);
@@ -28,6 +29,8 @@ public interface IBCData
     Task<IEnumerable<BCTournament>> GetTournamentsAsync();
     Task<BCTournament?> GetTournamentByYearAsync(string year);
     Task SetUserAsPayedAsync(string email);
+    Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId);
+    Task<BCTeam?> GetTeamByDraftOrderAsync(int draftId, int order);
 }
 
 public class BCData : IBCData
@@ -121,6 +124,26 @@ public class BCData : IBCData
         }, cacheDuration);
     }
 
+    public async Task<IEnumerable<PlayerProfile>> GetAllPlayerProfiles()
+    {
+        string sql = @"SELECT
+                        P.id AS PlayerId,
+                        P.name AS Name,
+                        P.dob AS Birthday,
+                        P.preferred_beer AS PreferredBeer,
+                        R.team_id AS CurrentTeamId,
+                        R.jersey_number AS JerseyNumber,
+                        R.position AS Position,
+                        CASE WHEN T.winning_team_id IS NOT NULL THEN true ELSE false END AS IsWinner
+                    FROM
+                        players P
+                        JOIN roster R ON P.id = R.player_id
+                        LEFT OUTER JOIN tournament T ON T.winning_team_id = R.team_id";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<PlayerProfile>(sql);
+    }
+    
     public async Task<PlayerProfile?> GetPlayerProfileById(int id)
     {
         string cacheKey = $"teamplayer_{id}";
@@ -608,6 +631,47 @@ public class BCData : IBCData
         
         await using var connection = new NpgsqlConnection(connectionString);
         await connection.ExecuteAsync(sql, new { Email = email });
+    }
+
+    public async Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId)
+    {
+        string sql = @"select
+                          *
+                        from
+                          draftpick
+                        where
+                          round = (
+                            select
+                              max(round)
+                            from
+                              draftpick
+                          )
+                          and pick = (
+                            select
+                              max(pick)
+                            from
+                              draftpick
+                          )
+                        and
+                          draft_id = @DraftId";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QuerySingleOrDefaultAsync<BCDraftPick>(sql, new { DraftId = draftId });
+    }
+
+    public async Task<BCTeam?> GetTeamByDraftOrderAsync(int draftId, int order)
+    {
+        string sql = @"select
+                          t.*
+                        from
+                          team t
+                          inner join draftorder o on t.id = o.team_id
+                        where
+                          o.order = @Order
+                          and o.draft_id = @DraftId";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QuerySingleOrDefaultAsync<BCTeam>(sql, new { DraftId = draftId, Order = order });
     }
 
 }

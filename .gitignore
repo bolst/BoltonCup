@@ -5,9 +5,11 @@ obj
 
 BoltonCup.Shared/obj
 BoltonCup.Web/obj
+BoltonCup.Draft/obj
 
 BoltonCup.Shared/bin
 BoltonCup.Web/bin
+BoltonCup.Draft/bin
 
 Xcode
 
