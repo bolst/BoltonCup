@@ -175,6 +175,7 @@ public class RegisterFormModel
         
     [Required(ErrorMessage="This is required")] 
     public string HighestLevel { get; set; }
+    public bool Payed { get; set; }
 }
 
 public class LoginFormModel
