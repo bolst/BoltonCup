@@ -8,18 +8,18 @@
     @if (profile is not null && profilePicture is not null)
     {
         <MudStack Class="d-flex align-center mb-10" Wrap="Wrap.Wrap" Row="true">
-            <MudText Typo="Typo.h3">@profile.Name.ToUpper()</MudText>
-            @if (profile.IsWinner)
+            <MudText Typo="Typo.h3">@profile.name.ToUpper()</MudText>
+            @if (profile.champion)
             {
                 <MudIcon Icon="@Icons.Material.Outlined.EmojiEvents" Size="Size.Large" Color="Color.Warning"></MudIcon>
                 
             }
             <MudDivider Class="d-none d-sm-flex mx-2" Vertical="true" FlexItem="true" />
-            <MudImage Src="@TeamLogoById(profile.CurrentTeamId)" Height="80" />
+            <MudImage Src="@TeamLogoById(profile.team_id)" Height="80" />
             <MudDivider Class="mx-2" Vertical="true" FlexItem="true" />
-            <MudText Typo="Typo.h2">#@profile.JerseyNumber</MudText>
+            <MudText Typo="Typo.h2">#@profile.jersey_number</MudText>
             <MudDivider Class="mx-2" Vertical="true" FlexItem="true" />
-            <MudText Typo="Typo.h2">@profile.Position.ToUpper().First()</MudText>
+            <MudText Typo="Typo.h2">@profile.position.ToUpper().First()</MudText>
         </MudStack>
         <MudStack Class="d-flex align-center mb-10" Wrap="Wrap.Wrap" Row="true">
             <div class="d-flex align-center mb-10">
@@ -29,16 +29,16 @@
                 <MudDivider Class="d-none d-sm-flex px-4" Vertical="true" FlexItem="true" />
 
                 <MudStack Class="mx-2">
-                    <MudText>Birth Year: @profile.Birthday.ToString("yyyy")</MudText>
+                    <MudText>Birth Year: @profile.dob.ToString("yyyy")</MudText>
                     @* <MudText>Hometown:</MudText> *@
-                    <MudText>Favourite Beer: @profile.PreferredBeer</MudText>
+                    <MudText>Favourite Beer: @profile.preferred_beer</MudText>
                 </MudStack>
 
                 <MudDivider Class="d-none d-sm-flex px-4" Vertical="true" FlexItem="true" />
             </div>
 
 
-            @if (profile.Position == "Goalie")
+            @if (profile.position == "Goalie")
             {
                 <GoalieStatSummary PlayerId="@Id" />
             }
@@ -52,7 +52,7 @@
         <MudText Typo="Typo.h4">Game History</MudText>
         <MudDivider />
 
-        @if (profile.Position == "Goalie")
+        @if (profile.position == "Goalie")
         {
             <GoalieGameByGame PlayerId="@Id" />
         }
@@ -80,7 +80,7 @@
     private PlayerProfilePicture? profilePicture;
     private IEnumerable<Data.BCTeam>? teams;
 
-    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.id == id)?.logo_url ?? string.Empty);
+    private string TeamLogoById(int? id) => teams is null || id is null ? string.Empty : (teams.FirstOrDefault(x => x.id == id)?.logo_url ?? string.Empty);
 
     protected override async Task OnParametersSetAsync()
     {

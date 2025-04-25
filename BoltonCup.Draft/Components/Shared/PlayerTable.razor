@@ -23,9 +23,9 @@
                         OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</ConfirmButton>
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Property="x => x.Name"/>
-            <PropertyColumn Property="x => x.Position"/>
-            <PropertyColumn Property="@(x => x.Birthday.ToString(" MMM dd, yyyy"))" Title="Bday!!"/>
+            <PropertyColumn Property="x => x.name"/>
+            <PropertyColumn Property="x => x.position"/>
+            <PropertyColumn Property="@(x => x.dob.ToString(" MMM dd, yyyy"))" Title="Bday!!"/>
         </Columns>
     </MudDataGrid>
 }
@@ -42,7 +42,7 @@
 
     private async Task OnPlayerDrafted(PlayerProfile player)
     {
-        Console.WriteLine(player.Name);
+        Console.WriteLine(player.name);
     }
     
     private Func<PlayerProfile, bool> QuickFilter => x =>
@@ -50,7 +50,7 @@
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
 
-        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (x.name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         return false;
