@@ -45,6 +45,13 @@ public class PlayerProfile
     public int? account_id { get; set; }
     public int? team_id { get; set; }
     public bool champion { get; set; }
+    public int tournament_id { get; set; }
+
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public DateTime? Birthday { get; set; }
+    public string? HighestLevel { get; set; }
+    public string? ProfilePicture { get; set; }
 }
 
 public class PlayerGameSummary

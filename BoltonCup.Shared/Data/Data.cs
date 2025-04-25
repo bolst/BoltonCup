@@ -9,7 +9,7 @@ public interface IBCData
     Task<IEnumerable<BCGame>> GetSchedule();
     Task<BCGame?> GetGameById(int id);
     Task<IEnumerable<PlayerProfile>> GetRosterByTeamId(int teamId);
-    Task<IEnumerable<PlayerProfile>> GetAllPlayerProfiles();
+    Task<IEnumerable<PlayerProfile>> GetAllTournamentPlayersAsync(int tournamentId);
     Task<PlayerProfile?> GetPlayerProfileById(int playerId);
     Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int playerId);
     Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int goalieId);
@@ -122,13 +122,15 @@ public class BCData : IBCData
         }, cacheDuration);
     }
 
-    public async Task<IEnumerable<PlayerProfile>> GetAllPlayerProfiles()
+    public async Task<IEnumerable<PlayerProfile>> GetAllTournamentPlayersAsync(int tournamentId)
     {
         string sql = @"SELECT *
-                        FROM players";
+                        FROM players p
+                                 LEFT OUTER JOIN account a ON p.account_id = a.id AND a.isactive = TRUE
+                        WHERE tournament_id = @TournamentId";
         
         await using var connection = new NpgsqlConnection(connectionString);
-        return await connection.QueryAsync<PlayerProfile>(sql);
+        return await connection.QueryAsync<PlayerProfile>(sql, new { TournamentId = tournamentId });
     }
     
     public async Task<PlayerProfile?> GetPlayerProfileById(int id)
