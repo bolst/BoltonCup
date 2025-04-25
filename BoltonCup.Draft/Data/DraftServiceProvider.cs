@@ -50,4 +50,12 @@ public class DraftServiceProvider
         // 1. update database to indicate the drafted player is now on the team with current pick
         // 2. notify subscribers that a selection has been made (e.g., timer)
     }
+
+    public async Task<IEnumerable<BCTeam>> GetTeamsInDraftAsync()
+    {
+        var teams = await _bcData.GetTeamsInTournamentAsync(DRAFT_ID);
+        var draftOrder = await _bcData.GetDraftOrderAsync(DRAFT_ID);
+
+        return teams.OrderBy(t => draftOrder.First(d => d.team_id == t.id).order);
+    }
 }
