@@ -7,7 +7,7 @@
 
 <MudLayout>
     <MudAppBar>
-        Bolton Cup Draft Board 
+        <MudImage Class="pr-4 clickable" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" Width="130"/>
     </MudAppBar>
     <MudMainContent>
         <div class="pa-4">
@@ -24,7 +24,6 @@
 </div>
 
 @code {
-    private bool _isDarkMode = false;
     private MudTheme? _theme = null;
     
     protected override void OnInitialized()
@@ -32,5 +31,6 @@
         base.OnInitialized();
     
         _theme = new CustomThemeProvider().Theme;
+        _theme.PaletteLight.AppbarBackground = "#232636";
     }
 }
