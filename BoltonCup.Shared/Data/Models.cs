@@ -34,30 +34,17 @@ public class BCGame
     public required string state { get; set; }
 }
 
-public class BCTeamPlayer
-{
-    public required string name { get; set; }
-    public DateTime dob { get; set; }
-    public string position { get; set; } = "";
-    public int jersey_number { get; set; }
-    public int player_id { get; set; }
-    public int team_id { get; set; }
-
-}
-
 public class PlayerProfile
 {
-    public int Id { get; set; }
-    public required string Name { get; set; }
-    public DateTime Birthday { get; set; }
-    public string PreferredBeer { get; set; } = "";
-    public string Position { get; set; } = "";
-    public int JerseyNumber { get; set; }
-    public int CurrentTeamId { get; set; }
-    public int Goals { get; set; }
-    public int Assists { get; set; }
-    public int PIMs { get; set; }
-    public bool IsWinner { get; set; }
+    public int id { get; set; }
+    public required string name { get; set; }
+    public DateTime dob { get; set; }
+    public string? preferred_beer { get; set; } = "";
+    public string position { get; set; } = "";
+    public int? jersey_number { get; set; }
+    public int? account_id { get; set; }
+    public int? team_id { get; set; }
+    public bool champion { get; set; }
 }
 
 public class PlayerGameSummary
