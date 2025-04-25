@@ -346,7 +346,7 @@ public class BCData : IBCData
                             team_id AS TeamId,
                             goals AS Goals,
                             assists AS Assists,
-                            tournament_id AS TournamentId
+                            p.tournament_id AS TournamentId
                             FROM
                                 (
                                     SELECT *
@@ -387,7 +387,7 @@ public class BCData : IBCData
                                 SELECT * FROM players where position = 'Goalie'
                             ),
                             goalie_games_played AS (
-                                SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date, G.tournament_id
+                                SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date
                                     FROM goalie_data P
                                              RIGHT OUTER JOIN game G ON P.team_id IN (G.home_team_id, G.away_team_id)
                             ),
@@ -414,10 +414,7 @@ public class BCData : IBCData
                                                    END
                                        ) AS goals_against
                                     FROM
-                                        (
-                                            SELECT *
-                                                FROM goalie_games_played GP
-                                        ) GP
+                                        goalie_games_played GP
                                             LEFT JOIN LATERAL (
                                             SELECT *
                                                 FROM points P
