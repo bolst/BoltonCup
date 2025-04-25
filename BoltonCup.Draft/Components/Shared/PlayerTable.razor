@@ -1,11 +1,12 @@
 @inject IBCData BCData
+@inject Data.DraftServiceProvider Drafter
 
 @if (_players is not null)
 {
     <MudDataGrid
         T="PlayerProfile"
         Items="_players"
-        Height="83vh"
+        Height="calc(85vh - 4rem)"
         QuickFilter="QuickFilter"
         FixedHeader>
         <ToolBarContent>
@@ -23,9 +24,10 @@
                         OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</ConfirmButton>
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Property="x => x.name"/>
-            <PropertyColumn Property="x => x.position"/>
-            <PropertyColumn Property="@(x => x.dob.ToString(" MMM dd, yyyy"))" Title="Bday!!"/>
+            <PropertyColumn Property="x => x.name" Title="Name" />
+            <PropertyColumn Property="x => x.position.ToUpper().First()" Title="Pos." />
+            <PropertyColumn Property="x => x.HighestLevel" Title="Highest Level" />
+            <PropertyColumn Property="@(x => x.dob.ToString("yyyy"))" Title="Birth year"/>
         </Columns>
     </MudDataGrid>
 }
@@ -37,12 +39,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _players = await BCData.GetAllPlayerProfiles();
+        _players = await BCData.GetAllTournamentPlayersAsync(Drafter.DraftId);
     }
 
     private async Task OnPlayerDrafted(PlayerProfile player)
     {
-        Console.WriteLine(player.name);
+        await Drafter.DraftPlayerAsync(player);
     }
     
     private Func<PlayerProfile, bool> QuickFilter => x =>

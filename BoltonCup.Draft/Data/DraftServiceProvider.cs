@@ -11,6 +11,8 @@ public class DraftServiceProvider
     {
         _bcData = bcData;
     }
+    
+    public int DraftId => DRAFT_ID;
 
     public async Task<BCTeam> GetTeamWithCurrentPick()
     {
@@ -37,5 +39,28 @@ public class DraftServiceProvider
             
             return (await _bcData.GetTeamByDraftOrderAsync(DRAFT_ID, order))!;
         }
+    }
+
+    public async Task DraftPlayerAsync(PlayerProfile player)
+    {
+        var team = await GetTeamWithCurrentPick();
+        Console.WriteLine($"{team.name} is drafting {player.name}");
+        
+        // TODO:
+        // 1. update database to indicate the drafted player is now on the team with current pick
+        // 2. notify subscribers that a selection has been made (e.g., timer)
+    }
+
+    public async Task<IEnumerable<BCTeam>> GetTeamsInDraftAsync()
+    {
+        var teams = await _bcData.GetTeamsInTournamentAsync(DRAFT_ID);
+        var draftOrder = await _bcData.GetDraftOrderAsync(DRAFT_ID);
+
+        return teams.OrderBy(t => draftOrder.First(d => d.team_id == t.id).order);
+    }
+
+    public async Task<IEnumerable<PlayerProfile>> GetTeamRosterAsync(BCTeam team)
+    {
+        return await _bcData.GetRosterByTeamId(team.id);
     }
 }

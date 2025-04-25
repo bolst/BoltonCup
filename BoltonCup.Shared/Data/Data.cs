@@ -9,7 +9,7 @@ public interface IBCData
     Task<IEnumerable<BCGame>> GetSchedule();
     Task<BCGame?> GetGameById(int id);
     Task<IEnumerable<PlayerProfile>> GetRosterByTeamId(int teamId);
-    Task<IEnumerable<PlayerProfile>> GetAllPlayerProfiles();
+    Task<IEnumerable<PlayerProfile>> GetAllTournamentPlayersAsync(int tournamentId);
     Task<PlayerProfile?> GetPlayerProfileById(int playerId);
     Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int playerId);
     Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int goalieId);
@@ -31,6 +31,8 @@ public interface IBCData
     Task SetUserAsPayedAsync(string email);
     Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId);
     Task<BCTeam?> GetTeamByDraftOrderAsync(int draftId, int order);
+    Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId);
+    Task<IEnumerable<BCDraftOrder>> GetDraftOrderAsync(int draftId);
 }
 
 public class BCData : IBCData
@@ -122,13 +124,15 @@ public class BCData : IBCData
         }, cacheDuration);
     }
 
-    public async Task<IEnumerable<PlayerProfile>> GetAllPlayerProfiles()
+    public async Task<IEnumerable<PlayerProfile>> GetAllTournamentPlayersAsync(int tournamentId)
     {
         string sql = @"SELECT *
-                        FROM players";
+                        FROM players p
+                                 LEFT OUTER JOIN account a ON p.account_id = a.id AND a.isactive = TRUE
+                        WHERE tournament_id = @TournamentId";
         
         await using var connection = new NpgsqlConnection(connectionString);
-        return await connection.QueryAsync<PlayerProfile>(sql);
+        return await connection.QueryAsync<PlayerProfile>(sql, new { TournamentId = tournamentId });
     }
     
     public async Task<PlayerProfile?> GetPlayerProfileById(int id)
@@ -342,7 +346,7 @@ public class BCData : IBCData
                             team_id AS TeamId,
                             goals AS Goals,
                             assists AS Assists,
-                            tournament_id AS TournamentId
+                            p.tournament_id AS TournamentId
                             FROM
                                 (
                                     SELECT *
@@ -383,7 +387,7 @@ public class BCData : IBCData
                                 SELECT * FROM players where position = 'Goalie'
                             ),
                             goalie_games_played AS (
-                                SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date, G.tournament_id
+                                SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date
                                     FROM goalie_data P
                                              RIGHT OUTER JOIN game G ON P.team_id IN (G.home_team_id, G.away_team_id)
                             ),
@@ -410,10 +414,7 @@ public class BCData : IBCData
                                                    END
                                        ) AS goals_against
                                     FROM
-                                        (
-                                            SELECT *
-                                                FROM goalie_games_played GP
-                                        ) GP
+                                        goalie_games_played GP
                                             LEFT JOIN LATERAL (
                                             SELECT *
                                                 FROM points P
@@ -642,6 +643,26 @@ public class BCData : IBCData
         
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QuerySingleOrDefaultAsync<BCTeam>(sql, new { DraftId = draftId, Order = order });
+    }
+
+    public async Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId)
+    {
+        string sql = @"SELECT *
+                        FROM team
+                        WHERE tournament_id = @TournamentId";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCTeam>(sql, new { TournamentId = tournamentId });
+    }
+
+    public async Task<IEnumerable<BCDraftOrder>> GetDraftOrderAsync(int draftId)
+    {
+        string sql = @"SELECT *
+                        FROM draftorder
+                        WHERE draft_id = @DraftId";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCDraftOrder>(sql, new { DraftId = draftId });
     }
 
 }

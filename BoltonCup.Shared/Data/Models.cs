@@ -45,6 +45,13 @@ public class PlayerProfile
     public int? account_id { get; set; }
     public int? team_id { get; set; }
     public bool champion { get; set; }
+    public int tournament_id { get; set; }
+
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public DateTime? Birthday { get; set; }
+    public string? HighestLevel { get; set; }
+    public string? ProfilePicture { get; set; }
 }
 
 public class PlayerGameSummary
@@ -223,4 +230,12 @@ public class BCDraftPick
     public required int round { get; set; }
     public required int pick { get; set; }
     public required int player_id { get; set; }
+}
+
+public class BCDraftOrder
+{
+    public required int id { get; set; }
+    public required int draft_id { get; set; }
+    public required int order { get; set; }
+    public required int team_id { get; set; }
 }
