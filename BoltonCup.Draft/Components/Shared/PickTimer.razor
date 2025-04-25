@@ -1,0 +1,19 @@
+@inject IJSRuntime JS
+
+<div class="d-flex justify-center">
+    <MudStack Class="px-1" AlignItems="AlignItems.Center">
+        <MudText Color="Color.Secondary" Typo="Typo.h1" HtmlTag="i"><b><span id="timersec"></span></b></MudText>
+    </MudStack>
+</div>
+
+@code {
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            
+            await JS.InvokeVoidAsync("picktimer", 30);
+        }
+    }
+}
