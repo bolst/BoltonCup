@@ -8,7 +8,8 @@ public interface IBCData
     Task<BCTeam?> GetTeamById(int id);
     Task<IEnumerable<BCGame>> GetSchedule();
     Task<BCGame?> GetGameById(int id);
-    Task<IEnumerable<BCTeamPlayer>?> GetRosterByTeamId(int teamId);
+    Task<IEnumerable<PlayerProfile>> GetRosterByTeamId(int teamId);
+    Task<IEnumerable<PlayerProfile>> GetAllPlayerProfiles();
     Task<PlayerProfile?> GetPlayerProfileById(int playerId);
     Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int playerId);
     Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int goalieId);
@@ -28,6 +29,8 @@ public interface IBCData
     Task<IEnumerable<BCTournament>> GetTournamentsAsync();
     Task<BCTournament?> GetTournamentByYearAsync(string year);
     Task SetUserAsPayedAsync(string email);
+    Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId);
+    Task<BCTeam?> GetTeamByDraftOrderAsync(int draftId, int order);
 }
 
 public class BCData : IBCData
@@ -104,41 +107,37 @@ public class BCData : IBCData
         }, cacheDuration);
     }
 
-    public async Task<IEnumerable<BCTeamPlayer>?> GetRosterByTeamId(int id)
+    public async Task<IEnumerable<PlayerProfile>> GetRosterByTeamId(int id)
     {
         string cacheKey = $"roster_{id}";
 
         return await cacheService.GetOrAddAsync(cacheKey, async () =>
         {
             string sql = @"SELECT *
-                            FROM
-                                roster R
-                            INNER JOIN players P ON R.player_id = P.id
-                                AND R.team_id = @TeamId";
+                            FROM players
+                            WHERE team_id = @TeamId";
 
             await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryAsync<BCTeamPlayer>(sql, new { TeamId = id });
+            return await connection.QueryAsync<PlayerProfile>(sql, new { TeamId = id });
         }, cacheDuration);
     }
 
+    public async Task<IEnumerable<PlayerProfile>> GetAllPlayerProfiles()
+    {
+        string sql = @"SELECT *
+                        FROM players";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<PlayerProfile>(sql);
+    }
+    
     public async Task<PlayerProfile?> GetPlayerProfileById(int id)
     {
         string cacheKey = $"teamplayer_{id}";
 
-        string sql = @"SELECT
-                        P.id AS PlayerId,
-                        P.name AS Name,
-                        P.dob AS Birthday,
-                        P.preferred_beer AS PreferredBeer,
-                        R.team_id AS CurrentTeamId,
-                        R.jersey_number AS JerseyNumber,
-                        R.position AS Position,
-                        CASE WHEN T.winning_team_id IS NOT NULL THEN true ELSE false END AS IsWinner
-                    FROM
-                        players P
-                        JOIN roster R ON P.id = R.player_id
-                        LEFT OUTER JOIN tournament T ON T.winning_team_id = R.team_id
-                    WHERE P.id = @PlayerId";
+        string sql = @"SELECT *
+                        FROM players
+                        WHERE id = @PlayerId";
 
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryFirstOrDefaultAsync<PlayerProfile>(sql, new { PlayerId = id });
@@ -149,8 +148,8 @@ public class BCData : IBCData
         string cacheKey = $"player_gbg_{id}";
 
         string sql = @"WITH player_teams AS (SELECT *
-                          FROM roster
-                          WHERE player_id = @PlayerId),
+                          FROM players
+                          WHERE id = @PlayerId),
                      player_games AS (SELECT g.*,
                                              p.team_id,
                                              CASE
@@ -192,43 +191,41 @@ public class BCData : IBCData
 
         string sql = @"WITH
                         goalie_data AS (
-                            SELECT P.id AS player_id, P.name, R.jersey_number, R.position, R.team_id
-                            FROM players P
-                            INNER JOIN roster R ON R.player_id = P.id AND R.position = 'Goalie'
+                            SELECT * from players
                         ),
                         goalie_games_played AS (
                             SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date
-                            FROM goalie_data P
-                            RIGHT OUTER JOIN game G ON P.team_id IN (G.home_team_id, G.away_team_id)
+                                FROM goalie_data P
+                                         RIGHT OUTER JOIN game G ON P.team_id IN (G.home_team_id, G.away_team_id)
                         ),
                         goalie_game_scores AS (
-                            SELECT GP.game_id, GP.player_id,  GP.team_id, GP.date,
-                            CASE WHEN GP.team_id != GP.home_team_id THEN GP.home_team_id ELSE GP.away_team_id END AS opponent_team_id,
-                            SUM(
-                                CASE
-                                WHEN ( GP.team_id = GP.home_team_id AND is_hometeam = TRUE ) OR ( GP.team_id = GP.away_team_id AND is_hometeam = FALSE ) THEN 1
-                                ELSE 0
-                                END
-                            ) AS goals_for,
-                            SUM(
-                                CASE
-                                WHEN ( GP.team_id = GP.home_team_id AND is_hometeam = FALSE ) OR ( GP.team_id = GP.away_team_id AND is_hometeam = TRUE ) THEN 1
-                                ELSE 0
-                                END
-                            ) AS goals_against
-                            FROM
-                            (
-                                SELECT *
-                                FROM goalie_games_played GP
-                            ) GP
-                            LEFT JOIN LATERAL (
-                                SELECT *
-                                FROM points P
-                                WHERE P.game_id = GP.game_id
-                            ) game_scores ON TRUE
-                            GROUP BY GP.game_id, GP.player_id, opponent_team_id, GP.team_id, GP.date
+                            SELECT GP.game_id, GP.id,  GP.team_id, GP.date,
+                                   CASE WHEN GP.team_id != GP.home_team_id THEN GP.home_team_id ELSE GP.away_team_id END AS opponent_team_id,
+                                   SUM(
+                                           CASE
+                                               WHEN ( GP.team_id = GP.home_team_id AND is_hometeam = TRUE ) OR ( GP.team_id = GP.away_team_id AND is_hometeam = FALSE ) THEN 1
+                                               ELSE 0
+                                               END
+                                   ) AS goals_for,
+                                   SUM(
+                                           CASE
+                                               WHEN ( GP.team_id = GP.home_team_id AND is_hometeam = FALSE ) OR ( GP.team_id = GP.away_team_id AND is_hometeam = TRUE ) THEN 1
+                                               ELSE 0
+                                               END
+                                   ) AS goals_against
+                                FROM
+                                    (
+                                        SELECT *
+                                            FROM goalie_games_played GP
+                                    ) GP
+                                        LEFT JOIN LATERAL (
+                                        SELECT *
+                                            FROM points P
+                                            WHERE P.game_id = GP.game_id
+                                        ) game_scores ON TRUE
+                                GROUP BY GP.game_id, GP.id, opponent_team_id, GP.team_id, GP.date
                         )
-                        SELECT
+                    SELECT
                         G.game_id AS GameId,
                         G.team_id AS TeamId,
                         G.opponent_team_id AS OpponentTeamId,
@@ -236,7 +233,7 @@ public class BCData : IBCData
                         G.goals_against AS GoalsAgainst,
                         G.date AS GameDate
                         FROM goalie_game_scores G
-                        WHERE G.player_id = @PlayerId";
+                        WHERE G.id = @PlayerId";
 
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryAsync<GoalieGameSummary>(sql, new { PlayerId = id });
@@ -314,33 +311,31 @@ public class BCData : IBCData
         {
             string sql = @"WITH
                             player_data AS (
-                                SELECT P.id AS player_id, P.name, R.jersey_number, R.position, R.team_id
-                                FROM players P
-                                INNER JOIN roster R ON R.player_id = P.id
-                                WHERE r.position != 'Goalie'
+                                SELECT *
+                                    FROM players WHERE position != 'Goalie'
                             ),
                             points_with_teams AS (
                                 SELECT G.id AS game_id, P.player_jerseynum, P.assist1_jerseynum, P.assist2_jerseynum, P.tournament_id,
-                                CASE
-                                    WHEN is_hometeam = TRUE THEN home_team_id
-                                    ELSE away_team_id
-                                END AS team_id
-                                FROM points P
-                                LEFT OUTER JOIN game G ON G.id = P.game_id
+                                       CASE
+                                           WHEN is_hometeam = TRUE THEN home_team_id
+                                           ELSE away_team_id
+                                           END AS team_id
+                                    FROM points P
+                                             LEFT OUTER JOIN game G ON G.id = P.game_id
                             ),
                             points_with_players AS (
                                 SELECT
-                                P.*, D1.player_id AS scorer_id, D2.player_id AS assist1_id, D3.player_id AS assist2_id
-                                FROM points_with_teams P
-                                LEFT OUTER JOIN player_data D1 ON D1.team_id = P.team_id
-                                AND D1.jersey_number = P.player_jerseynum
-                                LEFT OUTER JOIN player_data D2 ON D2.team_id = P.team_id
-                                AND D2.jersey_number = P.assist1_jerseynum
-                                LEFT OUTER JOIN player_data D3 ON D3.team_id = P.team_id
-                                AND D3.jersey_number = P.assist2_jerseynum
+                                    P.*, D1.id AS scorer_id, D2.id AS assist1_id, D3.id AS assist2_id
+                                    FROM points_with_teams P
+                                             LEFT OUTER JOIN player_data D1 ON D1.team_id = P.team_id
+                                        AND D1.jersey_number = P.player_jerseynum
+                                             LEFT OUTER JOIN player_data D2 ON D2.team_id = P.team_id
+                                        AND D2.jersey_number = P.assist1_jerseynum
+                                             LEFT OUTER JOIN player_data D3 ON D3.team_id = P.team_id
+                                        AND D3.jersey_number = P.assist2_jerseynum
                             )
-                            SELECT
-                            player_id AS PlayerId,
+                        SELECT
+                            id AS PlayerId,
                             name AS Name,
                             jersey_number AS PlayerNumber,
                             position AS Position,
@@ -349,28 +344,28 @@ public class BCData : IBCData
                             assists AS Assists,
                             tournament_id AS TournamentId
                             FROM
-                            (
-                                SELECT *
-                                FROM player_data
-                            ) p
-                            LEFT JOIN LATERAL (
-                                SELECT
-                                SUM(
-                                    CASE
-                                    WHEN p.player_id = scorer_id THEN 1
-                                    ELSE 0
-                                    END
-                                ) AS Goals,
-                                SUM(
-                                    CASE
-                                    WHEN p.player_id IN (assist1_id, assist2_id) THEN 1
-                                    ELSE 0
-                                    END
-                                ) AS Assists,
-                                tournament_id
-                                FROM points_with_players
-                                GROUP BY tournament_id
-                            ) g ON TRUE
+                                (
+                                    SELECT *
+                                        FROM player_data
+                                ) p
+                                    LEFT JOIN LATERAL (
+                                    SELECT
+                                        SUM(
+                                                CASE
+                                                    WHEN p.id = scorer_id THEN 1
+                                                    ELSE 0
+                                                    END
+                                        ) AS Goals,
+                                        SUM(
+                                                CASE
+                                                    WHEN p.id IN (assist1_id, assist2_id) THEN 1
+                                                    ELSE 0
+                                                    END
+                                        ) AS Assists,
+                                        tournament_id
+                                        FROM points_with_players
+                                        GROUP BY tournament_id
+                                    ) g ON TRUE
                             ORDER BY goals + assists DESC";
 
             await using var connection = new NpgsqlConnection(connectionString);
@@ -385,51 +380,49 @@ public class BCData : IBCData
         {
             string sql = @"WITH
                             goalie_data AS (
-                                SELECT P.id AS player_id, P.name, R.jersey_number, R.position, R.team_id, R.tournament_id
-                                FROM players P
-                                INNER JOIN roster R ON R.player_id = P.id AND R.position = 'Goalie'
+                                SELECT * FROM players where position = 'Goalie'
                             ),
                             goalie_games_played AS (
-                                SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date
-                                FROM goalie_data P
-                                RIGHT OUTER JOIN game G ON P.team_id IN (G.home_team_id, G.away_team_id)
+                                SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date, G.tournament_id
+                                    FROM goalie_data P
+                                             RIGHT OUTER JOIN game G ON P.team_id IN (G.home_team_id, G.away_team_id)
                             ),
                             goalie_game_scores AS (
-                                SELECT GP.game_id, GP.player_id, GP.name, GP.jersey_number, GP.team_id, GP.date, GP.tournament_id,
-                                CASE WHEN GP.team_id != GP.home_team_id THEN GP.home_team_id ELSE GP.away_team_id END AS opponent_team_id,
-                                SUM(
-                                    CASE
-                                    WHEN (
-                                        GP.team_id = GP.home_team_id
-                                        AND is_hometeam = TRUE
-                                    )
-                                    OR (
-                                        GP.team_id = GP.away_team_id
-                                        AND is_hometeam = FALSE
-                                    ) THEN 1
-                                    ELSE 0
-                                    END
-                                ) AS goals_for,
-                                SUM(
-                                    CASE
-                                    WHEN ( GP.team_id = GP.home_team_id AND is_hometeam = FALSE ) OR ( GP.team_id = GP.away_team_id AND is_hometeam = TRUE ) THEN 1
-                                    ELSE 0
-                                    END
-                                ) AS goals_against
-                                FROM
-                                (
-                                    SELECT *
-                                    FROM goalie_games_played GP
-                                ) GP
-                                LEFT JOIN LATERAL (
-                                    SELECT *
-                                    FROM points P
-                                    WHERE P.game_id = GP.game_id
-                                ) game_scores ON TRUE
-                                GROUP BY GP.game_id, GP.player_id, GP.name, GP.jersey_number, opponent_team_id, GP.team_id, GP.date, GP.tournament_id
+                                SELECT GP.game_id, GP.id, GP.name, GP.jersey_number, GP.team_id, GP.date, GP.tournament_id,
+                                       CASE WHEN GP.team_id != GP.home_team_id THEN GP.home_team_id ELSE GP.away_team_id END AS opponent_team_id,
+                                       SUM(
+                                               CASE
+                                                   WHEN (
+                                                            GP.team_id = GP.home_team_id
+                                                                AND is_hometeam = TRUE
+                                                            )
+                                                       OR (
+                                                            GP.team_id = GP.away_team_id
+                                                                AND is_hometeam = FALSE
+                                                            ) THEN 1
+                                                   ELSE 0
+                                                   END
+                                       ) AS goals_for,
+                                       SUM(
+                                               CASE
+                                                   WHEN ( GP.team_id = GP.home_team_id AND is_hometeam = FALSE ) OR ( GP.team_id = GP.away_team_id AND is_hometeam = TRUE ) THEN 1
+                                                   ELSE 0
+                                                   END
+                                       ) AS goals_against
+                                    FROM
+                                        (
+                                            SELECT *
+                                                FROM goalie_games_played GP
+                                        ) GP
+                                            LEFT JOIN LATERAL (
+                                            SELECT *
+                                                FROM points P
+                                                WHERE P.game_id = GP.game_id
+                                            ) game_scores ON TRUE
+                                    GROUP BY GP.game_id, GP.id, GP.name, GP.jersey_number, opponent_team_id, GP.team_id, GP.date, GP.tournament_id
                             )
-                            SELECT
-                            G.player_id AS PlayerId,
+                        SELECT
+                            G.id AS PlayerId,
                             G.name AS Name,
                             G.jersey_number AS PlayerNumber,
                             G.team_id AS TeamId,
@@ -437,7 +430,7 @@ public class BCData : IBCData
                             AVG(G.goals_against) AS GAA,
                             SUM(CASE WHEN G.goals_against = 0 THEN 1 END) AS Shutouts
                             FROM goalie_game_scores G
-                            GROUP BY G.player_id, G.name, G.jersey_number, G.team_id, G.tournament_id";
+                            GROUP BY G.id, G.name, G.jersey_number, G.team_id, G.tournament_id";
 
             await using var connection = new NpgsqlConnection(connectionString);
             return await connection.QueryAsync<GoalieStatLine>(sql);
@@ -608,6 +601,47 @@ public class BCData : IBCData
         
         await using var connection = new NpgsqlConnection(connectionString);
         await connection.ExecuteAsync(sql, new { Email = email });
+    }
+
+    public async Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId)
+    {
+        string sql = @"select
+                          *
+                        from
+                          draftpick
+                        where
+                          round = (
+                            select
+                              max(round)
+                            from
+                              draftpick
+                          )
+                          and pick = (
+                            select
+                              max(pick)
+                            from
+                              draftpick
+                          )
+                        and
+                          draft_id = @DraftId";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QuerySingleOrDefaultAsync<BCDraftPick>(sql, new { DraftId = draftId });
+    }
+
+    public async Task<BCTeam?> GetTeamByDraftOrderAsync(int draftId, int order)
+    {
+        string sql = @"select
+                          t.*
+                        from
+                          team t
+                          inner join draftorder o on t.id = o.team_id
+                        where
+                          o.order = @Order
+                          and o.draft_id = @DraftId";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QuerySingleOrDefaultAsync<BCTeam>(sql, new { DraftId = draftId, Order = order });
     }
 
 }

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Shared", "BoltonC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.App", "BoltonCup.App\BoltonCup.App.csproj", "{56231C39-1020-47BC-8F87-5C109F8EDC53}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Draft", "BoltonCup.Draft\BoltonCup.Draft.csproj", "{F7AE21A5-0726-4961-986C-D9798EAD212F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{56231C39-1020-47BC-8F87-5C109F8EDC53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56231C39-1020-47BC-8F87-5C109F8EDC53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56231C39-1020-47BC-8F87-5C109F8EDC53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7AE21A5-0726-4961-986C-D9798EAD212F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7AE21A5-0726-4961-986C-D9798EAD212F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7AE21A5-0726-4961-986C-D9798EAD212F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7AE21A5-0726-4961-986C-D9798EAD212F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

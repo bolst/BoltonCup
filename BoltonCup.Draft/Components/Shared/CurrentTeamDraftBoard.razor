@@ -1,0 +1,23 @@
+@inject Data.DraftServiceProvider Drafter
+
+@if (_team is not null)
+{
+    <MudStack Class="pt-2" Justify="Justify.Center" Row>
+        <MudText Typo="Typo.h5"><b>Round 1, Pick 1</b></MudText>
+    </MudStack>
+    <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row>
+        <MudImage Src="@_team.logo_url" Height="100" />
+        <MudText Typo="Typo.h4"><b>@_team.name</b></MudText>
+    </MudStack>
+}
+
+@code {
+
+    private BCTeam? _team;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _team = await Drafter.GetTeamWithCurrentPick();
+    }
+
+}

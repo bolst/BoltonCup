@@ -37,7 +37,7 @@
     [Parameter] public int Id { get; set; }
 
     private BoltonCup.Shared.Data.BCTeam? team { get; set; }
-    private IEnumerable<BCTeamPlayer>? roster { get; set; }
+    private IEnumerable<PlayerProfile>? roster { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -45,7 +45,7 @@
         roster = await BCData.GetRosterByTeamId(Id);
     }
 
-    private RenderFragment PlayerTable(IEnumerable<BCTeamPlayer> players) => __builder =>
+    private RenderFragment PlayerTable(IEnumerable<PlayerProfile> players) => __builder =>
     {
         <MudSimpleTable Class="mb-6" Hover="true" Dense="true" Striped="true" Elevation="0">
             <thead>
@@ -56,10 +56,10 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (BCTeamPlayer player in players)
+                @foreach (PlayerProfile player in players)
                 {
-                    <tr class="clickable" onclick=@(() => Navigation.NavigateTo($"player/{player.player_id}"))>
-                        <th>@player.jersey_number.ToString("D2")</th>
+                    <tr class="clickable" onclick=@(() => Navigation.NavigateTo($"player/{player.id}"))>
+                        <th>@(player.jersey_number is null ? string.Empty : player.jersey_number.Value.ToString("D2"))</th>
                         <th>@player.name</th>
                         <th>@player.dob.ToString("yyyy")</th>
                     </tr>

@@ -1,0 +1,59 @@
+@inject IBCData BCData
+
+@if (_players is not null)
+{
+    <MudDataGrid
+        T="PlayerProfile"
+        Items="_players"
+        Height="83vh"
+        QuickFilter="QuickFilter"
+        FixedHeader>
+        <ToolBarContent>
+            <MudSpacer/>
+            <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <Columns>
+            <TemplateColumn>
+                <CellTemplate>
+                    <ConfirmButton 
+                        Color="Color.Default" 
+                        Variant="Variant.Filled"
+                        OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</ConfirmButton>
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x => x.name"/>
+            <PropertyColumn Property="x => x.position"/>
+            <PropertyColumn Property="@(x => x.dob.ToString(" MMM dd, yyyy"))" Title="Bday!!"/>
+        </Columns>
+    </MudDataGrid>
+}
+
+@code {
+
+    private IEnumerable<PlayerProfile>? _players;
+    private string _searchString;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _players = await BCData.GetAllPlayerProfiles();
+    }
+
+    private async Task OnPlayerDrafted(PlayerProfile player)
+    {
+        Console.WriteLine(player.name);
+    }
+    
+    private Func<PlayerProfile, bool> QuickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+}
