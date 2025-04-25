@@ -58,4 +58,9 @@ public class DraftServiceProvider
 
         return teams.OrderBy(t => draftOrder.First(d => d.team_id == t.id).order);
     }
+
+    public async Task<IEnumerable<PlayerProfile>> GetTeamRosterAsync(BCTeam team)
+    {
+        return await _bcData.GetRosterByTeamId(team.id);
+    }
 }
