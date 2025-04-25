@@ -1,15 +1,26 @@
 @inject Data.DraftServiceProvider Drafter
 
-@if (_team is not null)
-{
-    <MudStack Class="pt-2" Justify="Justify.Center" Row>
-        <MudText Typo="Typo.h5"><b>Round 1, Pick 1</b></MudText>
-    </MudStack>
-    <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row>
-        <MudImage Src="@_team.logo_url" Height="100" />
-        <MudText Typo="Typo.h4"><b>@_team.name</b></MudText>
-    </MudStack>
-}
+<MudStack AlignItems="AlignItems.Center">
+    @if (_team is not null)
+    {
+        <MudStack Class="pt-2" Justify="Justify.Center" Row>
+            <MudText Typo="Typo.h5"><b>Round 1, Pick 1</b></MudText>
+        </MudStack>
+        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row>
+            <MudImage Src="@_team.logo_url" Height="100" />
+            <MudText Typo="Typo.h4"><b>@_team.name</b></MudText>
+        </MudStack>
+    }
+    
+    <MudDivider />
+    
+    @if (_roster is not null)
+    {
+        <MiniPlayerList Header="Forwards" Players="@(_roster.Where(r => r.position == "Forward"))" Height="225px" />
+        <MiniPlayerList Header="Defense" Players="@(_roster.Where(r => r.position == "Defenseman"))" Height="180px" />
+        <MiniPlayerList Header="Goalies" Players="@(_roster.Where(r => r.position == "Goalie"))" Height="80px" />
+    }
+</MudStack>
 
 @code {
 

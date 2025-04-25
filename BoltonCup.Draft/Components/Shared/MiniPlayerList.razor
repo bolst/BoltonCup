@@ -1,0 +1,40 @@
+
+
+<MudSimpleTable Style="@($"height: {Height}; width: 100%")" Square FixedHeader Dense Striped>
+    <thead>
+    <tr>
+        <th style="width: 50px"></th>
+        <th>@Header.ToUpper() (@PlayerCount)</th>
+    </tr>
+    </thead>
+    <tbody>
+    @if (Players is not null)
+    {
+        foreach (var player in Players)
+        {
+            <tr>
+                <td>
+                    <MudImage Src="@player.ProfilePicture" Height="20" />
+                </td>
+                <td>@player.name</td>
+            </tr>
+        }
+    }
+    </tbody>
+</MudSimpleTable>
+
+
+@code {
+
+    [Parameter] 
+    public IEnumerable<PlayerProfile>? Players { get; set; }
+
+    [Parameter] 
+    public string Header { get; set; } = "Players";
+
+    [Parameter] 
+    public string Height { get; set; } = "150px";
+
+    private int PlayerCount => Players?.Count() ?? 0;
+
+}

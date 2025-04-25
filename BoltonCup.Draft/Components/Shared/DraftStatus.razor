@@ -3,7 +3,7 @@
 @if (_teams is not null)
 {
     
-    <MudStack Class="py-4" AlignItems="AlignItems.Center">
+    <MudStack Class="py-4" AlignItems="AlignItems.Center" Spacing="2">
         <PickTimer />
         
         <MudDivider />
@@ -12,11 +12,31 @@
         {
             if (_currentTeam is not null && _currentTeam.id == team.id)
             {
-                <MudText Color="Color.Info">@team.name</MudText>
+                <MudPaper 
+                    Class="d-flex align-center border-double border-4" 
+                    Style="@($"border-color: {team.secondary_color_hex}; box-shadow: inset 0 0 0 2000px {team.primary_color_hex}ff;")" 
+                    Height="50px" 
+                    Width="100%" 
+                    Square>
+                    <MudStack AlignItems="AlignItems.Center" Row>
+                        <MudImage Src="@team.logo_url" Height="40" />
+                        <MudText Typo="Typo.button" Style="@($"color: {team.secondary_color_hex}")"><b>@team.name_short</b></MudText>
+                    </MudStack>
+                </MudPaper>
             }
             else
             {
-                <MudText>@team.name</MudText>
+                <MudPaper 
+                    Class="d-flex align-center" 
+                    Style="@($"box-shadow: inset 0 0 0 2000px {team.primary_color_hex}66;")" 
+                    Height="50px" 
+                    Width="100%" 
+                    Square>
+                    <MudStack AlignItems="AlignItems.Center" Row>
+                        <MudImage Src="@team.logo_url" Height="40" />
+                        <MudText Typo="Typo.button" Style="@($"color: {team.secondary_color_hex}")"><b>@team.name_short</b></MudText>
+                    </MudStack>
+                </MudPaper>
             }
         }
         
