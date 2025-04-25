@@ -1,2 +1,28 @@
+@inject Data.DraftServiceProvider Drafter
 
-<PickTimer />
+@if (_teams is not null)
+{
+    
+    <MudStack Class="py-4" AlignItems="AlignItems.Center">
+        <PickTimer />
+        
+        <MudDivider />
+     
+        @foreach (var team in _teams)
+        {
+            <div>@team.name</div>
+        }
+        
+    </MudStack>
+}
+
+@code{
+
+    private IEnumerable<BCTeam>? _teams { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _teams = await Drafter.GetTeamsInDraftAsync();
+    }
+
+}

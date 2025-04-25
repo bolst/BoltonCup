@@ -31,6 +31,8 @@ public interface IBCData
     Task SetUserAsPayedAsync(string email);
     Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId);
     Task<BCTeam?> GetTeamByDraftOrderAsync(int draftId, int order);
+    Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId);
+    Task<IEnumerable<BCDraftOrder>> GetDraftOrderAsync(int draftId);
 }
 
 public class BCData : IBCData
@@ -644,6 +646,26 @@ public class BCData : IBCData
         
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QuerySingleOrDefaultAsync<BCTeam>(sql, new { DraftId = draftId, Order = order });
+    }
+
+    public async Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId)
+    {
+        string sql = @"SELECT *
+                        FROM team
+                        WHERE tournament_id = @TournamentId";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCTeam>(sql, new { TournamentId = tournamentId });
+    }
+
+    public async Task<IEnumerable<BCDraftOrder>> GetDraftOrderAsync(int draftId)
+    {
+        string sql = @"SELECT *
+                        FROM draftorder
+                        WHERE draft_id = @DraftId";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCDraftOrder>(sql, new { DraftId = draftId });
     }
 
 }
