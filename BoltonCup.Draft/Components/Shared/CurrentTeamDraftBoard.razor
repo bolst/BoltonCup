@@ -14,10 +14,20 @@
 @code {
 
     private BCTeam? _team;
+    private IEnumerable<PlayerProfile>? _roster;
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
         _team = await Drafter.GetTeamWithCurrentPick();
+        if (_team is not null)
+        {
+            _roster = await Drafter.GetTeamRosterAsync(_team);
+        }
     }
 
 }

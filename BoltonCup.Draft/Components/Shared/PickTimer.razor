@@ -6,14 +6,20 @@
     </MudStack>
 </div>
 
+<MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Secondary" OnClick="StartTimer" />
+
 @code {
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            
-            await JS.InvokeVoidAsync("picktimer", 30);
+            await StartTimer();
         }
+    }
+
+    private async Task StartTimer()
+    {
+        await JS.InvokeVoidAsync("picktimer", 30);
     }
 }

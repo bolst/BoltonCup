@@ -1,2 +1,42 @@
+@inject Data.DraftServiceProvider Drafter
 
-<PickTimer />
+@if (_teams is not null)
+{
+    
+    <MudStack Class="py-4" AlignItems="AlignItems.Center">
+        <PickTimer />
+        
+        <MudDivider />
+     
+        @foreach (var team in _teams)
+        {
+            if (_currentTeam is not null && _currentTeam.id == team.id)
+            {
+                <MudText Color="Color.Info">@team.name</MudText>
+            }
+            else
+            {
+                <MudText>@team.name</MudText>
+            }
+        }
+        
+    </MudStack>
+}
+
+@code{
+
+    private IEnumerable<BCTeam>? _teams { get; set; }
+    private BCTeam? _currentTeam { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _teams = await Drafter.GetTeamsInDraftAsync();
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _currentTeam = await Drafter.GetTeamWithCurrentPick();
+    }
+
+}
