@@ -34,6 +34,7 @@ public interface IBCData
     Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId);
     Task<IEnumerable<BCDraftOrder>> GetDraftOrderAsync(int draftId);
     Task DraftPlayerAsync(PlayerProfile player, BCTeam team, BCDraftPick draftPick);
+    Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId);
 }
 
 public class BCData : IBCData
@@ -667,6 +668,24 @@ public class BCData : IBCData
         string draftSql = @"INSERT INTO draftpick (draft_id, round, pick, player_id)
                                 VALUES (@draft_id, @round, @pick, @player_id)";
         await connection.ExecuteAsync(draftSql, draftPick);
+    }
+
+    public async Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId)
+    {
+        string sql = @"SELECT 
+                        dp.*, 
+                        p.name, 
+                        p.dob AS Birthday, 
+                        p.team_id AS TeamId, 
+                        p.position, 
+                        a.profilepicture
+                        FROM draftpick dp
+                                 INNER JOIN players p ON p.id = dp.player_id AND dp.draft_id = @DraftId
+                                 LEFT OUTER JOIN account a ON a.id = p.account_id
+                        ORDER BY round, pick";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCDraftPickDetail>(sql, new { DraftId = draftId });
     }
 
 }

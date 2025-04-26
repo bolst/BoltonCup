@@ -2,7 +2,23 @@
 
 <MudDialog>
     <DialogContent>
-        Dialog Content
+        <div style="height: 80vh">
+            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="10" Wrap="Wrap.Wrap" Row>
+                @if (draftPicks is not null)
+                {
+                    foreach (var roundPicks in draftPicks.GroupBy(d => d.round))
+                    {
+                        <div class="mb-2" style="width: 15%">
+                            <MudText Typo="Typo.h6">Round @roundPicks.Key</MudText>
+                            @foreach (var (pick, pickNum) in roundPicks.Select((p,i) => (p,i+1)))
+                            {
+                                <MudText>@($"{pickNum}.") @pick.Name</MudText>
+                            }
+                        </div>
+                    }
+                }
+            </MudStack>
+        </div>
     </DialogContent>
     <DialogActions>
     </DialogActions>
@@ -13,10 +29,10 @@
     [CascadingParameter] 
     private IMudDialogInstance MudDialog { get; set; }
 
-    private object? draftPicks;
+    private IEnumerable<BCDraftPickDetail>? draftPicks;
 
     protected override async Task OnInitializedAsync()
     {
-        draftPicks = await Drafter.GetSelectedPlayersAsync();
+        draftPicks = await Drafter.GetDraftedPlayersAsync();
     }
 }
