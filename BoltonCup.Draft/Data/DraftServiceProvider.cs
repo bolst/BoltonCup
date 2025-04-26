@@ -77,6 +77,6 @@ public class DraftServiceProvider
 
     public async Task<IEnumerable<BCDraftPickDetail>> GetDraftedPlayersAsync()
     {
-        return await _bcData.GetDraftPicksAsync(1);
+        return await _bcData.GetDraftPicksAsync(DRAFT_ID);
     }
 }
