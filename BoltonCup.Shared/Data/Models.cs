@@ -239,3 +239,12 @@ public class BCDraftOrder
     public required int order { get; set; }
     public required int team_id { get; set; }
 }
+
+public class BCDraftPickDetail : BCDraftPick
+{
+    public required string Name { get; set; }
+    public required string Birthday { get; set; }
+    public required int TeamId { get; set; }
+    public required string Position { get; set; }
+    public string? ProfilePicture { get; set; }
+}

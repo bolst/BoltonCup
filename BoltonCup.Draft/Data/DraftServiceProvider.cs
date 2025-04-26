@@ -75,8 +75,8 @@ public class DraftServiceProvider
         return teams.OrderBy(t => draftOrder.First(d => d.team_id == t.id).order);
     }
 
-    public async Task<IEnumerable<object>> GetSelectedPlayersAsync()
+    public async Task<IEnumerable<BCDraftPickDetail>> GetDraftedPlayersAsync()
     {
-        throw new NotImplementedException();
+        return await _bcData.GetDraftPicksAsync(1);
     }
 }
