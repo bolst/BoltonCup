@@ -6,6 +6,7 @@ public class DraftServiceProvider
 {
     private readonly IBCData _bcData;
     private const int DRAFT_ID = 2;
+    private const int PICKS_PER_ROUND = 6;
 
     public DraftServiceProvider(IBCData bcData)
     {
@@ -35,11 +36,11 @@ public class DraftServiceProvider
         }
         else
         {
-            int order = currentPick.pick + 1;
+            int order = currentPick.pick >= PICKS_PER_ROUND ? 1 : currentPick.pick + 1;
 
             if (currentPick.round % 2 == 0)
             {
-                order = 6 - currentPick.pick + 1;
+                order = PICKS_PER_ROUND - currentPick.pick + 1;
             }
             
             var team = (await _bcData.GetTeamByDraftOrderAsync(DRAFT_ID, order))!;
@@ -47,8 +48,8 @@ public class DraftServiceProvider
             var pick = new BCDraftPick
             {
                 draft_id = DRAFT_ID,
-                pick = currentPick.pick == 6 ? 1 : currentPick.pick + 1,
-                round = currentPick.pick == 6 ? (currentPick.round + 1) : currentPick.round,
+                pick = currentPick.pick >= PICKS_PER_ROUND ? 1 : currentPick.pick + 1,
+                round = currentPick.pick >= PICKS_PER_ROUND ? (currentPick.round + 1) : currentPick.round,
             };
             
             return (team, pick);
