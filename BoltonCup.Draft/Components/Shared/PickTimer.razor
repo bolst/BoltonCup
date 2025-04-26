@@ -6,20 +6,47 @@
     </MudStack>
 </div>
 
-<MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Secondary" OnClick="StartTimer" />
+<MudStack Justify="Justify.Center" Spacing="0" Row>
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Secondary" OnClick="StartTimer"/>
+    @if (_paused)
+    {
+        <MudIconButton Icon="@Icons.Material.Filled.PlayCircleOutline" Color="Color.Primary" OnClick="ResumeTimer"/>
+    }
+    else
+    {
+        <MudIconButton Icon="@Icons.Material.Filled.PauseCircleOutline" Color="Color.Secondary" OnClick="PauseTimer"/>
+    }
+</MudStack>
 
 @code {
+
+    private bool _paused;
+    private const int TIME_LIMIT_SEC = 30;
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            _paused = false;
             await StartTimer();
         }
     }
 
     private async Task StartTimer()
     {
-        await JS.InvokeVoidAsync("picktimer", 30);
+        _paused = false;
+        await JS.InvokeVoidAsync("startTimer", TIME_LIMIT_SEC);
+    }
+
+    private async Task PauseTimer()
+    {
+        _paused = true;
+        await JS.InvokeVoidAsync("pauseTimer");
+    }
+
+    private async Task ResumeTimer()
+    {
+        _paused = false;
+        await JS.InvokeVoidAsync("resumeTimer");
     }
 }
