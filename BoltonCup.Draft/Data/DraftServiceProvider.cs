@@ -1,16 +1,21 @@
 using BoltonCup.Shared.Data;
+using BoltonCup.Draft.Hubs;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace BoltonCup.Draft.Data;
 
 public class DraftServiceProvider
 {
     private readonly IBCData _bcData;
+    private readonly HubConnectionProvider _hub;
+    
     private const int DRAFT_ID = 2;
     private const int PICKS_PER_ROUND = 6;
 
-    public DraftServiceProvider(IBCData bcData)
+    public DraftServiceProvider(IBCData bcData, HubConnectionProvider hub)
     {
         _bcData = bcData;
+        _hub = hub;
     }
     
     public int DraftId => DRAFT_ID;
@@ -61,11 +66,11 @@ public class DraftServiceProvider
         var (team, pick) = await GetTeamWithCurrentPick();
         Console.WriteLine($"{team.name} is drafting {player.name}");
         
-        // TODO:
         // 1. update database to indicate the drafted player is now on the team with current pick
         await _bcData.DraftPlayerAsync(player, team, pick);
         
         // 2. notify subscribers that a selection has been made (e.g., timer)
+        await _hub.SendAsync(nameof(DraftHub.PushDraftUpdate));
     }
 
     public async Task<IEnumerable<BCTeam>> GetTeamsInDraftAsync()
@@ -79,5 +84,13 @@ public class DraftServiceProvider
     public async Task<IEnumerable<BCDraftPickDetail>> GetDraftedPlayersAsync()
     {
         return await _bcData.GetDraftPicksAsync(DRAFT_ID);
+    }
+
+    public async Task ResetDraftAsync()
+    {
+        await _bcData.ResetDraftAsync(DRAFT_ID);
+        
+        // notify subscribers
+        await _hub.SendAsync(nameof(DraftHub.PushDraftUpdate));
     }
 }

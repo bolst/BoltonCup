@@ -1,16 +1,26 @@
 @inject IBCData BCData
 @inject Data.DraftServiceProvider Drafter
 @inject IDialogService DialogService
+@inject HubConnectionProvider Hub
 
 @if (_players is not null)
 {
     <MudDataGrid
         T="PlayerProfile"
-        Items="_players.Where(p => p.team_id is null)"
+        Items="_players"
         Height="calc(85vh - 4rem)"
         QuickFilter="QuickFilter"
         FixedHeader>
         <ToolBarContent>
+            <MudMenu 
+                Label="Actions" 
+                Variant="Variant.Filled" 
+                EndIcon="@Icons.Material.Filled.KeyboardArrowDown" 
+                IconColor="Color.Error" 
+                Dense>
+                <MudMenuItem Label="Reset" Class="red-text" OnClick="OnResetDraft" />
+            </MudMenu>
+            
             <MudSpacer/>
             <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
@@ -40,7 +50,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _players = await BCData.GetAllTournamentPlayersAsync(Drafter.DraftId);
+        await LoadDataAsync();
+        await InitializeHubConnection();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _players = (await BCData.GetAllTournamentPlayersAsync(Drafter.DraftId))
+            .Where(p => p.team_id is null)
+            .OrderBy(x => x.HighestLevel);
+    }
+
+    private async Task OnResetDraft()
+    {
+        await Drafter.ResetDraftAsync();
+        await LoadDataAsync();
     }
 
     private Task OnPlayerDrafted(PlayerProfile player)
@@ -67,5 +91,17 @@
 
         return false;
     };
+    
+    private async Task InitializeHubConnection()
+    {
+        var connection = await Hub.GetHubConnection();
+        
+        connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        {
+            await LoadDataAsync();
+            
+            InvokeAsync(StateHasChanged);
+        });
+    }
 
 }
