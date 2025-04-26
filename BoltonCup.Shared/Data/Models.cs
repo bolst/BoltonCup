@@ -225,11 +225,11 @@ public class BCTournament : IEquatable<BCTournament>
 
 public class BCDraftPick
 {
-    public required int id { get; set; }
+    public int id { get; set; }
     public required int draft_id { get; set; }
     public required int round { get; set; }
     public required int pick { get; set; }
-    public required int player_id { get; set; }
+    public int player_id { get; set; }
 }
 
 public class BCDraftOrder
@@ -238,4 +238,20 @@ public class BCDraftOrder
     public required int draft_id { get; set; }
     public required int order { get; set; }
     public required int team_id { get; set; }
+}
+
+public class BCDraftPickDetail : BCDraftPick
+{
+    public required string Name { get; set; }
+    public required string Birthday { get; set; }
+    public required int TeamId { get; set; }
+    public required string Position { get; set; }
+    public string? ProfilePicture { get; set; }
+    public required string TeamName { get; set; }
+    public required string TeamNameShort { get; set; }
+    public required string TeamLogo { get; set; }
+    public required string PrimaryColorHex { get; set; }
+    public required string SecondaryColorHex { get; set; }
+    public string? TertiaryColorHex { get; set; }
+    
 }

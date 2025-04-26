@@ -1,33 +1,96 @@
 @inject Data.DraftServiceProvider Drafter
+@inject IBCData BCData
+@inject HubConnectionProvider Hub
 
-@if (_team is not null)
-{
-    <MudStack Class="pt-2" Justify="Justify.Center" Row>
-        <MudText Typo="Typo.h5"><b>Round 1, Pick 1</b></MudText>
-    </MudStack>
-    <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row>
-        <MudImage Src="@_team.logo_url" Height="100" />
-        <MudText Typo="Typo.h4"><b>@_team.name</b></MudText>
-    </MudStack>
-}
+<MudStack AlignItems="AlignItems.Center">
+    @if (_team is not null && _pick is not null)
+    {
+        <MudStack Class="pt-2" Justify="Justify.Center" Row>
+            @if (_team.id == _selectedTeam.id)
+            {
+                <MudText Typo="Typo.h5"><b>Round @_pick.round, Pick @_pick.pick</b></MudText>
+            }
+            else
+            {
+                <MudText Typo="Typo.h5"><b>&nbsp;</b></MudText>
+            }
+        </MudStack>
+        <MudStack AlignItems="AlignItems.Center" Spacing="5" Row>
+            <MudStack Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Row>
+                <MudImage Src="@_selectedTeam.logo_url" Height="70"/>
+                <MudText Typo="Typo.h6"><b>@_selectedTeam.name</b></MudText>
+            </MudStack>
+        </MudStack>
+        
+        <MudChipSet 
+            T="BCTeam"
+            SelectedValue="_selectedTeam" 
+            SelectedValueChanged="OnSelectedTeamChange"
+            SelectionMode="SelectionMode.SingleSelection"
+            SelectedColor="Color.Tertiary"
+            Variant="Variant.Text"
+            Size="Size.Small">
+            @foreach (var team in _draftTeams)
+            {
+                <MudChip Value="@team">
+                    <MudImage Src="@team.logo_url" Height="30" />
+                </MudChip>
+            }
+        </MudChipSet>
+    }
+    
+    <MudDivider />
+    
+    @if (_roster is not null)
+    {
+        <MiniPlayerList Header="Forwards" Players="@(_roster.Where(r => r.position.ToLower().Contains("forward")))" Height="225px" />
+        <MiniPlayerList Header="Defense" Players="@(_roster.Where(r => r.position.ToLower().Contains("defense")))" Height="165px" />
+        <MiniPlayerList Header="Goalies" Players="@(_roster.Where(r => r.position.ToLower().Contains("goalie")))" Height="80px" Rounded />
+    }
+</MudStack>
 
 @code {
 
     private BCTeam? _team;
     private IEnumerable<PlayerProfile>? _roster;
+    private BCDraftPick? _pick;
+    private BCTeam? _selectedTeam;
+    private IEnumerable<BCTeam>? _draftTeams;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadDataAsync();
+        _draftTeams = await Drafter.GetTeamsInDraftAsync();
+        await InitializeHubConnection();
     }
 
     private async Task LoadDataAsync()
     {
-        _team = await Drafter.GetTeamWithCurrentPick();
+        (_team, _pick) = await Drafter.GetTeamWithCurrentPick();
+        
         if (_team is not null)
         {
-            _roster = await Drafter.GetTeamRosterAsync(_team);
+            _roster = await BCData.GetRosterByTeamId(_team.id);
+            _selectedTeam = _team;
         }
+    }
+
+    private async Task OnSelectedTeamChange(BCTeam selectedTeam)
+    {
+        _selectedTeam = selectedTeam;
+        _roster = await BCData.GetRosterByTeamId(_selectedTeam.id);
+    }
+
+    private async Task InitializeHubConnection()
+    {
+        var connection = await Hub.GetHubConnection();
+        
+        connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        {
+            await LoadDataAsync();
+
+            InvokeAsync(StateHasChanged);
+        });
     }
 
 }

@@ -1,0 +1,67 @@
+@inject Data.DraftServiceProvider Drafter
+
+<MudDialog>
+    <DialogContent>
+        <div style="height: 80vh">
+            <MudStack Style="height: inherit" Justify="Justify.Center" AlignItems="AlignItems.Start" Spacing="3" Wrap="Wrap.Wrap">
+                @if (draftPicks is not null)
+                {
+                    foreach (var roundPicks in draftPicks.GroupBy(d => d.round))
+                    {
+                        <div style="width: 250px;">
+                            <MudText Typo="Typo.h6">ROUND @roundPicks.Key</MudText>
+                            @foreach (var (pick, pickNum) in roundPicks.Select((p,i) => (p,i+1)))
+                            {
+                                <MudStack AlignItems="AlignItems.Center" Spacing="0" Row>
+                                    <MudPaper 
+                                        Class="mud-theme-surface d-flex justify-center align-center" 
+                                        Width="30px" 
+                                        Height="30px"
+                                        Square>
+                                        <MudText><b>@OverallPick(pick)</b></MudText>
+                                    </MudPaper>
+
+                                    <MudPaper
+                                        Class="d-flex align-center pl-1"
+                                        Height="25px"
+                                        Width="200px"
+                                        Elevation="0"
+                                        Outlined
+                                        Square>
+                                        <MudText Typo="Typo.button"><b>@pick.Name</b></MudText>
+                                    </MudPaper>
+                                    
+                                    <MudPaper
+                                        Style="@($"background-color: {pick.PrimaryColorHex}77")"
+                                        Height="27px"
+                                        Width="27px"
+                                        Square>
+                                        <MudImage Src="@pick.TeamLogo" Fluid />
+                                    </MudPaper>
+                                </MudStack>
+                            }                            
+                        </div>
+                    }
+                }
+            </MudStack>
+        </div>
+    </DialogContent>
+    <DialogActions>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] 
+    private IMudDialogInstance MudDialog { get; set; }
+
+    private IEnumerable<BCDraftPickDetail>? draftPicks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        draftPicks = await Drafter.GetDraftedPlayersAsync();
+    }
+
+    private int PicksPerRound => draftPicks?.Max(d => d.pick) ?? 1;
+    private int OverallPick(BCDraftPick pick) => (pick.round - 1) * PicksPerRound + pick.pick;
+}

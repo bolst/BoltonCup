@@ -33,6 +33,9 @@ public interface IBCData
     Task<BCTeam?> GetTeamByDraftOrderAsync(int draftId, int order);
     Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId);
     Task<IEnumerable<BCDraftOrder>> GetDraftOrderAsync(int draftId);
+    Task DraftPlayerAsync(PlayerProfile player, BCTeam team, BCDraftPick draftPick);
+    Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId);
+    Task ResetDraftAsync(int draftId);
 }
 
 public class BCData : IBCData
@@ -111,22 +114,18 @@ public class BCData : IBCData
 
     public async Task<IEnumerable<PlayerProfile>> GetRosterByTeamId(int id)
     {
-        string cacheKey = $"roster_{id}";
+        string sql = @"SELECT *, p.id
+                        FROM players p
+                            LEFT OUTER JOIN account a ON p.account_id = a.id AND a.isactive = TRUE
+                        WHERE p.team_id = @TeamId";
 
-        return await cacheService.GetOrAddAsync(cacheKey, async () =>
-        {
-            string sql = @"SELECT *
-                            FROM players
-                            WHERE team_id = @TeamId";
-
-            await using var connection = new NpgsqlConnection(connectionString);
-            return await connection.QueryAsync<PlayerProfile>(sql, new { TeamId = id });
-        }, cacheDuration);
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<PlayerProfile>(sql, new { TeamId = id });
     }
 
     public async Task<IEnumerable<PlayerProfile>> GetAllTournamentPlayersAsync(int tournamentId)
     {
-        string sql = @"SELECT *
+        string sql = @"SELECT *, p.id
                         FROM players p
                                  LEFT OUTER JOIN account a ON p.account_id = a.id AND a.isactive = TRUE
                         WHERE tournament_id = @TournamentId";
@@ -139,9 +138,10 @@ public class BCData : IBCData
     {
         string cacheKey = $"teamplayer_{id}";
 
-        string sql = @"SELECT *
-                        FROM players
-                        WHERE id = @PlayerId";
+        string sql = @"SELECT *, p.id
+                        FROM players p 
+                            LEFT OUTER JOIN account a ON p.account_id = a.id AND a.isactive = TRUE
+                        WHERE p.id = @PlayerId";
 
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryFirstOrDefaultAsync<PlayerProfile>(sql, new { PlayerId = id });
@@ -606,25 +606,15 @@ public class BCData : IBCData
 
     public async Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId)
     {
-        string sql = @"select
-                          *
-                        from
-                          draftpick
-                        where
-                          round = (
-                            select
-                              max(round)
-                            from
-                              draftpick
-                          )
-                          and pick = (
-                            select
-                              max(pick)
-                            from
-                              draftpick
-                          )
-                        and
-                          draft_id = @DraftId";
+        string sql = @"SELECT *
+                        FROM draftpick
+                        WHERE round = (SELECT MAX(round)
+                                           FROM draftpick
+                                           WHERE draft_id = @DraftId)
+                          AND pick = (SELECT MAX(pick)
+                                          FROM draftpick
+                                          WHERE draft_id = @DraftId)
+                          AND draft_id = @DraftId";
         
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QuerySingleOrDefaultAsync<BCDraftPick>(sql, new { DraftId = draftId });
@@ -663,6 +653,63 @@ public class BCData : IBCData
         
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryAsync<BCDraftOrder>(sql, new { DraftId = draftId });
+    }
+
+    public async Task DraftPlayerAsync(PlayerProfile player, BCTeam team, BCDraftPick draftPick)
+    {
+        await using var connection = new NpgsqlConnection(connectionString);
+        
+        string playerSql = @"UPDATE players
+                        SET team_id = @TeamId
+                            WHERE id = @PlayerId
+                            AND tournament_id = @TournamentId";
+        await connection.ExecuteAsync(playerSql, new { TeamId = team.id, PlayerId = player.id, TournamentId = player.tournament_id });
+        
+        draftPick.player_id = player.id;
+        string draftSql = @"INSERT INTO draftpick (draft_id, round, pick, player_id)
+                                VALUES (@draft_id, @round, @pick, @player_id)";
+        await connection.ExecuteAsync(draftSql, draftPick);
+    }
+
+    public async Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId)
+    {
+        string sql = @"SELECT dp.*,
+                               p.name,
+                               p.dob        AS birthday,
+                               p.team_id    AS teamid,
+                               p.position,
+                               a.profilepicture,
+                               t.name       AS teamname,
+                               t.name_short AS teamnameshort,
+                               t.id         AS teamid,
+                               t.logo_url   AS teamlogo,
+                               t.primary_color_hex AS PrimaryColorHex,
+                               t.secondary_color_hex AS SecondaryColorHex,
+                               t.tertiary_color_hex AS TertiaryColorHex
+                            FROM draftpick dp
+                                     INNER JOIN players p ON p.id = dp.player_id AND dp.draft_id = @DraftId
+                                     INNER JOIN team t ON t.id = p.team_id
+                                     LEFT OUTER JOIN account a ON a.id = p.account_id
+                            ORDER BY round, pick";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCDraftPickDetail>(sql, new { DraftId = draftId });
+    }
+
+    public async Task ResetDraftAsync(int draftId)
+    {
+        await using var connection = new NpgsqlConnection(connectionString);
+        
+        // delete all draft picks in draft
+        string draftSql = @"DELETE FROM draftpick
+                            WHERE draft_id = @DraftId";
+        await connection.ExecuteAsync(draftSql, new { DraftId = draftId });
+        
+        // set all player teams to null
+        string playerSql = @"UPDATE players
+                                SET team_id = NULL
+                                    WHERE tournament_id = (SELECT tournament_id FROM draft WHERE id = @DraftId)";
+        await connection.ExecuteAsync(playerSql, new { DraftId = draftId });
     }
 
 }

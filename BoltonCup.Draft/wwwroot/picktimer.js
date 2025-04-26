@@ -1,16 +1,35 @@
-function picktimer(countdownSeconds) {
-    var timer, days, hours, minutes, seconds;
+
+var timerObj = null;
+
+function startTimer(countdownSeconds) {
+    if (timerObj != null) { timerObj.pause(); }
+    
+    timerObj = initTimer(countdownSeconds);
+}
+
+function pauseTimer() {
+    if (timerObj != null) {
+        timerObj.pause();   
+    }
+}
+
+function resumeTimer() {
+    if (timerObj != null) {
+        timerObj.resume();
+    }
+}
+
+function initTimer(countdownSeconds) {
+    pause = true;
+    
+    var timer;
 
     const radius = 57;
     const circumference = 2 * Math.PI * radius;
 
+    let startTime;
     dateEnd = new Date();
-    dateEnd = new Date(dateEnd.getUTCFullYear(),
-        dateEnd.getUTCMonth(),
-        dateEnd.getUTCDate(),
-        dateEnd.getUTCHours(),
-        dateEnd.getUTCMinutes(),
-        dateEnd.getUTCSeconds() + countdownSeconds);
+    dateEnd.setSeconds(dateEnd.getSeconds() + countdownSeconds);
     dateEnd = dateEnd.getTime();
 
     if (isNaN(dateEnd)) return;
@@ -29,8 +48,7 @@ function picktimer(countdownSeconds) {
                     stroke-width="6"
                     stroke-linecap="round"
                     stroke-dasharray="${circumference}"
-                    stroke-dashoffset="0"
-                />
+                    stroke-dashoffset="0" />
                 <text
                     id="timer-text"
                     x="50%"
@@ -38,9 +56,7 @@ function picktimer(countdownSeconds) {
                     dominant-baseline="middle"
                     text-anchor="middle"
                     font-size="2rem"
-                    fill="#FF0000"
-                >
-            
+                    fill="#FF0000">
                 </text>
             </svg>
         `;
@@ -51,37 +67,36 @@ function picktimer(countdownSeconds) {
 
     circle.style.transition = "stroke-dashoffset 1s linear";
 
-    timer = setInterval(calculate);
-
+    var dt_ms = countdownSeconds * 1000;
+    var now = 0;
     function calculate() {
-        var dateStart = new Date();
-        dateStart = new Date(dateStart.getUTCFullYear(),
-            dateStart.getUTCMonth(),
-            dateStart.getUTCDate(),
-            dateStart.getUTCHours(),
-            dateStart.getUTCMinutes(),
-            dateStart.getUTCSeconds());
+        now = dt_ms - (new Date().getTime() - startTime);
+        let secRemaining = Math.floor(now / 1000) % 60;
 
-        var timeRemaining = parseInt((dateEnd - dateStart.getTime()) / 1000);
+        if (secRemaining >= 0) {
+            console.log(`secRemaining: ${secRemaining}`);
 
-        if (timeRemaining >= 0) {
-            days = parseInt(timeRemaining / 86400);
-            timeRemaining %= 86400;
-            hours = parseInt(timeRemaining / 3600);
-            timeRemaining %= 3600;
-            minutes = parseInt(timeRemaining / 60);
-            timeRemaining %= 60;
-            seconds = parseInt(timeRemaining);
+            text.textContent = ("0" + secRemaining).slice(-2);
 
-            text.textContent = ("0" + seconds).slice(-2);
-
-
-
-            const progress = timeRemaining / countdownSeconds;
+            const progress = secRemaining / countdownSeconds;
             const offset = circumference * (1 - progress);
             circle.style.strokeDashoffset = offset;
         } else {
             clearInterval(timer);
         }
     }
+
+    retval = {};
+    retval.resume = function() {
+        startTime = new Date().getTime();
+        timer = setInterval(calculate, 150);
+    }
+
+    retval.pause = function() {
+        dt_ms = now;
+        clearInterval(timer);
+    }
+    
+    retval.resume();
+    return retval;
 }
