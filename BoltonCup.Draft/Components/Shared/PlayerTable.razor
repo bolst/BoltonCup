@@ -1,5 +1,7 @@
 @inject IBCData BCData
 @inject Data.DraftServiceProvider Drafter
+@inject IDialogService DialogService
+@inject HubConnectionProvider Hub
 
 @if (_players is not null)
 {
@@ -10,6 +12,15 @@
         QuickFilter="QuickFilter"
         FixedHeader>
         <ToolBarContent>
+            <MudMenu 
+                Label="Actions" 
+                Variant="Variant.Filled" 
+                EndIcon="@Icons.Material.Filled.KeyboardArrowDown" 
+                IconColor="Color.Error" 
+                Dense>
+                <MudMenuItem Label="Reset" Class="red-text" OnClick="OnResetDraft" />
+            </MudMenu>
+            
             <MudSpacer/>
             <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
@@ -18,10 +29,10 @@
         <Columns>
             <TemplateColumn>
                 <CellTemplate>
-                    <ConfirmButton 
+                    <MudButton 
                         Color="Color.Default" 
                         Variant="Variant.Filled"
-                        OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</ConfirmButton>
+                        OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</MudButton>
                 </CellTemplate>
             </TemplateColumn>
             <PropertyColumn Property="x => x.name" Title="Name" />
@@ -39,12 +50,35 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _players = await BCData.GetAllTournamentPlayersAsync(Drafter.DraftId);
+        await LoadDataAsync();
+        await InitializeHubConnection();
     }
 
-    private async Task OnPlayerDrafted(PlayerProfile player)
+    private async Task LoadDataAsync()
     {
-        await Drafter.DraftPlayerAsync(player);
+        _players = (await BCData.GetAllTournamentPlayersAsync(Drafter.DraftId))
+            .Where(p => p.team_id is null)
+            .OrderBy(x => x.HighestLevel);
+    }
+
+    private async Task OnResetDraft()
+    {
+        await Drafter.ResetDraftAsync();
+        await LoadDataAsync();
+    }
+
+    private Task OnPlayerDrafted(PlayerProfile player)
+    {
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.False,
+            FullWidth = false,
+        };
+        var parameters = new DialogParameters<DraftPlayerDialog>
+        {
+            { x => x.Player, player },
+        };
+        return DialogService.ShowAsync<DraftPlayerDialog>("Draft Player", parameters, options);
     }
     
     private Func<PlayerProfile, bool> QuickFilter => x =>
@@ -57,5 +91,17 @@
 
         return false;
     };
+    
+    private async Task InitializeHubConnection()
+    {
+        var connection = await Hub.GetHubConnection();
+        
+        connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        {
+            await LoadDataAsync();
+            
+            InvokeAsync(StateHasChanged);
+        });
+    }
 
 }

@@ -2,6 +2,9 @@ using Blazored.LocalStorage;
 using BoltonCup.Draft.Components;
 using BoltonCup.Draft.Data;
 using BoltonCup.Shared.Data;
+using BoltonCup.Draft.Hubs;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +20,19 @@ builder.Services.AddScoped<ICustomLocalStorageProvider, BoltonCup.Draft.Data.Cus
 builder.Services.AddBoltonCupServices();
 
 builder.Services.AddScoped<DraftServiceProvider>();
+
+builder.Services.AddScoped(sp =>
+{
+    var Navigation = sp.GetRequiredService<NavigationManager>();
+    var hubConnection = new HubConnectionBuilder()
+        .WithUrl(Navigation.ToAbsoluteUri(DraftHub.HubUrl))
+        .WithAutomaticReconnect()
+        .Build();
+
+    return new HubConnectionProvider(hubConnection);
+});
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -35,5 +51,7 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapHub<DraftHub>(DraftHub.HubUrl);
 
 app.Run();
