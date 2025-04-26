@@ -1,10 +1,11 @@
 @inject Data.DraftServiceProvider Drafter
+@inject IBCData BCData
 
 <MudStack AlignItems="AlignItems.Center">
-    @if (_team is not null)
+    @if (_team is not null && _pick is not null)
     {
         <MudStack Class="pt-2" Justify="Justify.Center" Row>
-            <MudText Typo="Typo.h5"><b>Round 1, Pick 1</b></MudText>
+            <MudText Typo="Typo.h5"><b>Round @_pick.round, Pick @_pick.pick</b></MudText>
         </MudStack>
         <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row>
             <MudImage Src="@_team.logo_url" Height="100" />
@@ -16,9 +17,9 @@
     
     @if (_roster is not null)
     {
-        <MiniPlayerList Header="Forwards" Players="@(_roster.Where(r => r.position == "Forward"))" Height="225px" />
-        <MiniPlayerList Header="Defense" Players="@(_roster.Where(r => r.position == "Defenseman"))" Height="180px" />
-        <MiniPlayerList Header="Goalies" Players="@(_roster.Where(r => r.position == "Goalie"))" Height="80px" />
+        <MiniPlayerList Header="Forwards" Players="@(_roster.Where(r => r.position.ToLower().Contains("forward")))" Height="225px" />
+        <MiniPlayerList Header="Defense" Players="@(_roster.Where(r => r.position.ToLower().Contains("defense")))" Height="180px" />
+        <MiniPlayerList Header="Goalies" Players="@(_roster.Where(r => r.position.ToLower().Contains("goalie")))" Height="80px" />
     }
 </MudStack>
 
@@ -26,6 +27,7 @@
 
     private BCTeam? _team;
     private IEnumerable<PlayerProfile>? _roster;
+    private BCDraftPick? _pick;
 
     protected override async Task OnInitializedAsync()
     {
@@ -34,10 +36,11 @@
 
     private async Task LoadDataAsync()
     {
-        _team = await Drafter.GetTeamWithCurrentPick();
+        (_team, _pick) = await Drafter.GetTeamWithCurrentPick();
+        
         if (_team is not null)
         {
-            _roster = await Drafter.GetTeamRosterAsync(_team);
+            _roster = await BCData.GetRosterByTeamId(_team.id);
         }
     }
 

@@ -1,4 +1,6 @@
 @inject Data.DraftServiceProvider Drafter
+@inject IDialogService DialogService
+
 
 @if (_teams is not null)
 {
@@ -40,6 +42,9 @@
             }
         }
         
+        <MudSpacer />
+        
+        <MudButton OnClick="OnDraftBoardClicked" Color="Color.Info" Size="Size.Large" Variant="Variant.Filled">Draft Board</MudButton>
     </MudStack>
 }
 
@@ -56,7 +61,20 @@
 
     private async Task LoadDataAsync()
     {
-        _currentTeam = await Drafter.GetTeamWithCurrentPick();
+        var (team, _) = await Drafter.GetTeamWithCurrentPick();
+        _currentTeam = team;
+    }
+
+    private Task OnDraftBoardClicked()
+    {
+        DialogOptions options = new()
+        {
+            FullWidth = true,
+            MaxWidth = MaxWidth.ExtraExtraLarge,
+            CloseButton = true,
+        };
+
+        return DialogService.ShowAsync<DraftBoardDialog>("Draft Board", options);
     }
 
 }

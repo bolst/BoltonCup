@@ -225,11 +225,11 @@ public class BCTournament : IEquatable<BCTournament>
 
 public class BCDraftPick
 {
-    public required int id { get; set; }
+    public int id { get; set; }
     public required int draft_id { get; set; }
     public required int round { get; set; }
     public required int pick { get; set; }
-    public required int player_id { get; set; }
+    public int player_id { get; set; }
 }
 
 public class BCDraftOrder
