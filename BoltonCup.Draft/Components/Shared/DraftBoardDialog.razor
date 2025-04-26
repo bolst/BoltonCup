@@ -1,0 +1,22 @@
+@inject Data.DraftServiceProvider Drafter
+
+<MudDialog>
+    <DialogContent>
+        Dialog Content
+    </DialogContent>
+    <DialogActions>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] 
+    private IMudDialogInstance MudDialog { get; set; }
+
+    private object? draftPicks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        draftPicks = await Drafter.GetSelectedPlayersAsync();
+    }
+}
