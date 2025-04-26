@@ -1,5 +1,6 @@
 @inject IJSRuntime JS
 @inject Data.DraftServiceProvider Drafter
+@inject HubConnectionProvider Hub
 
 <div class="d-flex justify-center">
     <MudStack Class="px-1" AlignItems="AlignItems.Center">
@@ -28,8 +29,8 @@
     {
         if (firstRender)
         {
-            _paused = false;
             await StartTimer();
+            await InitializeHubConnection();
         }
     }
 
@@ -49,5 +50,15 @@
     {
         _paused = false;
         await JS.InvokeVoidAsync("resumeTimer");
+    }
+    
+    private async Task InitializeHubConnection()
+    {
+        var connection = await Hub.GetHubConnection();
+        
+        connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        {
+            await StartTimer();
+        });
     }
 }

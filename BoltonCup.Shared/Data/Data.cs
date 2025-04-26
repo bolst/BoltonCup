@@ -35,6 +35,7 @@ public interface IBCData
     Task<IEnumerable<BCDraftOrder>> GetDraftOrderAsync(int draftId);
     Task DraftPlayerAsync(PlayerProfile player, BCTeam team, BCDraftPick draftPick);
     Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId);
+    Task ResetDraftAsync(int draftId);
 }
 
 public class BCData : IBCData
@@ -693,6 +694,22 @@ public class BCData : IBCData
         
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryAsync<BCDraftPickDetail>(sql, new { DraftId = draftId });
+    }
+
+    public async Task ResetDraftAsync(int draftId)
+    {
+        await using var connection = new NpgsqlConnection(connectionString);
+        
+        // delete all draft picks in draft
+        string draftSql = @"DELETE FROM draftpick
+                            WHERE draft_id = @DraftId";
+        await connection.ExecuteAsync(draftSql, new { DraftId = draftId });
+        
+        // set all player teams to null
+        string playerSql = @"UPDATE players
+                                SET team_id = NULL
+                                    WHERE tournament_id = (SELECT tournament_id FROM draft WHERE id = @DraftId)";
+        await connection.ExecuteAsync(playerSql, new { DraftId = draftId });
     }
 
 }
