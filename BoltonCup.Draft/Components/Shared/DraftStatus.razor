@@ -67,15 +67,7 @@
 
     private Task OnDraftBoardClicked()
     {
-        DialogOptions options = new()
-        {
-            FullWidth = true,
-            MaxWidth = MaxWidth.ExtraExtraLarge,
-            CloseButton = true, 
-            CloseOnEscapeKey = true,
-        };
-
-        return DialogService.ShowAsync<DraftBoardDialog>("Draft Board", options);
+        return DialogService.ShowAsync<DraftBoardDialog>("Draft Board");
     }
 
 }

@@ -1,0 +1,90 @@
+@inject Data.DraftServiceProvider Drafter
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="8" Row>
+            <div>
+                <MudImage Src="@Player.ProfilePicture" Width="300"/>
+            </div>
+            <div>
+                <MudStack AlignItems="AlignItems.Center" Row>
+                    <MudText Typo="Typo.h3">@Player.name</MudText>
+                    @if (_team is not null)
+                    {
+                        <MudImage Src="@_team.logo_url" Height="80"/>
+                    }
+                    else
+                    {
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="60px" Width="60px" />
+                    }
+                </MudStack>
+                
+                <MudStack AlignItems="AlignItems.Center" Row>
+                    <MudChip T="string" Color="@PositionColor" Variant="Variant.Text">@Player.position.ToUpper()</MudChip>
+                    @if (Player.champion)
+                    {
+                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Text">2024 CHAMPION</MudChip>
+                    }
+                </MudStack>
+
+                <MudText Class="my-4" Typo="Typo.h6">@Player.dob.ToString("MMMM dd, yyyy")</MudText>
+                <MudText Typo="Typo.h6">Highest Level - @Player.HighestLevel</MudText>
+            </div>
+        
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton
+            Color="Color.Success"
+            Variant="Variant.Filled"
+            OnClick="OnDraftPlayer">
+            Draft
+        </MudButton>        
+        <MudButton
+            Color="Color.Error"
+            Variant="Variant.Outlined"
+            OnClick="OnCancel">
+            Cancel
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] 
+    private IMudDialogInstance MudDialog { get; set; }
+    
+    [Parameter, EditorRequired]
+    public required PlayerProfile Player { get; set; }
+
+    private BCTeam? _team;
+
+    private Color PositionColor
+    {
+        get
+        {
+            return Player.position.ToLower() switch
+            {
+                "forward" => Color.Primary,
+                "defense" => Color.Secondary,
+                "goalie" => Color.Tertiary,
+                _ => Color.Default,
+            };
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var (team, _) = await Drafter.GetTeamWithCurrentPick();
+        _team = team;
+    }
+    
+    private async Task OnDraftPlayer()
+    {
+        await Drafter.DraftPlayerAsync(Player);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private async Task OnCancel() => MudDialog.Cancel();
+    
+}
