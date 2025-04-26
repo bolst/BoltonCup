@@ -1,5 +1,6 @@
 @inject IBCData BCData
 @inject Data.DraftServiceProvider Drafter
+@inject IDialogService DialogService
 
 @if (_players is not null)
 {
@@ -18,10 +19,10 @@
         <Columns>
             <TemplateColumn>
                 <CellTemplate>
-                    <ConfirmButton 
+                    <MudButton 
                         Color="Color.Default" 
                         Variant="Variant.Filled"
-                        OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</ConfirmButton>
+                        OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</MudButton>
                 </CellTemplate>
             </TemplateColumn>
             <PropertyColumn Property="x => x.name" Title="Name" />
@@ -42,9 +43,18 @@
         _players = await BCData.GetAllTournamentPlayersAsync(Drafter.DraftId);
     }
 
-    private async Task OnPlayerDrafted(PlayerProfile player)
+    private Task OnPlayerDrafted(PlayerProfile player)
     {
-        await Drafter.DraftPlayerAsync(player);
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.False,
+            FullWidth = false,
+        };
+        var parameters = new DialogParameters<DraftPlayerDialog>
+        {
+            { x => x.Player, player },
+        };
+        return DialogService.ShowAsync<DraftPlayerDialog>("Draft Player", parameters, options);
     }
     
     private Func<PlayerProfile, bool> QuickFilter => x =>
