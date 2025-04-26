@@ -672,17 +672,24 @@ public class BCData : IBCData
 
     public async Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId)
     {
-        string sql = @"SELECT 
-                        dp.*, 
-                        p.name, 
-                        p.dob AS Birthday, 
-                        p.team_id AS TeamId, 
-                        p.position, 
-                        a.profilepicture
-                        FROM draftpick dp
-                                 INNER JOIN players p ON p.id = dp.player_id AND dp.draft_id = @DraftId
-                                 LEFT OUTER JOIN account a ON a.id = p.account_id
-                        ORDER BY round, pick";
+        string sql = @"SELECT dp.*,
+                               p.name,
+                               p.dob        AS birthday,
+                               p.team_id    AS teamid,
+                               p.position,
+                               a.profilepicture,
+                               t.name       AS teamname,
+                               t.name_short AS teamnameshort,
+                               t.id         AS teamid,
+                               t.logo_url   AS teamlogo,
+                               t.primary_color_hex AS PrimaryColorHex,
+                               t.secondary_color_hex AS SecondaryColorHex,
+                               t.tertiary_color_hex AS TertiaryColorHex
+                            FROM draftpick dp
+                                     INNER JOIN players p ON p.id = dp.player_id AND dp.draft_id = @DraftId
+                                     INNER JOIN team t ON t.id = p.team_id
+                                     LEFT OUTER JOIN account a ON a.id = p.account_id
+                            ORDER BY round, pick";
         
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryAsync<BCDraftPickDetail>(sql, new { DraftId = draftId });
