@@ -8,7 +8,7 @@
     <div class="py-10 px-6">
         <MudTabs Style="background-color: var(--mud-palette-surface)" Centered>
             <MudTabPanel Text="Pending">
-                @if (registrations is not null && registrationDetailsOpen is not null)
+                @if (registrations is not null)
                 {
                     <MudChip T="string" Color="Color.Primary" Variant="Variant.Text">@ForwardRegCount F</MudChip>
                     <MudChip T="string" Color="Color.Secondary" Variant="Variant.Text">@DefenseRegCount D</MudChip>
@@ -36,7 +36,7 @@
                     <MudChip T="string" Color="Color.Secondary" Variant="Variant.Text">@DefenseAccCount D</MudChip>
                     <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieAccCount G</MudChip>
                     
-                    <MudDataGrid Items="@accounts" Hover>
+                    <MudDataGrid Items="@accounts.Where(a => a.IsActive)" Hover>
                         <Columns>
                             <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
                             <PropertyColumn Title="Email" Property="x => x.Email"/>
@@ -71,7 +71,6 @@
 @code{
 
     private IEnumerable<RegisterFormModel>? registrations;
-    private Dictionary<string, bool>? registrationDetailsOpen;
 
     private IEnumerable<BCAccount>? accounts;
 
@@ -85,23 +84,31 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
         accounts = await BCData.GetAccountsAsync();
         
-        registrations = (await BCData.GetRegistrationsAsync()).Where(r => accounts.All(a => a.Email != r.Email));
+        registrations = (await BCData.GetRegistrationsAsync()).Where(r => accounts.All(a => a.Email != r.Email || !a.IsActive));
         registrations = registrations.OrderBy(r => r.LastName);
-
-        registrationDetailsOpen = registrations.ToDictionary(r => r.Email, r => false);
-
     }
 
     private async Task OnAdmit(RegisterFormModel form)
     {
         string errorMessage = await BCData.AdmitUserAsync(form);
+        
+        await LoadDataAsync();
+        StateHasChanged();
     }
 
     private async Task OnRemove(BCAccount account)
     {
-        // string errorMessage = await BCData.RemoveAccountAsync(form);
+        string errorMessage = await BCData.RemoveAdmittedUserAsync(account);
+        
+        await LoadDataAsync();
+        StateHasChanged();
     }
 
 }

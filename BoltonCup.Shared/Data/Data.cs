@@ -23,6 +23,7 @@ public interface IBCData
     Task<IEnumerable<RegisterFormModel>> GetRegistrationsAsync();
     Task<RegisterFormModel?> GetRegistrationByEmailAsync(string email);
     Task<string> AdmitUserAsync(RegisterFormModel form);
+    Task<string> RemoveAdmittedUserAsync(BCAccount account);
     Task<IEnumerable<BCAccount>> GetAccountsAsync();
     Task<BCAccount?> GetAccountByEmailAsync(string email);
     Task UpdateAccountProfilePictureAsync(string email, string imagePath);
@@ -524,13 +525,17 @@ public class BCData : IBCData
 
     public async Task<string> AdmitUserAsync(RegisterFormModel form)
     {
-        // check if user exists: if yes then do not admit
+        // check if user exists: if yes then set them to active
         string checkSql = @"SELECT * FROM account WHERE email = @Email";
         await using var connection = new NpgsqlConnection(connectionString);
         var users = await connection.QueryAsync<RegisterFormModel>(checkSql, new { Email = form.Email });
-        if (users.Count() > 0)
+        if (users.Any())
         {
-            return "User already admitted";
+            string activeSql = @"UPDATE account
+                                    SET isactive = TRUE
+                                        WHERE email = @Email";
+            var activeRowsAffected = await connection.ExecuteAsync(activeSql, form);
+            return activeRowsAffected == 0 ? "Something went wrong" : string.Empty;
         }
         
         string sql = @"INSERT INTO
@@ -538,7 +543,17 @@ public class BCData : IBCData
                         VALUES (@FirstName, @LastName, @Email, @Birthday, @Position, @HighestLevel)";
         
         var rowsAffected = await connection.ExecuteAsync(sql, form);
-
+        return rowsAffected == 0 ? "Something went wrong" : string.Empty;
+    }
+    
+    public async Task<string> RemoveAdmittedUserAsync(BCAccount account)
+    {
+        string sql = @"UPDATE account
+                        SET isactive = FALSE
+                            WHERE email = @Email";
+        
+        await using var connection = new NpgsqlConnection(connectionString);
+        var rowsAffected = await connection.ExecuteAsync(sql, account);
         return rowsAffected == 0 ? "Something went wrong" : string.Empty;
     }
 
@@ -547,7 +562,8 @@ public class BCData : IBCData
         string sql = @"SELECT
                           *
                         FROM
-                          account";
+                          account
+                        WHERE isactive = TRUE";
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryAsync<BCAccount>(sql);
     }

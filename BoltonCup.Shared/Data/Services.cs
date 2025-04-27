@@ -90,7 +90,7 @@ public class StripeServiceProvider
             Stripe.Checkout.Session session = service.Get(checkoutId);
 
             var email = session.CustomerDetails.Email;
-            if (email is null)
+            if (string.IsNullOrEmpty(email))
             {
                 return null;
             }
