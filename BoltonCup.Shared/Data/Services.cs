@@ -102,6 +102,9 @@ public class StripeServiceProvider
             }
             
             await _bcData.SetUserAsPayedAsync(email);
+            
+            // TODO: get the tournament id instead of hard-coding it
+            await _bcData.ConfigPlayerProfileAsync(userData, 2);
 
             return userData;
         }

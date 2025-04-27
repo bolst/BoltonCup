@@ -30,6 +30,7 @@ public interface IBCData
     Task<IEnumerable<BCTournament>> GetTournamentsAsync();
     Task<BCTournament?> GetTournamentByYearAsync(string year);
     Task SetUserAsPayedAsync(string email);
+    Task ConfigPlayerProfileAsync(RegisterFormModel form, int tournamentId);
     Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId);
     Task<BCTeam?> GetTeamByDraftOrderAsync(int draftId, int order);
     Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId);
@@ -618,6 +619,26 @@ public class BCData : IBCData
         
         await using var connection = new NpgsqlConnection(connectionString);
         await connection.ExecuteAsync(sql, new { Email = email });
+    }
+
+    public async Task ConfigPlayerProfileAsync(RegisterFormModel form, int tournamentId)
+    {
+        await using var connection = new NpgsqlConnection(connectionString);
+        
+        // first check to see if a user in this tournament exists - only proceed if there is none
+        string checkSql = @"SELECT p.*
+                            FROM players p
+                                     INNER JOIN account a ON p.account_id = a.id AND a.email = @Email
+                            WHERE tournament_id = @TournamentId";
+        var result = await connection.QueryFirstOrDefaultAsync<PlayerProfile>(checkSql, new { Email = form.Email, TournamentId = tournamentId });
+        if (result is not null) return;
+        
+        string sql = @"";
+        
+        var param = new DynamicParameters(form);
+        param.Add("TournamentId", tournamentId);
+        
+        await connection.ExecuteAsync(sql, param);
     }
 
     public async Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId)
