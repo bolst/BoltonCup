@@ -13,16 +13,16 @@
 
         <MudText Typo="Typo.h6">Forwards</MudText>
         <MudDivider />
-        @PlayerTable(roster.Where(p => p.position.ToLower() == "forward"))
+        @PlayerTable(roster.Where(p => p.IsForward))
 
 
         <MudText Typo="Typo.h6">Defensemen</MudText>
         <MudDivider />
-        @PlayerTable(roster.Where(p => p.position.ToLower() == "defense"))
+        @PlayerTable(roster.Where(p => p.IsDefense))
 
         <MudText Typo="Typo.h6">Goalies</MudText>
         <MudDivider />
-        @PlayerTable(roster.Where(p => p.position.ToLower() == "goalie"))
+        @PlayerTable(roster.Where(p => p.IsGoalie))
     }
     else
     {

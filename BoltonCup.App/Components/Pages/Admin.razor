@@ -90,13 +90,13 @@
 
     private IEnumerable<BCAccount>? accounts;
 
-    private int ForwardRegCount => registrations is null ? 0 : registrations.Count(r => r.Position == "forward");
-    private int DefenseRegCount => registrations is null ? 0 : registrations.Count(r => r.Position == "defense");
-    private int GoalieRegCount => registrations is null ? 0 : registrations.Count(r => r.Position == "goalie");    
+    private int ForwardRegCount => registrations is null ? 0 : registrations.Count(r => r.IsForward);
+    private int DefenseRegCount => registrations is null ? 0 : registrations.Count(r => r.IsDefense);
+    private int GoalieRegCount => registrations is null ? 0 : registrations.Count(r => r.IsGoalie);    
     
-    private int ForwardAccCount => accounts is null ? 0 : accounts.Count(r => r.Position == "forward");
-    private int DefenseAccCount => accounts is null ? 0 : accounts.Count(r => r.Position == "defense");
-    private int GoalieAccCount => accounts is null ? 0 : accounts.Count(r => r.Position == "goalie");
+    private int ForwardAccCount => accounts is null ? 0 : accounts.Count(r => r.IsForward);
+    private int DefenseAccCount => accounts is null ? 0 : accounts.Count(r => r.IsDefense);
+    private int GoalieAccCount => accounts is null ? 0 : accounts.Count(r => r.IsGoalie);
 
     protected override async Task OnInitializedAsync()
     {
