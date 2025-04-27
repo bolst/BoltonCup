@@ -13,6 +13,7 @@ public class BCTeam : IEquatable<BCTeam>
     public string? tertiary_color_hex { get; set; } = "";
     public string? logo_url { get; set; } = "";
     public required int tournament_id { get; set; }
+    public required int gm_account_id { get; set; }
 
     public bool Equals(BCTeam? other) => other is not null && other.id == id;
     public override bool Equals(object? obj) => Equals(obj as BCTeam);
@@ -169,7 +170,6 @@ public class RegisterFormModel
         
     [Required(ErrorMessage="This is required")] 
     public string HighestLevel { get; set; }
-    public bool Payed { get; set; }
 }
 
 public class LoginFormModel
@@ -191,6 +191,8 @@ public class BCAccount
     public required string Position { get; set; }
     public required string HighestLevel { get; set; }
     public required string ProfilePicture { get; set; }
+    public required bool Payed { get; set; }
+    public required bool IsActive { get; set; }
     public string FullName => $"{FirstName} {LastName}";
 
     public ClaimsPrincipal ToClaimsPrincipal()

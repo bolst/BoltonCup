@@ -38,7 +38,7 @@
             </div>
 
 
-            @if (profile.position == "Goalie")
+            @if (profile.position == "goalie")
             {
                 <GoalieStatSummary PlayerId="@Id" />
             }
@@ -52,7 +52,7 @@
         <MudText Typo="Typo.h4">Game History</MudText>
         <MudDivider />
 
-        @if (profile.position == "Goalie")
+        @if (profile.position == "goalie")
         {
             <GoalieGameByGame PlayerId="@Id" />
         }

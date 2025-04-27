@@ -8,25 +8,33 @@
     <div class="py-10 px-6">
         <MudTabs Style="background-color: var(--mud-palette-surface)" Centered>
             <MudTabPanel Text="Pending">
-                @if (registrations is not null && registrationDetailsOpen is not null)
+                @if (registrations is not null)
                 {
-                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Text">@ForwardRegCount F</MudChip>
-                        <MudChip T="string" Color="Color.Secondary" Variant="Variant.Text">@DefenseRegCount D</MudChip>
-                        <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieRegCount G</MudChip>
-                    
-                        <MudDataGrid Items="@registrations" Hover>
-                            <Columns>
-                                <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
-                                <PropertyColumn Title="Email" Property="x => x.Email"/>
-                                <PropertyColumn Title="Position" Property="x => x.Position" />
-                                <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel"/>
-                                <TemplateColumn>
-                                    <CellTemplate>
-                                        <ConfirmButton Color="Color.Success" OnClick="@(() => OnAdmit(context.Item))">Admit</ConfirmButton>
-                                    </CellTemplate>
-                                </TemplateColumn>
-                            </Columns>
-                        </MudDataGrid>
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Text">@ForwardRegCount F</MudChip>
+                    <MudChip T="string" Color="Color.Secondary" Variant="Variant.Text">@DefenseRegCount D</MudChip>
+                    <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieRegCount G</MudChip>
+
+                    <MudDataGrid Items="@registrations" Hover>
+                        <ToolBarContent>
+                            <MudButton
+                                OnClick="@(() => SendEmail(registrations.Select(x => x.Email)))"
+                                Color="Color.Info"
+                                Variant="Variant.Filled">
+                                Email Pendings
+                            </MudButton>
+                        </ToolBarContent>
+                        <Columns>
+                            <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
+                            <PropertyColumn Title="Email" Property="x => x.Email"/>
+                            <PropertyColumn Title="Position" Property="x => x.Position" />
+                            <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel"/>
+                            <TemplateColumn>
+                                <CellTemplate>
+                                    <ConfirmButton Color="Color.Success" OnClick="@(() => OnAdmit(context.Item))">Admit</ConfirmButton>
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                    </MudDataGrid>
                 }
             </MudTabPanel>
             <MudTabPanel Text="Admitted">
@@ -36,12 +44,32 @@
                     <MudChip T="string" Color="Color.Secondary" Variant="Variant.Text">@DefenseAccCount D</MudChip>
                     <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieAccCount G</MudChip>
                     
-                    <MudDataGrid Items="@accounts" Hover>
+                    <MudDataGrid Items="@accounts.Where(a => a.IsActive)" Hover>
+                        <ToolBarContent>
+                            <MudButton
+                                OnClick="@(() => SendEmail(accounts.Where(a => a.IsActive).Select(a => a.Email)))"
+                                Color="Color.Info"
+                                Variant="Variant.Filled">
+                                Email Admits
+                            </MudButton>
+                        </ToolBarContent>
                         <Columns>
                             <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
                             <PropertyColumn Title="Email" Property="x => x.Email"/>
                             <PropertyColumn Title="Position" Property="x => x.Position" />
                             <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel"/>
+                            <TemplateColumn Title="Payed">
+                                <CellTemplate>
+                                    @if (context.Item.Payed)
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.CheckCircleOutline" Color="Color.Success" />
+                                    }
+                                    else
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
+                                    }
+                                </CellTemplate>
+                            </TemplateColumn>
                             <TemplateColumn>
                                 <CellTemplate>
                                     <ConfirmButton Color="Color.Error" ConfirmColor="Color.Error" OnClick="@(() => OnRemove(context.Item))">Remove</ConfirmButton>
@@ -59,7 +87,6 @@
 @code{
 
     private IEnumerable<RegisterFormModel>? registrations;
-    private Dictionary<string, bool>? registrationDetailsOpen;
 
     private IEnumerable<BCAccount>? accounts;
 
@@ -73,23 +100,46 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
         accounts = await BCData.GetAccountsAsync();
         
-        registrations = (await BCData.GetRegistrationsAsync()).Where(r => accounts.All(a => a.Email != r.Email));
+        registrations = (await BCData.GetRegistrationsAsync()).Where(r => accounts.All(a => a.Email != r.Email || !a.IsActive));
         registrations = registrations.OrderBy(r => r.LastName);
-
-        registrationDetailsOpen = registrations.ToDictionary(r => r.Email, r => false);
-
     }
 
     private async Task OnAdmit(RegisterFormModel form)
     {
         string errorMessage = await BCData.AdmitUserAsync(form);
+        
+        await LoadDataAsync();
+        StateHasChanged();
     }
 
     private async Task OnRemove(BCAccount account)
     {
-        // string errorMessage = await BCData.RemoveAccountAsync(form);
+        string errorMessage = await BCData.RemoveAdmittedUserAsync(account);
+        
+        await LoadDataAsync();
+        StateHasChanged();
+    }
+
+    private async Task SendEmail(IEnumerable<string> recipients)
+    {
+        if (Email.Default.IsComposeSupported)
+        {
+            var message = new EmailMessage
+            {
+                Subject = "Bolton Cup",
+                BodyFormat = EmailBodyFormat.PlainText,
+                Bcc = recipients.ToList()
+            };
+
+            await Email.Default.ComposeAsync(message);
+        }
     }
 
 }
