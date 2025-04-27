@@ -240,6 +240,7 @@ Thumbs.db
 **/.idea/**/*.iml
 **/.idea/**/contentModel.xml
 **/.idea/**/modules.xml
+rider.project.restore.info
 
 *.suo
 *.user
