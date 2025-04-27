@@ -169,7 +169,6 @@ public class RegisterFormModel
         
     [Required(ErrorMessage="This is required")] 
     public string HighestLevel { get; set; }
-    public bool Payed { get; set; }
 }
 
 public class LoginFormModel
@@ -191,6 +190,7 @@ public class BCAccount
     public required string Position { get; set; }
     public required string HighestLevel { get; set; }
     public required string ProfilePicture { get; set; }
+    public required bool Payed { get; set; }
     public string FullName => $"{FirstName} {LastName}";
 
     public ClaimsPrincipal ToClaimsPrincipal()

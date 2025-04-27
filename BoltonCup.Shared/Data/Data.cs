@@ -596,7 +596,7 @@ public class BCData : IBCData
 
     public async Task SetUserAsPayedAsync(string email)
     {
-        string sql = @"UPDATE registration
+        string sql = @"UPDATE account
                         SET payed = true
                         WHERE email = @Email";
         
