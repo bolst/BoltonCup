@@ -53,6 +53,10 @@ public class PlayerProfile
     public DateTime? Birthday { get; set; }
     public string? HighestLevel { get; set; }
     public string? ProfilePicture { get; set; }
+    
+    public bool IsForward => position == "forward";
+    public bool IsDefense => position == "defense";
+    public bool IsGoalie => position == "goalie";
 }
 
 public class PlayerGameSummary
@@ -170,6 +174,10 @@ public class RegisterFormModel
         
     [Required(ErrorMessage="This is required")] 
     public string HighestLevel { get; set; }
+    
+    public bool IsForward => position == "forward";
+    public bool IsDefense => position == "defense";
+    public bool IsGoalie => position == "goalie";
 }
 
 public class LoginFormModel
@@ -194,6 +202,9 @@ public class BCAccount
     public required bool Payed { get; set; }
     public required bool IsActive { get; set; }
     public string FullName => $"{FirstName} {LastName}";
+    public bool IsForward => position == "forward";
+    public bool IsDefense => position == "defense";
+    public bool IsGoalie => position == "goalie";
 
     public ClaimsPrincipal ToClaimsPrincipal()
     {
