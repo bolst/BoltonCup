@@ -15,6 +15,14 @@
                     <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieRegCount G</MudChip>
 
                     <MudDataGrid Items="@registrations" Hover>
+                        <ToolBarContent>
+                            <MudButton
+                                OnClick="@(() => SendEmail(registrations.Select(x => x.Email)))"
+                                Color="Color.Info"
+                                Variant="Variant.Filled">
+                                Email Pendings
+                            </MudButton>
+                        </ToolBarContent>
                         <Columns>
                             <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
                             <PropertyColumn Title="Email" Property="x => x.Email"/>
@@ -37,6 +45,14 @@
                     <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieAccCount G</MudChip>
                     
                     <MudDataGrid Items="@accounts.Where(a => a.IsActive)" Hover>
+                        <ToolBarContent>
+                            <MudButton
+                                OnClick="@(() => SendEmail(accounts.Where(a => a.IsActive).Select(a => a.Email)))"
+                                Color="Color.Info"
+                                Variant="Variant.Filled">
+                                Email Admits
+                            </MudButton>
+                        </ToolBarContent>
                         <Columns>
                             <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
                             <PropertyColumn Title="Email" Property="x => x.Email"/>
@@ -109,6 +125,21 @@
         
         await LoadDataAsync();
         StateHasChanged();
+    }
+
+    private async Task SendEmail(IEnumerable<string> recipients)
+    {
+        if (Email.Default.IsComposeSupported)
+        {
+            var message = new EmailMessage
+            {
+                Subject = "Bolton Cup",
+                BodyFormat = EmailBodyFormat.PlainText,
+                Bcc = recipients.ToList()
+            };
+
+            await Email.Default.ComposeAsync(message);
+        }
     }
 
 }
