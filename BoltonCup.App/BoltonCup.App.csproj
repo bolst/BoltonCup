@@ -22,7 +22,7 @@
         <Nullable>enable</Nullable>
 
         <!-- Display name -->
-        <ApplicationTitle>BoltonCup.App</ApplicationTitle>
+        <ApplicationTitle>Bolton Cup</ApplicationTitle>
 
         <!-- App Identifier -->
         <ApplicationId>com.bolst.BoltonCup</ApplicationId>
@@ -40,7 +40,13 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <CodesignKey>Apple Development: nicholasjtbolton@live.ca (PB2DM5N57C)</CodesignKey>
+        <CodesignKey>Apple Development: nicholasjtbolton@live.ca (PB2DM5N57C)</CodesignKey>
+        <CodesignProvision>iOS Team Provisioning Profile: bolst.BoltonCup</CodesignProvision>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <CodesignKey>iPhone Distribution</CodesignKey>
+        <CodesignProvision>BCProvProfile</CodesignProvision>
     </PropertyGroup>
 
     <ItemGroup>
