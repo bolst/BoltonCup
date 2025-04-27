@@ -1,7 +1,7 @@
 
 <MudIconButton Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu" OnClick="@(() => _open = true)" />
 
-<MudDrawer @bind-Open="@_open" Elevation="1" Variant="@DrawerVariant.Temporary">
+<MudDrawer @bind-Open="@_open" Elevation="1" Variant="@DrawerVariant.Temporary" Anchor="Anchor.End">
     <MudNavMenu>
         <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home" Href="/">Home</MudNavLink>
         <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Info" Href="/info">Info</MudNavLink>

@@ -43,9 +43,9 @@
     
     @if (_roster is not null)
     {
-        <MiniPlayerList Header="Forwards" Players="@(_roster.Where(r => r.position.ToLower().Contains("forward")))" Height="225px" />
-        <MiniPlayerList Header="Defense" Players="@(_roster.Where(r => r.position.ToLower().Contains("defense")))" Height="165px" />
-        <MiniPlayerList Header="Goalies" Players="@(_roster.Where(r => r.position.ToLower().Contains("goalie")))" Height="80px" Rounded />
+        <MiniPlayerList Header="Forwards" Players="@(_roster.Where(r => r.IsForward))" Height="225px" />
+        <MiniPlayerList Header="Defense" Players="@(_roster.Where(r => r.IsDefense))" Height="165px" />
+        <MiniPlayerList Header="Goalies" Players="@(_roster.Where(r => r.IsGoalie))" Height="80px" Rounded />
     }
 </MudStack>
 

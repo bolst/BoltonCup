@@ -63,13 +63,9 @@
     {
         get
         {
-            return Player.position.ToLower() switch
-            {
-                "forward" => Color.Primary,
-                "defense" => Color.Secondary,
-                "goalie" => Color.Tertiary,
-                _ => Color.Default,
-            };
+            if (Player.IsForward) return Color.Primary;
+            if (Player.IsDefense) return Color.Secondary;
+            return Color.Tertiary;
         }
     }
 

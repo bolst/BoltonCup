@@ -87,7 +87,7 @@ public class StripeServiceProvider
         try
         {
             var service = new Stripe.Checkout.SessionService();
-            Stripe.Checkout.Session session = service.Get(checkoutId);
+            Stripe.Checkout.Session session = await service.GetAsync(checkoutId);
 
             var email = session.CustomerDetails.Email;
             if (string.IsNullOrEmpty(email))
@@ -102,6 +102,9 @@ public class StripeServiceProvider
             }
             
             await _bcData.SetUserAsPayedAsync(email);
+            
+            // TODO: get the tournament id instead of hard-coding it
+            await _bcData.ConfigPlayerProfileAsync(userData, 2);
 
             return userData;
         }
