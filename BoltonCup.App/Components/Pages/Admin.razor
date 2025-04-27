@@ -10,23 +10,23 @@
             <MudTabPanel Text="Pending">
                 @if (registrations is not null && registrationDetailsOpen is not null)
                 {
-                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Text">@ForwardRegCount F</MudChip>
-                        <MudChip T="string" Color="Color.Secondary" Variant="Variant.Text">@DefenseRegCount D</MudChip>
-                        <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieRegCount G</MudChip>
-                    
-                        <MudDataGrid Items="@registrations" Hover>
-                            <Columns>
-                                <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
-                                <PropertyColumn Title="Email" Property="x => x.Email"/>
-                                <PropertyColumn Title="Position" Property="x => x.Position" />
-                                <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel"/>
-                                <TemplateColumn>
-                                    <CellTemplate>
-                                        <ConfirmButton Color="Color.Success" OnClick="@(() => OnAdmit(context.Item))">Admit</ConfirmButton>
-                                    </CellTemplate>
-                                </TemplateColumn>
-                            </Columns>
-                        </MudDataGrid>
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Text">@ForwardRegCount F</MudChip>
+                    <MudChip T="string" Color="Color.Secondary" Variant="Variant.Text">@DefenseRegCount D</MudChip>
+                    <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieRegCount G</MudChip>
+
+                    <MudDataGrid Items="@registrations" Hover>
+                        <Columns>
+                            <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
+                            <PropertyColumn Title="Email" Property="x => x.Email"/>
+                            <PropertyColumn Title="Position" Property="x => x.Position" />
+                            <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel"/>
+                            <TemplateColumn>
+                                <CellTemplate>
+                                    <ConfirmButton Color="Color.Success" OnClick="@(() => OnAdmit(context.Item))">Admit</ConfirmButton>
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                    </MudDataGrid>
                 }
             </MudTabPanel>
             <MudTabPanel Text="Admitted">
@@ -42,6 +42,18 @@
                             <PropertyColumn Title="Email" Property="x => x.Email"/>
                             <PropertyColumn Title="Position" Property="x => x.Position" />
                             <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel"/>
+                            <TemplateColumn Title="Payed">
+                                <CellTemplate>
+                                    @if (context.Item.Payed)
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.CheckCircleOutline" Color="Color.Success" />
+                                    }
+                                    else
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
+                                    }
+                                </CellTemplate>
+                            </TemplateColumn>
                             <TemplateColumn>
                                 <CellTemplate>
                                     <ConfirmButton Color="Color.Error" ConfirmColor="Color.Error" OnClick="@(() => OnRemove(context.Item))">Remove</ConfirmButton>
