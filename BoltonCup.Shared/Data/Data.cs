@@ -317,7 +317,7 @@ public class BCData : IBCData
             string sql = @"WITH
                             player_data AS (
                                 SELECT *
-                                    FROM players WHERE position != 'Goalie'
+                                    FROM players WHERE position != 'goalie'
                             ),
                             points_with_teams AS (
                                 SELECT G.id AS game_id, P.player_jerseynum, P.assist1_jerseynum, P.assist2_jerseynum, P.tournament_id,
@@ -385,7 +385,7 @@ public class BCData : IBCData
         {
             string sql = @"WITH
                             goalie_data AS (
-                                SELECT * FROM players where position = 'Goalie'
+                                SELECT * FROM players where position = 'goalie'
                             ),
                             goalie_games_played AS (
                                 SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date
