@@ -45,8 +45,15 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <CodesignKey>iPhone Distribution</CodesignKey>
+        <CodesignKey>Apple Distribution: Nicholas Bolton (53JXWYVQX7)</CodesignKey>
         <CodesignProvision>BCProvProfile</CodesignProvision>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <UseInterpreter>true</UseInterpreter>
+    </PropertyGroup>
+    <PropertyGroup>
+        <MtouchLink>SdkOnly</MtouchLink>
     </PropertyGroup>
 
     <ItemGroup>

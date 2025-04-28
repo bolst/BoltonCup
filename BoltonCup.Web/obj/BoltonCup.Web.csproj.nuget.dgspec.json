@@ -77,6 +77,12 @@
               "target": "Package",
               "version": "[8.0.1, )"
             },
+            "Microsoft.NET.ILLink.Tasks": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.14, )",
+              "autoReferenced": true
+            },
             "MudBlazor": {
               "target": "Package",
               "version": "[7.16.0, )"
@@ -121,6 +127,11 @@
             }
           },
           "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.201/PortableRuntimeIdentifierGraph.json"
+        }
+      },
+      "runtimes": {
+        "ios-arm64": {
+          "#import": []
         }
       }
     },
@@ -169,6 +180,12 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.NET.ILLink.Tasks": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.14, )",
+              "autoReferenced": true
+            },
             "MudBlazor": {
               "target": "Package",
               "version": "[7.*, )"
@@ -191,10 +208,6 @@
               "version": "[8.0.14, 8.0.14]"
             },
             {
-              "name": "Microsoft.NETCore.App.Host.osx-arm64",
-              "version": "[8.0.14, 8.0.14]"
-            },
-            {
               "name": "Microsoft.NETCore.App.Ref",
               "version": "[8.0.14, 8.0.14]"
             }
@@ -208,6 +221,11 @@
             }
           },
           "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.201/PortableRuntimeIdentifierGraph.json"
+        }
+      },
+      "runtimes": {
+        "ios-arm64": {
+          "#import": []
         }
       }
     }
