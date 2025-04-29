@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using Blazored.LocalStorage;
 using BoltonCup.Shared.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 using Supabase;
@@ -21,17 +23,32 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 			});
 
+		using var stream = Assembly
+			.GetExecutingAssembly()
+			.GetManifestResourceStream("BoltonCup.App.appsettings.txt");
+		if (stream == null)
+		{
+			Console.WriteLine("Failed to load appsettings");
+		}
+		else
+		{
+			var config = new ConfigurationBuilder()
+				.AddJsonStream(stream)
+				.Build();
+			builder.Configuration.AddConfiguration(config);
+		}
+		
 		builder.Services.AddMauiBlazorWebView();
 
 		builder.Services.AddBlazoredLocalStorage();
-		builder.Services.AddScoped<ICustomLocalStorageProvider, BoltonCup.App.Data.CustomLocalStorageProvider>();
+		builder.Services.AddScoped<ICustomLocalStorageProvider, Data.CustomLocalStorageProvider>();
 
-		builder.Services.AddBoltonCupServices();
+		builder.Services.AddBoltonCupServices(builder.Configuration);
 		
 		builder.Services.AddScoped(provider =>
 		{
-			var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
-			var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+			var url = builder.Configuration["SUPABASE_URL"];
+			var key = builder.Configuration["SUPABASE_KEY"];
 
 			if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(key))
 			{

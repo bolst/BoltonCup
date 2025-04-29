@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -15,9 +16,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 
-builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddScoped<ICustomLocalStorageProvider, BoltonCup.Draft.Data.CustomLocalStorageProvider>();
-builder.Services.AddBoltonCupServices();
+builder.Services.AddBoltonCupServices(builder.Configuration);
 
 builder.Services.AddScoped<DraftServiceProvider>();
 

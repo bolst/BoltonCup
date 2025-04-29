@@ -2,8 +2,10 @@ using Blazored.LocalStorage;
 using MudBlazor.Services;
 using BoltonCup.Web.Components;
 using BoltonCup.Shared.Data;
+using BoltonCup.Web.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
@@ -14,10 +16,25 @@ builder.Services.AddRazorComponents()
 
 // Add local storage
 builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddScoped<ICustomLocalStorageProvider, BoltonCup.Web.Data.CustomLocalStorageProvider>();
+builder.Services.AddScoped<ICustomLocalStorageProvider, CustomLocalStorageProvider>();
 
 // Core services
-builder.Services.AddBoltonCupServices();
+builder.Services.AddBoltonCupServices(builder.Configuration);
+
+builder.Services.AddScoped<RegistrationStateService>();
+
+builder.Services.AddScoped<StripeServiceProvider>(sp =>
+{
+    var apiKey = builder.Configuration["STRIPE_API_KEY"]; 
+    
+    if (string.IsNullOrWhiteSpace(apiKey))
+    {
+        throw new InvalidOperationException("SET YOUR (Stripe) ENV VARIABLES!\n");
+    }
+    
+    var bcData = sp.GetRequiredService<IBCData>();
+    return new StripeServiceProvider(apiKey, bcData);
+});
 
 var app = builder.Build();
 
