@@ -44,7 +44,7 @@
                     <MudChip T="string" Color="Color.Secondary" Variant="Variant.Text">@DefenseAccCount D</MudChip>
                     <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieAccCount G</MudChip>
                     
-                    <MudDataGrid Items="@accounts.Where(a => a.IsActive)" Hover>
+                    <MudDataGrid Items="@accounts.Where(a => a.IsActive).OrderBy(a => !a.Payed)" Hover>
                         <ToolBarContent>
                             <MudButton
                                 OnClick="@(() => SendEmail(accounts.Where(a => a.IsActive).Select(a => a.Email)))"
@@ -133,9 +133,10 @@
         {
             var message = new EmailMessage
             {
+                To = recipients.ToList(),
                 Subject = "Bolton Cup",
                 BodyFormat = EmailBodyFormat.PlainText,
-                Bcc = recipients.ToList()
+                // Bcc = recipients.ToList()
             };
 
             await Email.Default.ComposeAsync(message);

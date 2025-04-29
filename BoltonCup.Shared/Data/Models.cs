@@ -191,6 +191,7 @@ public class LoginFormModel
 
 public class BCAccount
 {
+    public required int id { get; set; }
     public required string Roles { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }

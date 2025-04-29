@@ -20,7 +20,7 @@ public class StripeServiceProvider
             var service = new Stripe.Checkout.SessionService();
             Stripe.Checkout.Session session = await service.GetAsync(checkoutId);
 
-            var email = session.CustomerDetails.Email;
+            var email = session.CustomerDetails?.Email;
             if (string.IsNullOrEmpty(email))
             {
                 return null;

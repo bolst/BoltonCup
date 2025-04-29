@@ -632,13 +632,22 @@ public class BCData : IBCData
                             WHERE tournament_id = @TournamentId";
         var result = await connection.QueryFirstOrDefaultAsync<PlayerProfile>(checkSql, new { Email = form.Email, TournamentId = tournamentId });
         if (result is not null) return;
+
+        // get account
+        var account = await GetAccountByEmailAsync(form.Email);
+        if (account is null) return;
         
-        string sql = @"";
+        string sql = @"INSERT INTO players(name, dob, preferred_beer, account_id, team_id, jersey_number, position, champion, tournament_id)
+                        VALUES (@Name, @Dob, NULL, @AccountId, NULL, NULL, @Position, FALSE, @TournamentId)";
         
-        var param = new DynamicParameters(form);
-        param.Add("TournamentId", tournamentId);
-        
-        await connection.ExecuteAsync(sql, param);
+        await connection.ExecuteAsync(sql, new
+        {
+            Name = $"{form.FirstName} {form.LastName}",
+            Dob = form.Birthday!.Value.ToString("yyyy-MM-dd"),
+            AccountId = account.id,
+            Position = form.Position,
+            TournamentId = tournamentId,
+        });
     }
 
     public async Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId)
