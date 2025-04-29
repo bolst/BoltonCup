@@ -90,11 +90,15 @@
       <AdditionalFiles Include="Components\Pages\Login.razor" />
       <AdditionalFiles Include="Components\Shared\LoginForm.razor" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <EmbeddedResource Include="appsettings.txt" />
+    </ItemGroup>
 
     <ItemGroup>
       <Reference Include="Microsoft.AspNetCore.Components.Authorization">
         <HintPath>..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.AspNetCore.App\8.0.11\Microsoft.AspNetCore.Components.Authorization.dll</HintPath>
       </Reference>
     </ItemGroup>
-
+    
 </Project>

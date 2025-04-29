@@ -50,4 +50,9 @@
     <_ContentIncludedByDefault Remove="Components\Account\Pages\_Imports.razor" />
     <_ContentIncludedByDefault Remove="Components\Account\Shared\SignInCard.razor" />
   </ItemGroup>
+
+
+  <ItemGroup>
+    <AdditionalFiles Include="Components\Pages\Pay.razor" />
+  </ItemGroup>
 </Project>
