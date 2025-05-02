@@ -45,14 +45,26 @@
                     <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieAccCount G</MudChip>
                     <MudChip T="string" Color="Color.Success" Variant="Variant.Text">@PayedCount PAYED</MudChip>
                     
-                    <MudDataGrid Items="@accounts.Where(a => a.IsActive).OrderBy(a => !a.Payed)" Hover>
+                    <MudButton
+                        OnClick="@(() => SendEmail(accounts.Where(a => a.IsActive).Select(a => a.Email)))"
+                        Color="Color.Info"
+                        Variant="Variant.Filled">
+                        Email Admits
+                    </MudButton>
+                    
+                    <MudDataGrid 
+                        Items="@accounts.Where(a => a.IsActive).OrderBy(a => !a.Payed)"
+                        QuickFilter="QuickFilter"
+                        Hover>
                         <ToolBarContent>
-                            <MudButton
-                                OnClick="@(() => SendEmail(accounts.Where(a => a.IsActive).Select(a => a.Email)))"
-                                Color="Color.Info"
-                                Variant="Variant.Filled">
-                                Email Admits
-                            </MudButton>
+                            <MudTextField 
+                                @bind-Value="_searchString" 
+                                Placeholder="Search" 
+                                Adornment="Adornment.Start"
+                                AdornmentIcon="@Icons.Material.Filled.Search" 
+                                IconSize="Size.Medium" 
+                                Clearable
+                                Immediate />
                         </ToolBarContent>
                         <Columns>
                             <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
@@ -88,8 +100,8 @@
 @code{
 
     private IEnumerable<RegisterFormModel>? registrations;
-
     private IEnumerable<BCAccount>? accounts;
+    private string _searchString = string.Empty;
 
     private int ForwardRegCount => registrations?.Count(r => r.Position == "forward") ?? 0;
     private int DefenseRegCount => registrations?.Count(r => r.Position == "defense") ?? 0;
@@ -146,4 +158,17 @@
         }
     }
 
+    private Func<BCAccount, bool> QuickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.FirstName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;        
+        
+        if (x.LastName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
 }

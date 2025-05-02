@@ -1,0 +1,67 @@
+@page "/myschedule"
+
+@attribute [Authorize]
+
+@inject CustomAuthenticationStateProvider AuthenticationStateProvider
+@inject IBCData BCData
+
+<PageHeader>My Schedule</PageHeader>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="mx-2 my-2 mx-md-2">
+
+            @if (_userGames is not null)
+            {
+                if (_userGames.Any())
+                {
+                    foreach (var day in _userGames.DistinctBy(x => x.date.Day).Select(x => x.date))
+                    {
+                        <MudText Typo="Typo.h4">@day.ToString("dddd, MMMM dd")</MudText>
+                        <MudDivider/>
+                        <ScheduleTable Games="_userGames.Where(g => g.date.Date == day.Date)"/>
+                    }
+                }
+                else
+                {
+                    <MudText Typo="Typo.h6" Class="pa-6">No games scheduled yet.</MudText>
+                }
+            }
+            else
+            {
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="400px" Width="100%" />
+            }
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    private BCAccount? _account;
+    private IEnumerable<BCGame>? _userGames;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+            if (state.User.Identity is null || !state.User.Identity.IsAuthenticated || !state.User.HasClaim(x => x.Type == ClaimTypes.Email))
+            {
+                return;
+            }
+
+            var claim = state.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
+            if (claim is null) return;
+            
+            _account = await BCData.GetAccountByEmailAsync(claim.Value);
+
+            // TODO:
+            _userGames = await BCData.GetSchedule();
+            _userGames = _userGames.Where(g => g.tournament_id == 2);
+            
+            StateHasChanged();
+        }
+    }
+
+}
