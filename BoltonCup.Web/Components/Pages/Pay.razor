@@ -13,20 +13,17 @@
     else
     {
         <MudStack AlignItems="AlignItems.Center" Spacing="5" Style="min-width: 80%">
-            @if (_userData is null)
-            {
-                <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" Style="font-size: 8rem"/>
-                <MudDivider/>
+            @* @if (_userData is null) *@
+            @* { *@
+            @*     <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" Style="font-size: 8rem"/> *@
+            @*     <MudDivider/> *@
+            @* *@
+            @*     <MudText Typo="Typo.body1">Something went wrong! Reach out to <b>nicbolton17@icloud.com</b> for further assistance.</MudText> *@
+            @* } *@
+            <MudIcon Icon="@Icons.Material.Filled.CheckCircleOutline" Color="Color.Success" Style="font-size: 8rem"/>
+            <MudDivider/>
 
-                <MudText Typo="Typo.body1">Something went wrong! Reach out to <b>nicbolton17@icloud.com</b> for further assistance.</MudText>
-            }
-            else
-            {
-                <MudIcon Icon="@Icons.Material.Filled.CheckCircleOutline" Color="Color.Success" Style="font-size: 8rem"/>
-                <MudDivider/>
-
-                <MudText Typo="Typo.body1">Payment has been confirmed for <b>@_userData.Email</b>!</MudText>
-            }
+            <MudText Typo="Typo.body1">Payment has been confirmed!</MudText>
         </MudStack>
     }
 </MudPaper>
@@ -57,7 +54,7 @@
         _userData = await StripeService.ProcessCheckoutAsync(CheckoutId);
 
         _loading = false;
-        _headerText = _userData is null ? "Error" : "Payment Confirmed";
+        _headerText = "Payment Confirmed";
         StateHasChanged();
     }
     
