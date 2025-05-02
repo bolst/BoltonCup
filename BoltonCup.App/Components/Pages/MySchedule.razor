@@ -55,10 +55,12 @@
             if (claim is null) return;
             
             _account = await BCData.GetAccountByEmailAsync(claim.Value);
-
-            // TODO:
-            _userGames = await BCData.GetSchedule();
-            _userGames = _userGames.Where(g => g.tournament_id == 2);
+            if (_account is null) return;
+            
+            var profile = await BCData.GetUserTournamentPlayerProfileAsync(_account.id, 2);
+            if (profile is null) return;
+            
+            _userGames = await BCData.GetPlayerSchedule(profile.id);
             
             StateHasChanged();
         }

@@ -7,10 +7,12 @@ public interface IBCData
     Task<IEnumerable<BCTeam>> GetTeams();
     Task<BCTeam?> GetTeamById(int id);
     Task<IEnumerable<BCGame>> GetSchedule();
+    Task<IEnumerable<BCGame>> GetPlayerSchedule(int playerId);
     Task<BCGame?> GetGameById(int id);
     Task<IEnumerable<PlayerProfile>> GetRosterByTeamId(int teamId);
     Task<IEnumerable<PlayerProfile>> GetAllTournamentPlayersAsync(int tournamentId);
     Task<PlayerProfile?> GetPlayerProfileById(int playerId);
+    Task<PlayerProfile?> GetUserTournamentPlayerProfileAsync(int accountId, int tournamentId);
     Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int playerId);
     Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int goalieId);
     Task<IEnumerable<GameGoal>> GetGameGoalsByGameId(int gameId);
@@ -100,6 +102,15 @@ public class BCData : IBCData
         }, cacheDuration);
     }
 
+    public async Task<IEnumerable<BCGame>> GetPlayerSchedule(int playerId)
+    {
+        string sql = @"SELECT g.*
+                        FROM game g
+                                 INNER JOIN players p ON p.team_id IN (g.home_team_id, g.away_team_id) AND p.id = @PlayerId";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCGame>(sql, new { PlayerId = playerId });
+    }
+
     public async Task<BCGame?> GetGameById(int id)
     {
         string cacheKey = $"game_{id}";
@@ -148,6 +159,17 @@ public class BCData : IBCData
 
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryFirstOrDefaultAsync<PlayerProfile>(sql, new { PlayerId = id });
+    }
+
+    public async Task<PlayerProfile?> GetUserTournamentPlayerProfileAsync(int accountId, int tournamentId)
+    {
+        string sql = @"SELECT *
+                        FROM players
+                        WHERE account_id = @AccountId
+                          AND tournament_id = @TournamentId";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryFirstOrDefaultAsync<PlayerProfile>(sql,
+            new { AccountId = accountId, TournamentId = tournamentId });
     }
 
     public async Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int id)
