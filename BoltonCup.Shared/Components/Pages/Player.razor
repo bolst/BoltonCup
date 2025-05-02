@@ -1,11 +1,11 @@
-@page "/player/{id:int}"
+@page "/player/{playerid:int}"
 
 @inject IBCData BCData
 @inject NavigationManager Navigation
 
 <MudPaper Class="py-10 my-5 mx-2 px-2 px-sm-10 mx-sm-5">
 
-    @if (profile is not null && profilePicture is not null)
+    @if (profile is not null)
     {
         <MudStack Class="d-flex align-center mb-10" Wrap="Wrap.Wrap" Row="true">
             <MudText Typo="Typo.h3">@profile.name.ToUpper()</MudText>
@@ -24,7 +24,10 @@
         <MudStack Class="d-flex align-center mb-10" Wrap="Wrap.Wrap" Row="true">
             <div class="d-flex align-center mb-10">
 
-                <MudImage Src="@profilePicture.Source" Height="200" />
+                @if (_account is not null)
+                {
+                    <MudImage Src="@_account.ProfilePicture" Height="200" />
+                }
 
                 <MudDivider Class="d-none d-sm-flex px-4" Vertical="true" FlexItem="true" />
 
@@ -40,11 +43,11 @@
 
             @if (profile.IsGoalie)
             {
-                <GoalieStatSummary PlayerId="@Id" />
+                <GoalieStatSummary PlayerId="@PlayerId" />
             }
             else
             {
-                <PlayerStatSummary PlayerId="@Id" />
+                <PlayerStatSummary PlayerId="@PlayerId" />
             }
 
         </MudStack>
@@ -54,11 +57,11 @@
 
         @if (profile.IsGoalie)
         {
-            <GoalieGameByGame PlayerId="@Id" />
+            <GoalieGameByGame PlayerId="@PlayerId" />
         }
         else
         {
-            <PlayerGameByGame PlayerId="@Id" />
+            <PlayerGameByGame PlayerId="@PlayerId" />
         }
     }
     else
@@ -74,23 +77,27 @@
     </MudPaper>
 
     @code {
-    [Parameter] public int Id { get; set; }
+    [Parameter] 
+    public int PlayerId { get; set; }
 
     private PlayerProfile? profile;
-    private PlayerProfilePicture? profilePicture;
     private IEnumerable<Data.BCTeam>? teams;
+    private BCAccount? _account;
 
     private string TeamLogoById(int? id) => teams is null || id is null ? string.Empty : (teams.FirstOrDefault(x => x.id == id)?.logo_url ?? string.Empty);
 
     protected override async Task OnParametersSetAsync()
     {
-        var profileTask = BCData.GetPlayerProfileById(Id);
-        var profilePicTask = BCData.GetPlayerProfilePictureById(Id);
+        var profileTask = BCData.GetPlayerProfileById(PlayerId);
         var teamsTask = BCData.GetTeams();
-        await Task.WhenAll(profileTask, profilePicTask, teamsTask);
+        await Task.WhenAll(profileTask, teamsTask);
         
         profile = profileTask.Result;
-        profilePicture = profilePicTask.Result;
         teams = teamsTask.Result;
+
+        if (profile?.account_id is not null)
+        {
+            _account = await BCData.GetAccountByIdAsync(profile.account_id.Value);
+        }
     }
 }
