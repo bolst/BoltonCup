@@ -106,7 +106,8 @@ public class BCData : IBCData
     {
         string sql = @"SELECT g.*
                         FROM game g
-                                 INNER JOIN players p ON p.team_id IN (g.home_team_id, g.away_team_id) AND p.id = @PlayerId";
+                                 INNER JOIN players p ON p.team_id IN (g.home_team_id, g.away_team_id) AND p.id = @PlayerId
+                                 ORDER BY g.date ASC";
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryAsync<BCGame>(sql, new { PlayerId = playerId });
     }
