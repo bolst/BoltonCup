@@ -24,7 +24,6 @@ builder.Services.AddBoltonCupServices(builder.Configuration);
 builder.Services.AddBoltonCupSupabase(builder.Configuration);
 
 builder.Services.AddScoped<RegistrationStateService>();
-
 builder.Services.AddScoped<StripeServiceProvider>(sp =>
 {
     var apiKey = builder.Configuration["STRIPE_API_KEY"]; 

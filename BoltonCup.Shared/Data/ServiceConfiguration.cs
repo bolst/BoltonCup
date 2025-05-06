@@ -47,6 +47,8 @@ public static class ServiceConfiguration
             });
         });
 
+        services.AddScoped<SupabaseServiceProvider>();
+
         return services;
     }
     

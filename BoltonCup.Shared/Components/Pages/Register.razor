@@ -2,7 +2,7 @@
 
 @inject IBCData BCData
 @inject RegistrationStateService RegStateService
-@inject Supabase.Client SBClient
+@inject SupabaseServiceProvider SupabaseService
 
 @if (_hasRegistered is null)
 {
@@ -106,13 +106,10 @@ else
 
         if (string.IsNullOrEmpty(errorMessage))
         {
+            await SupabaseService.SendRegistrationEmail(form);
             await RegStateService.SetBrowserRegistered(true);
             _hasRegistered = true;
 
-            if (_currentTournament is not null && _currentTournament.payment_open || true)
-            {
-                await SendEmailAsync(form);
-            }
             
         }
         else
@@ -123,21 +120,4 @@ else
         StateHasChanged();
     }
 
-
-    // TODO: put this in a service
-    private async Task SendEmailAsync(RegisterFormModel form)
-    {
-        var options = new Supabase.Functions.Client.InvokeFunctionOptions
-        {
-            Body = new Dictionary<string, object>
-            {
-                { "name", "Functions" },
-                { "to", form.Email },
-                { "subject", "Registration - Bolton Cup 2025" },
-                { "html", "Hello there!" }
-            }
-        };
-        await SBClient.Functions.Invoke("resend-email", options: options);
-    }
-    
 }
