@@ -32,6 +32,7 @@ public interface IBCData
     Task UpdateAccountProfilePictureAsync(string email, string imagePath);
     Task<IEnumerable<BCTournament>> GetTournamentsAsync();
     Task<BCTournament?> GetTournamentByYearAsync(string year);
+    Task<BCTournament?> GetCurrentTournamentAsync();
     Task SetUserAsPayedAsync(string email);
     Task ConfigPlayerProfileAsync(RegisterFormModel form, int tournamentId);
     Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId);
@@ -647,6 +648,15 @@ public class BCData : IBCData
         return await connection.QueryFirstOrDefaultAsync<BCTournament>(sql, new { Year = year });
     }
 
+    public async Task<BCTournament?> GetCurrentTournamentAsync()
+    {
+        string sql = @"SELECT *
+                        FROM tournament
+                        WHERE current = TRUE";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryFirstOrDefaultAsync<BCTournament>(sql);
+    }
+    
     public async Task SetUserAsPayedAsync(string email)
     {
         string sql = @"UPDATE account

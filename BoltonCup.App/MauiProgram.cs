@@ -44,28 +44,8 @@ public static class MauiProgram
 		builder.Services.AddScoped<ICustomLocalStorageProvider, Data.CustomLocalStorageProvider>();
 
 		builder.Services.AddBoltonCupServices(builder.Configuration);
-		
-		builder.Services.AddScoped(provider =>
-		{
-			var url = builder.Configuration["SUPABASE_URL"];
-			var key = builder.Configuration["SUPABASE_KEY"];
-
-			if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(key))
-			{
-				throw new InvalidOperationException("SET YOUR ENV VARIABLES!\n");
-			}
-            
-			return new Supabase.Client(url, key, new SupabaseOptions
-			{
-				AutoConnectRealtime = true,
-			});
-		});
-		
-		// Authorization
-		builder.Services.AddAuthorizationCore();
-		builder.Services.AddScoped<CustomUserService>();
-		builder.Services.AddScoped<CustomAuthenticationStateProvider>();
-		builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
+		builder.Services.AddBoltonCupSupabase(builder.Configuration);
+		builder.Services.AddBoltonCupAuth();
 
 		builder.Services.AddMudServices();
 
