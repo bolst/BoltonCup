@@ -77,18 +77,29 @@ public class SupabaseServiceProvider
 {
     private readonly Supabase.Client _supabase;
     private readonly EmailContentBuilder _emailContentBuilder;
+    private readonly IBCData _bcData;
 
     public SupabaseServiceProvider(Supabase.Client supabase, IBCData bcData)
     {
         _supabase = supabase;
-        _emailContentBuilder = new EmailContentBuilder(bcData);
+        _bcData = bcData;
+        _emailContentBuilder = new EmailContentBuilder();
     }
 
     public async Task SendRegistrationEmail(RegisterFormModel form)
     {
-        var content = await _emailContentBuilder.BuildRegistrationEmail(form);
+        var tournament = await _bcData.GetCurrentTournamentAsync();
+        var content = _emailContentBuilder.BuildRegistrationEmail(form, tournament);
         await SendEmail(form.Email, "Registration - Bolton Cup 2025", content);
     }
+
+    public async Task SendPaymentConfirmationEmail(RegisterFormModel form)
+    {
+        var tournament = await _bcData.GetCurrentTournamentAsync();
+        var content = _emailContentBuilder.BuildPaymentConfirmationEmail(form, tournament);
+    }
+    
+    
 
     private async Task SendEmail(string to, string subject, string html)
     {
@@ -109,12 +120,10 @@ public class SupabaseServiceProvider
     
     
     
-    private class EmailContentBuilder(IBCData _bcData)
+    private class EmailContentBuilder
     {
-        public async Task<string> BuildRegistrationEmail(RegisterFormModel form)
+        public string BuildRegistrationEmail(RegisterFormModel form, BCTournament? tournament)
         {
-            var tournament = await _bcData.GetCurrentTournamentAsync();
-
             var paymentBody = string.Empty;
             
             if (tournament is not null && tournament.payment_open)
@@ -144,6 +153,12 @@ public class SupabaseServiceProvider
                            """;
             return content;
 
+        }
+
+        public string BuildPaymentConfirmationEmail(RegisterFormModel form, BCTournament? tournament)
+        {
+            var content = string.Empty;
+            return content;
         }
     }
 }

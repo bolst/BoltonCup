@@ -4,7 +4,7 @@
 @inject RegistrationStateService RegStateService
 @inject SupabaseServiceProvider SupabaseService
 
-@if (_hasRegistered is null)
+@if (_hasRegistered is null || _loading)
 {
     <div class="d-flex justify-center align-center" style="height: 100vh">
         <MudProgressCircular Size="Size.Large" Indeterminate="true" />
@@ -40,6 +40,7 @@ else
                     <MudItem xs="12" md="6" Class="d-flex align-center justify-center">
                         &nbsp;<div>
                             <MudText Typo="Typo.h3" Color="Color.Dark"><b>Register for Bolton Cup 2025</b></MudText>
+                            <MudText Typo="Typo.h6" Color="Color.Dark"><b>If you've already registered and need to pay, check your email</b></MudText>
                         </div>
                     </MudItem>        
                     <MudItem xs="12" md="6">
@@ -73,13 +74,18 @@ else
     
     private readonly string _containerStyle = "height: 120vh; background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//BOLTONCUP-86.webp'); background-size: cover; background-position: center center;";
 
+    private bool _loading;
     private bool? _hasRegistered;
     private string _errorMessage = string.Empty;
     private BCTournament? _currentTournament;
 
     protected override async Task OnInitializedAsync()
     {
+        _loading = true;
+        
         _currentTournament = await BCData.GetCurrentTournamentAsync();
+        
+        _loading = false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
