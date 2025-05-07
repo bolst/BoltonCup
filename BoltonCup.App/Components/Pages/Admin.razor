@@ -173,9 +173,12 @@
         if (form is null) return;
         
         await BCData.SetUserAsPayedAsync(account.Email);
-            
-        // TODO: get the tournament id instead of hard-coding it
-        await BCData.ConfigPlayerProfileAsync(form, 2);
+
+        var tournament = await BCData.GetCurrentTournamentAsync();
+        if (tournament is not null)
+        {
+            await BCData.ConfigPlayerProfileAsync(form, tournament.tournament_id);
+        }
         
         await LoadDataAsync();
         InvokeAsync(StateHasChanged);
