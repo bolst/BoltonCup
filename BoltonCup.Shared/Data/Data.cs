@@ -698,15 +698,13 @@ public class BCData : IBCData
 
     public async Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId)
     {
-        string sql = @"SELECT *
-                        FROM draftpick
-                        WHERE round = (SELECT MAX(round)
-                                           FROM draftpick
-                                           WHERE draft_id = @DraftId)
-                          AND pick = (SELECT MAX(pick)
-                                          FROM draftpick
-                                          WHERE draft_id = @DraftId)
-                          AND draft_id = @DraftId";
+        string sql = @"WITH max_round AS (SELECT MAX(round)
+                       FROM draftpick
+                       WHERE draft_id = @DraftId),
+                             max_round_picks AS (SELECT * FROM draftpick WHERE round IN (SELECT * FROM max_round) AND draft_id = @DraftId)
+                        SELECT *
+                            FROM draftpick d
+                                     INNER JOIN max_round_picks m ON d.id = m.id AND d.pick = (SELECT MAX(pick) FROM max_round_picks)";
         
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QuerySingleOrDefaultAsync<BCDraftPick>(sql, new { DraftId = draftId });
