@@ -234,6 +234,8 @@ public class BCTournament : IEquatable<BCTournament>
     public bool registration_open { get; set; }
     public bool payment_open { get; set; }
     public string? payment_link { get; set; }
+    public string? player_payment_link { get; set; }
+    public string? goalie_payment_link { get; set; }
 
     public bool Equals(BCTournament? other) => other is not null && other.tournament_id == tournament_id;
     public override bool Equals(object? obj) => Equals(obj as BCTournament);

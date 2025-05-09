@@ -4,7 +4,7 @@
 @inject RegistrationStateService RegStateService
 @inject SupabaseServiceProvider SupabaseService
 
-@if (_hasRegistered is null || _loading)
+@if (_loading)
 {
     <div class="d-flex justify-center align-center" style="height: 100vh">
         <MudProgressCircular Size="Size.Large" Indeterminate="true" />
@@ -14,7 +14,7 @@ else
 {
     if (_currentTournament is not null && _currentTournament.registration_open)
     {
-        if (_hasRegistered.Value)
+        if (!string.IsNullOrEmpty(_storedEmail))
         {
             <div class="d-flex justify-center px-4" style="height: 80vh">
                 <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
@@ -75,7 +75,7 @@ else
     private readonly string _containerStyle = "height: 120vh; background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//BOLTONCUP-86.webp'); background-size: cover; background-position: center center;";
 
     private bool _loading;
-    private bool? _hasRegistered;
+    private string? _storedEmail;
     private string _errorMessage = string.Empty;
     private BCTournament? _currentTournament;
 
@@ -92,7 +92,7 @@ else
     {
         if (firstRender)
         {
-            _hasRegistered = await RegStateService.GetBrowserRegistered();
+            _storedEmail = await RegStateService.GetBrowserRegistered();
             
             StateHasChanged();
         }
@@ -100,8 +100,8 @@ else
 
     private async Task OnFormBegin()
     {
-        await RegStateService.SetBrowserRegistered(false);
-        _hasRegistered = false;
+        await RegStateService.Clear();
+        _storedEmail = null;
         
         StateHasChanged();
     }
@@ -113,8 +113,8 @@ else
         if (string.IsNullOrEmpty(errorMessage))
         {
             await SupabaseService.SendRegistrationEmail(form);
-            await RegStateService.SetBrowserRegistered(true);
-            _hasRegistered = true;
+            await RegStateService.SetBrowserRegistered(form.Email);
+            _storedEmail = form.Email;
 
             
         }
