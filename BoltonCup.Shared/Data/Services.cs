@@ -53,21 +53,26 @@ public class CacheService : ICacheService
 
 public class RegistrationStateService
 {
+    private const string REG_KEY = "reg";
     private readonly ICustomLocalStorageProvider _customLocalStorageProvider;
-
     public RegistrationStateService(ICustomLocalStorageProvider customLocalStorageService)
     {
         _customLocalStorageProvider = customLocalStorageService;
     }
 
-    public async Task SetBrowserRegistered(bool state)
+    public async Task SetBrowserRegistered(string email)
     {
-        await _customLocalStorageProvider.SetAsync("reg", state);
+        await _customLocalStorageProvider.SetAsync(REG_KEY, email);
     }
 
-    public async Task<bool> GetBrowserRegistered()
+    public async Task<string?> GetBrowserRegistered()
     {
-        return await _customLocalStorageProvider.GetAsync<bool>("reg");
+        return await _customLocalStorageProvider.GetAsync<string>(REG_KEY);
+    }
+
+    public async Task Clear()
+    {
+        await _customLocalStorageProvider.RemoveAsync(REG_KEY);
     }
     
 }
