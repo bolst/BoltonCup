@@ -157,15 +157,15 @@
           }
         }
       },
-      "Microsoft.AspNetCore.DataProtection.Abstractions/8.0.13": {
+      "Microsoft.AspNetCore.DataProtection.Abstractions/9.0.4": {
         "type": "package",
         "compile": {
-          "lib/net8.0/Microsoft.AspNetCore.DataProtection.Abstractions.dll": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.DataProtection.Abstractions.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net8.0/Microsoft.AspNetCore.DataProtection.Abstractions.dll": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.DataProtection.Abstractions.dll": {
             "related": ".xml"
           }
         }
@@ -1105,10 +1105,10 @@
         "microsoft.aspnetcore.dataprotection.nuspec"
       ]
     },
-    "Microsoft.AspNetCore.DataProtection.Abstractions/8.0.13": {
-      "sha512": "4U9IehfaMC6mIrXCjwqraod8iBBqLnAN5f164KffqgPiZGWw5PsnpacS22E8Tz3TK0kf6FUjQVx4alY7UJ4KWw==",
+    "Microsoft.AspNetCore.DataProtection.Abstractions/9.0.4": {
+      "sha512": "Rpk6IzRhme46cdR1mVEgXXrXQzN/bORK/4pYYpVX8nsRaV2oX69SzyTMCJ4lfxRrxWD7UrFBMf3YOxyam8oYYQ==",
       "type": "package",
-      "path": "microsoft.aspnetcore.dataprotection.abstractions/8.0.13",
+      "path": "microsoft.aspnetcore.dataprotection.abstractions/9.0.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1116,11 +1116,11 @@
         "THIRD-PARTY-NOTICES.TXT",
         "lib/net462/Microsoft.AspNetCore.DataProtection.Abstractions.dll",
         "lib/net462/Microsoft.AspNetCore.DataProtection.Abstractions.xml",
-        "lib/net8.0/Microsoft.AspNetCore.DataProtection.Abstractions.dll",
-        "lib/net8.0/Microsoft.AspNetCore.DataProtection.Abstractions.xml",
+        "lib/net9.0/Microsoft.AspNetCore.DataProtection.Abstractions.dll",
+        "lib/net9.0/Microsoft.AspNetCore.DataProtection.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.AspNetCore.DataProtection.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.AspNetCore.DataProtection.Abstractions.xml",
-        "microsoft.aspnetcore.dataprotection.abstractions.8.0.13.nupkg.sha512",
+        "microsoft.aspnetcore.dataprotection.abstractions.9.0.4.nupkg.sha512",
         "microsoft.aspnetcore.dataprotection.abstractions.nuspec"
       ]
     },
@@ -2243,6 +2243,7 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "BoltonCup.Shared >= 1.0.0",
+      "Microsoft.AspNetCore.DataProtection.Abstractions >= 9.0.4",
       "MudBlazor >= 7.*"
     ]
   },
@@ -2294,6 +2295,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "Microsoft.AspNetCore.DataProtection.Abstractions": {
+            "target": "Package",
+            "version": "[9.0.4, )"
+          },
           "MudBlazor": {
             "target": "Package",
             "version": "[7.*, )"

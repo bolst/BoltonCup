@@ -169,6 +169,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.DataProtection.Abstractions": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            },
             "MudBlazor": {
               "target": "Package",
               "version": "[7.*, )"

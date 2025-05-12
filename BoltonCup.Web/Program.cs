@@ -23,6 +23,8 @@ builder.Services.AddScoped<ICustomLocalStorageProvider, CustomLocalStorageProvid
 builder.Services.AddBoltonCupServices(builder.Configuration);
 builder.Services.AddBoltonCupSupabase(builder.Configuration);
 
+builder.Services.AddDataProtection();
+
 builder.Services.AddScoped<RegistrationStateService>();
 builder.Services.AddScoped<StripeServiceProvider>(sp =>
 {

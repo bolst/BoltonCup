@@ -8,6 +8,7 @@
 
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="9.0.4" />
     <PackageReference Include="MudBlazor" Version="7.*" />
   </ItemGroup>
 

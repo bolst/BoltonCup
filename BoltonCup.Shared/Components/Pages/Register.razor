@@ -4,7 +4,7 @@
 @inject RegistrationStateService RegStateService
 @inject SupabaseServiceProvider SupabaseService
 
-@if (_loading)
+@if (_loading || _currentTournament is null)
 {
     <div class="d-flex justify-center align-center" style="height: 100vh">
         <MudProgressCircular Size="Size.Large" Indeterminate="true" />
@@ -12,16 +12,16 @@
 }
 else
 {
-    if (_currentTournament is not null && _currentTournament.registration_open)
+    if (_currentTournament.registration_open && (_playerCount < _currentTournament.player_limit || _goalieCount < _currentTournament.goalie_limit))
     {
-        if (!string.IsNullOrEmpty(_storedEmail))
+        if (_storedEmailForm is not null)
         {
             <div class="d-flex justify-center px-4" style="height: 80vh">
                 <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
                 @if (_currentTournament.payment_open)
                 {
                     <MudText Align="Align.Center" Typo="Typo.h4"><b>Thank you for registering!</b></MudText>
-                    <MudText Align="Align.Center" Typo="Typo.h6">To secure a spot you must pay the registration fee at <MudLink Target="_blank" Typo="Typo.inherit" Href="@_currentTournament.payment_link" Underline="Underline.Always"><b>this link</b></MudLink>.</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h6">To secure a spot you must pay the registration fee at <MudLink Target="_blank" Typo="Typo.inherit" Href="@(_storedEmailForm.IsGoalie ? _currentTournament.goalie_payment_link : _currentTournament.player_payment_link)" Underline="Underline.Always"><b>this link</b></MudLink>.</MudText>
                     <MudButton OnClick="OnFormBegin" Color="Color.Primary">Submit another registration</MudButton>
                 }
                 else
@@ -41,12 +41,21 @@ else
                         &nbsp;<div>
                             <MudText Typo="Typo.h3" Color="Color.Dark"><b>Register for Bolton Cup 2025</b></MudText>
                             <MudText Typo="Typo.h6" Color="Color.Dark"><b>If you've already registered and need to pay, check your email</b></MudText>
+                            <MudText Typo="Typo.h6" Color="Color.Dark"><b>Your spot is not reserved until you pay</b></MudText>
                         </div>
                     </MudItem>        
                     <MudItem xs="12" md="6">
                         <MudPaper Class="pa-6 px-10">
-                            <RegisterForm OnSubmit="OnFormSubmit">
+                            <RegisterForm OnSubmit="OnFormSubmit" DisablePlayers="_playerCount >= _currentTournament.player_limit" DisableGoalies="_goalieCount >= _currentTournament.goalie_limit">
                                 <ErrorContent>
+                                    @if (_playerCount >= _currentTournament.player_limit)
+                                    {
+                                        <MudText Color="Color.Info"><b>NOTE: All player spots have been filled!</b></MudText>
+                                    }
+                                    else if (_goalieCount >= _currentTournament.goalie_limit)
+                                    {
+                                        <MudText Color="Color.Info"><b>NOTE: All goalie spots have been filled!</b></MudText>
+                                    }
                                     <MudText Color="Color.Error">@_errorMessage</MudText>
                                 </ErrorContent>
                             </RegisterForm>
@@ -78,22 +87,34 @@ else
     private string? _storedEmail;
     private string _errorMessage = string.Empty;
     private BCTournament? _currentTournament;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _loading = true;
-        
-        _currentTournament = await BCData.GetCurrentTournamentAsync();
-        
-        _loading = false;
-    }
-
+    private RegisterFormModel? _storedEmailForm;
+    private int _playerCount;
+    private int _goalieCount;
+    
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _storedEmail = await RegStateService.GetBrowserRegistered();
+            _loading = true;
+            StateHasChanged();
             
+            _currentTournament = await BCData.GetCurrentTournamentAsync();
+            if (_currentTournament is not null)
+            {
+                var players = await BCData.GetAllTournamentPlayersAsync(_currentTournament.tournament_id);
+                _playerCount = players.Count(p => !p.IsGoalie);
+                _goalieCount = players.Count(p => p.IsGoalie);
+            }
+            
+            _storedEmail = await RegStateService.GetBrowserRegistered();
+
+            if (_storedEmail is not null)
+            {
+                _storedEmailForm = await BCData.GetRegistrationByEmailAsync(_storedEmail);
+            }
+            
+            _loading = false;
             StateHasChanged();
         }
     }
@@ -102,6 +123,7 @@ else
     {
         await RegStateService.Clear();
         _storedEmail = null;
+        _storedEmailForm = null;
         
         StateHasChanged();
     }
@@ -114,9 +136,12 @@ else
         {
             await SupabaseService.SendRegistrationEmail(form);
             await RegStateService.SetBrowserRegistered(form.Email);
-            _storedEmail = form.Email;
-
             
+            _storedEmail = form.Email;
+            if (_storedEmail is not null)
+            {
+                _storedEmailForm = await BCData.GetRegistrationByEmailAsync(_storedEmail);
+            }
         }
         else
         {

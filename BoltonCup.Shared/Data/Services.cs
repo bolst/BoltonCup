@@ -1,4 +1,4 @@
-using Stripe;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 
@@ -55,19 +55,22 @@ public class RegistrationStateService
 {
     private const string REG_KEY = "reg";
     private readonly ICustomLocalStorageProvider _customLocalStorageProvider;
-    public RegistrationStateService(ICustomLocalStorageProvider customLocalStorageService)
+    private IDataProtector _protector;
+    public RegistrationStateService(ICustomLocalStorageProvider customLocalStorageService, IDataProtectionProvider provider)
     {
         _customLocalStorageProvider = customLocalStorageService;
+        _protector = provider.CreateProtector("creds");
     }
 
     public async Task SetBrowserRegistered(string email)
     {
-        await _customLocalStorageProvider.SetAsync(REG_KEY, email);
+        await _customLocalStorageProvider.SetAsync(REG_KEY, _protector.Protect(email));
     }
 
     public async Task<string?> GetBrowserRegistered()
     {
-        return await _customLocalStorageProvider.GetAsync<string>(REG_KEY);
+        var protectedEmail = await _customLocalStorageProvider.GetAsync<string>(REG_KEY);
+        return protectedEmail is null ? null : _protector.Unprotect(protectedEmail);
     }
 
     public async Task Clear()
@@ -98,14 +101,6 @@ public class SupabaseServiceProvider
         await SendEmail(form.Email, "Registration - Bolton Cup 2025", content);
     }
 
-    public async Task SendPaymentConfirmationEmail(RegisterFormModel form)
-    {
-        var tournament = await _bcData.GetCurrentTournamentAsync();
-        var content = _emailContentBuilder.BuildPaymentConfirmationEmail(form, tournament);
-    }
-    
-    
-
     private async Task SendEmail(string to, string subject, string html)
     {
         var options = new Supabase.Functions.Client.InvokeFunctionOptions
@@ -133,10 +128,11 @@ public class SupabaseServiceProvider
             
             if (tournament is not null && tournament.payment_open)
             {
+                var paymentLink = form.IsGoalie ? tournament.goalie_payment_link : tournament.player_payment_link;
                 paymentBody =
                     $"""
                      <p>To complete your registration, you must pay the $150 fee at the link below. Spots are limited. Make sure to use the same email ({form.Email})!</p>
-                                         <p><a href="{tournament.payment_link}">{tournament.payment_link}</a></p>
+                                         <p><a href="{paymentLink}">{paymentLink}</a></p>
                      """;
             }
             
@@ -160,11 +156,6 @@ public class SupabaseServiceProvider
 
         }
 
-        public string BuildPaymentConfirmationEmail(RegisterFormModel form, BCTournament? tournament)
-        {
-            var content = string.Empty;
-            return content;
-        }
     }
 }
 
