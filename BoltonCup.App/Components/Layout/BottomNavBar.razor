@@ -1,11 +1,15 @@
 <MudAppBar ToolBarClass="d-flex justify-space-between" Bottom Fixed>
-    <MudIconButton Class="mb-6 px-4" Icon="@Icons.Material.Filled.Home" Ripple="false" Href="/" />
-    <MudIconButton Class="mb-6 px-4" Icon="@Icons.Material.Filled.Info" Ripple="false" Href="/info" />
-    <MudIconButton Class="mb-6 px-4" Icon="@Icons.Material.Filled.People" Ripple="false" Href="/teams" />
-    <MudIconButton Class="mb-6 px-4" Icon="@Icons.Material.Filled.CalendarMonth" Ripple="false" Href="/schedule" />
+    <BottomNavItem Icon="@Icons.Material.Filled.Home" Href="/" />
+    <BottomNavItem Icon="@Icons.Material.Filled.People" Href="/teams" />
+    <AuthorizeView>
+        <Authorized>
+            <BottomNavItem Icon="@Icons.Material.Filled.CalendarMonth" Href="/myschedule" />
+        </Authorized>
+        <NotAuthorized>
+            <BottomNavItem Icon="@Icons.Material.Filled.CalendarToday" Href="/schedule" />
+        </NotAuthorized>
+    </AuthorizeView>
+    <AuthorizeView>
+        <BottomNavItem Icon="@Icons.Material.Filled.Person" Href="/profile" />
+    </AuthorizeView>
 </MudAppBar>
-
-
-@code {
-    
-}

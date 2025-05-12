@@ -7,10 +7,12 @@ public interface IBCData
     Task<IEnumerable<BCTeam>> GetTeams();
     Task<BCTeam?> GetTeamById(int id);
     Task<IEnumerable<BCGame>> GetSchedule();
+    Task<IEnumerable<BCGame>> GetPlayerSchedule(int playerId);
     Task<BCGame?> GetGameById(int id);
     Task<IEnumerable<PlayerProfile>> GetRosterByTeamId(int teamId);
     Task<IEnumerable<PlayerProfile>> GetAllTournamentPlayersAsync(int tournamentId);
     Task<PlayerProfile?> GetPlayerProfileById(int playerId);
+    Task<PlayerProfile?> GetUserTournamentPlayerProfileAsync(int accountId, int tournamentId);
     Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int playerId);
     Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int goalieId);
     Task<IEnumerable<GameGoal>> GetGameGoalsByGameId(int gameId);
@@ -26,9 +28,11 @@ public interface IBCData
     Task<string> RemoveAdmittedUserAsync(BCAccount account);
     Task<IEnumerable<BCAccount>> GetAccountsAsync();
     Task<BCAccount?> GetAccountByEmailAsync(string email);
+    Task<BCAccount?> GetAccountByIdAsync(int accountId);
     Task UpdateAccountProfilePictureAsync(string email, string imagePath);
     Task<IEnumerable<BCTournament>> GetTournamentsAsync();
     Task<BCTournament?> GetTournamentByYearAsync(string year);
+    Task<BCTournament?> GetCurrentTournamentAsync();
     Task SetUserAsPayedAsync(string email);
     Task ConfigPlayerProfileAsync(RegisterFormModel form, int tournamentId);
     Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId);
@@ -99,6 +103,16 @@ public class BCData : IBCData
         }, cacheDuration);
     }
 
+    public async Task<IEnumerable<BCGame>> GetPlayerSchedule(int playerId)
+    {
+        string sql = @"SELECT g.*
+                        FROM game g
+                                 INNER JOIN players p ON p.team_id IN (g.home_team_id, g.away_team_id) AND p.id = @PlayerId
+                                 ORDER BY g.date ASC";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCGame>(sql, new { PlayerId = playerId });
+    }
+
     public async Task<BCGame?> GetGameById(int id)
     {
         string cacheKey = $"game_{id}";
@@ -147,6 +161,17 @@ public class BCData : IBCData
 
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QueryFirstOrDefaultAsync<PlayerProfile>(sql, new { PlayerId = id });
+    }
+
+    public async Task<PlayerProfile?> GetUserTournamentPlayerProfileAsync(int accountId, int tournamentId)
+    {
+        string sql = @"SELECT *
+                        FROM players
+                        WHERE account_id = @AccountId
+                          AND tournament_id = @TournamentId";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryFirstOrDefaultAsync<PlayerProfile>(sql,
+            new { AccountId = accountId, TournamentId = tournamentId });
     }
 
     public async Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int id)
@@ -581,6 +606,18 @@ public class BCData : IBCData
         return await connection.QueryFirstOrDefaultAsync<BCAccount>(sql, new { Email = email });
     }
 
+    public async Task<BCAccount?> GetAccountByIdAsync(int accountId)
+    {
+        string sql = @"SELECT
+                          *
+                        FROM
+                          account
+                        WHERE
+                          id = @AccountId";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryFirstOrDefaultAsync<BCAccount>(sql, new { AccountId = accountId });
+    }
+
     public async Task UpdateAccountProfilePictureAsync(string email, string imagePath)
     {
         string sql = @"UPDATE account
@@ -611,6 +648,15 @@ public class BCData : IBCData
         return await connection.QueryFirstOrDefaultAsync<BCTournament>(sql, new { Year = year });
     }
 
+    public async Task<BCTournament?> GetCurrentTournamentAsync()
+    {
+        string sql = @"SELECT *
+                        FROM tournament
+                        WHERE current = TRUE";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryFirstOrDefaultAsync<BCTournament>(sql);
+    }
+    
     public async Task SetUserAsPayedAsync(string email)
     {
         string sql = @"UPDATE account
@@ -652,15 +698,13 @@ public class BCData : IBCData
 
     public async Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId)
     {
-        string sql = @"SELECT *
-                        FROM draftpick
-                        WHERE round = (SELECT MAX(round)
-                                           FROM draftpick
-                                           WHERE draft_id = @DraftId)
-                          AND pick = (SELECT MAX(pick)
-                                          FROM draftpick
-                                          WHERE draft_id = @DraftId)
-                          AND draft_id = @DraftId";
+        string sql = @"WITH max_round AS (SELECT MAX(round)
+                       FROM draftpick
+                       WHERE draft_id = @DraftId),
+                             max_round_picks AS (SELECT * FROM draftpick WHERE round IN (SELECT * FROM max_round) AND draft_id = @DraftId)
+                        SELECT *
+                            FROM draftpick d
+                                     INNER JOIN max_round_picks m ON d.id = m.id AND d.pick = (SELECT MAX(pick) FROM max_round_picks)";
         
         await using var connection = new NpgsqlConnection(connectionString);
         return await connection.QuerySingleOrDefaultAsync<BCDraftPick>(sql, new { DraftId = draftId });
@@ -747,15 +791,24 @@ public class BCData : IBCData
         await using var connection = new NpgsqlConnection(connectionString);
         
         // delete all draft picks in draft
-        string draftSql = @"DELETE FROM draftpick
-                            WHERE draft_id = @DraftId";
-        await connection.ExecuteAsync(draftSql, new { DraftId = draftId });
+        string draftSql = @"DELETE
+                                FROM draftpick
+                                WHERE draft_id = @DraftId
+                                RETURNING player_id";
+        var deletedPicks = await connection.QueryAsync<int>(draftSql, new { DraftId = draftId });
         
         // set all player teams to null
-        string playerSql = @"UPDATE players
-                                SET team_id = NULL
-                                    WHERE tournament_id = (SELECT tournament_id FROM draft WHERE id = @DraftId)";
-        await connection.ExecuteAsync(playerSql, new { DraftId = draftId });
+        {
+            string sql = @"UPDATE players
+                                    SET team_id = NULL
+                                        WHERE tournament_id = (SELECT tournament_id FROM draft WHERE id = @DraftId)
+                                        AND id = ANY(@PlayerIds)";
+            await connection.ExecuteAsync(sql, new
+            {
+                DraftId = draftId,
+                PlayerIds = deletedPicks.ToList(),
+            });
+        }
     }
 
 }

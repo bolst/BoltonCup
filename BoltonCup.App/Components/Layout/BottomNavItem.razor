@@ -1,0 +1,31 @@
+@inject NavigationManager Navigation
+
+<MudIconButton 
+    Icon="@Icon"
+    Href="@Href"
+    Color="@_color" 
+    Class="mb-6 px-4" 
+    Ripple="false" />
+
+@code {
+
+    [Parameter, EditorRequired] 
+    public required string Href { get; set; } = "/";
+
+    [Parameter] 
+    public string Icon { get; set; } = Icons.Material.Filled.Link;
+
+    private Color _color = Color.Inherit;
+
+    protected override void OnParametersSet()
+    {
+        Navigation.LocationChanged += OnNavigationChange;
+    }
+
+    private void OnNavigationChange(object? sender, LocationChangedEventArgs args)
+    {
+        _color = args.Location.EndsWith(Href) ? Color.Primary : Color.Inherit;
+        InvokeAsync(StateHasChanged);
+    }
+
+}

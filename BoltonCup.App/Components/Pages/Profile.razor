@@ -9,19 +9,19 @@
 @implements IDisposable
 
 <div class="px-4 py-8">
-    @if (account is not null)
+    @if (_account is not null)
     {
-        <EditProfilePictureDrawer @bind-Open="drawerOpen" ImageSrc="@account.ProfilePicture" OnImageUpload="OnImageChanged" />
+        <EditProfilePictureDrawer @bind-Open="drawerOpen" ImageSrc="@_account.ProfilePicture" OnImageUpload="OnImageChanged" />
 
         <MudStack AlignItems="AlignItems.Start" Row>
             <MudBadge BadgeClass="mt-n3 ml-n3" Origin="Origin.BottomRight" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Overlap>
                 <MudAvatar Class="clickable" Style="height: 100px; width: 100px;" @onclick="@(() => drawerOpen = true)">
-                    <MudImage Src="@account.ProfilePicture" Height="null" Width="200" ObjectFit="ObjectFit.Cover" />
+                    <MudImage Src="@_account.ProfilePicture" Height="null" Width="200" ObjectFit="ObjectFit.Cover" />
                 </MudAvatar>
             </MudBadge>
 
             <MudStack Spacing="0">
-                <MudText Typo="Typo.h6"><b>@account.FirstName @account.LastName</b></MudText>
+                <MudText Typo="Typo.h6"><b>@_account.FirstName @_account.LastName</b></MudText>
                 <MudText Typo="Typo.caption">free agent</MudText>
             </MudStack>
         </MudStack>
@@ -31,16 +31,35 @@
             <MudLink Typo="Typo.caption"><b>Set Availability</b></MudLink>
         </MudStack>
 
-        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="2">
-            <MudAvatar Style="height: 150px; width: 150px" Elevation="4" Rounded >
-                <MudIcon Icon="@Icons.Material.Filled.SportsHockey" Style="font-size: 4rem;" />
-            </MudAvatar>
-        
-            <MudStack AlignItems="AlignItems.Center" Spacing="0">
-                <MudText Typo="Typo.subtitle2">No games yet</MudText>
-                <MudText Typo="Typo.caption">When you get drafted, your games will show up here</MudText>
-            </MudStack>
-        </MudStack>
+        @if (_userGames is not null)
+        {
+            if (_userGames.Any())
+            {
+                foreach (var day in _userGames.DistinctBy(x => x.date.Day).Select(x => x.date))
+                {
+                    <MudText Typo="Typo.h6">@day.ToString("dddd, MMMM dd")</MudText>
+                    <MudDivider/>
+                    <ScheduleTable Games="_userGames.Where(g => g.date.Date == day.Date)"/>
+                }
+            }
+            else
+            {
+                <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="2">
+                    <MudAvatar Style="height: 150px; width: 150px" Elevation="4" Rounded >
+                        <MudIcon Icon="@Icons.Material.Filled.SportsHockey" Style="font-size: 4rem;" />
+                    </MudAvatar>
+                
+                    <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                        <MudText Typo="Typo.subtitle2">No games yet</MudText>
+                        <MudText Typo="Typo.caption">When you get drafted, your games will show up here</MudText>
+                    </MudStack>
+                </MudStack>
+            }
+        }
+        else
+        {
+            
+        }
     }
 </div>
 
@@ -49,8 +68,9 @@
     [CascadingParameter]
     public Layout.MainLayout mainLayout { get; set; }
 
-    private BCAccount? account;
+    private BCAccount? _account;
     private PlayerProfilePicture? profilePicture;
+    private IEnumerable<BCGame>? _userGames;
     private bool drawerOpen;
 
     protected override void OnParametersSet()
@@ -72,7 +92,13 @@
             var claim = state.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
             if (claim is null) return;
             
-            account = await BCData.GetAccountByEmailAsync(claim.Value);
+            _account = await BCData.GetAccountByEmailAsync(claim.Value);
+            if (_account is null) return;
+            
+            var profile = await BCData.GetUserTournamentPlayerProfileAsync(_account.id, 2);
+            if (profile is null) return;
+
+            _userGames = await BCData.GetPlayerSchedule(profile.id);
             
             StateHasChanged();
         }
@@ -80,14 +106,14 @@
 
     private async Task OnImageChanged(byte[] imageBytes)
     {
-        if (account is not null)
+        if (_account is not null)
         {
-            string errorMessage = await CustomUserService.UpdateProfilePictureAsync(account.Email, imageBytes);
+            string errorMessage = await CustomUserService.UpdateProfilePictureAsync(_account.Email, imageBytes);
 
             if (string.IsNullOrEmpty(errorMessage))
             {
                 drawerOpen = false;
-                account.ProfilePicture = $"data:image/*;base64,{Convert.ToBase64String(imageBytes)}";
+                _account.ProfilePicture = $"data:image/*;base64,{Convert.ToBase64String(imageBytes)}";
                 StateHasChanged();
             }
             

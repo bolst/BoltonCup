@@ -34,8 +34,11 @@ public class StripeServiceProvider
             
             await _bcData.SetUserAsPayedAsync(email);
             
-            // TODO: get the tournament id instead of hard-coding it
-            await _bcData.ConfigPlayerProfileAsync(userData, 2);
+            var tournament = await _bcData.GetCurrentTournamentAsync();
+            if (tournament is not null)
+            {
+                await _bcData.ConfigPlayerProfileAsync(userData, tournament.tournament_id);
+            }
 
             return userData;
         }

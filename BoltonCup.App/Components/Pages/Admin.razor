@@ -43,18 +43,32 @@
                     <MudChip T="string" Color="Color.Primary" Variant="Variant.Text">@ForwardAccCount F</MudChip>
                     <MudChip T="string" Color="Color.Secondary" Variant="Variant.Text">@DefenseAccCount D</MudChip>
                     <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Text">@GoalieAccCount G</MudChip>
+                    <MudChip T="string" Color="Color.Success" Variant="Variant.Text">@PayedCount PAYED</MudChip>
                     
-                    <MudDataGrid Items="@accounts.Where(a => a.IsActive).OrderBy(a => !a.Payed)" Hover>
+                    <MudButton
+                        OnClick="@(() => SendEmail(accounts.Where(a => a.IsActive).Select(a => a.Email)))"
+                        Color="Color.Info"
+                        Variant="Variant.Filled">
+                        Email Admits
+                    </MudButton>
+                    
+                    <MudDataGrid 
+                        Items="@accounts.Where(a => a.IsActive).OrderBy(a => !a.Payed)"
+                        QuickFilter="QuickFilter"
+                        ExpandSingleRow
+                        Hover>
                         <ToolBarContent>
-                            <MudButton
-                                OnClick="@(() => SendEmail(accounts.Where(a => a.IsActive).Select(a => a.Email)))"
-                                Color="Color.Info"
-                                Variant="Variant.Filled">
-                                Email Admits
-                            </MudButton>
+                            <MudTextField 
+                                @bind-Value="_searchString" 
+                                Placeholder="Search" 
+                                Adornment="Adornment.Start"
+                                AdornmentIcon="@Icons.Material.Filled.Search" 
+                                IconSize="Size.Medium" 
+                                Clearable
+                                Immediate />
                         </ToolBarContent>
                         <Columns>
-                            <PropertyColumn Title="Name" Property=@(x => $"{x.LastName}, {x.FirstName}")/>
+                            <PropertyColumn Title="Name" Property="@(x => $"{x.LastName}, {x.FirstName}")" />
                             <PropertyColumn Title="Email" Property="x => x.Email"/>
                             <PropertyColumn Title="Position" Property="x => x.Position" />
                             <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel"/>
@@ -76,6 +90,12 @@
                                 </CellTemplate>
                             </TemplateColumn>
                         </Columns>
+                        <ChildRowContent>
+                            @if (!context.Item.Payed)
+                            {
+                                <MudButton Color="Color.Info" Variant="Variant.Outlined" OnClick="@(() => OnMarkPlayerPayed(context))">Mark as Payed</MudButton>
+                            }
+                        </ChildRowContent>
                     </MudDataGrid>
                 }
             </MudTabPanel>
@@ -87,17 +107,19 @@
 @code{
 
     private IEnumerable<RegisterFormModel>? registrations;
-
     private IEnumerable<BCAccount>? accounts;
+    private string _searchString = string.Empty;
 
-    private int ForwardRegCount => registrations is null ? 0 : registrations.Count(r => r.Position == "forward");
-    private int DefenseRegCount => registrations is null ? 0 : registrations.Count(r => r.Position == "defense");
-    private int GoalieRegCount => registrations is null ? 0 : registrations.Count(r => r.Position == "goalie");    
+    private int ForwardRegCount => registrations?.Count(r => r.Position == "forward") ?? 0;
+    private int DefenseRegCount => registrations?.Count(r => r.Position == "defense") ?? 0;
+    private int GoalieRegCount => registrations?.Count(r => r.Position == "goalie") ?? 0;    
     
-    private int ForwardAccCount => accounts is null ? 0 : accounts.Count(r => r.Position == "forward");
-    private int DefenseAccCount => accounts is null ? 0 : accounts.Count(r => r.Position == "defense");
-    private int GoalieAccCount => accounts is null ? 0 : accounts.Count(r => r.Position == "goalie");
+    private int ForwardAccCount => accounts?.Count(r => r.Position == "forward") ?? 0;
+    private int DefenseAccCount => accounts?.Count(r => r.Position == "defense") ?? 0;
+    private int GoalieAccCount => accounts?.Count(r => r.Position == "goalie") ?? 0;
 
+    private int PayedCount => accounts?.Count(r => r.Payed) ?? 0;
+    
     protected override async Task OnInitializedAsync()
     {
         await LoadDataAsync();
@@ -142,5 +164,37 @@
             await Email.Default.ComposeAsync(message);
         }
     }
+    
+    private async Task OnMarkPlayerPayed(CellContext<BCAccount> args)
+    {
+        var account = args.Item;
+        var form = await BCData.GetRegistrationByEmailAsync(account.Email);
 
+        if (form is null) return;
+        
+        await BCData.SetUserAsPayedAsync(account.Email);
+
+        var tournament = await BCData.GetCurrentTournamentAsync();
+        if (tournament is not null)
+        {
+            await BCData.ConfigPlayerProfileAsync(form, tournament.tournament_id);
+        }
+        
+        await LoadDataAsync();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private Func<BCAccount, bool> QuickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.FirstName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;        
+        
+        if (x.LastName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
 }

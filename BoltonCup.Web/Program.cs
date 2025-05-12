@@ -3,6 +3,7 @@ using MudBlazor.Services;
 using BoltonCup.Web.Components;
 using BoltonCup.Shared.Data;
 using BoltonCup.Web.Data;
+using Supabase;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
@@ -20,9 +21,11 @@ builder.Services.AddScoped<ICustomLocalStorageProvider, CustomLocalStorageProvid
 
 // Core services
 builder.Services.AddBoltonCupServices(builder.Configuration);
+builder.Services.AddBoltonCupSupabase(builder.Configuration);
+
+builder.Services.AddDataProtection();
 
 builder.Services.AddScoped<RegistrationStateService>();
-
 builder.Services.AddScoped<StripeServiceProvider>(sp =>
 {
     var apiKey = builder.Configuration["STRIPE_API_KEY"]; 
@@ -35,6 +38,7 @@ builder.Services.AddScoped<StripeServiceProvider>(sp =>
     var bcData = sp.GetRequiredService<IBCData>();
     return new StripeServiceProvider(apiKey, bcData);
 });
+
 
 var app = builder.Build();
 
