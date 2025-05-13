@@ -42,6 +42,7 @@ public interface IBCData
     Task DraftPlayerAsync(PlayerProfile player, BCTeam team, BCDraftPick draftPick);
     Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId);
     Task ResetDraftAsync(int draftId);
+    Task<IEnumerable<BCSponsor>> GetTournamentSponsorsAsync(int tournamentId);
 }
 
 public class BCData : IBCData
@@ -809,6 +810,16 @@ public class BCData : IBCData
                 PlayerIds = deletedPicks.ToList(),
             });
         }
+    }
+
+
+    public async Task<IEnumerable<BCSponsor>> GetTournamentSponsorsAsync(int tournamentId)
+    {
+        string sql = @"SELECT *
+                        FROM sponsor
+                        WHERE tournament_id = @TournamentId";
+        await using var connection = new NpgsqlConnection(connectionString);
+        return await connection.QueryAsync<BCSponsor>(sql, new { TournamentId = tournamentId });
     }
 
 }
