@@ -13,18 +13,31 @@
             <MudImage Src="@team.logo_url" Height="150" />
         </MudStack>
 
-        <MudText Typo="Typo.h6">Forwards</MudText>
-        <MudDivider />
-        @PlayerTable(roster.Where(p => p.IsForward))
-
-
-        <MudText Typo="Typo.h6">Defensemen</MudText>
-        <MudDivider />
-        @PlayerTable(roster.Where(p => p.IsDefense))
-
-        <MudText Typo="Typo.h6">Goalies</MudText>
-        <MudDivider />
-        @PlayerTable(roster.Where(p => p.IsGoalie))
+        <MudTable
+            T="PlayerProfile"
+            Items="roster"
+            Elevation="0"
+            GroupBy="_groupDefinition"
+            OnRowClick="OnRowClick"
+            Striped
+            Hover
+            Dense>
+            <HeaderContent>
+                <MudTh>#</MudTh>
+                <MudTh>NAME</MudTh>
+                <MudTh>BIRTH YEAR</MudTh>
+            </HeaderContent>
+            <GroupHeaderTemplate>
+                <MudTh colspan="3">
+                    <MudText Typo="Typo.h5">@GroupHeader(context.Key.ToString())</MudText>
+                </MudTh>
+            </GroupHeaderTemplate>
+            <RowTemplate>
+                <MudTd DataLabel="#">@(context.jersey_number is null ? string.Empty : context.jersey_number.Value.ToString("D2"))</MudTd>
+                <MudTd DataLabel="NAME">@context.name</MudTd>
+                <MudTd DataLabel="BIRTH YEAR">@context.dob.ToString("yyyy")</MudTd>
+            </RowTemplate>
+        </MudTable>
     }
     else
     {
@@ -45,6 +58,31 @@
     {
         team = await BCData.GetTeamById(Id);
         roster = await BCData.GetRosterByTeamId(Id);
+    }
+
+
+    private string GroupHeader(string key)
+    {
+        return key switch
+        {
+            "forward" => "Forwards",
+            "defense" => "Defensemen",
+            "goalie" => "Goalies",
+            _ => string.Empty
+        };
+    }
+    
+    
+    private TableGroupDefinition<PlayerProfile> _groupDefinition = new()
+    {
+        GroupName = "position",
+        Selector = (player) => player.position,
+    };
+
+
+    private void OnRowClick(TableRowClickEventArgs<PlayerProfile> args)
+    {
+        Navigation.NavigateTo($"/player/{args.Item.id}");
     }
 
     private RenderFragment PlayerTable(IEnumerable<PlayerProfile> players) => __builder =>
