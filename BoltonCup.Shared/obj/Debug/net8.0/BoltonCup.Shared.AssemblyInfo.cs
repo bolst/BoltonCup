@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BoltonCup.Shared")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1dbc0e7fbeba51c70e91fad5814fe7c83414af80")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a1a961f6920fb61105e79faecefa039e59ba73b1")]
 [assembly: System.Reflection.AssemblyProductAttribute("BoltonCup.Shared")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BoltonCup.Shared")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
