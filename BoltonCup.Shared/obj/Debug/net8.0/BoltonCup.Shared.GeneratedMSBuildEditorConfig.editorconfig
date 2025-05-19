@@ -1,7 +1,7 @@
 is_global = true
 build_property.MudDebugAnalyzer = 
 build_property.MudAllowedAttributePattern = 
-build_property.MudIllegalParameters = 
+build_property.MudAllowedAttributeList = 
 build_property.TargetFramework = net8.0
 build_property.TargetPlatformMinVersion = 
 build_property.UsingMicrosoftNETSdkWeb = 
@@ -97,6 +97,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvR2FtZVBlbmFsdGllc1RhYmxlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Shared/GameTypeChip.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvR2FtZVR5cGVDaGlwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Shared/GoalieGameByGame.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvR29hbGllR2FtZUJ5R2FtZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -123,10 +127,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Shared/PlayerStatSummary.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvUGxheWVyU3RhdFN1bW1hcnkucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Shared/ScheduleRow.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvU2NoZWR1bGVSb3cucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Shared/ScheduleTable.razor]

@@ -78,28 +78,51 @@ public class BCData : DapperBase, IBCData
 
     public async Task<IEnumerable<BCGame>> GetSchedule()
     {
-        string sql = @"SELECT *
-                        FROM
-                            game G
-                        ORDER BY G.date ASC";
+        string sql = @"SELECT g.*,
+                           h.name       AS hometeamname,
+                           h.name_short AS hometeamnameshort,
+                           h.logo_url   AS hometeamlogo,
+                           a.name       AS awayteamname,
+                           a.name_short AS awayteamnameshort,
+                           a.logo_url   AS awayteamlogo
+                        FROM game g
+                                 LEFT OUTER JOIN team h ON g.home_team_id = h.id
+                                 LEFT OUTER JOIN team a ON g.away_team_id = a.id
+                        ORDER BY g.date ASC";
         return await QueryDbAsync<BCGame>(sql);
     }
 
     public async Task<IEnumerable<BCGame>> GetPlayerSchedule(int playerId)
     {
-        string sql = @"SELECT g.*
+        string sql = @"SELECT g.*,
+                           h.name       AS hometeamname,
+                           h.name_short AS hometeamnameshort,
+                           h.logo_url   AS hometeamlogo,
+                           a.name       AS awayteamname,
+                           a.name_short AS awayteamnameshort,
+                           a.logo_url   AS awayteamlogo
                         FROM game g
+                                 LEFT OUTER JOIN team h ON g.home_team_id = h.id
+                                 LEFT OUTER JOIN team a ON g.away_team_id = a.id
                                  INNER JOIN players p ON p.team_id IN (g.home_team_id, g.away_team_id) AND p.id = @PlayerId
-                                 ORDER BY g.date ASC";
+                        ORDER BY g.date ASC";
         return await QueryDbAsync<BCGame>(sql, new { PlayerId = playerId });
     }
 
     public async Task<BCGame?> GetGameById(int id)
     {
-        string sql = @"SELECT *
-                        FROM
-                            game
-                        WHERE id = @GameId";
+        string sql = @"SELECT g.*,
+                           h.name       AS hometeamname,
+                           h.name_short AS hometeamnameshort,
+                           h.logo_url   AS hometeamlogo,
+                           a.name       AS awayteamname,
+                           a.name_short AS awayteamnameshort,
+                           a.logo_url   AS awayteamlogo
+                        FROM game g
+                                 LEFT OUTER JOIN team h ON g.home_team_id = h.id
+                                 LEFT OUTER JOIN team a ON g.away_team_id = a.id
+                        WHERE g.id = @GameId
+                        ORDER BY g.date ASC";
         return await QueryDbSingleAsync<BCGame>(sql, new { GameId = id });
     }
 

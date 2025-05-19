@@ -33,6 +33,12 @@ public class BCGame
     public int home_score { get; set; }
     public int away_score { get; set; }
     public required string state { get; set; }
+    public string HomeTeamName { get; set; }
+    public string HomeTeamLogo { get; set; }
+    public string HomeTeamNameShort { get; set; }
+    public string AwayTeamName { get; set; }
+    public string AwayTeamNameShort { get; set; }
+    public string AwayTeamLogo { get; set; }
 }
 
 public class PlayerProfile

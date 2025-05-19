@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "e4kXZs5uyScdXK34UHzYSO6KItrmZsHnqK1AOH8acJs=",
+  "Hash": "0tKYcQaPsFDq4yFBUuWxW8yCIbpFneRaGUr3JaXlhkI=",
   "Source": "BoltonCup.Shared",
   "BasePath": "_content/BoltonCup.Shared",
   "Mode": "Default",
@@ -17,10 +17,10 @@
   ],
   "Assets": [
     {
-      "Identity": "/Users/nic/.nuget/packages/mudblazor/7.16.0/staticwebassets/MudBlazor.min.css",
+      "Identity": "/Users/nic/.nuget/packages/mudblazor/8.5.1/staticwebassets/MudBlazor.min.css",
       "SourceId": "MudBlazor",
       "SourceType": "Package",
-      "ContentRoot": "/Users/nic/.nuget/packages/mudblazor/7.16.0/staticwebassets/",
+      "ContentRoot": "/Users/nic/.nuget/packages/mudblazor/8.5.1/staticwebassets/",
       "BasePath": "_content/MudBlazor",
       "RelativePath": "MudBlazor.min.css",
       "AssetKind": "All",
@@ -31,17 +31,17 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "mhumzvqd1g",
-      "Integrity": "2gItJ0j/o5RSWg7VYqCOBpSPI1dxTOG+mnEzWt7EvYw=",
+      "Fingerprint": "u34o0xbo4m",
+      "Integrity": "NgHobvE5wu6MFuX0QImF1lk8IP4UUN3UDirKa0WQVYc=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "/Users/nic/.nuget/packages/mudblazor/7.16.0/staticwebassets/MudBlazor.min.css"
+      "OriginalItemSpec": "/Users/nic/.nuget/packages/mudblazor/8.5.1/staticwebassets/MudBlazor.min.css"
     },
     {
-      "Identity": "/Users/nic/.nuget/packages/mudblazor/7.16.0/staticwebassets/MudBlazor.min.js",
+      "Identity": "/Users/nic/.nuget/packages/mudblazor/8.5.1/staticwebassets/MudBlazor.min.js",
       "SourceId": "MudBlazor",
       "SourceType": "Package",
-      "ContentRoot": "/Users/nic/.nuget/packages/mudblazor/7.16.0/staticwebassets/",
+      "ContentRoot": "/Users/nic/.nuget/packages/mudblazor/8.5.1/staticwebassets/",
       "BasePath": "_content/MudBlazor",
       "RelativePath": "MudBlazor.min.js",
       "AssetKind": "All",
@@ -52,11 +52,11 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "lzoc4abpk8",
-      "Integrity": "geXX14pnDwFT+yUxYoAOx7xU4GLnDCWwzb6rVTWgXKo=",
+      "Fingerprint": "gtd3sm4n1q",
+      "Integrity": "TOPYwKltorv5iM1JqqzJayZWZx7LFnfSq2AhkWFNwrg=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "/Users/nic/.nuget/packages/mudblazor/7.16.0/staticwebassets/MudBlazor.min.js"
+      "OriginalItemSpec": "/Users/nic/.nuget/packages/mudblazor/8.5.1/staticwebassets/MudBlazor.min.js"
     },
     {
       "Identity": "/Users/nic/git/BoltonCup/BoltonCup.Shared/wwwroot/background.png",
@@ -356,7 +356,7 @@
   "Endpoints": [
     {
       "Route": "_content/MudBlazor/MudBlazor.min.css",
-      "AssetFile": "/Users/nic/.nuget/packages/mudblazor/7.16.0/staticwebassets/MudBlazor.min.css",
+      "AssetFile": "/Users/nic/.nuget/packages/mudblazor/8.5.1/staticwebassets/MudBlazor.min.css",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -364,8 +364,12 @@
           "Value": "bytes"
         },
         {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
           "Name": "Content-Length",
-          "Value": "580975"
+          "Value": "597813"
         },
         {
           "Name": "Content-Type",
@@ -373,27 +377,23 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"2gItJ0j/o5RSWg7VYqCOBpSPI1dxTOG+mnEzWt7EvYw=\""
+          "Value": "\"NgHobvE5wu6MFuX0QImF1lk8IP4UUN3UDirKa0WQVYc=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 17 Jan 2025 17:00:50 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
+          "Value": "Mon, 31 Mar 2025 21:02:30 GMT"
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-2gItJ0j/o5RSWg7VYqCOBpSPI1dxTOG+mnEzWt7EvYw="
+          "Value": "sha256-NgHobvE5wu6MFuX0QImF1lk8IP4UUN3UDirKa0WQVYc="
         }
       ]
     },
     {
-      "Route": "_content/MudBlazor/MudBlazor.min.js",
-      "AssetFile": "/Users/nic/.nuget/packages/mudblazor/7.16.0/staticwebassets/MudBlazor.min.js",
+      "Route": "_content/MudBlazor/MudBlazor.min.gtd3sm4n1q.js",
+      "AssetFile": "/Users/nic/.nuget/packages/mudblazor/8.5.1/staticwebassets/MudBlazor.min.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -401,8 +401,12 @@
           "Value": "bytes"
         },
         {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
           "Name": "Content-Length",
-          "Value": "49824"
+          "Value": "58284"
         },
         {
           "Name": "Content-Type",
@@ -410,21 +414,107 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"geXX14pnDwFT+yUxYoAOx7xU4GLnDCWwzb6rVTWgXKo=\""
+          "Value": "\"TOPYwKltorv5iM1JqqzJayZWZx7LFnfSq2AhkWFNwrg=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 17 Jan 2025 17:00:50 GMT"
+          "Value": "Mon, 31 Mar 2025 21:02:30 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "gtd3sm4n1q"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-TOPYwKltorv5iM1JqqzJayZWZx7LFnfSq2AhkWFNwrg="
+        },
+        {
+          "Name": "label",
+          "Value": "_content/MudBlazor/MudBlazor.min.js"
+        }
+      ]
+    },
+    {
+      "Route": "_content/MudBlazor/MudBlazor.min.js",
+      "AssetFile": "/Users/nic/.nuget/packages/mudblazor/8.5.1/staticwebassets/MudBlazor.min.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
         },
         {
           "Name": "Cache-Control",
           "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "58284"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"TOPYwKltorv5iM1JqqzJayZWZx7LFnfSq2AhkWFNwrg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 31 Mar 2025 21:02:30 GMT"
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-geXX14pnDwFT+yUxYoAOx7xU4GLnDCWwzb6rVTWgXKo="
+          "Value": "sha256-TOPYwKltorv5iM1JqqzJayZWZx7LFnfSq2AhkWFNwrg="
+        }
+      ]
+    },
+    {
+      "Route": "_content/MudBlazor/MudBlazor.min.u34o0xbo4m.css",
+      "AssetFile": "/Users/nic/.nuget/packages/mudblazor/8.5.1/staticwebassets/MudBlazor.min.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "597813"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"NgHobvE5wu6MFuX0QImF1lk8IP4UUN3UDirKa0WQVYc=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 31 Mar 2025 21:02:30 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "u34o0xbo4m"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-NgHobvE5wu6MFuX0QImF1lk8IP4UUN3UDirKa0WQVYc="
+        },
+        {
+          "Name": "label",
+          "Value": "_content/MudBlazor/MudBlazor.min.css"
         }
       ]
     },
