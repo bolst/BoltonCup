@@ -3,6 +3,8 @@
 @inject IBCData BCData
 @inject NavigationManager Navigation
 
+<PageTitle>@team?.name_short</PageTitle>
+
 <MudPaper Class="pa-10 ma-5" Elevation="5">
     @if (team is not null && roster is not null)
     {
