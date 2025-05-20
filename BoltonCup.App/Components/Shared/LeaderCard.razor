@@ -9,7 +9,7 @@
         <MudGrid Class="pb-2">
             <MudItem xs="2">
                 <MudAvatar Class="clickable" @onclick=@(() => Navigation.NavigateTo($"player/{(IsGoalie ? selectedGoalie.PlayerId : selectedSkater.PlayerId)}"))>
-                    <MudImage Src="@LeaderProfilePic" />
+                    <MudImage Src="" />
                 </MudAvatar>
             </MudItem>
             <MudItem xs="8">
@@ -70,8 +70,6 @@
     private IEnumerable<BoltonCup.Shared.Data.PlayerStatLine>? skaterStats;
     private IEnumerable<BoltonCup.Shared.Data.GoalieStatLine>? goalieStats;
     
-    private IEnumerable<BoltonCup.Shared.Data.PlayerProfilePicture>? profilePictures;
-
     private BoltonCup.Shared.Data.PlayerStatLine? selectedSkater;
     private BoltonCup.Shared.Data.GoalieStatLine? selectedGoalie;
     
@@ -79,7 +77,6 @@
 
     private string LeaderName => IsGoalie ? selectedGoalie.Name : selectedSkater.Name;
     private string LeaderDetails => IsGoalie ? $"#{selectedGoalie.PlayerNumber} | G" : $"#{selectedSkater.PlayerNumber} | {selectedSkater.Position.First()}";
-    private string LeaderProfilePic => profilePictures?.Where(p => (IsGoalie ? p.PlayerId == selectedGoalie.PlayerId : p.PlayerId == selectedSkater.PlayerId)).First().Source;
     
     private string PlayerStatValue(BoltonCup.Shared.Data.PlayerStatLine player)
     {
@@ -130,8 +127,6 @@
             selectedSkater = skaterStats.First();
             selectedGoalie = goalieStats.First();
         }
-        
-        profilePictures ??= await BCData.GetPlayerProfilePictures();
     }
 
     private void OrderStats()

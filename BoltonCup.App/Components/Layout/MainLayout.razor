@@ -35,8 +35,9 @@
         <MudMainContent Class="py-12" Style="height: 100vh;">
             <div class="py-4">&nbsp;</div>
 
-            
-            @Body
+            <CustomErrorBoundary>
+                @Body
+            </CustomErrorBoundary>
             
             <div class="py-14">&nbsp;</div>
         </MudMainContent>
