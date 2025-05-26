@@ -452,9 +452,9 @@ public class BCData : DapperBase, IBCData
         form.Email = form.Email.ToLower();
         
         string sql = @"INSERT INTO
-                          registration (firstname, lastname, email, birthday, position, highestlevel)
+                          registration (firstname, lastname, email, birthday, position, highestlevel, jerseysize)
                         VALUES
-                          (@FirstName, @LastName, @Email, @Birthday, @Position, @HighestLevel)";
+                          (@FirstName, @LastName, @Email, @Birthday, @Position, @HighestLevel, @JerseySize);";
 
         try
         {

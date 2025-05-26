@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using Blazored.LocalStorage;
+using BoltonCup.App.Data;
 using BoltonCup.Shared.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MudBlazor;
 using MudBlazor.Services;
 using Supabase;
 
@@ -42,12 +44,15 @@ public static class MauiProgram
 
 		builder.Services.AddBlazoredLocalStorage();
 		builder.Services.AddScoped<ICustomLocalStorageProvider, Data.CustomLocalStorageProvider>();
-
+		
 		builder.Services.AddBoltonCupServices(builder.Configuration);
 		builder.Services.AddBoltonCupSupabase(builder.Configuration);
 		builder.Services.AddBoltonCupAuth();
 
-		builder.Services.AddMudServices();
+		builder.Services.AddMudServices(config =>
+		{
+			config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
+		});
 
 #if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();

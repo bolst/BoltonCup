@@ -44,6 +44,7 @@ public static class ServiceConfiguration
             return new Supabase.Client(url, key, new SupabaseOptions
             {
                 AutoConnectRealtime = true,
+                AutoRefreshToken = false,
             });
         });
 

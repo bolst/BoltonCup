@@ -1,4 +1,5 @@
 @page "/"
+@using System.ComponentModel
 
 <PageTitle>Home</PageTitle>
 
@@ -51,3 +52,5 @@
         </CardCarouselItem>
     </CardCarousel>
 </div>
+
+<MudButton Color="Color.Primary" OnClick="@(() => throw new InvalidEnumArgumentException())">SHOW</MudButton>

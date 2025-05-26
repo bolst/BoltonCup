@@ -1,15 +1,7 @@
-<MudAppBar ToolBarClass="d-flex justify-space-between" Bottom Fixed>
+<MudAppBar ToolBarClass="d-flex justify-space-around align-stretch pb-6" Bottom Fixed>
     <BottomNavItem Icon="@Icons.Material.Filled.Home" Href="/" />
-    <BottomNavItem Icon="@Icons.Material.Filled.People" Href="/teams" />
-    <AuthorizeView>
-        <Authorized>
-            <BottomNavItem Icon="@Icons.Material.Filled.CalendarMonth" Href="/myschedule" />
-        </Authorized>
-        <NotAuthorized>
-            <BottomNavItem Icon="@Icons.Material.Filled.CalendarToday" Href="/schedule" />
-        </NotAuthorized>
-    </AuthorizeView>
-    <AuthorizeView>
-        <BottomNavItem Icon="@Icons.Material.Filled.Person" Href="/profile" />
-    </AuthorizeView>
+
+    <BottomNavItem Icon="@Icons.Material.Filled.CalendarToday" Href="/schedule" />
+
+    <NavOverlayMenu />
 </MudAppBar>
