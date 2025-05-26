@@ -50,7 +50,17 @@
             <MudSelectItem Value=@("Jr. C")>Jr. C</MudSelectItem>
             <MudSelectItem Value=@("Jr. B")>Jr. B</MudSelectItem>
             <MudSelectItem Value=@("Jr. A or higher")>Jr.A or higher</MudSelectItem>
-        </MudSelect>
+        </MudSelect>       
+        
+        @if (!model.IsGoalie)
+        {
+            <MudSelect Label="Preferred jersey size" @bind-Value="model.JerseySize" For="@(() => model.JerseySize)" TransformOrigin="Origin.BottomCenter">
+                <MudSelectItem Value=@("M")>M</MudSelectItem>
+                <MudSelectItem Value=@("L")>L</MudSelectItem>
+                <MudSelectItem Value=@("XL")>XL</MudSelectItem>
+                <MudSelectItem Value=@("XXL")>XXL</MudSelectItem>
+            </MudSelect>
+        }
 
         <div class="d-flex align-center justify-space-between">
             @* <MudCheckBox T="bool" Label="I agree!" Required="true" /> *@

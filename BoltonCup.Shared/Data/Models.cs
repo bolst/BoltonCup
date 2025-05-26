@@ -179,7 +179,10 @@ public class RegisterFormModel
     public string Position { get; set; }
         
     [Required(ErrorMessage="This is required")] 
-    public string HighestLevel { get; set; }
+    public string HighestLevel { get; set; }    
+    
+    [Required(ErrorMessage="This is required")] 
+    public string JerseySize { get; set; }
     
     public bool IsForward => Position == "forward";
     public bool IsDefense => Position == "defense";
