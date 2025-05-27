@@ -44,13 +44,16 @@
             </div>
 
 
-            @if (profile.IsGoalie)
+            @if (_account is not null)
             {
-                <GoalieStatSummary PlayerId="@PlayerId" />
-            }
-            else
-            {
-                <PlayerStatSummary PlayerId="@PlayerId" />
+                if (profile.IsGoalie)
+                {
+                    <GoalieStatSummary AccountId="@_account.id" />
+                }
+                else
+                {
+                    <PlayerStatSummary AccountId="@_account.id" />
+                }
             }
 
         </MudStack>
@@ -58,13 +61,16 @@
         <MudText Typo="Typo.h4">Game History</MudText>
         <MudDivider />
 
-        @if (profile.IsGoalie)
+        @if (_account is not null)
         {
-            <GoalieGameByGame PlayerId="@PlayerId" />
-        }
-        else
-        {
-            <PlayerGameByGame PlayerId="@PlayerId" />
+            if (profile.IsGoalie)
+            {
+                <GoalieGameByGame AccountId="@_account.id" />
+            }
+            else
+            {
+                <PlayerGameByGame AccountId="@_account.id" />
+            }
         }
     }
     else

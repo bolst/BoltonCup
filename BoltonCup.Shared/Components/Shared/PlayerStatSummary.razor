@@ -1,24 +1,32 @@
 @inject NavigationManager Navigation
 @inject Data.IBCData BCData
 
-@if (playerGameByGame is not null)
+@if (_playerGameByGame is not null)
 {
     <MudPaper Class="pa-2 ml-4" Elevation="3">
     <MudStack Class="d-flex align-center" Row="true">
-        <MudText Class="mx-4 mx-sm-10" Typo="Typo.h6">2024</MudText>
+        @if (_tournament?.start_date is not null)
+        {
+            <MudText Class="mx-4 mx-sm-10" Typo="Typo.h6">
+                @_tournament.start_date.Value.ToString("yyyy")
+            </MudText>
+        }
         <MudDivider Vertical="true" FlexItem="true" />
 
-        @StatColumnRF("GP", playerGameByGame.Count())
-        @StatColumnRF("G", playerGameByGame.Sum(x => x.goals))
-        @StatColumnRF("A", playerGameByGame.Sum(x => x.assists))
-        @StatColumnRF("P", playerGameByGame.Sum(x => x.goals + x.assists))
+        @StatColumnRF("GP", _playerGameByGame.Count())
+        @StatColumnRF("G", _playerGameByGame.Sum(x => x.goals))
+        @StatColumnRF("A", _playerGameByGame.Sum(x => x.assists))
+        @StatColumnRF("P", _playerGameByGame.Sum(x => x.goals + x.assists))
     </MudStack>
 </MudPaper>
 }
 
 @code {
-    [Parameter] public int PlayerId { get; set; }
-    private IEnumerable<Data.PlayerGameSummary>? playerGameByGame;
+    [Parameter] 
+    public int AccountId { get; set; }
+
+    private BCTournament? _tournament;
+    private IEnumerable<Data.PlayerGameSummary>? _playerGameByGame;
 
     private RenderFragment StatColumnRF(string title, int value) => __builder =>
     {
@@ -28,8 +36,14 @@
         </MudStack>
     };
 
+
     protected override async Task OnInitializedAsync()
     {
-        playerGameByGame = await BCData.GetPlayerGameByGame(PlayerId);
+        _tournament = await BCData.GetCurrentTournamentAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _playerGameByGame = await BCData.GetPlayerGameByGame(AccountId, _tournament?.tournament_id);
     }
 }

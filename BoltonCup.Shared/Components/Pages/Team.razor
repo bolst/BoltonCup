@@ -58,6 +58,8 @@
     {
         team = await BCData.GetTeamById(Id);
         roster = await BCData.GetRosterByTeamId(Id);
+
+        roster = roster.OrderByDescending(x => GroupHeader(x.position).Length);
     }
 
 
@@ -66,8 +68,8 @@
         return key switch
         {
             "forward" => "Forwards",
-            "defense" => "Defensemen",
-            "goalie" => "Goalies",
+            "defense" => "Defense",
+            "goalie" => "Goalie",
             _ => string.Empty
         };
     }
@@ -84,28 +86,5 @@
     {
         Navigation.NavigateTo($"/player/{args.Item.id}");
     }
-
-    private RenderFragment PlayerTable(IEnumerable<PlayerProfile> players) => __builder =>
-    {
-        <MudSimpleTable Class="mb-6" Hover="true" Dense="true" Striped="true" Elevation="0">
-            <thead>
-                <tr>
-                    <th><b>#</b></th>
-                    <th><b>NAME</b></th>
-                    <th><b>BIRTH YEAR</b></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (PlayerProfile player in players)
-                {
-                    <tr class="clickable" onclick=@(() => Navigation.NavigateTo($"player/{player.id}"))>
-                        <th>@(player.jersey_number is null ? string.Empty : player.jersey_number.Value.ToString("D2"))</th>
-                        <th>@player.name</th>
-                        <th>@player.dob.ToString("yyyy")</th>
-                    </tr>
-                }
-            </tbody>
-        </MudSimpleTable>
-    };
 
 }
