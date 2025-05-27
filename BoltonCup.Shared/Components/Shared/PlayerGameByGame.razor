@@ -1,7 +1,7 @@
 @inject NavigationManager Navigation
 @inject Data.IBCData BCData
 
-@if (playerGameByGame is not null)
+@if (_playerGameByGame is not null)
 {
     <MudSimpleTable Class="mb-6" Hover="true" Dense="true" Striped="true" Elevation="0">
     <thead>
@@ -13,15 +13,15 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (Data.PlayerGameSummary summary in playerGameByGame)
+        @foreach (Data.PlayerGameSummary summary in _playerGameByGame)
             {
-                <tr class="clickable" onclick=@(() => Navigation.NavigateTo($"game/{summary.game_id}"))>
+                <tr class="clickable" onclick=@(() => Navigation.NavigateTo($"game/{summary.id}"))>
                     <th>@summary.date.ToString("MMM dd/yy")</th>
                     <th>
                         <MudStack Class="d-flex align-center" Row="true">
-                            <MudImage Src="@TeamLogoById(summary.team_id)" Height="30" />
+                            <MudImage Src="@summary.team_logo_url" Height="30" />
                             vs.
-                            <MudImage Src="@TeamLogoById(summary.opponent_team_id)" Height="30" />
+                            <MudImage Src="@summary.opponent_logo_url" Height="30" />
                         </MudStack>
                     </th>
                     <th>@summary.goals</th>
@@ -34,15 +34,14 @@
 
 
 @code {
-    [Parameter] public int PlayerId { get; set; }
-    private IEnumerable<Data.PlayerGameSummary>? playerGameByGame;
-    private IEnumerable<BCTeam>? teams;
-
-    private string TeamLogoById(int id) => teams is null ? string.Empty : (teams.FirstOrDefault(x => x.id == id)?.logo_url ?? string.Empty);
+    [Parameter] 
+    public int AccountId { get; set; }
+    
+    
+    private IEnumerable<Data.PlayerGameSummary>? _playerGameByGame;
 
     protected override async Task OnInitializedAsync()
     {
-        playerGameByGame = await BCData.GetPlayerGameByGame(PlayerId);
-        teams = await BCData.GetTeams();
+        _playerGameByGame = await BCData.GetPlayerGameByGame(AccountId);
     }
 }

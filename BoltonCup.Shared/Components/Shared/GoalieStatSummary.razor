@@ -5,20 +5,32 @@
 {
     <MudPaper Class="pa-2 ml-4" Elevation="3">
     <MudStack Class="d-flex align-center" Row="true">
-        <MudText Class="mx-4 mx-sm-10" Typo="Typo.h6">2024</MudText>
+        @if (_tournament?.start_date is not null)
+        {
+            <MudText Class="mx-4 mx-sm-10" Typo="Typo.h6">
+                @_tournament.start_date.Value.ToString("yyyy")
+            </MudText>
+        }
         <MudDivider Vertical="true" FlexItem="true" />
 
-        @StatColumnRF("GP", goalieGameByGame.Count())
-        @StatColumnRF("GAA", goalieGameByGame.Average(x => x.GoalsAgainst))
-        @StatColumnRF("SO", goalieGameByGame.Where(x => x.GoalsAgainst == 0).Sum(x => 1))
+        @StatColumnRF("GP", GamesPlayed)
+        @StatColumnRF("GAA", GAA)
+        @StatColumnRF("SO", Shutouts)
     </MudStack>
 </MudPaper>
 }
 
 @code {
-    [Parameter] public int PlayerId { get; set; }
+    [Parameter] 
+    public int AccountId { get; set; }
+    
+    private Data.BCTournament? _tournament;
     private IEnumerable<Data.GoalieGameSummary>? goalieGameByGame;
 
+    private int GamesPlayed => goalieGameByGame is not null && goalieGameByGame.Any() ? goalieGameByGame.Count() : 0;
+    private double GAA => goalieGameByGame is not null && goalieGameByGame.Any() ? goalieGameByGame.Average(x => x.opponent_team_score ?? 0) : 0;
+    private int Shutouts => goalieGameByGame is not null && goalieGameByGame.Any() ? goalieGameByGame.Where(x => x.opponent_team_score == 0).Sum(x => 1) : 0;
+    
     private RenderFragment StatColumnRF(string title, double value) => __builder =>
     {
         <MudStack Class="px-2 px-sm-10 d-flex justify-center">
@@ -29,6 +41,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        goalieGameByGame = await BCData.GetGoalieGameByGame(PlayerId);
+        _tournament = await BCData.GetCurrentTournamentAsync();
+        goalieGameByGame = await BCData.GetGoalieGameByGame(AccountId, _tournament?.tournament_id);
     }
 }

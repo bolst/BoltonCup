@@ -13,8 +13,8 @@ public interface IBCData
     Task<IEnumerable<PlayerProfile>> GetAllTournamentPlayersAsync(int tournamentId);
     Task<PlayerProfile?> GetPlayerProfileById(int playerId);
     Task<PlayerProfile?> GetUserTournamentPlayerProfileAsync(int accountId, int tournamentId);
-    Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int playerId);
-    Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int goalieId);
+    Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int accountId, int? tournamentId = null);
+    Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int accountId, int? tournamentId = null);
     Task<IEnumerable<GameGoal>> GetGameGoalsByGameId(int gameId);
     Task<IEnumerable<GamePenalty>> GetGamePenaltiesByGameId(int gameId);
     Task<IEnumerable<PlayerStatLine>> GetPlayerStats();
@@ -166,94 +166,97 @@ public class BCData : DapperBase, IBCData
             new { AccountId = accountId, TournamentId = tournamentId });
     }
 
-    public async Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int id)
+    public async Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int accountId, int? tournamentId = null)
     {
-        string sql = @"WITH player_teams AS (SELECT *
-                          FROM players
-                          WHERE id = @PlayerId),
-                     player_games AS (SELECT g.*,
-                                             p.team_id,
-                                             CASE
-                                                 WHEN p.team_id = g.home_team_id THEN g.away_team_id
-                                                 ELSE g.home_team_id END AS opponent_team_id,
-                                             CASE
-                                                 WHEN p.team_id = g.home_team_id THEN g.home_score
-                                                 ELSE g.away_score END   AS team_score,
-                                             CASE
-                                                 WHEN p.team_id = g.home_team_id THEN g.away_score
-                                                 ELSE g.home_score END   AS opponent_score
-                                          FROM game g
-                                                   INNER JOIN player_teams p ON p.team_id IN (g.home_team_id, g.away_team_id)),
-                     player_points AS (SELECT * FROM points WHERE @PlayerId IN (scorer_id, assist1_player_id, assist2_player_id))
-                SELECT g.id AS game_id,
-                       g.tournament_id,
-                       g.date,
-                       g.location,
-                       g.rink,
-                       g.type,
-                       g.team_score,
-                       g.opponent_score,
-                       g.team_id,
-                       g.opponent_team_id,
-                       SUM(CASE WHEN @PlayerId = p.scorer_id THEN 1 ELSE 0 END)                                 AS goals,
-                       SUM(CASE WHEN @PlayerId IN (p.assist1_player_id, p.assist2_player_id) THEN 1 ELSE 0 END) AS assists
-                    FROM player_games g
-                             LEFT OUTER JOIN player_points p ON g.id = p.game_id
-                    GROUP BY g.id, g.tournament_id, g.date, g.location, g.rink, g.type, g.team_score, g.opponent_score, g.team_id,
-                             g.opponent_team_id";
+        string sql = @"with
+                        player_teams as (
+                            select
+                                t.*,
+                                p.id as player_id
+                                from
+                                    team t
+                                        inner join players p on p.team_id = t.id
+                                        and p.account_id = @AccountId
+                        ),
+                        player_games as (
+                            select
+                                g.*,
+                                t.id as team_id,
+                                t.name as team_name,
+                                t.name_short as team_name_short,
+                                t.logo_url as team_logo_url,
+                                o.id  as opponent_team_id,
+                                o.name as opponent_name,
+                                o.name_short as opponent_name_short,
+                                o.logo_url as opponent_logo_url,
+                                case when t.id = home_team_id then home_score else away_score end as team_score,
+                                case when t.id != home_team_id then home_score else away_score end as opponent_team_score,
+                                t.player_id,
+                                t.name
+                                from
+                                    game g
+                                        inner join player_teams t on t.id in (g.home_team_id, g.away_team_id)
+                                        inner join team o on o.id = case when t.id = home_team_id then away_team_id else home_team_id end
+                                        and g.date < now()
+                                        {0}
+                        )
+                    select
+                        *,
+                        get_player_game_goals (@AccountId, id) as goals,
+                        get_player_game_assists (@AccountId, id) as assists
+                        from
+                            player_games
+                        order by date";
 
-        return await QueryDbAsync<PlayerGameSummary>(sql, new { PlayerId = id });
+        sql = string.Format(sql, tournamentId is not null ? "and g.tournament_id = @TournamentId" : string.Empty);
+
+        return await QueryDbAsync<PlayerGameSummary>(sql, new { AccountId = accountId, TournamentId = tournamentId });
     }
 
-    public async Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int id)
+    public async Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int accountId, int? tournamentId = null)
     {
-        string sql = @"WITH
-                        goalie_data AS (
-                            SELECT * from players
+        string sql = @"with
+                        player_teams as (
+                            select
+                                t.*,
+                                p.id as player_id
+                                from
+                                    team t
+                                        inner join players p on p.team_id = t.id
+                                        and p.account_id = @AccountId
                         ),
-                        goalie_games_played AS (
-                            SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date
-                                FROM goalie_data P
-                                         RIGHT OUTER JOIN game G ON P.team_id IN (G.home_team_id, G.away_team_id)
-                        ),
-                        goalie_game_scores AS (
-                            SELECT GP.game_id, GP.id,  GP.team_id, GP.date,
-                                   CASE WHEN GP.team_id != GP.home_team_id THEN GP.home_team_id ELSE GP.away_team_id END AS opponent_team_id,
-                                   SUM(
-                                           CASE
-                                               WHEN ( GP.team_id = GP.home_team_id AND is_hometeam = TRUE ) OR ( GP.team_id = GP.away_team_id AND is_hometeam = FALSE ) THEN 1
-                                               ELSE 0
-                                               END
-                                   ) AS goals_for,
-                                   SUM(
-                                           CASE
-                                               WHEN ( GP.team_id = GP.home_team_id AND is_hometeam = FALSE ) OR ( GP.team_id = GP.away_team_id AND is_hometeam = TRUE ) THEN 1
-                                               ELSE 0
-                                               END
-                                   ) AS goals_against
-                                FROM
-                                    (
-                                        SELECT *
-                                            FROM goalie_games_played GP
-                                    ) GP
-                                        LEFT JOIN LATERAL (
-                                        SELECT *
-                                            FROM points P
-                                            WHERE P.game_id = GP.game_id
-                                        ) game_scores ON TRUE
-                                GROUP BY GP.game_id, GP.id, opponent_team_id, GP.team_id, GP.date
+                        player_games as (
+                            select
+                                g.*,
+                                t.id as team_id,
+                                t.name as team_name,
+                                t.name_short as team_name_short,
+                                t.logo_url as team_logo_url,
+                                o.id  as opponent_team_id,
+                                o.name as opponent_name,
+                                o.name_short as opponent_name_short,
+                                o.logo_url as opponent_logo_url,
+                                case when t.id = home_team_id then home_score else away_score end as team_score,
+                                case when t.id != home_team_id then home_score else away_score end as opponent_team_score,
+                                t.player_id,
+                                t.name
+                                from
+                                    game g
+                                        inner join player_teams t on t.id in (g.home_team_id, g.away_team_id)
+                                        inner join team o on o.id = case when t.id = home_team_id then away_team_id else home_team_id end
+                                        and g.date < now()
+                                        {0}
                         )
-                    SELECT
-                        G.game_id AS GameId,
-                        G.team_id AS TeamId,
-                        G.opponent_team_id AS OpponentTeamId,
-                        G.goals_for AS GoalsFor,
-                        G.goals_against AS GoalsAgainst,
-                        G.date AS GameDate
-                        FROM goalie_game_scores G
-                        WHERE G.id = @PlayerId";
+                    select
+                        *,
+                        case when team_score > opponent_team_score then true else false end as win
+                        from
+                            player_games
+                        order by date";
+        
+        sql = string.Format(sql, tournamentId is not null ? "and g.tournament_id = @TournamentId" : string.Empty);
 
-        return await QueryDbAsync<GoalieGameSummary>(sql, new { PlayerId = id });
+        return await QueryDbAsync<GoalieGameSummary>(sql, new { AccountId = accountId, TournamentId = tournamentId });
     }
 
     public async Task<IEnumerable<GameGoal>> GetGameGoalsByGameId(int id)

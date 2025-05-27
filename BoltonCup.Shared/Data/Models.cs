@@ -65,29 +65,39 @@ public class PlayerProfile
     public bool IsGoalie => position == "goalie";
 }
 
-public class PlayerGameSummary
+public class PlayerGameSummary : BCGame
 {
-    public int game_id { get; set; }
-    public int tournament_id { get; set; }
-    public string location { get; set; }
-    public string rink { get; set; }
-    public string type { get; set; }
-    public int team_score { get; set; }
-    public int opponent_score { get; set; }
     public int team_id { get; set; }
+    public string team_name { get; set; }
+    public string team_name_short { get; set; }
+    public string team_logo_url { get; set; }
+    public int? team_score { get; set; }
     public int opponent_team_id { get; set; }
+    public string opponent_name { get; set; }
+    public string opponent_name_short { get; set; }
+    public string opponent_logo_url { get; set; }
+    public int? opponent_team_score { get; set; }
+    public int player_id { get; set; }
     public int goals { get; set; }
     public int assists { get; set; }
-    public DateTime date { get; set; }
 }
-public class GoalieGameSummary
+
+
+
+public class GoalieGameSummary : BCGame
 {
-    public int GameId { get; set; }
-    public int TeamId { get; set; }
-    public int OpponentTeamId { get; set; }
-    public int GoalsFor { get; set; }
-    public int GoalsAgainst { get; set; }
-    public DateTime GameDate { get; set; }
+    public int team_id { get; set; }
+    public string team_name { get; set; }
+    public string team_name_short { get; set; }
+    public string team_logo_url { get; set; }
+    public int? team_score { get; set; }
+    public int opponent_team_id { get; set; }
+    public string opponent_name { get; set; }
+    public string opponent_name_short { get; set; }
+    public string opponent_logo_url { get; set; }
+    public int? opponent_team_score { get; set; }
+    public int player_id { get; set; }
+    public bool win { get; set; }
 }
 
 public class GameGoal
