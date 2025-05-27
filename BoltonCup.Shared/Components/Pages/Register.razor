@@ -146,6 +146,7 @@ else
             // if open admit user right away
             if (_storedEmailForm is not null && _currentTournament is not null && _currentTournament.payment_open)
             {
+                await BCData.AdmitUserAsync(_storedEmailForm);
                 await BCData.ConfigPlayerProfileAsync(_storedEmailForm, _currentTournament.tournament_id);
             }
         }

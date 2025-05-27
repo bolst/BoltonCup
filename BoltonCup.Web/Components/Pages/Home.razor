@@ -1,5 +1,8 @@
 ﻿@page "/"
 
+@inject SupabaseServiceProvider SBService
+@inject IBCData BCData
+
 <PageTitle>Home</PageTitle>
 
 <!-- <Sponsors /> -->
@@ -13,3 +16,21 @@
         </MudItem>
     </MudGrid>
 </div>
+
+<MudButton OnClick="OnClick">CLICK ME</MudButton>
+
+@code {
+
+
+    private async Task OnClick()
+    {
+        string[] emails = { "biggee317317@gmail.com", "eastonwforrest@gmail.com" };
+
+        foreach (var email in emails)
+        {
+            var form = await BCData.GetRegistrationByEmailAsync(email);
+            await SBService.SendRegistrationEmail(form);
+        }
+    }
+
+}
