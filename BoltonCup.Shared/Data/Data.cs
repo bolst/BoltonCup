@@ -42,7 +42,7 @@ public interface IBCData
     Task DraftPlayerAsync(PlayerProfile player, BCTeam team, BCDraftPick draftPick);
     Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId);
     Task ResetDraftAsync(int draftId);
-    Task<IEnumerable<BCSponsor>> GetTournamentSponsorsAsync(int tournamentId);
+    Task<IEnumerable<BCSponsor>> GetActiveSponsorsAsync();
 }
 
 public class BCData : DapperBase, IBCData
@@ -741,12 +741,13 @@ public class BCData : DapperBase, IBCData
     }
 
 
-    public async Task<IEnumerable<BCSponsor>> GetTournamentSponsorsAsync(int tournamentId)
+    public async Task<IEnumerable<BCSponsor>> GetActiveSponsorsAsync()
     {
         string sql = @"SELECT *
                         FROM sponsor
-                        WHERE tournament_id = @TournamentId";
-        return await QueryDbAsync<BCSponsor>(sql, new { TournamentId = tournamentId });
+                        WHERE is_active = true
+                        ORDER BY sort_key";
+        return await QueryDbAsync<BCSponsor>(sql);
     }
 
 }

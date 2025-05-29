@@ -2,7 +2,7 @@
 
 <div class="countdown"></div>
 
-<MudStack Class="px-20 mx-10" Row="true" Wrap="Wrap.Wrap" Justify="Justify.SpaceEvenly">
+<MudStack Class="px-20 mx-10" Row="true" Wrap="Wrap.Wrap" Justify="Justify.SpaceEvenly" Spacing="0">
     @TimeUnitRF("days")
     @TimeUnitRF("hours")
     @TimeUnitRF("minutes")
@@ -10,21 +10,52 @@
 </MudStack>
 
 @code {
+    
+    [Parameter]
+    public DateTime? To { get; set; }
 
+    [Parameter] 
+    public string FontSize { get; set; } = "5rem";
+
+    private DateTime? _to;
+
+    private bool _canInvokeJs;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (To != _to)
+        {
+            _to = To;
+            await BeginTimer();
+        }
+    }
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JS.InvokeVoidAsync("countdown", "06/27/2025 05:00:00 PM");
+            _canInvokeJs = true;
+            await BeginTimer();
         }
     }
+
+    private async Task BeginTimer()
+    {
+        if (_canInvokeJs)
+        {
+            var date = _to ?? DateTime.UtcNow;
+            var dateStr = date.ToString("MM/dd/yyyy hh:mm:ss tt").Replace('-', '/');
+            await JS.InvokeVoidAsync("countdown", dateStr);
+        }
+    }
+    
 
     private RenderFragment TimeUnitRF(string id) => __builder =>
     {
         <div class="d-flex justify-center">
-            <MudStack Class="px-1" AlignItems="AlignItems.Center">
-                <MudText Color="Color.Secondary" Typo="Typo.h1" HtmlTag="i"><b><span id="@id"></span></b></MudText>
-                <MudText Color="Color.Secondary" Typo="Typo.h6" HtmlTag="i">@id</MudText>
+            <MudStack Class="px-1" AlignItems="AlignItems.Center" Spacing="1">
+                    <MudText Color="Color.Secondary" Typo="Typo.h1" Style="@($"font-size: {FontSize}")" HtmlTag="i"><b><span id="@id"></span></b></MudText>
+                    <MudText Color="Color.Secondary" Typo="Typo.h6" Style="font-size: 1rem" HtmlTag="i">@id</MudText>
             </MudStack>
         </div>
     };

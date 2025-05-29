@@ -1,0 +1,15 @@
+
+
+<div class="pa-4 d-flex justify-center align-center" style="width: 200px; height: 200px;">
+    <MudLink Underline="Underline.None" Href="@Sponsor.site_url" Target="_blank">
+        <MudImage Src="@Sponsor.logo_url" Fluid/>
+    </MudLink>
+</div>
+
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required BCSponsor Sponsor { get; set; }
+
+}
