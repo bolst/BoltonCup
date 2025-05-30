@@ -4,224 +4,179 @@
 
 <PageHeader Title="Stats">Statistics</PageHeader>
 
-<TournamentPicker @bind-SelectedTournament="selectedTournament" />
+<TournamentPicker @bind-SelectedTournament="_selectedTournament" />
 
-@if (teams is not null)
-{
-    <MudTabs @bind-ActivePanelIndex="activeTabIndex" Centered>
-        <MudStack Class="d-flex flex-grow-1 px-4 py-4" Style="background-color: var(--mud-palette-surface)" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Row>
-            <div style="width: 200px">
-                <MudSelect @bind-Value="selectedFilterTeam" Variant="Variant.Outlined" Margin="Margin.Dense" Placeholder="Team" Dense>
-                    <MudSelectItem Value="null as BCTeam">All</MudSelectItem>
-                    @foreach (var team in teams)
-                    {
-                        <MudSelectItem Value="team">
-                            <MudStack AlignItems="AlignItems.Center" Row>
-                                <MudImage Src="@team.logo_url" Height="20" Class="mr-1"/> 
-                                @team.name_short
-                            </MudStack>
-                        </MudSelectItem>
-                    }
-                </MudSelect>
-            </div>
-            
-            <MudSpacer/>
-                        
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
-        </MudStack>
-            
-        @if (renderedSkaterStats is not null)
-        {
-            <MudTabPanel Text="Skaters" BadgeData="renderedSkaterStats.Count()">
-                <MudDataGrid Items="@renderedSkaterStats" QuickFilter="@_playerQuickFilter" Height="65vh" FixedHeader Dense>
-                    <ToolBarContent>
-                        <MudText Typo="Typo.h6">Skaters</MudText>
-                    </ToolBarContent>
-                    <Columns>
-                        <TemplateColumn Title="Player" Sortable="true" Filterable="true" StickyLeft>
-                            <CellTemplate>
-                                <MudStack AlignItems="AlignItems.Center" Row>
-                                    <MudAvatar>
-                                        <MudImage Src="@profilePictures.FirstOrDefault(x => x.PlayerId == context.Item.PlayerId)?.Source"/>
-                                    </MudAvatar>
-                                    <MudLink Typo="Typo.subtitle1" Href=@($"/player/{context.Item.PlayerId}")>@context.Item.Name</MudLink>
-                                    <MudImage Src="@teams.FirstOrDefault(x => x.id == context.Item.TeamId)?.logo_url" Height="30"/>
-                                </MudStack>
-                            </CellTemplate>
-                        </TemplateColumn>
-                        <PropertyColumn Property="x => x.PlayerNumber" Title="#"/>
-                        <PropertyColumn Property="x => x.Position" Title="Pos"/>
-                        <PropertyColumn Property="x => x.Goals + x.Assists" Title="P" Sortable="true" Filterable="true" InitialDirection="SortDirection.Descending"/>
-                        <PropertyColumn Property="x => x.Goals" Title="G" Sortable="true" Filterable="true"/>
-                        <PropertyColumn Property="x => x.Assists" Title="A" Sortable="true" Filterable="true"/>
-                    </Columns>
-                </MudDataGrid>
-            </MudTabPanel>
-        }
-        @if (renderedGoalieStats is not null)
-        {
-            <MudTabPanel Text="Goalies" BadgeData="renderedGoalieStats.Count()">
-                <MudDataGrid Items="@renderedGoalieStats" QuickFilter="@_goalieQuickFilter" Height="65vh" FixedHeader Dense>
-                    <ToolBarContent>
-                        <MudText Typo="Typo.h6">Goalies</MudText>
-                    </ToolBarContent>
-                    <Columns>
-                        <TemplateColumn Title="Goalie" Sortable="true" Filterable="true" StickyLeft>
-                            <CellTemplate>
-                                <MudStack AlignItems="AlignItems.Center" Row>
-                                    <MudAvatar>
-                                        <MudImage Src="@profilePictures.First(x => x.PlayerId == context.Item.PlayerId).Source"/>
-                                    </MudAvatar>
-                                    <MudLink Typo="Typo.subtitle1" Href=@($"/player/{context.Item.PlayerId}")>@context.Item.Name</MudLink>
-                                    <MudImage Src="@teams.First(x => x.id == context.Item.TeamId).logo_url" Height="30"/>
-                                </MudStack>
-                            </CellTemplate>
-                        </TemplateColumn>
-                        <PropertyColumn Property="x => x.PlayerNumber" Title="#"/>
-                        <PropertyColumn Property="x => 'G'" Title="Pos"/>
-                        <PropertyColumn Property="x => x.GAA" Title="GAA" Sortable="true" Filterable="true" InitialDirection="SortDirection.Ascending"/>
-                        <PropertyColumn Property="x => x.Shutouts" Title="SO" Sortable="true" Filterable="true"/>
-                    </Columns>
-                </MudDataGrid>
-            </MudTabPanel>
-        }
-    </MudTabs>
-}
+<MudTabs Class="relative" @bind-ActivePanelIndex="_activeTabIndex" Centered>
+    <MudStack Class="d-flex flex-grow-1 px-4 py-4" Style="background-color: var(--mud-palette-surface)" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Row>
+        <div style="width: 200px">
+            <MudSelect @bind-Value="_selectedFilterTeam" Variant="Variant.Outlined" Margin="Margin.Dense" Placeholder="Team" Dense>
+                <MudSelectItem Value="null as BCTeam">All</MudSelectItem>
+                @foreach (var team in _teams)
+                {
+                    <MudSelectItem Value="team">
+                        <MudStack AlignItems="AlignItems.Center" Row>
+                            <MudImage Src="@team.logo_url" Height="20" Class="mr-1"/> 
+                            @team.name_short
+                        </MudStack>
+                    </MudSelectItem>
+                }
+            </MudSelect>
+        </div>
+        
+        <MudSpacer/>
+                    
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+    </MudStack>
+        
+    <MudTabPanel Text="Skaters" BadgeData="_skaterStats.Count()">
+        <MudDataGrid Items="_skaterStats" QuickFilter="PlayerQuickFilter" Height="65vh" FixedHeader Dense>
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Skaters</MudText>
+            </ToolBarContent>
+            <Columns>
+                <TemplateColumn Title="Player" Sortable="true" Filterable="true" StickyLeft>
+                    <CellTemplate>
+                        <MudStack AlignItems="AlignItems.Center" Row>
+                            <MudAvatar>
+                                <MudImage Src="@context.Item.profilepicture"/>
+                            </MudAvatar>
+                            <MudLink Typo="Typo.subtitle1" Href=@($"/player/{context.Item.player_id}")>@context.Item.player_name</MudLink>
+                            <MudImage Src="@_teams.FirstOrDefault(x => x.id == context.Item.team_id)?.logo_url" Height="30"/>
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="x => x.jersey_number" Title="#"/>
+                <PropertyColumn Property="x => x.position" Title="Pos"/>
+                <PropertyColumn Property="x => x.goals + x.assists" Title="P" Sortable="true" Filterable="true" InitialDirection="SortDirection.Descending"/>
+                <PropertyColumn Property="x => x.goals" Title="G" Sortable="true" Filterable="true"/>
+                <PropertyColumn Property="x => x.assists" Title="A" Sortable="true" Filterable="true"/>
+            </Columns>
+        </MudDataGrid>
+    </MudTabPanel>
+    
+    <MudTabPanel Text="Goalies" BadgeData="_goalieStats.Count()">
+        <MudDataGrid Items="_goalieStats" QuickFilter="GoalieQuickFilter" Height="65vh" FixedHeader Dense>
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Goalies</MudText>
+            </ToolBarContent>
+            <Columns>
+                <TemplateColumn Title="Goalie" Sortable="true" Filterable="true" StickyLeft>
+                    <CellTemplate>
+                        <MudStack AlignItems="AlignItems.Center" Row>
+                            <MudAvatar>
+                                <MudImage Src=""/>
+                            </MudAvatar>
+                            <MudLink Typo="Typo.subtitle1" Href=@($"/player/{context.Item.player_id}")>@context.Item.player_name</MudLink>
+                            <MudImage Src="@context.Item.team_logo" Height="30"/>
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="x => x.jersey_number" Title="#"/>
+                <PropertyColumn Property="x => 'G'" Title="Pos"/>
+                <PropertyColumn Property="x => x.GAA" Title="GAA" Sortable="true" Filterable="true" InitialDirection="SortDirection.Ascending"/>
+                <PropertyColumn Property="x => x.shutouts" Title="SO" Sortable="true" Filterable="true"/>
+            </Columns>
+        </MudDataGrid>
+    </MudTabPanel>
+    
+    <MudOverlay @bind-Visible="_loading" DarkBackground Absolute>
+        <MudProgressCircular Indeterminate />
+    </MudOverlay>
+</MudTabs>
 
 
 @code {
     
-    private IEnumerable<PlayerStatLine>? allSkaterStats;
-    private IEnumerable<PlayerStatLine>? renderedSkaterStats
-    {
-        get
-        {
-            if (allSkaterStats is null) return null;
-            
-            var skaterStats = allSkaterStats.ToList();
-            
-            if (selectedFilterTeam is not null)
-            {
-                skaterStats = skaterStats.Where(x => x.TeamId == selectedFilterTeam.id).ToList();
-            }
-            
-            if (selectedTournament is not null)
-            {
-                skaterStats = skaterStats.Where(x => x.TournamentId == selectedTournament.tournament_id).ToList();
-            }
-
-            // TODO: investigate why default sort doesn't work on MAUI
-            return skaterStats.OrderByDescending(x => x.Goals + x.Assists).ToList();
-        }    
-    }
+    private IEnumerable<PlayerStatLine> _skaterStats = [];
+    private IEnumerable<GoalieStatLine> _goalieStats = [];
+    private IEnumerable<BCTeam> _teams = [];
     
-    private IEnumerable<GoalieStatLine>? allGoalieStats;
-    private IEnumerable<GoalieStatLine>? renderedGoalieStats
-    {
-        get
-        {
-            if (allGoalieStats is null) return null;
-            
-            var goalieStats = allGoalieStats.ToList();
-            
-            if (selectedFilterTeam is not null)
-            {
-                goalieStats = goalieStats.Where(x => x.TeamId == selectedFilterTeam.id).ToList();
-            }
-            
-            if (selectedTournament is not null)
-            {
-                goalieStats = goalieStats.Where(x => x.TournamentId == selectedTournament.tournament_id).ToList();
-            }
-            
-            // TODO: investigate why default sort doesn't work on MAUI
-            return goalieStats.OrderBy(x => x.GAA).ToList();
-        }  
-    }
-    private IEnumerable<PlayerProfilePicture>? profilePictures;
-    private string searchString;
     
-    private IEnumerable<BCTeam>? allTeams;
-    private IEnumerable<BCTeam>? teams
-    {
-        get
-        {
-            if (selectedTournament is null || allTeams is null) return allTeams;
-            
-            return allTeams.Where(x => x.tournament_id == selectedTournament.tournament_id);
-        }
-    }
-
     private BCTeam? selectedFilterTeam;
-    
-    private int _activeTabIndex;
-    private int activeTabIndex
+    private BCTeam? _selectedFilterTeam
     {
-        get => _activeTabIndex;
+        get => selectedFilterTeam;
         set
         {
-            _activeTabIndex = value;
-            searchString = string.Empty;
+            if (value?.id != selectedFilterTeam?.id)
+            {
+                selectedFilterTeam = value;
+                InvokeAsync(LoadDataAsync);
+            }
+        }
+    }
+    
+    private string _searchString;
+    private bool _loading;
+    
+    private int activeTabIndex;
+    private int _activeTabIndex
+    {
+        get => activeTabIndex;
+        set
+        {
+            activeTabIndex = value;
+            _searchString = string.Empty;
         }
     }
 
-    private BCTournament? _selectedTournament;
-    private BCTournament? selectedTournament
+    private BCTournament? selectedTournament;
+    private BCTournament? _selectedTournament
     {
-        get => _selectedTournament;
+        get => selectedTournament;
         set
         {
-            if (value is null)
+            if (value?.tournament_id != selectedTournament?.tournament_id)
             {
-                _selectedTournament = null;
-                selectedFilterTeam = null;
-                return;
-            }
-            
-            if (!value.Equals(_selectedTournament))
-            {
-                selectedFilterTeam = null;
-
-                _selectedTournament = value;
-                InvokeAsync(StateHasChanged);
+                _selectedFilterTeam = null;
+                selectedTournament = value;
+                InvokeAsync(LoadDataAsync);
             }
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        var skaterTask = BCData.GetPlayerStats();
-        var goalieTask = BCData.GetGoalieStats();
-        var teamTask = BCData.GetTeams();
-        var profilePicTask = BCData.GetPlayerProfilePictures();
-        await Task.WhenAll(skaterTask, goalieTask, teamTask, profilePicTask);
-        
-        allSkaterStats = skaterTask.Result;
-        allGoalieStats = goalieTask.Result;
-        allTeams = teamTask.Result;
-        profilePictures = profilePicTask.Result;
+        selectedTournament ??= await BCData.GetCurrentTournamentAsync();
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        if (_selectedTournament is not null)
+        {
+            _loading = true;
+            InvokeAsync(StateHasChanged);
+            
+            _skaterStats = await BCData.GetPlayerStats(_selectedTournament.tournament_id, _selectedFilterTeam?.id);
+            _goalieStats = await BCData.GetGoalieStats(_selectedTournament.tournament_id, _selectedFilterTeam?.id);
+            _teams = await BCData.GetTeamsInTournamentAsync(_selectedTournament.tournament_id);
+
+            _loading = false;
+            InvokeAsync(StateHasChanged);
+        }
     }
     
     // quick filter - filter globally across multiple columns with the same input
-    private Func<PlayerStatLine, bool> _playerQuickFilter => x =>
+    private Func<PlayerStatLine, bool> PlayerQuickFilter => x =>
     {
-        if (string.IsNullOrWhiteSpace(searchString))
+        if (string.IsNullOrWhiteSpace(_searchString))
             return true;
         
-        if (x.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (x.player_name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         
         return false;
     };    
     
     // quick filter - filter globally across multiple columns with the same input
-    private Func<GoalieStatLine, bool> _goalieQuickFilter => x =>
+    private Func<GoalieStatLine, bool> GoalieQuickFilter => x =>
     {
-        if (string.IsNullOrWhiteSpace(searchString))
+        if (string.IsNullOrWhiteSpace(_searchString))
             return true;
         
-        if (x.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (x.player_name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         return false;

@@ -8,22 +8,22 @@
         <MudPaper Class="d-flex justify-center align-center flex-grow-1">
             <MudStack Class="d-flex align-center">
                 <MudAvatar Class="clickable" Style="height: 120px; width: 120px;" @onclick=@(() =>
-                    Navigation.NavigateTo($"player/{selectedSkater.PlayerId}"))>
-                    <MudImage Src="@profilePictures.Where(p => p.PlayerId == selectedSkater.PlayerId).First().Source"
+                    Navigation.NavigateTo($"player/{selectedSkater.player_id}"))>
+                    <MudImage Src="@profilePictures.Where(p => p.PlayerId == selectedSkater.player_id).First().Source"
                         Height="200" />
                 </MudAvatar>
 
                 <MudText Class="d-flex justify-center clickable" @onclick=@(() =>
-                    Navigation.NavigateTo($"player/{selectedSkater.PlayerId}")) Typo="Typo.h5">
-                    <b>@selectedSkater.Name.ToUpper()</b>
+                    Navigation.NavigateTo($"player/{selectedSkater.player_id}")) Typo="Typo.h5">
+                    <b>@selectedSkater.player_name.ToUpper()</b>
                 </MudText>
 
                 <MudStack Class="d-flex align-center" Row="true">
-                    <MudImage Src="@(TeamLogoById(selectedSkater.TeamId))" Height="50" />
+                    <MudImage Src="@selectedSkater.team_logo" Height="50" />
                     <MudDivider Vertical="true" FlexItem="true" />
-                    <MudText Typo="Typo.body1">#@selectedSkater.PlayerNumber</MudText>
+                    <MudText Typo="Typo.body1">#@selectedSkater.jersey_number</MudText>
                     <MudDivider Vertical="true" FlexItem="true" />
-                    <MudText Typo="Typo.body1">@selectedSkater.Position.First()</MudText>
+                    <MudText Typo="Typo.body1">@selectedSkater.position.First()</MudText>
                 </MudStack>
 
                 <MudText Class="d-flex justify-center" Typo="Typo.h6">@Label.ToUpper()</MudText>
@@ -42,7 +42,7 @@
                             Variant="@skaterButtonVariant(skater)">
                             <MudStack Class="d-flex flex-grow-1" Row="true">
                                 <MudText>@playerRank</MudText>
-                                <MudText Class="d-flex flex-grow-1">@skater.Name.ToUpper()</MudText>
+                                <MudText Class="d-flex flex-grow-1">@skater.player_name.ToUpper()</MudText>
                                 <MudText>@StatValue(skater)</MudText>
                             </MudStack>
                         </MudButton>
@@ -98,8 +98,8 @@ else
         selectedSkater = orderedSkaters?.First();
     }
 
-    private Variant skaterButtonVariant(Data.PlayerStatLine skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
+    private Variant skaterButtonVariant(Data.PlayerStatLine skater) => (skater.player_id == selectedSkater!.player_id) ?
     Variant.Filled : Variant.Outlined;
-    private Color skaterButtonColor(Data.PlayerStatLine skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
+    private Color skaterButtonColor(Data.PlayerStatLine skater) => (skater.player_id == selectedSkater!.player_id) ?
     Color.Primary : Color.Default;
 }
