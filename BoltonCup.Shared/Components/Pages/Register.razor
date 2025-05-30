@@ -98,24 +98,33 @@ else
         {
             _loading = true;
             StateHasChanged();
-            
-            _currentTournament = await BCData.GetCurrentTournamentAsync();
-            if (_currentTournament is not null)
-            {
-                var players = await BCData.GetAllTournamentPlayersAsync(_currentTournament.tournament_id);
-                _playerCount = players.Count(p => !p.IsGoalie);
-                _goalieCount = players.Count(p => p.IsGoalie);
-            }
-            
-            _storedEmail = await RegStateService.GetBrowserRegistered();
 
-            if (_storedEmail is not null)
+            try
             {
-                _storedEmailForm = await BCData.GetRegistrationByEmailAsync(_storedEmail);
+                _currentTournament = await BCData.GetCurrentTournamentAsync();
+                if (_currentTournament is not null)
+                {
+                    var players = await BCData.GetAllTournamentPlayersAsync(_currentTournament.tournament_id);
+                    _playerCount = players.Count(p => !p.IsGoalie);
+                    _goalieCount = players.Count(p => p.IsGoalie);
+                }
+
+                _storedEmail = await RegStateService.GetBrowserRegistered();
+
+                if (_storedEmail is not null)
+                {
+                    _storedEmailForm = await BCData.GetRegistrationByEmailAsync(_storedEmail);
+                }
             }
-            
-            _loading = false;
-            StateHasChanged();
+            catch
+            {
+            }
+            finally
+            {
+                _loading = false;
+                StateHasChanged();
+            }
+
         }
     }
 
