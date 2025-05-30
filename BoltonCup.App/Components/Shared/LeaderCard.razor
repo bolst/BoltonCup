@@ -8,7 +8,7 @@
 
         <MudGrid Class="pb-2">
             <MudItem xs="2">
-                <MudAvatar Class="clickable" @onclick=@(() => Navigation.NavigateTo($"player/{(IsGoalie ? selectedGoalie.PlayerId : selectedSkater.PlayerId)}"))>
+                <MudAvatar Class="clickable" @onclick=@(() => Navigation.NavigateTo($"player/{(IsGoalie ? selectedGoalie.player_id : selectedSkater.player_id)}"))>
                     <MudImage Src="" />
                 </MudAvatar>
             </MudItem>
@@ -34,7 +34,7 @@
                     <MudButton Color="Color.Primary" OnClick=@(() => selectedGoalie = goalie) Variant="@goalieButtonVariant(goalie)">
                         <MudStack Class="d-flex flex-grow-1" Row="true">
                             <MudText>@playerRank</MudText>
-                            <MudText Class="d-flex flex-grow-1">@goalie.Name</MudText>
+                            <MudText Class="d-flex flex-grow-1">@goalie.player_name</MudText>
                             <MudText>@PlayerStatValue(goalie)</MudText>
                         </MudStack>
                     </MudButton>
@@ -51,7 +51,7 @@
                     <MudButton Color="Color.Primary" OnClick=@(() => selectedSkater = skater) Variant="@skaterButtonVariant(skater)">
                         <MudStack Class="d-flex flex-grow-1" Row="true">
                             <MudText>@playerRank</MudText>
-                            <MudText Class="d-flex flex-grow-1">@skater.Name</MudText>
+                            <MudText Class="d-flex flex-grow-1">@skater.player_name</MudText>
                             <MudText>@PlayerStatValue(skater)</MudText>
                         </MudStack>
                     </MudButton>
@@ -75,8 +75,8 @@
     
     private bool IsGoalie => new[] { "goals against average", "shutouts" }.Contains(StatType.ToLower());
 
-    private string LeaderName => IsGoalie ? selectedGoalie.Name : selectedSkater.Name;
-    private string LeaderDetails => IsGoalie ? $"#{selectedGoalie.PlayerNumber} | G" : $"#{selectedSkater.PlayerNumber} | {selectedSkater.Position.First()}";
+    private string LeaderName => IsGoalie ? selectedGoalie.player_name : selectedSkater.player_name;
+    private string LeaderDetails => IsGoalie ? $"#{selectedGoalie.jersey_number} | G" : $"#{selectedSkater.jersey_number} | {selectedSkater.position.First()}";
     
     private string PlayerStatValue(BoltonCup.Shared.Data.PlayerStatLine player)
     {
@@ -94,7 +94,7 @@
         return StatType.ToLower() switch
         {
             "goals against average" => goalie.GAA.ToString("F2"),
-            "shutouts" => goalie.Shutouts.ToString(),
+            "shutouts" => goalie.shutouts.ToString(),
             _ => "0",
         };
     }
@@ -141,13 +141,13 @@
         goalieStats = StatType.ToLower() switch
         {
             "goals against average" => goalieStats.OrderBy(g => g.GAA),
-            "shutouts" => goalieStats.OrderByDescending(g => g.Shutouts),
+            "shutouts" => goalieStats.OrderByDescending(g => g.shutouts),
             _ => goalieStats,
         };
     }
 
-    private Variant skaterButtonVariant(BoltonCup.Shared.Data.PlayerStatLine skater) => (skater.PlayerId == selectedSkater!.PlayerId) ?
+    private Variant skaterButtonVariant(BoltonCup.Shared.Data.PlayerStatLine skater) => (skater.player_id == selectedSkater!.player_id) ?
         Variant.Filled : Variant.Text;    
-    private Variant goalieButtonVariant(BoltonCup.Shared.Data.GoalieStatLine goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
+    private Variant goalieButtonVariant(BoltonCup.Shared.Data.GoalieStatLine goalie) => (goalie.player_id == selectedGoalie!.player_id) ?
         Variant.Filled : Variant.Text;
 }

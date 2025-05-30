@@ -17,8 +17,8 @@ public interface IBCData
     Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int accountId, int? tournamentId = null);
     Task<IEnumerable<GameGoal>> GetGameGoalsByGameId(int gameId);
     Task<IEnumerable<GamePenalty>> GetGamePenaltiesByGameId(int gameId);
-    Task<IEnumerable<PlayerStatLine>> GetPlayerStats();
-    Task<IEnumerable<GoalieStatLine>> GetGoalieStats();
+    Task<IEnumerable<PlayerStatLine>> GetPlayerStats(int tournamentId, int? teamId = null);
+    Task<IEnumerable<GoalieStatLine>> GetGoalieStats(int tournamentId, int? teamId = null);
     Task<IEnumerable<PlayerProfilePicture>> GetPlayerProfilePictures();
     Task<PlayerProfilePicture> GetPlayerProfilePictureById(int playerId);
     Task<string> SubmitRegistration(RegisterFormModel form);
@@ -42,7 +42,7 @@ public interface IBCData
     Task DraftPlayerAsync(PlayerProfile player, BCTeam team, BCDraftPick draftPick);
     Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId);
     Task ResetDraftAsync(int draftId);
-    Task<IEnumerable<BCSponsor>> GetTournamentSponsorsAsync(int tournamentId);
+    Task<IEnumerable<BCSponsor>> GetActiveSponsorsAsync();
 }
 
 public class BCData : DapperBase, IBCData
@@ -311,122 +311,65 @@ public class BCData : DapperBase, IBCData
         return await QueryDbAsync<GamePenalty>(sql, new { GameId = id });
     }
 
-    public async Task<IEnumerable<PlayerStatLine>> GetPlayerStats()
+    public async Task<IEnumerable<PlayerStatLine>> GetPlayerStats(int tournamentId, int? teamId = null)
     {
-        string sql = @"WITH
-                        player_data AS (
-                            SELECT *
-                                FROM players WHERE position != 'goalie'
-                        ),
-                        points_with_teams AS (
-                            SELECT G.id AS game_id, P.player_jerseynum, P.assist1_jerseynum, P.assist2_jerseynum, P.tournament_id,
-                                   CASE
-                                       WHEN is_hometeam = TRUE THEN home_team_id
-                                       ELSE away_team_id
-                                       END AS team_id
-                                FROM points P
-                                         LEFT OUTER JOIN game G ON G.id = P.game_id
-                        ),
-                        points_with_players AS (
-                            SELECT
-                                P.*, D1.id AS scorer_id, D2.id AS assist1_id, D3.id AS assist2_id
-                                FROM points_with_teams P
-                                         LEFT OUTER JOIN player_data D1 ON D1.team_id = P.team_id
-                                    AND D1.jersey_number = P.player_jerseynum
-                                         LEFT OUTER JOIN player_data D2 ON D2.team_id = P.team_id
-                                    AND D2.jersey_number = P.assist1_jerseynum
-                                         LEFT OUTER JOIN player_data D3 ON D3.team_id = P.team_id
-                                    AND D3.jersey_number = P.assist2_jerseynum
-                        )
-                    SELECT
-                        id AS PlayerId,
-                        name AS Name,
-                        jersey_number AS PlayerNumber,
-                        position AS Position,
-                        team_id AS TeamId,
-                        goals AS Goals,
-                        assists AS Assists,
-                        p.tournament_id AS TournamentId
-                        FROM
-                            (
-                                SELECT *
-                                    FROM player_data
-                            ) p
-                                LEFT JOIN LATERAL (
-                                SELECT
-                                    SUM(
-                                            CASE
-                                                WHEN p.id = scorer_id THEN 1
-                                                ELSE 0
-                                                END
-                                    ) AS Goals,
-                                    SUM(
-                                            CASE
-                                                WHEN p.id IN (assist1_id, assist2_id) THEN 1
-                                                ELSE 0
-                                                END
-                                    ) AS Assists,
-                                    tournament_id
-                                    FROM points_with_players
-                                    GROUP BY tournament_id
-                                ) g ON TRUE
-                        ORDER BY goals + assists DESC";
-        return await QueryDbAsync<PlayerStatLine>(sql);
-    }
-    public async Task<IEnumerable<GoalieStatLine>> GetGoalieStats()
-    {
-        string sql = @"WITH
-                        goalie_data AS (
-                            SELECT * FROM players where position = 'goalie'
-                        ),
-                        goalie_games_played AS (
-                            SELECT P.*, G.id AS game_id, G.home_team_id, G.away_team_id, G.date
-                                FROM goalie_data P
-                                         RIGHT OUTER JOIN game G ON P.team_id IN (G.home_team_id, G.away_team_id)
-                        ),
-                        goalie_game_scores AS (
-                            SELECT GP.game_id, GP.id, GP.name, GP.jersey_number, GP.team_id, GP.date, GP.tournament_id,
-                                   CASE WHEN GP.team_id != GP.home_team_id THEN GP.home_team_id ELSE GP.away_team_id END AS opponent_team_id,
-                                   SUM(
-                                           CASE
-                                               WHEN (
-                                                        GP.team_id = GP.home_team_id
-                                                            AND is_hometeam = TRUE
-                                                        )
-                                                   OR (
-                                                        GP.team_id = GP.away_team_id
-                                                            AND is_hometeam = FALSE
-                                                        ) THEN 1
-                                               ELSE 0
-                                               END
-                                   ) AS goals_for,
-                                   SUM(
-                                           CASE
-                                               WHEN ( GP.team_id = GP.home_team_id AND is_hometeam = FALSE ) OR ( GP.team_id = GP.away_team_id AND is_hometeam = TRUE ) THEN 1
-                                               ELSE 0
-                                               END
-                                   ) AS goals_against
-                                FROM
-                                    goalie_games_played GP
-                                        LEFT JOIN LATERAL (
-                                        SELECT *
-                                            FROM points P
-                                            WHERE P.game_id = GP.game_id
-                                        ) game_scores ON TRUE
-                                GROUP BY GP.game_id, GP.id, GP.name, GP.jersey_number, opponent_team_id, GP.team_id, GP.date, GP.tournament_id
-                        )
-                    SELECT
-                        G.id AS PlayerId,
-                        G.name AS Name,
-                        G.jersey_number AS PlayerNumber,
-                        G.team_id AS TeamId,
-                        G.tournament_id AS TournamentId,
-                        AVG(G.goals_against) AS GAA,
-                        SUM(CASE WHEN G.goals_against = 0 THEN 1 END) AS Shutouts
-                        FROM goalie_game_scores G
-                        GROUP BY G.id, G.name, G.jersey_number, G.team_id, G.tournament_id";
+        string sql = @"SELECT p.id AS player_id,
+                               p.name AS player_name,
+                               p.jersey_number,
+                               p.position,
+                               p.tournament_id,
+                               p.team_id,
+                               a.profilepicture,
+                               t.name AS team_name,
+                               t.name_short AS team_name_short,
+                               t.logo_url  AS team_logo,
+                               COUNT(DISTINCT CASE WHEN pts.scorer_id = p.id THEN pts.id END) AS goals,
+                               COUNT(DISTINCT CASE WHEN pts.assist1_player_id = p.id OR pts.assist2_player_id = p.id THEN pts.id END) AS assists
+                            FROM players p
+                                     LEFT JOIN team t ON p.team_id = t.id
+                                     LEFT JOIN account a ON p.account_id = a.id
+                                     LEFT JOIN
+                                 points pts ON p.id IN (pts.scorer_id, pts.assist1_player_id, pts.assist2_player_id)
+                            WHERE p.tournament_id = @TournamentId
+                                    {0}
+                            GROUP BY p.id, p.name, p.jersey_number, p.position, p.tournament_id, p.team_id, a.profilepicture, t.name,
+                                     t.name_short, t.logo_url
+                            ORDER BY goals DESC, assists DESC";
 
-        return await QueryDbAsync<GoalieStatLine>(sql);
+        sql = string.Format(sql, teamId.HasValue ? "AND t.id = @TeamId" : string.Empty);
+        
+        return await QueryDbAsync<PlayerStatLine>(sql, new { TournamentId = tournamentId, TeamId = teamId });
+    }
+    public async Task<IEnumerable<GoalieStatLine>> GetGoalieStats(int tournamentId, int? teamId = null)
+    {
+        string sql = @"SELECT p.id AS player_id,
+                               p.name AS player_name,
+                               p.jersey_number,
+                               p.position,
+                               p.tournament_id,
+                               p.team_id,
+                               a.profilepicture,
+                               t.name AS team_name,
+                               t.name_short AS team_name_short,
+                               t.logo_url  AS team_logo,
+                               COUNT(DISTINCT CASE WHEN p.team_id IN (g.home_team_id, g.away_team_id) THEN g.id END) AS games_played,
+                               COUNT(DISTINCT CASE WHEN (g.home_team_id = p.team_id AND g.away_score = 0) OR (g.away_team_id = p.team_id AND g.home_score = 0) THEN g.id END) AS shutouts,
+                               SUM(CASE WHEN g.home_team_id = p.team_id THEN g.away_score WHEN g.away_team_id = p.team_id THEN g.home_score END) / COUNT(DISTINCT CASE WHEN p.team_id IN (g.home_team_id, g.away_team_id) THEN g.id END)AS GAA
+                            FROM players p
+                                     LEFT JOIN team t ON p.team_id = t.id
+                                     LEFT JOIN account a ON p.account_id = a.id
+                                     LEFT JOIN
+                                 game g ON p.team_id in (g.home_team_id, g.away_team_id)
+                            WHERE p.tournament_id = @TournamentId
+                                {0}
+                                AND p.position = 'goalie'
+                            GROUP BY p.id, p.name, p.jersey_number, p.position, p.tournament_id, p.team_id, a.profilepicture, t.name,
+                                t.name_short, t.logo_url
+                            ORDER BY GAA, shutouts DESC";
+
+        sql = string.Format(sql, teamId.HasValue ? "AND t.id = @TeamId" : string.Empty);
+        
+        return await QueryDbAsync<GoalieStatLine>(sql, new { TournamentId = tournamentId, TeamId = teamId });
     }
 
     public async Task<IEnumerable<PlayerProfilePicture>> GetPlayerProfilePictures()
@@ -741,12 +684,13 @@ public class BCData : DapperBase, IBCData
     }
 
 
-    public async Task<IEnumerable<BCSponsor>> GetTournamentSponsorsAsync(int tournamentId)
+    public async Task<IEnumerable<BCSponsor>> GetActiveSponsorsAsync()
     {
         string sql = @"SELECT *
                         FROM sponsor
-                        WHERE tournament_id = @TournamentId";
-        return await QueryDbAsync<BCSponsor>(sql, new { TournamentId = tournamentId });
+                        WHERE is_active = true
+                        ORDER BY sort_key";
+        return await QueryDbAsync<BCSponsor>(sql);
     }
 
 }

@@ -8,20 +8,20 @@
         <MudPaper Class="d-flex justify-center align-center flex-grow-1">
             <MudStack Class="d-flex align-center">
                 <MudAvatar Class="clickable" Style="height: 120px; width: 120px;" @onclick=@(() =>
-                    Navigation.NavigateTo($"player/{selectedGoalie.PlayerId}"))>
-                    <MudImage Src="@profilePictures.Where(p => p.PlayerId == selectedGoalie.PlayerId).First().Source"
+                    Navigation.NavigateTo($"player/{selectedGoalie.player_id}"))>
+                    <MudImage Src="@profilePictures.Where(p => p.PlayerId == selectedGoalie.player_id).First().Source"
                         Height="200" />
                 </MudAvatar>
 
                 <MudText Class="d-flex justify-center clickable" @onclick=@(() =>
-                    Navigation.NavigateTo($"player/{selectedGoalie.PlayerId}")) Typo="Typo.h5">
-                    <b>@selectedGoalie.Name.ToUpper()</b>
+                    Navigation.NavigateTo($"player/{selectedGoalie.player_id}")) Typo="Typo.h5">
+                    <b>@selectedGoalie.player_name.ToUpper()</b>
                 </MudText>
 
                 <MudStack Class="d-flex align-center" Row="true">
-                    <MudImage Src="@(TeamLogoById(selectedGoalie.TeamId))" Height="50" />
+                    <MudImage Src="@selectedGoalie.team_logo" Height="50" />
                     <MudDivider Vertical="true" FlexItem="true" />
-                    <MudText Typo="Typo.body1">#@selectedGoalie.PlayerNumber</MudText>
+                    <MudText Typo="Typo.body1">#@selectedGoalie.jersey_number</MudText>
                     <MudDivider Vertical="true" FlexItem="true" />
                     <MudText Typo="Typo.body1">G</MudText>
                 </MudStack>
@@ -42,7 +42,7 @@
                             Variant="@goalieButtonVariant(goalie)">
                             <MudStack Class="d-flex flex-grow-1" Row="true">
                                 <MudText>@playerRank</MudText>
-                                <MudText Class="d-flex flex-grow-1">@goalie.Name.ToUpper()</MudText>
+                                <MudText Class="d-flex flex-grow-1">@goalie.player_name.ToUpper()</MudText>
                                 <MudText>@StatValue(goalie)</MudText>
                             </MudStack>
                         </MudButton>
@@ -97,8 +97,8 @@ else
         selectedGoalie = orderedGoalies?.First();
     }
 
-    private Variant goalieButtonVariant(Data.GoalieStatLine goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
+    private Variant goalieButtonVariant(Data.GoalieStatLine goalie) => (goalie.player_id == selectedGoalie!.player_id) ?
     Variant.Filled : Variant.Outlined;
-    private Color goalieButtonColor(Data.GoalieStatLine goalie) => (goalie.PlayerId == selectedGoalie!.PlayerId) ?
+    private Color goalieButtonColor(Data.GoalieStatLine goalie) => (goalie.player_id == selectedGoalie!.player_id) ?
     Color.Primary : Color.Default;
 }
