@@ -82,9 +82,9 @@
     {
         return StatType.ToLower() switch
         {
-            "points" => (player.Goals + player.Assists).ToString(),
-            "goals" => player.Goals.ToString(),
-            "assists" => player.Assists.ToString(),
+            "points" => (player.goals + player.assists).ToString(),
+            "goals" => player.goals.ToString(),
+            "assists" => player.assists.ToString(),
             _ => "0",
         };
     }    
@@ -113,8 +113,10 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        var skaterStatTask = BCData.GetPlayerStats();
-        var goalieStatTask = BCData.GetGoalieStats();
+        var tournament = await BCData.GetCurrentTournamentAsync();
+        
+        var skaterStatTask = BCData.GetPlayerStats(tournament.tournament_id);
+        var goalieStatTask = BCData.GetGoalieStats(tournament.tournament_id);
         await Task.WhenAll(skaterStatTask, goalieStatTask);
         
         skaterStats = skaterStatTask.Result;
@@ -133,9 +135,9 @@
     {
         skaterStats = StatType.ToLower() switch
         {
-            "points" => skaterStats?.OrderByDescending(s => s.Goals + s.Assists),
-            "goals" => skaterStats?.OrderByDescending(s => s.Goals),
-            "assists" => skaterStats?.OrderByDescending(s => s.Assists),
+            "points" => skaterStats?.OrderByDescending(s => s.goals + s.assists),
+            "goals" => skaterStats?.OrderByDescending(s => s.goals),
+            "assists" => skaterStats?.OrderByDescending(s => s.assists),
             _ => skaterStats,
         };
         goalieStats = StatType.ToLower() switch

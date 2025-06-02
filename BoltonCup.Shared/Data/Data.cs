@@ -479,7 +479,8 @@ public class BCData : DapperBase, IBCData
                           *
                         FROM
                           account
-                        WHERE isactive = TRUE";
+                        WHERE isactive = TRUE
+                        ORDER BY lastname";
         return await QueryDbAsync<BCAccount>(sql);
     }
 

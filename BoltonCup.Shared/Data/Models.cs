@@ -41,7 +41,7 @@ public class BCGame
     public string AwayTeamLogo { get; set; }
 }
 
-public class PlayerProfile
+public class PlayerProfile : IEquatable<PlayerProfile>
 {
     public int id { get; set; }
     public required string name { get; set; }
@@ -63,6 +63,18 @@ public class PlayerProfile
     public bool IsForward => position == "forward";
     public bool IsDefense => position == "defense";
     public bool IsGoalie => position == "goalie";
+    
+    
+    #region IEquatable
+    
+    public bool Equals(PlayerProfile? other) => other is not null && other.id == id;
+    public override bool Equals(object? obj) => Equals(obj as PlayerProfile);
+    public override int GetHashCode() => id.GetHashCode();
+    public static bool operator == (PlayerProfile? left, PlayerProfile? right) => left is null ? right is null : left.Equals(right);
+    
+    public static bool operator != (PlayerProfile? left, PlayerProfile? right) => left is null ? right is not null : !left.Equals(right);
+
+    #endregion
 }
 
 public class PlayerGameSummary : BCGame
