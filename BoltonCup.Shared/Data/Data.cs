@@ -38,6 +38,7 @@ public interface IBCData
     Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId);
     Task<BCTeam?> GetTeamByDraftOrderAsync(int draftId, int order);
     Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId);
+    Task<IEnumerable<PlayerProfile>> GetDraftAvailableTournamentPlayersAsync(int tournamentId);
     Task<IEnumerable<BCDraftOrder>> GetDraftOrderAsync(int draftId);
     Task DraftPlayerAsync(PlayerProfile player, BCTeam team, BCDraftPick draftPick);
     Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId);
@@ -141,7 +142,8 @@ public class BCData : DapperBase, IBCData
         string sql = @"SELECT *, p.id
                         FROM players p
                                  LEFT OUTER JOIN account a ON p.account_id = a.id AND a.isactive = TRUE
-                        WHERE tournament_id = @TournamentId";
+                        WHERE tournament_id = @TournamentId
+                        ORDER BY birthday, p.position";
         
         return await QueryDbAsync<PlayerProfile>(sql, new { TournamentId = tournamentId });
     }
@@ -610,6 +612,17 @@ public class BCData : DapperBase, IBCData
                         WHERE tournament_id = @TournamentId";
         
         return await QueryDbAsync<BCTeam>(sql, new { TournamentId = tournamentId });
+    }
+    
+    public async Task<IEnumerable<PlayerProfile>> GetDraftAvailableTournamentPlayersAsync(int tournamentId)
+    {
+        string sql = @"SELECT *, p.id
+                        FROM players p
+                                 LEFT OUTER JOIN account a ON p.account_id = a.id AND a.isactive = TRUE
+                        WHERE tournament_id = @TournamentId
+                            AND p.team_id IS NULL
+                        ORDER BY birthday, p.position";
+        return await QueryDbAsync<PlayerProfile>(sql, new { TournamentId = tournamentId });
     }
 
     public async Task<IEnumerable<BCDraftOrder>> GetDraftOrderAsync(int draftId)

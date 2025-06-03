@@ -8,11 +8,12 @@
     <MudDataGrid
         T="PlayerProfile"
         Items="_filteredPlayers"
-        Height="calc(85vh - 4rem)"
+        Height="calc(90vh - 4rem)"
         QuickFilter="QuickFilter"
         Fil
         ShowColumnOptions="false"
-        FixedHeader>
+        FixedHeader
+        Dense>
         <ToolBarContent>
             <MudMenu 
                 Label="Actions" 
@@ -37,14 +38,18 @@
         <Columns>
             <TemplateColumn>
                 <CellTemplate>
-                    <MudButton 
-                        Color="Color.Default" 
+                    <MudButton
+                        Color="Color.Default"
                         Variant="Variant.Filled"
                         OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</MudButton>
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Property="x => x.name" Title="Name" />
-            <PropertyColumn Property="x => x.position.ToUpper().First()" Title="Pos." />
+            <PropertyColumn Property="x => x.name.ToUpper()" Title="Name" CellStyle="" />
+            <PropertyColumn Property="x => x.position" Title="Pos.">
+                <CellTemplate>
+                    <PositionChip Position="@context.Item.position" Size="Size.Small" />
+                </CellTemplate>
+            </PropertyColumn>
             <PropertyColumn Property="x => x.HighestLevel" Title="Highest Level" SortBy="SortByHighestLevel" />
             <PropertyColumn Property="@(x => x.dob.ToString("yyyy"))" Title="Birth year"/>
         </Columns>
@@ -57,6 +62,7 @@
     private HashSet<PlayerProfile> _filteredPlayers = new();
     private string _searchString;
     private string _positionFilter;
+    private BCTournament? _currentTournament;
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,10 +72,12 @@
 
     private async Task LoadDataAsync()
     {
-        _players = (await BCData.GetAllTournamentPlayersAsync(Drafter.DraftId))
-            .Where(p => p.team_id is null)
-            .OrderBy(SortByHighestLevel);
-        _filteredPlayers = new(_players);
+        _currentTournament = await BCData.GetCurrentTournamentAsync();
+        if (_currentTournament is not null)
+        {
+            _players = (await BCData.GetDraftAvailableTournamentPlayersAsync(_currentTournament.tournament_id)).OrderBy(SortByHighestLevel);
+            _filteredPlayers = new(_players);
+        }
     }
 
     private async Task OnResetDraft()
@@ -105,9 +113,16 @@
 
     private void PositionFilterChanged(string? position)
     {
-        if (_players is null || string.IsNullOrEmpty(position)) return;
-        
-        _filteredPlayers = new(_players.Where(p => p.position == position));
+        if (_players is null) return;
+
+        if (string.IsNullOrEmpty(position))
+        {
+            _filteredPlayers = new(_players);
+        }
+        else
+        {
+            _filteredPlayers = new(_players.Where(p => p.position == position));
+        }
     }
 
     private Func<PlayerProfile, object> SortByHighestLevel => x =>
