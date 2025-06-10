@@ -7,10 +7,13 @@
 {
     <MudDataGrid
         T="PlayerProfile"
-        Items="_players"
-        Height="calc(85vh - 4rem)"
+        Items="_filteredPlayers"
+        Height="calc(90vh - 4rem)"
         QuickFilter="QuickFilter"
-        FixedHeader>
+        Fil
+        ShowColumnOptions="false"
+        FixedHeader
+        Dense>
         <ToolBarContent>
             <MudMenu 
                 Label="Actions" 
@@ -21,6 +24,12 @@
                 <MudMenuItem Label="Reset" Class="red-text" OnClick="OnResetDraft" />
             </MudMenu>
             
+            <MudChipSet T="string" Variant="Variant.Text" SelectedValue="_positionFilter" SelectedValueChanged="PositionFilterChanged" SelectionMode="SelectionMode.ToggleSelection">
+                <MudChip Text="F" Color="Color.Primary" Value="@("forward")" />
+                <MudChip Text="D" Color="Color.Secondary" Value="@("defense")" />
+                <MudChip Text="G" Color="Color.Tertiary" Value="@("goalie")" />
+            </MudChipSet>
+            
             <MudSpacer/>
             <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
@@ -29,15 +38,19 @@
         <Columns>
             <TemplateColumn>
                 <CellTemplate>
-                    <MudButton 
-                        Color="Color.Default" 
+                    <MudButton
+                        Color="Color.Default"
                         Variant="Variant.Filled"
                         OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</MudButton>
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Property="x => x.name" Title="Name" />
-            <PropertyColumn Property="x => x.position.ToUpper().First()" Title="Pos." />
-            <PropertyColumn Property="x => x.HighestLevel" Title="Highest Level" />
+            <PropertyColumn Property="x => x.name.ToUpper()" Title="Name" CellStyle="" />
+            <PropertyColumn Property="x => x.position" Title="Pos.">
+                <CellTemplate>
+                    <PositionChip Position="@context.Item.position" Size="Size.Small" />
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.HighestLevel" Title="Highest Level" SortBy="SortByHighestLevel" />
             <PropertyColumn Property="@(x => x.dob.ToString("yyyy"))" Title="Birth year"/>
         </Columns>
     </MudDataGrid>
@@ -46,7 +59,10 @@
 @code {
 
     private IEnumerable<PlayerProfile>? _players;
+    private HashSet<PlayerProfile> _filteredPlayers = new();
     private string _searchString;
+    private string _positionFilter;
+    private BCTournament? _currentTournament;
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,9 +72,12 @@
 
     private async Task LoadDataAsync()
     {
-        _players = (await BCData.GetAllTournamentPlayersAsync(Drafter.DraftId))
-            .Where(p => p.team_id is null)
-            .OrderBy(x => x.HighestLevel);
+        _currentTournament = await BCData.GetCurrentTournamentAsync();
+        if (_currentTournament is not null)
+        {
+            _players = (await BCData.GetDraftAvailableTournamentPlayersAsync(_currentTournament.tournament_id)).OrderBy(SortByHighestLevel);
+            _filteredPlayers = new(_players);
+        }
     }
 
     private async Task OnResetDraft()
@@ -90,6 +109,34 @@
             return true;
 
         return false;
+    };
+
+    private void PositionFilterChanged(string? position)
+    {
+        if (_players is null) return;
+
+        if (string.IsNullOrEmpty(position))
+        {
+            _filteredPlayers = new(_players);
+        }
+        else
+        {
+            _filteredPlayers = new(_players.Where(p => p.position == position));
+        }
+    }
+
+    private Func<PlayerProfile, object> SortByHighestLevel => x =>
+    {
+        return x.HighestLevel switch
+        {
+            "Jr. A or higher" => 0,
+            "Jr. B" => 1,
+            "Jr. C" => 2,
+            "AAA" => 3,
+            "A/AA" => 4,
+            "House league" => 5,
+            _ => 1000
+        };
     };
     
     private async Task InitializeHubConnection()

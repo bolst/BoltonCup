@@ -5,12 +5,20 @@
 {
     <MudPaper Class="pa-2 ml-4" Elevation="3">
     <MudStack Class="d-flex align-center" Row="true">
-        @if (_tournament?.start_date is not null)
-        {
-            <MudText Class="mx-4 mx-sm-10" Typo="Typo.h6">
-                @_tournament.start_date.Value.ToString("yyyy")
-            </MudText>
-        }
+        <MudSelect @bind-Value="_selectedTournament" Underline="false">
+            @foreach (var tournament in _tournaments)
+            {
+                <MudSelectItem Value="@tournament" >
+                    @if (tournament?.start_date is not null)
+                    {
+                        <MudText Class="mx-2" Typo="Typo.body1">
+                            @tournament.start_date.Value.ToString("yyyy")
+                        </MudText>
+                    }
+                </MudSelectItem>
+            }
+        </MudSelect>
+        
         <MudDivider Vertical="true" FlexItem="true" />
 
         @StatColumnRF("GP", _playerGameByGame.Count())
@@ -25,7 +33,20 @@
     [Parameter] 
     public int AccountId { get; set; }
 
-    private BCTournament? _tournament;
+    private Data.BCTournament? selectedTournament;
+    private Data.BCTournament? _selectedTournament
+    {
+        get => selectedTournament;
+        set
+        {
+            if (selectedTournament == value) return;
+
+            selectedTournament = value;
+            InvokeAsync(LoadDataAsync);
+        }
+    }
+    
+    private IEnumerable<BCTournament> _tournaments = [];
     private IEnumerable<Data.PlayerGameSummary>? _playerGameByGame;
 
     private RenderFragment StatColumnRF(string title, int value) => __builder =>
@@ -37,13 +58,20 @@
     };
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        _tournament = await BCData.GetCurrentTournamentAsync();
-    }
-
     protected override async Task OnParametersSetAsync()
     {
-        _playerGameByGame = await BCData.GetPlayerGameByGame(AccountId, _tournament?.tournament_id);
+        _tournaments = await BCData.GetTournamentsAsync();
+        _selectedTournament = await BCData.GetCurrentTournamentAsync();
+
+        await LoadDataAsync();
+    }
+    
+    private async Task LoadDataAsync()
+    {
+        if (_selectedTournament is null) return;
+        
+        _playerGameByGame = await BCData.GetPlayerGameByGame(AccountId, _selectedTournament.tournament_id);
+     
+        InvokeAsync(StateHasChanged);
     }
 }

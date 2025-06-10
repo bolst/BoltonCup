@@ -53,7 +53,7 @@
                     </MudButton>
                     
                     <MudDataGrid 
-                        Items="@accounts.Where(a => a.IsActive).OrderBy(a => !a.Payed)"
+                        Items="@accounts.Where(a => a.IsActive).OrderBy(a => a.Payed)"
                         QuickFilter="QuickFilter"
                         ExpandSingleRow
                         Hover>

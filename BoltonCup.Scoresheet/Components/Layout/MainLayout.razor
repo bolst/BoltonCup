@@ -11,13 +11,13 @@
 
 <MudLayout>
     <MudAppBar>
-        <MudImage Class="pr-4 clickable" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" Width="130"/>
+        <MudImage Class="pr-4 clickable" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" Width="90"/>
     </MudAppBar>
-    <MudDrawer ClipMode="DrawerClipMode.Always" Elevation="2" Variant="@DrawerVariant.Mini">
+    <MudDrawer ClipMode="DrawerClipMode.Always" Elevation="2" Width="100px" Open>
         <MudNavMenu>
-            <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Store" Href="/">Home</MudNavLink>
-            <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LibraryBooks" Href="scoresheet">Scoresheet</MudNavLink>
-            <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Group" Href="games">Games</MudNavLink>
+            <CustomNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Store" Href="/">Home</CustomNavLink>
+            <CustomNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LibraryBooks" Href="scoresheet">Scoresheet</CustomNavLink>
+            <CustomNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Group" Href="games">Games</CustomNavLink>
         </MudNavMenu>
     </MudDrawer>
     <MudMainContent>
