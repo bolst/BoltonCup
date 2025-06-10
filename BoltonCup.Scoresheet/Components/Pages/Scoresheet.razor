@@ -1,1 +1,160 @@
-@page "/scoresheet"
+@page "/scoresheet/{GameId:int}"
+
+@inject IBCData BCData
+@inject IDialogService DialogService
+
+<div class="relative">
+    @if (_game is not null)
+    {
+
+        if (_homeTeam is not null && _awayTeam is not null)
+        {
+            <MudStack AlignItems="AlignItems.Center" Row>
+                <MudImage Src="@_homeTeam.logo_url" Width="70" />
+                <MudText Typo="Typo.h6">@_homeTeam.name - <b>@HomeGoals.Count()</b></MudText>            
+                
+                <MudSpacer />
+                
+                <MudText Typo="Typo.h6"><b>@AwayGoals.Count()</b> - @_awayTeam.name</MudText>
+                <MudImage Src="@_awayTeam.logo_url" Width="70" />
+            </MudStack>
+        }
+        
+        <MudToolBar>
+            <MudButton OnClick="@(() => OnAddGoal(_homeTeam, _homeRoster))" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
+            <MudSpacer />
+            <MudButton OnClick="@(() => OnAddGoal(_awayTeam, _awayRoster))" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
+        </MudToolBar>
+        
+        <MudGrid Style="height: 35vh">
+            <MudItem xs="6">
+                @GoalTable(HomeGoals)                
+            </MudItem>            
+            <MudItem xs="6">
+                @GoalTable(AwayGoals)
+            </MudItem>
+        </MudGrid>
+    
+        
+        <MudToolBar>
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+            <MudSpacer />
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+        </MudToolBar>
+        
+        <MudGrid Style="height: 35vh">
+            <MudItem xs="6">
+                @PenaltyTable(HomePenalties)
+            </MudItem>            
+            <MudItem xs="6">
+                @PenaltyTable(AwayPenalties)
+            </MudItem>
+        </MudGrid>
+    
+    }
+    else
+    {
+        <MudText>No game found!</MudText>
+    }
+    
+    
+    <MudOverlay Visible="_loading" DarkBackground Absolute>
+        <MudProgressCircular Size="Size.Large" Indeterminate />
+    </MudOverlay>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public required int GameId { get; set; }
+
+    private BCGame? _game;
+    private BCTeam? _homeTeam;
+    private BCTeam? _awayTeam;
+    private IEnumerable<PlayerProfile> _homeRoster = [];
+    private IEnumerable<PlayerProfile> _awayRoster = [];
+    
+    private IEnumerable<GameGoal> _goals = [];
+    private IEnumerable<GamePenalty> _penalties = [];
+    
+    private bool _loading;
+
+    private IEnumerable<GameGoal> HomeGoals => _homeTeam is null ? [] : _goals.Where(g => g.TeamId == _homeTeam.id);
+    private IEnumerable<GameGoal> AwayGoals => _awayTeam is null ? [] : _goals.Where(g => g.TeamId == _awayTeam.id);
+    private IEnumerable<GamePenalty> HomePenalties => _homeTeam is null ? [] : _penalties.Where(g => g.TeamId == _homeTeam.id);
+    private IEnumerable<GamePenalty> AwayPenalties => _awayTeam is null ? [] : _penalties.Where(g => g.TeamId == _awayTeam.id);
+    
+    
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        StateHasChanged();
+        
+        _game = await BCData.GetGameById(GameId);
+
+        if (_game is not null)
+        {
+            _homeTeam = await BCData.GetTeamById(_game.home_team_id);
+            _awayTeam = await BCData.GetTeamById(_game.away_team_id);
+            
+            _homeRoster = await BCData.GetRosterByTeamId(_game.home_team_id);
+            _awayRoster = await BCData.GetRosterByTeamId(_game.away_team_id);
+
+            _goals = await BCData.GetGameGoalsByGameId(_game.id);
+            _penalties = await BCData.GetGamePenaltiesByGameId(_game.id);
+        }
+
+        _loading = false;
+        StateHasChanged();
+    }
+
+
+
+    private async Task OnAddGoal(BCTeam team, IEnumerable<PlayerProfile> players)
+    {
+        var parameters = new DialogParameters<AddGoalDialog>
+        {
+            { x => x.Team, team },
+            { x => x.Players, players }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small
+        };
+
+        var dialog = await DialogService.ShowAsync<AddGoalDialog>("Add Goal", parameters, options);
+        var result = await dialog.Result;
+    }
+    
+
+
+    private RenderFragment GoalTable(IEnumerable<GameGoal> goals)
+    {
+        return 
+            @<MudDataGrid Items="goals" SortMode="SortMode.None" ShowColumnOptions="false" Dense>
+                <Columns>
+                <PropertyColumn Property="x => x.Period" Title="Period" />
+                <PropertyColumn Property="@(x => x.Time.ToString(@"hh\:mm"))" Title="Time" />
+                <PropertyColumn Property="x => x.ScorerName" Title="Scorer" />
+                <PropertyColumn Property="x => x.Assist1Name" Title="Assist" />
+                <PropertyColumn Property="x => x.Assist2Name" Title="Assist" />
+                </Columns>
+            </MudDataGrid>;
+    }
+
+    private RenderFragment PenaltyTable(IEnumerable<GamePenalty> penalties)
+    {
+        return
+            @<MudDataGrid Items="penalties" SortMode="SortMode.None" ShowColumnOptions="false" Dense>
+                <Columns>
+                    <PropertyColumn Property="x => x.Period" Title="Period"/>
+                    <PropertyColumn Property="@(x => x.Time.ToString(@"hh\:mm"))" Title="Time"/>
+                    <PropertyColumn Property="x => x.PlayerName" Title="Player"/>
+                    <PropertyColumn Property="x => x.Infraction" Title="Infraction"/>
+                </Columns>
+            </MudDataGrid>;
+    }
+}

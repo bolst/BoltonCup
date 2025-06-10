@@ -44,6 +44,7 @@ public interface IBCData
     Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId);
     Task ResetDraftAsync(int draftId);
     Task<IEnumerable<BCSponsor>> GetActiveSponsorsAsync();
+    Task<IEnumerable<BCGame>> GetIncompleteGamesAsync();
 }
 
 public class BCData : DapperBase, IBCData
@@ -705,6 +706,24 @@ public class BCData : DapperBase, IBCData
                         WHERE is_active = true
                         ORDER BY sort_key";
         return await QueryDbAsync<BCSponsor>(sql);
+    }
+
+
+    public async Task<IEnumerable<BCGame>> GetIncompleteGamesAsync()
+    {
+        string sql = @"SELECT g.*,
+                           h.name       AS hometeamname,
+                           h.name_short AS hometeamnameshort,
+                           h.logo_url   AS hometeamlogo,
+                           a.name       AS awayteamname,
+                           a.name_short AS awayteamnameshort,
+                           a.logo_url   AS awayteamlogo
+                        FROM game g
+                                 LEFT OUTER JOIN team h ON g.home_team_id = h.id
+                                 LEFT OUTER JOIN team a ON g.away_team_id = a.id
+                        WHERE g.state != 'FIN'
+                        ORDER BY g.date ASC";
+        return await QueryDbAsync<BCGame>(sql);
     }
 
 }
