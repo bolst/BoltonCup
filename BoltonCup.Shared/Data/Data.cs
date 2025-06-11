@@ -334,6 +334,7 @@ public class BCData : DapperBase, IBCData
                                      LEFT JOIN
                                  points pts ON p.id IN (pts.scorer_id, pts.assist1_player_id, pts.assist2_player_id)
                             WHERE p.tournament_id = @TournamentId
+                                    AND p.position != 'goalie'
                                     {0}
                             GROUP BY p.id, p.name, p.jersey_number, p.position, p.tournament_id, p.team_id, a.profilepicture, t.name,
                                      t.name_short, t.logo_url
