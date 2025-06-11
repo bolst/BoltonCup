@@ -30,12 +30,12 @@
     </MudStack>
         
     <MudTabPanel Text="Skaters" BadgeData="_skaterStats.Count()">
-        <MudDataGrid Items="_skaterStats" QuickFilter="PlayerQuickFilter" Height="65vh" FixedHeader Dense>
+        <MudDataGrid Items="_skaterStats" QuickFilter="PlayerQuickFilter" Height="65vh" SortMode="SortMode.Single" Filterable FixedHeader Dense>
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Skaters</MudText>
             </ToolBarContent>
             <Columns>
-                <TemplateColumn Title="Player" Sortable="true" Filterable="true" StickyLeft>
+                <PropertyColumn Property="x => x.player_name" Title="Player" StickyLeft>
                     <CellTemplate>
                         <MudStack AlignItems="AlignItems.Center" Row>
                             <MudAvatar>
@@ -45,12 +45,12 @@
                             <MudImage Src="@_teams.FirstOrDefault(x => x.id == context.Item.team_id)?.logo_url" Height="30"/>
                         </MudStack>
                     </CellTemplate>
-                </TemplateColumn>
+                </PropertyColumn>
                 <PropertyColumn Property="x => x.jersey_number" Title="#"/>
                 <PropertyColumn Property="x => x.position" Title="Pos"/>
-                <PropertyColumn Property="x => x.goals + x.assists" Title="P" Sortable="true" Filterable="true" InitialDirection="SortDirection.Descending"/>
-                <PropertyColumn Property="x => x.goals" Title="G" Sortable="true" Filterable="true"/>
-                <PropertyColumn Property="x => x.assists" Title="A" Sortable="true" Filterable="true"/>
+                <PropertyColumn Property="x => x.goals + x.assists" Title="P" InitialDirection="SortDirection.Descending"/>
+                <PropertyColumn Property="x => x.goals" Title="G" />
+                <PropertyColumn Property="x => x.assists" Title="A" />
             </Columns>
         </MudDataGrid>
     </MudTabPanel>
