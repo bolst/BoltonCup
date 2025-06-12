@@ -14,6 +14,7 @@ public class BCTeam : IEquatable<BCTeam>
     public string? logo_url { get; set; } = "";
     public required int tournament_id { get; set; }
     public required int gm_account_id { get; set; }
+    public string? banner_image { get; set; }
 
     public bool Equals(BCTeam? other) => other is not null && other.id == id;
     public override bool Equals(object? obj) => Equals(obj as BCTeam);

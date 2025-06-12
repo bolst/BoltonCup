@@ -20,12 +20,6 @@ body {
     background-position: center center;
 }
 
-.info-banner-background {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url("images/scisoc.webp");
-    background-size: cover;
-    background-position: center 40%;
-}
-
 .soon-background {
     background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url("https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//chris-doey.webp");
     background-size: cover;

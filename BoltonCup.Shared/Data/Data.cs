@@ -45,6 +45,8 @@ public interface IBCData
     Task ResetDraftAsync(int draftId);
     Task<IEnumerable<BCSponsor>> GetActiveSponsorsAsync();
     Task<IEnumerable<BCGame>> GetIncompleteGamesAsync();
+    Task<BCAccount?> GetAccountByPCKeyAsync(Guid pckey);
+    Task<PlayerProfile?> GetCurrentPlayerProfileByPCKeyAsync(Guid pckey);
 }
 
 public class BCData : DapperBase, IBCData
@@ -727,6 +729,27 @@ public class BCData : DapperBase, IBCData
         return await QueryDbAsync<BCGame>(sql);
     }
 
+    public async Task<BCAccount?> GetAccountByPCKeyAsync(Guid pckey)
+    {
+        string sql = @"SELECT *
+                        FROM account
+                        WHERE pckey = @PCKey";
+        
+        return await QueryDbSingleAsync<BCAccount>(sql, new { PCKey = pckey });
+    }
+    
+    
+    public async Task<PlayerProfile?> GetCurrentPlayerProfileByPCKeyAsync(Guid pckey)
+    {
+        string sql = @"SELECT p.*
+                        FROM players p
+                                 INNER JOIN account a ON a.id = p.account_id
+                                 INNER JOIN tournament t ON t.tournament_id = p.tournament_id AND t.current = TRUE
+                        WHERE a.pckey = @PCKey";
+        
+        return await QueryDbSingleAsync<PlayerProfile>(sql, new { PCKey = pckey });
+
+    }
 }
 
 

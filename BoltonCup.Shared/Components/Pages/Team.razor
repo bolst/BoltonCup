@@ -3,52 +3,51 @@
 @inject IBCData BCData
 @inject NavigationManager Navigation
 
-<PageTitle>@team?.name_short</PageTitle>
-
-<MudPaper Class="pa-10 ma-5" Elevation="5">
-    @if (team is not null && roster is not null)
-    {
+@if (team is not null && roster is not null)
+{
+    <PageHeader Title="@team?.name" BkgImage="@team.banner_image" Height="250px">
+        
         <MudStack Class="mb-6 d-flex align-center" Row="true" Wrap="Wrap.Wrap">
-            <MudText Typo="Typo.h3">@team.name_short.ToUpper()</MudText>
+            <MudText Typo="Typo.h3">@team?.name.ToUpper()</MudText>
             <MudImage Src="@team.logo_url" Height="150" />
         </MudStack>
+    </PageHeader>
 
-        <MudTable
-            T="PlayerProfile"
-            Items="roster"
-            Elevation="0"
-            GroupBy="_groupDefinition"
-            OnRowClick="OnRowClick"
-            Striped
-            Hover
-            Dense>
-            <HeaderContent>
-                <MudTh>#</MudTh>
-                <MudTh>NAME</MudTh>
-                <MudTh>BIRTH YEAR</MudTh>
-            </HeaderContent>
-            <GroupHeaderTemplate>
-                <MudTh colspan="3">
-                    <MudText Typo="Typo.h5">@GroupHeader(context.Key.ToString())</MudText>
-                </MudTh>
-            </GroupHeaderTemplate>
-            <RowTemplate>
-                <MudTd DataLabel="#">@(context.jersey_number is null ? string.Empty : context.jersey_number.Value.ToString("D2"))</MudTd>
-                <MudTd DataLabel="NAME">@context.name</MudTd>
-                <MudTd DataLabel="BIRTH YEAR">@context.dob.ToString("yyyy")</MudTd>
-            </RowTemplate>
-        </MudTable>
-    }
-    else
-    {
-        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="30vw" Height="10vh" />
-        <MudSkeleton Class="my-5" SkeletonType="SkeletonType.Rectangle" Width="70vw" Height="40vh" />
-        <MudSkeleton Class="my-5" SkeletonType="SkeletonType.Rectangle" Width="70vw" Height="40vh" />
-        <MudSkeleton Class="my-5" SkeletonType="SkeletonType.Rectangle" Width="70vw" Height="20vh" />
-    }
-    </MudPaper>
+    <MudTable
+        T="PlayerProfile"
+        Items="roster"
+        Elevation="0"
+        GroupBy="_groupDefinition"
+        OnRowClick="OnRowClick"
+        Striped
+        Hover
+        Dense>
+        <HeaderContent>
+            <MudTh>#</MudTh>
+            <MudTh>NAME</MudTh>
+            <MudTh>BIRTH YEAR</MudTh>
+        </HeaderContent>
+        <GroupHeaderTemplate>
+            <MudTh colspan="3">
+                <MudText Typo="Typo.h5">@GroupHeader(context.Key.ToString())</MudText>
+            </MudTh>
+        </GroupHeaderTemplate>
+        <RowTemplate>
+            <MudTd DataLabel="#">@(context.jersey_number is null ? string.Empty : context.jersey_number.Value.ToString("D2"))</MudTd>
+            <MudTd DataLabel="NAME">@context.name</MudTd>
+            <MudTd DataLabel="BIRTH YEAR">@context.dob.ToString("yyyy")</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+else
+{
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="30vw" Height="10vh" />
+    <MudSkeleton Class="my-5" SkeletonType="SkeletonType.Rectangle" Width="70vw" Height="40vh" />
+    <MudSkeleton Class="my-5" SkeletonType="SkeletonType.Rectangle" Width="70vw" Height="40vh" />
+    <MudSkeleton Class="my-5" SkeletonType="SkeletonType.Rectangle" Width="70vw" Height="20vh" />
+}
 
-    @code {
+@code {
     [Parameter] public int Id { get; set; }
 
     private BoltonCup.Shared.Data.BCTeam? team { get; set; }

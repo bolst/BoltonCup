@@ -30,8 +30,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>a1dmj37rv3</Fingerprint>
-      <Integrity>fvrLPsnb1qsTsoim+tYiQ8D6HUE/R8l7MOWDftHYqF8=</Integrity>
+      <Fingerprint>rf27dqfmwm</Fingerprint>
+      <Integrity>6bIVWYb6ZoL08VCIspJxkOc03U0YNfaH3hxbk4diu7U=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\BoltonCup.min.css'))</OriginalItemSpec>
