@@ -1,0 +1,49 @@
+@page "/config"
+
+@inject NavigationManager Navigation
+@inject IBCData BCData
+
+<PageHeader></PageHeader>
+
+@if (_account is not null)
+{
+    <MudImage Src="@_account.ProfilePicture" />
+}
+
+@code {
+
+    // 31d82357-9f1d-451a-9d3f-3882b8e17cc6
+    [SupplyParameterFromQuery] 
+    public string Key { get; set; } = string.Empty;
+
+    private Guid _key = Guid.Empty;
+
+    private BCAccount? _account;
+    private PlayerProfile? _profile;
+    
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var valid = Guid.TryParse(Key, out var parsedKey);
+        
+        if (string.IsNullOrEmpty(Key) || Key.Length != 36 || !valid)
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+
+        if (parsedKey != _key)
+        {
+            _key = parsedKey;
+            _account = await BCData.GetAccountByPCKeyAsync(_key);
+            _profile = await BCData.GetCurrentPlayerProfileByPCKeyAsync(_key);
+
+            if (_account is null)
+            {
+                Navigation.NavigateTo("/");
+                return;
+            }
+        }
+    }
+
+}
