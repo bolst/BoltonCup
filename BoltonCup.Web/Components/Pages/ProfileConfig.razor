@@ -1,9 +1,11 @@
 @page "/config"
+@using System.Diagnostics
 
 @inject NavigationManager Navigation
 @inject IBCData BCData
 @inject SupabaseServiceProvider SBService
 @inject ISnackbar Snackbar
+@inject IJSRuntime JS
 
 <PageHeader Title="Profile" Height="15vh">Edit Profile</PageHeader>
 
@@ -90,6 +92,7 @@
         {
             var resizer = new SkiaSharpImageResizer();
             const int maxUploadSizeKB = 5 * 1024 * 1024; // 5 MB
+            await JS.InvokeVoidAsync("console.log", $"uploaded size: {file.Size}");
             bytes = await resizer.ApproxResizeImageAsync(file.OpenReadStream(maxUploadSizeKB), 800);
         }
         catch
@@ -108,6 +111,8 @@
 
             File.Delete(path);
         }
+
+        await JS.InvokeVoidAsync("console.log", $"bytes: {bytes.Length}");
 
         var extension = Path.GetExtension(file.Name).ToLower();
         var message = await SBService.UpdateProfilePictureAsync(_account.Email, bytes, extension);
