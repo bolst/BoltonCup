@@ -116,7 +116,35 @@ public class SupabaseServiceProvider
         await _supabase.Functions.Invoke("resend-email", options: options);
     }
     
-    
+    public async Task<string> UpdateProfilePictureAsync(string email, byte[] imageBytes)
+    {
+        try
+        {
+            var account = await _bcData.GetAccountByEmailAsync(email);
+            if (account is null) return "Could not find an account with that email";
+
+            var filename = $"{account.FirstName}-{account.LastName}.png";
+            var options = new Supabase.Storage.FileOptions
+            {
+                ContentType = "data:image/*;base64",
+                Upsert = true,
+            };
+
+            await _supabase.Storage.From("profile-pictures").Upload(imageBytes, filename, options);
+            var publicUrl = _supabase.Storage.From("profile-pictures").GetPublicUrl(filename);
+            await _bcData.UpdateAccountProfilePictureAsync(account.Email, publicUrl);
+        }
+        catch (Supabase.Storage.Exceptions.SupabaseStorageException exc)
+        {
+            return "File is too large!";
+        }
+        catch (Exception e)
+        {
+            return "Something went wrong";
+        }
+        
+        return string.Empty;
+    }
     
     
     
