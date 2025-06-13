@@ -2,21 +2,37 @@
 
 @inject NavigationManager Navigation
 @inject IBCData BCData
+@inject SupabaseServiceProvider SBService
 
-<PageHeader></PageHeader>
+<PageHeader Title="Profile" Height="15vh">Edit Profile</PageHeader>
 
 @if (_account is not null)
 {
-    <MudImage Src="@_account.ProfilePicture" />
+    <MudStack Class="pa-4" AlignItems="AlignItems.Center" Row>
+        <MudText Typo="Typo.h6">Profile Picture</MudText>
+        
+        <MudFileUpload T="IBrowserFile" FilesChanged="OnChangeProfilePic" Accept=".png, .jpg">
+            <ActivatorContent>
+                <MudIconButton Icon="@Icons.Material.Filled.UploadFile" Color="Color.Primary" Size="Size.Large" />
+            </ActivatorContent>
+        </MudFileUpload>
+        
+        <MudSpacer />
+        
+        <MudImage Src="@_account.ProfilePicture" Height="120" />
+    </MudStack>
+    
+    <MudDivider />
+    
 }
 
 @code {
 
     // 31d82357-9f1d-451a-9d3f-3882b8e17cc6
     [SupplyParameterFromQuery] 
-    public string Key { get; set; } = string.Empty;
+    public string PCK { get; set; } = string.Empty;
 
-    private Guid _key = Guid.Empty;
+    private Guid _pcKey = Guid.Empty;
 
     private BCAccount? _account;
     private PlayerProfile? _profile;
@@ -24,19 +40,19 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        var valid = Guid.TryParse(Key, out var parsedKey);
+        var valid = Guid.TryParse(PCK, out var parsedKey);
         
-        if (string.IsNullOrEmpty(Key) || Key.Length != 36 || !valid)
+        if (string.IsNullOrEmpty(PCK) || PCK.Length != 36 || !valid)
         {
             Navigation.NavigateTo("/");
             return;
         }
 
-        if (parsedKey != _key)
+        if (parsedKey != _pcKey)
         {
-            _key = parsedKey;
-            _account = await BCData.GetAccountByPCKeyAsync(_key);
-            _profile = await BCData.GetCurrentPlayerProfileByPCKeyAsync(_key);
+            _pcKey = parsedKey;
+            _account = await BCData.GetAccountByPCKeyAsync(_pcKey);
+            _profile = await BCData.GetCurrentPlayerProfileByPCKeyAsync(_pcKey);
 
             if (_account is null)
             {
@@ -44,6 +60,29 @@
                 return;
             }
         }
+    }
+
+
+    private async Task OnChangeProfilePic(IBrowserFile? file)
+    {
+        if (_account is null || file is null) return;
+
+        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        await using var fs = new FileStream(path, FileMode.Create);
+        await file.OpenReadStream(file.Size).CopyToAsync(fs);
+        var bytes = new byte[file.Size];
+
+        fs.Position = 0;
+        _ = await fs.ReadAsync(bytes);            
+        fs.Close();
+
+        File.Delete(path);
+        
+        await SBService.UpdateProfilePictureAsync(_account.Email, bytes);
+
+        _account.ProfilePicture = $"data:image/*;base64,{Convert.ToBase64String(bytes)}";
+        InvokeAsync(StateHasChanged);
     }
 
 }
