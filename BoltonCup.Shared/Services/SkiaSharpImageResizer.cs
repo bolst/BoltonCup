@@ -12,26 +12,16 @@ public class SkiaSharpImageResizer
     private const int MIN_QUALITY = 50; // do not go below 50% quality
     private const int QUALITY_STEP = 10; // reduce quality by 10% in each iteration
 
-    private IJSRuntime _js;
-    
-    public SkiaSharpImageResizer(IJSRuntime js)
-    {
-        _js = js;
-    }
-    
+
     public async Task<byte[]> ApproxResizeImageAsync(Stream imageStream, long targetSizeKB = 500)
     {
         using var memoryStream = new MemoryStream();
         await imageStream.CopyToAsync(memoryStream);
         byte[] originalBytes = memoryStream.ToArray();
-        await _js.InvokeVoidAsync("console.log", $"starting with image bytes (length = {originalBytes.Length})");   
         
         // if image is alr smaller than target size, return
         if (originalBytes.Length <= targetSizeKB * 1024)
-        {
-            await _js.InvokeVoidAsync("console.log", "returning original");   
             return originalBytes;
-        }
         
         using var originalBitmap = SKBitmap.Decode(new MemoryStream(originalBytes));
         var quality = INIT_QUALITY; // start with high quality
@@ -50,12 +40,10 @@ public class SkiaSharpImageResizer
             if (imageSizeBytes > targetSizeKB * 1024 && quality > MIN_QUALITY)
             {
                 quality -= QUALITY_STEP;
-                await _js.InvokeVoidAsync("console.log", $"quality set to {quality}");   
             }
             else if (imageSizeBytes < targetSizeKB * 1024 / 2 && scaleFactor > MIN_SCALE_FACTOR)
             {
                 scaleFactor -= SCALE_DEC;
-                await _js.InvokeVoidAsync("console.log", $"scale set to {scaleFactor}");   
             }
             else
             {
@@ -64,7 +52,6 @@ public class SkiaSharpImageResizer
 
         } while (imageSizeBytes > targetSizeKB * 1024 || imageSizeBytes < targetSizeKB * 1024 / 2);
 
-        await _js.InvokeVoidAsync("console.log", $"returning image bytes (length = {imageBytes.Length})");   
         return imageBytes;
     }
 
