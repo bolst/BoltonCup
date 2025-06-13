@@ -20,7 +20,6 @@ public interface IBCData
     Task<IEnumerable<PlayerStatLine>> GetPlayerStats(int tournamentId, int? teamId = null);
     Task<IEnumerable<GoalieStatLine>> GetGoalieStats(int tournamentId, int? teamId = null);
     Task<IEnumerable<PlayerProfilePicture>> GetPlayerProfilePictures();
-    Task<PlayerProfilePicture> GetPlayerProfilePictureById(int playerId);
     Task<string> SubmitRegistration(RegisterFormModel form);
     Task<IEnumerable<RegisterFormModel>> GetRegistrationsAsync();
     Task<RegisterFormModel?> GetRegistrationByEmailAsync(string email);
@@ -47,6 +46,7 @@ public interface IBCData
     Task<IEnumerable<BCGame>> GetIncompleteGamesAsync();
     Task<BCAccount?> GetAccountByPCKeyAsync(Guid pckey);
     Task<PlayerProfile?> GetCurrentPlayerProfileByPCKeyAsync(Guid pckey);
+    Task UpdateConfigDataAsync(BCAccount account);
 }
 
 public class BCData : DapperBase, IBCData
@@ -387,16 +387,8 @@ public class BCData : DapperBase, IBCData
         return await QueryDbAsync<PlayerProfilePicture>(sql);
     }
 
-    public async Task<PlayerProfilePicture> GetPlayerProfilePictureById(int id)
-    {
-        string sql = @"SELECT
-                        player_id AS PlayerId,
-                        uri AS Source
-                        FROM profile_pictures
-                        WHERE player_id = @PlayerId";
-        return await QueryDbSingleAsync<PlayerProfilePicture>(sql, new { PlayerId = id }) ?? new();
-    }
 
+    
     public async Task<string> SubmitRegistration(RegisterFormModel form)
     {
         form.FirstName = form.FirstName.ToLower();
@@ -748,7 +740,19 @@ public class BCData : DapperBase, IBCData
                         WHERE a.pckey = @PCKey";
         
         return await QueryDbSingleAsync<PlayerProfile>(sql, new { PCKey = pckey });
+    }
 
+
+    public async Task UpdateConfigDataAsync(BCAccount account)
+    {
+        string sql = @"UPDATE account
+                        SET preferred_number1 = @preferred_number1,
+                            preferred_number2 = @preferred_number2,
+                            preferred_number3 = @preferred_number3,
+                            preferred_beer = @preferred_beer
+                            WHERE id = @id";
+
+        await ExecuteSqlAsync(sql, account);
     }
 }
 
