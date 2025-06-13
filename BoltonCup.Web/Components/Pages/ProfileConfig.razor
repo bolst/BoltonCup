@@ -109,7 +109,8 @@
             File.Delete(path);
         }
 
-        var message = await SBService.UpdateProfilePictureAsync(_account.Email, bytes);
+        var extension = Path.GetExtension(file.Name).ToLower();
+        var message = await SBService.UpdateProfilePictureAsync(_account.Email, bytes, extension);
 
         if (message is null)
         {
