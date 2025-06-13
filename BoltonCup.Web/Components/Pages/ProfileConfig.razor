@@ -90,7 +90,7 @@
         // try to rescale image
         try
         {
-            var resizer = new SkiaSharpImageResizer();
+            var resizer = new SkiaSharpImageResizer(JS);
             const int maxUploadSizeKB = 5 * 1024 * 1024; // 5 MB
             await JS.InvokeVoidAsync("console.log", $"uploaded size: {file.Size}");
             bytes = await resizer.ApproxResizeImageAsync(file.OpenReadStream(maxUploadSizeKB), 800);
