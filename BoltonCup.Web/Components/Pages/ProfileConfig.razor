@@ -95,9 +95,10 @@
             await JS.InvokeVoidAsync("console.log", $"uploaded size: {file.Size}");
             bytes = await resizer.ApproxResizeImageAsync(file.OpenReadStream(maxUploadSizeKB), 800);
         }
-        catch
+        catch (Exception e)
         {
             skEm = "(NSK)";
+            await JS.InvokeVoidAsync("console.log", $"skia error: {e.Message}");
             
             var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
