@@ -82,16 +82,20 @@
         InvokeAsync(StateHasChanged);
         
         byte[] bytes;
+
+        var skEm = string.Empty;
         
         // try to rescale image
         try
         {
             var resizer = new SkiaSharpImageResizer();
-            const int maxUploadSizeKB = 3 * 1024 * 1024; // 3 MB
+            const int maxUploadSizeKB = 5 * 1024 * 1024; // 5 MB
             bytes = await resizer.ApproxResizeImageAsync(file.OpenReadStream(maxUploadSizeKB), 800);
         }
         catch
         {
+            skEm = "(NSK)";
+            
             var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
             await using var fs = new FileStream(path, FileMode.Create);
@@ -114,11 +118,11 @@
         }
         else if (message == ProfilePicUploadErrorType.FileTooLarge)
         {
-            Snackbar.Add("That image was too large :( try a different one.", Severity.Error);
+            Snackbar.Add($"That image was too large :( try a different one {skEm}.", Severity.Error);
         }
         else
         {
-            Snackbar.Add("That image didn't work :( try a different one.", Severity.Error);
+            Snackbar.Add($"That image didn't work :( try a different one {skEm}.", Severity.Error);
         }
         
         _loading = false;
