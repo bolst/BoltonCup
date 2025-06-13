@@ -85,6 +85,10 @@
               "target": "Package",
               "version": "[8.0.6, )"
             },
+            "SkiaSharp": {
+              "target": "Package",
+              "version": "[3.119.0, )"
+            },
             "Stripe.net": {
               "target": "Package",
               "version": "[48.0.2, )"

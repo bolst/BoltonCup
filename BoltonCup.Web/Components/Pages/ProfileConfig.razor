@@ -9,22 +9,30 @@
 
 @if (_account is not null)
 {
-    <MudStack Class="pa-4" AlignItems="AlignItems.Center" Row>
-        <MudText Typo="Typo.h6">Profile Picture</MudText>
+    <div class="relative">
         
-        <MudFileUpload T="IBrowserFile" FilesChanged="OnChangeProfilePic" Accept=".png, .jpg">
-            <ActivatorContent>
-                <MudIconButton Icon="@Icons.Material.Filled.UploadFile" Color="Color.Primary" Size="Size.Large" />
-            </ActivatorContent>
-        </MudFileUpload>
+        <MudStack Class="pa-4" AlignItems="AlignItems.Center" Row>
+            <MudText Typo="Typo.h6">Profile Picture</MudText>
+            
+            <MudFileUpload T="IBrowserFile" FilesChanged="OnChangeProfilePic" Accept=".png, .jpg">
+                <ActivatorContent>
+                    <MudIconButton Icon="@Icons.Material.Filled.UploadFile" Color="Color.Primary" Size="Size.Large" />
+                </ActivatorContent>
+            </MudFileUpload>
+            
+            <MudSpacer />
+            
+            <MudImage Src="@_account.ProfilePicture" Height="120" />
+        </MudStack>
         
-        <MudSpacer />
+        <MudDivider />
         
-        <MudImage Src="@_account.ProfilePicture" Height="120" />
-    </MudStack>
-    
-    <MudDivider />
-    
+        
+        
+        <MudOverlay @bind-Visible="_loading" DarkBackground Absolute>
+            <MudProgressCircular Size="Size.Large" Indeterminate />
+        </MudOverlay>    
+    </div>
 }
 
 @code {
@@ -34,6 +42,8 @@
     public string PCK { get; set; } = string.Empty;
 
     private Guid _pcKey = Guid.Empty;
+
+    private bool _loading;
 
     private BCAccount? _account;
     private PlayerProfile? _profile;
@@ -66,36 +76,53 @@
 
     private async Task OnChangeProfilePic(IBrowserFile? file)
     {
-        if (_account is null || file is null) return;
+        if (_account is null || file is null || !file.ContentType.StartsWith("image/")) return;
 
+        _loading = true;
+        InvokeAsync(StateHasChanged);
+        
+        byte[] bytes;
+        
+        // try to rescale image
         try
+        {
+            var resizer = new SkiaSharpImageResizer();
+            const int maxUploadSizeKB = 3 * 1024 * 1024; // 3 MB
+            bytes = await resizer.ApproxResizeImageAsync(file.OpenReadStream(maxUploadSizeKB), 800);
+        }
+        catch
         {
             var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
             await using var fs = new FileStream(path, FileMode.Create);
             await file.OpenReadStream(file.Size).CopyToAsync(fs);
-            var bytes = new byte[file.Size];
+            bytes = new byte[file.Size];
 
             fs.Position = 0;
             _ = await fs.ReadAsync(bytes);
             fs.Close();
 
             File.Delete(path);
+        }
 
-            await SBService.UpdateProfilePictureAsync(_account.Email, bytes);
+        var message = await SBService.UpdateProfilePictureAsync(_account.Email, bytes);
 
+        if (message is null)
+        {
             _account.ProfilePicture = $"data:image/*;base64,{Convert.ToBase64String(bytes)}";
-
             Snackbar.Add("Success! Your profile picture is being updated.", Severity.Success);
         }
-        catch
+        else if (message == ProfilePicUploadErrorType.FileTooLarge)
+        {
+            Snackbar.Add("That image was too large :( try a different one.", Severity.Error);
+        }
+        else
         {
             Snackbar.Add("That image didn't work :( try a different one.", Severity.Error);
         }
-        finally
-        {
-            InvokeAsync(StateHasChanged);
-        }
+        
+        _loading = false;
+        InvokeAsync(StateHasChanged);
     }
 
 }

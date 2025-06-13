@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
@@ -116,12 +117,13 @@ public class SupabaseServiceProvider
         await _supabase.Functions.Invoke("resend-email", options: options);
     }
     
-    public async Task<string> UpdateProfilePictureAsync(string email, byte[] imageBytes)
+    [Pure]
+    public async Task<ProfilePicUploadErrorType?> UpdateProfilePictureAsync(string email, byte[] imageBytes)
     {
         try
         {
             var account = await _bcData.GetAccountByEmailAsync(email);
-            if (account is null) return "Could not find an account with that email";
+            if (account is null) return ProfilePicUploadErrorType.AccountNotFound;
 
             var filename = $"{account.FirstName}-{account.LastName}.png";
             var options = new Supabase.Storage.FileOptions
@@ -136,14 +138,14 @@ public class SupabaseServiceProvider
         }
         catch (Supabase.Storage.Exceptions.SupabaseStorageException exc)
         {
-            return "File is too large!";
+            return ProfilePicUploadErrorType.FileTooLarge;
         }
         catch (Exception e)
         {
-            return "Something went wrong";
+            return ProfilePicUploadErrorType.Unknown;
         }
         
-        return string.Empty;
+        return null;
     }
     
     
