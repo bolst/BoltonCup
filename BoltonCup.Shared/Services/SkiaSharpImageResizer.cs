@@ -61,8 +61,12 @@ public class SkiaSharpImageResizer
                 new SKImageInfo((int)(originalBitmap.Width * scaleFactor), (int)(originalBitmap.Height * scaleFactor)), 
                 new SKSamplingOptions(SKCubicResampler.Mitchell)
                 );
- 
-    private byte[] BitmapToByteArray(SKBitmap bitmap, int quality) 
-        => SKImage.FromBitmap(bitmap).Encode(SKEncodedImageFormat.Png, quality).ToArray();
+
+    private byte[] BitmapToByteArray(SKBitmap bitmap, int quality)
+    {
+        using var image = SKImage.FromBitmap(bitmap);
+        using var data = image.Encode(SKEncodedImageFormat.Jpeg, quality);
+        return data.ToArray();
+    }
     
 }

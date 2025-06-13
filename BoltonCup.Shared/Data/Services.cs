@@ -118,14 +118,14 @@ public class SupabaseServiceProvider
     }
     
     [Pure]
-    public async Task<ProfilePicUploadErrorType?> UpdateProfilePictureAsync(string email, byte[] imageBytes)
+    public async Task<ProfilePicUploadErrorType?> UpdateProfilePictureAsync(string email, byte[] imageBytes, string? extension = ".png")
     {
         try
         {
             var account = await _bcData.GetAccountByEmailAsync(email);
             if (account is null) return ProfilePicUploadErrorType.AccountNotFound;
 
-            var filename = $"{account.FirstName}-{account.LastName}.png";
+            var filename = $"{account.FirstName}-{account.LastName}{extension}";
             var options = new Supabase.Storage.FileOptions
             {
                 ContentType = "data:image/*;base64",
