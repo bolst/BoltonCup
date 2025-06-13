@@ -23,6 +23,8 @@
         <PackageReference Include="MudBlazor" Version="8.5.1" />
         <PackageReference Include="Npgsql" Version="8.0.6" />
         <PackageReference Include="SkiaSharp" Version="3.119.0" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.0" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.0" />
         <PackageReference Include="Stripe.net" Version="48.0.2" />
         <PackageReference Include="Supabase" Version="1.1.1" />
     </ItemGroup>
