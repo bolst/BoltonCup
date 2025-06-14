@@ -241,8 +241,14 @@ public class BCAccount
     public required string Position { get; set; }
     public required string HighestLevel { get; set; }
     public required string ProfilePicture { get; set; }
-    public required bool Payed { get; set; }
+    public bool Payed { get; set; }
     public required bool IsActive { get; set; }
+    public int? preferred_number1 { get; set; }
+    public int? preferred_number2 { get; set; }
+    public int? preferred_number3 { get; set; }
+    public string? preferred_beer { get; set; }
+    
+    
     public string FullName => $"{FirstName} {LastName}";
     public bool IsForward => Position == "forward";
     public bool IsDefense => Position == "defense";
