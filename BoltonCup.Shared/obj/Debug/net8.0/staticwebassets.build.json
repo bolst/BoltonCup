@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "fpqIwUo8cRBwXno8fhOPSSM4VN/4JHt9+J1FsZK8wcM=",
+  "Hash": "qTB9ptyR7zaYSzHLQQjQGJG1ZP7zj39tQ9RtmnztioU=",
   "Source": "BoltonCup.Shared",
   "BasePath": "_content/BoltonCup.Shared",
   "Mode": "Default",
@@ -668,7 +668,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Thu, 12 Jun 2025 03:55:33 GMT"
+          "Value": "Sat, 14 Jun 2025 06:36:05 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -742,7 +742,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Thu, 12 Jun 2025 03:55:33 GMT"
+          "Value": "Sat, 14 Jun 2025 06:36:05 GMT"
         },
         {
           "Name": "Cache-Control",

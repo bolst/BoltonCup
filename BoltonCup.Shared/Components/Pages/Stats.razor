@@ -65,7 +65,7 @@
                     <CellTemplate>
                         <MudStack AlignItems="AlignItems.Center" Row>
                             <MudAvatar>
-                                <MudImage Src=""/>
+                                <MudImage Src="@context.Item.profilepicture"/>
                             </MudAvatar>
                             <MudLink Typo="Typo.subtitle1" Href=@($"/player/{context.Item.player_id}")>@context.Item.player_name</MudLink>
                             <MudImage Src="@context.Item.team_logo" Height="30"/>
