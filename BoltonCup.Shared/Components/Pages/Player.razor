@@ -36,8 +36,7 @@
 
                 <MudStack Class="mx-2">
                     <MudText>Birth Year: @profile.dob.ToString("yyyy")</MudText>
-                    @* <MudText>Hometown:</MudText> *@
-                    <MudText>Favourite Beer: @profile.preferred_beer</MudText>
+                    <MudText>Favourite Beer: @_account?.preferred_beer</MudText>
                 </MudStack>
 
                 <MudDivider Class="d-none d-sm-flex px-4" Vertical="true" FlexItem="true" />

@@ -47,6 +47,9 @@ public interface IBCData
     Task<BCAccount?> GetAccountByPCKeyAsync(Guid pckey);
     Task<PlayerProfile?> GetCurrentPlayerProfileByPCKeyAsync(Guid pckey);
     Task UpdateConfigDataAsync(BCAccount account);
+    Task UpdatePlayerAvailabilityAsync(IEnumerable<BCAvailability> availabilities);
+    Task<IEnumerable<BCAvailability>> GetPlayerAvailabilityAsync(int accountId, int tournamentId);
+    Task PopulatePlayerAvailabilitiesAsync(int accountId);
 }
 
 public class BCData : DapperBase, IBCData
@@ -561,8 +564,8 @@ public class BCData : DapperBase, IBCData
         var account = await GetAccountByEmailAsync(form.Email);
         if (account is null) return;
         
-        string sql = @"INSERT INTO players(name, dob, preferred_beer, account_id, team_id, jersey_number, position, champion, tournament_id)
-                        VALUES (@Name, @Dob, NULL, @AccountId, NULL, NULL, @Position, FALSE, @TournamentId)";
+        string sql = @"INSERT INTO players(name, dob, account_id, team_id, jersey_number, position, champion, tournament_id)
+                        VALUES (@Name, @Dob, @AccountId, NULL, NULL, @Position, FALSE, @TournamentId)";
         
         await ExecuteSqlAsync(sql, new
         {
@@ -753,6 +756,104 @@ public class BCData : DapperBase, IBCData
                             WHERE id = @id";
 
         await ExecuteSqlAsync(sql, account);
+    }
+
+
+    public async Task UpdatePlayerAvailabilityAsync(IEnumerable<BCAvailability> availabilities)
+    {
+        string sql = @"UPDATE availability
+                        SET availability = @Availability
+                            WHERE id = @Id";
+
+        await ExecuteSqlAsync(sql, availabilities);
+    }
+
+
+    public async Task<IEnumerable<BCAvailability>> GetPlayerAvailabilityAsync(int accountId, int tournamentId)
+    {
+        string sql = @"WITH set_games AS (SELECT y.id,
+                                              y.account_id                    AS accountid,
+                                              y.game_id                       AS gameid,
+                                              y.availability                  AS availability,
+                                              g.date                          AS gamedate,
+                                              CASE
+                                                  WHEN g.home_team_id = p.team_id THEN g.home_team_id
+                                                  ELSE g.away_team_id END     AS teamid,
+                                              CASE
+                                                  WHEN g.home_team_id = p.team_id THEN g.away_team_id
+                                                  ELSE g.home_team_id END     AS opponentid,
+                                              CASE
+                                                  WHEN g.home_team_id = p.team_id THEN home_team.name
+                                                  ELSE away_team.name END     AS teamname,
+                                              CASE
+                                                  WHEN g.home_team_id = p.team_id THEN away_team.name
+                                                  ELSE home_team.name END     AS opponentname,
+                                              CASE
+                                                  WHEN g.home_team_id = p.team_id THEN home_team.logo_url
+                                                  ELSE away_team.logo_url END AS teamlogo,
+                                              CASE
+                                                  WHEN g.home_team_id = p.team_id THEN away_team.logo_url
+                                                  ELSE home_team.logo_url END AS opponentlogo,
+                                           g.type as gametype
+                                           FROM availability y
+                                                    INNER JOIN account a ON y.account_id = a.id
+                                                    INNER JOIN game g ON y.game_id = g.id AND g.tournament_id = @TournamentId
+                                                    INNER JOIN players p ON p.account_id = y.account_id AND p.tournament_id = @TournamentId
+                                                    INNER JOIN team home_team ON g.home_team_id = home_team.id
+                                                    INNER JOIN team away_team ON g.away_team_id = away_team.id
+                                           WHERE y.account_id = @AccountId),
+                         tbd_games AS (SELECT distinct on (g.type)
+                                              y.id,
+                                              y.account_id   AS accountid,
+                                              y.game_id      AS gameid,
+                                              y.availability AS availability,
+                                              g.date         AS gamedate,
+                                              0              AS teamid,
+                                              0              AS opponentid,
+                                              ''             AS teamname,
+                                              ''             AS opponentname,
+                                              ''             AS teamlogo,
+                                              ''                opponentlogo,
+                                              g.type as gametype
+                                           FROM availability y
+                                                    INNER JOIN account a ON y.account_id = a.id
+                                                    INNER JOIN game g ON y.game_id = g.id AND g.tournament_id = @TournamentId AND
+                                                                         g.home_team_id IS NULL AND g.away_team_id IS NULL
+                                                    INNER JOIN
+                                                players p
+                                                ON p.account_id = y.account_id AND p.tournament_id = @TournamentId
+                                           WHERE y.account_id = @AccountId)
+                    SELECT *
+                        FROM set_games
+                    UNION
+                    SELECT *
+                        FROM tbd_games
+                    ORDER BY gamedate";
+
+        return await QueryDbAsync<BCAvailability>(sql, new { AccountId = accountId, TournamentId = tournamentId });
+    }
+
+
+    public async Task PopulatePlayerAvailabilitiesAsync(int accountId)
+    {
+        string sql = @"INSERT INTO availability(account_id, game_id, availability)
+                        SELECT @AccountId,
+                               g.id,
+                               NULL
+                            FROM game g
+                                     INNER JOIN players p ON p.team_id IN (g.home_team_id, g.away_team_id) AND p.account_id = @AccountId
+                                     INNER JOIN tournament t ON t.tournament_id = g.tournament_id AND t.current = TRUE
+                        UNION
+                        SELECT @AccountId,
+                               g.id,
+                               NULL
+                            FROM game g
+                                     INNER JOIN players p ON g.home_team_id IS NULL AND g.away_team_id IS NULL AND p.account_id = @AccountId
+                                     INNER JOIN tournament t ON t.tournament_id = g.tournament_id AND t.current = TRUE
+                        ON CONFLICT (account_id, game_id)
+                            DO NOTHING";
+                                
+        await ExecuteSqlAsync(sql, new { AccountId = accountId });
     }
 }
 

@@ -10,7 +10,7 @@
 
 @if (_account is not null)
 {
-    <div class="relative" style="min-height: 120vh">
+    <div class="relative">
         
         <MudStack Class="pa-4" AlignItems="AlignItems.Center" Row>
             <MudText Typo="Typo.h6">Profile Picture</MudText>
@@ -58,7 +58,52 @@
 
         </MudStack>
         
+        <MudDivider />        
+        
+        <MudStack Class="pa-4" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="1" Row>
+            <MudText Typo="Typo.h6">Game Availability</MudText>
+
+            @SaveButton
+            
+            <MudFlexBreak />
+            
+            <MudText Typo="Typo.caption">This will be used for the draft and to get subs. Playoff games begin at the times listed.</MudText>
+
+            <MudFlexBreak/>
+
+            @foreach (var availability in _availabilities)
+            {
+                <MudStack AlignItems="AlignItems.Center" Spacing="3" Row>
+                    <MudSelect Style="width: 7rem" T="string" @bind-Value="availability.Availability" Variant="Variant.Outlined" Margin="Margin.Dense" Dense>
+                        <MudSelectItem Value="@("in")">In</MudSelectItem>
+                        <MudSelectItem Value="@("out")">Out</MudSelectItem>
+                        <MudSelectItem Value="@("unsure")">Unsure</MudSelectItem>
+                    </MudSelect>
+                    
+                    <MudText>@availability.GameDate.ToString("ddd. MMMM dd/yy h:mmtt").Replace("-", "/")</MudText>
+                    
+                    @if (availability.GameType == GameType.RoundRobin)
+                    {
+                        <MudText>vs.</MudText>
+                    }
+                    else
+                    {
+                        <GameTypeChip Type="@availability.GameType" />
+                    }
+                    <MudLink Href="@($"team/{availability.OpponentId}")">
+                        <MudImage Height="50" Src="@availability.OpponentLogo" />
+                    </MudLink>
+                </MudStack>
+                
+                <MudFlexBreak />
+            }
+
+        </MudStack>
+        
         <MudDivider />
+        
+        
+        <div style="height: 30vh">&nbsp;</div>
         
         
         
@@ -80,6 +125,7 @@
 
     private BCAccount? _account;
     private PlayerProfile? _profile;
+    private IEnumerable<BCAvailability> _availabilities = [];
     
 
     protected override async Task OnParametersSetAsync()
@@ -101,7 +147,11 @@
             if (_account is null)
             {
                 Navigation.NavigateTo("/");
+                return;
             }
+
+            await BCData.PopulatePlayerAvailabilitiesAsync(_account.id);
+            _availabilities = await BCData.GetPlayerAvailabilityAsync(_account.id, _profile.tournament_id);
         }
     }
 
@@ -115,6 +165,7 @@
         InvokeAsync(StateHasChanged);
         
         await BCData.UpdateConfigDataAsync(_account);
+        await BCData.UpdatePlayerAvailabilityAsync(_availabilities);
 
         _loading = false;
         InvokeAsync(StateHasChanged);

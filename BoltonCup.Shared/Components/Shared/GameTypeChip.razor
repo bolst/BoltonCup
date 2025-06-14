@@ -1,18 +1,23 @@
 
 
-<MudChip T="string" Variant="Variant.Outlined" Color="_color">@Game.type</MudChip>
+<MudChip T="string" Variant="Variant.Outlined" Color="_color">@Type</MudChip>
 
 
 @code {
 
-    [Parameter, EditorRequired] 
-    public required BCGame Game { get; set; }
+    [Parameter] 
+    public BCGame? Game { get; set; }
 
+    [Parameter]
+    public string? Type { get; set; }
+    
     private Color _color = Color.Default;
 
     protected override void OnParametersSet()
     {
-        _color = Game.type switch
+        Type ??= Game?.type;
+        
+        _color = Type switch
         {
             "Round robin" => Color.Primary,
             "Quarter finals" => Color.Secondary,
