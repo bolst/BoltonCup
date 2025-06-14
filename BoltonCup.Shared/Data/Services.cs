@@ -102,6 +102,13 @@ public class SupabaseServiceProvider
         await SendEmail(form.Email, "Registration - Bolton Cup 2025", content);
     }
 
+
+    public async Task SendConfigEmail(BCAccount account)
+    {
+        var content = _emailContentBuilder.BuildConfigEmail(account);
+        await SendEmail(account.Email, "Profile Link", content);
+    }
+
     private async Task SendEmail(string to, string subject, string html)
     {
         var options = new Supabase.Functions.Client.InvokeFunctionOptions
@@ -184,6 +191,25 @@ public class SupabaseServiceProvider
                            """;
             return content;
 
+        }
+
+
+        public string BuildConfigEmail(BCAccount account)
+        {
+            var content = $"""
+                           <p><img src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" style="height: 200px; width: 200px;"></p>
+                                               <h3 id="profile-setup-header">Set up your profile</h3>
+                                               <p>Hi {account.FirstName},</p>
+                                               <p>Below is a link where you can edit your profile. You can set your profile picture, availability, etc.</p>
+                                               <ul>
+                                               <li>Link: <a href="https://boltoncup.ca/config?pck={account.PCKey}">https://boltoncup.ca/config?pck={account.PCKey}</a></li>
+                                               </ul>
+                                               <h3 id="have-questions-">Have Questions?</h3>
+                                               <ul>
+                                               <li>Nic Bolton: nicbolton17@icloud.com</li>
+                                               </ul>
+                           """;
+            return content;
         }
 
     }

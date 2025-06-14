@@ -246,8 +246,11 @@ public class BCAccount
     public int? preferred_number2 { get; set; }
     public int? preferred_number3 { get; set; }
     public string? preferred_beer { get; set; }
-    
-    
+    public Guid PCKey { get; set; }
+    public bool Editable { get; set; }
+    public string? Message { get; set; }
+
+
     public string FullName => $"{FirstName} {LastName}";
     public bool IsForward => Position == "forward";
     public bool IsDefense => Position == "defense";
