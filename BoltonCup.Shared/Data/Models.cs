@@ -47,7 +47,6 @@ public class PlayerProfile : IEquatable<PlayerProfile>
     public int id { get; set; }
     public required string name { get; set; }
     public DateTime dob { get; set; }
-    public string? preferred_beer { get; set; } = "";
     public string position { get; set; } = "";
     public int? jersey_number { get; set; }
     public int? account_id { get; set; }
@@ -337,4 +336,33 @@ public class BCSponsor
     public bool is_active { get; set; }
     public string site_url { get; set; }
     public string logo_url { get; set; }
+}
+
+
+
+public class BCAvailability : IEquatable<BCAvailability>
+{
+    public int Id { get; set; }
+    public int AccountId { get; set; }
+    public int GameId { get; set; }
+    public string? Availability { get; set; }
+    public DateTime GameDate { get; set; }
+    public int TeamId { get; set; }
+    public int OpponentId { get; set; }
+    public string TeamName { get; set; }
+    public string OpponentName { get; set; }
+    public string TeamLogo { get; set; }
+    public string OpponentLogo { get; set; }
+    public string GameType { get; set; }
+    
+    #region IEquatable
+    
+    public bool Equals(BCAvailability? other) => other is not null && other.Id == Id;
+    public override bool Equals(object? obj) => Equals(obj as BCAvailability);
+    public override int GetHashCode() => Id.GetHashCode();
+    public static bool operator == (BCAvailability? left, BCAvailability? right) => left is null ? right is null : left.Equals(right);
+    
+    public static bool operator != (BCAvailability? left, BCAvailability? right) => left is null ? right is not null : !left.Equals(right);
+
+    #endregion
 }
