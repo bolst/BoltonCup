@@ -802,7 +802,7 @@ public class BCData : DapperBase, IBCData
                                                     INNER JOIN team home_team ON g.home_team_id = home_team.id
                                                     INNER JOIN team away_team ON g.away_team_id = away_team.id
                                            WHERE y.account_id = @AccountId),
-                         tbd_games AS (SELECT distinct on (g.type)
+                         tbd_games AS (SELECT
                                               y.id,
                                               y.account_id   AS accountid,
                                               y.game_id      AS gameid,
