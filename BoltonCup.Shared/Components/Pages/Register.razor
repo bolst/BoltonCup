@@ -49,6 +49,8 @@ else
                     </MudItem>        
                     <MudItem xs="12" md="6">
                         <MudPaper Class="pa-6 px-10">
+                            <MudLink Color="Color.Primary" Href="info" Underline="Underline.Always">Tournament Information Here</MudLink>
+                            
                             <RegisterForm OnSubmit="OnFormSubmit" DisablePlayers="_playerCount >= _currentTournament.player_limit" DisableGoalies="_goalieCount >= _currentTournament.goalie_limit">
                                 <ErrorContent>
                                     @if (_playerCount >= _currentTournament.player_limit)
