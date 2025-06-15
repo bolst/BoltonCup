@@ -10,15 +10,15 @@ public class CustomThemeProvider
     {
         Primary = "#3364BE",
         Secondary = "#EB443A",
-        Black = "#ffffff",
-        Tertiary = "#000000",
+        Tertiary = "#DDCBA4",
+        Black = "#141414",
         AppbarText = "#ffffff",
         AppbarBackground = "#3364BE",
-        DrawerBackground = "#ffffff",
+        DrawerBackground = "#eddfc0",
         GrayLight = "#e8e8e8",
         GrayLighter = "#f9f9f9",
-        Dark = "#e0e0e0",
-        DarkContrastText = "#2e2e2e"
+        Dark = "#151721",
+        DarkContrastText = "#DDCBA4"
     };
     
     private readonly PaletteDark _defaultDark = new()
