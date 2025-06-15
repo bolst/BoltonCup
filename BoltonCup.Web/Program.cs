@@ -1,9 +1,11 @@
 using Blazored.LocalStorage;
 using MudBlazor.Services;
 using BoltonCup.Web.Components;
-using BoltonCup.Shared.Data;
 using BoltonCup.Web.Data;
-using Supabase;
+using BoltonCup.Web.Services;
+using BoltonCup.Shared.Services;
+using BoltonCup.Shared.Data;
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
@@ -58,5 +60,17 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddAdditionalAssemblies(typeof(BoltonCup.Shared.Components.Pages.Info).Assembly);
+
+app.UseStatusCodePagesWithRedirects("/404");
+
+app.MapGet("/sitemap.xml", async httpContext =>
+{
+    var webPages = new BoltonCup.Web.Services.SitemapService().GetPages();
+    var sharedPages = new BoltonCup.Shared.Services.SitemapService().GetPages();
+    var pages = webPages.Concat(sharedPages);
+    var sitemap = ISitemapService.GenerateSitemap(pages);
+    
+    await httpContext.Response.WriteAsync(sitemap);
+});
 
 app.Run();
