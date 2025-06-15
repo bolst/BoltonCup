@@ -37,11 +37,14 @@ else
         {
             <div class="pa-6 d-flex align-center" style="@_containerStyle">
                 <MudGrid>
-                    <MudItem xs="12" md="6" Class="d-flex align-center justify-center">
+                    <MudItem xs="12" md="6" Class="d-flex align-center justify-center mt-sm-3">
                         &nbsp;<div>
-                            <MudText Typo="Typo.h3" Color="Color.Dark"><b>Register for Bolton Cup 2025</b></MudText>
-                            <MudText Typo="Typo.h6" Color="Color.Dark"><b>If you've already registered and need to pay, check your email</b></MudText>
-                            <MudText Typo="Typo.h6" Color="Color.Dark"><b>Your spot is not reserved until you pay</b></MudText>
+                            <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
+                                <div style="height: 30vh">&nbsp;</div>
+                            </MudHidden>
+                            <MudText Typo="Typo.h3" Class="white-text"><b>Register for Bolton Cup 2025</b></MudText>
+                            <MudText Typo="Typo.h6" Class="white-text"><b>If you've already registered and need to pay, check your email</b></MudText>
+                            <MudText Typo="Typo.h6" Class="white-text"><b>Your spot is not reserved until you pay</b></MudText>
                         </div>
                     </MudItem>        
                     <MudItem xs="12" md="6">
@@ -71,7 +74,7 @@ else
             <MudGrid>
                 <MudItem xs="12" Class="d-flex align-center justify-center">
                     &nbsp;<div>
-                        <MudText Typo="Typo.h3" Color="Color.Dark"><b>Registration has closed.</b></MudText>
+                        <MudText Typo="Typo.h3" Class="white-text"><b>Registration has closed.</b></MudText>
                     </div>
                 </MudItem>
             </MudGrid>

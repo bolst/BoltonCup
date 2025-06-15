@@ -11,6 +11,7 @@ public class CustomThemeProvider
         Primary = "#3364BE",
         Secondary = "#EB443A",
         Tertiary = "#DDCBA4",
+        Surface = "#fcfcfc",
         Black = "#141414",
         AppbarText = "#ffffff",
         AppbarBackground = "#3364BE",
