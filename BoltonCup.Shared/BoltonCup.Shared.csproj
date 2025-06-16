@@ -25,6 +25,7 @@
         <PackageReference Include="SkiaSharp" Version="3.119.0" />
         <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.0" />
         <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.0" />
+        <PackageReference Include="SpotifyAPI.Web" Version="7.2.1" />
         <PackageReference Include="Stripe.net" Version="48.0.2" />
         <PackageReference Include="Supabase" Version="1.1.1" />
     </ItemGroup>

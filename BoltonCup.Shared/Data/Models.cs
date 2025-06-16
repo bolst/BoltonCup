@@ -249,6 +249,8 @@ public class BCAccount
     public Guid PCKey { get; set; }
     public bool Editable { get; set; }
     public string? Message { get; set; }
+    public string? SongRequest { get; set; }
+    public string? SongRequestId { get; set; }
 
 
     public string FullName => $"{FirstName} {LastName}";

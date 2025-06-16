@@ -745,6 +745,22 @@
           }
         }
       },
+      "SpotifyAPI.Web/7.2.1": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.3"
+        },
+        "compile": {
+          "lib/net8.0/SpotifyAPI.Web.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/SpotifyAPI.Web.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Stripe.net/48.0.2": {
         "type": "package",
         "dependencies": {
@@ -1090,6 +1106,7 @@
           "SkiaSharp": "3.119.0",
           "SkiaSharp.NativeAssets.Linux": "3.119.0",
           "SkiaSharp.NativeAssets.Linux.NoDependencies": "3.119.0",
+          "SpotifyAPI.Web": "7.2.1",
           "Stripe.net": "48.0.2",
           "Supabase": "1.1.1"
         },
@@ -2129,6 +2146,29 @@
         "runtimes/win-x86/native/libSkiaSharp.dll",
         "skiasharp.nativeassets.win32.3.119.0.nupkg.sha512",
         "skiasharp.nativeassets.win32.nuspec"
+      ]
+    },
+    "SpotifyAPI.Web/7.2.1": {
+      "sha512": "7yatLKdwPmigJ+GGPUHwZppYzWNIPOSrpA3KKK/kndJl657zm1yzaAQ7j2xy3G7lyiKsdRZtz4k6CpFN32pyng==",
+      "type": "package",
+      "path": "spotifyapi.web/7.2.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net5.0/SpotifyAPI.Web.dll",
+        "lib/net5.0/SpotifyAPI.Web.xml",
+        "lib/net6.0/SpotifyAPI.Web.dll",
+        "lib/net6.0/SpotifyAPI.Web.xml",
+        "lib/net7.0/SpotifyAPI.Web.dll",
+        "lib/net7.0/SpotifyAPI.Web.xml",
+        "lib/net8.0/SpotifyAPI.Web.dll",
+        "lib/net8.0/SpotifyAPI.Web.xml",
+        "lib/netstandard2.0/SpotifyAPI.Web.dll",
+        "lib/netstandard2.0/SpotifyAPI.Web.xml",
+        "lib/netstandard2.1/SpotifyAPI.Web.dll",
+        "lib/netstandard2.1/SpotifyAPI.Web.xml",
+        "spotifyapi.web.7.2.1.nupkg.sha512",
+        "spotifyapi.web.nuspec"
       ]
     },
     "Stripe.net/48.0.2": {

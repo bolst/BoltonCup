@@ -1,3 +1,4 @@
+using BoltonCup.Shared.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,6 +47,19 @@ public static class ServiceConfiguration
                 AutoConnectRealtime = true,
                 AutoRefreshToken = false,
             });
+        });
+        
+        services.AddScoped<SpotifyService>(config =>
+        {
+            var clientId = configuration["SPOTIFY_CLIENT_ID"];
+            var secret = configuration["SPOTIFY_SECRET"];
+            
+            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(secret))
+            {
+                throw new InvalidOperationException("SET YOUR ENV VARIABLES (Spotify)!\n");
+            }
+            
+            return new SpotifyService(clientId, secret);
         });
 
         services.AddScoped<SupabaseServiceProvider>();

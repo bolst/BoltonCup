@@ -752,8 +752,10 @@ public class BCData : DapperBase, IBCData
                         SET preferred_number1 = @preferred_number1,
                             preferred_number2 = @preferred_number2,
                             preferred_number3 = @preferred_number3,
-                            preferred_beer = @preferred_beer
-                            WHERE id = @id";
+                            preferred_beer = @preferred_beer,
+                            songrequest = @songrequest,
+                            songrequestid = @songrequestid
+                        WHERE id = @id";
 
         await ExecuteSqlAsync(sql, account);
     }
