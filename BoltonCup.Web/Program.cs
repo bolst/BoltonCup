@@ -61,7 +61,7 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddAdditionalAssemblies(typeof(BoltonCup.Shared.Components.Pages.Info).Assembly);
 
-app.UseStatusCodePagesWithRedirects("/404");
+app.UseStatusCodePagesWithRedirects("/404?status={0}");
 
 app.MapGet("/sitemap.xml", async httpContext =>
 {
