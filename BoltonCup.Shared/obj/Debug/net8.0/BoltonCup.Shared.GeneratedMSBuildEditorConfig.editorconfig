@@ -137,6 +137,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvU2NoZWR1bGVUYWJsZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Shared/SongSearch.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvU29uZ1NlYXJjaC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/nic/git/BoltonCup/BoltonCup.Shared/Components/Shared/SponsorCard.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvU3BvbnNvckNhcmQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

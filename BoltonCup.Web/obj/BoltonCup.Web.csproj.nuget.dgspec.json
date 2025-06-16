@@ -97,6 +97,10 @@
               "target": "Package",
               "version": "[3.119.0, )"
             },
+            "SpotifyAPI.Web": {
+              "target": "Package",
+              "version": "[7.2.1, )"
+            },
             "Stripe.net": {
               "target": "Package",
               "version": "[48.0.2, )"
