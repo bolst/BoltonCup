@@ -165,7 +165,7 @@
             selectedTrack = value;
             if (_account is not null && value is not null)
             {
-                _account.SongRequest = $"{value?.Name} ({String.Join(", ", value.Artists.Select(x => x.Name))})";
+                _account.SongRequest = $"{value?.Name} ({string.Join(", ", value.Artists.Select(x => x.Name))})";
                 _account.SongRequestId = value.Id;
             }
         }
@@ -179,7 +179,7 @@
 
         if (string.IsNullOrEmpty(PCK) || PCK.Length != 36 || !valid)
         {
-            //Navigation.NavigateTo("/");
+            Navigation.NavigateTo("/");
             return;
         }
 
@@ -191,7 +191,7 @@
 
             if (_account is null)
             {
-                //Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/");
                 return;
             }
 
