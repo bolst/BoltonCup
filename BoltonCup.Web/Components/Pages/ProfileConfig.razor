@@ -6,6 +6,7 @@
 @inject IBCData BCData
 @inject SupabaseServiceProvider SBService
 @inject ISnackbar Snackbar
+@inject IJSRuntime JS
 
 <PageHeader Title="Profile" Height="15vh">Edit Profile</PageHeader>
 
@@ -173,8 +174,11 @@
     
     
     
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!firstRender) return;
+        
+        await JS.InvokeVoidAsync("console.log", $"starting parse");
         var valid = Guid.TryParse(PCK, out var parsedKey);
 
         if (string.IsNullOrEmpty(PCK) || PCK.Length != 36 || !valid)
@@ -182,22 +186,28 @@
             Navigation.NavigateTo("/");
             return;
         }
+        
+        await JS.InvokeVoidAsync("console.log", $"parsed pck {parsedKey}");
 
         if (parsedKey != _pcKey)
         {
             _pcKey = parsedKey;
             _account = await BCData.GetAccountByPCKeyAsync(_pcKey);
             _profile = await BCData.GetCurrentPlayerProfileByPCKeyAsync(_pcKey);
-
+            
             if (_account is null)
             {
                 Navigation.NavigateTo("/");
                 return;
             }
 
+            await JS.InvokeVoidAsync("console.log", $"got account {_account.FullName}");
+
             await BCData.PopulatePlayerAvailabilitiesAsync(_account.id);
             _availabilities = await BCData.GetPlayerAvailabilityAsync(_account.id, _profile.tournament_id);
         }
+
+        StateHasChanged();
     }
     
 
