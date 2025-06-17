@@ -1,6 +1,7 @@
 using BoltonCup.Scoresheet.Components;
 using BoltonCup.Shared.Data;
 using MudBlazor.Services;
+using Blazored.LocalStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddDataProtection();
 builder.Services.AddBoltonCupServices(builder.Configuration);
 
 var app = builder.Build();

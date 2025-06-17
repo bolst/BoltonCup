@@ -1,7 +1,9 @@
+@page "/scoresheet"
 @page "/scoresheet/{GameId:int}"
 
 @inject IBCData BCData
 @inject IDialogService DialogService
+@inject NavigationManager Navigation
 
 <div class="relative">
     @if (_game is not null)
@@ -66,8 +68,8 @@
 
 @code {
 
-    [Parameter]
-    public required int GameId { get; set; }
+    [Parameter] 
+    public int GameId { get; set; }
 
     private BCGame? _game;
     private BCTeam? _homeTeam;
@@ -84,7 +86,16 @@
     private IEnumerable<GameGoal> AwayGoals => _awayTeam is null ? [] : _goals.Where(g => g.TeamId == _awayTeam.id);
     private IEnumerable<GamePenalty> HomePenalties => _homeTeam is null ? [] : _penalties.Where(g => g.TeamId == _homeTeam.id);
     private IEnumerable<GamePenalty> AwayPenalties => _awayTeam is null ? [] : _penalties.Where(g => g.TeamId == _awayTeam.id);
-    
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (GameId == 0)
+        {
+            // TODO: check if there is a live game and navigate to its scoresheet endpoint
+            Navigation.NavigateTo("/games");
+        }
+    }
     
     
     protected override async Task OnParametersSetAsync()

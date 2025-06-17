@@ -1,0 +1,32 @@
+@page "/callback"
+
+@inject SpotifyService Spotify
+@inject NavigationManager Navigation
+
+
+@code {
+    
+    [SupplyParameterFromQuery]
+    public string Code { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await HandleCallback();
+            
+            Navigation.NavigateTo("/");
+        }
+    }
+
+
+    private async Task HandleCallback()
+    {
+        if (!string.IsNullOrEmpty(Code))
+        {
+            await Spotify.SetOAuthCode(Code);
+        }
+    }
+
+}

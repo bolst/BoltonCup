@@ -1,5 +1,7 @@
+using Blazored.LocalStorage;
 using BoltonCup.Shared.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Supabase;
@@ -26,6 +28,28 @@ public static class ServiceConfiguration
             return new BCData(connectionString!, cacheService);
         });
         
+        services.AddScoped<SpotifyService>(config =>
+        {
+            var clientId = configuration["SPOTIFY_CLIENT_ID"];
+            var secret = configuration["SPOTIFY_SECRET"];
+            
+            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(secret))
+            {
+                throw new InvalidOperationException("SET YOUR ENV VARIABLES (Spotify)!\n");
+            }
+            
+            var localStorage = config.GetRequiredService<ILocalStorageService>();
+            var protector = config.GetRequiredService<IDataProtectionProvider>();
+
+            if (localStorage is null || protector is null)
+            {
+                throw new InvalidOperationException("Blazored.LocalStorage or IDataProtector service is not configured!\n");
+            }
+
+            
+            return new SpotifyService(clientId, secret, localStorage, protector);
+        });
+        
         return services;
     }
     
@@ -47,19 +71,6 @@ public static class ServiceConfiguration
                 AutoConnectRealtime = true,
                 AutoRefreshToken = false,
             });
-        });
-        
-        services.AddScoped<SpotifyService>(config =>
-        {
-            var clientId = configuration["SPOTIFY_CLIENT_ID"];
-            var secret = configuration["SPOTIFY_SECRET"];
-            
-            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(secret))
-            {
-                throw new InvalidOperationException("SET YOUR ENV VARIABLES (Spotify)!\n");
-            }
-            
-            return new SpotifyService(clientId, secret);
         });
 
         services.AddScoped<SupabaseServiceProvider>();
