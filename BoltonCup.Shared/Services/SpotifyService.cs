@@ -1,8 +1,6 @@
-using System.Globalization;
 using SpotifyAPI.Web;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.DataProtection;
-using Newtonsoft.Json;
 
 namespace BoltonCup.Shared.Data;
 
@@ -41,14 +39,13 @@ public class SpotifyService
         _defaultConfig = SpotifyClientConfig.CreateDefault();
     }
 
-    
-    
-    public async Task<bool> IsAuthenticated()
-    {
-        var token = await GetAuthRequestToken();
-        return !string.IsNullOrEmpty(token);
-    }
 
+    public async Task LogoutAsync()
+    {
+        await _localStorage.RemoveItemAsync("local_id");
+        _oauthToken = null;
+    }
+    
 
     public async Task<SpotifyClient?> GetClientAsync()
     {

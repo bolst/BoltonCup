@@ -1,3 +1,5 @@
+using SpotifyAPI.Web;
+
 namespace BoltonCup.Shared.Data;
 using Dapper;
 using Npgsql;
@@ -53,6 +55,7 @@ public interface IBCData
     Task<BCRefreshToken?> GetRefreshToken(Guid localId);
     Task UpdateRefreshToken(Guid localId, string token);
     Task<IEnumerable<BCSong>> GetGameSongsAsync(int gameId);
+    Task SetGeneralGameSongsAsync(IEnumerable<FullTrack> songs);
 }
 
 public class BCData : DapperBase, IBCData
@@ -886,15 +889,25 @@ public class BCData : DapperBase, IBCData
     // TODO: get players in game and their requested songs in order before the preset songs
     public async Task<IEnumerable<BCSong>> GetGameSongsAsync(int gameId)
     {
-        string sql = @"SELECT a.songrequest AS name, a.songrequestid AS spotify_id
+        string sql = @"SELECT a.songrequest AS name, a.songrequestid AS spotify_id, a.songlastplayed as last_played
                             FROM account a
                                      INNER JOIN game g ON g.id = @GameId
                                      INNER JOIN players p ON p.account_id = a.id AND p.team_id IN (g.home_team_id, g.away_team_id)
                             WHERE a.songrequest IS NOT NULL
                         UNION
-                        SELECT name, spotify_id
+                        SELECT name, spotify_id, last_played
                             FROM song";
         return await QueryDbAsync<BCSong>(sql, new { GameId = gameId });
+    }
+
+
+    public async Task SetGeneralGameSongsAsync(IEnumerable<FullTrack> songs)
+    {
+        await ExecuteSqlAsync("DELETE FROM song");
+
+        string sql = @"INSERT INTO song(spotify_id, name) VALUES (@Id, @Name)";
+        
+        await ExecuteSqlAsync(sql, songs);
     }
 }
 

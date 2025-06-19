@@ -386,4 +386,5 @@ public class BCSong
 {
     public string spotify_id { get; set; }
     public string name { get; set; }
+    public DateTime? last_played { get; set; }
 }
