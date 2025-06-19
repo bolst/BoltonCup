@@ -50,6 +50,8 @@ public interface IBCData
     Task UpdatePlayerAvailabilityAsync(IEnumerable<BCAvailability> availabilities);
     Task<IEnumerable<BCAvailability>> GetPlayerAvailabilityAsync(int accountId, int tournamentId);
     Task PopulatePlayerAvailabilitiesAsync(int accountId);
+    Task<BCRefreshToken?> GetRefreshToken(Guid localId);
+    Task UpdateRefreshToken(Guid localId, string token);
 }
 
 public class BCData : DapperBase, IBCData
@@ -856,6 +858,27 @@ public class BCData : DapperBase, IBCData
                             DO NOTHING";
                                 
         await ExecuteSqlAsync(sql, new { AccountId = accountId });
+    }
+
+
+    public async Task<BCRefreshToken?> GetRefreshToken(Guid localId)
+    {
+        string sql = @"SELECT *
+                        FROM refresh_token
+                        WHERE local_id = @LocalId
+                        ORDER BY created_at DESC
+                        LIMIT 1";
+        
+        return await QueryDbSingleAsync<BCRefreshToken>(sql, new { LocalId = localId });
+    }
+
+
+    public async Task UpdateRefreshToken(Guid localId, string token)
+    {
+        string sql = @"INSERT INTO refresh_token(token, local_id)
+                        VALUES (@Token, @LocalId)";
+        
+        await ExecuteSqlAsync(sql, new { LocalId = localId, Token = token });
     }
 }
 

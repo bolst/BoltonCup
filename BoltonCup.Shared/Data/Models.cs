@@ -371,3 +371,12 @@ public class BCAvailability : IEquatable<BCAvailability>
 
     #endregion
 }
+
+
+public class BCRefreshToken
+{
+    public required int id { get; set; }
+    public required DateTime created_at { get; set; }
+    public required string token { get; set; }
+    public required Guid local_id { get; set; }
+}

@@ -3,42 +3,46 @@
 @inject SpotifyService Spotify
 @inject NavigationManager Navigation
 
-@if (_authenticated)
+@if (_loading)
 {
-    <MudStack AlignItems="AlignItems.Center" Row>
-        @if (_currentTrack is not null)
-        {
-            var track = _currentTrack.Item as FullTrack;
-            
-            <MudText Typo="Typo.body2">@track.Name (@string.Join(", ", track.Artists.Select(x => x.Name)))</MudText>
-            <MudImage Src="@track.Album.Images.FirstOrDefault().Url" Height="40" />
-            
-            <MudSlider T="int" Class="white-text" Style="width: 15vw" Value="_volume" ValueChanged="OnVolumeChanged" Color="Color.Tertiary" Min="0" Max="100" Size="Size.Small" Immediate="false">Volume</MudSlider>
-
-            <MudIconButton OnClick="OnSkipBackward" Icon="@Icons.Material.Filled.SkipPrevious" Color="Color.Tertiary" />
-            
-            if (_currentTrack.IsPlaying)
-            {
-                <MudIconButton OnClick="OnPause" Icon="@Icons.Material.Filled.PauseCircle" Color="Color.Tertiary" />
-            }
-            else
-            {
-                <MudIconButton OnClick="OnPlay" Icon="@Icons.Material.Filled.PlayCircle" Color="Color.Tertiary"  />
-            }
-            
-            <MudIconButton OnClick="OnSkipForward" Icon="@Icons.Material.Filled.SkipNext" Color="Color.Tertiary" />
-        }
-        else
-        {
-            <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.PauseCircle" />
-            <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.PlayCircle" />
-        }
-        
-    </MudStack>
+    <MudProgressCircular Size="Size.Small" Color="Color.Secondary" Indeterminate />
 }
 else
 {
-    <MudButton OnClick="Login" StartIcon="@_spotifySvg" Variant="Variant.Filled" Color="Color.Success">Login</MudButton>
+    if (_authenticated)
+    {
+        <MudStack AlignItems="AlignItems.Center" Row>
+            @if (_currentTrack is not null)
+            {
+                var track = _currentTrack.Item as FullTrack;
+                
+                <MudText Typo="Typo.body2">@track.Name (@string.Join(", ", track.Artists.Select(x => x.Name)))</MudText>
+                <MudImage Src="@track.Album.Images.FirstOrDefault().Url" Height="40" />
+                
+                <MudIconButton OnClick="OnSkipBackward" Icon="@Icons.Material.Filled.SkipPrevious" Color="Color.Tertiary" />
+                
+                if (_currentTrack.IsPlaying)
+                {
+                    <MudIconButton OnClick="OnPause" Icon="@Icons.Material.Filled.PauseCircle" Color="Color.Tertiary" />
+                }
+                else
+                {
+                    <MudIconButton OnClick="OnPlay" Icon="@Icons.Material.Filled.PlayCircle" Color="Color.Tertiary"  />
+                }
+                
+                <MudIconButton OnClick="OnSkipForward" Icon="@Icons.Material.Filled.SkipNext" Color="Color.Tertiary" />
+            }
+            else
+            {
+                <MudIconButton OnClick="RefreshState" Color="Color.Error" Icon="@Icons.Material.Filled.Refresh" />
+            }
+            
+        </MudStack>
+    }
+    else
+    {
+        <MudButton OnClick="Login" StartIcon="@_spotifySvg" Variant="Variant.Filled" Color="Color.Success">Login</MudButton>
+    }
 }
 
 
@@ -46,6 +50,7 @@ else
 @code {
 
 
+    private bool _loading;
     private bool _authenticated;
     private int _volume;
     private CurrentlyPlayingContext? _currentTrack;
@@ -53,19 +58,38 @@ else
 
     private const string _spotifySvg = @"<svg role=""img"" viewBox=""0 0 24 24"" xmlns=""http://www.w3.org/2000/svg""><title>Spotify</title><path d=""M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z""/></svg>";
     
+    
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _authenticated = await Spotify.GetAuthStateAsync();
-            _currentTrack = await Spotify.GetPlayerState();
-            
+            _loading = true;
             StateHasChanged();
+            _authenticated = await Spotify.IsAuthenticated();
+
+            await RefreshState();
+            
+            _loading = false;
+            StateHasChanged();
+            
         }
     }
 
 
-    private async Task Login()
+    private async Task RefreshState()
+    {
+        var spotify = await Spotify.GetClientAsync();
+        if (spotify is null) return;
+        
+        var request = new PlayerCurrentPlaybackRequest();
+        _currentTrack = await spotify.Player.GetCurrentPlayback(request);
+        
+        InvokeAsync(StateHasChanged);
+    }
+    
+
+    private void Login()
     {
         var uri = Spotify.LoginRequestUri.ToString();
         
@@ -75,45 +99,50 @@ else
 
     private async Task OnPause()
     {
-        await Spotify.Pause();
-        _currentTrack = await Spotify.GetPlayerState();
-        InvokeAsync(StateHasChanged);
+        var spotify = await Spotify.GetClientAsync();
+        if (spotify is null) return;
+        
+        var request = new PlayerPausePlaybackRequest();
+        await spotify.Player.PausePlayback(request);
+        
+        await RefreshState();
     }
     
     
     private async Task OnPlay()
     {
-        await Spotify.Play();
-        _currentTrack = await Spotify.GetPlayerState();
-        InvokeAsync(StateHasChanged);
+        var spotify = await Spotify.GetClientAsync();
+        if (spotify is null) return;
+        
+        var request = new PlayerResumePlaybackRequest();
+        await spotify.Player.ResumePlayback(request);
+
+        await RefreshState();
     }
 
 
     private async Task OnSkipForward()
-    {
-        await Spotify.SkipForward();
-        _currentTrack = await Spotify.GetPlayerState();
-        InvokeAsync(StateHasChanged);
+    {           
+        var spotify = await Spotify.GetClientAsync();
+        if (spotify is null) return;
+        
+        var request = new PlayerSkipNextRequest();
+        await spotify.Player.SkipNext(request);
+        
+        await RefreshState();
     }
 
 
 
     private async Task OnSkipBackward()
     {
-        await Spotify.SkipBackward();
-        _currentTrack = await Spotify.GetPlayerState();
-        InvokeAsync(StateHasChanged);
+        var spotify = await Spotify.GetClientAsync();
+        if (spotify is null) return;
+        
+        var request = new PlayerSkipPreviousRequest();
+        await spotify.Player.SkipPrevious(request);
+        
+        await RefreshState();
     }
-
-
-
-    private async Task OnVolumeChanged(int volume)
-    {
-        await Spotify.SetVolume(volume);
-        _currentTrack = await Spotify.GetPlayerState();
-        InvokeAsync(StateHasChanged);
-    }
-
-    
     
 }
