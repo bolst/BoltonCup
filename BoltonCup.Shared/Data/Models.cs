@@ -380,3 +380,10 @@ public class BCRefreshToken
     public required string token { get; set; }
     public required Guid local_id { get; set; }
 }
+
+
+public class BCSong
+{
+    public string spotify_id { get; set; }
+    public string name { get; set; }
+}

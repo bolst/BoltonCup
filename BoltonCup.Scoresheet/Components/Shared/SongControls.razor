@@ -111,11 +111,18 @@ else
     
     private async Task OnPlay()
     {
-        var spotify = await Spotify.GetClientAsync();
-        if (spotify is null) return;
-        
-        var request = new PlayerResumePlaybackRequest();
-        await spotify.Player.ResumePlayback(request);
+        try
+        {
+            var spotify = await Spotify.GetClientAsync();
+            if (spotify is null) return;
+            
+            var request = new PlayerResumePlaybackRequest();
+            await spotify.Player.ResumePlayback(request);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"From OnPlay:\n{e.Message}");
+        }
 
         await RefreshState();
     }

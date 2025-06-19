@@ -23,14 +23,6 @@ public class SpotifyService
     private readonly Uri LoginCallbackUri = new("https://127.0.0.1:7107/callback/");
     private readonly List<string> RequestScopes =
         [Scopes.UserReadPlaybackState, Scopes.UserModifyPlaybackState, Scopes.UserReadCurrentlyPlaying];
-
-
-
-    public async Task<bool> IsAuthenticated()
-    {
-        var token = await GetAuthRequestToken();
-        return !string.IsNullOrEmpty(token);
-    }
     
     public Uri LoginRequestUri => new LoginRequest(LoginCallbackUri, _clientId, LoginRequest.ResponseType.Code)
     {
@@ -49,7 +41,13 @@ public class SpotifyService
         _defaultConfig = SpotifyClientConfig.CreateDefault();
     }
 
-
+    
+    
+    public async Task<bool> IsAuthenticated()
+    {
+        var token = await GetAuthRequestToken();
+        return !string.IsNullOrEmpty(token);
+    }
 
 
     public async Task<SpotifyClient?> GetClientAsync()
@@ -69,6 +67,7 @@ public class SpotifyService
         }
         catch (Exception e)
         {
+            Console.WriteLine($"From GetClientAsync:\n{e.Message}");
             return null;
         }
     }
@@ -127,10 +126,8 @@ public class SpotifyService
     {
         if (_clientToken is not null && !_clientToken.IsExpired) return _clientToken;
         
-        var config = SpotifyClientConfig.CreateDefault();
         var request = new ClientCredentialsRequest(_clientId, _secret);
-
-        _clientToken = await new OAuthClient(config).RequestToken(request, cancellationToken);
+        _clientToken = await new OAuthClient(_defaultConfig).RequestToken(request, cancellationToken);
 
         return _clientToken;
     }
@@ -164,7 +161,6 @@ public class SpotifyService
             {
                 var authRequest = new AuthorizationCodeRefreshRequest(_clientId, _secret, refreshToken.token);
                 _oauthToken = await new OAuthClient(_defaultConfig).RequestToken(authRequest, cancellationToken);
-
                 return _oauthToken.AccessToken;
             }
             catch (Exception e)
