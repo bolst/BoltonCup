@@ -189,9 +189,27 @@ else
     {           
         var spotify = await Spotify.GetClientAsync();
         if (spotify is null) return;
-        
-        var request = new PlayerSkipNextRequest();
-        await spotify.Player.SkipNext(request);
+
+        var nextSong = await BCData.GetNextSongAsync();
+        try
+        {
+            if (nextSong is not null)
+            {
+                var track = await spotify.Tracks.Get(nextSong.spotify_id);
+                var request = new PlayerResumePlaybackRequest { Uris = [track.Uri] };
+                await spotify.Player.ResumePlayback(request);
+                await BCData.SetSongAsPlayedAsync(nextSong);
+            }
+            else
+            {
+                var request = new PlayerSkipNextRequest();
+                await spotify.Player.SkipNext(request);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"OnSkipForward: {e.Message}");
+        }
         
         await RefreshState();
     }
@@ -242,13 +260,16 @@ else
 
                 var playlistTracks = await spotify.Playlists.GetItems(playlist.Id, request);
 
-                var newTracks = playlistTracks.Items.Select(x => x.Track as FullTrack);
-                if (!newTracks.Any()) break;
+                var newTracks = playlistTracks.Items?
+                    .Where(x => x.Track is FullTrack)
+                    .Select(x => x.Track as FullTrack)
+                    .ToList();
+                if (newTracks is null || !newTracks.Any()) break;
                 
-                tracks = tracks.Concat(newTracks);
+                tracks = tracks.Concat(newTracks)!;
             }
                 
-            await BCData.SetGeneralGameSongsAsync(tracks);
+            await BCData.SetBCPlaylistSongsAsync(tracks);
         }
     }
     

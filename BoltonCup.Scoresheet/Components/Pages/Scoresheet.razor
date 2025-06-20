@@ -17,15 +17,26 @@
                 
                 <MudSpacer />
                 
+                @if (ReadOnly)
+                {
+                    <MudButton OnClick="BeginRecordingGame" Color="Color.Info" Variant="Variant.Filled">Begin Recording</MudButton>
+                }
+                else
+                {
+                    <MudButton OnClick="SaveGame" Color="Color.Success" Variant="Variant.Outlined">Save</MudButton>
+                }
+                
+                <MudSpacer />
+                
                 <MudText Typo="Typo.h6"><b>@AwayGoals.Count()</b> - @_awayTeam.name</MudText>
                 <MudImage Src="@_awayTeam.logo_url" Width="70" />
             </MudStack>
         }
         
         <MudToolBar>
-            <MudButton OnClick="@(() => OnAddGoal(_homeTeam, _homeRoster))" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
+            <MudButton OnClick="@(() => OnAddGoal(_homeTeam, _homeRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
             <MudSpacer />
-            <MudButton OnClick="@(() => OnAddGoal(_awayTeam, _awayRoster))" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
+            <MudButton OnClick="@(() => OnAddGoal(_awayTeam, _awayRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
         </MudToolBar>
         
         <MudGrid Style="height: 35vh">
@@ -39,9 +50,9 @@
     
         
         <MudToolBar>
-            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+            <MudButton Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
             <MudSpacer />
-            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+            <MudButton Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
         </MudToolBar>
         
         <MudGrid Style="height: 35vh">
@@ -67,6 +78,9 @@
 
 
 @code {
+    
+    [CascadingParameter]
+    public int? EditingGameId { get; set; }
 
     [Parameter] 
     public int GameId { get; set; }
@@ -87,6 +101,8 @@
     private IEnumerable<GamePenalty> HomePenalties => _homeTeam is null ? [] : _penalties.Where(g => g.TeamId == _homeTeam.id);
     private IEnumerable<GamePenalty> AwayPenalties => _awayTeam is null ? [] : _penalties.Where(g => g.TeamId == _awayTeam.id);
 
+    private bool ReadOnly => _game is not null && _game.state != GameState.Active;
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -100,9 +116,16 @@
     
     protected override async Task OnParametersSetAsync()
     {
+        await LoadDataAsync();
+    }
+
+
+
+    private async Task LoadDataAsync()
+    {
         _loading = true;
-        StateHasChanged();
-        
+        InvokeAsync(StateHasChanged);
+
         _game = await BCData.GetGameById(GameId);
 
         if (_game is not null)
@@ -118,9 +141,29 @@
         }
 
         _loading = false;
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
+
+
+    private async Task SaveGame()
+    {
+        if (_game is null) return;
+        
+        await BCData.EndRecordingGameAsync(_game.id);
+        await LoadDataAsync();
+    }
+
+
+
+    private async Task BeginRecordingGame()
+    {
+        if (_game is null) return;
+
+        await BCData.BeginRecordingGameAsync(_game.id);
+        await LoadDataAsync();
+    }
+    
 
 
     private async Task OnAddGoal(BCTeam team, IEnumerable<PlayerProfile> players)

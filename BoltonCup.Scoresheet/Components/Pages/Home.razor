@@ -1,7 +1,41 @@
 ﻿@page "/"
 
+@inject IBCData BCData
+@inject NavigationManager Navigation
+
+
 <PageTitle>Bolton Cup Scoresheet</PageTitle>
 
 <MudText Typo="Typo.h6">Welcome Back</MudText>
+<MudDivider />
 
-<MudText>There is no active game being recorded - <MudLink Href="games">select a game to record.</MudLink></MudText>
+@if (_games.Any())
+{
+    <MudText Class="py-2" Typo="Typo.h6">Active Games</MudText>
+    
+    <MudDataGrid T="BCGame" Items="_games" RowClick="@(row => Navigation.NavigateTo($"scoresheet/{row.Item.id}"))" Hover Striped Dense>
+        <Columns>
+            <PropertyColumn Title="Date" Property="x => x.date" />
+            <PropertyColumn Title="Home" Property="x => x.HomeTeamName" />
+            <PropertyColumn Title="Away" Property="x => x.AwayTeamName" />
+            <PropertyColumn Title="State" Property="x => x.state" />
+            <PropertyColumn Title="Location" Property="x => x.location" />
+        </Columns>
+    </MudDataGrid>
+}
+else
+{
+    <MudText>There is no active game being recorded - <MudLink Href="games">select a game to record.</MudLink></MudText>
+}
+
+
+@code {
+
+    private IEnumerable<BCGame> _games = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _games = await BCData.GetActiveGamesAsync();
+    }
+
+}
