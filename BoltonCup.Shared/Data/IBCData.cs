@@ -50,14 +50,22 @@ public partial interface IBCData
     Task UpdatePlayerAvailabilityAsync(IEnumerable<BCAvailability> availabilities);
     Task<IEnumerable<BCAvailability>> GetPlayerAvailabilityAsync(int accountId, int tournamentId);
     Task PopulatePlayerAvailabilitiesAsync(int accountId);
+    
+    
     Task<BCRefreshToken?> GetRefreshToken(Guid localId);
     Task UpdateRefreshToken(Guid localId, string token);
-    Task<IEnumerable<BCSong>> GetGameSongsAsync(int gameId);
-    Task<IEnumerable<BCSong>> GetBCPlaylistSongsAsync();
+    
+    
     Task SetBCPlaylistSongsAsync(IEnumerable<FullTrack> songs);
-    Task SetSongAsPlayedAsync(BCSong song);
+    Task<IEnumerable<BCSong>> GetSongQueueAsync();
+    Task<BCSong?> GetCurrentSongAsync();
+    Task PauseSongAsync(BCSong song);
+    Task PlaySongAsync(BCSong song);
     Task<BCSong?> GetNextSongAsync();
+    Task<BCSong?> SkipToNextSongAsync();
+    
+    
     Task<IEnumerable<BCGame>> GetActiveGamesAsync();
     Task BeginRecordingGameAsync(int gameId);
-    Task EndRecordingGameAsync(int gameId);
+    Task EndRecordingGameAsync(int gameId, bool complete = false);
 }

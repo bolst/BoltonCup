@@ -1,4 +1,4 @@
-namespace BoltonCup.Shared.Extensions;
+namespace BoltonCup.Shared.Data;
 
 
 public static class StringExtensions

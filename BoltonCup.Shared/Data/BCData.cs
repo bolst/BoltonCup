@@ -807,27 +807,6 @@ public partial class BCData : DapperBase, IBCData
     }
 
 
-    public async Task<BCRefreshToken?> GetRefreshToken(Guid localId)
-    {
-        string sql = @"SELECT *
-                        FROM refresh_token
-                        WHERE local_id = @LocalId
-                        ORDER BY created_at DESC
-                        LIMIT 1";
-        
-        return await QueryDbSingleAsync<BCRefreshToken>(sql, new { LocalId = localId });
-    }
-
-
-    public async Task UpdateRefreshToken(Guid localId, string token)
-    {
-        string sql = @"INSERT INTO refresh_token(token, local_id)
-                        VALUES (@Token, @LocalId)";
-        
-        await ExecuteSqlAsync(sql, new { LocalId = localId, Token = token });
-    }
-
-
     public async Task<IEnumerable<BCGame>> GetActiveGamesAsync()
     {
         string sql = @"SELECT g.*,
@@ -849,22 +828,29 @@ public partial class BCData : DapperBase, IBCData
 
     public async Task BeginRecordingGameAsync(int gameId)
     {
-        string sql = @"UPDATE game
-                        SET state = @State
+        string clearSql = $@"UPDATE game
+                        SET state = '{GameState.PreGame}'
+                            WHERE state = '{GameState.Active}'";
+
+        await ExecuteSqlAsync(clearSql, new { GameId = gameId });
+        
+        string sql = $@"UPDATE game
+                        SET state = '{GameState.Active}'
                             WHERE id = @GameId";
 
-        await ExecuteSqlAsync(sql, new { State = GameState.Active, GameId = gameId });
+        await ExecuteSqlAsync(sql, new { GameId = gameId });
     }
     
     
     
-    public async Task EndRecordingGameAsync(int gameId)
+    public async Task EndRecordingGameAsync(int gameId, bool complete = false)
     {
         string sql = @"UPDATE game
                         SET state = @State
                             WHERE id = @GameId";
 
-        await ExecuteSqlAsync(sql, new { State = GameState.Complete, GameId = gameId });
+        var state = complete ? GameState.Complete : GameState.PreGame;
+        await ExecuteSqlAsync(sql, new { State = state, GameId = gameId });
     }
     
 }

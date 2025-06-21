@@ -7,58 +7,98 @@ namespace BoltonCup.Shared.Data;
 
 public partial class BCData
 {
-    // TODO: get players in game and their requested songs in order before the preset songs
-    public async Task<IEnumerable<BCSong>> GetGameSongsAsync(int gameId)
-    {
-        string sql = @"SELECT a.songrequest AS name, a.songrequestid AS spotify_id, a.songlastplayed as last_played
-                            FROM account a
-                                     INNER JOIN game g ON g.id = @GameId
-                                     INNER JOIN players p ON p.account_id = a.id AND p.team_id IN (g.home_team_id, g.away_team_id)
-                            WHERE a.songrequest IS NOT NULL
-                        UNION
-                        SELECT name, spotify_id, last_played
-                            FROM song";
-        return await QueryDbAsync<BCSong>(sql, new { GameId = gameId });
-    }
-
-
-
-    public async Task<IEnumerable<BCSong>> GetBCPlaylistSongsAsync()
-    {
-        string sql = @"SELECT name, spotify_id, last_played
-                        FROM song
-                        ORDER BY last_played NULLS FIRST";
-        return await QueryDbAsync<BCSong>(sql);
-    }
-
 
     public async Task SetBCPlaylistSongsAsync(IEnumerable<FullTrack> songs)
     {
         await ExecuteSqlAsync("DELETE FROM song");
 
-        string sql = @"INSERT INTO song(spotify_id, name) VALUES (@Id, @Name)";
+        string sql = @"INSERT INTO song(spotify_id, name, album_cover) VALUES (@Id, @Name, @AlbumCover)";
+
+        var parameters = songs.Select(x => new
+        {
+            Id = x.Id,
+            Name = x.Name,
+            AlbumCover = x.Album.Images.FirstOrDefault()?.Url,
+        });
         
-        await ExecuteSqlAsync(sql, songs);
+        await ExecuteSqlAsync(sql, parameters);
     }
 
-
-    public async Task SetSongAsPlayedAsync(BCSong song)
+    public async Task<IEnumerable<BCSong>> GetSongQueueAsync()
     {
-        string sql = @"UPDATE song
-                        SET last_played = NOW() AT TIME ZONE 'utc'
-                        where spotify_id = @spotify_id";
+        string sql = $@"SELECT *
+                        FROM song
+                        WHERE state = '{SongState.Queued}'
+                        ORDER BY last_played NULLS FIRST, id";
+
+        return await QueryDbAsync<BCSong>(sql);
+    }
+    
+    
+    
+    public async Task<BCSong?> GetCurrentSongAsync()
+    {
+        string sql = $@"SELECT *
+                        FROM song
+                        WHERE state IN ('{SongState.Playing}', '{SongState.Paused}')
+                        LIMIT 1";
+
+        return await QueryDbSingleAsync<BCSong>(sql);
+    }
+    
+    
+    
+    public async Task PauseSongAsync(BCSong song)
+    {
+        string sql = $@"UPDATE song
+                        SET state = '{SongState.Paused}'
+                            WHERE id = @Id";
         
+        await ExecuteSqlAsync(sql, song);
+    }
+    
+    
+    
+    public async Task PlaySongAsync(BCSong song)
+    {
+        await ExecuteSqlAsync($"UPDATE song SET state = '{SongState.Queued}'");
+        
+        string sql = $@"UPDATE song
+                        SET state = '{SongState.Playing}', last_played = now() AT TIME ZONE 'UTC'
+                            WHERE id = @Id";
+
         await ExecuteSqlAsync(sql, song);
     }
 
 
+
     public async Task<BCSong?> GetNextSongAsync()
     {
-        string sql = @"SELECT *
+        string sql = $@"SELECT *
                         FROM song
-                        ORDER BY last_played NULLS FIRST
+                        WHERE state = '{SongState.Queued}'
+                        ORDER BY last_played NULLS FIRST, id
                         LIMIT 1";
-        
+
         return await QueryDbSingleAsync<BCSong>(sql);
+    }
+
+
+
+    public async Task<BCSong?> SkipToNextSongAsync()
+    {
+        // put all songs back in queue
+        await ExecuteSqlAsync($"UPDATE song SET state = '{SongState.Queued}'");
+
+        var nextSong = await GetNextSongAsync();
+        if (nextSong is null) return null;
+        
+        // update next song to playing
+        string sql = $@"UPDATE song
+                        SET state = '{SongState.Playing}', last_played = now() AT TIME ZONE 'UTC'
+                            WHERE id = @Id
+                        RETURNING *";
+
+        return await QueryDbSingleAsync<BCSong>(sql, nextSong);
     }
 }
