@@ -1,4 +1,4 @@
-
+namespace BoltonCup.Shared.Data;
 
 public class GameType
 {

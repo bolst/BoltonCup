@@ -1,8 +1,6 @@
-using System.Globalization;
 using SpotifyAPI.Web;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.DataProtection;
-using Newtonsoft.Json;
 
 namespace BoltonCup.Shared.Data;
 
@@ -13,37 +11,65 @@ public class SpotifyService
     private readonly string _secret;
     private readonly ILocalStorageService _localStorage;
     private readonly IDataProtector _protector;
+    private readonly IBCData _bcData;
+    private readonly SpotifyClientConfig _defaultConfig;
+    
+    private ClientCredentialsTokenResponse? _clientToken;
+    private IRefreshableToken? _oauthToken;
+    private string? _oauthCode;
     
     private readonly Uri LoginCallbackUri = new("https://127.0.0.1:7107/callback/");
     
-    private ClientCredentialsTokenResponse? _clientToken;
-    private AuthorizationCodeTokenResponse? _oauthToken;
+    public Uri LoginRequestUri => new LoginRequest(LoginCallbackUri, _clientId, LoginRequest.ResponseType.Code)
+    {
+        Scope = [
+            Scopes.UserReadPlaybackState, 
+            Scopes.UserModifyPlaybackState, 
+            Scopes.UserReadCurrentlyPlaying,
+            Scopes.PlaylistModifyPublic,
+        ],
+    }.ToUri();
 
-    private readonly List<string> RequestScopes =
-        [Scopes.UserReadPlaybackState, Scopes.UserModifyPlaybackState, Scopes.UserReadCurrentlyPlaying];
 
-    private string? _oauthCode;
-
-
-    public SpotifyService(string clientId, string secret, ILocalStorageService localStorage, IDataProtectionProvider provider)
+    
+    public SpotifyService(string clientId, string secret, ILocalStorageService localStorage, IDataProtectionProvider provider, IBCData bcData)
     {
         _clientId = clientId;
         _secret = secret;
         _localStorage = localStorage;
         _protector = provider.CreateProtector("creds");
+        _bcData = bcData;
+        _defaultConfig = SpotifyClientConfig.CreateDefault();
     }
 
-    
-    
-    public Uri LoginRequestUri => new LoginRequest(LoginCallbackUri, _clientId, LoginRequest.ResponseType.Code)
-    {
-        Scope = RequestScopes,
-    }.ToUri();
 
-    public async Task<bool> GetAuthStateAsync()
+    public async Task LogoutAsync()
+    {
+        await _localStorage.RemoveItemAsync("local_id");
+        _oauthToken = null;
+    }
+    
+
+    public async Task<SpotifyClient?> GetClientAsync()
     {
         var token = await GetAuthRequestToken();
-        return token is not null && !token.IsExpired;
+
+        var config = _defaultConfig;
+        
+        if (token is not null)
+        {
+            config = config.WithToken(token);
+        }
+
+        try
+        {
+            return new SpotifyClient(config);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"From GetClientAsync:\n{e.Message}");
+            return null;
+        }
     }
     
     
@@ -53,7 +79,7 @@ public class SpotifyService
         {
             var token = await GetClientRequestToken(cancellationToken);
             
-            var spotify = new SpotifyClient(token);
+            var spotify = new SpotifyClient(_defaultConfig.WithToken(token.AccessToken));
             
             var request = new SearchRequest(SearchRequest.Types.Track, $"{song}");
 
@@ -65,244 +91,84 @@ public class SpotifyService
             return new();
         }
     }
-
-
-    public async Task<CurrentlyPlayingContext?> GetPlayerState(CancellationToken cancellationToken = default)
+    
+    
+    
+    
+    
+    public async Task ConfigAuthWithCallbackCode(string code)
     {
         try
         {
-            var token = await GetAuthRequestToken(cancellationToken);
-            if (token is null) return null;
+            var request = new AuthorizationCodeTokenRequest(_clientId, _secret, code, LoginCallbackUri);
+            _oauthToken = await new OAuthClient(_defaultConfig).RequestToken(request);
 
-            SpotifyClientConfig.CreateDefault().WithToken(token.AccessToken);
+            if (_oauthToken.IsExpired) return;
             
-            var spotify = new SpotifyClient(token);
+            var localIdStr = await _localStorage.GetItemAsync<string>("local_id");
+            // if local storage has no value or is improper guid: we generate a new one for local storage
+            // use this to set refresh token in db
+            if (localIdStr is null || !Guid.TryParse(localIdStr, out Guid localId))
+            {
+                localId = Guid.NewGuid();
+                await _localStorage.SetItemAsync("local_id", localId.ToString());
+            }
 
-            var request = new PlayerCurrentPlaybackRequest();
-            
-            return await spotify.Player.GetCurrentPlayback(request, cancel: cancellationToken);
+            await _bcData.UpdateRefreshToken(localId, _oauthToken.RefreshToken);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return null;
-        }
-
-    }
-
-
-
-    public async Task Pause(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var token = await GetAuthRequestToken(cancellationToken);
-            if (token is null) return;
-
-            SpotifyClientConfig.CreateDefault().WithToken(token.AccessToken);
-            
-            var spotify = new SpotifyClient(token);
-            
-            var request = new PlayerPausePlaybackRequest();
-            
-            await spotify.Player.PausePlayback(request, cancellationToken);
-            
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"From SpotifyService.Pause: {e.Message}");
+            Console.WriteLine($"From ConfigAuthWithCallbackCode:\n{e.Message}");
         }
     }
-    
-    
-    public async Task Play(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var token = await GetAuthRequestToken(cancellationToken);
-            if (token is null) return;
-
-            SpotifyClientConfig.CreateDefault().WithToken(token.AccessToken);
-            
-            var spotify = new SpotifyClient(token);
-            
-            var request = new PlayerResumePlaybackRequest();
-            
-            await spotify.Player.ResumePlayback(request, cancellationToken);
-            
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"From SpotifyService.Play: {e.Message}");
-        }
-    }
-    
-    
-        
-    public async Task SkipForward(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var token = await GetAuthRequestToken(cancellationToken);
-            if (token is null) return;
-
-            SpotifyClientConfig.CreateDefault().WithToken(token.AccessToken);
-            
-            var spotify = new SpotifyClient(token);
-            
-            var request = new PlayerSkipNextRequest();
-            
-            await spotify.Player.SkipNext(request, cancellationToken);
-            
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"From SpotifyService.SkipForward: {e.Message}");
-        }
-    }
-    
-    
-        
-    public async Task SkipBackward(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var token = await GetAuthRequestToken(cancellationToken);
-            if (token is null) return;
-
-            SpotifyClientConfig.CreateDefault().WithToken(token.AccessToken);
-            
-            var spotify = new SpotifyClient(token);
-            
-            var request = new PlayerSkipPreviousRequest();
-            
-            await spotify.Player.SkipPrevious(request, cancellationToken);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"From SpotifyService.SkipBackward: {e.Message}");
-        }
-    }
-
-
-
-    public async Task SetVolume(int level, CancellationToken cancellationToken = default)
-    {
-        if (level < 0 || level > 100) return;
-        
-        try
-        {
-            var token = await GetAuthRequestToken(cancellationToken);
-            if (token is null) return;
-
-            SpotifyClientConfig.CreateDefault().WithToken(token.AccessToken);
-            
-            var spotify = new SpotifyClient(token);
-            
-            var request = new PlayerVolumeRequest(level);
-            
-            await spotify.Player.SetVolume(request, cancellationToken);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"From SpotifyService.SetVolume: {e.Message}");
-        }
-    }
-    
-    
-    
-    
-    
-    
-    public async Task SetOAuthCode(string code)
-    {
-        _oauthCode = code;
-        await _localStorage.SetItemAsync("OAuthCode", _protector.Protect(code));
-        _ = await GetAuthRequestToken();
-    }
-
-    private async Task<string?> GetOAuthCode()
-    {
-        if (!string.IsNullOrEmpty(_oauthCode)) return _oauthCode;
-        
-        var protectedData = await _localStorage.GetItemAsync<string>("OAuthCode");
-        return null;
-        if (protectedData is null) return null;
-        
-        var data = _protector.Unprotect(protectedData);
-        return data;
-    }
-
-
-    private async Task SetOAuthToken(AuthorizationCodeTokenResponse token)
-    {
-        _oauthToken = token;
-
-        var serializedData = JsonConvert.SerializeObject(token);
-
-        try
-        {
-            await _localStorage.SetItemAsStringAsync("spotify_o", _protector.Protect(serializedData));
-        }
-        catch {}
-    }
-
-    private async Task<AuthorizationCodeTokenResponse?> GetAuthTokenFromBrowser()
-    {
-        try
-        {
-            var serializedData = await _localStorage.GetItemAsStringAsync("spotify_o");
-            if (string.IsNullOrEmpty(serializedData)) return null;
-            
-            var data = JsonConvert.DeserializeObject<AuthorizationCodeTokenResponse>(_protector.Unprotect(serializedData));
-            return data;
-        }
-        catch(Exception exc)
-        {
-            return null;
-        }
-    }
-
 
     private async Task<ClientCredentialsTokenResponse> GetClientRequestToken(CancellationToken cancellationToken = default)
     {
         if (_clientToken is not null && !_clientToken.IsExpired) return _clientToken;
         
-        var config = SpotifyClientConfig.CreateDefault();
         var request = new ClientCredentialsRequest(_clientId, _secret);
-
-        _clientToken = await new OAuthClient(config).RequestToken(request, cancellationToken);
+        _clientToken = await new OAuthClient(_defaultConfig).RequestToken(request, cancellationToken);
 
         return _clientToken;
     }
 
 
-    private async Task<AuthorizationCodeTokenResponse?> GetAuthRequestToken(CancellationToken cancellationToken = default)
+    private async Task<string?> GetAuthRequestToken(CancellationToken cancellationToken = default)
     {
-        // _oauthToken ??= await GetAuthTokenFromBrowser();
-        
-        if (_oauthToken is not null && !_oauthToken.IsExpired) return _oauthToken;
-
-        var oauthCode = await GetOAuthCode();
-        
-        if (string.IsNullOrEmpty(oauthCode)) return null;
-        
-        var config = SpotifyClientConfig.CreateDefault();
-
-        try
+        var localIdStr = await _localStorage.GetItemAsync<string>("local_id", cancellationToken: cancellationToken);
+        // if local storage has no value or is improper guid: we generate a new one for local storage
+        // use this to lookup refresh token in db
+        if (localIdStr is null || !Guid.TryParse(localIdStr, out Guid localId))
         {
-            var request = new AuthorizationCodeTokenRequest(_clientId, _secret, oauthCode, LoginCallbackUri);
-            var token = await new OAuthClient(config).RequestToken(request, cancellationToken);
-            
-            await SetOAuthToken(token);
-            
-            return token;
+            localId = Guid.NewGuid();
+            await _localStorage.SetItemAsync("local_id", localId.ToString(), cancellationToken);
         }
-        catch (Exception e)
+
+        // if oauth token is valid just return that
+        if (_oauthToken is not null && !_oauthToken.IsExpired)
         {
-            Console.WriteLine(e);
-            return null;
+            if (!string.IsNullOrEmpty(_oauthToken.RefreshToken))
+                await _bcData.UpdateRefreshToken(localId, _oauthToken.RefreshToken);
+            return _oauthToken.AccessToken;
         }
+
+        // use local id to try to fetch refresh token
+        var refreshToken = await _bcData.GetRefreshToken(localId);
+
+        if (refreshToken is not null)
+        {
+            try
+            {
+                var authRequest = new AuthorizationCodeRefreshRequest(_clientId, _secret, refreshToken.token);
+                _oauthToken = await new OAuthClient(_defaultConfig).RequestToken(authRequest, cancellationToken);
+                return _oauthToken.AccessToken;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"GetAuthRequestToken:\n{e.Message}");
+            }
+        }
+
+        return null;
     }
-    
 }

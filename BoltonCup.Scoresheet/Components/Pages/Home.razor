@@ -1,7 +1,66 @@
 ﻿@page "/"
 
+@inject IBCData BCData
+@inject NavigationManager Navigation
+
+
 <PageTitle>Bolton Cup Scoresheet</PageTitle>
 
 <MudText Typo="Typo.h6">Welcome Back</MudText>
+<MudDivider />
 
-<MudText>There is no active game being recorded - <MudLink Href="games">select a game to record.</MudLink></MudText>
+@if (_games.Any())
+{
+    <MudText Class="py-2" Typo="Typo.h6">Active Games</MudText>
+
+    foreach (var game in _games)
+    {
+        <MudPaper Class="pa-4" Width="15rem" Height="15rem">
+            <MudLink Href="@($"scoresheet/{game.id}")" Color="Color.Default">
+                <MudStack Spacing="1">
+                    <MudStack AlignItems="AlignItems.Center" Row>
+                        <MudImage Src="@game.HomeTeamLogo" Width="80" />
+                        <MudSpacer />
+                        <MudImage Src="@game.AwayTeamLogo" Width="80" />
+                    </MudStack>
+                    
+                    <MudStack AlignItems="AlignItems.Center" Row>
+                        <MudText Typo="Typo.body1"><b>@game.HomeTeamNameShort</b></MudText>
+                        <MudSpacer />
+                        <MudText Typo="Typo.body1">vs.</MudText>
+                        <MudSpacer />
+                        <MudText Typo="Typo.body1"><b>@game.AwayTeamNameShort</b></MudText>
+                    </MudStack>
+                    
+                    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row>
+                        <MudText Typo="Typo.body1"><b>@game.home_score - @game.away_score</b></MudText>
+                    </MudStack>                
+                    
+                    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row>
+                        <MudText Typo="Typo.body1">@game.date.ToString("ddd. MMM. dd @ h:mm tt")</MudText>
+                    </MudStack>                
+                    
+                    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row>
+                        <MudText Typo="Typo.body1">@game.location</MudText>
+                    </MudStack>
+                </MudStack>
+            </MudLink>
+        </MudPaper>
+    }
+}
+else
+{
+    <MudText>There is no active game being recorded - <MudLink Href="games">select a game to record.</MudLink></MudText>
+}
+
+
+@code {
+
+    private IEnumerable<BCGame> _games = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _games = await BCData.GetActiveGamesAsync();
+    }
+
+}

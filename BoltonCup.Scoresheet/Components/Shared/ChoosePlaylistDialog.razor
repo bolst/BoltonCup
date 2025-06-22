@@ -1,0 +1,53 @@
+@using SpotifyAPI.Web
+
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Choose Playlist</MudText> 
+    </TitleContent>
+    <DialogContent>
+        <MudStack AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="8" Row>
+            @foreach (var playlist in Playlists)
+            {
+                var color = playlist.Name == _selectedPlaylist?.Name ? "mud-theme-primary" : "mud-palette-surface";
+                var elevation = playlist.Name == _selectedPlaylist?.Name ? 10 : 3;
+                <MudLink OnClick="@(() => _selectedPlaylist = playlist)">
+                    <MudPaper Class="@($"pa-2 {color}")" Height="200" MinWidth="160" MaxWidth="160" Elevation="elevation">
+                        <MudStack AlignItems="AlignItems.Center">
+                            <MudImage Src="@playlist.Images.FirstOrDefault().Url" Width="150" Height="150"/>
+                            <MudText Typo="Typo.caption"><b>@playlist.Name.FixedLengthWithEllipsis(20)</b>&nbsp;</MudText>
+                        </MudStack>
+                    </MudPaper>
+                </MudLink>
+            }
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">OK</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter] 
+    public IEnumerable<FullPlaylist> Playlists { get; set; } = [];
+
+    private FullPlaylist? _selectedPlaylist;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var options = MudDialog.Options with
+        {
+            MaxWidth = MaxWidth.Large
+        };
+
+        await MudDialog.SetOptionsAsync(options);
+    }
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(_selectedPlaylist));
+
+    private void Cancel() => MudDialog.Cancel();
+}

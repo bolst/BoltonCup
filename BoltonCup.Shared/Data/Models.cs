@@ -34,6 +34,9 @@ public class BCGame
     public int home_score { get; set; }
     public int away_score { get; set; }
     public required string state { get; set; }
+    public string? playlist_id { get; set; }
+    public string? last_played { get; set; }
+    public string? last_played_id { get; set; }
     public string HomeTeamName { get; set; }
     public string HomeTeamLogo { get; set; }
     public string HomeTeamNameShort { get; set; }
@@ -370,4 +373,41 @@ public class BCAvailability : IEquatable<BCAvailability>
     public static bool operator != (BCAvailability? left, BCAvailability? right) => left is null ? right is not null : !left.Equals(right);
 
     #endregion
+}
+
+
+public class BCRefreshToken
+{
+    public required int id { get; set; }
+    public required DateTime created_at { get; set; }
+    public required string token { get; set; }
+    public required Guid local_id { get; set; }
+}
+
+
+public class BCSong : IEquatable<BCSong>
+{
+    public int id { get; set; }
+    public string spotify_id { get; set; }
+    public string name { get; set; }
+    public DateTime? last_played { get; set; }
+    public int account_id { get; set; }
+    public string state { get; set; }
+    public string album_cover { get; set; }
+    public int sort_key { get; set; }
+    public int times_played { get; set; }
+
+    public bool IsPlaying => state == SongState.Playing;
+    
+    #region IEquatable
+    
+    public bool Equals(BCSong? other) => other is not null && other.id == id;
+    public override bool Equals(object? obj) => Equals(obj as BCSong);
+    public override int GetHashCode() => id.GetHashCode();
+    public static bool operator == (BCSong? left, BCSong? right) => left is null ? right is null : left.Equals(right);
+    
+    public static bool operator != (BCSong? left, BCSong? right) => left is null ? right is not null : !left.Equals(right);
+
+    #endregion
+
 }

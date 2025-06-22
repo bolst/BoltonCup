@@ -1,67 +1,15 @@
+
 namespace BoltonCup.Shared.Data;
-using Dapper;
 using Npgsql;
 
-public interface IBCData
+public partial class BCData : DapperBase, IBCData
 {
-    Task<IEnumerable<BCTeam>> GetTeams();
-    Task<BCTeam?> GetTeamById(int id);
-    Task<IEnumerable<BCGame>> GetSchedule();
-    Task<IEnumerable<BCGame>> GetPlayerSchedule(int playerId);
-    Task<BCGame?> GetGameById(int id);
-    Task<IEnumerable<PlayerProfile>> GetRosterByTeamId(int teamId);
-    Task<IEnumerable<PlayerProfile>> GetAllTournamentPlayersAsync(int tournamentId);
-    Task<PlayerProfile?> GetPlayerProfileById(int playerId);
-    Task<PlayerProfile?> GetUserTournamentPlayerProfileAsync(int accountId, int tournamentId);
-    Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int accountId, int? tournamentId = null);
-    Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int accountId, int? tournamentId = null);
-    Task<IEnumerable<GameGoal>> GetGameGoalsByGameId(int gameId);
-    Task<IEnumerable<GamePenalty>> GetGamePenaltiesByGameId(int gameId);
-    Task<IEnumerable<PlayerStatLine>> GetPlayerStats(int tournamentId, int? teamId = null);
-    Task<IEnumerable<GoalieStatLine>> GetGoalieStats(int tournamentId, int? teamId = null);
-    Task<IEnumerable<PlayerProfilePicture>> GetPlayerProfilePictures();
-    Task<string> SubmitRegistration(RegisterFormModel form);
-    Task<IEnumerable<RegisterFormModel>> GetRegistrationsAsync();
-    Task<RegisterFormModel?> GetRegistrationByEmailAsync(string email);
-    Task<string> AdmitUserAsync(RegisterFormModel form);
-    Task<string> RemoveAdmittedUserAsync(BCAccount account);
-    Task<IEnumerable<BCAccount>> GetAccountsAsync();
-    Task<BCAccount?> GetAccountByEmailAsync(string email);
-    Task<BCAccount?> GetAccountByIdAsync(int accountId);
-    Task UpdateAccountProfilePictureAsync(string email, string imagePath);
-    Task<IEnumerable<BCTournament>> GetTournamentsAsync();
-    Task<BCTournament?> GetTournamentByYearAsync(string year);
-    Task<BCTournament?> GetCurrentTournamentAsync();
-    Task SetUserAsPayedAsync(string email);
-    Task ConfigPlayerProfileAsync(RegisterFormModel form, int tournamentId);
-    Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId);
-    Task<BCTeam?> GetTeamByDraftOrderAsync(int draftId, int order);
-    Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId);
-    Task<IEnumerable<PlayerProfile>> GetDraftAvailableTournamentPlayersAsync(int tournamentId);
-    Task<IEnumerable<BCDraftOrder>> GetDraftOrderAsync(int draftId);
-    Task DraftPlayerAsync(PlayerProfile player, BCTeam team, BCDraftPick draftPick);
-    Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId);
-    Task ResetDraftAsync(int draftId);
-    Task<IEnumerable<BCSponsor>> GetActiveSponsorsAsync();
-    Task<IEnumerable<BCGame>> GetIncompleteGamesAsync();
-    Task<BCAccount?> GetAccountByPCKeyAsync(Guid pckey);
-    Task<PlayerProfile?> GetCurrentPlayerProfileByPCKeyAsync(Guid pckey);
-    Task UpdateConfigDataAsync(BCAccount account);
-    Task UpdatePlayerAvailabilityAsync(IEnumerable<BCAvailability> availabilities);
-    Task<IEnumerable<BCAvailability>> GetPlayerAvailabilityAsync(int accountId, int tournamentId);
-    Task PopulatePlayerAvailabilitiesAsync(int accountId);
-}
-
-public class BCData : DapperBase, IBCData
-{
-    private readonly string connectionString;
     private readonly ICacheService cacheService;
     private readonly TimeSpan cacheDuration = TimeSpan.FromMinutes(10);
 
 
     public BCData(string _connectionString, ICacheService _cacheService) : base(_connectionString)
     {
-        connectionString = _connectionString;
         cacheService = _cacheService;
     }
 
@@ -719,9 +667,9 @@ public class BCData : DapperBase, IBCData
                         FROM game g
                                  LEFT OUTER JOIN team h ON g.home_team_id = h.id
                                  LEFT OUTER JOIN team a ON g.away_team_id = a.id
-                        WHERE g.state != 'FIN'
+                        WHERE g.state != @State
                         ORDER BY g.date ASC";
-        return await QueryDbAsync<BCGame>(sql);
+        return await QueryDbAsync<BCGame>(sql, new { State = GameState.Complete });
     }
 
     public async Task<BCAccount?> GetAccountByPCKeyAsync(Guid pckey)
@@ -857,6 +805,54 @@ public class BCData : DapperBase, IBCData
                                 
         await ExecuteSqlAsync(sql, new { AccountId = accountId });
     }
+
+
+    public async Task<IEnumerable<BCGame>> GetActiveGamesAsync()
+    {
+        string sql = @"SELECT g.*,
+                           h.name       AS hometeamname,
+                           h.name_short AS hometeamnameshort,
+                           h.logo_url   AS hometeamlogo,
+                           a.name       AS awayteamname,
+                           a.name_short AS awayteamnameshort,
+                           a.logo_url   AS awayteamlogo
+                        FROM game g
+                                 LEFT OUTER JOIN team h ON g.home_team_id = h.id
+                                 LEFT OUTER JOIN team a ON g.away_team_id = a.id
+                        WHERE g.state = @State
+                        ORDER BY g.date ASC";
+
+        return await QueryDbAsync<BCGame>(sql, new { State = GameState.Active });
+    }
+
+
+    public async Task BeginRecordingGameAsync(int gameId)
+    {
+        string clearSql = $@"UPDATE game
+                        SET state = '{GameState.PreGame}'
+                            WHERE state = '{GameState.Active}'";
+
+        await ExecuteSqlAsync(clearSql, new { GameId = gameId });
+        
+        string sql = $@"UPDATE game
+                        SET state = '{GameState.Active}'
+                            WHERE id = @GameId";
+
+        await ExecuteSqlAsync(sql, new { GameId = gameId });
+    }
+    
+    
+    
+    public async Task EndRecordingGameAsync(int gameId, bool complete = false)
+    {
+        string sql = @"UPDATE game
+                        SET state = @State
+                            WHERE id = @GameId";
+
+        var state = complete ? GameState.Complete : GameState.PreGame;
+        await ExecuteSqlAsync(sql, new { State = state, GameId = gameId });
+    }
+    
 }
 
 

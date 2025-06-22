@@ -46,8 +46,9 @@ public static class ServiceConfiguration
                 throw new InvalidOperationException("Blazored.LocalStorage or IDataProtector service is not configured!\n");
             }
 
+            var bcdata = config.GetRequiredService<IBCData>();
             
-            return new SpotifyService(clientId, secret, localStorage, protector);
+            return new SpotifyService(clientId, secret, localStorage, protector, bcdata);
         });
         
         return services;
