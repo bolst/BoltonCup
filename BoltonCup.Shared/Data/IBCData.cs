@@ -2,7 +2,7 @@ using SpotifyAPI.Web;
 
 namespace BoltonCup.Shared.Data;
 
-public partial interface IBCData
+public interface IBCData
 {
     Task<IEnumerable<BCTeam>> GetTeams();
     Task<BCTeam?> GetTeamById(int id);
@@ -54,15 +54,12 @@ public partial interface IBCData
     
     Task<BCRefreshToken?> GetRefreshToken(Guid localId);
     Task UpdateRefreshToken(Guid localId, string token);
-    
-    
+
+
+    Task UpdatePlayerSongAsync(int accountId, FullTrack song);
     Task SetBCPlaylistSongsAsync(IEnumerable<FullTrack> songs);
-    Task<IEnumerable<BCSong>> GetSongQueueAsync();
-    Task<BCSong?> GetCurrentSongAsync();
-    Task PauseSongAsync(BCSong song);
-    Task PlaySongAsync(BCSong song);
-    Task<BCSong?> GetNextSongAsync();
-    Task<BCSong?> SkipToNextSongAsync();
+    Task SetGamePlaylistAsync(int gameId, string playlistId);
+    Task<IEnumerable<BCSong>> GetGameSongsAsync(int gameId);
     
     
     Task<IEnumerable<BCGame>> GetActiveGamesAsync();

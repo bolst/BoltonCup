@@ -19,12 +19,15 @@ public class SpotifyService
     private string? _oauthCode;
     
     private readonly Uri LoginCallbackUri = new("https://127.0.0.1:7107/callback/");
-    private readonly List<string> RequestScopes =
-        [Scopes.UserReadPlaybackState, Scopes.UserModifyPlaybackState, Scopes.UserReadCurrentlyPlaying];
     
     public Uri LoginRequestUri => new LoginRequest(LoginCallbackUri, _clientId, LoginRequest.ResponseType.Code)
     {
-        Scope = RequestScopes,
+        Scope = [
+            Scopes.UserReadPlaybackState, 
+            Scopes.UserModifyPlaybackState, 
+            Scopes.UserReadCurrentlyPlaying,
+            Scopes.PlaylistModifyPublic,
+        ],
     }.ToUri();
 
 

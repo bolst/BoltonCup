@@ -8,9 +8,42 @@ namespace BoltonCup.Shared.Data;
 public partial class BCData
 {
 
+    public async Task UpdatePlayerSongAsync(int accountId, FullTrack song)
+    {
+        {
+            string sql = @"INSERT INTO song(name, spotify_id, account_id, album_cover)
+                            SELECT @Name, @Id, @AccountId, @AlbumCover
+                                WHERE NOT EXISTS (SELECT * FROM song WHERE account_id = @AccountId)";
+
+            await ExecuteSqlAsync(sql, new
+            {
+                Name = song.Name,
+                Id = song.Id,
+                AccountId = accountId,
+                AlbumCover = song.Album.Images.FirstOrDefault()?.Url,
+            });        
+        }
+
+        {
+            string sql = @"UPDATE SONG SET 
+                                name = @Name,
+                                spotify_id = @Id,
+                                album_cover = @AlbumCover
+                            WHERE account_id = @AccountId";
+
+            await ExecuteSqlAsync(sql, new
+            {
+                Name = song.Name,
+                Id = song.Id,
+                AccountId = accountId,
+                AlbumCover = song.Album.Images.FirstOrDefault()?.Url,
+            });
+        }
+    }
+
     public async Task SetBCPlaylistSongsAsync(IEnumerable<FullTrack> songs)
     {
-        await ExecuteSqlAsync("DELETE FROM song");
+        await ExecuteSqlAsync("DELETE FROM song WHERE account_id IS NULL");
 
         string sql = @"INSERT INTO song(spotify_id, name, album_cover) VALUES (@Id, @Name, @AlbumCover)";
 
@@ -24,81 +57,33 @@ public partial class BCData
         await ExecuteSqlAsync(sql, parameters);
     }
 
-    public async Task<IEnumerable<BCSong>> GetSongQueueAsync()
-    {
-        string sql = $@"SELECT *
-                        FROM song
-                        WHERE state = '{SongState.Queued}'
-                        ORDER BY last_played NULLS FIRST, id";
 
-        return await QueryDbAsync<BCSong>(sql);
-    }
-    
-    
-    
-    public async Task<BCSong?> GetCurrentSongAsync()
+    public async Task SetGamePlaylistAsync(int gameId, string playlistId)
     {
-        string sql = $@"SELECT *
-                        FROM song
-                        WHERE state IN ('{SongState.Playing}', '{SongState.Paused}')
-                        LIMIT 1";
-
-        return await QueryDbSingleAsync<BCSong>(sql);
-    }
-    
-    
-    
-    public async Task PauseSongAsync(BCSong song)
-    {
-        string sql = $@"UPDATE song
-                        SET state = '{SongState.Paused}'
-                            WHERE id = @Id";
+        string sql = @"UPDATE game
+                        SET playlist_id = @PlaylistId
+                            WHERE id = @GameId";
         
-        await ExecuteSqlAsync(sql, song);
-    }
-    
-    
-    
-    public async Task PlaySongAsync(BCSong song)
-    {
-        await ExecuteSqlAsync($"UPDATE song SET state = '{SongState.Queued}'");
-        
-        string sql = $@"UPDATE song
-                        SET state = '{SongState.Playing}', last_played = now() AT TIME ZONE 'UTC'
-                            WHERE id = @Id";
-
-        await ExecuteSqlAsync(sql, song);
+        await ExecuteSqlAsync(sql, new { GameId = gameId, PlaylistId = playlistId });
     }
 
 
-
-    public async Task<BCSong?> GetNextSongAsync()
+    public async Task<IEnumerable<BCSong>> GetGameSongsAsync(int gameId)
     {
-        string sql = $@"SELECT *
-                        FROM song
-                        WHERE state = '{SongState.Queued}'
-                        ORDER BY last_played NULLS FIRST, id
-                        LIMIT 1";
+        // TODO: join with the game players requested songs
+        string sql = @"WITH game_account_ids AS (
+                        SELECT a.id
+                          FROM account a
+                           INNER JOIN players p ON p.account_id = a.id
+                           INNER JOIN game g
+                                      ON p.team_id IN (g.home_team_id, g.away_team_id) AND g.id = @GameId
+                            )
+                        SELECT *
+                            FROM song
+                            WHERE account_id IS NULL
+                               OR account_id IN (SELECT * FROM game_account_ids)
+                            ORDER BY account_id";
 
-        return await QueryDbSingleAsync<BCSong>(sql);
-    }
-
-
-
-    public async Task<BCSong?> SkipToNextSongAsync()
-    {
-        // put all songs back in queue
-        await ExecuteSqlAsync($"UPDATE song SET state = '{SongState.Queued}'");
-
-        var nextSong = await GetNextSongAsync();
-        if (nextSong is null) return null;
-        
-        // update next song to playing
-        string sql = $@"UPDATE song
-                        SET state = '{SongState.Playing}', last_played = now() AT TIME ZONE 'UTC'
-                            WHERE id = @Id
-                        RETURNING *";
-
-        return await QueryDbSingleAsync<BCSong>(sql, nextSong);
+        return await QueryDbAsync<BCSong>(sql, new { GameId = gameId });
     }
 }

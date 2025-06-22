@@ -210,6 +210,10 @@
 
         await BCData.UpdateConfigDataAsync(_account);
         await BCData.UpdatePlayerAvailabilityAsync(_availabilities);
+        if (_selectedTrack is not null)
+        {
+            await BCData.UpdatePlayerSongAsync(_account.id, _selectedTrack);
+        }
 
         _loading = false;
         InvokeAsync(StateHasChanged);

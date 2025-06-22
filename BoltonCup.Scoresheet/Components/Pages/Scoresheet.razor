@@ -219,8 +219,9 @@
                 Console.WriteLine($"From ConfigureGamePlaylist (checking if playlist exists): {e.Message}");
                 game.playlist_id = null;
             }
-            
         }
+        
+        // 
 
         if (string.IsNullOrEmpty(game.playlist_id))
         {
@@ -240,8 +241,6 @@
 
                 await client.Playlists.AddItems(playlist.Id, new PlaylistAddItemsRequest(uris));
                 await BCData.SetGamePlaylistAsync(game.id, playlist.Id);
-                
-                // TODO: get the song to play
             }
             catch (Exception e)
             {

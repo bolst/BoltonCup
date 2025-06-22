@@ -34,6 +34,9 @@ public class BCGame
     public int home_score { get; set; }
     public int away_score { get; set; }
     public required string state { get; set; }
+    public string? playlist_id { get; set; }
+    public string? last_played { get; set; }
+    public string? last_played_id { get; set; }
     public string HomeTeamName { get; set; }
     public string HomeTeamLogo { get; set; }
     public string HomeTeamNameShort { get; set; }
@@ -391,6 +394,8 @@ public class BCSong : IEquatable<BCSong>
     public int account_id { get; set; }
     public string state { get; set; }
     public string album_cover { get; set; }
+    public int sort_key { get; set; }
+    public int times_played { get; set; }
 
     public bool IsPlaying => state == SongState.Playing;
     
