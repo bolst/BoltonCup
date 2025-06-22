@@ -30,6 +30,26 @@ else
             }
 
             <MudButtonGroup OverrideStyles="false">
+                @if (_currentTrack is not null)
+                {
+                    @if (_currentTrack.IsPlaying)
+                    {
+                        <MudIconButton OnClick="OnPause" Icon="@Icons.Material.Filled.PauseCircle" Color="Color.Tertiary"/>
+                    }
+                    else
+                    {
+                        <MudIconButton OnClick="OnPlay" Icon="@Icons.Material.Filled.PlayCircle" Color="Color.Tertiary"/>
+                    }
+
+                    <MudIconButton OnClick="OnSkipForward" Icon="@Icons.Material.Filled.SkipNext" Color="Color.Tertiary"/>
+                }
+                else
+                {
+                    <MudTooltip Text="Reload Spotify data">
+                        <MudIconButton OnClick="(() => RefreshState())" Color="Color.Error" Icon="@Icons.Material.Filled.Refresh"/>
+                    </MudTooltip>
+                }
+
                 @if (_user!.DisplayName == "nicbolton")
                 {
                     <MudIconButton OnClick="ShowChoosePlaylistDialog" Icon="@Icons.Material.Filled.PlaylistAddCircle" Color="Color.Warning"/>
@@ -37,39 +57,29 @@ else
 
                 @if (_queue.Any())
                 {
-                    <MudMenu Icon="@Icons.Material.Filled.QueueMusic" Color="Color.Info" Dense>
-                        @foreach (var track in _queue.Take(8))
-                        {
-                            <MudMenuItem Label="@track.name">
-                                <MudStack AlignItems="AlignItems.Center" Row>
-                                    <MudImage Src="@track.album_cover" Height="30"/>
-                                    <MudText>@track.name.FixedLengthWithEllipsis(30)</MudText>
-                                </MudStack>
-                            </MudMenuItem>
-                        }
+                    <MudMenu Icon="@Icons.Material.Filled.QueueMusic" Color="Color.Info">
+                        <MudDropContainer T="IPlayableItem" Items="_queue.Take(8)" ItemsSelector="@((_,__) => true)" ItemDropped="OnReorderQueue">
+                            <ChildContent>
+                                <MudList T="IPlayableItem" Color="Color.Info" Class="d-flex flex-column mud-height-full" Dense>
+                                    <MudDropZone T="IPlayableItem" Identifier="yooo" AllowReorder />
+                                </MudList>
+                            </ChildContent>
+                            <ItemRenderer>
+                                @if (context is FullTrack item)
+                                {
+                                    <MudListItem Value="context" Text="@item.Name">
+                                        <MudStack AlignItems="AlignItems.Center" Row>
+                                            <MudImage Src="@item.Album.Images.FirstOrDefault()?.Url" Height="30"/>
+                                            <MudText>@item.Name.FixedLengthWithEllipsis(30)</MudText>
+                                        </MudStack>
+                                    </MudListItem>
+                                }
+                            </ItemRenderer>
+                        </MudDropContainer>
                     </MudMenu>
                 }
 
-                @if (_currentTrack is not null)
-                {
-                    var track = _currentTrack.Item as FullTrack;
-                    var artists = string.Join(", ", track.Artists.Select(x => x.Name));
-
-                        @if (_currentTrack.IsPlaying)
-                        {
-                            <MudIconButton OnClick="OnPause" Icon="@Icons.Material.Filled.PauseCircle" Color="Color.Tertiary"/>
-                        }
-                        else
-                        {
-                            <MudIconButton OnClick="OnPlay" Icon="@Icons.Material.Filled.PlayCircle" Color="Color.Tertiary"/>
-                        }
-
-                        <MudIconButton OnClick="OnSkipForward" Icon="@Icons.Material.Filled.SkipNext" Color="Color.Tertiary"/>
-                }
-                else
-                {
-                    <MudIconButton OnClick="(() => RefreshState())" Color="Color.Error" Icon="@Icons.Material.Filled.Refresh"/>
-                }
+                
 
                 <MudMenu Icon="@Icons.Material.Filled.Person" Color="Color.Info" Dense>
                     <MudMenuItem Icon="@Icons.Material.Filled.Person" Label="@_user.DisplayName"/>
@@ -88,14 +98,12 @@ else
 
 
 @code {
-
-
+    
     private bool _loading;
     private int _volume;
     private PrivateUser? _user;
-    private BCSong? _currentSong;
     private CurrentlyPlayingContext? _currentTrack;
-    private IEnumerable<BCSong> _queue = [];
+    private List<IPlayableItem> _queue = [];
     
 
     private const string _spotifySvg = @"<svg role=""img"" viewBox=""0 0 24 24"" xmlns=""http://www.w3.org/2000/svg""><title>Spotify</title><path d=""M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z""/></svg>";
@@ -110,7 +118,7 @@ else
             _loading = true;
             StateHasChanged();
 
-            var spotify = await GetClient();
+            var spotify = await GetClient(true);
             if (spotify is not null)
                 _user = await spotify.UserProfile.Current();
             
@@ -122,23 +130,19 @@ else
     }
 
 
-    private async Task<SpotifyClient?> GetClient()
+    private async Task<SpotifyClient?> GetClient(bool suppress = false)
     {
         var spotify = await Spotify.GetClientAsync();
         if (spotify is not null) return spotify;
 
-        Snackbar.Add("Unable to fetch Spotify client", Severity.Error);
+        if (!suppress) Snackbar.Add("Unable to fetch Spotify client", Severity.Error);
         return null;
     }
 
 
     private async Task RefreshState(bool suppress = false)
     {
-        _currentSong = await BCData.GetCurrentSongAsync();
-        _currentSong ??= await BCData.SkipToNextSongAsync();
-        _queue = await BCData.GetSongQueueAsync();
-        
-        var spotify = await GetClient();
+        var spotify = await GetClient(suppress);
         if (spotify is null) return;
         
         _currentTrack = await spotify.Player.GetCurrentPlayback();
@@ -148,24 +152,7 @@ else
             return;
         }
 
-        if (_currentSong is null)
-        {
-            if (!suppress) Snackbar.Add("No songs found in database", Severity.Error);
-            return;
-        }
-        
-        // if the spotify track is not the same as the one in the database
-        // play the database song on spotify
-        if ((_currentTrack.Item as FullTrack)?.Id != _currentSong.spotify_id)
-        {
-            var trackToPlay = await spotify.Tracks.Get(_currentSong.spotify_id);
-            await spotify.Player.ResumePlayback(new PlayerResumePlaybackRequest
-            {
-                Uris = [trackToPlay.Uri],
-            });
-            await spotify.Player.PausePlayback();
-            _currentTrack = await spotify.Player.GetCurrentPlayback();
-        }
+        _queue = (await spotify.Player.GetQueue()).Queue;
         
         InvokeAsync(StateHasChanged);
     }
@@ -188,14 +175,19 @@ else
 
     private async Task OnPause()
     {
-        var spotify = await GetClient();
-        if (spotify is null) return;
-        
-        await spotify.Player.PausePlayback();
-        await BCData.PauseSongAsync(_currentSong);
+        try
+        {
+            var spotify = await GetClient();
+            if (spotify is null) return;
+            
+            await spotify.Player.PausePlayback();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"From OnPause:\n{e.Message}");
+        }
         
         await RefreshState();
-
     }
     
     
@@ -207,7 +199,6 @@ else
             if (spotify is null) return;
             
             await spotify.Player.ResumePlayback();
-            await BCData.PlaySongAsync(_currentSong);
         }
         catch (Exception e)
         {
@@ -223,24 +214,9 @@ else
         var spotify = await GetClient();
         if (spotify is null) return;
 
-        var nextSong = await BCData.GetNextSongAsync();
         try
         {
-            if (nextSong is not null)
-            {
-                var track = await spotify.Tracks.Get(nextSong.spotify_id);
-                await spotify.Player.ResumePlayback(new PlayerResumePlaybackRequest
-                {
-                    Uris = [track.Uri, track.Uri]
-                });
-
-                await BCData.PlaySongAsync(nextSong);
-            }
-            else
-            {
-                //var request = new PlayerSkipNextRequest();
-                //await spotify.Player.SkipNext(request);
-            }
+            await spotify.Player.SkipNext();
         }
         catch (Exception e)
         {
@@ -295,6 +271,19 @@ else
                 
             await BCData.SetBCPlaylistSongsAsync(tracks);
         }
+    }
+
+
+
+    private async Task OnReorderQueue(MudItemDropInfo<IPlayableItem> dropItem)
+    {
+        if (dropItem.Item is null) return;
+
+        // var oldIndex = _queue.IndexOf(dropItem.Item);
+        // var newIndex = dropItem.IndexInZone;
+        //
+        // (_queue[oldIndex], _queue[newIndex]) = (_queue[newIndex], _queue[oldIndex]);
+        // await BCData.SwapSongOrdersAsync(_queue[oldIndex], _queue[newIndex]);
     }
     
 }

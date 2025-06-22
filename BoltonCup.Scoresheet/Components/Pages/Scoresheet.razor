@@ -1,9 +1,14 @@
 @page "/scoresheet"
 @page "/scoresheet/{GameId:int}"
 
+@using SpotifyAPI.Web
+
 @inject IBCData BCData
 @inject IDialogService DialogService
 @inject NavigationManager Navigation
+@inject SpotifyService Spotify
+@inject ISnackbar Snackbar
+
 
 <div class="relative">
     @if (_game is not null)
@@ -23,7 +28,14 @@
                 }
                 else
                 {
-                    <MudButton OnClick="SaveGame" Color="Color.Success" Variant="Variant.Outlined">Save</MudButton>
+                    <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
+                        <MudTooltip Text="Saves the game for editing later" Duration="0">
+                            <MudButton OnClick="SaveGame" StartIcon="@Icons.Material.Filled.Save">Save</MudButton>
+                        </MudTooltip>
+                        <MudTooltip Text="Saves the game and marks it as complete" Duration="0">
+                            <MudButton OnClick="CompleteGame" StartIcon="@Icons.Material.Filled.Check">Complete</MudButton>
+                        </MudTooltip>
+                    </MudButtonGroup>
                 }
                 
                 <MudSpacer />
@@ -50,9 +62,9 @@
     
         
         <MudToolBar>
-            <MudButton Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+            <MudButton OnClick="@(() => OnAddPenalty(_homeTeam, _homeRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
             <MudSpacer />
-            <MudButton Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+            <MudButton OnClick="@(() => OnAddPenalty(_awayTeam, _awayRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
         </MudToolBar>
         
         <MudGrid Style="height: 35vh">
@@ -64,10 +76,6 @@
             </MudItem>
         </MudGrid>
     
-    }
-    else
-    {
-        <MudText>No game found!</MudText>
     }
     
     
@@ -109,7 +117,15 @@
         if (GameId == 0)
         {
             // TODO: check if there is a live game and navigate to its scoresheet endpoint
-            Navigation.NavigateTo("/games");
+            var currentGame = await BCData.GetActiveGamesAsync();
+            if (currentGame.Any())
+            {
+                Navigation.NavigateTo($"scoresheet/{currentGame.First().id}");
+            }
+            else
+            {
+                Navigation.NavigateTo("/games");
+            }
         }
     }
     
@@ -156,12 +172,85 @@
 
 
 
+    private async Task CompleteGame()
+    {
+        if (_game is null) return;
+        
+        await BCData.EndRecordingGameAsync(_game.id, complete: true);
+        await LoadDataAsync();
+    }
+
+
+
     private async Task BeginRecordingGame()
     {
         if (_game is null) return;
 
         await BCData.BeginRecordingGameAsync(_game.id);
+
+        await ConfigureGamePlaylist(_game);
+        
         await LoadDataAsync();
+    }
+
+
+    private async Task ConfigureGamePlaylist(BCGame game)
+    {
+        var client = await Spotify.GetClientAsync();
+        if (client is null) return;
+
+        var user = await client.UserProfile.Current();
+
+        if (!string.IsNullOrEmpty(game.playlist_id))
+        {
+            // ensure the playlist exists
+            try
+            {
+                // spotify API has no endpoint to get a specific playlist that a user owns
+                // so if this errors out, we know the current user does not own this playlist
+                await client.Playlists.ChangeDetails(game.playlist_id, new PlaylistChangeDetailsRequest
+                {
+                    Public = true,
+                });
+            }
+            catch (Exception e)
+            {
+                // if it does not invalidate the game playlist id
+                Console.WriteLine($"From ConfigureGamePlaylist (checking if playlist exists): {e.Message}");
+                game.playlist_id = null;
+            }
+            
+        }
+
+        if (string.IsNullOrEmpty(game.playlist_id))
+        {
+            try
+            {
+                // if no playlist, create one and populate
+                var playlist = await client.Playlists.Create(user.Id, new PlaylistCreateRequest($"{game.HomeTeamNameShort} vs. {game.AwayTeamNameShort} {game.date:d} ({game.id})")
+                {
+                    Description = $"Bolton Cup: {game.HomeTeamNameShort} vs. {game.AwayTeamNameShort} ({game.date:f})."
+                });
+
+                if (playlist?.Id is null) return;
+
+                var songsToAdd = await BCData.GetGameSongsAsync(game.id);
+
+                var uris = songsToAdd.Select(x => $"spotify:track:{x.spotify_id}").ToList();
+
+                await client.Playlists.AddItems(playlist.Id, new PlaylistAddItemsRequest(uris));
+                await BCData.SetGamePlaylistAsync(game.id, playlist.Id);
+                
+                // TODO: get the song to play
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"From ConfigureGamePlaylist (creating playlist): {e.Message}");
+                Snackbar.Add("Something went wrong creating the playlist...", Severity.Error);
+                return;
+            }
+        }
+        
     }
     
 
@@ -180,6 +269,25 @@
         };
 
         var dialog = await DialogService.ShowAsync<AddGoalDialog>("Add Goal", parameters, options);
+        var result = await dialog.Result;
+    }
+    
+
+
+    private async Task OnAddPenalty(BCTeam team, IEnumerable<PlayerProfile> players)
+    {
+        var parameters = new DialogParameters<AddPenaltyDialog>
+        {
+            { x => x.Team, team },
+            { x => x.Players, players }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small
+        };
+
+        var dialog = await DialogService.ShowAsync<AddPenaltyDialog>("Add Penalty", parameters, options);
         var result = await dialog.Result;
     }
     
