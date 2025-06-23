@@ -70,7 +70,6 @@ public partial class BCData
 
     public async Task<IEnumerable<BCSong>> GetGameSongsAsync(int gameId)
     {
-        // TODO: join with the game players requested songs
         string sql = @"WITH game_account_ids AS (
                         SELECT a.id
                           FROM account a
@@ -86,4 +85,18 @@ public partial class BCData
 
         return await QueryDbAsync<BCSong>(sql, new { GameId = gameId });
     }
+
+
+    
+    // idk if i like this style yet
+    public async Task<int> GetSongOffsetAsync(string spotifyId) 
+        => await QueryDbSingleAsync<int>(@"SELECT COALESCE(MAX(offset_seconds), 0)
+                                            FROM song_offset
+                                            WHERE spotify_id = @SpotifyId", 
+            new 
+            {
+                SpotifyId = spotifyId
+            });
+    
+        
 }

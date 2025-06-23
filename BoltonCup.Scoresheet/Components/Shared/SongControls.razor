@@ -217,6 +217,21 @@ else
         try
         {
             await spotify.Player.SkipNext();
+
+            // TODO: fuck with this n test more
+            await Task.Delay(100);
+            
+            // if offset exists skip to it
+            var song = await spotify.Player.GetCurrentPlayback();
+            if (song.Item is not FullTrack track)
+                return;
+
+            var offset = await BCData.GetSongOffsetAsync(track.Id);
+            if (offset == 0)
+                return;
+
+            int offsetMs = offset * 1000;
+            await spotify.Player.SeekTo(new PlayerSeekToRequest(offsetMs));
         }
         catch (Exception e)
         {

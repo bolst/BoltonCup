@@ -60,6 +60,7 @@ public interface IBCData
     Task SetBCPlaylistSongsAsync(IEnumerable<FullTrack> songs);
     Task SetGamePlaylistAsync(int gameId, string playlistId);
     Task<IEnumerable<BCSong>> GetGameSongsAsync(int gameId);
+    Task<int> GetSongOffsetAsync(string spotifyId);
     
     
     Task<IEnumerable<BCGame>> GetActiveGamesAsync();
