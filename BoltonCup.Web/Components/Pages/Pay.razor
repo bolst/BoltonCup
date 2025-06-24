@@ -2,6 +2,8 @@
 
 @inject NavigationManager Navigation
 @inject Data.StripeServiceProvider StripeService
+@inject SupabaseServiceProvider SBService
+@inject IBCData BCData
 
 <PageHeader>@_headerText</PageHeader>
 
@@ -52,6 +54,12 @@
 
         await Task.Delay(1000);
         _userData = await StripeService.ProcessCheckoutAsync(CheckoutId);
+        
+        var account = await BCData.GetAccountByEmailAsync(_userData?.Email ?? "");
+        if (account is not null)
+        {
+            await SBService.SendConfigEmail(account);
+        }
 
         _loading = false;
         _headerText = "Payment Confirmed";

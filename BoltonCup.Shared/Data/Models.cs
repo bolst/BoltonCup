@@ -390,14 +390,8 @@ public class BCSong : IEquatable<BCSong>
     public int id { get; set; }
     public string spotify_id { get; set; }
     public string name { get; set; }
-    public DateTime? last_played { get; set; }
     public int account_id { get; set; }
-    public string state { get; set; }
     public string album_cover { get; set; }
-    public int sort_key { get; set; }
-    public int times_played { get; set; }
-
-    public bool IsPlaying => state == SongState.Playing;
     
     #region IEquatable
     
