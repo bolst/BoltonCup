@@ -124,93 +124,24 @@ public partial class BCData : DapperBase, IBCData
 
     public async Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int accountId, int? tournamentId = null)
     {
-        string sql = @"with
-                        player_teams as (
-                            select
-                                t.*,
-                                p.id as player_id
-                                from
-                                    team t
-                                        inner join players p on p.team_id = t.id
-                                        and p.account_id = @AccountId
-                        ),
-                        player_games as (
-                            select
-                                g.*,
-                                t.id as team_id,
-                                t.name as team_name,
-                                t.name_short as team_name_short,
-                                t.logo_url as team_logo_url,
-                                o.id  as opponent_team_id,
-                                o.name as opponent_name,
-                                o.name_short as opponent_name_short,
-                                o.logo_url as opponent_logo_url,
-                                case when t.id = home_team_id then home_score else away_score end as team_score,
-                                case when t.id != home_team_id then home_score else away_score end as opponent_team_score,
-                                t.player_id,
-                                t.name
-                                from
-                                    game g
-                                        inner join player_teams t on t.id in (g.home_team_id, g.away_team_id)
-                                        inner join team o on o.id = case when t.id = home_team_id then away_team_id else home_team_id end
-                                        and g.date < now()
-                                        {0}
-                        )
-                    select
-                        *,
-                        get_player_game_goals (@AccountId, id) as goals,
-                        get_player_game_assists (@AccountId, id) as assists
-                        from
-                            player_games
-                        order by date";
+        string sql = @"SELECT *
+                        FROM playergbg
+                        WHERE account_id = @AccountId
+                            {0}";
 
-        sql = string.Format(sql, tournamentId is not null ? "and g.tournament_id = @TournamentId" : string.Empty);
+        sql = string.Format(sql, tournamentId is not null ? "and tournament_id = @TournamentId" : string.Empty);
 
         return await QueryDbAsync<PlayerGameSummary>(sql, new { AccountId = accountId, TournamentId = tournamentId });
     }
 
     public async Task<IEnumerable<GoalieGameSummary>> GetGoalieGameByGame(int accountId, int? tournamentId = null)
     {
-        string sql = @"with
-                        player_teams as (
-                            select
-                                t.*,
-                                p.id as player_id
-                                from
-                                    team t
-                                        inner join players p on p.team_id = t.id
-                                        and p.account_id = @AccountId
-                        ),
-                        player_games as (
-                            select
-                                g.*,
-                                t.id as team_id,
-                                t.name as team_name,
-                                t.name_short as team_name_short,
-                                t.logo_url as team_logo_url,
-                                o.id  as opponent_team_id,
-                                o.name as opponent_name,
-                                o.name_short as opponent_name_short,
-                                o.logo_url as opponent_logo_url,
-                                case when t.id = home_team_id then home_score else away_score end as team_score,
-                                case when t.id != home_team_id then home_score else away_score end as opponent_team_score,
-                                t.player_id,
-                                t.name
-                                from
-                                    game g
-                                        inner join player_teams t on t.id in (g.home_team_id, g.away_team_id)
-                                        inner join team o on o.id = case when t.id = home_team_id then away_team_id else home_team_id end
-                                        and g.date < now()
-                                        {0}
-                        )
-                    select
-                        *,
-                        case when team_score > opponent_team_score then true else false end as win
-                        from
-                            player_games
-                        order by date";
+        string sql = @"SELECT *
+                        FROM goaliegbg
+                        WHERE account_id = @AccountId
+                            {0}";
         
-        sql = string.Format(sql, tournamentId is not null ? "and g.tournament_id = @TournamentId" : string.Empty);
+        sql = string.Format(sql, tournamentId is not null ? "and tournament_id = @TournamentId" : string.Empty);
 
         return await QueryDbAsync<GoalieGameSummary>(sql, new { AccountId = accountId, TournamentId = tournamentId });
     }
@@ -269,29 +200,9 @@ public partial class BCData : DapperBase, IBCData
 
     public async Task<IEnumerable<PlayerStatLine>> GetPlayerStats(int tournamentId, int? teamId = null)
     {
-        string sql = @"SELECT p.id AS player_id,
-                               p.name AS player_name,
-                               p.jersey_number,
-                               p.position,
-                               p.tournament_id,
-                               p.team_id,
-                               a.profilepicture,
-                               t.name AS team_name,
-                               t.name_short AS team_name_short,
-                               t.logo_url  AS team_logo,
-                               COUNT(DISTINCT CASE WHEN pts.scorer_id = p.id THEN pts.id END) AS goals,
-                               COUNT(DISTINCT CASE WHEN pts.assist1_player_id = p.id OR pts.assist2_player_id = p.id THEN pts.id END) AS assists
-                            FROM players p
-                                     LEFT JOIN team t ON p.team_id = t.id
-                                     LEFT JOIN account a ON p.account_id = a.id
-                                     LEFT JOIN
-                                 points pts ON p.id IN (pts.scorer_id, pts.assist1_player_id, pts.assist2_player_id)
-                            WHERE p.tournament_id = @TournamentId
-                                    AND p.position != 'goalie'
-                                    {0}
-                            GROUP BY p.id, p.name, p.jersey_number, p.position, p.tournament_id, p.team_id, a.profilepicture, t.name,
-                                     t.name_short, t.logo_url
-                            ORDER BY goals DESC, assists DESC";
+        string sql = @"SELECT * from playerstats
+                            WHERE tournament_id = @TournamentId
+                                {0}";
 
         sql = string.Format(sql, teamId.HasValue ? "AND t.id = @TeamId" : string.Empty);
         
@@ -299,30 +210,9 @@ public partial class BCData : DapperBase, IBCData
     }
     public async Task<IEnumerable<GoalieStatLine>> GetGoalieStats(int tournamentId, int? teamId = null)
     {
-        string sql = @"SELECT p.id AS player_id,
-                               p.name AS player_name,
-                               p.jersey_number,
-                               p.position,
-                               p.tournament_id,
-                               p.team_id,
-                               a.profilepicture,
-                               t.name AS team_name,
-                               t.name_short AS team_name_short,
-                               t.logo_url  AS team_logo,
-                               COUNT(DISTINCT CASE WHEN p.team_id IN (g.home_team_id, g.away_team_id) THEN g.id END) AS games_played,
-                               COUNT(DISTINCT CASE WHEN (g.home_team_id = p.team_id AND g.away_score = 0) OR (g.away_team_id = p.team_id AND g.home_score = 0) THEN g.id END) AS shutouts,
-                               SUM(CASE WHEN g.home_team_id = p.team_id THEN g.away_score WHEN g.away_team_id = p.team_id THEN g.home_score END) / COUNT(DISTINCT CASE WHEN p.team_id IN (g.home_team_id, g.away_team_id) THEN g.id END)AS GAA
-                            FROM players p
-                                     LEFT JOIN team t ON p.team_id = t.id
-                                     LEFT JOIN account a ON p.account_id = a.id
-                                     LEFT JOIN
-                                 game g ON p.team_id in (g.home_team_id, g.away_team_id)
-                            WHERE p.tournament_id = @TournamentId
-                                {0}
-                                AND p.position = 'goalie'
-                            GROUP BY p.id, p.name, p.jersey_number, p.position, p.tournament_id, p.team_id, a.profilepicture, t.name,
-                                t.name_short, t.logo_url
-                            ORDER BY GAA, shutouts DESC";
+        string sql = @"SELECT * from goaliestats
+                            WHERE tournament_id = @TournamentId
+                                {0}";
 
         sql = string.Format(sql, teamId.HasValue ? "AND t.id = @TeamId" : string.Empty);
         
