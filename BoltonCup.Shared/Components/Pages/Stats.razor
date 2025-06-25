@@ -1,15 +1,16 @@
 @page "/stats"
 
 @inject IBCData BCData
+@inject NavigationManager Navigation
 
 <PageHeader Title="Stats" BkgImage="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//BOLTONCUP-160.JPG" OffsetY="30" Height="25vh">Statistics</PageHeader>
 
-<TournamentPicker @bind-SelectedTournament="_selectedTournament" />
+<TournamentPicker SelectedTournament="_selectedTournament" SelectedTournamentChanged="SelectedTournamentChanged" />
 
-<MudTabs Class="relative" @bind-ActivePanelIndex="_activeTabIndex" Centered>
+<MudTabs Class="relative" ActivePanelIndex="_activeTabIndex" ActivePanelIndexChanged="ActiveTabChanged" Centered>
     <MudStack Class="d-flex flex-grow-1 px-4 py-4" Style="background-color: var(--mud-palette-surface)" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Row>
         <div style="width: 200px">
-            <MudSelect @bind-Value="_selectedFilterTeam" Variant="Variant.Outlined" Margin="Margin.Dense" Placeholder="Team" Dense>
+            <MudSelect T="BCTeam" Value="_selectedFilterTeam" ValueChanged="SelectedTeamChanged" Variant="Variant.Outlined" Margin="Margin.Dense" Placeholder="Team" Dense>
                 <MudSelectItem Value="null as BCTeam">All</MudSelectItem>
                 @foreach (var team in _teams)
                 {
@@ -88,59 +89,60 @@
 
 @code {
     
+    [SupplyParameterFromQuery]
+    public int? tab { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? team { get; set; }
+
+    [SupplyParameterFromQuery] 
+    public int? tourney { get; set; }
+    
+
     private IEnumerable<PlayerStatLine> _skaterStats = [];
     private IEnumerable<GoalieStatLine> _goalieStats = [];
     private IEnumerable<BCTeam> _teams = [];
     
-    
-    private BCTeam? selectedFilterTeam;
-    private BCTeam? _selectedFilterTeam
-    {
-        get => selectedFilterTeam;
-        set
-        {
-            if (value?.id != selectedFilterTeam?.id)
-            {
-                selectedFilterTeam = value;
-                InvokeAsync(LoadDataAsync);
-            }
-        }
-    }
-    
-    private string _searchString;
     private bool _loading;
+    private string _searchString;
     
-    private int activeTabIndex;
-    private int _activeTabIndex
-    {
-        get => activeTabIndex;
-        set
-        {
-            activeTabIndex = value;
-            _searchString = string.Empty;
-        }
-    }
+    private int _activeTabIndex;
+    private BCTeam? _selectedFilterTeam;
+    private BCTournament? _selectedTournament;
 
-    private BCTournament? selectedTournament;
-    private BCTournament? _selectedTournament
-    {
-        get => selectedTournament;
-        set
-        {
-            if (value?.tournament_id != selectedTournament?.tournament_id)
-            {
-                _selectedFilterTeam = null;
-                selectedTournament = value;
-                InvokeAsync(LoadDataAsync);
-            }
-        }
-    }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        selectedTournament ??= await BCData.GetCurrentTournamentAsync();
-        await LoadDataAsync();
+        var reload = false;
+
+        if (_selectedTournament is null)
+        {
+            _selectedTournament = await BCData.GetCurrentTournamentAsync();
+            reload = true;
+        }
+        
+        if (tab is not null && _activeTabIndex != tab)
+        {
+            _activeTabIndex = tab.Value;
+        }
+
+        if (team is not null && _selectedFilterTeam?.id != team)
+        {
+            _selectedFilterTeam = await BCData.GetTeamById(team.Value);
+            reload = true;
+        }
+
+        if (tourney is not null && _selectedTournament?.tournament_id != tourney)
+        {
+            _selectedTournament = await BCData.GetTournamentByIdAsync(tourney.Value);
+            reload = true;
+        }
+
+        if (reload)
+            await LoadDataAsync();
+        
     }
+    
 
     private async Task LoadDataAsync()
     {
@@ -149,14 +151,64 @@
             _loading = true;
             InvokeAsync(StateHasChanged);
             
+            _teams = await BCData.GetTeamsInTournamentAsync(_selectedTournament.tournament_id);
+
+            // invalidate invalid arguments
+            if (_selectedFilterTeam is not null && _teams.All(x => x.id != _selectedFilterTeam.id))
+            {
+                _selectedFilterTeam = null;
+            }
+            
             _skaterStats = await BCData.GetPlayerStats(_selectedTournament.tournament_id, _selectedFilterTeam?.id);
             _goalieStats = await BCData.GetGoalieStats(_selectedTournament.tournament_id, _selectedFilterTeam?.id);
-            _teams = await BCData.GetTeamsInTournamentAsync(_selectedTournament.tournament_id);
 
             _loading = false;
             InvokeAsync(StateHasChanged);
         }
     }
+
+
+    private async Task SelectedTournamentChanged(BCTournament value)
+    {
+        if (value?.tournament_id != _selectedTournament?.tournament_id)
+        {
+            _selectedFilterTeam = null;
+            _selectedTournament = value;
+            await NavWithParam("tourney", value.tournament_id);
+            await LoadDataAsync();
+        }
+    }
+
+
+    private async Task ActiveTabChanged(int value)
+    {
+        _activeTabIndex = value;
+        await NavWithParam("tab", value);
+        _searchString = string.Empty;
+    }
+
+
+    private async Task SelectedTeamChanged(BCTeam? value)
+    {
+        if (value?.id != _selectedFilterTeam?.id)
+        {
+            _selectedFilterTeam = value;
+            if (value is not null)
+                await NavWithParam("team", value.id);
+            await LoadDataAsync();
+        }
+    }
+
+
+    private async Task NavWithParam(string name, int value)
+    {
+        try
+        {
+            Navigation.NavigateTo(Navigation.GetUriWithQueryParameter(name, value));
+        }
+        catch {}
+    }
+    
     
     // quick filter - filter globally across multiple columns with the same input
     private Func<PlayerStatLine, bool> PlayerQuickFilter => x =>

@@ -30,7 +30,7 @@ public interface IBCData
     Task<BCAccount?> GetAccountByIdAsync(int accountId);
     Task UpdateAccountProfilePictureAsync(string email, string imagePath);
     Task<IEnumerable<BCTournament>> GetTournamentsAsync();
-    Task<BCTournament?> GetTournamentByYearAsync(string year);
+    Task<BCTournament?> GetTournamentByIdAsync(int id);
     Task<BCTournament?> GetCurrentTournamentAsync();
     Task SetUserAsPayedAsync(string email);
     Task ConfigPlayerProfileAsync(RegisterFormModel form, int tournamentId);

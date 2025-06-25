@@ -200,21 +200,22 @@ public partial class BCData : DapperBase, IBCData
 
     public async Task<IEnumerable<PlayerStatLine>> GetPlayerStats(int tournamentId, int? teamId = null)
     {
-        string sql = @"SELECT * from playerstats
+        string sql = @"SELECT * FROM playerstats
                             WHERE tournament_id = @TournamentId
-                                {0}";
+                                {0}
+                            ORDER BY team_id, player_name";
 
-        sql = string.Format(sql, teamId.HasValue ? "AND t.id = @TeamId" : string.Empty);
+        sql = string.Format(sql, teamId.HasValue ? "AND team_id = @TeamId" : string.Empty);
         
         return await QueryDbAsync<PlayerStatLine>(sql, new { TournamentId = tournamentId, TeamId = teamId });
     }
     public async Task<IEnumerable<GoalieStatLine>> GetGoalieStats(int tournamentId, int? teamId = null)
     {
-        string sql = @"SELECT * from goaliestats
+        string sql = @"SELECT * FROM goaliestats
                             WHERE tournament_id = @TournamentId
                                 {0}";
 
-        sql = string.Format(sql, teamId.HasValue ? "AND t.id = @TeamId" : string.Empty);
+        sql = string.Format(sql, teamId.HasValue ? "AND team_id = @TeamId" : string.Empty);
         
         return await QueryDbAsync<GoalieStatLine>(sql, new { TournamentId = tournamentId, TeamId = teamId });
     }
@@ -362,12 +363,12 @@ public partial class BCData : DapperBase, IBCData
         return await QueryDbAsync<BCTournament>(sql);
     }    
     
-    public async Task<BCTournament?> GetTournamentByYearAsync(string year)
+    public async Task<BCTournament?> GetTournamentByIdAsync(int id)
     {
         string sql = @"SELECT *
                         FROM tournament
-                        WHERE EXTRACT(YEAR FROM start_date) = @Year";
-        return await QueryDbSingleAsync<BCTournament>(sql, new { Year = year });
+                        WHERE tournament_id = @Id";
+        return await QueryDbSingleAsync<BCTournament>(sql, new { Id = id });
     }
 
     public async Task<BCTournament?> GetCurrentTournamentAsync()
