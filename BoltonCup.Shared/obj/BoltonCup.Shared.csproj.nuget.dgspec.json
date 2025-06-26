@@ -79,7 +79,7 @@
             },
             "MudBlazor": {
               "target": "Package",
-              "version": "[8.5.1, )"
+              "version": "[8.8.0, )"
             },
             "Npgsql": {
               "target": "Package",

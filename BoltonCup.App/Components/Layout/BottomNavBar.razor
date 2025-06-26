@@ -3,5 +3,12 @@
 
     <BottomNavItem Icon="@Icons.Material.Filled.CalendarToday" Href="/schedule" />
 
-    <NavOverlayMenu />
+    <NavOverlayMenu>
+        <AuthorizeView>
+            <NavOverlayMenuItem Label="Profile" Href="/profile" Color="Color.Primary" Icon="@Icons.Material.Filled.Person" />
+        </AuthorizeView>
+        <NavOverlayMenuItem Label="Teams" Href="/teams" Color="Color.Secondary" Icon="@Icons.Material.Filled.Groups" />
+        <NavOverlayMenuItem Label="Schedule" Href="/schedule" Color="Color.Warning" Icon="@Icons.Material.Filled.CalendarMonth" />
+        <NavOverlayMenuItem Label="Stats" Href="/stats" Color="Color.Info" Icon="@Icons.Material.Filled.AreaChart" />
+    </NavOverlayMenu>
 </MudAppBar>

@@ -19,17 +19,18 @@
         Elevation="0"
         GroupBy="_groupDefinition"
         OnRowClick="OnRowClick"
+        Breakpoint="Breakpoint.None"
         Striped
         Hover
         Dense>
         <HeaderContent>
-            <MudTh>#</MudTh>
-            <MudTh>NAME</MudTh>
-            <MudTh>BIRTH YEAR</MudTh>
+            <MudTh><b>NAME</b></MudTh>
+            <MudTh><b>#</b></MudTh>
+            <MudTh><b>BIRTH YEAR</b></MudTh>
         </HeaderContent>
         <GroupHeaderTemplate>
             <MudTh colspan="3">
-                <MudText Typo="Typo.h5">@GroupHeader(context.Key.ToString())</MudText>
+                <MudText Typo="Typo.h6">@GroupHeader(context.Key.ToString())</MudText>
             </MudTh>
         </GroupHeaderTemplate>
         <RowTemplate>
