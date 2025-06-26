@@ -528,7 +528,7 @@
           }
         }
       },
-      "MudBlazor/8.5.1": {
+      "MudBlazor/8.8.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.AspNetCore.Components": "8.0.12",
@@ -1870,10 +1870,10 @@
         "mimemapping.nuspec"
       ]
     },
-    "MudBlazor/8.5.1": {
-      "sha512": "xzGhtY60e1fvvyI7rJSYYV0UEkvY8niKuTaqby19cb8rELd29EpPU439RVL8KjVSMy473BEcpgYWBRAoDPGl8A==",
+    "MudBlazor/8.8.0": {
+      "sha512": "9LTen4AUh+GjXqKcrBoUxCZEEgnKx3a+82k2F7K849rfpGs/fQ1pha0sw2upMzGFIsCRfI+w8bkgZZspJCxbpQ==",
       "type": "package",
-      "path": "mudblazor/8.5.1",
+      "path": "mudblazor/8.8.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1891,7 +1891,7 @@
         "lib/net8.0/MudBlazor.xml",
         "lib/net9.0/MudBlazor.dll",
         "lib/net9.0/MudBlazor.xml",
-        "mudblazor.8.5.1.nupkg.sha512",
+        "mudblazor.8.8.0.nupkg.sha512",
         "mudblazor.nuspec",
         "staticwebassets/MudBlazor.min.css",
         "staticwebassets/MudBlazor.min.js"
@@ -2594,7 +2594,7 @@
       "Microsoft.AspNetCore.Components.Web >= 8.0.12",
       "Microsoft.AspNetCore.DataProtection >= 8.0.13",
       "Microsoft.Extensions.Caching.Memory >= 8.0.1",
-      "MudBlazor >= 8.5.1",
+      "MudBlazor >= 8.8.0",
       "Npgsql >= 8.0.6",
       "SkiaSharp >= 3.119.0",
       "SkiaSharp.NativeAssets.Linux >= 3.119.0",
@@ -2682,7 +2682,7 @@
           },
           "MudBlazor": {
             "target": "Package",
-            "version": "[8.5.1, )"
+            "version": "[8.8.0, )"
           },
           "Npgsql": {
             "target": "Package",

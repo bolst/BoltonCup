@@ -20,7 +20,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.12"/>
         <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="8.0.13" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
-        <PackageReference Include="MudBlazor" Version="8.5.1" />
+        <PackageReference Include="MudBlazor" Version="8.8.0" />
         <PackageReference Include="Npgsql" Version="8.0.6" />
         <PackageReference Include="SkiaSharp" Version="3.119.0" />
         <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.0" />

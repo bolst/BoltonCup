@@ -26,7 +26,14 @@
         <MudSpacer/>
 
         <div class="d-block d-md-none">
-            <NavDrawer/>
+            @* <NavDrawer/> *@
+            <NavOverlayMenu IconColor="Color.Tertiary">
+                <NavOverlayMenuItem Icon="@Icons.Material.Filled.Home" IconClass="white-text" Href="/" Label="Home" LabelClass="white-text" />
+                <NavOverlayMenuItem Icon="@Icons.Material.Filled.Info" IconClass="white-text" Href="/info" Label="Info" LabelClass="white-text" />
+                <NavOverlayMenuItem Icon="@Icons.Material.Filled.People" IconClass="white-text" Href="/teams" Label="Teams" LabelClass="white-text" />
+                <NavOverlayMenuItem Icon="@Icons.Material.Filled.Schedule" IconClass="white-text" Href="/schedule" Label="Schedule" LabelClass="white-text" />
+                <NavOverlayMenuItem Icon="@Icons.Material.Filled.BarChart" IconClass="white-text" Href="/stats" Label="Stats" LabelClass="white-text" />
+            </NavOverlayMenu>
         </div>
 
         <div class="d-none d-md-block">

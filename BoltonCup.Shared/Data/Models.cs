@@ -162,6 +162,16 @@ public class PlayerStatLine
     public int goals { get; set; }
     public int assists { get; set; }
     public int tournament_id { get; set; }
+
+    private string GetShortName()
+    {
+        var names = player_name.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x));
+        var initials = names.SkipLast(1).Select(x => x.ToUpper().First());
+
+        return $"{string.Join("", initials)}. {names.Last()}";
+    }
+
+    public string ShortName => GetShortName();
 }
 
 public class GoalieStatLine
@@ -178,6 +188,16 @@ public class GoalieStatLine
     public int games_played { get; set; }
     public int shutouts { get; set; }
     public int tournament_id { get; set; }
+    
+    private string GetShortName()
+    {
+        var names = player_name.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x));
+        var initials = names.SkipLast(1).Select(x => x.ToUpper().First());
+
+        return $"{string.Join("", initials)}. {names.Last()}";
+    }
+
+    public string ShortName => GetShortName();
 }
 
 public class GameScore
