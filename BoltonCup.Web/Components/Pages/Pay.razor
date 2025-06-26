@@ -40,8 +40,12 @@
     
     private RegisterFormModel? _userData;
 
+    private string? _checkoutId;
+
     protected override async Task OnParametersSetAsync()
     {
+        if (!string.IsNullOrEmpty(_checkoutId) && _checkoutId == CheckoutId) return;
+        
         _headerText = "Confirming Payment";
         _loading = true;
         StateHasChanged();
@@ -63,6 +67,7 @@
 
         _loading = false;
         _headerText = "Payment Confirmed";
+        _checkoutId = CheckoutId;
         StateHasChanged();
     }
     

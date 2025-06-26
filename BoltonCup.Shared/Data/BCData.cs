@@ -296,8 +296,8 @@ public partial class BCData : DapperBase, IBCData
         }
         
         string sql = @"INSERT INTO
-                          account (firstname, lastname, email, birthday, position, highestlevel)
-                        VALUES (@FirstName, @LastName, @Email, @Birthday, @Position, @HighestLevel)";
+                          account (firstname, lastname, email, birthday, position, highestlevel, pckey)
+                        VALUES (@FirstName, @LastName, @Email, @Birthday, @Position, @HighestLevel, gen_random_uuid())";
         
         var rowsAffected = await ExecuteSqlAsync(sql, form);
         return rowsAffected == 0 ? "Something went wrong" : string.Empty;
