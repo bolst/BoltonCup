@@ -31,52 +31,70 @@
     </MudStack>
         
     <MudTabPanel Text="Skaters" BadgeData="_skaterStats.Count()">
-        <MudDataGrid Items="_skaterStats" QuickFilter="PlayerQuickFilter" Height="80vh" SortMode="SortMode.Single" Virtualize Filterable FixedHeader Dense>
+        <MudDataGrid Items="_skaterStats" ColumnResizeMode="ResizeMode.Column" QuickFilter="PlayerQuickFilter" Height="80vh" SortMode="SortMode.Single" Breakpoint="Breakpoint.None" ShowColumnOptions="false" Virtualize FixedHeader Dense>
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Skaters</MudText>
             </ToolBarContent>
             <Columns>
-                <PropertyColumn Property="x => x.player_name" Title="Player" StickyLeft>
+                <PropertyColumn Property="x => x.player_name" Title="Player" CellStyle="min-width: 200px" Resizable="false" StickyLeft>
                     <CellTemplate>
-                        <MudStack AlignItems="AlignItems.Center" Row>
-                            <MudAvatar>
-                                <MudImage Src="@context.Item.profilepicture"/>
+                        <MudStack AlignItems="AlignItems.Center" Spacing="1" Row>
+                            <MudAvatar Style="height: 30px; width: 30px">
+                                <MudImage Src="@context.Item.profilepicture" ObjectFit="ObjectFit.Cover" />
                             </MudAvatar>
-                            <MudLink Typo="Typo.subtitle1" Href=@($"/player/{context.Item.player_id}")>@context.Item.player_name</MudLink>
-                            <MudImage Src="@_teams.FirstOrDefault(x => x.id == context.Item.team_id)?.logo_url" Height="30"/>
+                            
+                            <MudHidden Breakpoint="Breakpoint.Xs" Invert>
+                                <MudText Typo="Typo.body2"><MudLink Typo="Typo.body2" Href=@($"/player/{context.Item.player_id}")>@context.Item.ShortName</MudLink> @(context.Item.jersey_number == 0 ? string.Empty : $"#{context.Item.jersey_number}")</MudText>
+                            </MudHidden>
+                            <MudHidden Breakpoint="Breakpoint.Xs">
+                                <MudText Typo="Typo.body2"><MudLink Typo="Typo.body2" Href=@($"/player/{context.Item.player_id}")>@context.Item.player_name</MudLink> @(context.Item.jersey_number == 0 ? string.Empty : $"#{context.Item.jersey_number}")</MudText>
+                            </MudHidden>
                         </MudStack>
                     </CellTemplate>
                 </PropertyColumn>
-                <PropertyColumn Property="x => x.jersey_number" Title="#"/>
-                <PropertyColumn Property="x => x.position" Title="Pos"/>
-                <PropertyColumn Property="x => x.goals + x.assists" Title="P" InitialDirection="SortDirection.Descending"/>
-                <PropertyColumn Property="x => x.goals" Title="G" />
-                <PropertyColumn Property="x => x.assists" Title="A" />
+                <PropertyColumn Property="x => x.team_name" Title="Team" Sortable="false" Resizable="false">
+                    <CellTemplate>
+                        <MudImage Src="@_teams.FirstOrDefault(x => x.id == context.Item.team_id)?.logo_url" Height="30" />
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.position.ToUpper().FirstOrDefault()" Title="Pos" Sortable="false" Resizable="false" />
+                <PropertyColumn Property="x => x.goals + x.assists" Title="P" InitialDirection="SortDirection.Descending" Resizable="false" />
+                <PropertyColumn Property="x => x.goals" Title="G" Resizable="false" />
+                <PropertyColumn Property="x => x.assists" Title="A" Resizable="false" />
             </Columns>
         </MudDataGrid>
     </MudTabPanel>
     
     <MudTabPanel Text="Goalies" BadgeData="_goalieStats.Count()">
-        <MudDataGrid Items="_goalieStats" QuickFilter="GoalieQuickFilter" Height="80vh" FixedHeader Dense>
+        <MudDataGrid Items="_goalieStats" ColumnResizeMode="ResizeMode.Column" QuickFilter="GoalieQuickFilter" Height="80vh" SortMode="SortMode.Single" ShowColumnOptions="false" Breakpoint="Breakpoint.None" FixedHeader Dense>
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Goalies</MudText>
             </ToolBarContent>
             <Columns>
-                <TemplateColumn Title="Goalie" Sortable="true" Filterable="true" StickyLeft>
+                <PropertyColumn Property="x => x.player_name" Title="Goalie" CellStyle="min-width: 200px" Resizable="false" StickyLeft>
                     <CellTemplate>
-                        <MudStack AlignItems="AlignItems.Center" Row>
-                            <MudAvatar>
-                                <MudImage Src="@context.Item.profilepicture"/>
+                        <MudStack AlignItems="AlignItems.Center" Spacing="1" Row>
+                            <MudAvatar Style="height: 30px; width: 30px">
+                                <MudImage Src="@context.Item.profilepicture" ObjectFit="ObjectFit.Cover" />
                             </MudAvatar>
-                            <MudLink Typo="Typo.subtitle1" Href=@($"/player/{context.Item.player_id}")>@context.Item.player_name</MudLink>
-                            <MudImage Src="@context.Item.team_logo" Height="30"/>
+
+                            <MudHidden Breakpoint="Breakpoint.Xs" Invert>
+                                <MudText Typo="Typo.body2"><MudLink Typo="Typo.body2" Href=@($"/player/{context.Item.player_id}")>@context.Item.ShortName</MudLink> @(context.Item.jersey_number == 0 ? string.Empty : $"#{context.Item.jersey_number}")</MudText>
+                            </MudHidden>
+                            <MudHidden Breakpoint="Breakpoint.Xs">
+                                <MudText Typo="Typo.body2"><MudLink Typo="Typo.body2" Href=@($"/player/{context.Item.player_id}")>@context.Item.player_name</MudLink> @(context.Item.jersey_number == 0 ? string.Empty : $"#{context.Item.jersey_number}")</MudText>
+                            </MudHidden>
                         </MudStack>
                     </CellTemplate>
-                </TemplateColumn>
-                <PropertyColumn Property="x => x.jersey_number" Title="#"/>
-                <PropertyColumn Property="x => 'G'" Title="Pos"/>
-                <PropertyColumn Property="x => x.GAA" Title="GAA" Sortable="true" Filterable="true" InitialDirection="SortDirection.Ascending"/>
-                <PropertyColumn Property="x => x.shutouts" Title="SO" Sortable="true" Filterable="true"/>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.team_name" Title="Team" Sortable="false" Resizable="false">
+                    <CellTemplate>
+                        <MudImage Src="@_teams.FirstOrDefault(x => x.id == context.Item.team_id)?.logo_url" Height="30" />
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.games_played" Title="GP" Resizable="false" />
+                <PropertyColumn Property="x => x.GAA" Title="GAA" Sortable="true" Resizable="false"/>
+                <PropertyColumn Property="x => x.shutouts" Title="SO" Sortable="true" Resizable="false"/>
             </Columns>
         </MudDataGrid>
     </MudTabPanel>
