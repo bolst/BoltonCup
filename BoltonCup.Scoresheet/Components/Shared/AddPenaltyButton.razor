@@ -1,3 +1,6 @@
+@inject IBCData BCData
+
+
 @if (_confirmed)
 {
     <MudButtonGroup OverrideStyles="false">
@@ -45,6 +48,8 @@ else
 
 @code {
 
+    [Parameter, EditorRequired]
+    public required BCGame Game { get; set; }
     
     [Parameter, EditorRequired] 
     public required BCTeam Team { get; set; }
@@ -56,7 +61,7 @@ else
     public bool ReadOnly { get; set; }
     
     [Parameter]
-    public EventCallback<PenaltyEntry> PenaltyAdded { get; set; }
+    public EventCallback OnPenaltyAdded { get; set; }
 
     private readonly DialogOptions _dialogOptions = new()
     {
@@ -80,17 +85,29 @@ else
     private async Task OnAddPenalty()
     {
         if (_player is null || _infraction is null) return;
-        
-        var retval = new PenaltyEntry
-        {
-            Team = Team,
-            Player = _player,
-            Infraction = _infraction,
-        };
-        await PenaltyAdded.InvokeAsync(retval);
+
+        await AddPenaltyToDb();
+        await OnPenaltyAdded.InvokeAsync();
 
         _visible = false;
         await InvokeAsync(StateHasChanged);
+    }
+
+
+    private async Task AddPenaltyToDb()
+    {
+        if (_player is null || _infraction is null) return;
+
+        var retval = new PenaltyEntry
+        {
+            Game = Game,
+            Team = Team,
+            Player = _player,
+            Infraction = _infraction,
+            DurationMins = 2,
+        };
+
+        await BCData.AddPenaltyAsync(retval);
     }
     
 }

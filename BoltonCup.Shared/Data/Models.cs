@@ -118,10 +118,8 @@ public class GoalieGameSummary : BCGame
 
 public class GameGoal
 {
+    public int Id { get; set; }
     public int GameId { get; set; }
-    public int ScorerJersey { get; set; }
-    public int? Assist1Jersey { get; set; }
-    public int? Assist2Jersey { get; set; }
     public TimeSpan Time { get; set; }
     public int Period { get; set; }
     public int TeamId { get; set; }
@@ -138,8 +136,8 @@ public class GameGoal
 
 public class GamePenalty
 {
+    public int Id { get; set; }
     public int GameId { get; set; }
-    public int PlayerJersey { get; set; }
     public TimeSpan Time { get; set; }
     public int Period { get; set; }
     public int TeamId { get; set; }
@@ -425,4 +423,23 @@ public class BCSong : IEquatable<BCSong>
 
     #endregion
 
+}
+
+public class GoalEntry
+{
+    public required BCGame Game { get; set; }
+    public required BCTeam Team { get; set; }
+    public required PlayerProfile Scorer { get; set; }
+    public PlayerProfile? Assist1 { get; set; }
+    public PlayerProfile? Assist2 { get; set; }
+}
+
+
+public class PenaltyEntry
+{
+    public required BCGame Game { get; set; }
+    public required BCTeam Team { get; set; }
+    public required PlayerProfile Player { get; set; }
+    public required string Infraction { get; set; }
+    public required int DurationMins { get; set; }
 }

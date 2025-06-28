@@ -1,4 +1,5 @@
 @inject IJSRuntime JS
+@inject IBCData BCData
 
 
 @if (_confirmed)
@@ -51,12 +52,15 @@ else
         </MudSelect>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="OnAddGoal" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
+        <MudButton OnClick="AddGoal" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
         <MudButton OnClick="() => _visible = false">Cancel</MudButton>
     </DialogActions>
 </MudDialog>
     
 @code{
+    
+    [Parameter, EditorRequired]
+    public required BCGame Game { get; set; }
 
     [Parameter, EditorRequired] 
     public required BCTeam Team { get; set; }
@@ -68,8 +72,8 @@ else
     public bool ReadOnly { get; set; }
     
     [Parameter]
-    public EventCallback<GoalEntry> GoalAdded { get; set; }
-
+    public EventCallback OnGoalAdded { get; set; }
+    
     private readonly DialogOptions _dialogOptions = new()
     {
         MaxWidth = MaxWidth.Small,
@@ -95,21 +99,32 @@ else
         _visible = true;
     }
 
-    private async Task OnAddGoal()
+    private async Task AddGoal()
     {
         if (_scorer is null) return;
         
+        await AddGoalToDb();
+        await OnGoalAdded.InvokeAsync();
+
+        _visible = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    private async Task AddGoalToDb()
+    {
+        if (_scorer is null) return;
+
         var retval = new GoalEntry
         {
+            Game = Game,
             Team = Team,
             Scorer = _scorer,
             Assist1 = _assist1,
             Assist2 = _assist2,
         };
-        await GoalAdded.InvokeAsync(retval);
 
-        _visible = false;
-        await InvokeAsync(StateHasChanged);
+        await BCData.AddGoalAsync(retval);
     }
 
 
