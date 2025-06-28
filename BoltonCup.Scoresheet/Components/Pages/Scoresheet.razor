@@ -46,9 +46,9 @@
         }
         
         <MudToolBar>
-            <MudButton OnClick="@(() => OnAddGoal(_homeTeam, _homeRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
+            <AddGoalButton Team="_homeTeam" Players="_homeRoster" ReadOnly="ReadOnly" GoalAdded="AddGoal" />
             <MudSpacer />
-            <MudButton OnClick="@(() => OnAddGoal(_awayTeam, _awayRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
+            <AddGoalButton Team="_awayTeam" Players="_awayRoster" ReadOnly="ReadOnly" GoalAdded="AddGoal" />
         </MudToolBar>
         
         <MudGrid Style="height: 35vh">
@@ -62,9 +62,9 @@
     
         
         <MudToolBar>
-            <MudButton OnClick="@(() => OnAddPenalty(_homeTeam, _homeRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+            <AddPenaltyButton Team="_homeTeam" Players="_homeRoster" ReadOnly="ReadOnly" PenaltyAdded="AddPenalty" />
             <MudSpacer />
-            <MudButton OnClick="@(() => OnAddPenalty(_awayTeam, _awayRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+            <AddPenaltyButton Team="_awayTeam" Players="_awayRoster" ReadOnly="ReadOnly" PenaltyAdded="AddPenalty" />
         </MudToolBar>
         
         <MudGrid Style="height: 35vh">
@@ -252,42 +252,14 @@
         
     }
     
-
-
-    private async Task OnAddGoal(BCTeam team, IEnumerable<PlayerProfile> players)
+    
+    private async Task AddGoal(GoalEntry goal)
     {
-        var parameters = new DialogParameters<AddGoalDialog>
-        {
-            { x => x.Team, team },
-            { x => x.Players, players }
-        };
-
-        var options = new DialogOptions
-        {
-            MaxWidth = MaxWidth.Small
-        };
-
-        var dialog = await DialogService.ShowAsync<AddGoalDialog>("Add Goal", parameters, options);
-        var result = await dialog.Result;
     }
     
-
-
-    private async Task OnAddPenalty(BCTeam team, IEnumerable<PlayerProfile> players)
+    
+    private async Task AddPenalty(PenaltyEntry penalty)
     {
-        var parameters = new DialogParameters<AddPenaltyDialog>
-        {
-            { x => x.Team, team },
-            { x => x.Players, players }
-        };
-
-        var options = new DialogOptions
-        {
-            MaxWidth = MaxWidth.Small
-        };
-
-        var dialog = await DialogService.ShowAsync<AddPenaltyDialog>("Add Penalty", parameters, options);
-        var result = await dialog.Result;
     }
     
 
