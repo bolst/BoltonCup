@@ -182,6 +182,12 @@
     private async Task CompleteGame()
     {
         if (_game is null) return;
+
+        var confirmed = await DialogService.ShowMessageBox("Complete Game", "Continue? This will lock the game from any further changes.", noText: "Cancel", options: new()
+        {
+            MaxWidth = MaxWidth.Small,
+        });
+        if (!confirmed.GetValueOrDefault()) return;
         
         await BCData.EndRecordingGameAsync(_game.id, complete: true);
         await LoadDataAsync();

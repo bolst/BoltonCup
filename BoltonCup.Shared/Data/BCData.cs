@@ -694,53 +694,6 @@ public partial class BCData : DapperBase, IBCData
                                 
         await ExecuteSqlAsync(sql, new { AccountId = accountId });
     }
-
-
-    public async Task<IEnumerable<BCGame>> GetActiveGamesAsync()
-    {
-        string sql = @"SELECT g.*,
-                           h.name       AS hometeamname,
-                           h.name_short AS hometeamnameshort,
-                           h.logo_url   AS hometeamlogo,
-                           a.name       AS awayteamname,
-                           a.name_short AS awayteamnameshort,
-                           a.logo_url   AS awayteamlogo
-                        FROM game g
-                                 LEFT OUTER JOIN team h ON g.home_team_id = h.id
-                                 LEFT OUTER JOIN team a ON g.away_team_id = a.id
-                        WHERE g.state = @State
-                        ORDER BY g.date ASC";
-
-        return await QueryDbAsync<BCGame>(sql, new { State = GameState.Active });
-    }
-
-
-    public async Task BeginRecordingGameAsync(int gameId)
-    {
-        string clearSql = $@"UPDATE game
-                        SET state = '{GameState.PreGame}'
-                            WHERE state = '{GameState.Active}'";
-
-        await ExecuteSqlAsync(clearSql, new { GameId = gameId });
-        
-        string sql = $@"UPDATE game
-                        SET state = '{GameState.Active}'
-                            WHERE id = @GameId";
-
-        await ExecuteSqlAsync(sql, new { GameId = gameId });
-    }
-    
-    
-    
-    public async Task EndRecordingGameAsync(int gameId, bool complete = false)
-    {
-        string sql = @"UPDATE game
-                        SET state = @State
-                            WHERE id = @GameId";
-
-        var state = complete ? GameState.Complete : GameState.PreGame;
-        await ExecuteSqlAsync(sql, new { State = state, GameId = gameId });
-    }
     
 }
 
