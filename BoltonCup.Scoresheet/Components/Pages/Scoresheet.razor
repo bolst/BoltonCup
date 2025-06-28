@@ -46,9 +46,9 @@
         }
         
         <MudToolBar>
-            <MudButton OnClick="@(() => OnAddGoal(_homeTeam, _homeRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
+            <AddGoalButton Game="_game" Team="_homeTeam" Players="_homeRoster" ReadOnly="ReadOnly" OnGoalAdded="LoadDataAsync" />
             <MudSpacer />
-            <MudButton OnClick="@(() => OnAddGoal(_awayTeam, _awayRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
+            <AddGoalButton Game="_game" Team="_awayTeam" Players="_awayRoster" ReadOnly="ReadOnly" OnGoalAdded="LoadDataAsync" />
         </MudToolBar>
         
         <MudGrid Style="height: 35vh">
@@ -62,9 +62,9 @@
     
         
         <MudToolBar>
-            <MudButton OnClick="@(() => OnAddPenalty(_homeTeam, _homeRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+            <AddPenaltyButton Game="_game" Team="_homeTeam" Players="_homeRoster" ReadOnly="ReadOnly" OnPenaltyAdded="LoadDataAsync" />
             <MudSpacer />
-            <MudButton OnClick="@(() => OnAddPenalty(_awayTeam, _awayRoster))" Disabled="ReadOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+            <AddPenaltyButton Game="_game" Team="_awayTeam" Players="_awayRoster" ReadOnly="ReadOnly" OnPenaltyAdded="LoadDataAsync" />
         </MudToolBar>
         
         <MudGrid Style="height: 35vh">
@@ -146,14 +146,21 @@
 
         if (_game is not null)
         {
-            _homeTeam = await BCData.GetTeamById(_game.home_team_id);
-            _awayTeam = await BCData.GetTeamById(_game.away_team_id);
-            
-            _homeRoster = await BCData.GetRosterByTeamId(_game.home_team_id);
-            _awayRoster = await BCData.GetRosterByTeamId(_game.away_team_id);
+            var homeTeamTask = BCData.GetTeamById(_game.home_team_id);
+            var awayTeamTask = BCData.GetTeamById(_game.away_team_id);
+            var homeRosterTask = BCData.GetRosterByTeamId(_game.home_team_id);
+            var awayRosterTask = BCData.GetRosterByTeamId(_game.away_team_id);
+            var goalsTask = BCData.GetGameGoalsByGameId(_game.id);
+            var penaltiesTask = BCData.GetGamePenaltiesByGameId(_game.id);
 
-            _goals = await BCData.GetGameGoalsByGameId(_game.id);
-            _penalties = await BCData.GetGamePenaltiesByGameId(_game.id);
+            await Task.WhenAll(homeTeamTask, awayTeamTask, homeRosterTask, awayRosterTask, goalsTask, penaltiesTask);
+            
+            _homeTeam = homeTeamTask.Result;
+            _awayTeam = awayTeamTask.Result;
+            _homeRoster = homeRosterTask.Result;
+            _awayRoster = awayRosterTask.Result;
+            _goals = goalsTask.Result;
+            _penalties = penaltiesTask.Result;
         }
 
         _loading = false;
@@ -175,6 +182,12 @@
     private async Task CompleteGame()
     {
         if (_game is null) return;
+
+        var confirmed = await DialogService.ShowMessageBox("Complete Game", "Continue? This will lock the game from any further changes.", noText: "Cancel", options: new()
+        {
+            MaxWidth = MaxWidth.Small,
+        });
+        if (!confirmed.GetValueOrDefault()) return;
         
         await BCData.EndRecordingGameAsync(_game.id, complete: true);
         await LoadDataAsync();
@@ -251,45 +264,48 @@
         }
         
     }
-    
 
 
-    private async Task OnAddGoal(BCTeam team, IEnumerable<PlayerProfile> players)
+    private async Task RemoveGoal(GameGoal? goal)
     {
-        var parameters = new DialogParameters<AddGoalDialog>
+        if (goal is null)
         {
-            { x => x.Team, team },
-            { x => x.Players, players }
-        };
+            await DialogService.ShowMessageBox("Error", "Goal is null");
+            return;
+        }
 
-        var options = new DialogOptions
+        var confirmed = await DialogService.ShowMessageBox("", "Delete this goal?", noText: "Cancel", options: new DialogOptions
         {
             MaxWidth = MaxWidth.Small
-        };
+        });
 
-        var dialog = await DialogService.ShowAsync<AddGoalDialog>("Add Goal", parameters, options);
-        var result = await dialog.Result;
+        if (confirmed.GetValueOrDefault())
+        {
+            await BCData.RemoveGoalAsync(goal.Id);
+            await LoadDataAsync();
+        }
     }
     
-
-
-    private async Task OnAddPenalty(BCTeam team, IEnumerable<PlayerProfile> players)
+    
+    private async Task RemovePenalty(GamePenalty? penalty)
     {
-        var parameters = new DialogParameters<AddPenaltyDialog>
+        if (penalty is null)
         {
-            { x => x.Team, team },
-            { x => x.Players, players }
-        };
+            await DialogService.ShowMessageBox("Error", "Penalty is null");
+            return;
+        }
 
-        var options = new DialogOptions
+        var confirmed = await DialogService.ShowMessageBox("", "Delete this penalty?", noText: "Cancel", options: new DialogOptions
         {
             MaxWidth = MaxWidth.Small
-        };
+        });
 
-        var dialog = await DialogService.ShowAsync<AddPenaltyDialog>("Add Penalty", parameters, options);
-        var result = await dialog.Result;
+        if (confirmed.GetValueOrDefault())
+        {
+            await BCData.RemovePenaltyAsync(penalty.Id);
+            await LoadDataAsync();
+        }
     }
-    
 
 
     private RenderFragment GoalTable(IEnumerable<GameGoal> goals)
@@ -302,6 +318,11 @@
                 <PropertyColumn Property="x => x.ScorerName" Title="Scorer" />
                 <PropertyColumn Property="x => x.Assist1Name" Title="Assist" />
                 <PropertyColumn Property="x => x.Assist2Name" Title="Assist" />
+                <TemplateColumn>
+                    <CellTemplate>
+                        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="(() => RemoveGoal(context.Item))" />
+                    </CellTemplate>
+                </TemplateColumn>
                 </Columns>
             </MudDataGrid>;
     }
@@ -315,6 +336,11 @@
                     <PropertyColumn Property="@(x => x.Time.ToString(@"hh\:mm"))" Title="Time"/>
                     <PropertyColumn Property="x => x.PlayerName" Title="Player"/>
                     <PropertyColumn Property="x => x.Infraction" Title="Infraction"/>
+                    <TemplateColumn>
+                        <CellTemplate>
+                            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="(() => RemovePenalty(context.Item))" />
+                        </CellTemplate>
+                    </TemplateColumn>
                 </Columns>
             </MudDataGrid>;
     }

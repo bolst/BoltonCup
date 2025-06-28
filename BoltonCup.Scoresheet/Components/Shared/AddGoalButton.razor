@@ -1,0 +1,145 @@
+@inject IJSRuntime JS
+@inject IBCData BCData
+
+
+@if (_confirmed)
+{
+    <MudButtonGroup OverrideStyles="false">
+        <MudButton OnClick="ShowDialog" Color="Color.Success" Variant="Variant.Filled">Confirm</MudButton>
+        <MudButton OnClick="(() => _confirmed = false)" Color="Color.Error" Variant="Variant.Filled">Discard</MudButton>
+    </MudButtonGroup>
+}
+else
+{
+    <MudButton 
+        OnClick="(() => _confirmed = true)" 
+        Disabled="ReadOnly" 
+        StartIcon="@Icons.Material.Filled.Add" 
+        Variant="Variant.Filled" 
+        Color="Color.Primary">Add Goal</MudButton>
+}
+
+<MudDialog @bind-Visible="_visible" Options="_dialogOptions">
+    <TitleContent>
+        <MudStack AlignItems="AlignItems.Center" Row>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.SportsHockey" Class="mr-3 mb-n1"/>
+                Add Goal
+            </MudText>
+            <MudImage Src="@Team.logo_url" Height="50"/>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudSelect Class="my-1" @bind-Value="_scorer" Label="Scorer" Margin="Margin.Dense" Clearable Dense Required>
+            @foreach (var player in Players.Where(p => p.id != _assist1?.id && p.id != _assist2?.id))
+            {
+                <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudSelect Class="my-1" @bind-Value="_assist1" Label="Primary Assist" Margin="Margin.Dense" Dense Clearable>
+            @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist2?.id))
+            {
+                <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudSelect Class="my-1" @bind-Value="_assist2" Label="Secondary Assist" Margin="Margin.Dense" Dense Clearable>
+            @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist1?.id))
+            {
+                <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="AddGoal" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
+        <MudButton OnClick="() => _visible = false">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+    
+@code{
+    
+    [Parameter, EditorRequired]
+    public required BCGame Game { get; set; }
+
+    [Parameter, EditorRequired] 
+    public required BCTeam Team { get; set; }
+
+    [Parameter, EditorRequired] 
+    public required IEnumerable<PlayerProfile> Players { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+    
+    [Parameter]
+    public EventCallback OnGoalAdded { get; set; }
+    
+    private readonly DialogOptions _dialogOptions = new()
+    {
+        MaxWidth = MaxWidth.Small,
+    };
+
+    private PlayerProfile? _scorer;
+    private PlayerProfile? _assist1;
+    private PlayerProfile? _assist2;
+    
+    private bool _visible;
+    private bool _confirmed;
+    private bool? _songPlayed;
+
+    private async Task ShowDialog()
+    {
+        _scorer = null;
+        _assist1 = null;
+        _assist2 = null;
+        _confirmed = false;
+
+        await PlayGoalSong();
+        
+        _visible = true;
+    }
+
+    private async Task AddGoal()
+    {
+        if (_scorer is null) return;
+        
+        await AddGoalToDb();
+        await OnGoalAdded.InvokeAsync();
+
+        _visible = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    private async Task AddGoalToDb()
+    {
+        if (_scorer is null) return;
+
+        var retval = new GoalEntry
+        {
+            Game = Game,
+            Team = Team,
+            Scorer = _scorer,
+            Assist1 = _assist1,
+            Assist2 = _assist2,
+        };
+
+        await BCData.AddGoalAsync(retval);
+    }
+
+
+    private async Task PlayGoalSong()
+    {
+        _songPlayed = false;
+        if (string.IsNullOrEmpty(Team.goal_horn_url)) return;
+        
+        try
+        {
+            await JS.InvokeVoidAsync("open", Team.goal_horn_url, "_blank");
+            _songPlayed = true;
+        }
+        catch (JSDisconnectedException e)
+        {
+        }
+    }
+}

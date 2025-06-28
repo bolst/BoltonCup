@@ -66,4 +66,8 @@ public interface IBCData
     Task<IEnumerable<BCGame>> GetActiveGamesAsync();
     Task BeginRecordingGameAsync(int gameId);
     Task EndRecordingGameAsync(int gameId, bool complete = false);
+    Task AddGoalAsync(GoalEntry goal);
+    Task AddPenaltyAsync(PenaltyEntry penalty);    
+    Task RemoveGoalAsync(int goalId);
+    Task RemovePenaltyAsync(int penaltyId);
 }

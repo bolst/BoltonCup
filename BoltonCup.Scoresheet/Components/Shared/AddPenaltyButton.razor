@@ -1,0 +1,113 @@
+@inject IBCData BCData
+
+
+@if (_confirmed)
+{
+    <MudButtonGroup OverrideStyles="false">
+        <MudButton OnClick="ShowDialog" Color="Color.Success" Variant="Variant.Filled">Confirm</MudButton>
+        <MudButton OnClick="(() => _confirmed = false)" Color="Color.Error" Variant="Variant.Filled">Discard</MudButton>
+    </MudButtonGroup>
+}
+else
+{
+    <MudButton 
+        OnClick="(() => _confirmed = true)" 
+        Disabled="ReadOnly" 
+        StartIcon="@Icons.Material.Filled.Add" 
+        Variant="Variant.Filled" 
+        Color="Color.Primary">Add Penalty</MudButton>
+}
+
+<MudDialog @bind-Visible="_visible" Options="_dialogOptions">
+    <TitleContent>
+        <MudStack AlignItems="AlignItems.Center" Row>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.MoodBad" Class="mr-3 mb-n1"/>
+                Add Penalty
+            </MudText>
+            <MudImage Src="@Team.logo_url" Height="50"/>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudSelect Class="my-1" @bind-Value="_player" Label="Player" Margin="Margin.Dense" Dense Clearable Required>
+            @foreach (var player in Players)
+            {
+                <MudSelectItem Value="player">@player.name</MudSelectItem>
+            }
+        </MudSelect>
+        
+        <MudSelect Class="my-1" @bind-Value="_infraction" Label="Infraction" Margin="Margin.Dense" Dense Clearable Required>
+            <MudSelectItem Value="@("tripping")">Tripping</MudSelectItem>
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnAddPenalty" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+        <MudButton OnClick="() => _visible = false">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required BCGame Game { get; set; }
+    
+    [Parameter, EditorRequired] 
+    public required BCTeam Team { get; set; }
+
+    [Parameter, EditorRequired] 
+    public required IEnumerable<PlayerProfile> Players { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+    
+    [Parameter]
+    public EventCallback OnPenaltyAdded { get; set; }
+
+    private readonly DialogOptions _dialogOptions = new()
+    {
+        MaxWidth = MaxWidth.Small,
+    };
+
+    private PlayerProfile? _player;
+    private string? _infraction;
+    
+    private bool _visible;
+    private bool _confirmed;
+
+    private void ShowDialog()
+    {
+        _player = null;
+        _confirmed = false;
+        _visible = true;
+    }
+    
+    
+    private async Task OnAddPenalty()
+    {
+        if (_player is null || _infraction is null) return;
+
+        await AddPenaltyToDb();
+        await OnPenaltyAdded.InvokeAsync();
+
+        _visible = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    private async Task AddPenaltyToDb()
+    {
+        if (_player is null || _infraction is null) return;
+
+        var retval = new PenaltyEntry
+        {
+            Game = Game,
+            Team = Team,
+            Player = _player,
+            Infraction = _infraction,
+            DurationMins = 2,
+        };
+
+        await BCData.AddPenaltyAsync(retval);
+    }
+    
+}
