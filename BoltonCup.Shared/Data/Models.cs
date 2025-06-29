@@ -273,6 +273,8 @@ public class BCAccount
     public string? Message { get; set; }
     public string? SongRequest { get; set; }
     public string? SongRequestId { get; set; }
+    public int? preferred_teammate1 { get; set; }
+    public int? preferred_teammate2 { get; set; }
 
 
     public string FullName => $"{FirstName} {LastName}";
@@ -432,6 +434,8 @@ public class GoalEntry
     public required PlayerProfile Scorer { get; set; }
     public PlayerProfile? Assist1 { get; set; }
     public PlayerProfile? Assist2 { get; set; }
+    public required int Period { get; set; }
+    public required TimeSpan Time { get; set; }
 }
 
 
@@ -442,4 +446,6 @@ public class PenaltyEntry
     public required PlayerProfile Player { get; set; }
     public required string Infraction { get; set; }
     public required int DurationMins { get; set; }
+    public required int Period { get; set; }
+    public required TimeSpan Time { get; set; }
 }

@@ -46,9 +46,11 @@
         }
         
         <MudToolBar>
-            <AddGoalButton Game="_game" Team="_homeTeam" Players="_homeRoster" ReadOnly="ReadOnly" OnGoalAdded="LoadDataAsync" />
+            <AddGoalButton Game="_game" Team="_homeTeam" Players="_homeRoster" ReadOnly="ReadOnly" OnGoalAdded="LoadDataAsync" WithGoalHorn="_playGoalHorn" />
             <MudSpacer />
-            <AddGoalButton Game="_game" Team="_awayTeam" Players="_awayRoster" ReadOnly="ReadOnly" OnGoalAdded="LoadDataAsync" />
+            <MudSwitch @bind-Value="_playGoalHorn" Color="Color.Primary" Label="Play Goal Horn"></MudSwitch>
+            <MudSpacer />
+            <AddGoalButton Game="_game" Team="_awayTeam" Players="_awayRoster" ReadOnly="ReadOnly" OnGoalAdded="LoadDataAsync" WithGoalHorn="_playGoalHorn" />
         </MudToolBar>
         
         <MudGrid Style="height: 35vh">
@@ -103,6 +105,7 @@
     private IEnumerable<GamePenalty> _penalties = [];
     
     private bool _loading;
+    private bool _playGoalHorn = true;
 
     private IEnumerable<GameGoal> HomeGoals => _homeTeam is null ? [] : _goals.Where(g => g.TeamId == _homeTeam.id);
     private IEnumerable<GameGoal> AwayGoals => _awayTeam is null ? [] : _goals.Where(g => g.TeamId == _awayTeam.id);

@@ -39,6 +39,14 @@ else
         <MudSelect Class="my-1" @bind-Value="_infraction" Label="Infraction" Margin="Margin.Dense" Dense Clearable Required>
             <MudSelectItem Value="@("tripping")">Tripping</MudSelectItem>
         </MudSelect>
+
+        <MudText Class="mt-2" Typo="Typo.caption">Period</MudText>
+        <MudToggleGroup T="int" Class="mb-1" @bind-Value="_period" Color="Color.Primary">
+            <MudToggleItem Value="1">1</MudToggleItem>
+            <MudToggleItem Value="2">2</MudToggleItem>
+            <MudToggleItem Value="3">3</MudToggleItem>
+        </MudToggleGroup>
+        
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="OnAddPenalty" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
@@ -70,6 +78,8 @@ else
 
     private PlayerProfile? _player;
     private string? _infraction;
+    private int _period;
+    private TimeSpan? _time;
     
     private bool _visible;
     private bool _confirmed;
@@ -84,7 +94,7 @@ else
     
     private async Task OnAddPenalty()
     {
-        if (_player is null || _infraction is null) return;
+        if (_player is null || _infraction is null || _time is null) return;
 
         await AddPenaltyToDb();
         await OnPenaltyAdded.InvokeAsync();
@@ -96,7 +106,7 @@ else
 
     private async Task AddPenaltyToDb()
     {
-        if (_player is null || _infraction is null) return;
+        if (_player is null || _infraction is null || _time is null) return;
 
         var retval = new PenaltyEntry
         {
@@ -105,6 +115,8 @@ else
             Player = _player,
             Infraction = _infraction,
             DurationMins = 2,
+            Period = _period,
+            Time = _time.Value,
         };
 
         await BCData.AddPenaltyAsync(retval);
