@@ -61,8 +61,8 @@ public partial class BCData
         await ExecuteSqlAsync(sql, new
         {
             GameId = goal.Game.id,
-            Time = DateTime.Now,
-            Period = 1,
+            Time = goal.Time,
+            Period = goal.Period,
             IsHomeTeam = goal.Game.home_team_id == goal.Team.id,
             TournamentId = goal.Game.tournament_id,
             ScorerId = goal.Scorer.id,
@@ -80,8 +80,8 @@ public partial class BCData
 
         await ExecuteSqlAsync(sql, new
         {
-            Time = DateTime.Now,
-            Period = 1,
+            Time = penalty.Time,
+            Period = penalty.Period,
             DurationMins = penalty.DurationMins,
             Infraction = penalty.Infraction,
             IsHomeTeam = penalty.Game.home_team_id == penalty.Team.id,

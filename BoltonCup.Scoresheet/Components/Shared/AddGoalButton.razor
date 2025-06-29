@@ -1,4 +1,3 @@
-@inject IJSRuntime JS
 @inject IBCData BCData
 
 
@@ -30,29 +29,53 @@ else
         </MudStack>
     </TitleContent>
     <DialogContent>
-        <MudSelect Class="my-1" @bind-Value="_scorer" Label="Scorer" Margin="Margin.Dense" Clearable Dense Required>
-            @foreach (var player in Players.Where(p => p.id != _assist1?.id && p.id != _assist2?.id))
-            {
-                <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
-            }
-        </MudSelect>
+        @if (!string.IsNullOrEmpty(_alertMessage))
+        {
+            <MudAlert Severity="_alertSeverity" Dense>@_alertMessage</MudAlert>
+        }
+        @if (WithGoalHorn && _goalHornPlaying)
+        {
+            <div style="width: 100%">
+                <audio autoplay controls style="width: 100%"><source src="@Team.goal_horn_url" /></audio>
+            </div>
+        }
+        
+        <MudForm @ref="_form">
+            <MudSelect Class="my-1" @bind-Value="_scorer" Label="Scorer" Margin="Margin.Dense" AutoFocus Clearable Dense Required>
+                @foreach (var player in Players.Where(p => p.id != _assist1?.id && p.id != _assist2?.id))
+                {
+                    <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
+                }
+            </MudSelect>
 
-        <MudSelect Class="my-1" @bind-Value="_assist1" Label="Primary Assist" Margin="Margin.Dense" Dense Clearable>
-            @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist2?.id))
-            {
-                <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
-            }
-        </MudSelect>
+            <MudSelect Class="my-1" @bind-Value="_assist1" Label="Primary Assist" Margin="Margin.Dense" Dense Clearable>
+                @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist2?.id))
+                {
+                    <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
+                }
+            </MudSelect>
 
-        <MudSelect Class="my-1" @bind-Value="_assist2" Label="Secondary Assist" Margin="Margin.Dense" Dense Clearable>
-            @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist1?.id))
-            {
-                <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
-            }
-        </MudSelect>
+            <MudSelect Class="my-1" @bind-Value="_assist2" Label="Secondary Assist" Margin="Margin.Dense" Dense Clearable>
+                @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist1?.id))
+                {
+                    <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
+                }
+            </MudSelect>
+            
+            
+            <MudText Class="mt-2" Typo="Typo.caption">Period</MudText>
+            <MudToggleGroup T="int" Class="mb-1" @bind-Value="_period" Color="Color.Primary">
+                <MudToggleItem Value="1">1</MudToggleItem>
+                <MudToggleItem Value="2">2</MudToggleItem>
+                <MudToggleItem Value="3">3</MudToggleItem>
+            </MudToggleGroup>
+
+            <MudTimePicker Label="Time" @bind-Time="_time" Editable Required />
+            
+        </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="AddGoal" Variant="Variant.Filled" Color="Color.Primary">Add Goal</MudButton>
+        <ConfirmButton OnClick="AddGoal" Variant="Variant.Filled" Color="Color.Primary">Add Goal</ConfirmButton>
         <MudButton OnClick="() => _visible = false">Cancel</MudButton>
     </DialogActions>
 </MudDialog>
@@ -73,19 +96,33 @@ else
     
     [Parameter]
     public EventCallback OnGoalAdded { get; set; }
-    
+
+    [Parameter] 
+    public bool WithGoalHorn { get; set; } = true;
+
     private readonly DialogOptions _dialogOptions = new()
     {
         MaxWidth = MaxWidth.Small,
+        BackdropClick = false,
+        CloseButton = false,
+        CloseOnEscapeKey = false,
     };
 
+    private MudForm _form;
+    
     private PlayerProfile? _scorer;
     private PlayerProfile? _assist1;
     private PlayerProfile? _assist2;
-    
+    private int _period;
+    private TimeSpan? _time;
+
     private bool _visible;
+    private bool _goalHornPlaying;
+    
+    
     private bool _confirmed;
-    private bool? _songPlayed;
+    private string? _alertMessage;
+    private Severity _alertSeverity = Severity.Normal;
 
     private async Task ShowDialog()
     {
@@ -93,15 +130,20 @@ else
         _assist1 = null;
         _assist2 = null;
         _confirmed = false;
+        _goalHornPlaying = false;
+        _alertMessage = null;
+        _alertSeverity = Severity.Normal;
 
-        await PlayGoalSong();
+        await PlayGoalHorn();
         
         _visible = true;
     }
 
     private async Task AddGoal()
     {
-        if (_scorer is null) return;
+        await _form.Validate();
+        if (_scorer is null || _time is null) return;
+
         
         await AddGoalToDb();
         await OnGoalAdded.InvokeAsync();
@@ -113,7 +155,7 @@ else
 
     private async Task AddGoalToDb()
     {
-        if (_scorer is null) return;
+        if (_scorer is null || _time is null) return;
 
         var retval = new GoalEntry
         {
@@ -122,24 +164,30 @@ else
             Scorer = _scorer,
             Assist1 = _assist1,
             Assist2 = _assist2,
+            Period = _period,
+            Time = _time.Value,
         };
 
         await BCData.AddGoalAsync(retval);
     }
 
 
-    private async Task PlayGoalSong()
+    private async Task PlayGoalHorn()
     {
-        _songPlayed = false;
-        if (string.IsNullOrEmpty(Team.goal_horn_url)) return;
+        if (!WithGoalHorn)
+        {
+            _alertMessage = "Play goal horn option disabled";
+            _alertSeverity = Severity.Warning;
+            return;
+        }
         
-        try
+        if (string.IsNullOrEmpty(Team.goal_horn_url))
         {
-            await JS.InvokeVoidAsync("open", Team.goal_horn_url, "_blank");
-            _songPlayed = true;
+            _alertMessage = "Team has no goal horn";
+            _alertSeverity = Severity.Error;
+            return;
         }
-        catch (JSDisconnectedException e)
-        {
-        }
+
+        _goalHornPlaying = true;
     }
 }

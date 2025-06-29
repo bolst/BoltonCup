@@ -591,7 +591,9 @@ public partial class BCData : DapperBase, IBCData
                             preferred_number3 = @preferred_number3,
                             preferred_beer = @preferred_beer,
                             songrequest = @songrequest,
-                            songrequestid = @songrequestid
+                            songrequestid = @songrequestid,
+                            preferred_teammate1 = @preferred_teammate1,
+                            preferred_teammate2 = @preferred_teammate2
                         WHERE id = @id";
 
         await ExecuteSqlAsync(sql, account);
