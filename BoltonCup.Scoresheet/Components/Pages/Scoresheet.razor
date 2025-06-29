@@ -9,16 +9,16 @@
 @inject SpotifyService Spotify
 @inject ISnackbar Snackbar
 
+<PageTitle>Game</PageTitle>
 
 <div class="relative">
     @if (_game is not null)
     {
-
         if (_homeTeam is not null && _awayTeam is not null)
         {
             <MudStack AlignItems="AlignItems.Center" Row>
                 <MudImage Src="@_homeTeam.logo_url" Width="70" />
-                <MudText Typo="Typo.h6">@_homeTeam.name - <b>@HomeGoals.Count()</b></MudText>            
+                <MudText Typo="Typo.h6">@_homeTeam.name - <b>@_game.home_score</b></MudText>            
                 
                 <MudSpacer />
                 
@@ -40,7 +40,7 @@
                 
                 <MudSpacer />
                 
-                <MudText Typo="Typo.h6"><b>@AwayGoals.Count()</b> - @_awayTeam.name</MudText>
+                <MudText Typo="Typo.h6"><b>@_game.away_score</b> - @_awayTeam.name</MudText>
                 <MudImage Src="@_awayTeam.logo_url" Width="70" />
             </MudStack>
         }
@@ -64,9 +64,11 @@
     
         
         <MudToolBar>
-            <AddPenaltyButton Game="_game" Team="_homeTeam" Players="_homeRoster" ReadOnly="ReadOnly" OnPenaltyAdded="LoadDataAsync" />
+            <AddPenaltyButton Game="_game" Team="_homeTeam" Players="_homeRoster" ReadOnly="ReadOnly" OnPenaltyAdded="LoadDataAsync" WithPenaltySong="_playPenaltySong" />
             <MudSpacer />
-            <AddPenaltyButton Game="_game" Team="_awayTeam" Players="_awayRoster" ReadOnly="ReadOnly" OnPenaltyAdded="LoadDataAsync" />
+            <MudSwitch @bind-Value="_playPenaltySong" Color="Color.Primary" Label="Play Penalty Song"></MudSwitch>
+            <MudSpacer />
+            <AddPenaltyButton Game="_game" Team="_awayTeam" Players="_awayRoster" ReadOnly="ReadOnly" OnPenaltyAdded="LoadDataAsync" WithPenaltySong="_playPenaltySong" />
         </MudToolBar>
         
         <MudGrid Style="height: 35vh">
@@ -106,6 +108,7 @@
     
     private bool _loading;
     private bool _playGoalHorn = true;
+    private bool _playPenaltySong = true;
 
     private IEnumerable<GameGoal> HomeGoals => _homeTeam is null ? [] : _goals.Where(g => g.TeamId == _homeTeam.id);
     private IEnumerable<GameGoal> AwayGoals => _awayTeam is null ? [] : _goals.Where(g => g.TeamId == _awayTeam.id);
@@ -114,27 +117,26 @@
 
     private bool ReadOnly => _game is not null && _game.state != GameState.Active;
     
-
-    protected override async Task OnInitializedAsync()
+    
+    protected override async Task OnParametersSetAsync()
     {
+        if (_game is not null && _game.id == GameId) return;
+
         if (GameId == 0)
         {
-            // TODO: check if there is a live game and navigate to its scoresheet endpoint
             var currentGame = await BCData.GetActiveGamesAsync();
             if (currentGame.Any())
             {
                 Navigation.NavigateTo($"scoresheet/{currentGame.First().id}");
+                return;
             }
             else
             {
                 Navigation.NavigateTo("/games");
+                return;
             }
         }
-    }
-    
-    
-    protected override async Task OnParametersSetAsync()
-    {
+        
         await LoadDataAsync();
     }
 
@@ -336,7 +338,7 @@
             @<MudDataGrid Items="penalties" SortMode="SortMode.None" ShowColumnOptions="false" Dense>
                 <Columns>
                     <PropertyColumn Property="x => x.Period" Title="Period"/>
-                    <PropertyColumn Property="@(x => x.Time.ToString(@"hh\:mm"))" Title="Time"/>
+                    <PropertyColumn Property="@(x => x.Time.ToString(@"mm\:ss"))" Title="Time"/>
                     <PropertyColumn Property="x => x.PlayerName" Title="Player"/>
                     <PropertyColumn Property="x => x.Infraction" Title="Infraction"/>
                     <TemplateColumn>

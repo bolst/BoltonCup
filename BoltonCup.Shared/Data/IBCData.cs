@@ -70,4 +70,5 @@ public interface IBCData
     Task AddPenaltyAsync(PenaltyEntry penalty);    
     Task RemoveGoalAsync(int goalId);
     Task RemovePenaltyAsync(int penaltyId);
+    Task<IEnumerable<BCInfraction>> GetInfractionsAsync();
 }
