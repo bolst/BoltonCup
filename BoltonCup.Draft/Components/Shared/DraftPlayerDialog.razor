@@ -1,4 +1,6 @@
 @inject Data.DraftServiceProvider Drafter
+@inject IBCData BCData
+
 
 <MudDialog>
     <DialogContent>
@@ -28,7 +30,27 @@
                 </MudStack>
 
                 <MudText Class="my-4" Typo="Typo.h6">@Player.dob.ToString("MMMM dd, yyyy")</MudText>
-                <MudText Typo="Typo.h6">Highest Level - @Player.HighestLevel</MudText>
+                <MudText Class="my-4" Typo="Typo.h6">Highest Level - @Player.HighestLevel</MudText>
+                
+                <MudText Typo="Typo.h6">Preferred Teammates</MudText>
+                <MudStack Class="mx-6" Spacing="1">
+                    @if (_preferredTeammate1 is not null)
+                    {
+                        <MudStack AlignItems="AlignItems.Center" Row>
+                            <MudText>@_preferredTeammate1.name</MudText>
+                            @AvailabilityChip(_preferredTeammate1)
+                        </MudStack>
+                    }
+                    @if (_preferredTeammate2 is not null)
+                    {
+                        <MudStack AlignItems="AlignItems.Center" Row>
+                            <MudText>@_preferredTeammate2.name</MudText>
+                            @AvailabilityChip(_preferredTeammate2)
+                        </MudStack>
+                    }
+                </MudStack>
+                
+                
             </div>
         
         </MudStack>
@@ -57,8 +79,12 @@
     [Parameter, EditorRequired]
     public required PlayerProfile Player { get; set; }
 
+    private BCAccount? _account;
     private BCTeam? _team;
 
+    private PlayerProfile? _preferredTeammate1;
+    private PlayerProfile? _preferredTeammate2;
+    
     private Color PositionColor
     {
         get
@@ -71,6 +97,19 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        if (Player.account_id.HasValue)
+        {
+            _account = await BCData.GetAccountByIdAsync(Player.account_id.Value);
+            var tournament = await BCData.GetCurrentTournamentAsync();
+
+            if (tournament is null) return;
+            
+            if (_account?.preferred_teammate1 is not null)
+                _preferredTeammate1 = await BCData.GetUserTournamentPlayerProfileAsync(_account.preferred_teammate1.Value, tournament.tournament_id);
+            if (_account?.preferred_teammate2 is not null)
+                _preferredTeammate2 = await BCData.GetUserTournamentPlayerProfileAsync(_account.preferred_teammate2.Value, tournament.tournament_id);
+        }
+        
         var (team, _) = await Drafter.GetTeamWithCurrentPick();
         _team = team;
     }
@@ -82,5 +121,18 @@
     }
 
     private async Task OnCancel() => MudDialog.Cancel();
+
+
+    private RenderFragment AvailabilityChip(PlayerProfile player)
+    {
+        if (player.team_id is null)
+        {
+            return @<MudChip T="string" Color="Color.Primary" Variant="Variant.Text">Available</MudChip>;
+        }
+        else
+        {
+            return @<MudChip T="string" Color="Color.Error" Variant="Variant.Text">Drafted</MudChip>;
+        }
+    }
     
 }
