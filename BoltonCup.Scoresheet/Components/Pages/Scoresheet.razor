@@ -317,7 +317,7 @@
             @<MudDataGrid Items="goals" SortMode="SortMode.None" ShowColumnOptions="false" Dense>
                 <Columns>
                 <PropertyColumn Property="x => x.Period" Title="Period" />
-                <PropertyColumn Property="@(x => x.Time.ToString(@"hh\:mm"))" Title="Time" />
+                <PropertyColumn Property="@(x => x.Time.ToString(@"mm\:ss"))" Title="Time" />
                 <PropertyColumn Property="x => x.ScorerName" Title="Scorer" />
                 <PropertyColumn Property="x => x.Assist1Name" Title="Assist" />
                 <PropertyColumn Property="x => x.Assist2Name" Title="Assist" />

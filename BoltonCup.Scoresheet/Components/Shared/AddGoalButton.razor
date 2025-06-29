@@ -41,21 +41,21 @@ else
         }
         
         <MudForm @ref="_form">
-            <MudSelect Class="my-1" @bind-Value="_scorer" Label="Scorer" Margin="Margin.Dense" AutoFocus Clearable Dense Required>
+            <MudSelect Class="my-1" @bind-Value="_scorer" Label="Scorer" Margin="Margin.Dense" Variant="Variant.Outlined" AutoFocus Clearable Dense Required>
                 @foreach (var player in Players.Where(p => p.id != _assist1?.id && p.id != _assist2?.id))
                 {
                     <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
                 }
             </MudSelect>
 
-            <MudSelect Class="my-1" @bind-Value="_assist1" Label="Primary Assist" Margin="Margin.Dense" Dense Clearable>
+            <MudSelect Class="my-1" @bind-Value="_assist1" Label="Primary Assist" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Clearable>
                 @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist2?.id))
                 {
                     <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
                 }
             </MudSelect>
 
-            <MudSelect Class="my-1" @bind-Value="_assist2" Label="Secondary Assist" Margin="Margin.Dense" Dense Clearable>
+            <MudSelect Class="my-1" @bind-Value="_assist2" Label="Secondary Assist" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Clearable>
                 @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist1?.id))
                 {
                     <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
@@ -70,7 +70,24 @@ else
                 <MudToggleItem Value="3">3</MudToggleItem>
             </MudToggleGroup>
 
-            <MudTimePicker Label="Time" @bind-Time="_time" Editable Required />
+
+            <MudText Class="mt-2" Typo="Typo.caption">Time</MudText>
+            <MudStack Class="mb-1" AlignItems="AlignItems.Center" Row>
+                <MudSelect @bind-Value="_minutes" Label="Minutes" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Required>
+                    @foreach (var minute in Enumerable.Range(0, 11))
+                    {
+                        <MudSelectItem Value="minute">@minute</MudSelectItem>
+                    }
+                </MudSelect>                
+                <MudSelect @bind-Value="_seconds" Label="Seconds" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Required>
+                    @foreach (var second in Enumerable.Range(0, 60))
+                    {
+                        <MudSelectItem Value="second">@second</MudSelectItem>
+                    }
+                </MudSelect>
+                
+                <MudText>@($"{_time.Minutes}:{_time.Seconds:00}")</MudText>
+            </MudStack>
             
         </MudForm>
     </DialogContent>
@@ -114,7 +131,18 @@ else
     private PlayerProfile? _assist1;
     private PlayerProfile? _assist2;
     private int _period;
-    private TimeSpan? _time;
+    private int _minutes
+    {
+        get => _time.Minutes;
+        set => _time = new(0, value, _seconds);
+    }    
+    private int _seconds
+    {
+        get => _time.Seconds;
+        set => _time = new(0, _minutes, value);
+    }
+    
+    private TimeSpan _time = TimeSpan.Zero;
 
     private bool _visible;
     private bool _goalHornPlaying;
@@ -142,7 +170,7 @@ else
     private async Task AddGoal()
     {
         await _form.Validate();
-        if (_scorer is null || _time is null) return;
+        if (_scorer is null) return;
 
         
         await AddGoalToDb();
@@ -155,7 +183,7 @@ else
 
     private async Task AddGoalToDb()
     {
-        if (_scorer is null || _time is null) return;
+        if (_scorer is null) return;
 
         var retval = new GoalEntry
         {
@@ -165,7 +193,7 @@ else
             Assist1 = _assist1,
             Assist2 = _assist2,
             Period = _period,
-            Time = _time.Value,
+            Time = _time,
         };
 
         await BCData.AddGoalAsync(retval);
