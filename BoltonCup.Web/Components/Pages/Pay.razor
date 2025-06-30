@@ -40,35 +40,33 @@
     
     private RegisterFormModel? _userData;
 
-    private string? _checkoutId;
-
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!string.IsNullOrEmpty(_checkoutId) && _checkoutId == CheckoutId) return;
-        
-        _headerText = "Confirming Payment";
-        _loading = true;
-        StateHasChanged();
-
-        if (string.IsNullOrEmpty(CheckoutId))
+        if (firstRender)
         {
-            Navigation.NavigateTo("/");
-            return;
-        }
+            if (string.IsNullOrEmpty(CheckoutId))
+            {
+                Navigation.NavigateTo("/");
+                return;
+            }
+            
+            _headerText = "Confirming Payment";
+            _loading = true;
+            StateHasChanged();
 
-        await Task.Delay(1000);
-        _userData = await StripeService.ProcessCheckoutAsync(CheckoutId);
+            await Task.Delay(1000);
+            _userData = await StripeService.ProcessCheckoutAsync(CheckoutId);
         
-        var account = await BCData.GetAccountByEmailAsync(_userData?.Email ?? "");
-        if (account is not null)
-        {
-            await SBService.SendConfigEmail(account);
-        }
+            var account = await BCData.GetAccountByEmailAsync(_userData?.Email ?? "");
+            if (account is not null)
+            {
+                await SBService.SendConfigEmail(account);
+            }
 
-        _loading = false;
-        _headerText = "Payment Confirmed";
-        _checkoutId = CheckoutId;
-        StateHasChanged();
+            _loading = false;
+            _headerText = "Payment Confirmed";
+            StateHasChanged();
+        }
     }
     
 }
