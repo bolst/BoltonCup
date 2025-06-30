@@ -16,6 +16,7 @@ public class BCTeam : IEquatable<BCTeam>
     public required int gm_account_id { get; set; }
     public string? banner_image { get; set; }
     public string? goal_horn_url { get; set; }
+    public string? penalty_song_url { get; set; }
 
     public bool Equals(BCTeam? other) => other is not null && other.id == id;
     public override bool Equals(object? obj) => Equals(obj as BCTeam);
@@ -114,6 +115,19 @@ public class GoalieGameSummary : BCGame
     public int? opponent_team_score { get; set; }
     public int player_id { get; set; }
     public bool win { get; set; }
+}
+
+public class BCGoal
+{
+    public int id { get; set; }
+    public int game_id { get; set; }
+    public TimeSpan time { get; set; }
+    public int period { get; set; }
+    public bool is_hometeam { get; set; }
+    public int tournament_id { get; set; }
+    public int scorer_id { get; set; }
+    public int? assist1_player_id { get; set; }
+    public int? assist2_player_id { get; set; }
 }
 
 public class GameGoal
@@ -445,7 +459,15 @@ public class PenaltyEntry
     public required BCTeam Team { get; set; }
     public required PlayerProfile Player { get; set; }
     public required string Infraction { get; set; }
+    public string Notes { get; set; } = string.Empty;
     public required int DurationMins { get; set; }
     public required int Period { get; set; }
     public required TimeSpan Time { get; set; }
+}
+
+
+public class BCInfraction
+{
+    public required int id { get; set; }
+    public required string name { get; set; }
 }

@@ -3,7 +3,7 @@
 
 @if (_confirmed)
 {
-    <MudButtonGroup OverrideStyles="false">
+    <MudButtonGroup OverrideStyles="false" >
         <MudButton OnClick="ShowDialog" Color="Color.Success" Variant="Variant.Filled">Confirm</MudButton>
         <MudButton OnClick="(() => _confirmed = false)" Color="Color.Error" Variant="Variant.Filled">Discard</MudButton>
     </MudButtonGroup>
@@ -29,27 +29,74 @@ else
         </MudStack>
     </TitleContent>
     <DialogContent>
-        <MudSelect Class="my-1" @bind-Value="_player" Label="Player" Margin="Margin.Dense" Dense Clearable Required>
-            @foreach (var player in Players)
-            {
-                <MudSelectItem Value="player">@player.name</MudSelectItem>
-            }
-        </MudSelect>
+        @if (!string.IsNullOrEmpty(_alertMessage))
+        {
+            <MudAlert Severity="_alertSeverity" Dense>@_alertMessage</MudAlert>
+        }
+        @if (WithPenaltySong && _penaltySongPlaying)
+        {
+            <div style="width: 100%">
+                <audio autoplay controls style="width: 100%"><source src="@Team.penalty_song_url" /></audio>
+            </div>
+        }
         
-        <MudSelect Class="my-1" @bind-Value="_infraction" Label="Infraction" Margin="Margin.Dense" Dense Clearable Required>
-            <MudSelectItem Value="@("tripping")">Tripping</MudSelectItem>
-        </MudSelect>
+        <MudForm @ref="_form">
 
-        <MudText Class="mt-2" Typo="Typo.caption">Period</MudText>
-        <MudToggleGroup T="int" Class="mb-1" @bind-Value="_period" Color="Color.Primary">
-            <MudToggleItem Value="1">1</MudToggleItem>
-            <MudToggleItem Value="2">2</MudToggleItem>
-            <MudToggleItem Value="3">3</MudToggleItem>
-        </MudToggleGroup>
-        
+            <MudSelect Class="my-1" @bind-Value="_player" Label="Player" Margin="Margin.Dense" Dense Clearable Required>
+                @foreach (var player in Players)
+                {
+                    <MudSelectItem Value="player">@player.name</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudSelect Class="my-1" @bind-Value="_infraction" Label="Infraction" Margin="Margin.Dense" Dense Clearable Required>
+                @foreach (var infraction in _infractions)
+                {
+                    <MudSelectItem Value="infraction.name">@infraction.name</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudSelect Class="my-1" @bind-Value="_duration" Label="Duration" Margin="Margin.Dense" Dense Required>
+                @foreach (var minute in Enumerable.Range(2, 11))
+                {
+                    <MudSelectItem Value="minute">@minute mins</MudSelectItem>
+                }
+            </MudSelect>
+            
+            <MudTextField Class="my-1" @bind-Value="_notes" Label="Notes" Variant="Variant.Outlined" Margin="Margin.Dense" MaxLines="4" AutoGrow Clearable />
+
+            <MudText Class="mt-2" Typo="Typo.caption">Period</MudText>
+            <MudToggleGroup T="int" Class="mb-1" @bind-Value="_period" Color="Color.Primary">
+                <MudToggleItem Value="1">1</MudToggleItem>
+                <MudToggleItem Value="2">2</MudToggleItem>
+                <MudToggleItem Value="3">3</MudToggleItem>
+                <MudToggleItem Value="4">OT</MudToggleItem>
+                <MudToggleItem Value="5">SO</MudToggleItem>
+            </MudToggleGroup>
+
+
+            <MudText Class="mt-2" Typo="Typo.caption">Time</MudText>
+            <MudStack Class="mb-1" AlignItems="AlignItems.Center" Row>
+                <MudSelect @bind-Value="_minutes" Label="Minutes" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Required>
+                    @foreach (var minute in Enumerable.Range(0, 11))
+                    {
+                        <MudSelectItem Value="minute">@minute</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudSelect @bind-Value="_seconds" Label="Seconds" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Required>
+                    @foreach (var second in Enumerable.Range(0, 60))
+                    {
+                        <MudSelectItem Value="second">@second</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudText>@($"({_time.Minutes}:{_time.Seconds:00})")</MudText>
+            </MudStack>
+
+        </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="OnAddPenalty" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
+        <MudButton OnClick="AddPenalty" Variant="Variant.Filled" Color="Color.Primary">Add Penalty</MudButton>
         <MudButton OnClick="() => _visible = false">Cancel</MudButton>
     </DialogActions>
 </MudDialog>
@@ -71,30 +118,74 @@ else
     [Parameter]
     public EventCallback OnPenaltyAdded { get; set; }
 
+    [Parameter] 
+    public bool WithPenaltySong { get; set; } = true;
+
     private readonly DialogOptions _dialogOptions = new()
     {
         MaxWidth = MaxWidth.Small,
+        BackdropClick = false,
+        CloseButton = false,
+        CloseOnEscapeKey = false,
     };
+
+    private IEnumerable<BCInfraction> _infractions = [];
+    
+    private MudForm _form;
 
     private PlayerProfile? _player;
     private string? _infraction;
+    private string _notes = string.Empty;
+    private int _duration = 2;
     private int _period;
-    private TimeSpan? _time;
+    private int _minutes
+    {
+        get => _time.Minutes;
+        set => _time = new(0, value, _seconds);
+    }    
+    private int _seconds
+    {
+        get => _time.Seconds;
+        set => _time = new(0, _minutes, value);
+    }
+    private TimeSpan _time = TimeSpan.Zero;
     
     private bool _visible;
-    private bool _confirmed;
+    private bool _penaltySongPlaying;
 
-    private void ShowDialog()
+    private bool _confirmed;
+    private string? _alertMessage;
+    private Severity _alertSeverity = Severity.Normal;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _infractions = await BCData.GetInfractionsAsync();
+    }
+    
+
+    private async Task ShowDialog()
     {
         _player = null;
+        _infraction = null;
+        _duration = 2;
+        _period = 0;        
+        _time = TimeSpan.Zero;
         _confirmed = false;
+        _penaltySongPlaying = false;
+        _alertMessage = null;
+        _alertSeverity = Severity.Normal;
+
+        PlayPenaltySong();
+        
         _visible = true;
     }
     
     
-    private async Task OnAddPenalty()
+    private async Task AddPenalty()
     {
-        if (_player is null || _infraction is null || _time is null) return;
+        var isValid = await Validate();
+        if (!isValid) return;
 
         await AddPenaltyToDb();
         await OnPenaltyAdded.InvokeAsync();
@@ -106,7 +197,8 @@ else
 
     private async Task AddPenaltyToDb()
     {
-        if (_player is null || _infraction is null || _time is null) return;
+        var isValid = await Validate();
+        if (!isValid) return;
 
         var retval = new PenaltyEntry
         {
@@ -114,12 +206,54 @@ else
             Team = Team,
             Player = _player,
             Infraction = _infraction,
-            DurationMins = 2,
+            Notes = _notes,
+            DurationMins = _duration,
             Period = _period,
-            Time = _time.Value,
+            Time = _time,
         };
 
         await BCData.AddPenaltyAsync(retval);
     }
     
+    private void PlayPenaltySong()
+    {
+        if (!WithPenaltySong)
+        {
+            _alertMessage = "Play penalty song option disabled";
+            _alertSeverity = Severity.Warning;
+            return;
+        }
+        
+        if (string.IsNullOrEmpty(Team.penalty_song_url))
+        {
+            _alertMessage = "Team has no penalty song";
+            _alertSeverity = Severity.Error;
+            return;
+        }
+
+        _penaltySongPlaying = true;
+    }
+    
+    private async Task<bool> Validate()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return false;
+
+        if (_player is null)
+        {
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(_infraction))
+        {
+            return false;
+        }
+        
+        if (_period is < 1 or > 5)
+        {
+            return false;
+        }
+        
+        return true;
+    }
 }

@@ -41,37 +41,55 @@ else
         }
         
         <MudForm @ref="_form">
-            <MudSelect Class="my-1" @bind-Value="_scorer" Label="Scorer" Margin="Margin.Dense" AutoFocus Clearable Dense Required>
+            
+            <MudSelect Class="my-1" @bind-Value="_scorer" Label="Scorer" Margin="Margin.Dense" Variant="Variant.Outlined" AutoFocus Clearable Dense Required>
                 @foreach (var player in Players.Where(p => p.id != _assist1?.id && p.id != _assist2?.id))
                 {
                     <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
                 }
             </MudSelect>
 
-            <MudSelect Class="my-1" @bind-Value="_assist1" Label="Primary Assist" Margin="Margin.Dense" Dense Clearable>
+            <MudSelect Class="my-1" @bind-Value="_assist1" Label="Primary Assist" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Clearable>
                 @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist2?.id))
                 {
                     <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
                 }
             </MudSelect>
 
-            <MudSelect Class="my-1" @bind-Value="_assist2" Label="Secondary Assist" Margin="Margin.Dense" Dense Clearable>
+            <MudSelect Class="my-1" @bind-Value="_assist2" Label="Secondary Assist" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Clearable>
                 @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist1?.id))
                 {
                     <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
                 }
             </MudSelect>
-            
-            
+
             <MudText Class="mt-2" Typo="Typo.caption">Period</MudText>
             <MudToggleGroup T="int" Class="mb-1" @bind-Value="_period" Color="Color.Primary">
                 <MudToggleItem Value="1">1</MudToggleItem>
                 <MudToggleItem Value="2">2</MudToggleItem>
                 <MudToggleItem Value="3">3</MudToggleItem>
+                <MudToggleItem Value="4">OT</MudToggleItem>
+                <MudToggleItem Value="5">SO</MudToggleItem>
             </MudToggleGroup>
 
-            <MudTimePicker Label="Time" @bind-Time="_time" Editable Required />
-            
+            <MudText Class="mt-2" Typo="Typo.caption">Time</MudText>
+            <MudStack Class="mb-1" AlignItems="AlignItems.Center" Row>
+                <MudSelect @bind-Value="_minutes" Label="Minutes" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Required>
+                    @foreach (var minute in Enumerable.Range(0, 11))
+                    {
+                        <MudSelectItem Value="minute">@minute</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudSelect @bind-Value="_seconds" Label="Seconds" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Required>
+                    @foreach (var second in Enumerable.Range(0, 60))
+                    {
+                        <MudSelectItem Value="second">@second</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudText>@($"({_time.Minutes}:{_time.Seconds:00})")</MudText>
+            </MudStack>
+
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -114,11 +132,20 @@ else
     private PlayerProfile? _assist1;
     private PlayerProfile? _assist2;
     private int _period;
-    private TimeSpan? _time;
+    private int _minutes
+    {
+        get => _time.Minutes;
+        set => _time = new(0, value, _seconds);
+    }    
+    private int _seconds
+    {
+        get => _time.Seconds;
+        set => _time = new(0, _minutes, value);
+    }
+    private TimeSpan _time = TimeSpan.Zero;
 
     private bool _visible;
     private bool _goalHornPlaying;
-    
     
     private bool _confirmed;
     private string? _alertMessage;
@@ -129,22 +156,22 @@ else
         _scorer = null;
         _assist1 = null;
         _assist2 = null;
+        _time = TimeSpan.Zero;
         _confirmed = false;
         _goalHornPlaying = false;
         _alertMessage = null;
         _alertSeverity = Severity.Normal;
 
-        await PlayGoalHorn();
+        PlayGoalHorn();
         
         _visible = true;
     }
 
     private async Task AddGoal()
     {
-        await _form.Validate();
-        if (_scorer is null || _time is null) return;
+        var isValid = await Validate();
+        if (!isValid) return;
 
-        
         await AddGoalToDb();
         await OnGoalAdded.InvokeAsync();
 
@@ -155,7 +182,8 @@ else
 
     private async Task AddGoalToDb()
     {
-        if (_scorer is null || _time is null) return;
+        var isValid = await Validate();
+        if (!isValid) return;
 
         var retval = new GoalEntry
         {
@@ -165,14 +193,14 @@ else
             Assist1 = _assist1,
             Assist2 = _assist2,
             Period = _period,
-            Time = _time.Value,
+            Time = _time,
         };
 
         await BCData.AddGoalAsync(retval);
     }
 
 
-    private async Task PlayGoalHorn()
+    private void PlayGoalHorn()
     {
         if (!WithGoalHorn)
         {
@@ -189,5 +217,24 @@ else
         }
 
         _goalHornPlaying = true;
+    }
+
+
+    private async Task<bool> Validate()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return false;
+
+        if (_scorer is null)
+        {
+            return false;
+        }
+
+        if (_period is < 1 or > 5)
+        {
+            return false;
+        }
+        
+        return true;
     }
 }
