@@ -1,6 +1,6 @@
 
 
-<MudChip T="string" Variant="Variant.Outlined" Color="_color">@Type</MudChip>
+<MudChip T="string" Variant="Variant.Outlined" Color="_color" Style="@Style">@Type</MudChip>
 
 
 @code {
@@ -10,6 +10,9 @@
 
     [Parameter]
     public string? Type { get; set; }
+
+    [Parameter] 
+    public string Style { get; set; } = string.Empty;
     
     private Color _color = Color.Default;
 

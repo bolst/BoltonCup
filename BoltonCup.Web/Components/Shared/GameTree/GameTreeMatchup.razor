@@ -1,0 +1,50 @@
+@namespace BoltonCup.Web.Components.Shared
+
+<MudPaper Square>
+    <div class="pa-2">
+        <MudStack AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Row>
+            @if (!string.IsNullOrEmpty(Game.HomeTeamName))
+            {
+                <MudText><b>@Game.HomeTeamNameShort.ToUpper()</b></MudText>
+                <MudImage Src="@Game.HomeTeamLogo" Height="40"/>
+            }
+            else
+            {
+                <MudText><b>TBD</b></MudText>
+                <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Small" />
+            }
+        </MudStack>
+        <MudStack AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Row>
+            @if (!string.IsNullOrEmpty(Game.AwayTeamName))
+            {
+                <MudText><b>@Game.AwayTeamNameShort.ToUpper()</b></MudText>
+                <MudImage Src="@Game.AwayTeamLogo" Height="40"/>
+            }
+            else
+            {
+                <MudText><b>TBD</b></MudText>
+                <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Small" />
+            }
+        </MudStack>
+    </div>
+    <MudStack Class="gray darken-3" AlignItems="AlignItems.Center" Justify="Justify.Center" Row>
+        <MudText Style="@($"color: {TextColor}")"><b>@Game.type.ToUpper()</b></MudText>
+    </MudStack>
+</MudPaper>
+
+
+@code {
+    
+    [Parameter, EditorRequired]
+    public required BCGame Game { get; set; }
+
+    private string TextColor => Game.type switch
+    {
+        GameType.Finals5th => "#F2C3B3",
+        GameType.Finals3rd => "#CFD8DC",
+        GameType.Finals1st => "#FFECB3",
+        _ => "white"
+    };
+
+
+}
