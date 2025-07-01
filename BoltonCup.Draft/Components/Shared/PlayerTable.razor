@@ -10,7 +10,7 @@
         Items="_filteredPlayers"
         Height="calc(90vh - 4rem)"
         QuickFilter="QuickFilter"
-        Fil
+        RowClassFunc="RowClassFunc"
         ShowColumnOptions="false"
         FixedHeader
         Dense>
@@ -44,7 +44,7 @@
                         OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</MudButton>
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Property="x => x.name.ToUpper()" Title="Name" CellStyle="" />
+            <PropertyColumn Property="x => x.name" Title="Name" CellStyle="" />
             <PropertyColumn Property="x => x.position" Title="Pos.">
                 <CellTemplate>
                     <PositionChip Position="@context.Item.position" Size="Size.Small" />
@@ -63,7 +63,9 @@
     private string _searchString;
     private string _positionFilter;
     private BCTournament? _currentTournament;
-
+    private BCTeam? _currentTeam;
+    private IEnumerable<BCAccount> _currentRoster = [];
+    
     protected override async Task OnInitializedAsync()
     {
         await LoadDataAsync();
@@ -72,6 +74,8 @@
 
     private async Task LoadDataAsync()
     {
+        (_currentTeam, _) = await Drafter.GetTeamWithCurrentPick();
+        _currentRoster = await BCData.GetAccountsByTeamIdAsync(_currentTeam.id);
         _currentTournament = await BCData.GetCurrentTournamentAsync();
         if (_currentTournament is not null)
         {
@@ -149,6 +153,16 @@
             
             InvokeAsync(StateHasChanged);
         });
+    }
+
+    private string RowClassFunc(PlayerProfile player, int row)
+    {
+        if (_currentRoster.Any(x => x.preferred_teammate1 == player.account_id || x.preferred_teammate2 == player.account_id))
+        {
+            return "green lighten-5";
+        }
+
+        return string.Empty;
     }
 
 }

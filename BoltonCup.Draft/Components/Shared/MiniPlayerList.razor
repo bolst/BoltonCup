@@ -1,3 +1,4 @@
+@inject IBCData BCData
 
 
 <MudSimpleTable Style="@($"height: {Height}; width: 100%")" Square="!Rounded" FixedHeader Dense Striped>
@@ -5,6 +6,7 @@
     <tr>
         <th style="width: 50px"></th>
         <th>@Header.ToUpper() (@PlayerCount)</th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -17,6 +19,23 @@
                     <MudImage Src="@player.ProfilePicture" Height="20" />
                 </td>
                 <td>@player.name</td>
+                <td>
+                    <MudTooltip Placement="Placement.Top" VisibleChanged="(value) => VisibleChanged(value, player)">
+                        <TooltipContent>
+                            @foreach (var prefPlayer in _preferredPlayers)
+                            {
+                                <MudText Typo="Typo.subtitle2">@prefPlayer.FullName</MudText>
+                            }
+                            @if (!_preferredPlayers.Any())
+                            {
+                                <MudText Typo="Typo.subtitle2">No preferred teammates</MudText>
+                            }
+                        </TooltipContent>
+                        <ChildContent>
+                            <MudIcon Icon="@Icons.Material.Filled.PeopleAlt" Size="Size.Small"/>
+                        </ChildContent>
+                    </MudTooltip>
+                </td>
             </tr>
         }
     }
@@ -36,8 +55,22 @@
     public string Height { get; set; } = "150px";
 
     [Parameter] 
-    public bool Rounded { get; set; } = false;
+    public bool Rounded { get; set; }
 
     private int PlayerCount => Players?.Count() ?? 0;
+
+    private IEnumerable<BCAccount> _preferredPlayers = [];
+
+    private async Task VisibleChanged(bool value, PlayerProfile? player)
+    {
+        if (value && player?.account_id is not null)
+        {
+            _preferredPlayers = await BCData.GetUserPreferredPlayersAsync(player.account_id.Value);
+        }
+        else
+        {
+            _preferredPlayers = [];
+        }
+    }
 
 }

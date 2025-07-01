@@ -168,6 +168,7 @@ public class PlayerStatLine
     public int jersey_number { get; set; }
     public string position { get; set; } = "";
     public int? team_id { get; set; }
+    public DateTime dob { get; set; }
     public string profilepicture { get; set; } = "";
     public string? team_name { get; set; }
     public string? team_name_short { get; set; }
@@ -193,6 +194,7 @@ public class GoalieStatLine
     public string player_name { get; set; } = "";
     public int jersey_number { get; set; }
     public int? team_id { get; set; }
+    public DateTime dob { get; set; }
     public string profilepicture { get; set; } = "";
     public string? team_name { get; set; }
     public string? team_name_short { get; set; }

@@ -7,7 +7,7 @@
 
 <TournamentPicker SelectedTournament="_selectedTournament" SelectedTournamentChanged="SelectedTournamentChanged" />
 
-<MudTabs Class="relative" ActivePanelIndex="_activeTabIndex" ActivePanelIndexChanged="ActiveTabChanged" Centered>
+<MudTabs Class="relative pb-14" PanelClass="mx-lg-20 mx-0 px-lg-20 px-0" ActivePanelIndex="_activeTabIndex" ActivePanelIndexChanged="ActiveTabChanged" Centered>
     <MudStack Class="d-flex flex-grow-1 px-4 py-4" Style="background-color: var(--mud-palette-surface)" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Row>
         <div style="width: 200px">
             <MudSelect T="BCTeam" Value="_selectedFilterTeam" ValueChanged="SelectedTeamChanged" Variant="Variant.Outlined" Margin="Margin.Dense" Placeholder="Team" Dense>
@@ -57,8 +57,9 @@
                         <MudImage Src="@_teams.FirstOrDefault(x => x.id == context.Item.team_id)?.logo_url" Height="30" />
                     </CellTemplate>
                 </PropertyColumn>
+                <PropertyColumn Property="x => x.dob.Year" Title="Year" Resizable="false" />
                 <PropertyColumn Property="x => x.position.ToUpper().FirstOrDefault()" Title="Pos" Sortable="false" Resizable="false" />
-                <PropertyColumn Property="x => x.goals + x.assists" Title="P" InitialDirection="SortDirection.Descending" Resizable="false" />
+                <PropertyColumn Property="x => x.goals + x.assists" Title="P" Resizable="false" />
                 <PropertyColumn Property="x => x.goals" Title="G" Resizable="false" />
                 <PropertyColumn Property="x => x.assists" Title="A" Resizable="false" />
             </Columns>
@@ -92,6 +93,7 @@
                         <MudImage Src="@_teams.FirstOrDefault(x => x.id == context.Item.team_id)?.logo_url" Height="30" />
                     </CellTemplate>
                 </PropertyColumn>
+                <PropertyColumn Property="x => x.dob.Year" Title="Year" Resizable="false" />
                 <PropertyColumn Property="x => x.games_played" Title="GP" Resizable="false" />
                 <PropertyColumn Property="x => x.GAA" Title="GAA" Sortable="true" Resizable="false"/>
                 <PropertyColumn Property="x => x.shutouts" Title="SO" Sortable="true" Resizable="false"/>
