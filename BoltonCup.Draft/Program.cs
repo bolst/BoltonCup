@@ -3,6 +3,7 @@ using BoltonCup.Draft.Components;
 using BoltonCup.Draft.Data;
 using BoltonCup.Shared.Data;
 using BoltonCup.Draft.Hubs;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor.Services;
@@ -16,7 +17,19 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<ICustomLocalStorageProvider, CustomLocalStorageProvider>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
+        options =>
+        {
+            options.LoginPath = new PathString("/login");
+            options.AccessDeniedPath = new PathString("/auth/denied");
+        });
 builder.Services.AddBoltonCupServices(builder.Configuration);
+builder.Services.AddBoltonCupSupabase(builder.Configuration);
+builder.Services.AddBoltonCupAuth();
 
 builder.Services.AddScoped<DraftServiceProvider>();
 
@@ -49,7 +62,8 @@ app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode()
+    .AddAdditionalAssemblies(typeof(BoltonCup.Shared.Components.Pages.Info).Assembly);
 
 app.MapHub<DraftHub>(DraftHub.HubUrl);
 

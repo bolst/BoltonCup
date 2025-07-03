@@ -59,7 +59,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="state"></param>
-    private async void SupabaseAuthStateChanged(IGotrueClient<User, Session> sender, Constants.AuthState state)
+    private void SupabaseAuthStateChanged(IGotrueClient<User, Session> sender, Constants.AuthState state)
     {
         switch (state)
         {
@@ -69,9 +69,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
                     NotifyAuthenticationStateChanged(Task.FromResult(AnonymousState));
                     break;
                 }
-                var account = await _customUserService.LookupAccountAsync(sender.CurrentUser.Email);
-                var authState = account is null ? AnonymousState : new AuthenticationState(account.ToClaimsPrincipal());
-                NotifyAuthenticationStateChanged(Task.FromResult(authState));
+                NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
                 break;
             case Constants.AuthState.SignedOut:
                 NotifyAuthenticationStateChanged(Task.FromResult(AnonymousState));

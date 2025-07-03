@@ -40,7 +40,7 @@
     
     protected override async Task OnInitializedAsync()
     {
-        tournaments = await BCData.GetTournamentsAsync();
+        tournaments = (await BCData.GetTournamentsAsync()).OrderBy(x => x.start_date ?? DateTime.Now);
         if (tournaments is not null)
             selectedTournament = First ? tournaments.First() : tournaments.Last();
     }
