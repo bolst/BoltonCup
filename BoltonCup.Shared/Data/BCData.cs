@@ -101,6 +101,20 @@ public partial class BCData : DapperBase, IBCData
         
         return await QueryDbAsync<PlayerProfile>(sql, new { TournamentId = tournamentId });
     }
+
+    public async Task<IEnumerable<BCAccount>> GetUserPreferredPlayersAsync(int accountId)
+    {
+        string cacheKey = $"preferred_players_{accountId}";
+
+        return await cacheService.GetOrAddAsync(cacheKey, async () =>
+        {
+            string sql = @"SELECT pref.*
+                            FROM account a
+                                     JOIN account pref ON pref.id IN (a.preferred_teammate1, a.preferred_teammate2)
+                            WHERE a.id = @AccountId";
+            return await QueryDbAsync<BCAccount>(sql, new { AccountId = accountId });
+        }, cacheDuration);
+    }
     
     public async Task<PlayerProfile?> GetPlayerProfileById(int id)
     {
@@ -201,7 +215,7 @@ public partial class BCData : DapperBase, IBCData
         string sql = @"SELECT * FROM playerstats
                             WHERE tournament_id = @TournamentId
                                 {0}
-                            ORDER BY team_id, player_name";
+                            ORDER BY goals + assists DESC, goals DESC, team_id, player_name";
 
         sql = string.Format(sql, teamId.HasValue ? "AND team_id = @TeamId" : string.Empty);
         
@@ -211,7 +225,8 @@ public partial class BCData : DapperBase, IBCData
     {
         string sql = @"SELECT * FROM goaliestats
                             WHERE tournament_id = @TournamentId
-                                {0}";
+                                {0}
+                            ORDER BY GAA, shutouts, team_id, player_name";
 
         sql = string.Format(sql, teamId.HasValue ? "AND team_id = @TeamId" : string.Empty);
         
@@ -320,6 +335,15 @@ public partial class BCData : DapperBase, IBCData
                         WHERE isactive = TRUE
                         ORDER BY lastname";
         return await QueryDbAsync<BCAccount>(sql);
+    }
+
+    public async Task<IEnumerable<BCAccount>> GetAccountsByTeamIdAsync(int teamId)
+    {
+        string sql = @"SELECT a.*
+                        FROM players p
+                            LEFT OUTER JOIN account a ON p.account_id = a.id AND a.isactive = TRUE
+                        WHERE p.team_id = @TeamId";
+        return await QueryDbAsync<BCAccount>(sql, new { TeamId = teamId });
     }
 
     public async Task<BCAccount?> GetAccountByEmailAsync(string email)
@@ -457,7 +481,7 @@ public partial class BCData : DapperBase, IBCData
                                  LEFT OUTER JOIN account a ON p.account_id = a.id AND a.isactive = TRUE
                         WHERE tournament_id = @TournamentId
                             AND p.team_id IS NULL
-                        ORDER BY birthday, p.position";
+                        ORDER BY birthday, p.name";
         return await QueryDbAsync<PlayerProfile>(sql, new { TournamentId = tournamentId });
     }
 

@@ -11,11 +11,20 @@
 <PageTitle>Bolton Cup</PageTitle>
 
 <div class="home-banner-background">
-    <MudGrid class="py-6" style="width: 100%; height: 85vh;">
-        <MudItem class="ma-auto" xs="12">
-            <Countdown To="_currentTournament?.start_date"/>
-        </MudItem>
-    </MudGrid>
+    <div class="py-6 d-flex align-center justify-center" style="width: 100%; height: 85vh;">
+        @if (ShowCountdown)
+        {
+            <div class="flex-grow-1">
+                <Countdown To="_currentTournament?.start_date"/>
+            </div>
+        }
+        else
+        {
+            <div class="pl-4 pr-lg-4 overflow-scroll">
+                <GameTree2025 />
+            </div>
+        }
+    </div>
     
     
     <div class="pa-4 mt-8" style="background-image: linear-gradient(to bottom, #00000000, #000000ff 60%);">
@@ -38,6 +47,8 @@
     private BCTournament? _currentTournament;
 
     private bool _loading;
+
+    private bool ShowCountdown => _currentTournament?.start_date is not null && DateTime.Now.Date < _currentTournament.start_date.Value.Date;
 
     protected override async Task OnInitializedAsync()
     {

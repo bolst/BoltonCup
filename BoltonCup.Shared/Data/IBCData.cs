@@ -11,6 +11,7 @@ public interface IBCData
     Task<BCGame?> GetGameById(int id);
     Task<IEnumerable<PlayerProfile>> GetRosterByTeamId(int teamId);
     Task<IEnumerable<PlayerProfile>> GetAllTournamentPlayersAsync(int tournamentId);
+    Task<IEnumerable<BCAccount>> GetUserPreferredPlayersAsync(int accountId);
     Task<PlayerProfile?> GetPlayerProfileById(int playerId);
     Task<PlayerProfile?> GetUserTournamentPlayerProfileAsync(int accountId, int tournamentId);
     Task<IEnumerable<PlayerGameSummary>> GetPlayerGameByGame(int accountId, int? tournamentId = null);
@@ -26,6 +27,7 @@ public interface IBCData
     Task<string> AdmitUserAsync(RegisterFormModel form);
     Task<string> RemoveAdmittedUserAsync(BCAccount account);
     Task<IEnumerable<BCAccount>> GetAccountsAsync();
+    Task<IEnumerable<BCAccount>> GetAccountsByTeamIdAsync(int teamId);
     Task<BCAccount?> GetAccountByEmailAsync(string email);
     Task<BCAccount?> GetAccountByIdAsync(int accountId);
     Task UpdateAccountProfilePictureAsync(string email, string imagePath);

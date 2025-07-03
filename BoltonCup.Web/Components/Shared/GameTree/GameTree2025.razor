@@ -1,0 +1,94 @@
+@namespace BoltonCup.Web.Components.Shared
+
+@inject IBCData BCData
+
+
+<MudGrid Style="width: 1200px">
+    <MudItem Class="ma-auto" xs="2">
+        <MudStack Class="gap-20">
+            @foreach (var game in _games.Where(g => g.date.DayOfWeek == DayOfWeek.Friday))
+            {
+                <GameTreeMatchup Game="game" />
+            }
+        </MudStack>
+    </MudItem>
+    <MudItem Class="ma-auto" xs="2">
+        <MudStack Class="gap-20">
+            @foreach (var game in _games.Where(g => g.date.DayOfWeek == DayOfWeek.Saturday && g.type == GameType.RoundRobin))
+            {
+                <GameTreeMatchup Game="game" />
+            }
+        </MudStack>
+    </MudItem>
+    <MudItem Class="ma-auto" xs="2">
+        <MudStack Class="gap-12">
+            @foreach (var game in _games.Where(g => g.type == GameType.QuarterFinals))
+            {
+                <GameTreeMatchup Game="game" />
+            }
+            @foreach (var game in _games.Where(g => g.type == GameType.Finals5th))
+            {
+                <GameTreeMatchup Game="game" />
+            }
+        </MudStack>
+    </MudItem>
+    <MudItem Class="ma-auto" xs="2">
+        <MudStack Class="gap-3">
+            @foreach (var game in _games.Where(g => g.type == GameType.SemiFinals))
+            {
+                <GameTreeMatchup Game="game" />
+            }
+            @foreach (var game in _games.Where(g => g.type == GameType.Finals3rd))
+            {
+                <GameTreeMatchup Game="game" />
+            }
+        </MudStack>
+    </MudItem>
+    <MudItem Class="ma-auto" xs="2">
+        <MudStack>
+            @foreach (var game in _games.Where(g => g.type == GameType.Finals1st))
+            {
+                <GameTreeMatchup Game="game" />
+            }
+        </MudStack>
+    </MudItem>
+    <MudItem Class="ma-auto" xs="2">
+        <MudPaper Square>
+            <div class="pa-2">
+                <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row>
+                    @if (_champion is not null)
+                    {
+                        <MudImage Src="@_champion.logo_url" Height="80" />
+                    }
+                    else
+                    {
+                        <MudImage Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" Height="80" />
+                    }
+                </MudStack>
+            </div>
+            <MudStack Class="gray darken-3" AlignItems="AlignItems.Center" Justify="Justify.Center" Row>
+                <MudText Style="color: #FFD54F"><b>CHAMPION</b></MudText>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+    
+</MudGrid>
+
+
+
+
+@code {
+
+    private IEnumerable<BCGame> _games = [];
+    private BCTournament? _tournament;
+    private BCTeam? _champion;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _games = (await BCData.GetSchedule()).Where(x => x.tournament_id == 2);
+        _tournament = await BCData.GetTournamentByIdAsync(2);
+        if (_tournament?.winning_team_id is not null)
+            _champion = await BCData.GetTeamById(_tournament.winning_team_id.Value);
+    }
+
+}
