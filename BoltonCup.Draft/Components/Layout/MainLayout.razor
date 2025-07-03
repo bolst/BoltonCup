@@ -1,5 +1,8 @@
 ﻿@inherits LayoutComponentBase
 
+@inject CustomAuthenticationStateProvider CustomAuthenticationStateProvider
+@inject NavigationManager Navigation
+
 <MudThemeProvider Theme="_theme" />
 <MudPopoverProvider />
 <MudDialogProvider
@@ -12,6 +15,11 @@
 <MudLayout>
     <MudAppBar Style="height: 5vh">
         <MudImage Class=" clickable" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" Width="40"/>
+        <MudSpacer />
+        <AuthorizeView>
+            <MudText Typo="Typo.caption">Welcome back, @context.User.Identity?.Name</MudText>
+            <MudButton Class="ml-2" OnClick="LogOutClicked" Color="Color.Error">Log Out</MudButton>
+        </AuthorizeView>
     </MudAppBar>
     <MudMainContent>
         <div class="px-2">
@@ -36,5 +44,11 @@
     
         _theme = new CustomThemeProvider().Theme;
         _theme.PaletteLight.AppbarBackground = "#232636";
+    }
+
+    private async Task LogOutClicked()
+    {
+        await CustomAuthenticationStateProvider.LogoutAsync();
+        Navigation.NavigateTo("/", true);
     }
 }

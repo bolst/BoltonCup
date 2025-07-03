@@ -298,6 +298,8 @@ public class BCAccount
     public bool IsDefense => Position == "defense";
     public bool IsGoalie => Position == "goalie";
 
+    public bool IsAdmin => ToClaimsPrincipal().HasClaim(x => x.Value == "admin");
+
     public ClaimsPrincipal ToClaimsPrincipal()
     {
         IEnumerable<Claim> claims =
