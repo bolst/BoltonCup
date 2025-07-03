@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Y+F4dWNh0U4=",
+  "dgSpecHash": "BdoiNQOHxKg=",
   "success": true,
   "projectFilePath": "/Users/nic/git/BoltonCup/BoltonCup.Shared/BoltonCup.Shared.csproj",
   "expectedPackageFiles": [
@@ -15,6 +15,7 @@
     "/Users/nic/.nuget/packages/microsoft.aspnetcore.cryptography.internal/8.0.13/microsoft.aspnetcore.cryptography.internal.8.0.13.nupkg.sha512",
     "/Users/nic/.nuget/packages/microsoft.aspnetcore.dataprotection/8.0.13/microsoft.aspnetcore.dataprotection.8.0.13.nupkg.sha512",
     "/Users/nic/.nuget/packages/microsoft.aspnetcore.dataprotection.abstractions/8.0.13/microsoft.aspnetcore.dataprotection.abstractions.8.0.13.nupkg.sha512",
+    "/Users/nic/.nuget/packages/microsoft.aspnetcore.dataprotection.extensions/8.0.13/microsoft.aspnetcore.dataprotection.extensions.8.0.13.nupkg.sha512",
     "/Users/nic/.nuget/packages/microsoft.aspnetcore.metadata/8.0.12/microsoft.aspnetcore.metadata.8.0.12.nupkg.sha512",
     "/Users/nic/.nuget/packages/microsoft.extensions.caching.abstractions/8.0.0/microsoft.extensions.caching.abstractions.8.0.0.nupkg.sha512",
     "/Users/nic/.nuget/packages/microsoft.extensions.caching.memory/8.0.1/microsoft.extensions.caching.memory.8.0.1.nupkg.sha512",

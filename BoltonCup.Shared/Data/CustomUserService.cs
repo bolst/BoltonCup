@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.DataProtection;
 
 namespace BoltonCup.Shared.Data;
@@ -9,12 +8,14 @@ public class CustomUserService
     private readonly ICustomLocalStorageProvider _customLocalStorageProvider;
     private readonly IBCData _bcData;
     private readonly Supabase.Client _supabaseClient;
+    private readonly IDataProtector _protector;
 
     public CustomUserService(ICustomLocalStorageProvider customLocalStorageProvider, IBCData bcData, Supabase.Client supabaseClient)
     {
         _customLocalStorageProvider = customLocalStorageProvider; 
         _bcData = bcData;
         _supabaseClient = supabaseClient;
+        _protector = DataProtectionProvider.Create("BC_PROTECTION").CreateProtector("tokenz");
     }
 
     public async Task<BCAccount?> LookupAccountAsync(string email)
@@ -32,9 +33,12 @@ public class CustomUserService
                 Console.WriteLine($"Session provided no access/refresh token");
                 return;
             }
+
+            var protectedAccess = _protector.Protect(session.AccessToken);
+            var protectedRefresh = _protector.Protect(session.RefreshToken);
             
-            await _customLocalStorageProvider.SetAsync("access", session.AccessToken);
-            await _customLocalStorageProvider.SetAsync("refresh", session.RefreshToken);
+            await _customLocalStorageProvider.SetAsync("access", protectedAccess);
+            await _customLocalStorageProvider.SetAsync("refresh", protectedRefresh);
         }
         catch (Exception e)
         {
@@ -46,14 +50,17 @@ public class CustomUserService
     {
         try
         {
-            var accessToken = await _customLocalStorageProvider.GetAsync<string>("access");
-            var refreshToken = await _customLocalStorageProvider.GetAsync<string>("refresh");
-
-            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+            var protectedAccess = await _customLocalStorageProvider.GetAsync<string>("access");
+            var protectedRefresh = await _customLocalStorageProvider.GetAsync<string>("refresh");
+            
+            if (string.IsNullOrEmpty(protectedAccess) || string.IsNullOrEmpty(protectedRefresh))
             {
                 Console.WriteLine("No tokens found");
                 return (string.Empty, string.Empty);
             }
+            
+            var accessToken = _protector.Unprotect(protectedAccess);
+            var refreshToken = _protector.Unprotect(protectedRefresh);
 
             return (accessToken, refreshToken);
         }

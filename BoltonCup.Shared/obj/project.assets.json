@@ -170,6 +170,23 @@
           }
         }
       },
+      "Microsoft.AspNetCore.DataProtection.Extensions/8.0.13": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.DataProtection": "8.0.13",
+          "Microsoft.Extensions.DependencyInjection": "8.0.1"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.AspNetCore.DataProtection.Extensions.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.AspNetCore.DataProtection.Extensions.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.AspNetCore.Metadata/8.0.12": {
         "type": "package",
         "compile": {
@@ -1277,6 +1294,25 @@
         "lib/netstandard2.0/Microsoft.AspNetCore.DataProtection.Abstractions.xml",
         "microsoft.aspnetcore.dataprotection.abstractions.8.0.13.nupkg.sha512",
         "microsoft.aspnetcore.dataprotection.abstractions.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.DataProtection.Extensions/8.0.13": {
+      "sha512": "WbYDDHlUh+MduKKM3AmK3SsIf+ytEq0khwgu9svRZE1lygqgX1MCe6BWo9QZZ7Rr0SXscfeMiDgyBfsfJUQulw==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.dataprotection.extensions/8.0.13",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net462/Microsoft.AspNetCore.DataProtection.Extensions.dll",
+        "lib/net462/Microsoft.AspNetCore.DataProtection.Extensions.xml",
+        "lib/net8.0/Microsoft.AspNetCore.DataProtection.Extensions.dll",
+        "lib/net8.0/Microsoft.AspNetCore.DataProtection.Extensions.xml",
+        "lib/netstandard2.0/Microsoft.AspNetCore.DataProtection.Extensions.dll",
+        "lib/netstandard2.0/Microsoft.AspNetCore.DataProtection.Extensions.xml",
+        "microsoft.aspnetcore.dataprotection.extensions.8.0.13.nupkg.sha512",
+        "microsoft.aspnetcore.dataprotection.extensions.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Metadata/8.0.12": {
@@ -2593,6 +2629,7 @@
       "Microsoft.AspNetCore.Components.Authorization >= 8.0.12",
       "Microsoft.AspNetCore.Components.Web >= 8.0.12",
       "Microsoft.AspNetCore.DataProtection >= 8.0.13",
+      "Microsoft.AspNetCore.DataProtection.Extensions >= 8.0.13",
       "Microsoft.Extensions.Caching.Memory >= 8.0.1",
       "MudBlazor >= 8.5.1",
       "Npgsql >= 8.0.6",
@@ -2673,6 +2710,10 @@
             "version": "[8.0.12, )"
           },
           "Microsoft.AspNetCore.DataProtection": {
+            "target": "Package",
+            "version": "[8.0.13, )"
+          },
+          "Microsoft.AspNetCore.DataProtection.Extensions": {
             "target": "Package",
             "version": "[8.0.13, )"
           },
