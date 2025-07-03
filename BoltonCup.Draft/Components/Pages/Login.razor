@@ -1,0 +1,50 @@
+@page "/login"
+
+@inject NavigationManager Navigation
+@inject CustomAuthenticationStateProvider CustomAuthenticationStateProvider
+
+<div class="pa-6 py-10 d-flex align-center" style="@containerStyle">
+    <MudGrid>
+        <MudItem xs="12" md="6" Class="d-flex align-center justify-center">
+            &nbsp;<div>
+                <MudText Typo="Typo.h3" Style="color: white"><b>Login</b></MudText>
+            </div>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-6 px-10">
+                <LoginForm OnSubmit="OnFormSubmit" />
+                
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <MudText Typo="Typo.subtitle1" Color="Color.Error">@errorMessage</MudText>
+                }
+            
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</div>
+
+
+@code {
+    
+    private readonly string containerStyle = "height: 85vh; background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//BOLTONCUP-86.webp'); background-size: cover; background-position: center center;";
+
+    private string? errorMessage;
+
+    private async Task OnFormSubmit(LoginFormModel form)
+    {
+        errorMessage = null;
+
+        errorMessage = await CustomAuthenticationStateProvider.LoginAsync(form);
+
+        if (string.IsNullOrEmpty(errorMessage))
+        {
+            Navigation.NavigateTo("/");
+        }
+        
+        StateHasChanged();
+
+    }
+    
+
+}
