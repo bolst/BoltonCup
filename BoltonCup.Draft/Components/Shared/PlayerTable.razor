@@ -11,7 +11,7 @@
         Items="_filteredPlayers"
         Height="calc(90vh - 4rem)"
         QuickFilter="QuickFilter"
-        RowClassFunc="RowClassFunc"
+        RowStyleFunc="RowStyleFunc"
         ShowColumnOptions="false"
         FixedHeader
         Dense>
@@ -58,7 +58,7 @@
                     </AuthorizeView>                    
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Property="x => x.name" Title="Name" CellStyle="" />
+            <PropertyColumn Property="x => x.name" Title="Name" CellStyle="font-weight: bold" />
             <PropertyColumn Property="x => x.position" Title="Pos.">
                 <CellTemplate>
                     <PositionChip Position="@context.Item.position" Size="Size.Small" />
@@ -209,11 +209,11 @@
         });
     }
 
-    private string RowClassFunc(PlayerProfile player, int row)
+    private string RowStyleFunc(PlayerProfile player, int row)
     {
         if (_currentRoster.Any(x => x.preferred_teammate1 == player.account_id || x.preferred_teammate2 == player.account_id))
         {
-            return "green lighten-5";
+            return "background-color: var(--mud-palette-tertiary);";
         }
 
         return string.Empty;

@@ -7,4 +7,5 @@ public class BCDraftPick
     public required int round { get; set; }
     public required int pick { get; set; }
     public int player_id { get; set; }
+    public int OverallPick(int picksPerRound) => (round - 1) * picksPerRound + pick;
 }

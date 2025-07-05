@@ -74,8 +74,6 @@ function initTimer(countdownSeconds) {
         let secRemaining = Math.floor(now / 1000);
 
         if (secRemaining >= 0) {
-            console.log(`secRemaining: ${secRemaining}`);
-
             text.textContent = secRemaining.toString();
 
             const progress = secRemaining / countdownSeconds;

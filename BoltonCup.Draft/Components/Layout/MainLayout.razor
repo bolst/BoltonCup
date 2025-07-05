@@ -3,7 +3,7 @@
 @inject CustomAuthenticationStateProvider CustomAuthenticationStateProvider
 @inject NavigationManager Navigation
 
-<MudThemeProvider Theme="_theme" />
+<MudThemeProvider Theme="_theme" @bind-IsDarkMode="_darkMode" />
 <MudPopoverProvider />
 <MudDialogProvider
     FullWidth="true"
@@ -14,25 +14,43 @@
 
 <MudLayout>
     <MudAppBar Style="height: 5vh">
-        <MudImage Class="clickable" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" @onclick="@(() => Navigation.NavigateTo("/"))" Width="40"/>
-        
+        <MudLink Style="height: 5vh" Href="https://boltoncup.ca" Target="_blank" Underline="Underline.None">
+            <MudImage Class="cursor-pointer" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" Width="40"/>
+        </MudLink>
+
         <MudButtonGroup Class="ml-8" OverrideStyles="false">
-            <MudIconButton Href="/" Icon="@Icons.Material.Filled.Home" Color="Color.Tertiary" Size="Size.Small" />
+            <MudIconButton Href="/" Icon="@Icons.Material.Filled.Home" Color="Color.Tertiary" Size="Size.Small"/>
             <AuthorizeView>
                 <MudButton Href="draft" Color="Color.Tertiary" Size="Size.Small">Draft Tool</MudButton>
             </AuthorizeView>
         </MudButtonGroup>
-        
-        <MudSpacer />
-        
-        <CurrentPickBanner />
 
-        <MudSpacer />
-        
+        <MudSpacer/>
+
+        <CurrentPickBanner/>
+
+        <MudSpacer/>
+
+        <MudButtonGroup Class="mx-4" OverrideStyles="false">
+            <DarkModeToggle @bind-IsDarkMode="_darkMode"/>
+        </MudButtonGroup>
+
         <AuthorizeView>
-            <MudText Typo="Typo.caption">Welcome back, @context.User.Identity?.Name</MudText>
-            <MudButton Class="ml-2" OnClick="LogOutClicked" Color="Color.Error">Log Out</MudButton>
+            <Authorized>
+                <MudText Typo="Typo.caption">Welcome back, @context.User.Identity?.Name</MudText>
+            </Authorized>
         </AuthorizeView>
+
+        <MudButtonGroup OverrideStyles="false">
+            <AuthorizeView>
+                <Authorized>
+                    <MudButton Class="ml-2" OnClick="LogOutClicked" Color="Color.Error">Log Out</MudButton>
+                </Authorized>
+                <NotAuthorized>
+                    <MudIconButton Icon="@Icons.Material.Filled.Login" Href="login" Color="Color.Tertiary" Size="Size.Small"/>
+                </NotAuthorized>
+            </AuthorizeView>
+        </MudButtonGroup>
     </MudAppBar>
     <MudMainContent>
         <div class="px-2">
@@ -49,14 +67,18 @@
 </div>
 
 @code {
-    private MudTheme? _theme = null;
     
+    private MudTheme? _theme = null;
+
+    private bool _darkMode;    
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
     
         _theme = new CustomThemeProvider().Theme;
         _theme.PaletteLight.AppbarBackground = "#232636";
+        _theme.PaletteDark.AppbarBackground = "#232636";
     }
 
     private async Task LogOutClicked()

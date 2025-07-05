@@ -19,18 +19,20 @@ public class CustomThemeProvider
         GrayLight = BCColors.Gray,
         GrayLighter = BCColors.LightGray,
         Dark = BCColors.Navy,
+        DarkLighten = BCColors.LightNavy,
+        DarkDarken = BCColors.DarkNavy,
         DarkContrastText = BCColors.Beige
     };
     
     private readonly PaletteDark _defaultDark = new()
     {
-        Primary = BCColors.Beige,
-        PrimaryContrastText = BCColors.Navy,
+        Primary = BCColors.Blue,
+        PrimaryContrastText = BCColors.White,
         Secondary = BCColors.Red,
-        Surface = "#232636",
+        Tertiary = BCColors.Beige,
+        TertiaryContrastText = BCColors.Navy,
+        Surface = BCColors.LightNavy,
         Black = BCColors.Black,
-        Tertiary = BCColors.Blue,
-        TertiaryContrastText = BCColors.White,
         AppbarText = BCColors.White,
         AppbarBackground = BCColors.DarkNavy,
         DrawerBackground = BCColors.DarkNavy,
@@ -38,8 +40,10 @@ public class CustomThemeProvider
         Background = BCColors.Navy,
         GrayLight = BCColors.Gray,
         GrayLighter =  BCColors.LightGray,
-        Dark = "#e0e0e0",
-        DarkContrastText = "#2e2e2e"
+        Dark = BCColors.Beige,
+        DarkLighten = BCColors.LightBeige,
+        DarkDarken = BCColors.DarkBeige,
+        DarkContrastText = BCColors.DarkNavy,
     };
 
     public CustomThemeProvider()
