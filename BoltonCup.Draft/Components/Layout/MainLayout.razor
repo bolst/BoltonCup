@@ -15,7 +15,13 @@
 <MudLayout>
     <MudAppBar Style="height: 5vh">
         <MudImage Class="clickable" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" @onclick="@(() => Navigation.NavigateTo("/"))" Width="40"/>
-        <MudButton Class="ml-8" Href="draft" Color="Color.Inherit">Draft</MudButton>
+        
+        <MudButtonGroup Class="ml-8" OverrideStyles="false">
+            <MudIconButton Href="/" Icon="@Icons.Material.Filled.Home" Color="Color.Tertiary" Size="Size.Small" />
+            <AuthorizeView>
+                <MudButton Href="draft" Color="Color.Tertiary" Size="Size.Small">Draft Tool</MudButton>
+            </AuthorizeView>
+        </MudButtonGroup>
         
         <MudSpacer />
         
