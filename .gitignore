@@ -1,6 +1,6 @@
-BoltonCup.sln.DotSettings.user
+src/BoltonCup.sln.DotSettings.user
 
-BoltonCup.App/appsettings.txt
+src/BoltonCup.App/appsettings.txt
  
 # ------
 .DS_STORE
@@ -8,13 +8,13 @@ bin
 obj
 .idea
 
-BoltonCup.Shared/obj
-BoltonCup.Web/obj
-BoltonCup.Draft/obj
+src/BoltonCup.Shared/obj
+src/BoltonCup.Web/obj
+src/BoltonCup.Draft/obj
 
-BoltonCup.Shared/bin
-BoltonCup.Web/bin
-BoltonCup.Draft/bin
+src/BoltonCup.Shared/bin
+src/BoltonCup.Web/bin
+src/BoltonCup.Draft/bin
 
 Xcode
 
