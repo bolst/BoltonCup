@@ -36,14 +36,20 @@ public interface IBCData
     Task<BCTournament?> GetCurrentTournamentAsync();
     Task SetUserAsPayedAsync(string email);
     Task ConfigPlayerProfileAsync(RegisterFormModel form, int tournamentId);
+
+
+    Task<BCDraft?> GetTournamentDraftAsync(int tournamentId);
     Task<BCDraftPick?> GetMostRecentDraftPickAsync(int draftId);
     Task<BCTeam?> GetTeamByDraftOrderAsync(int draftId, int order);
-    Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId);
     Task<IEnumerable<PlayerProfile>> GetDraftAvailableTournamentPlayersAsync(int tournamentId);
     Task<IEnumerable<BCDraftOrder>> GetDraftOrderAsync(int draftId);
     Task DraftPlayerAsync(PlayerProfile player, BCTeam team, BCDraftPick draftPick);
     Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId);
     Task ResetDraftAsync(int draftId);
+    Task UpdateDraftStateAsync(int draftId, DraftState state);
+    
+    
+    Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId);
     Task<IEnumerable<BCSponsor>> GetActiveSponsorsAsync();
     Task<IEnumerable<BCGame>> GetIncompleteGamesAsync();
     Task<BCAccount?> GetAccountByPCKeyAsync(Guid pckey);

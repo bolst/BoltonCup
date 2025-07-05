@@ -1,12 +1,18 @@
-@inject Data.DraftServiceProvider DraftService
+@implements IDisposable
+
+@inject Data.DraftServiceProvider Drafter
 @inject HubConnectionProvider Hub
 
 
 @if (_currentPick is not null && _teamWithCurrentPick is not null)
 {
     <div class="d-flex align-center flex-row gap-2">
+        @if (_draft is not null && _draft.State.EqualsEnum(DraftState.Live))
+        {
+            <MudChip T="string" Color="Color.Error" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Circle" Size="Size.Small">LIVE</MudChip>
+        }
         <MudText Typo="Typo.h6" Color="Color.Tertiary"><b>Round @_currentPick.round Pick @_currentPick.pick</b></MudText>
-        <MudImage Src="@_teamWithCurrentPick.logo_url" Height="30" />
+        <MudImage Src="@_teamWithCurrentPick.logo_url" Height="30"/>
     </div>
 }
 
@@ -15,29 +21,53 @@
     
     private BCDraftPick? _currentPick;
     private BCTeam? _teamWithCurrentPick;
+    private BCDraft? _draft;
     
+    private IEnumerable<IDisposable> _hubEvents = [];
+
     
     protected override async Task OnInitializedAsync()
     {
-        await InitializeHubConnection();
+        _draft = await Drafter.GetDraftAsync();
         await LoadDataAsync();
+        await InitializeHubConnection();
     }
 
     private async Task LoadDataAsync()
     {
-        (_teamWithCurrentPick, _currentPick) = await DraftService.GetTeamWithCurrentPick();
+        (_teamWithCurrentPick, _currentPick) = await Drafter.GetTeamWithCurrentPick();
     }
-    
+
     
     private async Task InitializeHubConnection()
     {
         var connection = await Hub.GetHubConnection();
         
-        connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        var c1 = connection.On(DraftHub.Events.OnDraftUpdate, async () =>
         {
             await LoadDataAsync();
             InvokeAsync(StateHasChanged);
         });
+
+        var c2 = connection.On(DraftHub.Events.OnDraftStateChange, async () =>
+        {
+            Drafter.InvalidateDraftCache();
+            _draft = await Drafter.GetDraftAsync();
+            InvokeAsync(StateHasChanged);
+        });
+
+        _hubEvents = _hubEvents.Append(c1);
+        _hubEvents = _hubEvents.Append(c2);
+    }
+    
+    
+    public void Dispose()
+    {
+        foreach (var hubEvent in _hubEvents)
+        {
+            hubEvent.Dispose();
+        }
+        _hubEvents = [];
     }
 
 }

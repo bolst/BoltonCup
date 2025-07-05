@@ -11,28 +11,41 @@
 </div>
 
 <MudStack Justify="Justify.Center" Spacing="0" Row>
-    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Secondary" OnClick="StartTimer"/>
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Secondary" OnClick="StartTimer" Disabled="_disabled" />
     @if (_paused)
     {
-        <MudIconButton Icon="@Icons.Material.Filled.PlayCircleOutline" Color="Color.Primary" OnClick="ResumeTimer"/>
+        <MudIconButton Icon="@Icons.Material.Filled.PlayCircleOutline" Color="Color.Primary" OnClick="ResumeTimer" Disabled="_disabled" />
     }
     else
     {
-        <MudIconButton Icon="@Icons.Material.Filled.PauseCircleOutline" Color="Color.Secondary" OnClick="PauseTimer"/>
+        <MudIconButton Icon="@Icons.Material.Filled.PauseCircleOutline" Color="Color.Secondary" OnClick="PauseTimer" Disabled="_disabled" />
     }
 </MudStack>
 
 @code {
 
+    private BCDraft _draft;
+    
+    private bool _disabled;
     private bool _paused;
     private const int TIME_LIMIT_SEC = 120;
     private IEnumerable<IDisposable> _connections = [];
-    
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await StartTimer();
+            Drafter.InvalidateDraftCache();
+            _draft = await Drafter.GetDraftAsync();
+            
+            if (_draft.State.EqualsEnum(DraftState.Live)) 
+            {
+                await StartTimer();
+            }
+            else
+            {
+                _disabled = true;
+            }
             await InitializeHubConnection();
         }
     }
@@ -62,9 +75,28 @@
         var c1 = connection.On(DraftHub.Events.OnDraftUpdate, async () =>
         {
             await StartTimer();
+        });        
+        
+        var c2 = connection.On(DraftHub.Events.OnDraftStateChange, async () =>
+        {
+            Drafter.InvalidateDraftCache();
+            _draft = await Drafter.GetDraftAsync();
+
+            if (_draft.State.EqualsEnum(DraftState.Inactive))
+            {
+                await StartTimer();
+                await PauseTimer();
+                _disabled = true;
+            }
+            else
+            {
+                await StartTimer();
+                _disabled = false;
+            }
         });
 
         _connections = _connections.Append(c1);
+        _connections = _connections.Append(c2);
     }
 
     public async ValueTask DisposeAsync()

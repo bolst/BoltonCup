@@ -9,7 +9,7 @@ public class DraftServiceProvider
     private readonly IBCData _bcData;
     private readonly HubConnectionProvider _hub;
     
-    private const int DRAFT_ID = 2;
+    private BCDraft? _draft;
     private const int PICKS_PER_ROUND = 6;
 
     public DraftServiceProvider(IBCData bcData, HubConnectionProvider hub)
@@ -17,22 +17,35 @@ public class DraftServiceProvider
         _bcData = bcData;
         _hub = hub;
     }
-    
-    public int DraftId => DRAFT_ID;
 
+    public async Task<BCDraft> GetDraftAsync()
+    {
+        if (_draft is not null) return _draft;
+        
+        var currentTournament = await _bcData.GetCurrentTournamentAsync() ?? throw new InvalidOperationException("No active tournament!");
+        _draft = await _bcData.GetTournamentDraftAsync(currentTournament.tournament_id) ?? throw new InvalidOperationException("Draft not found.");
+
+        return _draft;
+    }
+
+    public void InvalidateDraftCache() => _draft = null;
+
+    
     public async Task<(BCTeam, BCDraftPick)> GetTeamWithCurrentPick()
     {
-        var currentPick = await _bcData.GetMostRecentDraftPickAsync(DRAFT_ID);
+        var draft = await GetDraftAsync();
+        
+        var currentPick = await _bcData.GetMostRecentDraftPickAsync(draft.Id);
 
         if (currentPick is null)
         {
             int order = 1;
 
-            var team = (await _bcData.GetTeamByDraftOrderAsync(DRAFT_ID, order))!;
+            var team = (await _bcData.GetTeamByDraftOrderAsync(draft.Id, order))!;
             
             var pick = new BCDraftPick
             {
-                draft_id = DRAFT_ID,
+                draft_id = draft.Id,
                 pick = 1,
                 round = 1,
             };
@@ -45,7 +58,7 @@ public class DraftServiceProvider
 
             var pick = new BCDraftPick
             {
-                draft_id = DRAFT_ID,
+                draft_id = draft.Id,
                 pick = currentPick.pick >= PICKS_PER_ROUND ? 1 : currentPick.pick + 1,
                 round = currentPick.pick >= PICKS_PER_ROUND ? (currentPick.round + 1) : currentPick.round,
             };
@@ -55,7 +68,7 @@ public class DraftServiceProvider
                 order = PICKS_PER_ROUND - pick.pick + 1;
             }
             
-            var team = (await _bcData.GetTeamByDraftOrderAsync(DRAFT_ID, order))!;
+            var team = (await _bcData.GetTeamByDraftOrderAsync(draft.Id, order))!;
             
             return (team, pick);
         }
@@ -75,20 +88,24 @@ public class DraftServiceProvider
 
     public async Task<IEnumerable<BCTeam>> GetTeamsInDraftAsync()
     {
-        var teams = await _bcData.GetTeamsInTournamentAsync(DRAFT_ID);
-        var draftOrder = await _bcData.GetDraftOrderAsync(DRAFT_ID);
+        var draft = await GetDraftAsync();
+        
+        var teams = await _bcData.GetTeamsInTournamentAsync(draft.Id);
+        var draftOrder = await _bcData.GetDraftOrderAsync(draft.Id);
 
         return teams.OrderBy(t => draftOrder.First(d => d.team_id == t.id).order);
     }
 
     public async Task<IEnumerable<BCDraftPickDetail>> GetDraftedPlayersAsync()
     {
-        return await _bcData.GetDraftPicksAsync(DRAFT_ID);
+        var draft = await GetDraftAsync();
+        return await _bcData.GetDraftPicksAsync(draft.Id);
     }
 
     public async Task ResetDraftAsync()
     {
-        await _bcData.ResetDraftAsync(DRAFT_ID);
+        var draft = await GetDraftAsync();
+        await _bcData.ResetDraftAsync(draft.Id);
         
         // notify subscribers
         await _hub.SendAsync(nameof(DraftHub.PushDraftUpdate));

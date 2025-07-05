@@ -1,8 +1,6 @@
 namespace BoltonCup.Shared.Data;
 
 
-
-
 public partial class BCData
 {
     public async Task<IEnumerable<BCGame>> GetActiveGamesAsync()

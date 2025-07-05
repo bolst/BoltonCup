@@ -1,3 +1,5 @@
+@implements IDisposable
+
 @inject IBCData BCData
 @inject Data.DraftServiceProvider Drafter
 @inject IDialogService DialogService
@@ -23,7 +25,12 @@
                     EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
                     IconColor="Color.Error"
                     Dense>
-                    <MudMenuItem Label="Reset" Class="red-text" OnClick="OnResetDraft"/>
+                    <MudMenuItem >
+                        <DraftControlButton FullWidth />
+                    </MudMenuItem>
+                    <MudMenuItem>
+                        <MudButton Color="Color.Error" OnClick="OnResetDraft" FullWidth>Reset</MudButton>
+                    </MudMenuItem>
                 </MudMenu>
             </AuthorizeView>
 
@@ -76,6 +83,7 @@
 
 
 @code {
+    private IEnumerable<IDisposable> _hubEvents = [];
 
     private IEnumerable<PlayerProfile>? _players;
     private HashSet<PlayerProfile> _filteredPlayers = new();
@@ -201,12 +209,20 @@
     {
         var connection = await Hub.GetHubConnection();
         
-        connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        var c1 = connection.On(DraftHub.Events.OnDraftUpdate, async () =>
         {
             await LoadDataAsync();
             
             InvokeAsync(StateHasChanged);
         });
+        
+        var c2 = connection.On(DraftHub.Events.OnDraftStateChange, async () =>
+        {
+            
+        });
+
+        _hubEvents = _hubEvents.Append(c1);
+        _hubEvents = _hubEvents.Append(c2);
     }
 
     private string RowStyleFunc(PlayerProfile player, int row)
@@ -219,4 +235,13 @@
         return string.Empty;
     }
 
+    
+    public void Dispose()
+    {
+        foreach (var hubEvent in _hubEvents)
+        {
+            hubEvent.Dispose();
+        }
+        _hubEvents = [];
+    }
 }
