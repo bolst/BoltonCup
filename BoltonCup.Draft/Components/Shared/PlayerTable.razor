@@ -70,16 +70,23 @@
     </MudDataGrid>
 }
 
+<MudOverlay @bind-Visible="_loading" DarkBackground Absolute>
+    <MudProgressCircular Indeterminate />
+</MudOverlay>
+
+
 @code {
 
     private IEnumerable<PlayerProfile>? _players;
     private HashSet<PlayerProfile> _filteredPlayers = new();
-    private string _searchString;
-    private string _positionFilter;
     private BCTournament? _currentTournament;
     private BCTeam? _currentTeam;
     private IEnumerable<BCAccount> _currentRoster = [];
 
+    private bool _loading;
+    private string _searchString;
+    private string _positionFilter;
+    
     private BCAccount? _currentUser;
     private bool UserCanPick => _currentUser is not null && (_currentTeam?.gm_account_id == _currentUser.id);
     
@@ -102,6 +109,9 @@
 
     private async Task LoadDataAsync()
     {
+        _loading = true;
+        await InvokeAsync(StateHasChanged);
+        
         (_currentTeam, _) = await Drafter.GetTeamWithCurrentPick();
         _currentRoster = await BCData.GetAccountsByTeamIdAsync(_currentTeam.id);
         _currentTournament = await BCData.GetCurrentTournamentAsync();
@@ -110,6 +120,9 @@
             _players = (await BCData.GetDraftAvailableTournamentPlayersAsync(_currentTournament.tournament_id)).OrderBy(SortByHighestLevel);
             _filteredPlayers = new(_players);
         }
+        
+        _loading = false;
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task OnResetDraft()
@@ -118,7 +131,7 @@
         await LoadDataAsync();
     }
 
-    private Task OnPlayerDrafted(PlayerProfile player)
+    private async Task OnPlayerDrafted(PlayerProfile player)
     {
         var options = new DialogOptions
         {
@@ -129,7 +142,20 @@
         {
             { x => x.Player, player },
         };
-        return DialogService.ShowAsync<DraftPlayerDialog>("Draft Player", parameters, options);
+        
+        var dialog = await DialogService.ShowAsync<DraftPlayerDialog>("Draft Player", parameters, options);
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled)
+        {
+            _loading = true;
+            await InvokeAsync(StateHasChanged);
+            
+            await Drafter.DraftPlayerAsync(player);
+
+            _loading = false;
+            await InvokeAsync(StateHasChanged);
+        }
     }
     
     private Func<PlayerProfile, bool> QuickFilter => x =>

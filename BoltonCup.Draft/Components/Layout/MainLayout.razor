@@ -14,8 +14,15 @@
 
 <MudLayout>
     <MudAppBar Style="height: 5vh">
-        <MudImage Class=" clickable" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" Width="40"/>
+        <MudImage Class="clickable" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" @onclick="@(() => Navigation.NavigateTo("/"))" Width="40"/>
+        <MudButton Class="ml-8" Href="draft" Color="Color.Inherit">Draft</MudButton>
+        
         <MudSpacer />
+        
+        <CurrentPickBanner />
+
+        <MudSpacer />
+        
         <AuthorizeView>
             <MudText Typo="Typo.caption">Welcome back, @context.User.Identity?.Name</MudText>
             <MudButton Class="ml-2" OnClick="LogOutClicked" Color="Color.Error">Log Out</MudButton>
