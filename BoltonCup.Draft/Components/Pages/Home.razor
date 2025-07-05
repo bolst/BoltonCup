@@ -1,6 +1,6 @@
 @page "/"
 
-@inject Data.DraftServiceProvider DraftService
+@inject Data.DraftServiceProvider Drafter
 @inject HubConnectionProvider Hub
 
 
@@ -44,14 +44,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await InitializeHubConnection();
+        
         await LoadDataAsync();
+        await InitializeHubConnection();
     }
 
     private async Task LoadDataAsync()
     {
-        (_teamWithCurrentPick, _currentPick) = await DraftService.GetTeamWithCurrentPick();
-        _draftPicks = await DraftService.GetDraftedPlayersAsync();
+        (_teamWithCurrentPick, _currentPick) = await Drafter.GetTeamWithCurrentPick();
+        _draftPicks = await Drafter.GetDraftedPlayersAsync();
     }
     
     

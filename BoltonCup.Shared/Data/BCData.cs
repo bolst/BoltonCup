@@ -162,29 +162,11 @@ public partial class BCData : DapperBase, IBCData
 
     public async Task<IEnumerable<GameGoal>> GetGameGoalsByGameId(int id)
     {
-        string sql = @"SELECT p.id as id,
-                               p.game_id           AS gameid,
-                               p.scorer_id         AS scorerid,
-                               p.assist1_player_id AS assist1id,
-                               p.assist2_player_id AS assist2id,
-                               g0.name             AS scorername,
-                               a1.name             AS assist1name,
-                               a2.name             AS assist2name,
-                               p.time,
-                               p.period,
-                               CASE WHEN p.is_hometeam THEN g.home_team_id ELSE g.away_team_id END AS teamid,
-                               a.profilepicture    AS scorerprofilepic,
-                               t.name              AS teamname,
-                               t.logo_url          AS teamlogo
-                            FROM points p
-                                     JOIN game g ON p.game_id = g.id
-                                     JOIN players g0 ON g0.id = p.scorer_id
-                                     JOIN account a on a.id = g0.account_id
-                                     JOIN team t ON t.id = (CASE WHEN p.is_hometeam THEN g.home_team_id ELSE g.away_team_id END)
-                                     LEFT OUTER JOIN players a1 ON a1.id = p.assist1_player_id
-                                     LEFT OUTER JOIN players a2 ON a2.id = p.assist2_player_id
-                            WHERE p.game_id = @GameId
-                            ORDER BY p.period, time DESC";
+        string sql = @"SELECT *
+                        FROM
+	                        public.gamegoals
+                        WHERE
+	                        gameid = @GameId";
 
         return await QueryDbAsync<GameGoal>(sql, new { GameId = id });
     }

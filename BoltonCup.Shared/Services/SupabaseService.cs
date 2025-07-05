@@ -1,94 +1,17 @@
 using System.Diagnostics.Contracts;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Primitives;
 
 namespace BoltonCup.Shared.Data;
 
 
-public interface ICacheService
-{
-    Task<T> GetOrAddAsync<T>(string cacheKey, Func<Task<T>> factory, TimeSpan cacheDuration);
-    void Clear();
-    void Clear(string cacheKey);
-}
-public class CacheService : ICacheService
-{
-    private readonly IMemoryCache memoryCache;
-    private CancellationTokenSource resetCacheToken = new();
-    public CacheService(IMemoryCache _memoryCache)
-    {
-        memoryCache = _memoryCache;
-    }
 
-    public async Task<T> GetOrAddAsync<T>(string cacheKey, Func<Task<T>> factory, TimeSpan cacheDuration)
-    {
-        if (!memoryCache.TryGetValue(cacheKey, out T? cacheEntry))
-        {
-            cacheEntry = await factory();
-
-            var cacheOptions = new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = cacheDuration,
-            };
-            cacheOptions.AddExpirationToken(new CancellationChangeToken(resetCacheToken.Token));
-
-            memoryCache.Set(cacheKey, cacheEntry, cacheOptions);
-        }
-
-        return cacheEntry!;
-    }
-
-    public void Clear()
-    {
-        resetCacheToken.Cancel();
-        resetCacheToken.Dispose();
-        resetCacheToken = new CancellationTokenSource();
-    }
-
-    public void Clear(string cacheKey)
-    {
-        memoryCache.Remove(cacheKey);
-    }
-}
-
-public class RegistrationStateService
-{
-    private const string REG_KEY = "reg";
-    private readonly ICustomLocalStorageProvider _customLocalStorageProvider;
-    private IDataProtector _protector;
-    public RegistrationStateService(ICustomLocalStorageProvider customLocalStorageService, IDataProtectionProvider provider)
-    {
-        _customLocalStorageProvider = customLocalStorageService;
-        _protector = provider.CreateProtector("creds");
-    }
-
-    public async Task SetBrowserRegistered(string email)
-    {
-        await _customLocalStorageProvider.SetAsync(REG_KEY, _protector.Protect(email));
-    }
-
-    public async Task<string?> GetBrowserRegistered()
-    {
-        var protectedEmail = await _customLocalStorageProvider.GetAsync<string>(REG_KEY);
-        return protectedEmail is null ? null : _protector.Unprotect(protectedEmail);
-    }
-
-    public async Task Clear()
-    {
-        await _customLocalStorageProvider.RemoveAsync(REG_KEY);
-    }
-    
-}
-
-
-public class SupabaseServiceProvider
+// yes. I am aware that this is not the correct way to do this.
+public class SupabaseService
 {
     private readonly Supabase.Client _supabase;
     private readonly EmailContentBuilder _emailContentBuilder;
     private readonly IBCData _bcData;
 
-    public SupabaseServiceProvider(Supabase.Client supabase, IBCData bcData)
+    public SupabaseService(Supabase.Client supabase, IBCData bcData)
     {
         _supabase = supabase;
         _bcData = bcData;
@@ -214,4 +137,3 @@ public class SupabaseServiceProvider
 
     }
 }
-

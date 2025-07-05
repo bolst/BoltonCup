@@ -1,5 +1,4 @@
 using Blazored.LocalStorage;
-using BoltonCup.Shared.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +7,7 @@ using Supabase;
 
 namespace BoltonCup.Shared.Data;
 
-public static class ServiceConfiguration
+public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddBoltonCupServices(
         this IServiceCollection services, IConfiguration configuration)
@@ -74,7 +73,7 @@ public static class ServiceConfiguration
             });
         });
 
-        services.AddScoped<SupabaseServiceProvider>();
+        services.AddScoped<SupabaseService>();
 
         return services;
     }

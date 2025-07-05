@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using System.Reflection;
-using BoltonCup.Shared.Services;
+using BoltonCup.Shared.Data;
 
 namespace BoltonCup.Web.Services;
 
