@@ -24,52 +24,62 @@ public class CustomUserService
         return account;
     }
     
-    public async Task PersistSessionToBrowserAsync(Supabase.Gotrue.Session session)
+    public async Task PersistSessionAsync(Supabase.Gotrue.Session session)
     {
         try
         {
             if (string.IsNullOrEmpty(session.AccessToken) || string.IsNullOrEmpty(session.RefreshToken))
             {
-                Console.WriteLine($"Session provided no access/refresh token");
+                // Console.WriteLine($"Session provided no access/refresh token");
                 return;
             }
-
-            var protectedAccess = _protector.Protect(session.AccessToken);
-            var protectedRefresh = _protector.Protect(session.RefreshToken);
             
-            await _customLocalStorageProvider.SetAsync("access", protectedAccess);
-            await _customLocalStorageProvider.SetAsync("refresh", protectedRefresh);
+            var localIdStr = await _customLocalStorageProvider.GetAsync<string>("local_id");
+            // if local storage has no value or is improper guid: we generate a new one for local storage
+            // use this to lookup refresh token in db
+            if (localIdStr is null || !Guid.TryParse(localIdStr, out Guid localId))
+            {
+                localId = Guid.NewGuid();
+                await _customLocalStorageProvider.SetAsync("local_id", localId.ToString());
+            }
+
+            await _bcData.UpdateRefreshTokenAsync(new BCRefreshToken
+            {
+                refresh = session.RefreshToken,
+                access = session.AccessToken,
+                local_id = localId,
+                provider = TokenProvider.Supabase.ToDescriptionString(),
+            });
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Failed to persist user to browser with:\n\t{e}");
+            // Console.WriteLine($"Failed to persist user to browser with:\n\t{e}");
         }
     }
 
-    public async Task<(string, string)> FetchTokensFromBrowserAsync()
+    public async Task<(string?, string?)> FetchPersistedTokensAsync()
     {
         try
         {
-            var protectedAccess = await _customLocalStorageProvider.GetAsync<string>("access");
-            var protectedRefresh = await _customLocalStorageProvider.GetAsync<string>("refresh");
-            
-            if (string.IsNullOrEmpty(protectedAccess) || string.IsNullOrEmpty(protectedRefresh))
+            var localIdStr = await _customLocalStorageProvider.GetAsync<string>("local_id");
+            // if local storage has no value or is improper guid: we generate a new one for local storage
+            // use this to lookup refresh token in db
+            if (localIdStr is null || !Guid.TryParse(localIdStr, out Guid localId))
             {
-                Console.WriteLine("No tokens found");
-                return (string.Empty, string.Empty);
+                localId = Guid.NewGuid();
+                await _customLocalStorageProvider.SetAsync("local_id", localId.ToString());
             }
-            
-            var accessToken = _protector.Unprotect(protectedAccess);
-            var refreshToken = _protector.Unprotect(protectedRefresh);
 
-            return (accessToken, refreshToken);
+            var token = await _bcData.GetRefreshTokenAsync(localId, TokenProvider.Supabase);
+
+            return (token?.access, token?.refresh);
         }
         catch (System.InvalidOperationException) { }
         catch (Exception err)
         {
-            Console.WriteLine($"Failed to load session with:\n\t{err}");
+            // Console.WriteLine($"Failed to load session with:\n\t{err}");
         }
-        return (string.Empty, string.Empty);
+        return (null, null);
     }
 
     public async Task ClearBrowserStorageAsync()

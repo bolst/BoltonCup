@@ -2,23 +2,33 @@ namespace BoltonCup.Shared.Data;
 
 public partial class BCData
 {
-    public async Task<BCRefreshToken?> GetRefreshToken(Guid localId)
+    public async Task<BCRefreshToken?> GetRefreshTokenAsync(Guid localId, TokenProvider provider)
     {
+        await DeleteOldTokensAsync();
+        
         string sql = @"SELECT *
-                        FROM refresh_token
+                        FROM auth_token
                         WHERE local_id = @LocalId
+                            AND provider = @Provider
                         ORDER BY created_at DESC
                         LIMIT 1";
         
-        return await QueryDbSingleAsync<BCRefreshToken>(sql, new { LocalId = localId });
+        return await QueryDbSingleAsync<BCRefreshToken>(sql, new { LocalId = localId, Provider = provider.ToDescriptionString() });
     }
 
 
-    public async Task UpdateRefreshToken(Guid localId, string token)
+    public async Task UpdateRefreshTokenAsync(BCRefreshToken refreshToken)
     {
-        string sql = @"INSERT INTO refresh_token(token, local_id)
-                        VALUES (@Token, @LocalId)";
+        string sql = @"INSERT INTO auth_token(refresh, local_id, provider, access)
+                        VALUES (@refresh, @local_id, @provider, @access)";
         
-        await ExecuteSqlAsync(sql, new { LocalId = localId, Token = token });
+        await ExecuteSqlAsync(sql, refreshToken);
     }
+
+
+    private async Task DeleteOldTokensAsync()
+        => await ExecuteSqlAsync(@"DELETE
+                                            FROM auth_token
+                                            WHERE created_at < NOW() - INTERVAL '3' DAY");
+
 }

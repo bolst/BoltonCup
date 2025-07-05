@@ -22,13 +22,13 @@
         else
         {
             <div @onclick="this.AsNonRenderingEventHandler<MouseEventArgs>(OnClickHandler)"
-                 class="@LinkClassname"
+                 class="@_linkClassname"
                  tabindex="@TabIndex">
                 @if (!string.IsNullOrEmpty(Icon))
                 {
                     <MudIcon Disabled="@Disabled" Icon="@Icon" Color="@IconColor" Class="@IconClassname" />
                 }
-                <div class="mud-nav-link-text">
+                <div class="mud-nav-link-text d-flex justify-center ma-0">
                     @ChildContent
                 </div>
             </div>

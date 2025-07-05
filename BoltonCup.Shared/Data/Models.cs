@@ -417,10 +417,12 @@ public class BCAvailability : IEquatable<BCAvailability>
 
 public class BCRefreshToken
 {
-    public required int id { get; set; }
-    public required DateTime created_at { get; set; }
-    public required string token { get; set; }
+    public int id { get; set; }
+    public DateTime created_at { get; set; }
+    public required string refresh { get; set; }
     public required Guid local_id { get; set; }
+    public required string provider { get; set; }
+    public string? access { get; set; }
 }
 
 
