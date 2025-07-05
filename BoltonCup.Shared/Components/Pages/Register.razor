@@ -1,8 +1,11 @@
 @page "/register"
 
+@using Microsoft.AspNetCore.DataProtection
+
 @inject IBCData BCData
-@inject RegistrationStateService RegStateService
-@inject SupabaseServiceProvider SupabaseService
+@inject ICustomLocalStorageProvider LocalStorage
+@inject IDataProtectionProvider DataProtectionProvider
+@inject SupabaseService SupabaseService
 
 @if (_loading || _currentTournament is null)
 {
@@ -85,7 +88,9 @@ else
 }
 
 @code{
-    
+
+    private IDataProtector _protector;
+    private const string REG_KEY = "reg";
     private readonly string _containerStyle = "height: 120vh; background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//BOLTONCUP-86.webp'); background-size: cover; background-position: center center;";
 
     private bool _loading;
@@ -95,6 +100,12 @@ else
     private RegisterFormModel? _storedEmailForm;
     private int _playerCount;
     private int _goalieCount;
+
+
+    protected override void OnInitialized()
+    {
+        _protector = DataProtectionProvider.CreateProtector("creds");
+    }
     
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -114,7 +125,7 @@ else
                     _goalieCount = players.Count(p => p.IsGoalie);
                 }
 
-                _storedEmail = await RegStateService.GetBrowserRegistered();
+                _storedEmail = await GetBrowserRegistered();
 
                 if (_storedEmail is not null)
                 {
@@ -135,7 +146,7 @@ else
 
     private async Task OnFormBegin()
     {
-        await RegStateService.Clear();
+        await ClearBrowser();
         _storedEmail = null;
         _storedEmailForm = null;
         
@@ -149,7 +160,7 @@ else
         if (string.IsNullOrEmpty(errorMessage))
         {
             await SupabaseService.SendRegistrationEmail(form);
-            await RegStateService.SetBrowserRegistered(form.Email);
+            await SetBrowserRegistered(form.Email);
             
             _storedEmail = form.Email;
             if (_storedEmail is not null)
@@ -169,6 +180,37 @@ else
         }
         
         StateHasChanged();
+    }
+    
+    
+    private async Task SetBrowserRegistered(string email)
+    {
+        try
+        {
+            await LocalStorage.SetAsync(REG_KEY, _protector.Protect(email));
+        }
+        catch { }
+    }
+
+    private async Task<string?> GetBrowserRegistered()
+    {
+        try
+        {
+            var protectedEmail = await LocalStorage.GetAsync<string>(REG_KEY);
+            return protectedEmail is null ? null : _protector.Unprotect(protectedEmail);
+        }
+        catch { }
+
+        return null;
+    }
+
+    private async Task ClearBrowser()
+    {
+        try
+        {
+            await LocalStorage.RemoveAsync(REG_KEY);
+        }
+        catch { }
     }
 
 }

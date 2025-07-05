@@ -64,7 +64,7 @@ public class DraftServiceProvider
     public async Task DraftPlayerAsync(PlayerProfile player)
     {
         var (team, pick) = await GetTeamWithCurrentPick();
-        Console.WriteLine($"{team.name} is drafting {player.name}");
+        // Console.WriteLine($"{team.name} is drafting {player.name}");
         
         // 1. update database to indicate the drafted player is now on the team with current pick
         await _bcData.DraftPlayerAsync(player, team, pick);

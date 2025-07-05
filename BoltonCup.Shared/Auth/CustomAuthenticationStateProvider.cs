@@ -18,32 +18,9 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
 
     private AuthenticationState AnonymousState => new(new ClaimsPrincipal(new ClaimsIdentity()));
 
-    /// <summary>
-    /// Creates an <see cref="AuthenticationState"/> that is either Anonymous or Authenticated if Gotrue has a current user.
-    /// </summary>
-    private AuthenticationState AuthenticatedState
-    {
-        get
-        {
-            var user = _supabase.Auth.CurrentUser;
-
-            if (user == null)
-                return AnonymousState;
-
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.Email, user.Email!),
-                new(ClaimTypes.Role, user.Role!),
-                new(ClaimTypes.Authentication, "supabase")
-            };
-
-            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "supabase")));
-        }
-    }
-
     public CustomAuthenticationStateProvider(Supabase.Client supabase, CustomUserService customUserService)
     {
-        Console.WriteLine($"{nameof(CustomAuthenticationStateProvider)} initialized.");
+        // Console.WriteLine($"{nameof(CustomAuthenticationStateProvider)} initialized.");
         _supabase = supabase;
         _supabase.Auth.AddStateChangedListener(SupabaseAuthStateChanged);
         _customUserService = customUserService;
@@ -87,18 +64,22 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
         }
         
         // otherwise try to refresh the session
-        var (access, refresh) = await _customUserService.FetchTokensFromBrowserAsync();
+        var (access, refresh) = await _customUserService.FetchPersistedTokensAsync();
         if (string.IsNullOrEmpty(access) || string.IsNullOrEmpty(refresh))
         {
-            Console.WriteLine("No session found, returning as anonymous.");
+            // Console.WriteLine("No session found, returning as anonymous.");
             return AnonymousState;
         }
 
-        await _supabase.Auth.SetSession(access, refresh);
-        
+        try
+        {
+            await _supabase.Auth.SetSession(access, refresh);
+        }
+        catch { }
+
         if (_supabase.Auth.CurrentUser?.Email == null)
         {
-            Console.WriteLine("An authenticated user not found, returning as anonymous.");
+            // Console.WriteLine("An authenticated user not found, returning as anonymous.");
             return AnonymousState;
         }
 
@@ -115,7 +96,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
             var session = await _supabase.Auth.SignIn(form.Email, form.Password);
             if (session is not null)
             {
-                await _customUserService.PersistSessionToBrowserAsync(session);
+                await _customUserService.PersistSessionAsync(session);
             }
             else
             {
@@ -136,7 +117,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider, ID
 
     public async Task LogoutAsync()
     {
-        await _supabase.Auth.SignOut();
         await _customUserService.ClearBrowserStorageAsync();
+        await _supabase.Auth.SignOut();
     }
 }

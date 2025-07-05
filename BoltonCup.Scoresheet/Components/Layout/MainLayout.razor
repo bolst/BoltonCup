@@ -1,5 +1,8 @@
 ﻿@inherits LayoutComponentBase
 
+@inject CustomAuthenticationStateProvider CustomAuthenticationStateProvider
+@inject NavigationManager Navigation
+
 <MudThemeProvider Theme="_theme" />
 <MudPopoverProvider />
 <MudDialogProvider
@@ -11,12 +14,26 @@
 
 <MudLayout>
     <AppBar />
-    <MudDrawer ClipMode="DrawerClipMode.Always" Elevation="2" Width="100px" Open>
+    <MudDrawer ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Persistent" Breakpoint="Breakpoint.Always" Elevation="2" Width="100px" Open>
         <MudNavMenu>
-            <CustomNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Store" Href="/">Home</CustomNavLink>
-            <CustomNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LibraryBooks" Href="scoresheet">Scoresheet</CustomNavLink>
-            <CustomNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Group" Href="games">Games</CustomNavLink>
+            <AuthorizeView>
+                <CustomNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Store" Href="/">Home</CustomNavLink>
+                <CustomNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LibraryBooks" Href="scoresheet">Scoresheet</CustomNavLink>
+                <CustomNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Group" Href="games">Games</CustomNavLink>
+            </AuthorizeView>
         </MudNavMenu>
+        <MudSpacer />
+
+        <AuthorizeView>
+            <Authorized>
+                <MudTooltip Text="@($"Signed in as {context.User.Identity?.Name}")" Placement="Placement.Right">
+                    <CustomNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Logout" OnClick="LogOutClicked">Log Out</CustomNavLink>
+                </MudTooltip>
+            </Authorized>
+            <NotAuthorized>
+                <CustomNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Login" Href="login">Login</CustomNavLink>
+            </NotAuthorized>
+        </AuthorizeView>
     </MudDrawer>
     <MudMainContent>
         <div class="pa-4">
@@ -41,5 +58,12 @@
     
         _theme = new CustomThemeProvider().Theme;
         _theme.PaletteLight.AppbarBackground = "#232636";
+    }
+
+
+    private async Task LogOutClicked()
+    {
+        await CustomAuthenticationStateProvider.LogoutAsync();
+        Navigation.NavigateTo("/", true);
     }
 }

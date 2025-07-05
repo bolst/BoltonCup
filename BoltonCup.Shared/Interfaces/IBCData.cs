@@ -54,8 +54,8 @@ public interface IBCData
     Task PopulatePlayerAvailabilitiesAsync(int accountId);
     
     
-    Task<BCRefreshToken?> GetRefreshToken(Guid localId);
-    Task UpdateRefreshToken(Guid localId, string token);
+    Task<BCRefreshToken?> GetRefreshTokenAsync(Guid localId, TokenProvider provider);
+    Task UpdateRefreshTokenAsync(BCRefreshToken refreshToken);
 
 
     Task UpdatePlayerSongAsync(int accountId, FullTrack song);

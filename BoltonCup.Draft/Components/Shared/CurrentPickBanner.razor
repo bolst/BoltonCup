@@ -1,0 +1,43 @@
+@inject Data.DraftServiceProvider DraftService
+@inject HubConnectionProvider Hub
+
+
+@if (_currentPick is not null && _teamWithCurrentPick is not null)
+{
+    <div class="d-flex align-center flex-row gap-2">
+        <MudText Typo="Typo.h6" Color="Color.Tertiary"><b>Round @_currentPick.round Pick @_currentPick.pick</b></MudText>
+        <MudImage Src="@_teamWithCurrentPick.logo_url" Height="30" />
+    </div>
+}
+
+
+@code {
+    
+    private BCDraftPick? _currentPick;
+    private BCTeam? _teamWithCurrentPick;
+    
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeHubConnection();
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        (_teamWithCurrentPick, _currentPick) = await DraftService.GetTeamWithCurrentPick();
+    }
+    
+    
+    private async Task InitializeHubConnection()
+    {
+        var connection = await Hub.GetHubConnection();
+        
+        connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        {
+            await LoadDataAsync();
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+}

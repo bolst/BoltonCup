@@ -1,6 +1,10 @@
 @page "/games"
 
+@attribute [Authorize]
+
 @inject IBCData BCData
+
+
 
 <MudDataGrid Items="_games" Striped Dense>
     <Columns>

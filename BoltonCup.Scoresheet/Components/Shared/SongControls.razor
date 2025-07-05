@@ -16,9 +16,8 @@ else
     {
         <MudStack AlignItems="AlignItems.Center" Row>
             
-            @if (_currentTrack is not null)
+            @if (_currentTrack?.Item is FullTrack track)
             {
-                var track = _currentTrack.Item as FullTrack;
                 var artists = string.Join(", ", track.Artists.Select(x => x.Name));
 
                 <MudStack AlignItems="AlignItems.End" Spacing="0">
@@ -184,7 +183,7 @@ else
         }
         catch (Exception e)
         {
-            Console.WriteLine($"From OnPause:\n{e.Message}");
+            // Console.WriteLine($"From OnPause:\n{e.Message}");
         }
         
         await RefreshState();
@@ -202,7 +201,7 @@ else
         }
         catch (Exception e)
         {
-            Console.WriteLine($"From OnPlay:\n{e.Message}");
+            // Console.WriteLine($"From OnPlay:\n{e.Message}");
         }
 
         await RefreshState();
@@ -235,7 +234,7 @@ else
         }
         catch (Exception e)
         {
-            Console.WriteLine($"OnSkipForward: {e.Message}");
+            // Console.WriteLine($"OnSkipForward: {e.Message}");
         }
         
         await RefreshState();

@@ -1,23 +1,69 @@
-﻿@page "/"
+@page "/"
 
-@attribute [Authorize]
+@inject Data.DraftServiceProvider Drafter
+@inject HubConnectionProvider Hub
 
-<PageTitle>Bolton Cup Draft</PageTitle>
 
-<MudGrid Spacing="2">
-    <MudItem xs="3">
-        <MudPaper Width="100%" Height="90vh" Class="mud-theme-surface" Elevation="3">
-            <CurrentTeamDraftBoard />
+<MudStack Style="width: 100%" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap" Justify="Justify.FlexStart" Row>
+    @foreach (var round in DraftRoundGrouping)
+    {
+        <MudPaper MinHeight="290px" Width="300px" Style="background-color: var(--mud-palette-dark-lighten); color: var(--mud-palette-dark-text);" Square>
+            <MudText Class="ma-2" Typo="Typo.h6"><b>Round @round.Key</b></MudText>
+            @foreach (var pick in round)
+            {
+                <MudPaper Class="mud-theme-dark" Width="300px" Height="40px" Elevation="0" Square>
+                    <div class="d-flex align-center flex-row">
+                        <div class="d-flex justify-center" style="width: 40px">
+                            <MudText Typo="Typo.h6" Class="px-2"><b>@pick.OverallPick(6)</b></MudText>
+                        </div>
+                        <div class="d-flex align-center flex-row" style="@($"height: 40px; width: 40px; background-color: {pick.PrimaryColorHex}DD")">
+                            <MudImage Src="@pick.TeamLogo" Width="40" />
+                        </div>
+                        <MudPaper Class="mud-theme-light pa-2" Width="218px" Height="38px" Elevation="0" Square>
+                            <MudText Align="Align.Start" Typo="Typo.subtitle2" Color="Color.Inherit">@pick.Name.ToUpper()</MudText>
+                        </MudPaper>
+                    </div>
+                </MudPaper>
+            }
         </MudPaper>
-    </MudItem>
-    <MudItem xs="7">
-        <MudPaper Width="100%" Height="90vh" Class="mud-theme-surface" Elevation="3">
-            <PlayerTable />
-        </MudPaper>
-    </MudItem>
-    <MudItem xs="2">
-        <MudPaper Width="100%" Height="90vh" Class="mud-theme-surface" Elevation="3">
-            <DraftStatus />
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+    }
+</MudStack>
+
+
+@code {
+
+    private BCDraftPick? _currentPick;
+    private BCTeam? _teamWithCurrentPick;
+    private IEnumerable<BCDraftPickDetail> _draftPicks = [];
+
+    private IEnumerable<IGrouping<int, BCDraftPickDetail>> DraftRoundGrouping 
+        => _draftPicks
+            .OrderByDescending(x => x.round)
+            .ThenBy(x => x.pick)
+            .GroupBy(x => x.round);
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        await LoadDataAsync();
+        await InitializeHubConnection();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        (_teamWithCurrentPick, _currentPick) = await Drafter.GetTeamWithCurrentPick();
+        _draftPicks = await Drafter.GetDraftedPlayersAsync();
+    }
+    
+    
+    private async Task InitializeHubConnection()
+    {
+        var connection = await Hub.GetHubConnection();
+        
+        connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        {
+            await LoadDataAsync();
+            InvokeAsync(StateHasChanged);
+        });
+    }
+}

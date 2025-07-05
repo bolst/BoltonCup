@@ -71,12 +71,10 @@ function initTimer(countdownSeconds) {
     var now = 0;
     function calculate() {
         now = dt_ms - (new Date().getTime() - startTime);
-        let secRemaining = Math.floor(now / 1000) % 60;
+        let secRemaining = Math.floor(now / 1000);
 
         if (secRemaining >= 0) {
-            console.log(`secRemaining: ${secRemaining}`);
-
-            text.textContent = ("0" + secRemaining).slice(-2);
+            text.textContent = secRemaining.toString();
 
             const progress = secRemaining / countdownSeconds;
             const offset = circumference * (1 - progress);

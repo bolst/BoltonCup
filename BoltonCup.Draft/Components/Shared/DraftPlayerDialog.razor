@@ -3,70 +3,52 @@
 
 
 <MudDialog>
+    <TitleContent>
+        <MudStack AlignItems="AlignItems.Center" Row>
+            <MudText Typo="Typo.h5">@Player.name (@Player.dob.ToString("yyyy"))</MudText>
+            <PositionChip Position="@Player.position" />
+        </MudStack>
+    </TitleContent>
     <DialogContent>
         <MudStack Spacing="8" Row>
             <div>
                 <MudImage Src="@Player.ProfilePicture" Width="300"/>
             </div>
             <div>
-                <MudStack AlignItems="AlignItems.Center" Row>
-                    <MudText Typo="Typo.h3">@Player.name</MudText>
-                    @if (_team is not null)
-                    {
-                        <MudImage Src="@_team.logo_url" Height="80"/>
-                    }
-                    else
-                    {
-                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="60px" Width="60px" />
-                    }
-                </MudStack>
-                
-                <MudStack AlignItems="AlignItems.Center" Row>
-                    <MudChip T="string" Color="@PositionColor" Variant="Variant.Text">@Player.position.ToUpper()</MudChip>
-                    @if (Player.champion)
-                    {
-                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Text">2024 CHAMPION</MudChip>
-                    }
-                </MudStack>
-
-                <MudText Class="my-4" Typo="Typo.h6">@Player.dob.ToString("MMMM dd, yyyy")</MudText>
                 <MudText Class="my-4" Typo="Typo.h6">Highest Level - @Player.HighestLevel</MudText>
-                
-                <MudText Typo="Typo.h6">Preferred Teammates</MudText>
-                <MudStack Class="mx-6" Spacing="1">
-                    @if (_preferredTeammate1 is not null)
-                    {
-                        <MudStack AlignItems="AlignItems.Center" Row>
-                            <MudText>@_preferredTeammate1.name</MudText>
-                            @AvailabilityChip(_preferredTeammate1)
-                        </MudStack>
-                    }
-                    @if (_preferredTeammate2 is not null)
-                    {
-                        <MudStack AlignItems="AlignItems.Center" Row>
-                            <MudText>@_preferredTeammate2.name</MudText>
-                            @AvailabilityChip(_preferredTeammate2)
-                        </MudStack>
-                    }
-                </MudStack>
-                
-                
+
+                @if (_preferredTeammate1 is not null || _preferredTeammate2 is not null)
+                {
+                    <MudText Typo="Typo.h6">Preferred Teammates</MudText>
+                    <MudStack Class="mx-6" Spacing="1">
+                        @if (_preferredTeammate1 is not null)
+                        {
+                            <MudStack AlignItems="AlignItems.Center" Row>
+                                <MudText>@_preferredTeammate1.name</MudText>
+                                @AvailabilityChip(_preferredTeammate1)
+                            </MudStack>
+                        }
+                        @if (_preferredTeammate2 is not null)
+                        {
+                            <MudStack AlignItems="AlignItems.Center" Row>
+                                <MudText>@_preferredTeammate2.name</MudText>
+                                @AvailabilityChip(_preferredTeammate2)
+                            </MudStack>
+                        }
+                    </MudStack>
+                }
+
+
             </div>
-        
+
         </MudStack>
     </DialogContent>
     <DialogActions>
         <MudButton
-            Color="Color.Primary"
+            Class="mud-theme-dark"
             Variant="Variant.Filled"
             OnClick="OnDraftPlayer">
             Draft
-        </MudButton>        
-        <MudButton
-            Color="Color.Error"
-            Variant="Variant.Outlined"
-            OnClick="OnCancel">
-            Cancel
         </MudButton>
     </DialogActions>
 </MudDialog>
@@ -80,21 +62,10 @@
     public required PlayerProfile Player { get; set; }
 
     private BCAccount? _account;
-    private BCTeam? _team;
 
     private PlayerProfile? _preferredTeammate1;
     private PlayerProfile? _preferredTeammate2;
     
-    private Color PositionColor
-    {
-        get
-        {
-            if (Player.IsForward) return Color.Primary;
-            if (Player.IsDefense) return Color.Secondary;
-            return Color.Tertiary;
-        }
-    }
-
     protected override async Task OnParametersSetAsync()
     {
         if (Player.account_id.HasValue)
@@ -109,14 +80,11 @@
             if (_account?.preferred_teammate2 is not null)
                 _preferredTeammate2 = await BCData.GetUserTournamentPlayerProfileAsync(_account.preferred_teammate2.Value, tournament.tournament_id);
         }
-        
-        var (team, _) = await Drafter.GetTeamWithCurrentPick();
-        _team = team;
     }
     
     private async Task OnDraftPlayer()
     {
-        await Drafter.DraftPlayerAsync(Player);
+        // await Drafter.DraftPlayerAsync(Player);
         MudDialog.Close(DialogResult.Ok(true));
     }
 

@@ -2,6 +2,7 @@
 @inject Data.DraftServiceProvider Drafter
 @inject IDialogService DialogService
 @inject HubConnectionProvider Hub
+@inject Supabase.Client SBClient
 
 @if (_players is not null)
 {
@@ -10,41 +11,54 @@
         Items="_filteredPlayers"
         Height="calc(90vh - 4rem)"
         QuickFilter="QuickFilter"
-        RowClassFunc="RowClassFunc"
+        RowStyleFunc="RowStyleFunc"
         ShowColumnOptions="false"
         FixedHeader
         Dense>
         <ToolBarContent>
-            <MudMenu 
-                Label="Actions" 
-                Variant="Variant.Filled" 
-                EndIcon="@Icons.Material.Filled.KeyboardArrowDown" 
-                IconColor="Color.Error" 
-                Dense>
-                <MudMenuItem Label="Reset" Class="red-text" OnClick="OnResetDraft" />
-            </MudMenu>
-            
+            <AuthorizeView Roles="admin">
+                <MudMenu
+                    Label="Actions"
+                    Variant="Variant.Filled"
+                    EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
+                    IconColor="Color.Error"
+                    Dense>
+                    <MudMenuItem Label="Reset" Class="red-text" OnClick="OnResetDraft"/>
+                </MudMenu>
+            </AuthorizeView>
+
             <MudChipSet T="string" Variant="Variant.Text" SelectedValue="_positionFilter" SelectedValueChanged="PositionFilterChanged" SelectionMode="SelectionMode.ToggleSelection">
-                <MudChip Text="F" Color="Color.Primary" Value="@("forward")" />
-                <MudChip Text="D" Color="Color.Secondary" Value="@("defense")" />
-                <MudChip Text="G" Color="Color.Warning" Value="@("goalie")" />
+                <MudChip Text="F" Color="Color.Primary" Value="@("forward")"/>
+                <MudChip Text="D" Color="Color.Secondary" Value="@("defense")"/>
+                <MudChip Text="G" Color="Color.Warning" Value="@("goalie")"/>
             </MudChipSet>
-            
+
             <MudSpacer/>
             <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
         </ToolBarContent>
 
         <Columns>
             <TemplateColumn>
                 <CellTemplate>
-                    <MudButton
-                        Color="Color.Default"
-                        Variant="Variant.Filled"
-                        OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</MudButton>
+                    <AuthorizeView Roles="captain,admin" Context="authContext">
+                        <AuthorizeView Roles="captain" Context="captainContext">
+                            <MudButton
+                                Color="Color.Default"
+                                Variant="Variant.Filled"
+                                OnClick="@(() => OnPlayerDrafted(context.Item))"
+                                Disabled="!UserCanPick">DRAFT</MudButton>
+                        </AuthorizeView>
+                        <AuthorizeView Roles="admin" Context="adminContext">
+                            <MudButton
+                                Color="Color.Default"
+                                Variant="Variant.Filled"
+                                OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</MudButton>
+                        </AuthorizeView>
+                    </AuthorizeView>                    
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Property="x => x.name" Title="Name" CellStyle="" />
+            <PropertyColumn Property="x => x.name" Title="Name" CellStyle="font-weight: bold" />
             <PropertyColumn Property="x => x.position" Title="Pos.">
                 <CellTemplate>
                     <PositionChip Position="@context.Item.position" Size="Size.Small" />
@@ -56,15 +70,25 @@
     </MudDataGrid>
 }
 
+<MudOverlay @bind-Visible="_loading" DarkBackground Absolute>
+    <MudProgressCircular Indeterminate />
+</MudOverlay>
+
+
 @code {
 
     private IEnumerable<PlayerProfile>? _players;
     private HashSet<PlayerProfile> _filteredPlayers = new();
-    private string _searchString;
-    private string _positionFilter;
     private BCTournament? _currentTournament;
     private BCTeam? _currentTeam;
     private IEnumerable<BCAccount> _currentRoster = [];
+
+    private bool _loading;
+    private string _searchString;
+    private string _positionFilter;
+    
+    private BCAccount? _currentUser;
+    private bool UserCanPick => _currentUser is not null && (_currentTeam?.gm_account_id == _currentUser.id);
     
     protected override async Task OnInitializedAsync()
     {
@@ -72,8 +96,22 @@
         await InitializeHubConnection();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        var user = SBClient.Auth.CurrentUser;
+        if (user?.Email is not null)
+        {
+            _currentUser = await BCData.GetAccountByEmailAsync(user.Email);
+        }
+    }
+
     private async Task LoadDataAsync()
     {
+        _loading = true;
+        await InvokeAsync(StateHasChanged);
+        
         (_currentTeam, _) = await Drafter.GetTeamWithCurrentPick();
         _currentRoster = await BCData.GetAccountsByTeamIdAsync(_currentTeam.id);
         _currentTournament = await BCData.GetCurrentTournamentAsync();
@@ -82,6 +120,9 @@
             _players = (await BCData.GetDraftAvailableTournamentPlayersAsync(_currentTournament.tournament_id)).OrderBy(SortByHighestLevel);
             _filteredPlayers = new(_players);
         }
+        
+        _loading = false;
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task OnResetDraft()
@@ -90,7 +131,7 @@
         await LoadDataAsync();
     }
 
-    private Task OnPlayerDrafted(PlayerProfile player)
+    private async Task OnPlayerDrafted(PlayerProfile player)
     {
         var options = new DialogOptions
         {
@@ -101,7 +142,20 @@
         {
             { x => x.Player, player },
         };
-        return DialogService.ShowAsync<DraftPlayerDialog>("Draft Player", parameters, options);
+        
+        var dialog = await DialogService.ShowAsync<DraftPlayerDialog>("Draft Player", parameters, options);
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled)
+        {
+            _loading = true;
+            await InvokeAsync(StateHasChanged);
+            
+            await Drafter.DraftPlayerAsync(player);
+
+            _loading = false;
+            await InvokeAsync(StateHasChanged);
+        }
     }
     
     private Func<PlayerProfile, bool> QuickFilter => x =>
@@ -155,11 +209,11 @@
         });
     }
 
-    private string RowClassFunc(PlayerProfile player, int row)
+    private string RowStyleFunc(PlayerProfile player, int row)
     {
         if (_currentRoster.Any(x => x.preferred_teammate1 == player.account_id || x.preferred_teammate2 == player.account_id))
         {
-            return "green lighten-5";
+            return "background-color: var(--mud-palette-tertiary);";
         }
 
         return string.Empty;

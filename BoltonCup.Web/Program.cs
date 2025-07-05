@@ -2,8 +2,6 @@ using Blazored.LocalStorage;
 using MudBlazor.Services;
 using BoltonCup.Web.Components;
 using BoltonCup.Web.Data;
-using BoltonCup.Web.Services;
-using BoltonCup.Shared.Services;
 using BoltonCup.Shared.Data;
 
 
@@ -27,7 +25,6 @@ builder.Services.AddBoltonCupSupabase(builder.Configuration);
 
 builder.Services.AddDataProtection();
 
-builder.Services.AddScoped<RegistrationStateService>();
 builder.Services.AddScoped<StripeServiceProvider>(sp =>
 {
     var apiKey = builder.Configuration["STRIPE_API_KEY"]; 
@@ -66,7 +63,7 @@ app.UseStatusCodePagesWithRedirects("/404?status={0}");
 app.MapGet("/sitemap.xml", async httpContext =>
 {
     var webPages = new BoltonCup.Web.Services.SitemapService().GetPages();
-    var sharedPages = new BoltonCup.Shared.Services.SitemapService().GetPages();
+    var sharedPages = new BoltonCup.Shared.Data.SitemapService().GetPages();
     var pages = webPages.Concat(sharedPages);
     var sitemap = ISitemapService.GenerateSitemap(pages);
     

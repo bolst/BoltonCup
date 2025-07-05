@@ -1,6 +1,8 @@
 @page "/scoresheet"
 @page "/scoresheet/{GameId:int}"
 
+@attribute [Authorize]
+
 @using SpotifyAPI.Web
 
 @inject IBCData BCData
@@ -234,7 +236,7 @@
             catch (Exception e)
             {
                 // if it does not invalidate the game playlist id
-                Console.WriteLine($"From ConfigureGamePlaylist (checking if playlist exists): {e.Message}");
+                // Console.WriteLine($"From ConfigureGamePlaylist (checking if playlist exists): {e.Message}");
                 game.playlist_id = null;
             }
         }
@@ -262,7 +264,7 @@
             }
             catch (Exception e)
             {
-                Console.WriteLine($"From ConfigureGamePlaylist (creating playlist): {e.Message}");
+                // Console.WriteLine($"From ConfigureGamePlaylist (creating playlist): {e.Message}");
                 Snackbar.Add("Something went wrong creating the playlist...", Severity.Error);
                 return;
             }

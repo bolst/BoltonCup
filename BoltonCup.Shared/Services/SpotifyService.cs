@@ -67,7 +67,7 @@ public class SpotifyService
         }
         catch (Exception e)
         {
-            Console.WriteLine($"From GetClientAsync:\n{e.Message}");
+            // Console.WriteLine($"From GetClientAsync:\n{e.Message}");
             return null;
         }
     }
@@ -87,7 +87,7 @@ public class SpotifyService
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error in Spotify Search: {e.Message}");
+            // Console.WriteLine($"Error in Spotify Search: {e.Message}");
             return new();
         }
     }
@@ -114,11 +114,16 @@ public class SpotifyService
                 await _localStorage.SetItemAsync("local_id", localId.ToString());
             }
 
-            await _bcData.UpdateRefreshToken(localId, _oauthToken.RefreshToken);
+            await _bcData.UpdateRefreshTokenAsync(new BCRefreshToken
+            {
+                refresh = _oauthToken.RefreshToken,
+                local_id = localId,
+                provider = TokenProvider.Spotify.ToDescriptionString(),
+            });
         }
         catch (Exception e)
         {
-            Console.WriteLine($"From ConfigAuthWithCallbackCode:\n{e.Message}");
+            // Console.WriteLine($"From ConfigAuthWithCallbackCode:\n{e.Message}");
         }
     }
 
@@ -148,24 +153,31 @@ public class SpotifyService
         if (_oauthToken is not null && !_oauthToken.IsExpired)
         {
             if (!string.IsNullOrEmpty(_oauthToken.RefreshToken))
-                await _bcData.UpdateRefreshToken(localId, _oauthToken.RefreshToken);
+            {
+                await _bcData.UpdateRefreshTokenAsync(new BCRefreshToken
+                {
+                    refresh = _oauthToken.RefreshToken,
+                    local_id = localId,
+                    provider = TokenProvider.Spotify.ToDescriptionString(),
+                });
+            }
             return _oauthToken.AccessToken;
         }
 
         // use local id to try to fetch refresh token
-        var refreshToken = await _bcData.GetRefreshToken(localId);
+        var refreshToken = await _bcData.GetRefreshTokenAsync(localId, TokenProvider.Spotify);
 
         if (refreshToken is not null)
         {
             try
             {
-                var authRequest = new AuthorizationCodeRefreshRequest(_clientId, _secret, refreshToken.token);
+                var authRequest = new AuthorizationCodeRefreshRequest(_clientId, _secret, refreshToken.refresh);
                 _oauthToken = await new OAuthClient(_defaultConfig).RequestToken(authRequest, cancellationToken);
                 return _oauthToken.AccessToken;
             }
             catch (Exception e)
             {
-                Console.WriteLine($"GetAuthRequestToken:\n{e.Message}");
+                // Console.WriteLine($"GetAuthRequestToken:\n{e.Message}");
             }
         }
 
