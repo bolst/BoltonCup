@@ -93,6 +93,8 @@
                 await StartTimer();
                 _disabled = false;
             }
+
+            await InvokeAsync(StateHasChanged);
         });
 
         _connections = _connections.Append(c1);

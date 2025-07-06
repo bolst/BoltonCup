@@ -47,13 +47,6 @@
     {
         if (!firstRender) return;
 
-        var state = await CustomAuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (state.User.IsInRole("admin") || state.User.IsInRole("captain"))
-        {
-            Navigation.NavigateTo("/draft");
-            return;
-        }
-        
         await LoadDataAsync();
         await InitializeHubConnection();
     }

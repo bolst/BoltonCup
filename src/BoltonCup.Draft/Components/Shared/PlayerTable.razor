@@ -60,7 +60,8 @@
                             <MudButton
                                 Color="Color.Default"
                                 Variant="Variant.Filled"
-                                OnClick="@(() => OnPlayerDrafted(context.Item))">DRAFT</MudButton>
+                                OnClick="@(() => OnPlayerDrafted(context.Item))"
+                                Disabled="Disabled">DRAFT</MudButton>
                         </AuthorizeView>
                     </AuthorizeView>                    
                 </CellTemplate>
@@ -83,6 +84,10 @@
 
 
 @code {
+    
+    [Parameter]
+    public bool Disabled { get; set; }
+    
     private IEnumerable<IDisposable> _hubEvents = [];
 
     private IEnumerable<PlayerProfile>? _players;
@@ -94,7 +99,7 @@
     private bool _loading;
     private string _searchString;
     private string _positionFilter;
-    
+
     private BCAccount? _currentUser;
     private bool UserCanPick => _currentUser is not null && (_currentTeam?.gm_account_id == _currentUser.id);
     
@@ -215,14 +220,8 @@
             
             InvokeAsync(StateHasChanged);
         });
-        
-        var c2 = connection.On(DraftHub.Events.OnDraftStateChange, async () =>
-        {
-            // TODO: lock table
-        });
 
         _hubEvents = _hubEvents.Append(c1);
-        _hubEvents = _hubEvents.Append(c2);
     }
 
     private string RowStyleFunc(PlayerProfile player, int row)
