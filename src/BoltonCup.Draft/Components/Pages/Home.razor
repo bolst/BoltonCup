@@ -2,7 +2,8 @@
 
 @inject Data.DraftServiceProvider Drafter
 @inject HubConnectionProvider Hub
-
+@inject CustomAuthenticationStateProvider CustomAuthenticationStateProvider
+@inject NavigationManager Navigation
 
 <MudStack Style="width: 100%" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap" Justify="Justify.FlexStart" Row>
     @foreach (var round in DraftRoundGrouping)
@@ -42,13 +43,22 @@
             .ThenBy(x => x.pick)
             .GroupBy(x => x.round);
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!firstRender) return;
+
+        var state = await CustomAuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (state.User.IsInRole("admin") || state.User.IsInRole("captain"))
+        {
+            Navigation.NavigateTo("/draft");
+            return;
+        }
         
         await LoadDataAsync();
         await InitializeHubConnection();
     }
 
+    
     private async Task LoadDataAsync()
     {
         (_teamWithCurrentPick, _currentPick) = await Drafter.GetTeamWithCurrentPick();

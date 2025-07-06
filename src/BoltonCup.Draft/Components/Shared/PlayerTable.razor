@@ -218,7 +218,7 @@
         
         var c2 = connection.On(DraftHub.Events.OnDraftStateChange, async () =>
         {
-            
+            // TODO: lock table
         });
 
         _hubEvents = _hubEvents.Append(c1);
