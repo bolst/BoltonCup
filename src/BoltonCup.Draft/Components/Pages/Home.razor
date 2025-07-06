@@ -8,11 +8,11 @@
 <MudStack Style="width: 100%" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap" Justify="Justify.FlexStart" Row>
     @foreach (var round in DraftRoundGrouping)
     {
-        <MudPaper MinHeight="290px" Width="300px" Style="background-color: var(--mud-palette-dark-lighten); color: var(--mud-palette-dark-text);" Square>
+        <MudPaper MinHeight="290px" Width="300px" Style="background-color: var(--mud-palette-dark-lighten); color: var(--mud-palette-dark-text);" Elevation="5" Square>
             <MudText Class="ma-2" Typo="Typo.h6"><b>Round @round.Key</b></MudText>
             @foreach (var pick in round)
             {
-                <MudPaper Class="mud-theme-dark" Width="300px" Height="40px" Elevation="0" Square>
+                <MudPaper Style="background-color: var(--mud-palette-dark-lighten); color: var(--mud-palette-dark-text);" Width="300px" Height="40px" Elevation="0" Square>
                     <div class="d-flex align-center flex-row">
                         <div class="d-flex justify-center" style="width: 40px">
                             <MudText Typo="Typo.h6" Class="px-2"><b>@pick.OverallPick(6)</b></MudText>
