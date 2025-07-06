@@ -39,6 +39,13 @@
                 <MudChip Text="D" Color="Color.Secondary" Value="@("defense")"/>
                 <MudChip Text="G" Color="Color.Warning" Value="@("goalie")"/>
             </MudChipSet>
+            
+            <MudSwitch T="bool" 
+                       Value="_availabilityView" 
+                       ValueChanged="OnAvailabilityViewSwitchChanged"
+                       ThumbIcon="@(_availabilityView ? Icons.Material.Filled.EventAvailable : Icons.Material.Filled.QueryStats)"
+                       ThumbIconColor="@(_availabilityView ? Color.Secondary : Color.Primary)"
+                       Disabled="_loading" />
 
             <MudSpacer/>
             <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
@@ -67,13 +74,33 @@
                 </CellTemplate>
             </TemplateColumn>
             <PropertyColumn Property="x => x.name" Title="Name" CellStyle="font-weight: bold" />
-            <PropertyColumn Property="x => x.position" Title="Pos.">
+            <PropertyColumn Property="x => x.position" Title="Pos." Hidden="_availabilityView">
                 <CellTemplate>
                     <PositionChip Position="@context.Item.position" Size="Size.Small" />
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.HighestLevel" Title="Highest Level" SortBy="SortByHighestLevel" />
-            <PropertyColumn Property="@(x => x.dob.ToString("yyyy"))" Title="Birth year"/>
+            <PropertyColumn Property="x => x.HighestLevel" Title="Highest Level" SortBy="SortByHighestLevel" Hidden="_availabilityView" />
+            <PropertyColumn Property="@(x => x.dob.ToString("yyyy"))" Title="Birth year" Hidden="_availabilityView" />
+            
+            
+            <PropertyColumn Property="x => x.Availabilities" Title="Availability" Hidden="!_availabilityView">
+                <CellTemplate>
+                    <MudStack AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="0" Row>
+                        @if (context.Item.Availabilities.Any(a => a.Value != "null"))
+                        {
+                            foreach (var availability in context.Item.Availabilities.Where(a => a.Value != "null"))
+                            {
+                                var isIn = availability.Value == "in";
+                                <MudChip Color="Color.Surface" Icon="@(isIn ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Cancel)" IconColor="@(isIn ? Color.Success : Color.Error)" Variant="Variant.Filled" Size="Size.Small">@availability.Key.ToString("ddd. h:mm")</MudChip>
+                            }
+                        }
+                        else
+                        {
+                            <MudText>Not set</MudText>
+                        }
+                    </MudStack>
+                </CellTemplate>
+            </PropertyColumn>
         </Columns>
     </MudDataGrid>
 }
@@ -99,7 +126,8 @@
     private bool _loading;
     private string _searchString;
     private string _positionFilter;
-
+    private bool _availabilityView;
+    
     private BCAccount? _currentUser;
     private bool UserCanPick => _currentUser is not null && (_currentTeam?.gm_account_id == _currentUser.id);
     
@@ -138,6 +166,18 @@
         await InvokeAsync(StateHasChanged);
     }
 
+
+    private async Task OnAvailabilityViewSwitchChanged(bool value)
+    {
+        _loading = true;
+        await InvokeAsync(StateHasChanged);
+        
+        _availabilityView = value;
+
+        _loading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+    
     private async Task OnResetDraft()
     {
         await Drafter.ResetDraftAsync();

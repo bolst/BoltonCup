@@ -46,11 +46,14 @@ public partial class BCData
     
     public async Task<IEnumerable<PlayerProfile>> GetDraftAvailableTournamentPlayersAsync(int tournamentId)
     {
-        string sql = @"SELECT *, p.id
+        string sql = @"SELECT a.*, p.*, JSON_OBJECT_AGG(COALESCE(g.date, '2001-01-01'), COALESCE(b.availability, 'null')) AS availabilities
                         FROM players p
                                  LEFT OUTER JOIN account a ON p.account_id = a.id AND a.isactive = TRUE
-                        WHERE tournament_id = @TournamentId
-                            AND p.team_id IS NULL
+                                 LEFT OUTER JOIN availability b ON b.account_id = a.id
+                                 LEFT OUTER JOIN game g ON g.id = b.game_id
+                        WHERE p.tournament_id = @TournamentId
+                          AND p.team_id IS NULL
+                        GROUP BY p.id, a.id
                         ORDER BY birthday, p.name";
         return await QueryDbAsync<PlayerProfile>(sql, new { TournamentId = tournamentId });
     }

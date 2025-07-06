@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace BoltonCup.Shared.Data;
 
 public class PlayerProfile : IEquatable<PlayerProfile>
@@ -18,6 +20,43 @@ public class PlayerProfile : IEquatable<PlayerProfile>
     public string? HighestLevel { get; set; }
     public string? ProfilePicture { get; set; }
     
+    public string? availabilities { get; set; }
+
+    private IEnumerable<KeyValuePair<DateTime, string>>? _availabilities;
+    public IEnumerable<KeyValuePair<DateTime, string>> Availabilities
+    {
+        get
+        {
+            if (_availabilities is not null)
+            {
+                return _availabilities;
+            }
+            
+            if (string.IsNullOrEmpty(availabilities))
+            {
+                _availabilities = [];
+                return [];
+            }
+            
+            var pairs = JsonSerializer.Deserialize<Dictionary<string, string>>(availabilities);
+            if (pairs?.Count == 1)
+            {
+                _availabilities = [];
+                return [];
+            }
+
+            var retval = pairs
+                .Where(x => DateTime.TryParse(x.Key, out _))
+                .Select(pair =>
+                {
+                    var date = DateTime.Parse(pair.Key).AddHours(4); // for EST cause Im lazy
+                    return new KeyValuePair<DateTime, string>(date, pair.Value);
+                });
+
+            _availabilities = retval.OrderBy(x => x.Key);
+            return _availabilities;
+        }
+    }
     public bool IsForward => position == "forward";
     public bool IsDefense => position == "defense";
     public bool IsGoalie => position == "goalie";
