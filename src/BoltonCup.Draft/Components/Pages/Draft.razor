@@ -53,6 +53,7 @@
         if (_draft is null) return;
         
         _disabled = _draft.State.EqualsEnum(DraftState.Inactive);
+        await InvokeAsync(StateHasChanged);
     }
     
     

@@ -40,10 +40,10 @@ public class CustomThemeProvider
         Background = BCColors.Navy,
         GrayLight = BCColors.Gray,
         GrayLighter =  BCColors.LightGray,
-        Dark = BCColors.Beige,
-        DarkLighten = BCColors.LightBeige,
-        DarkDarken = BCColors.DarkBeige,
-        DarkContrastText = BCColors.DarkNavy,
+        Dark = BCColors.Navy,
+        DarkLighten = BCColors.LightNavy,
+        DarkDarken = BCColors.DarkNavy,
+        DarkContrastText = BCColors.LightBeige,
     };
 
     public CustomThemeProvider()

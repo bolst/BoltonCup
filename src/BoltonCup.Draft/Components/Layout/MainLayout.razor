@@ -13,44 +13,48 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Style="height: 5vh">
-        <MudLink Style="height: 5vh" Href="https://boltoncup.ca" Target="_blank" Underline="Underline.None">
-            <MudImage Class="cursor-pointer" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" Width="40"/>
-        </MudLink>
+    <MudAppBar Style="height: 40px">
+        <MudHidden Breakpoint="Breakpoint.SmAndUp" Invert>
+            <MudLink Style="height: 40px" Href="https://boltoncup.ca" Target="_blank" Underline="Underline.None">
+                <MudImage Class="cursor-pointer" Src="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/logos//bc-new.png" Width="40"/>
+            </MudLink>
 
-        <MudButtonGroup Class="ml-8" OverrideStyles="false">
-            <MudIconButton Href="/" Icon="@Icons.Material.Filled.Home" Color="Color.Tertiary" Size="Size.Small"/>
-            <AuthorizeView>
-                <MudButton Href="draft" Color="Color.Tertiary" Size="Size.Small">Draft Tool</MudButton>
-            </AuthorizeView>
-        </MudButtonGroup>
+            <MudButtonGroup Class="ml-8" OverrideStyles="false">
+                <MudIconButton Href="/" Icon="@Icons.Material.Filled.Home" Color="Color.Tertiary" Size="Size.Small"/>
+                <AuthorizeView>
+                    <MudButton Href="draft" Color="Color.Tertiary" Size="Size.Small">Draft Tool</MudButton>
+                </AuthorizeView>
+            </MudButtonGroup>
+        </MudHidden>
 
         <MudSpacer/>
 
-        <CurrentPickBanner/>
+        <CurrentPickBanner />
 
         <MudSpacer/>
 
         <MudButtonGroup Class="mx-4" OverrideStyles="false">
             <DarkModeToggle @bind-IsDarkMode="_darkMode"/>
         </MudButtonGroup>
-
-        <AuthorizeView>
-            <Authorized>
-                <MudText Typo="Typo.caption">Welcome back, @context.User.Identity?.Name</MudText>
-            </Authorized>
-        </AuthorizeView>
-
-        <MudButtonGroup OverrideStyles="false">
+        
+        <MudHidden Breakpoint="Breakpoint.SmAndUp" Invert>
             <AuthorizeView>
                 <Authorized>
-                    <MudButton Class="ml-2" OnClick="LogOutClicked" Color="Color.Error">Log Out</MudButton>
+                    <MudText Typo="Typo.caption">Welcome back, @context.User.Identity?.Name</MudText>
                 </Authorized>
-                <NotAuthorized>
-                    <MudIconButton Icon="@Icons.Material.Filled.Login" Href="login" Color="Color.Tertiary" Size="Size.Small"/>
-                </NotAuthorized>
             </AuthorizeView>
-        </MudButtonGroup>
+
+            <MudButtonGroup OverrideStyles="false">
+                <AuthorizeView>
+                    <Authorized>
+                        <MudButton Class="ml-2" OnClick="LogOutClicked" Color="Color.Error">Log Out</MudButton>
+                    </Authorized>
+                    <NotAuthorized>
+                        <MudIconButton Icon="@Icons.Material.Filled.Login" Href="login" Color="Color.Tertiary" Size="Size.Small"/>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </MudButtonGroup>
+        </MudHidden>
     </MudAppBar>
     <MudMainContent>
         <div class="px-2">
