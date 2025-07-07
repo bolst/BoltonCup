@@ -2,6 +2,12 @@
 
 @attribute [Authorize]
 
+@implements IDisposable
+
+@inject HubConnectionProvider Hub
+@inject IBCData BCData
+
+
 <PageTitle>Bolton Cup Draft</PageTitle>
 
 <MudGrid Spacing="2">
@@ -12,7 +18,7 @@
     </MudItem>
     <MudItem xs="7">
         <MudPaper Width="100%" Height="90vh" Class="mud-theme-surface" Elevation="3">
-            <PlayerTable />
+            <PlayerTable Disabled="_disabled" />
         </MudPaper>
     </MudItem>
     <MudItem xs="2">
@@ -21,3 +27,58 @@
         </MudPaper>
     </MudItem>
 </MudGrid>
+
+
+@code {
+
+    private IEnumerable<IDisposable> _hubEvents = [];
+
+    private bool _disabled;
+    private BCTournament? _currentTournament;
+    private BCDraft? _draft;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currentTournament = await BCData.GetCurrentTournamentAsync();
+        await LoadDataAsync();
+        await InitializeHubConnection();
+    }
+
+
+    private async Task LoadDataAsync()
+    {
+        if (_currentTournament is null) return;
+
+        _draft = await BCData.GetTournamentDraftAsync(_currentTournament.tournament_id);
+        if (_draft is null) return;
+        
+        _disabled = _draft.State.EqualsEnum(DraftState.Inactive);
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    
+    private async Task InitializeHubConnection()
+    {
+        var connection = await Hub.GetHubConnection();
+        
+        var c1 = connection.On(DraftHub.Events.OnDraftStateChange, async () =>
+        {
+            await LoadDataAsync();
+            await InvokeAsync(StateHasChanged);
+        });
+
+        _hubEvents = _hubEvents.Append(c1);
+    }
+    
+    
+    public void Dispose()
+    {
+        foreach (var hubEvent in _hubEvents)
+        {
+            hubEvent.Dispose();
+        }
+        _hubEvents = [];
+    }
+
+
+}

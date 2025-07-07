@@ -1,0 +1,74 @@
+@implements IDisposable
+
+@inject Data.DraftServiceProvider Drafter
+@inject IBCData _bcData
+@inject HubConnectionProvider Hub
+
+@if (_draft is not null)
+{
+    if (_draft.State.EqualsEnum(DraftState.Live))
+    {
+        <MudButton OnClick="EndDraft" Color="Color.Error" FullWidth="FullWidth">End Draft</MudButton>
+    }
+    else if (_draft.State.EqualsEnum(DraftState.Inactive))
+    {
+        <MudButton OnClick="BeginDraft" Color="Color.Info" FullWidth="FullWidth">Start Draft</MudButton>
+    }
+}
+
+@code {
+
+    [Parameter]
+    public bool FullWidth { get; set; }
+
+    private BCDraft? _draft;
+
+    private IEnumerable<IDisposable> _hubEvents = [];
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _draft = await Drafter.GetDraftAsync();
+    }
+
+    
+    public async Task BeginDraft()
+    {
+        if (_draft is null) return;
+        
+        await _bcData.UpdateDraftStateAsync(_draft.Id, DraftState.Live);
+        await Hub.SendAsync(nameof(DraftHub.PushDraftStateChange));
+    }
+
+    public async Task EndDraft()
+    {
+        if (_draft is null) return;
+        
+        await _bcData.UpdateDraftStateAsync(_draft.Id, DraftState.Inactive);
+        await Hub.SendAsync(nameof(DraftHub.PushDraftStateChange));
+    }
+    
+    
+    private async Task InitializeHubConnection()
+    {
+        var connection = await Hub.GetHubConnection();
+        
+        var c1 = connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        {
+            Drafter.InvalidateDraftCache();
+            _draft = await Drafter.GetDraftAsync();
+            await InvokeAsync(StateHasChanged);
+        });
+
+        _hubEvents = _hubEvents.Append(c1);
+    }
+
+
+    public void Dispose()
+    {
+        foreach (var hubEvent in _hubEvents)
+        {
+            hubEvent.Dispose();
+        }
+        _hubEvents = [];
+    }
+}

@@ -17,6 +17,23 @@
             <div>
                 <MudText Class="my-4" Typo="Typo.h6">Highest Level - @Player.HighestLevel</MudText>
 
+                <MudText Class="my-4" Typo="Typo.h6">Availability</MudText>
+                <MudStack Style="max-width: 450px" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="0" Row>
+                    @if (Player.Availabilities.Any(a => a.Value != "null"))
+                    {
+                        foreach (var availability in Player.Availabilities.Where(a => a.Value != "null"))
+                        {
+                            var isIn = availability.Value == "in";
+                            <MudChip T="string" Color="Color.Surface" Icon="@(isIn ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Cancel)" IconColor="@(isIn ? Color.Success : Color.Error)" Variant="Variant.Filled" Size="Size.Small">@availability.Key.ToString("ddd. h:mm")</MudChip>
+                        }
+                    }
+                    else
+                    {
+                        <MudText>Not set</MudText>
+                    }
+                </MudStack>
+                
+                
                 @if (_preferredTeammate1 is not null || _preferredTeammate2 is not null)
                 {
                     <MudText Typo="Typo.h6">Preferred Teammates</MudText>
@@ -37,8 +54,6 @@
                         }
                     </MudStack>
                 }
-
-
             </div>
 
         </MudStack>

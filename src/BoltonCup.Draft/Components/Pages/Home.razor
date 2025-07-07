@@ -1,17 +1,37 @@
 @page "/"
 
+@implements IDisposable
+
 @inject Data.DraftServiceProvider Drafter
 @inject HubConnectionProvider Hub
+
+
+@if (!DraftRoundGrouping.Any())
+{
+    <div class="d-flex align-center justify-center flex-column gap-5" style="height: 80vh">
+        <AuthorizeView Roles="captain,admin">
+            @if (_draft is not null && _draft.State.EqualsEnum(DraftState.Inactive))
+            {
+                <MudText Typo="Typo.h5"><b>Draft has not started</b></MudText>
+            }
+            else if (_draft is not null && _draft.State.EqualsEnum(DraftState.Live))
+            {
+                <MudText Typo="Typo.h5"><b>No picks have been made yet</b></MudText>
+            }
+            <MudButton Style="@($"color: {BCColors.LightNavy}")" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.FormatListNumbered" Href="draft" Variant="Variant.Filled">Draft tool</MudButton>
+        </AuthorizeView>
+    </div>
+}
 
 
 <MudStack Style="width: 100%" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap" Justify="Justify.FlexStart" Row>
     @foreach (var round in DraftRoundGrouping)
     {
-        <MudPaper MinHeight="290px" Width="300px" Style="background-color: var(--mud-palette-dark-lighten); color: var(--mud-palette-dark-text);" Square>
+        <MudPaper MinHeight="290px" Width="300px" Style="background-color: var(--mud-palette-dark-lighten); color: var(--mud-palette-dark-text);" Elevation="5" Square>
             <MudText Class="ma-2" Typo="Typo.h6"><b>Round @round.Key</b></MudText>
             @foreach (var pick in round)
             {
-                <MudPaper Class="mud-theme-dark" Width="300px" Height="40px" Elevation="0" Square>
+                <MudPaper Style="background-color: var(--mud-palette-dark-lighten); color: var(--mud-palette-dark-text);" Width="300px" Height="40px" Elevation="0" Square>
                     <div class="d-flex align-center flex-row">
                         <div class="d-flex justify-center" style="width: 40px">
                             <MudText Typo="Typo.h6" Class="px-2"><b>@pick.OverallPick(6)</b></MudText>
@@ -19,7 +39,7 @@
                         <div class="d-flex align-center flex-row" style="@($"height: 40px; width: 40px; background-color: {pick.PrimaryColorHex}DD")">
                             <MudImage Src="@pick.TeamLogo" Width="40" />
                         </div>
-                        <MudPaper Class="mud-theme-light pa-2" Width="218px" Height="38px" Elevation="0" Square>
+                        <MudPaper Class="pa-2" Width="218px" Height="38px" Elevation="0" Square>
                             <MudText Align="Align.Start" Typo="Typo.subtitle2" Color="Color.Inherit">@pick.Name.ToUpper()</MudText>
                         </MudPaper>
                     </div>
@@ -29,11 +49,38 @@
     }
 </MudStack>
 
+@if (_lastPick is not null)
+{
+    <MudOverlay @bind-Visible="_overlayVisible" DarkBackground>
+        <MudPaper Class="pa-4" Style="background-color: var(--mud-palette-dark-lighten); color: var(--mud-palette-dark-text);">
+            <MudStack Wrap="Wrap.Wrap" Row>
+                <MudStack AlignItems="AlignItems.End">
+                    <MudStack AlignItems="AlignItems.Center" Row>
+                        <MudImage Src="@_lastPick.TeamLogo" Height="100" />
+                        <MudText Typo="Typo.h5">@_lastPick.TeamName.ToUpper() SELECT</MudText>
+                    </MudStack>
+
+                    <MudStack AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Row>
+                        <MudText>Round @_lastPick.round Pick @_lastPick.pick</MudText>
+                        <MudText Typo="Typo.h6">@_lastPick.Name</MudText>
+                    </MudStack>
+                </MudStack>
+                
+                <MudImage Src="@_lastPick.ProfilePicture" Width="200"/>
+            </MudStack>
+        </MudPaper>
+    </MudOverlay>
+}
+
 
 @code {
 
-    private BCDraftPick? _currentPick;
-    private BCTeam? _teamWithCurrentPick;
+    private IEnumerable<IDisposable> _hubEvents = [];
+
+    private bool _overlayVisible;
+    private BCDraftPickDetail? _lastPick;
+    
+    private BCDraft? _draft;
     private IEnumerable<BCDraftPickDetail> _draftPicks = [];
 
     private IEnumerable<IGrouping<int, BCDraftPickDetail>> DraftRoundGrouping 
@@ -44,15 +91,31 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
+        _draft = await Drafter.GetDraftAsync();
         await LoadDataAsync();
         await InitializeHubConnection();
     }
 
+    
     private async Task LoadDataAsync()
     {
-        (_teamWithCurrentPick, _currentPick) = await Drafter.GetTeamWithCurrentPick();
         _draftPicks = await Drafter.GetDraftedPlayersAsync();
+    }
+
+
+    private async Task ShowLastPickOverlay()
+    {
+        if (!_draftPicks.Any()) return;
+
+        _lastPick = _draftPicks.Last();
+
+        _overlayVisible = true;
+        await InvokeAsync(StateHasChanged);
+        
+        await Task.Delay(4000);
+
+        _overlayVisible = false;
+        await InvokeAsync(StateHasChanged);
     }
     
     
@@ -60,10 +123,29 @@
     {
         var connection = await Hub.GetHubConnection();
         
-        connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        var c1 =  connection.On(DraftHub.Events.OnDraftUpdate, async () =>
         {
             await LoadDataAsync();
-            InvokeAsync(StateHasChanged);
+            await ShowLastPickOverlay();
         });
+
+        var c2 = connection.On(DraftHub.Events.OnDraftStateChange, async () =>
+        {
+            _draft = await Drafter.GetDraftAsync();
+        });
+
+        _hubEvents = _hubEvents.Append(c1);
+        _hubEvents = _hubEvents.Append(c2);
     }
+    
+    
+    public void Dispose()
+    {
+        foreach (var hubEvent in _hubEvents)
+        {
+            hubEvent.Dispose();
+        }
+        _hubEvents = [];
+    }
+
 }
