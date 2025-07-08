@@ -261,7 +261,7 @@
 
     private string RowStyleFunc(PlayerProfile player, int row)
     {
-        if (_currentRoster.Any(x => x.preferred_teammate1 == player.account_id || x.preferred_teammate2 == player.account_id))
+        if (_currentUser?.id == _currentTeam?.gm_account_id && _currentRoster.Any(x => x.preferred_teammate1 == player.account_id || x.preferred_teammate2 == player.account_id))
         {
             return "background-color: var(--mud-palette-tertiary);";
         }

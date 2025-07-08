@@ -5,19 +5,20 @@
 @inject Data.DraftServiceProvider Drafter
 @inject HubConnectionProvider Hub
 
+<PageTitle>Bolton Cup Draft</PageTitle>
 
 @if (!DraftRoundGrouping.Any())
 {
     <div class="d-flex align-center justify-center flex-column gap-5" style="height: 80vh">
+        @if (_draft is not null && _draft.State.EqualsEnum(DraftState.Inactive))
+        {
+            <MudText Typo="Typo.h5"><b>Draft has not started</b></MudText>
+        }
+        else if (_draft is not null && _draft.State.EqualsEnum(DraftState.Live))
+        {
+            <MudText Typo="Typo.h5"><b>No picks have been made yet</b></MudText>
+        }
         <AuthorizeView Roles="captain,admin">
-            @if (_draft is not null && _draft.State.EqualsEnum(DraftState.Inactive))
-            {
-                <MudText Typo="Typo.h5"><b>Draft has not started</b></MudText>
-            }
-            else if (_draft is not null && _draft.State.EqualsEnum(DraftState.Live))
-            {
-                <MudText Typo="Typo.h5"><b>No picks have been made yet</b></MudText>
-            }
             <MudButton Style="@($"color: {BCColors.LightNavy}")" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.FormatListNumbered" Href="draft" Variant="Variant.Filled">Draft tool</MudButton>
         </AuthorizeView>
     </div>

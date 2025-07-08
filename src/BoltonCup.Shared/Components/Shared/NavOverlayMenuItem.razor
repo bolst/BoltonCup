@@ -1,4 +1,4 @@
-<MudNavLink Class="pa-2" Href="@Href">
+<MudNavLink Class="pa-2" Href="@Href" Target="@Target">
     <MudStack AlignItems="AlignItems.Center" Row>
         @if (Icon is not null)
         {
@@ -28,5 +28,8 @@
     
     [Parameter]
     public string LabelClass { get; set; } = string.Empty;
+
+    [Parameter] 
+    public string? Target { get; set; }
 
 }
