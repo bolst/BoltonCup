@@ -47,8 +47,9 @@
     private BCTournament? _currentTournament;
 
     private bool _loading;
+    private bool _initialized;
 
-    private bool ShowCountdown => _currentTournament?.start_date is not null && DateTime.Now.Date < _currentTournament.start_date.Value.Date;
+    private bool ShowCountdown => !_initialized || (_currentTournament?.start_date is not null && DateTime.Now.Date < _currentTournament.start_date.Value.Date);
 
     protected override async Task OnInitializedAsync()
     {
@@ -58,6 +59,7 @@
         _currentTournament = await BCData.GetCurrentTournamentAsync();
         _sponsors = await BCData.GetActiveSponsorsAsync();
 
+        _initialized = true;
         _loading = false;
         StateHasChanged();
     }
