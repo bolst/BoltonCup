@@ -1,9 +1,8 @@
 @page "/"
 
-@implements IDisposable
+@inherits HubComponentBase
 
 @inject Data.DraftServiceProvider Drafter
-@inject HubConnectionProvider Hub
 
 <PageTitle>Bolton Cup Draft</PageTitle>
 
@@ -57,13 +56,13 @@
             <MudStack Wrap="Wrap.Wrap" Row>
                 <MudStack AlignItems="AlignItems.End">
                     <MudStack AlignItems="AlignItems.Center" Row>
-                        <MudImage Src="@_lastPick.TeamLogo" Height="100" />
-                        <MudText Typo="Typo.h5">@_lastPick.TeamName.ToUpper() SELECT</MudText>
+                        <MudImage Src="@_lastPick.TeamLogo" Height="120" />
+                        <MudText Typo="Typo.h4">@_lastPick.TeamName.ToUpper() SELECT</MudText>
                     </MudStack>
 
                     <MudStack AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Row>
-                        <MudText>Round @_lastPick.round Pick @_lastPick.pick</MudText>
-                        <MudText Typo="Typo.h6">@_lastPick.Name</MudText>
+                        <MudText Typo="Typo.h6">Round @_lastPick.round Pick @_lastPick.pick</MudText>
+                        <MudText Typo="Typo.h5">@_lastPick.Name</MudText>
                     </MudStack>
                 </MudStack>
                 
@@ -75,8 +74,6 @@
 
 
 @code {
-
-    private IEnumerable<IDisposable> _hubEvents = [];
 
     private bool _overlayVisible;
     private BCDraftPickDetail? _lastPick;
@@ -94,7 +91,7 @@
     {
         _draft = await Drafter.GetDraftAsync();
         await LoadDataAsync();
-        await InitializeHubConnection();
+        await base.OnInitializedAsync();
     }
 
     
@@ -118,35 +115,20 @@
         _overlayVisible = false;
         await InvokeAsync(StateHasChanged);
     }
-    
-    
-    private async Task InitializeHubConnection()
-    {
-        var connection = await Hub.GetHubConnection();
-        
-        var c1 =  connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+
+
+    protected override void AddHubHandlers()
+    { 
+        Hub.On(DraftHub.Events.OnDraftUpdate, async () =>
         {
             await LoadDataAsync();
             await ShowLastPickOverlay();
         });
 
-        var c2 = connection.On(DraftHub.Events.OnDraftStateChange, async () =>
+        Hub.On(DraftHub.Events.OnDraftStateChange, async () =>
         {
             _draft = await Drafter.GetDraftAsync();
         });
-
-        _hubEvents = _hubEvents.Append(c1);
-        _hubEvents = _hubEvents.Append(c2);
     }
     
-    
-    public void Dispose()
-    {
-        foreach (var hubEvent in _hubEvents)
-        {
-            hubEvent.Dispose();
-        }
-        _hubEvents = [];
-    }
-
 }

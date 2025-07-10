@@ -1,0 +1,133 @@
+@page "/trades"
+
+@inject IBCData BCData
+@inject ISnackbar Snackbar
+
+
+<MudText Typo="Typo.h6">Select Teams</MudText>
+<MudSelect T="BCTeam" Value="_team1" ValueChanged="Team1Changed" Variant="Variant.Outlined" Label="Team 1" FullWidth>
+    @foreach (var team in _teams.Where(x => x != _team2))
+    {
+        <MudSelectItem Value="team">
+            <MudStack AlignItems="AlignItems.Center" Row>
+                <MudImage Src="@team.logo_url" Height="30" />
+                <MudText>@team.name</MudText>
+            </MudStack>
+        </MudSelectItem>
+    }
+</MudSelect>
+<MudSelect T="BCTeam" Value="_team2" ValueChanged="Team2Changed" Variant="Variant.Outlined" Label="Team 2" FullWidth>
+    @foreach (var team in _teams.Where(x => x != _team1))
+    {
+        <MudSelectItem Value="team">
+            <MudStack AlignItems="AlignItems.Center" Row>
+                <MudImage Src="@team.logo_url" Height="30" />
+                <MudText>@team.name</MudText>
+            </MudStack>
+        </MudSelectItem>
+    }
+</MudSelect>
+
+<MudDivider Class="my-2" />
+
+@if (_team1 is not null && _team2 is not null)
+{
+    <MudText Typo="Typo.h6">Select Players</MudText>
+
+    <MudSelect @bind-Value="_team1Player" Variant="Variant.Outlined" Label="Team 1 Player" FullWidth>
+        @foreach (var player in _team1Roster.Where(x => x.account_id != _team1.gm_account_id))
+        {
+            <MudSelectItem Value="player">
+                <MudStack AlignItems="AlignItems.Center" Row>
+                    <MudImage Src="@player.ProfilePicture" Height="30" />
+                    <MudText>@player.name</MudText>
+                </MudStack>
+            </MudSelectItem>
+        }
+    </MudSelect>
+    <MudSelect @bind-Value="_team2Player" Variant="Variant.Outlined" Label="Team 2 Player" FullWidth>
+        @foreach (var player in _team2Roster.Where(x => x.account_id != _team2.gm_account_id))
+        {
+            <MudSelectItem Value="player">
+                <MudStack AlignItems="AlignItems.Center" Row>
+                    <MudImage Src="@player.ProfilePicture" Height="30" />
+                    <MudText>@player.name</MudText>
+                </MudStack>
+            </MudSelectItem>
+        }
+    </MudSelect>
+    
+    <MudDivider Class="my-2" />
+    
+    <MudButton OnClick="TradePlayers" Variant="Variant.Filled" Color="Color.Tertiary" Disabled="_team1Player is null || _team2Player is null" FullWidth>Execute Trade</MudButton>
+}
+
+
+
+@code {
+
+    private BCTournament? _currentTournament;
+    private IEnumerable<BCTeam> _teams = [];
+
+    private BCTeam? _team1;
+    private BCTeam? _team2;
+
+    private IEnumerable<PlayerProfile> _team1Roster = [];
+    private IEnumerable<PlayerProfile> _team2Roster = [];
+
+    private PlayerProfile? _team1Player;
+    private PlayerProfile? _team2Player;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currentTournament = await BCData.GetCurrentTournamentAsync();
+        if (_currentTournament is null) return;
+
+        _teams = await BCData.GetTeamsInTournamentAsync(_currentTournament.tournament_id);
+    }
+
+
+    private async Task Team1Changed(BCTeam team)
+    {
+        _team1 = team;
+        _team1Player = null;
+        _team1Roster = await BCData.GetRosterByTeamId(team.id);
+    }
+
+    private async Task Team2Changed(BCTeam team)
+    {
+        _team2 = team;
+        _team2Player = null;
+        _team2Roster = await BCData.GetRosterByTeamId(team.id);
+    }
+
+    private async Task TradePlayers()
+    {
+        if (_team1Player is null || _team2Player is null) return;
+
+        var success = await BCData.TradePlayersAsync(_team1Player, _team2Player);
+
+        if (success)
+        {
+            Snackbar.Add("Success!", Severity.Success);
+            await Task.Delay(1500);
+            ResetData();
+        }
+        else
+        {
+            Snackbar.Add("That didn't work...", Severity.Error);
+        }
+    }
+
+
+    private void ResetData()
+    {
+        _team1 = null;
+        _team2 = null;
+        _team1Roster = [];
+        _team2Roster = [];
+        _team1Player = null;
+        _team2Player = null;
+    }
+
+}

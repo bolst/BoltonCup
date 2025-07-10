@@ -15,21 +15,21 @@
     <tbody>
         <tr>
             <th>
-                <MudImage Src="@(TeamLogoById(Game.home_team_id))" Height="50" />
+                <MudImage Src="@(TeamLogoById(Game.HomeTeamId))" Height="50" />
             </th>
-            <th>@Goals.Where(g => g.TeamId == Game.home_team_id && g.Period == 1).Count()</th>
-            <th>@Goals.Where(g => g.TeamId == Game.home_team_id && g.Period == 2).Count()</th>
-            <th>@Goals.Where(g => g.TeamId == Game.home_team_id && g.Period == 3).Count()</th>
-            <th><b>@Goals.Where(g => g.TeamId == Game.home_team_id).Count()</b></th>
+            <th>@Goals.Where(g => g.TeamId == Game.HomeTeamId && g.Period == 1).Count()</th>
+            <th>@Goals.Where(g => g.TeamId == Game.HomeTeamId && g.Period == 2).Count()</th>
+            <th>@Goals.Where(g => g.TeamId == Game.HomeTeamId && g.Period == 3).Count()</th>
+            <th><b>@Goals.Where(g => g.TeamId == Game.HomeTeamId).Count()</b></th>
         </tr>
         <tr>
             <th>
-                <MudImage Src="@(TeamLogoById(Game.away_team_id))" Height="50" />
+                <MudImage Src="@(TeamLogoById(Game.AwayTeamId))" Height="50" />
             </th>
-            <th>@Goals.Where(g => g.TeamId == Game.away_team_id && g.Period == 1).Count()</th>
-            <th>@Goals.Where(g => g.TeamId == Game.away_team_id && g.Period == 2).Count()</th>
-            <th>@Goals.Where(g => g.TeamId == Game.away_team_id && g.Period == 3).Count()</th>
-            <th><b>@Goals.Where(g => g.TeamId == Game.away_team_id).Count()</b></th>
+            <th>@Goals.Where(g => g.TeamId == Game.AwayTeamId && g.Period == 1).Count()</th>
+            <th>@Goals.Where(g => g.TeamId == Game.AwayTeamId && g.Period == 2).Count()</th>
+            <th>@Goals.Where(g => g.TeamId == Game.AwayTeamId && g.Period == 3).Count()</th>
+            <th><b>@Goals.Where(g => g.TeamId == Game.AwayTeamId).Count()</b></th>
         </tr>
     </tbody>
 </MudSimpleTable>

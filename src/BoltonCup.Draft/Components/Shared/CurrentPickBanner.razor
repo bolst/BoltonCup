@@ -1,7 +1,6 @@
-@implements IDisposable
+@inherits HubComponentBase
 
 @inject Data.DraftServiceProvider Drafter
-@inject HubConnectionProvider Hub
 
 
 @if (_currentPick is not null && _teamWithCurrentPick is not null)
@@ -23,14 +22,12 @@
     private BCTeam? _teamWithCurrentPick;
     private BCDraft? _draft;
     
-    private IEnumerable<IDisposable> _hubEvents = [];
-
     
     protected override async Task OnInitializedAsync()
     {
         _draft = await Drafter.GetDraftAsync();
         await LoadDataAsync();
-        await InitializeHubConnection();
+        await base.OnInitializedAsync();
     }
 
     private async Task LoadDataAsync()
@@ -39,35 +36,20 @@
     }
 
     
-    private async Task InitializeHubConnection()
+    protected override void AddHubHandlers()
     {
-        var connection = await Hub.GetHubConnection();
-        
-        var c1 = connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        Hub.On(DraftHub.Events.OnDraftUpdate, async () =>
         {
             await LoadDataAsync();
             InvokeAsync(StateHasChanged);
         });
 
-        var c2 = connection.On(DraftHub.Events.OnDraftStateChange, async () =>
+        Hub.On(DraftHub.Events.OnDraftStateChange, async () =>
         {
             Drafter.InvalidateDraftCache();
             _draft = await Drafter.GetDraftAsync();
             InvokeAsync(StateHasChanged);
         });
-
-        _hubEvents = _hubEvents.Append(c1);
-        _hubEvents = _hubEvents.Append(c2);
     }
     
-    
-    public void Dispose()
-    {
-        foreach (var hubEvent in _hubEvents)
-        {
-            hubEvent.Dispose();
-        }
-        _hubEvents = [];
-    }
-
 }

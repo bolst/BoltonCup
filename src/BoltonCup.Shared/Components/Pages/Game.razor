@@ -148,8 +148,8 @@ else
         gamePenalties = pensTask.Result;
         
 
-        var homeTask = BCData.GetTeamById(currGame.home_team_id);
-        var awayTask = BCData.GetTeamById(currGame.away_team_id);
+        var homeTask = BCData.GetTeamById(currGame.HomeTeamId);
+        var awayTask = BCData.GetTeamById(currGame.AwayTeamId);
         await Task.WhenAll(homeTask, awayTask);
         
         homeTeam = homeTask.Result;

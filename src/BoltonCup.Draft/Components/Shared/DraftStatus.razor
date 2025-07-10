@@ -1,6 +1,7 @@
+@inherits HubComponentBase
+
 @inject Data.DraftServiceProvider Drafter
 @inject IDialogService DialogService
-@inject HubConnectionProvider Hub
 
 @if (_teams is not null)
 {
@@ -57,7 +58,7 @@
     {
         _teams = await Drafter.GetTeamsInDraftAsync();
         await LoadDataAsync();
-        await InitializeHubConnection();
+        await base.OnInitializedAsync();
     }
 
     private async Task LoadDataAsync()
@@ -71,11 +72,9 @@
         return DialogService.ShowAsync<DraftBoardDialog>("Draft Board");
     }
     
-    private async Task InitializeHubConnection()
+    protected override void AddHubHandlers()
     {
-        var connection = await Hub.GetHubConnection();
-        
-        connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        Hub.On(DraftHub.Events.OnDraftUpdate, async () =>
         {
             await LoadDataAsync();
 

@@ -1,8 +1,7 @@
+@inherits HubComponentBase
+
 @inject IJSRuntime JS
 @inject Data.DraftServiceProvider Drafter
-@inject HubConnectionProvider Hub
-
-@implements IAsyncDisposable
 
 <div class="d-flex justify-center">
     <MudStack Class="px-1" AlignItems="AlignItems.Center">
@@ -10,17 +9,19 @@
     </MudStack>
 </div>
 
-<MudStack Justify="Justify.Center" Spacing="0" Row>
-    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Secondary" OnClick="StartTimer" Disabled="_disabled" />
-    @if (_paused)
-    {
-        <MudIconButton Icon="@Icons.Material.Filled.PlayCircleOutline" Color="Color.Primary" OnClick="ResumeTimer" Disabled="_disabled" />
-    }
-    else
-    {
-        <MudIconButton Icon="@Icons.Material.Filled.PauseCircleOutline" Color="Color.Secondary" OnClick="PauseTimer" Disabled="_disabled" />
-    }
-</MudStack>
+<AuthorizeView Roles="admin">
+    <MudStack Justify="Justify.Center" Spacing="0" Row>
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Secondary" OnClick="(() => StartTimer(true))" Disabled="_disabled" />
+        @if (_paused)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.PlayCircleOutline" Color="Color.Primary" OnClick="(() => ResumeTimer(true))" Disabled="_disabled" />
+        }
+        else
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.PauseCircleOutline" Color="Color.Secondary" OnClick="(() => PauseTimer(true))" Disabled="_disabled" />
+        }
+    </MudStack>
+</AuthorizeView>
 
 @code {
 
@@ -29,7 +30,6 @@
     private bool _disabled;
     private bool _paused;
     private const int TIME_LIMIT_SEC = 120;
-    private IEnumerable<IDisposable> _connections = [];
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -46,38 +46,44 @@
             {
                 _disabled = true;
             }
-            await InitializeHubConnection();
         }
     }
 
-    private async Task StartTimer()
+    private async Task StartTimer(bool sendHub = false)
     {
         _paused = false;
         await JS.InvokeVoidAsync("startTimer", TIME_LIMIT_SEC);
+        
+        if (sendHub)
+            await Hub.SendAsync(nameof(DraftHub.PushTimerStateChange), "startTimer");
     }
 
-    private async Task PauseTimer()
+    private async Task PauseTimer(bool sendHub = false)
     {
         _paused = true;
         await JS.InvokeVoidAsync("pauseTimer");
+        
+        if (sendHub)
+            await Hub.SendAsync(nameof(DraftHub.PushTimerStateChange), "pauseTimer");
     }
 
-    private async Task ResumeTimer()
+    private async Task ResumeTimer(bool sendHub = false)
     {
         _paused = false;
         await JS.InvokeVoidAsync("resumeTimer");
-    }
-    
-    private async Task InitializeHubConnection()
-    {
-        var connection = await Hub.GetHubConnection();
         
-        var c1 = connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        if (sendHub)
+            await Hub.SendAsync(nameof(DraftHub.PushTimerStateChange), "resumeTimer");
+    }
+
+    protected override void AddHubHandlers()
+    {
+        Hub.On(DraftHub.Events.OnDraftUpdate, async () =>
         {
             await StartTimer();
         });        
         
-        var c2 = connection.On(DraftHub.Events.OnDraftStateChange, async () =>
+        Hub.On(DraftHub.Events.OnDraftStateChange, async () =>
         {
             Drafter.InvalidateDraftCache();
             _draft = await Drafter.GetDraftAsync();
@@ -97,17 +103,20 @@
             await InvokeAsync(StateHasChanged);
         });
 
-        _connections = _connections.Append(c1);
-        _connections = _connections.Append(c2);
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await PauseTimer();
-        foreach (var connection in _connections)
+        Hub.On<string>(DraftHub.Events.OnTimerStateChange, async (jsCommand) =>
         {
-            connection.Dispose();
-        }
-        _connections = [];
+            switch (jsCommand)
+            {
+                case "startTimer":
+                    await StartTimer();
+                    break;
+                case "pauseTimer":
+                    await PauseTimer();
+                    break;
+                case "resumeTimer":
+                    await ResumeTimer();
+                    break;
+            }
+        });
     }
 }

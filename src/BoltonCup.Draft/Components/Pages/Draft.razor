@@ -2,9 +2,8 @@
 
 @attribute [Authorize]
 
-@implements IDisposable
+@inherits HubComponentBase
 
-@inject HubConnectionProvider Hub
 @inject IBCData BCData
 
 
@@ -31,8 +30,6 @@
 
 @code {
 
-    private IEnumerable<IDisposable> _hubEvents = [];
-
     private bool _disabled;
     private BCTournament? _currentTournament;
     private BCDraft? _draft;
@@ -41,7 +38,7 @@
     {
         _currentTournament = await BCData.GetCurrentTournamentAsync();
         await LoadDataAsync();
-        await InitializeHubConnection();
+        await base.OnInitializedAsync();
     }
 
 
@@ -57,28 +54,13 @@
     }
     
     
-    private async Task InitializeHubConnection()
+    protected override void AddHubHandlers()
     {
-        var connection = await Hub.GetHubConnection();
-        
-        var c1 = connection.On(DraftHub.Events.OnDraftStateChange, async () =>
+        Hub.On(DraftHub.Events.OnDraftStateChange, async () =>
         {
             await LoadDataAsync();
             await InvokeAsync(StateHasChanged);
         });
-
-        _hubEvents = _hubEvents.Append(c1);
     }
     
-    
-    public void Dispose()
-    {
-        foreach (var hubEvent in _hubEvents)
-        {
-            hubEvent.Dispose();
-        }
-        _hubEvents = [];
-    }
-
-
 }

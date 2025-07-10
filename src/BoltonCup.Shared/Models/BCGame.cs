@@ -3,8 +3,10 @@ namespace BoltonCup.Shared.Data;
 public class BCGame
 {
     public int id { get; set; }
-    public int home_team_id { get; set; }
-    public int away_team_id { get; set; }
+    public int? home_team_id { get; set; }
+    public int? away_team_id { get; set; }
+    public int HomeTeamId => home_team_id ?? 0;
+    public int AwayTeamId => away_team_id ?? 0;
     public DateTime date { get; set; }
     public string type { get; set; } = "";
     public string location { get; set; } = "";
