@@ -593,6 +593,31 @@ public partial class BCData : DapperBase, IBCData
                                 
         await ExecuteSqlAsync(sql, new { AccountId = accountId });
     }
+
+
+    public async Task<bool> UpdateGameTeamsAsync(BCGame game)
+    {
+        string sql = @"UPDATE game
+                        SET home_team_id = @home_team_id,
+                            away_team_id = @away_team_id
+                        WHERE id = @id";
+
+        return await ExecuteSqlAsync(sql, game) == 1;
+    }
+
+
+    public async Task<bool> TradePlayersAsync(PlayerProfile player1, PlayerProfile player2)
+    {
+        return await ExecuteTransactionAsync(async () =>
+        {
+            string sql = @"UPDATE players
+                            SET team_id = @TeamId
+                            WHERE id = @PlayerId";
+
+            await ExecuteSqlAsync(sql, new { PlayerId = player1.id, TeamId = player2.team_id });
+            await ExecuteSqlAsync(sql, new { PlayerId = player2.id, TeamId = player1.team_id });
+        });
+    }
     
 }
 

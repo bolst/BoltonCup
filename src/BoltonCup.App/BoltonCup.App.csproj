@@ -88,8 +88,6 @@
 
     <ItemGroup>
       <AdditionalFiles Include="Components\Pages\Admin.razor" />
-      <AdditionalFiles Include="Components\Pages\Login.razor" />
-      <AdditionalFiles Include="Components\Shared\LoginForm.razor" />
     </ItemGroup>
     
     <ItemGroup>

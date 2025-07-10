@@ -79,4 +79,7 @@ public interface IBCData
     Task RemoveGoalAsync(int goalId);
     Task RemovePenaltyAsync(int penaltyId);
     Task<IEnumerable<BCInfraction>> GetInfractionsAsync();
+
+    Task<bool> UpdateGameTeamsAsync(BCGame game);
+    Task<bool> TradePlayersAsync(PlayerProfile player1, PlayerProfile player2);
 }

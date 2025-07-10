@@ -63,7 +63,7 @@ public partial class BCData
                 GameId = goal.Game.id,
                 Time = goal.Time,
                 Period = goal.Period,
-                IsHomeTeam = goal.Game.home_team_id == goal.Team.id,
+                IsHomeTeam = goal.Game.HomeTeamId == goal.Team.id,
                 TournamentId = goal.Game.tournament_id,
                 ScorerId = goal.Scorer.id,
                 Assist1Id = goal.Assist1?.id,
@@ -88,7 +88,7 @@ public partial class BCData
             DurationMins = penalty.DurationMins,
             Infraction = penalty.Infraction,
             Notes = penalty.Notes,
-            IsHomeTeam = penalty.Game.home_team_id == penalty.Team.id,
+            IsHomeTeam = penalty.Game.HomeTeamId == penalty.Team.id,
             GameId = penalty.Game.id,
             TournamentId = penalty.Game.tournament_id,
             PlayerId = penalty.Player?.id

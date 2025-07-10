@@ -1,56 +1,19 @@
 @page "/"
-@using System.ComponentModel
+
 
 <PageTitle>Home</PageTitle>
 
-<div class="py-6 px-2" style="width: 100%;">
-    <CardCarousel Class="spotlight-carousel">
-        <CardCarouselItem>
-            <NavCard Title="Set Availability" To="profile" ImgSrc="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//bc-2024.webp">
-                <NavCardContent>
-                    <MudText Align="Align.End" Typo="Typo.h5"><b>Set your availability for your games.</b></MudText>
-                </NavCardContent>
-            </NavCard>
-        </CardCarouselItem>        
-        
-        <CardCarouselItem>
-            <NavCard Title="Teams" To="teams" ImgSrc="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//BOLTONCUP-153.webp">
-                <NavCardContent>
-                    <MudText Align="Align.End" Typo="Typo.h5"><b>6 teams, 1 winner. Checkout this year's teams</b></MudText>
-                </NavCardContent>
-            </NavCard>
-        </CardCarouselItem>
-
-        <CardCarouselItem>
-            <NavCard Title="Schedule" To="schedule" ImgSrc="https://iiedqecnfyojvubvugmy.supabase.co/storage/v1/object/public/images//BOLTONCUP-86.webp">
-                <NavCardContent>
-                    <MudText Align="Align.End" Typo="Typo.h5"><b>Tournament begins Jul. 18: See when your team is playing</b></MudText>
-                </NavCardContent>
-            </NavCard>
-        </CardCarouselItem>
-    </CardCarousel>
-    
-    <MudStack Class="mt-10" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Row>
-        <MudText Typo="Typo.h6"><b>2024 Leaders</b></MudText>
-        <MudButton Color="Color.Secondary" EndIcon="@Icons.Material.Filled.ArrowRight" Href="/stats">All stats</MudButton>
-    </MudStack>
-    <CardCarousel Class="leader-carousel">
-        <CardCarouselItem>
-            <LeaderCard StatType="Points" />
-        </CardCarouselItem>        
-        <CardCarouselItem>
-            <LeaderCard StatType="Goals" />
-        </CardCarouselItem>
-        <CardCarouselItem>
-            <LeaderCard StatType="Assists" />
-        </CardCarouselItem>
-        <CardCarouselItem>
-            <LeaderCard StatType="Goals Against Average" />
-        </CardCarouselItem>
-        <CardCarouselItem>
-            <LeaderCard StatType="Shutouts" />
-        </CardCarouselItem>
-    </CardCarousel>
+<div class="py-2" style="width: 100%;">
+    <div class="d-flex justify-center align-center" style="height: 60vh">
+        <MudStack AlignItems="AlignItems.Center" Style="width: 100%">
+            <MudButtonGroup Color="Color.Tertiary" Size="Size.Large" Variant="Variant.Outlined" FullWidth>
+                <MudButton Href="admin" StartIcon="@Icons.Material.Filled.AdminPanelSettings">Admin</MudButton>
+                <MudButton Href="trades" StartIcon="@Icons.Material.Filled.SwapHoriz">Trades</MudButton>
+                <MudButton Href="playoffs" StartIcon="@Icons.Material.Filled.SportsHockey">Playoffs</MudButton>
+            </MudButtonGroup>
+            <MudButtonGroup Color="Color.Tertiary" Size="Size.Large" Variant="Variant.Outlined" FullWidth>
+                <MudButton Href="rankings" StartIcon="@Icons.Material.Filled.FormatListNumbered">Rankings</MudButton>
+            </MudButtonGroup>
+        </MudStack>
+    </div>
 </div>
-
-<MudButton Color="Color.Primary" OnClick="@(() => throw new InvalidEnumArgumentException())">SHOW</MudButton>

@@ -153,10 +153,10 @@
 
         if (_game is not null)
         {
-            var homeTeamTask = BCData.GetTeamById(_game.home_team_id);
-            var awayTeamTask = BCData.GetTeamById(_game.away_team_id);
-            var homeRosterTask = BCData.GetRosterByTeamId(_game.home_team_id);
-            var awayRosterTask = BCData.GetRosterByTeamId(_game.away_team_id);
+            var homeTeamTask = BCData.GetTeamById(_game.HomeTeamId);
+            var awayTeamTask = BCData.GetTeamById(_game.AwayTeamId);
+            var homeRosterTask = BCData.GetRosterByTeamId(_game.HomeTeamId);
+            var awayRosterTask = BCData.GetRosterByTeamId(_game.AwayTeamId);
             var goalsTask = BCData.GetGameGoalsByGameId(_game.id);
             var penaltiesTask = BCData.GetGamePenaltiesByGameId(_game.id);
 

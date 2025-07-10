@@ -1,0 +1,78 @@
+@page "/playoffs"
+
+@inject IBCData BCData
+@inject ISnackbar Snackbar
+
+@foreach (var game in _games)
+{
+    <MudStack AlignItems="AlignItems.Center" Row>
+        <MudText>@game.date.ToString("dddd MMM dd, hh:mm tt")</MudText>
+        <GameTypeChip Game="game" />
+    </MudStack>
+    <MudSelect @bind-Value="game.home_team_id" Variant="Variant.Outlined" Label="Home" Clearable FullWidth>
+        @foreach (var team in _teams.Where(x => x.id != game.away_team_id))
+        {
+            <MudSelectItem T="int?" Value="team.id">
+                <MudStack AlignItems="AlignItems.Center" Row>
+                    <MudImage Src="@team.logo_url" Height="30" />
+                    <MudText>@team.name</MudText>
+                </MudStack>
+            </MudSelectItem>
+        }
+    </MudSelect>
+    <MudSelect @bind-Value="game.away_team_id" Variant="Variant.Outlined" Label="Away" Clearable FullWidth>
+        @foreach (var team in _teams.Where(x => x.id != game.home_team_id))
+        {
+            <MudSelectItem T="int?" Value="team.id">
+                <MudStack AlignItems="AlignItems.Center" Row>
+                    <MudImage Src="@team.logo_url" Height="30"/>
+                    <MudText>@team.name</MudText>
+                </MudStack>
+            </MudSelectItem>
+        }
+    </MudSelect>
+    
+    <MudButton OnClick="(() => SetGameTeams(game))" Variant="Variant.Filled" Color="Color.Tertiary" FullWidth>Update Game</MudButton>
+    
+    <MudDivider Class="my-2" />
+}
+
+@code {
+
+    private IEnumerable<BCGame> _games = [];
+    private IEnumerable<BCTeam> _teams = [];
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+
+    private async Task LoadDataAsync()
+    {
+        var tournament = await BCData.GetCurrentTournamentAsync();
+        if (tournament is null) return;
+        
+        _games = await BCData.GetSchedule();
+        _games = _games.Where(x => x.tournament_id == tournament.tournament_id && x.type != GameType.RoundRobin);
+        _teams = await BCData.GetTeamsInTournamentAsync(tournament.tournament_id);
+    }
+
+
+    private async Task SetGameTeams(BCGame game)
+    {
+        var status = await BCData.UpdateGameTeamsAsync(game);
+        if (status)
+        {
+            Snackbar.Add("Success!", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("That didn't work...", Severity.Error);
+        }
+
+        await LoadDataAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

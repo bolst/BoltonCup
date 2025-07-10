@@ -24,7 +24,7 @@
 
     private void OnNavigationChange(object? sender, LocationChangedEventArgs args)
     {
-        _color = args.Location.EndsWith(Href) ? Color.Primary : Color.Inherit;
+        _color = args.Location.EndsWith(Href) ? Color.Tertiary : Color.Inherit;
         InvokeAsync(StateHasChanged);
     }
 

@@ -1,0 +1,20 @@
+@page "/rankings"
+
+@inject IBCData BCData
+@inject Supabase.Client SBClient
+@inject CustomUserService CustomUserService
+
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        var account = await CustomUserService.LookupAccountAsync(SBClient.Auth.CurrentUser?.Email ?? "");
+        if (account is null) return;
+        
+        
+    }
+
+}
