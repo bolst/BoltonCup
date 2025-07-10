@@ -1,8 +1,7 @@
-@implements IDisposable
+@inherits HubComponentBase
 
 @inject Data.DraftServiceProvider Drafter
 @inject IBCData _bcData
-@inject HubConnectionProvider Hub
 
 @if (_draft is not null)
 {
@@ -22,12 +21,11 @@
     public bool FullWidth { get; set; }
 
     private BCDraft? _draft;
-
-    private IEnumerable<IDisposable> _hubEvents = [];
     
     protected override async Task OnInitializedAsync()
     {
         _draft = await Drafter.GetDraftAsync();
+        await base.OnInitializedAsync();
     }
 
     
@@ -48,27 +46,14 @@
     }
     
     
-    private async Task InitializeHubConnection()
+    protected override void AddHubHandlers()
     {
-        var connection = await Hub.GetHubConnection();
-        
-        var c1 = connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        Hub.On(DraftHub.Events.OnDraftUpdate, async () =>
         {
             Drafter.InvalidateDraftCache();
             _draft = await Drafter.GetDraftAsync();
             await InvokeAsync(StateHasChanged);
         });
-
-        _hubEvents = _hubEvents.Append(c1);
     }
 
-
-    public void Dispose()
-    {
-        foreach (var hubEvent in _hubEvents)
-        {
-            hubEvent.Dispose();
-        }
-        _hubEvents = [];
-    }
 }

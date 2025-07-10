@@ -1,6 +1,7 @@
+@inherits HubComponentBase
+
 @inject Data.DraftServiceProvider Drafter
 @inject IBCData BCData
-@inject HubConnectionProvider Hub
 
 <MudStack AlignItems="AlignItems.Center">
     @if (_team is not null && _pick is not null)
@@ -61,7 +62,7 @@
     {
         await LoadDataAsync();
         _draftTeams = await Drafter.GetTeamsInDraftAsync();
-        await InitializeHubConnection();
+        await base.OnInitializedAsync();
     }
 
     private async Task LoadDataAsync()
@@ -81,11 +82,9 @@
         _roster = await BCData.GetRosterByTeamId(_selectedTeam.id);
     }
 
-    private async Task InitializeHubConnection()
+    protected override void AddHubHandlers()
     {
-        var connection = await Hub.GetHubConnection();
-        
-        connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        Hub.On(DraftHub.Events.OnDraftUpdate, async () =>
         {
             await LoadDataAsync();
 

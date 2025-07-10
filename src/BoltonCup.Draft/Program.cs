@@ -33,17 +33,6 @@ builder.Services.AddBoltonCupAuth();
 
 builder.Services.AddScoped<DraftServiceProvider>();
 
-builder.Services.AddScoped(sp =>
-{
-    var Navigation = sp.GetRequiredService<NavigationManager>();
-    var hubConnection = new HubConnectionBuilder()
-        .WithUrl(Navigation.ToAbsoluteUri(DraftHub.HubUrl))
-        .WithAutomaticReconnect()
-        .Build();
-
-    return new HubConnectionProvider(hubConnection);
-});
-
 builder.Services.AddSignalR();
 
 var app = builder.Build();

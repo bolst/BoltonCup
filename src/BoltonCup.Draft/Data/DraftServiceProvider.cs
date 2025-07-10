@@ -7,15 +7,13 @@ namespace BoltonCup.Draft.Data;
 public class DraftServiceProvider
 {
     private readonly IBCData _bcData;
-    private readonly HubConnectionProvider _hub;
     
     private BCDraft? _draft;
     private const int PICKS_PER_ROUND = 6;
 
-    public DraftServiceProvider(IBCData bcData, HubConnectionProvider hub)
+    public DraftServiceProvider(IBCData bcData)
     {
         _bcData = bcData;
-        _hub = hub;
     }
 
     public async Task<BCDraft> GetDraftAsync()
@@ -74,7 +72,7 @@ public class DraftServiceProvider
         }
     }
 
-    public async Task DraftPlayerAsync(PlayerProfile player)
+    public async Task DraftPlayerAsync(PlayerProfile player, HubConnection hub)
     {
         var (team, pick) = await GetTeamWithCurrentPick();
         // Console.WriteLine($"{team.name} is drafting {player.name}");
@@ -83,7 +81,7 @@ public class DraftServiceProvider
         await _bcData.DraftPlayerAsync(player, team, pick);
         
         // 2. notify subscribers that a selection has been made (e.g., timer)
-        await _hub.SendAsync(nameof(DraftHub.PushDraftUpdate));
+        await hub.SendAsync(nameof(DraftHub.PushDraftUpdate));
     }
 
     public async Task<IEnumerable<BCTeam>> GetTeamsInDraftAsync()
@@ -102,12 +100,12 @@ public class DraftServiceProvider
         return await _bcData.GetDraftPicksAsync(draft.Id);
     }
 
-    public async Task ResetDraftAsync()
+    public async Task ResetDraftAsync(HubConnection hub)
     {
         var draft = await GetDraftAsync();
         await _bcData.ResetDraftAsync(draft.Id);
         
         // notify subscribers
-        await _hub.SendAsync(nameof(DraftHub.PushDraftUpdate));
+        await hub.SendAsync(nameof(DraftHub.PushDraftUpdate));
     }
 }

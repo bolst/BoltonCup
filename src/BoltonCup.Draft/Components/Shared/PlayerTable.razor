@@ -1,9 +1,8 @@
-@implements IDisposable
+@inherits HubComponentBase
 
 @inject IBCData BCData
 @inject Data.DraftServiceProvider Drafter
 @inject IDialogService DialogService
-@inject HubConnectionProvider Hub
 @inject Supabase.Client SBClient
 
 @if (_players is not null)
@@ -110,8 +109,6 @@
     [Parameter]
     public bool Disabled { get; set; }
     
-    private IEnumerable<IDisposable> _hubEvents = [];
-
     private IEnumerable<PlayerProfile>? _players;
     private HashSet<PlayerProfile> _filteredPlayers = new();
     private BCTournament? _currentTournament;
@@ -131,7 +128,7 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadDataAsync();
-        await InitializeHubConnection();
+        await base.OnInitializedAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -177,7 +174,7 @@
     
     private async Task OnResetDraft()
     {
-        await Drafter.ResetDraftAsync();
+        await Drafter.ResetDraftAsync(Hub);
         await LoadDataAsync();
     }
 
@@ -201,7 +198,7 @@
             _loading = true;
             await InvokeAsync(StateHasChanged);
             
-            await Drafter.DraftPlayerAsync(player);
+            await Drafter.DraftPlayerAsync(player, Hub);
             //await LoadDataAsync();
         }
     }
@@ -245,18 +242,14 @@
         };
     };
     
-    private async Task InitializeHubConnection()
+    protected override void AddHubHandlers()
     {
-        var connection = await Hub.GetHubConnection();
-        
-        var c1 = connection.On(DraftHub.Events.OnDraftUpdate, async () =>
+        Hub.On(DraftHub.Events.OnDraftUpdate, async () =>
         {
             await LoadDataAsync();
             
             InvokeAsync(StateHasChanged);
         });
-
-        _hubEvents = _hubEvents.Append(c1);
     }
 
     private string RowStyleFunc(PlayerProfile player, int row)
@@ -269,13 +262,4 @@
         return string.Empty;
     }
 
-    
-    public void Dispose()
-    {
-        foreach (var hubEvent in _hubEvents)
-        {
-            hubEvent.Dispose();
-        }
-        _hubEvents = [];
-    }
 }
