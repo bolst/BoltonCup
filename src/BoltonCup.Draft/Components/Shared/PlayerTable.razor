@@ -46,9 +46,9 @@
                        ThumbIconColor="@(_availabilityView ? Color.Secondary : Color.Primary)"
                        Disabled="_loading" />
             
-            <MudTooltip Text="My Rankings">
-                <MudIconButton Icon="@Icons.Material.Filled.Reorder" Color="Color.Info" Size="Size.Small" OnClick="ShowMyRankingsDialog" />
-            </MudTooltip>
+            <MudButtonGroup OverrideStyles="false">
+                <MudButton StartIcon="@Icons.Material.Filled.Reorder" Color="Color.Info" Size="Size.Small" OnClick="ShowMyRankingsDialog">My Rankings</MudButton>
+            </MudButtonGroup>
 
             <MudSpacer/>
             <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
