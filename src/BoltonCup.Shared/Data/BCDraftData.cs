@@ -1,3 +1,5 @@
+using Dapper;
+
 namespace BoltonCup.Shared.Data;
 
 
@@ -138,5 +140,58 @@ public partial class BCData
                         WHERE id = @DraftId";
         
         await ExecuteSqlAsync(sql, new { DraftId = draftId, State = state.ToDescriptionString() });
+    }
+
+
+
+    public async Task<IEnumerable<DraftRanking>> GetDraftRankingsAsync(int tournamentId, int accountId)
+    {
+        string sql = @"SELECT p.id AS playerid,
+                               p.name AS playername,
+                               p.account_id AS accountid,
+                               p.team_id AS teamid,
+                               t.name AS teamname,
+                               t.logo_url AS teamlogo,
+                               p.position,
+                               COALESCE(r.rank, ROW_NUMBER() OVER ( PARTITION BY p.position
+                                   ORDER BY RANDOM())) AS rank
+                        FROM players p
+                                 INNER JOIN account a
+                                            ON p.account_id = a.id AND a.isactive = TRUE AND a.payed = TRUE AND p.tournament_id = @TournamentId
+                                 LEFT OUTER JOIN draft_ranking r ON r.player_id = p.id AND r.account_id = @AccountId
+                                 LEFT OUTER JOIN team t ON t.id = p.team_id
+                        WHERE a.id NOT IN (SELECT gm_account_id FROM team WHERE tournament_id = @TournamentId)
+                        ORDER BY CASE WHEN p.position = 'forward' THEN 1 WHEN p.position = 'defense' THEN 2 ELSE 3 END, rank";
+        
+        return await QueryDbAsync<DraftRanking>(sql, new { TournamentId = tournamentId, AccountId = accountId });
+    }
+
+
+
+    public async Task UpdateDraftRankingAsync(int draftId, int accountId, IEnumerable<DraftRanking> rankings)
+    {
+        await ExecuteTransactionAsync(async () =>
+        {
+            {
+                string sql = @"DELETE FROM draft_ranking WHERE draft_id = @DraftId AND account_id = @AccountId";
+                
+                await ExecuteSqlAsync(sql, new { DraftId = draftId, AccountId = accountId });
+            }
+
+            {
+                string sql = @"INSERT INTO draft_ranking(account_id, player_id, rank, draft_id)
+                                    VALUES(@AccountId, @PlayerId, @Rank, @DraftId)";
+
+                var parameters = rankings.Select(x => new DynamicParameters(new
+                {
+                    AccountId = accountId,
+                    PlayerId = x.PlayerId,
+                    Rank = x.Rank,
+                    DraftId = draftId,
+                }));
+
+                await ExecuteSqlAsync(sql, parameters);
+            }
+        });
     }
 }
