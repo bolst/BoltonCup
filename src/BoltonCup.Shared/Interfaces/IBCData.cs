@@ -47,6 +47,8 @@ public interface IBCData
     Task<IEnumerable<BCDraftPickDetail>> GetDraftPicksAsync(int draftId);
     Task ResetDraftAsync(int draftId);
     Task UpdateDraftStateAsync(int draftId, DraftState state);
+    Task<IEnumerable<DraftRanking>> GetDraftRankingsAsync(int tournamentId, int accountId);
+    Task UpdateDraftRankingAsync(int tournamentId, int accountId, IEnumerable<DraftRanking> rankings);
     
     
     Task<IEnumerable<BCTeam>> GetTeamsInTournamentAsync(int tournamentId);

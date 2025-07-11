@@ -45,6 +45,10 @@
                        ThumbIcon="@(_availabilityView ? Icons.Material.Filled.EventAvailable : Icons.Material.Filled.QueryStats)"
                        ThumbIconColor="@(_availabilityView ? Color.Secondary : Color.Primary)"
                        Disabled="_loading" />
+            
+            <MudTooltip Text="My Rankings">
+                <MudIconButton Icon="@Icons.Material.Filled.Reorder" Color="Color.Info" Size="Size.Small" OnClick="ShowMyRankingsDialog" />
+            </MudTooltip>
 
             <MudSpacer/>
             <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
@@ -202,7 +206,20 @@
             //await LoadDataAsync();
         }
     }
-    
+
+    private async Task ShowMyRankingsDialog()
+    {
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Large,
+            FullWidth = false,
+            CloseOnEscapeKey = false,
+            BackdropClick = false,
+        };
+
+        await DialogService.ShowAsync<RankingEditDialog>("Draft Player", options);
+    }
+
     private Func<PlayerProfile, bool> QuickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(_searchString))
