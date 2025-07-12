@@ -17,7 +17,8 @@ public partial class BCData : DapperBase, IBCData
     {
         string sql = @"SELECT *
                     FROM
-                      team T";
+                      team T
+                    ORDER BY name";
         return await QueryDbAsync<BCTeam>(sql);
     }
 
@@ -83,7 +84,7 @@ public partial class BCData : DapperBase, IBCData
 
     public async Task<IEnumerable<PlayerProfile>> GetRosterByTeamId(int id)
     {
-        string sql = @"SELECT *, p.id
+        string sql = @"SELECT *, p.id, p.position
                         FROM players p
                             LEFT OUTER JOIN account a ON p.account_id = a.id AND a.isactive = TRUE
                         WHERE p.team_id = @TeamId";
