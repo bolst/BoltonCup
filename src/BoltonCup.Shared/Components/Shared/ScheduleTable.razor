@@ -40,7 +40,7 @@
                     <MudText><b>@context.AwayTeamNameShort</b></MudText>
                 </MudStack>
             </MudTd>
-            <MudTd DataLabel="Result">@context.home_score - @context.away_score</MudTd>
+            <MudTd DataLabel="Result"><MudText Typo="Typo.h6"><b>@context.home_score - @context.away_score</b></MudText></MudTd>
             <MudTd DataLabel="Time">@context.date.ToString("hh:mmtt")</MudTd>
             <MudTd DataLabel="Location">@context.location (@context.rink)</MudTd>
         </RowTemplate>

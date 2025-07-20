@@ -43,23 +43,23 @@ else
         <MudForm @ref="_form">
             
             <MudSelect Class="my-1" @bind-Value="_scorer" Label="Scorer" Margin="Margin.Dense" Variant="Variant.Outlined" AutoFocus Clearable Dense Required>
-                @foreach (var player in Players.Where(p => p.id != _assist1?.id && p.id != _assist2?.id))
+                @foreach (var player in OrderedPlayers.Where(p => p.id != _assist1?.id && p.id != _assist2?.id))
                 {
-                    <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
+                    <MudSelectItem Value="player"><b>#@player.jersey_number @player.name</b></MudSelectItem>
                 }
             </MudSelect>
 
             <MudSelect Class="my-1" @bind-Value="_assist1" Label="Primary Assist" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Clearable>
-                @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist2?.id))
+                @foreach (var player in OrderedPlayers.Where(p => p.id != _scorer?.id && p.id != _assist2?.id))
                 {
-                    <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
+                    <MudSelectItem Value="player"><b>#@player.jersey_number @player.name</b></MudSelectItem>
                 }
             </MudSelect>
 
             <MudSelect Class="my-1" @bind-Value="_assist2" Label="Secondary Assist" Margin="Margin.Dense" Variant="Variant.Outlined" Dense Clearable>
-                @foreach (var player in Players.Where(p => p.id != _scorer?.id && p.id != _assist1?.id))
+                @foreach (var player in OrderedPlayers.Where(p => p.id != _scorer?.id && p.id != _assist1?.id))
                 {
-                    <MudSelectItem Value="player">#@player.jersey_number @player.name</MudSelectItem>
+                    <MudSelectItem Value="player"><b>#@player.jersey_number @player.name</b></MudSelectItem>
                 }
             </MudSelect>
 
@@ -117,6 +117,8 @@ else
 
     [Parameter] 
     public bool WithGoalHorn { get; set; } = true;
+
+    private IEnumerable<PlayerProfile> OrderedPlayers => Players.OrderBy(x => x.jersey_number);
 
     private readonly DialogOptions _dialogOptions = new()
     {
