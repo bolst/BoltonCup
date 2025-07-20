@@ -70,18 +70,20 @@ public partial class BCData
 
     public async Task<IEnumerable<BCSong>> GetGameSongsAsync(int gameId)
     {
-        string sql = @"WITH game_account_ids AS (
-                        SELECT a.id
+        string sql = @"WITH game_account_ids AS (SELECT a.id
                           FROM account a
-                           INNER JOIN players p ON p.account_id = a.id
-                           INNER JOIN game g
-                                      ON p.team_id IN (g.home_team_id, g.away_team_id) AND g.id = @GameId
-                            )
+                                   INNER JOIN players p ON p.account_id = a.id
+                                   INNER JOIN game g
+                                              ON p.team_id IN (g.home_team_id, g.away_team_id) AND g.id = @GameId)
                         SELECT *
-                            FROM song
-                            WHERE account_id IS NULL
-                               OR account_id IN (SELECT * FROM game_account_ids)
-                            ORDER BY account_id";
+                        FROM song
+                        WHERE account_id IS NULL
+                           OR account_id IN (SELECT * FROM game_account_ids)
+                        ORDER BY CASE WHEN account_id IS NULL THEN 1 ELSE 0 END,
+                                 CASE
+                                     WHEN account_id IS NULL THEN RANDOM()
+                                     ELSE RANDOM()
+                                     END";
 
         return await QueryDbAsync<BCSong>(sql, new { GameId = gameId });
     }

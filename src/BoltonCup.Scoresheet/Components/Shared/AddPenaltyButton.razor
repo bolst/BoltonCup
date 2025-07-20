@@ -42,24 +42,24 @@ else
         
         <MudForm @ref="_form">
 
-            <MudSelect Class="my-1" @bind-Value="_player" Label="Player" Margin="Margin.Dense" Dense Clearable Required>
-                @foreach (var player in Players)
+            <MudSelect Class="my-1" @bind-Value="_player" Label="Player" Variant="Variant.Outlined" Margin="Margin.Dense" Dense Clearable Required>
+                @foreach (var player in OrderedPlayers)
                 {
-                    <MudSelectItem Value="player">@player.name</MudSelectItem>
+                    <MudSelectItem Value="player"><b>#@player.jersey_number @player.name</b></MudSelectItem>
                 }
             </MudSelect>
 
-            <MudSelect Class="my-1" @bind-Value="_infraction" Label="Infraction" Margin="Margin.Dense" Dense Clearable Required>
+            <MudSelect Class="my-1" @bind-Value="_infraction" Label="Infraction" Variant="Variant.Outlined" Margin="Margin.Dense" Dense Clearable Required>
                 @foreach (var infraction in _infractions)
                 {
-                    <MudSelectItem Value="infraction.name">@infraction.name</MudSelectItem>
+                    <MudSelectItem Value="infraction.name"><b>@infraction.name</b></MudSelectItem>
                 }
             </MudSelect>
 
-            <MudSelect Class="my-1" @bind-Value="_duration" Label="Duration" Margin="Margin.Dense" Dense Required>
+            <MudSelect Class="my-1" @bind-Value="_duration" Label="Duration" Variant="Variant.Outlined" Margin="Margin.Dense" Dense Required>
                 @foreach (var minute in Enumerable.Range(2, 11))
                 {
-                    <MudSelectItem Value="minute">@minute mins</MudSelectItem>
+                    <MudSelectItem Value="minute"><b>@minute mins</b></MudSelectItem>
                 }
             </MudSelect>
             
@@ -120,6 +120,8 @@ else
 
     [Parameter] 
     public bool WithPenaltySong { get; set; } = true;
+    
+    private IEnumerable<PlayerProfile> OrderedPlayers => Players.OrderBy(x => x.jersey_number);
 
     private readonly DialogOptions _dialogOptions = new()
     {
