@@ -1,36 +1,70 @@
 @namespace BoltonCup.Web.Components.Shared
 
-<MudPaper Square>
-    <div class="pa-2">
-        <MudStack AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Row>
-            @if (!string.IsNullOrEmpty(Game.HomeTeamName))
-            {
-                <MudText><b>@Game.HomeTeamNameShort.ToUpper()</b></MudText>
-                <MudImage Src="@Game.HomeTeamLogo" Height="40"/>
-            }
-            else
-            {
-                <MudText><b>TBD</b></MudText>
-                <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Small" />
-            }
+<MudLink Href="@($"game/{Game.id}")" Underline="Underline.None">
+    <MudPaper Square>
+        <div class="pa-2">
+            <MudGrid Style="height: 65px">
+                <MudItem Class="d-flex align-center" xs="6">
+                    @if (!string.IsNullOrEmpty(Game.HomeTeamName))
+                    {
+                        <MudText><b>@Game.HomeTeamNameShort.ToUpper()</b></MudText>
+                    }
+                    else
+                    {
+                        <MudText><b>TBD</b></MudText>
+                    }
+                </MudItem>
+                <MudItem Class="d-flex align-center" xs="4">
+                    @if (!string.IsNullOrEmpty(Game.HomeTeamName))
+                    {
+                        <MudImage Src="@Game.HomeTeamLogo" Width="40"/>
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Small"/>
+                    }
+                </MudItem>
+                <MudItem Class="d-flex align-center justify-center" xs="2">
+                    @if (Game.state == GameState.Complete)
+                    {
+                        <MudText><b>@Game.home_score</b></MudText>
+                    }
+                </MudItem>
+            </MudGrid>
+            <MudGrid Style="height: 65px">
+                <MudItem Class="d-flex align-center" xs="6">
+                    @if (!string.IsNullOrEmpty(Game.AwayTeamName))
+                    {
+                        <MudText><b>@Game.AwayTeamNameShort.ToUpper()</b></MudText>
+                    }
+                    else
+                    {
+                        <MudText><b>TBD</b></MudText>
+                    }
+                </MudItem>
+                <MudItem Class="d-flex align-center" xs="4">
+                    @if (!string.IsNullOrEmpty(Game.AwayTeamName))
+                    {
+                        <MudImage Src="@Game.AwayTeamLogo" Width="40"/>
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Small"/>
+                    }
+                </MudItem>
+                <MudItem Class="d-flex align-center justify-center" xs="2">
+                    @if (Game.state == GameState.Complete)
+                    {
+                        <MudText><b>@Game.away_score</b></MudText>
+                    }
+                </MudItem>
+            </MudGrid>
+        </div>
+        <MudStack Class="gray darken-3" AlignItems="AlignItems.Center" Justify="Justify.Center" Row>
+            <MudText Style="@($"color: {TextColor}")"><b>@Game.type.ToUpper()</b></MudText>
         </MudStack>
-        <MudStack AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Row>
-            @if (!string.IsNullOrEmpty(Game.AwayTeamName))
-            {
-                <MudText><b>@Game.AwayTeamNameShort.ToUpper()</b></MudText>
-                <MudImage Src="@Game.AwayTeamLogo" Height="40"/>
-            }
-            else
-            {
-                <MudText><b>TBD</b></MudText>
-                <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Small" />
-            }
-        </MudStack>
-    </div>
-    <MudStack Class="gray darken-3" AlignItems="AlignItems.Center" Justify="Justify.Center" Row>
-        <MudText Style="@($"color: {TextColor}")"><b>@Game.type.ToUpper()</b></MudText>
-    </MudStack>
-</MudPaper>
+    </MudPaper>
+</MudLink>
 
 
 @code {
