@@ -9,4 +9,7 @@ public enum DraftState
     
     [Description("live")]
     Live,
+
+    [Description("complete")]
+    Complete,
 }
