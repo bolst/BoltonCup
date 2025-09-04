@@ -58,7 +58,9 @@
                 <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row>
                     @if (_champion is not null)
                     {
-                        <MudImage Src="@_champion.logo_url" Height="80" />
+                        <MudLink Href="@($"/team/{_champion.id}")" Underline="Underline.None">
+                            <MudImage Src="@_champion.logo_url" Height="80" />
+                        </MudLink>
                     }
                     else
                     {
