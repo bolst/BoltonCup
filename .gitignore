@@ -1,6 +1,9 @@
 src/BoltonCup.sln.DotSettings.user
 
 src/BoltonCup.App/appsettings.txt
+
+appSettings.Development*
+
  
 # ------
 .DS_STORE
