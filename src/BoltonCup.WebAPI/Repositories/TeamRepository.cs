@@ -10,7 +10,8 @@ public class TeamRepository : ITeamRepository
 
     public TeamRepository(IConfiguration configuration)
     {
-        _connectionString = configuration.GetBoltonCupConnectionString();
+        _connectionString = configuration.GetValue<string>(ConfigurationPaths.ConnectionString) 
+                            ?? throw new Exception("Connection string is null");
     }
 
     public Task<IEnumerable<Team>> GetAllAsync()
