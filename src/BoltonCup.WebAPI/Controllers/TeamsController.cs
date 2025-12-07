@@ -16,9 +16,11 @@ public class TeamsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Team>>> Get()
+    public async Task<ActionResult<IEnumerable<Team>>> Get(int? tournamentId = null)
     {
-        return Ok(await _unitOfWork.Teams.GetAllAsync());
+        return tournamentId is null 
+            ? Ok(await _unitOfWork.Teams.GetAllAsync())
+            : Ok(await _unitOfWork.Teams.GetAllAsync(tournamentId.Value));
     }
 
     [HttpGet("{id}")]
