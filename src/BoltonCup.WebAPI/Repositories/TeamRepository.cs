@@ -22,17 +22,17 @@ public class TeamRepository : ITeamRepository
                               id as Id,
                               name as Name,
                               name_short as NameShort,
-                              primary_color_hex as PrimaryColorHex,
-                              secondary_color_hex as SecondaryColorHex,
-                              tertiary_color_hex as TertiaryColorHex,
-                              logo_url as LogoUrl,
+                              abbreviation as Abbreviation,
                               tournament_id as TournamentId,
-                              gm_account_id as GmAccountId,
-                              banner_image as BannerImage,
-                              goal_horn_url as GoalHornUrl,
+                              logo_url as LogoUrl,
+                              banner_url as BannerUrl,
+                              primary_hex as PrimaryHex,
+                              secondary_hex as SecondaryHex,
+                              tertiary_hex as TertiaryHex,
+                              goal_song_url as GoalSongUrl,
                               penalty_song_url as PenaltySongUrl
                             from
-                              team T
+                              core.teams
                             order by
                               tournament_id,
                               id";
@@ -46,17 +46,17 @@ public class TeamRepository : ITeamRepository
                               id as Id,
                               name as Name,
                               name_short as NameShort,
-                              primary_color_hex as PrimaryColorHex,
-                              secondary_color_hex as SecondaryColorHex,
-                              tertiary_color_hex as TertiaryColorHex,
-                              logo_url as LogoUrl,
+                              abbreviation as Abbreviation,
                               tournament_id as TournamentId,
-                              gm_account_id as GmAccountId,
-                              banner_image as BannerImage,
-                              goal_horn_url as GoalHornUrl,
+                              logo_url as LogoUrl,
+                              banner_url as BannerUrl,
+                              primary_hex as PrimaryHex,
+                              secondary_hex as SecondaryHex,
+                              tertiary_hex as TertiaryHex,
+                              goal_song_url as GoalSongUrl,
                               penalty_song_url as PenaltySongUrl
                             from
-                              team T
+                              core.teams
                             where
                               tournament_id = @TournamentId
                             order by
@@ -72,17 +72,17 @@ public class TeamRepository : ITeamRepository
                               id as Id,
                               name as Name,
                               name_short as NameShort,
-                              primary_color_hex as PrimaryColorHex,
-                              secondary_color_hex as SecondaryColorHex,
-                              tertiary_color_hex as TertiaryColorHex,
-                              logo_url as LogoUrl,
+                              abbreviation as Abbreviation,
                               tournament_id as TournamentId,
-                              gm_account_id as GmAccountId,
-                              banner_image as BannerImage,
-                              goal_horn_url as GoalHornUrl,
+                              logo_url as LogoUrl,
+                              banner_url as BannerUrl,
+                              primary_hex as PrimaryHex,
+                              secondary_hex as SecondaryHex,
+                              tertiary_hex as TertiaryHex,
+                              goal_song_url as GoalSongUrl,
                               penalty_song_url as PenaltySongUrl
                             from
-                              team T
+                              core.teams
                             where
                                 id = @Id";
         await using var connection = new NpgsqlConnection(_connectionString);
