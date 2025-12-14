@@ -4,7 +4,7 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddBoltonCupWebAPIServices();
+builder.Services.AddBoltonCupWebAPIServices(builder.Configuration);
 
 builder.Services.AddControllers();
 // https://aka.ms/aspnetcore/swashbuckle

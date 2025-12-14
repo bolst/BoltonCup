@@ -1,106 +1,62 @@
+using BoltonCup.WebAPI.Data;
 using BoltonCup.WebAPI.Interfaces;
 using BoltonCup.WebAPI.Models;
-using Npgsql;
-using Dapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.WebAPI.Repositories;
 
 public class TeamRepository : ITeamRepository
 {
-    // private readonly ILogger<TeamRepository> _logger;
-    private readonly string _connectionString;
+    private readonly BoltonCupDbContext _context;
 
-    public TeamRepository(IConfiguration configuration)
+    public TeamRepository(BoltonCupDbContext context)
     {
-        _connectionString = configuration.GetValue<string>(ConfigurationPaths.ConnectionString) 
-                            ?? throw new Exception("Connection string is null");
+        _context = context;
     }
 
     public async Task<IEnumerable<Team>> GetAllAsync()
     {
-        const string sql = @"select
-                              id as Id,
-                              name as Name,
-                              name_short as NameShort,
-                              abbreviation as Abbreviation,
-                              tournament_id as TournamentId,
-                              logo_url as LogoUrl,
-                              banner_url as BannerUrl,
-                              primary_hex as PrimaryHex,
-                              secondary_hex as SecondaryHex,
-                              tertiary_hex as TertiaryHex,
-                              goal_song_url as GoalSongUrl,
-                              penalty_song_url as PenaltySongUrl
-                            from
-                              core.teams
-                            order by
-                              tournament_id,
-                              id";
-        await using var connection = new NpgsqlConnection(_connectionString);
-        return await connection.QueryAsync<Team>(sql);
+        return await _context.Teams
+            .OrderBy(t => t.TournamentId)
+            .ThenBy(t => t.Id)
+            .ToListAsync();
     }
     
     public async Task<IEnumerable<Team>> GetAllAsync(int tournamentId)
     {
-        const string sql = @"select
-                              id as Id,
-                              name as Name,
-                              name_short as NameShort,
-                              abbreviation as Abbreviation,
-                              tournament_id as TournamentId,
-                              logo_url as LogoUrl,
-                              banner_url as BannerUrl,
-                              primary_hex as PrimaryHex,
-                              secondary_hex as SecondaryHex,
-                              tertiary_hex as TertiaryHex,
-                              goal_song_url as GoalSongUrl,
-                              penalty_song_url as PenaltySongUrl
-                            from
-                              core.teams
-                            where
-                              tournament_id = @TournamentId
-                            order by
-                              tournament_id,
-                              id";
-        await using var connection = new NpgsqlConnection(_connectionString);
-        return await connection.QueryAsync<Team>(sql, new { TournamentId = tournamentId });
+        return await _context.Teams
+            .Where(t => t.TournamentId == tournamentId)
+            .OrderBy(t => t.TournamentId)
+            .ThenBy(t => t.Id)
+            .ToListAsync();
     }
 
     public async Task<Team?> GetByIdAsync(int id)
     {
-        const string sql = @"select
-                              id as Id,
-                              name as Name,
-                              name_short as NameShort,
-                              abbreviation as Abbreviation,
-                              tournament_id as TournamentId,
-                              logo_url as LogoUrl,
-                              banner_url as BannerUrl,
-                              primary_hex as PrimaryHex,
-                              secondary_hex as SecondaryHex,
-                              tertiary_hex as TertiaryHex,
-                              goal_song_url as GoalSongUrl,
-                              penalty_song_url as PenaltySongUrl
-                            from
-                              core.teams
-                            where
-                                id = @Id";
-        await using var connection = new NpgsqlConnection(_connectionString);
-        return await connection.QuerySingleOrDefaultAsync<Team>(sql, new { Id = id });
+        return await _context.Teams.FindAsync(id);
     }
 
-    public Task<bool> AddAsync(Team entity)
+    public async Task<bool> AddAsync(Team entity)
     {
-        throw new NotImplementedException();
+        await _context.Teams.AddAsync(entity);
+        var result = await _context.SaveChangesAsync();
+        return result > 0;
     }
 
-    public Task<bool> UpdateAsync(Team entity)
+    public async Task<bool> UpdateAsync(Team entity)
     {
-        throw new NotImplementedException();
+        _context.Teams.Update(entity);
+        var result = await _context.SaveChangesAsync();
+        return result > 0;
     }
 
-    public Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        var entity = await _context.Teams.FindAsync(id);
+        if (entity == null) return false;
+
+        _context.Teams.Remove(entity);
+        var result = await _context.SaveChangesAsync();
+        return result > 0;
     }
 }
