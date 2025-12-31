@@ -1,5 +1,5 @@
 using BoltonCup.WebAPI.Interfaces;
-using BoltonCup.WebAPI.Models.Base;
+using BoltonCup.WebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;

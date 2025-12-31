@@ -1,4 +1,4 @@
-namespace BoltonCup.WebAPI.Models.Base;
+namespace BoltonCup.WebAPI.Models;
 
 public class Player
 {

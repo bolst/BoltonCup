@@ -1,6 +1,6 @@
 using BoltonCup.WebAPI.Data;
 using BoltonCup.WebAPI.Interfaces;
-using BoltonCup.WebAPI.Models.Base;
+using BoltonCup.WebAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.WebAPI.Repositories;
