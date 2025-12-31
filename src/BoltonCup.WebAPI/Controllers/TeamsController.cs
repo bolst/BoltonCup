@@ -8,25 +8,25 @@ namespace BoltonCup.WebAPI.Controllers;
 [ApiController]
 public class TeamsController : ControllerBase
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ITeamRepository _teams;
 
-    public TeamsController(IUnitOfWork unitOfWork)
+    public TeamsController(ITeamRepository teams)
     {
-        _unitOfWork = unitOfWork;
+        _teams = teams;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Team>>> Get(int? tournamentId = null)
     {
         return tournamentId is null 
-            ? Ok(await _unitOfWork.Teams.GetAllAsync())
-            : Ok(await _unitOfWork.Teams.GetAllAsync(tournamentId.Value));
+            ? Ok(await _teams.GetAllAsync())
+            : Ok(await _teams.GetAllAsync(tournamentId.Value));
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Team?>> Get(int id)
     {
-        var result = await _unitOfWork.Teams.GetByIdAsync(id);
+        var result = await _teams.GetByIdAsync(id);
         if (result is null)
         {
             return NotFound();
@@ -38,7 +38,7 @@ public class TeamsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] Team entity)
     {
-        var result = await _unitOfWork.Teams.AddAsync(entity);
+        var result = await _teams.AddAsync(entity);
         if (!result)
         {
             return BadRequest();
@@ -50,7 +50,7 @@ public class TeamsController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> Put([FromBody] Team entity)
     {
-        var result = await _unitOfWork.Teams.UpdateAsync(entity);
+        var result = await _teams.UpdateAsync(entity);
         if (!result)
         {
             return NotFound();
@@ -62,7 +62,7 @@ public class TeamsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _unitOfWork.Teams.DeleteAsync(id);
+        var result = await _teams.DeleteAsync(id);
         if (!result)
         {
             return NotFound();

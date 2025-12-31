@@ -16,7 +16,6 @@ public static class ServiceCollectionExtensions
             {
                 options.UseNpgsql(connectionString);
             })
-            .AddTransient<ITeamRepository, TeamRepository>()
-            .AddTransient<IUnitOfWork, UnitOfWork>();
+            .AddTransient<ITeamRepository, TeamRepository>();
     }   
 }
