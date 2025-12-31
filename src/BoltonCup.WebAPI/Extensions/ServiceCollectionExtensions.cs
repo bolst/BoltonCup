@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
                 options.UseNpgsql(connectionString);
             })
             .AddTransient<ITeamRepository, TeamRepository>()
-            .AddTransient<ITournamentRepository, TournamentRepository>();
+            .AddTransient<ITournamentRepository, TournamentRepository>()
+            .AddTransient<IPlayerRepository, PlayerRepository>();
     }   
 }

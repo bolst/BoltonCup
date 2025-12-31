@@ -1,5 +1,5 @@
 using BoltonCup.WebAPI.Interfaces;
-using BoltonCup.WebAPI.Models;
+using BoltonCup.WebAPI.Models.Base;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
@@ -21,7 +21,7 @@ public class TournamentsController : ControllerBase
         return Ok(await _tournaments.GetAllAsync());
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<Tournament?>> Get(int id)
     {
         var result = await _tournaments.GetByIdAsync(id);

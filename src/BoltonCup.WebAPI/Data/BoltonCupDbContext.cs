@@ -1,4 +1,4 @@
-using BoltonCup.WebAPI.Models;
+using BoltonCup.WebAPI.Models.Base;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.WebAPI.Data;
@@ -11,6 +11,7 @@ public class BoltonCupDbContext : DbContext
 
     public DbSet<Team> Teams { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
+    public DbSet<Player> Players { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,6 +53,20 @@ public class BoltonCupDbContext : DbContext
             entity.Property(e => e.GoaliePaymentLink).HasColumnName("goalie_payment_link");
             entity.Property(e => e.SkaterLimit).HasColumnName("skater_limit");
             entity.Property(e => e.GoalieLimit).HasColumnName("goalie_limit");
+        });
+
+        modelBuilder.Entity<Player>(entity =>
+        {
+            entity.ToTable("players", "core");
+
+            entity.HasKey(e => e.Id);
+            
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.TeamId).HasColumnName("team_id");
+            entity.Property(e => e.Position).HasColumnName("position");
+            entity.Property(e => e.PreferredBeer).HasColumnName("preferred_beer");
+            entity.Property(e => e.JerseyNumber).HasColumnName("jersey_number");
         });
     }
 }

@@ -5,57 +5,56 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.WebAPI.Repositories;
 
-public class TeamRepository : ITeamRepository
+public class PlayerRepository : IPlayerRepository
 {
     private readonly BoltonCupDbContext _context;
 
-    public TeamRepository(BoltonCupDbContext context)
+    public PlayerRepository(BoltonCupDbContext context)
     {
         _context = context;
     }
 
-    public async Task<IEnumerable<Team>> GetAllAsync()
+    public async Task<IEnumerable<Player>> GetAllAsync()
     {
-        return await _context.Teams
+        return await _context.Players
             .OrderBy(t => t.TournamentId)
             .ThenBy(t => t.Id)
             .ToListAsync();
     }
     
-    public async Task<IEnumerable<Team>> GetAllAsync(int tournamentId)
+    public async Task<IEnumerable<Player>> GetAllAsync(int tournamentId)
     {
-        return await _context.Teams
+        return await _context.Players
             .Where(t => t.TournamentId == tournamentId)
-            .OrderBy(t => t.TournamentId)
-            .ThenBy(t => t.Id)
+            .OrderBy(t => t.Id)
             .ToListAsync();
     }
 
-    public async Task<Team?> GetByIdAsync(int id)
+    public async Task<Player?> GetByIdAsync(Guid id)
     {
-        return await _context.Teams.FindAsync(id);
+        return await _context.Players.FindAsync(id);
     }
 
-    public async Task<bool> AddAsync(Team entity)
+    public async Task<bool> AddAsync(Player entity)
     {
-        await _context.Teams.AddAsync(entity);
+        await _context.Players.AddAsync(entity);
         var result = await _context.SaveChangesAsync();
         return result > 0;
     }
 
-    public async Task<bool> UpdateAsync(Team entity)
+    public async Task<bool> UpdateAsync(Player entity)
     {
-        _context.Teams.Update(entity);
+        _context.Players.Update(entity);
         var result = await _context.SaveChangesAsync();
         return result > 0;
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(Guid id)
     {
-        var entity = await _context.Teams.FindAsync(id);
+        var entity = await _context.Players.FindAsync(id);
         if (entity == null) return false;
 
-        _context.Teams.Remove(entity);
+        _context.Players.Remove(entity);
         var result = await _context.SaveChangesAsync();
         return result > 0;
     }

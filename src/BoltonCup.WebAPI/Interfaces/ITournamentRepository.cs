@@ -1,4 +1,4 @@
-using BoltonCup.WebAPI.Models;
+using BoltonCup.WebAPI.Models.Base;
 
 namespace BoltonCup.WebAPI.Interfaces;
 

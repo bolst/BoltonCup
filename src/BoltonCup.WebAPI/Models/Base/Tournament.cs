@@ -1,4 +1,4 @@
-namespace BoltonCup.WebAPI.Models;
+namespace BoltonCup.WebAPI.Models.Base;
 
 public class Tournament
 {
