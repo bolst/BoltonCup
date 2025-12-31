@@ -58,16 +58,4 @@ public class TeamsController : ControllerBase
 
         return NoContent();
     }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var result = await _teams.DeleteAsync(id);
-        if (!result)
-        {
-            return NotFound();
-        }
-
-        return NoContent();
-    }
 }
