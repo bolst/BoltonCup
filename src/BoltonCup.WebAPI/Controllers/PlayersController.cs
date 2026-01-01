@@ -1,5 +1,6 @@
 using BoltonCup.WebAPI.Interfaces;
 using BoltonCup.WebAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
@@ -15,6 +16,7 @@ public class PlayersController : ControllerBase
         _players = players;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Player>>> Get(int? tournamentId = null)
     {
@@ -23,6 +25,7 @@ public class PlayersController : ControllerBase
             : Ok(await _players.GetAllAsync(tournamentId.Value));
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<Player?>> Get(Guid id)
     {
