@@ -1,6 +1,7 @@
 using BoltonCup.WebAPI;
 using BoltonCup.WebAPI.Data;
 using BoltonCup.WebAPI.Middleware;
+using BoltonCup.WebAPI.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
@@ -30,12 +31,7 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Enter access token below."
     });
-    options.AddSecurityRequirement(doc => new OpenApiSecurityRequirement()
-    {
-        {
-            new OpenApiSecuritySchemeReference("Bearer", doc), []
-        }
-    });
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
 var app = builder.Build();
