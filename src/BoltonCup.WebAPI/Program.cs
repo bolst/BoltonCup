@@ -1,5 +1,6 @@
 using BoltonCup.WebAPI;
 using BoltonCup.WebAPI.Data;
+using BoltonCup.WebAPI.Middleware;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
@@ -13,6 +14,7 @@ builder.Services
     .AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<AuthDbContext>();
 
+builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 // https://aka.ms/aspnetcore/swashbuckle
@@ -53,6 +55,10 @@ app.UseHttpsRedirection();
 
 app.MapIdentityApi<IdentityUser>();
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseMiddleware<DevAuthMiddleware>();
+}
 app.UseAuthentication();
 app.UseAuthorization();
 
