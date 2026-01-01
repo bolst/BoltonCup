@@ -7,15 +7,14 @@ namespace BoltonCup.WebAPI;
 
 public static class ServiceCollectionExtensions
 {
+    
     public static IServiceCollection AddBoltonCupWebAPIServices(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
 
         return services
-            .AddDbContext<BoltonCupDbContext>(options =>
-            {
-                options.UseNpgsql(connectionString);
-            })
+            .AddDbContext<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
+            .AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString))
             .AddTransient<ITeamRepository, TeamRepository>()
             .AddTransient<ITournamentRepository, TournamentRepository>()
             .AddTransient<IPlayerRepository, PlayerRepository>();

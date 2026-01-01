@@ -1,24 +1,23 @@
 using BoltonCup.WebAPI.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.WebAPI.Data;
 
-public class BoltonCupDbContext : DbContext
+public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options) 
+    : IdentityDbContext<IdentityUser>(options)
 {
-    public BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options) : base(options)
-    {
-    }
-
     public DbSet<Team> Teams { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
     public DbSet<Player> Players { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        
         modelBuilder.Entity<Team>(entity =>
         {
-            entity.ToTable("teams", "core");
-
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id).HasColumnName("id");
@@ -37,8 +36,6 @@ public class BoltonCupDbContext : DbContext
 
         modelBuilder.Entity<Tournament>(entity =>
         {
-            entity.ToTable("tournaments", "core");
-
             entity.HasKey(e => e.Id);
             
             entity.Property(e => e.Id).HasColumnName("id");
@@ -57,8 +54,6 @@ public class BoltonCupDbContext : DbContext
 
         modelBuilder.Entity<Player>(entity =>
         {
-            entity.ToTable("players", "core");
-
             entity.HasKey(e => e.Id);
             
             entity.Property(e => e.Id).HasColumnName("id");

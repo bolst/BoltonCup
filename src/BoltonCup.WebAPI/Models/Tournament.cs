@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace BoltonCup.WebAPI.Models;
 
+[Table("tournaments", Schema = "core")]
 public class Tournament
 {
     public required int Id { get; set; }
