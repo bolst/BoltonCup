@@ -7,9 +7,9 @@ public class Goal : EntityBase
     public required int Period { get; set; }
     public required string PeriodLabel  { get; set; }
     public required TimeSpan PeriodTimeRemaining { get; set; }
-    public required Guid GoalPlayerId { get; set; }
-    public Guid? Assist1PlayerId { get; set; }
-    public Guid? Assist2PlayerId { get; set; }
+    public required int GoalPlayerId { get; set; }
+    public int? Assist1PlayerId { get; set; }
+    public int? Assist2PlayerId { get; set; }
     public string? Notes { get; set; }
     
     public Game Game { get; set; }

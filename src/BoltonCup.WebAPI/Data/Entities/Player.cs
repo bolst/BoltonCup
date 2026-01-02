@@ -2,7 +2,7 @@ namespace BoltonCup.WebAPI.Data.Entities;
 
 public class Player : EntityBase
 {
-    public required Guid Id { get; set; }
+    public required int Id { get; set; }
     public required Guid AccountId { get; set; }
     public required int TournamentId { get; set; }
     public int? TeamId { get; set; }

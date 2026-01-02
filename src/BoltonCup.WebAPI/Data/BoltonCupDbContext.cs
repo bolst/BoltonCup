@@ -16,7 +16,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("coretest");
+        modelBuilder.HasDefaultSchema("core");
         
         modelBuilder.Entity<Account>(entity =>
         {
@@ -181,5 +181,16 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.SkaterLimit).HasColumnName("skater_limit");
             entity.Property(e => e.GoalieLimit).HasColumnName("goalie_limit");
         });
+
+        // entities deriving from EntityBase should have created_at = now() by default
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (entityType.ClrType.IsSubclassOf(typeof(EntityBase)))
+            {
+                modelBuilder.Entity(entityType.ClrType)
+                    .Property(nameof(EntityBase.CreatedAt))
+                    .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
+            }
+        }
     }
 }

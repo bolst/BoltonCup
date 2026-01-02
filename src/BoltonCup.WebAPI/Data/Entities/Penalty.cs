@@ -7,7 +7,7 @@ public class Penalty : EntityBase
     public required int Period { get; set; }
     public required string PeriodLabel  { get; set; }
     public required TimeSpan PeriodTimeRemaining { get; set; }
-    public required Guid PlayerId { get; set; }
+    public required int PlayerId { get; set; }
     public required string InfractionName { get; set; }
     public required int DurationMinutes { get; set; }
     public string? Notes { get; set; }
