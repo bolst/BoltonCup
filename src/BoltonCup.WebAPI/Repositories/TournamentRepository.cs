@@ -24,12 +24,21 @@ public class TournamentRepository : ITournamentRepository
     public async Task<Tournament?> GetByIdAsync(int id)
     {
         return await _context.Tournaments
-            .Include(e => e.Players)
-                .ThenInclude(e => e.Account)
-            .Include(e => e.Teams)
-                .ThenInclude(e => e.GeneralManager)
             .Include(e => e.Games)
+                .ThenInclude(e => e.HomeTeam)            
+            .Include(e => e.Games)
+                .ThenInclude(e => e.AwayTeam)
             .FirstOrDefaultAsync(e => e.Id == id);
+    }
+
+    public async Task<Tournament?> GetActiveAsync()
+    {
+        return await _context.Tournaments
+            .Include(e => e.Games)
+                .ThenInclude(e => e.HomeTeam)            
+            .Include(e => e.Games)
+                .ThenInclude(e => e.AwayTeam)
+            .FirstOrDefaultAsync(e => e.IsActive);
     }
 
     public async Task<bool> AddAsync(Tournament entity)

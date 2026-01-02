@@ -14,33 +14,31 @@ public record TournamentDetailDto
     public bool IsPaymentOpen { get; set; }
     public int? SkaterLimit { get; set; }
     public int? GoalieLimit { get; set; }
+    
+    public List<GameDetail> Games { get; set; }
 
-    public List<PlayerDetailDto> Players { get; set; } = [];
-    public List<TeamDetailDto> Teams { get; set; } = [];
-}
+    public record GameDetail
+    {
+        public int Id { get; set; }
+        public DateTime GameTime { get; set; }
+        public string? GameType { get; set; }
+        public string? Venue { get; set; }
+        public string? Rink { get; set; }
+        public TeamDetail? HomeTeam { get; set; }
+        public TeamDetail? AwayTeam { get; set; }
+    }
 
-
-public record PlayerDetailDto
-{
-    public int Id { get; set; }
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
-    public string? Position { get; set; }
-    public int? JerseyNumber { get; set; }
-}
-
-
-public record TeamDetailDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string? NameShort { get; set; }
-    public string? Abbreviation { get; set; }
-    public string? LogoUrl { get; set; }
-    public string? BannerUrl { get; set; }
-    public string? PrimaryHex { get; set; }
-    public string? SecondaryHex { get; set; }
-    public string? TertiaryHex { get; set; }
+    public record TeamDetail
+    {
+        public int Id { get; set; }
+        public string Name  { get; set; }
+        public string NameShort  { get; set; }
+        public string? LogoUrl { get; set; }
+        public string? BannerUrl { get; set; }
+        public string PrimaryHex { get; set; }
+        public string SecondaryHex { get; set; }
+        public string? TertiaryHex { get; set; }
+    }
 }
 
 
@@ -48,7 +46,7 @@ public static class TournamentDetailDtoExtensions
 {
     public static TournamentDetailDto ToTournamentDetailDto(this Tournament entity)
     {
-        return new TournamentDetailDto()
+        return new TournamentDetailDto
         {
             Id = entity.Id,
             Name = entity.Name,
@@ -60,36 +58,35 @@ public static class TournamentDetailDtoExtensions
             IsPaymentOpen = entity.IsPaymentOpen,
             SkaterLimit = entity.SkaterLimit,
             GoalieLimit = entity.GoalieLimit,
-            Players = entity.Players.Select(e => e.ToPlayerDetailDto()).ToList(),
-            Teams = entity.Teams.Select(e => e.ToTeamDetailDto()).ToList()
+            Games = entity.Games
+                .Select(g => new TournamentDetailDto.GameDetail
+                {
+                    Id = g.Id,
+                    GameTime = g.GameTime,
+                    GameType = g.GameType,
+                    Venue = g.Venue,
+                    Rink = g.Rink,
+                    HomeTeam = g.HomeTeam?.ToTeamDetailDto(),
+                    AwayTeam = g.AwayTeam?.ToTeamDetailDto()
+                })
+                .OrderBy(g => g.GameTime)
+                .ToList(),
         };
     }
 
-    public static PlayerDetailDto ToPlayerDetailDto(this Player player)
-    {
-        return new PlayerDetailDto()
-        {
-            Id = player.Id,
-            FirstName = player?.Account?.FirstName,
-            LastName = player?.Account?.LastName,
-            Position = player?.Position,
-            JerseyNumber = player?.JerseyNumber,
-        };
-    }
 
-    public static TeamDetailDto ToTeamDetailDto(this Team team)
+    private static TournamentDetailDto.TeamDetail ToTeamDetailDto(this Team entity)
     {
-        return new TeamDetailDto()
+        return new TournamentDetailDto.TeamDetail
         {
-            Id = team.Id,
-            Name = team.Name,
-            NameShort = team.NameShort,
-            Abbreviation = team.Abbreviation,
-            LogoUrl = team.LogoUrl,
-            BannerUrl = team.BannerUrl,
-            PrimaryHex = team.PrimaryColorHex,
-            SecondaryHex = team.SecondaryColorHex,
-            TertiaryHex = team.TertiaryColorHex,
+            Id = entity.Id,
+            Name =  entity.Name,
+            NameShort = entity.NameShort,
+            LogoUrl = entity.LogoUrl,
+            BannerUrl = entity.BannerUrl,
+            PrimaryHex = entity.PrimaryColorHex,
+            SecondaryHex = entity.SecondaryColorHex,
+            TertiaryHex = entity.TertiaryColorHex,
         };
     }
 }

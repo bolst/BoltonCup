@@ -8,20 +8,15 @@ namespace BoltonCup.WebAPI.Controllers;
 
 [Route("api/tournaments")]
 [ApiController]
-public class TournamentsController : ControllerBase
+public class TournamentsController(ITournamentRepository _tournaments) : ControllerBase
 {
-    private readonly ITournamentRepository _tournaments;
-
-    public TournamentsController(ITournamentRepository tournaments)
-    {
-        _tournaments = tournaments;
-    }
-
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Tournament>>> Get()
+    public async Task<ActionResult<IEnumerable<TournamentDetailDto>>> Get()
     {
-        return Ok(await _tournaments.GetAllAsync());
+        var result = await _tournaments.GetAllAsync();
+        var response = result.Select(t => t.ToTournamentDetailDto());
+        return Ok(response);
     }
 
     [AllowAnonymous]
@@ -37,28 +32,19 @@ public class TournamentsController : ControllerBase
         var response = result.ToTournamentDetailDto();
         return Ok(response);
     }
-
-    [HttpPost]
-    public async Task<IActionResult> Post([FromBody] Tournament entity)
+    
+    [AllowAnonymous]
+    [HttpGet("active")]
+    public async Task<ActionResult<TournamentDetailDto?>> GetActive()
     {
-        var result = await _tournaments.AddAsync(entity);
-        if (!result)
-        {
-            return BadRequest();
-        }
-
-        return NoContent();
-    }
-
-    [HttpPut]
-    public async Task<IActionResult> Put([FromBody] Tournament entity)
-    {
-        var result = await _tournaments.UpdateAsync(entity);
-        if (!result)
+        var result = await _tournaments.GetActiveAsync();
+        if (result is null)
         {
             return NotFound();
         }
 
-        return NoContent();
+        var response = result.ToTournamentDetailDto();
+        return Ok(response);
     }
+    
 }
