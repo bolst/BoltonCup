@@ -25,10 +25,12 @@ namespace BoltonCup.WebAPI.Migrations
 
             modelBuilder.Entity("BoltonCup.WebAPI.Data.Entities.Account", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Birthday")
                         .HasColumnType("timestamp with time zone")
@@ -54,6 +56,10 @@ namespace BoltonCup.WebAPI.Migrations
                         .HasColumnType("text")
                         .HasColumnName("first_name");
 
+                    b.Property<string>("HighestLevel")
+                        .HasColumnType("text")
+                        .HasColumnName("highest_level");
+
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_modified");
@@ -71,13 +77,17 @@ namespace BoltonCup.WebAPI.Migrations
                         .HasColumnType("text")
                         .HasColumnName("phone");
 
+                    b.Property<string>("PreferredBeer")
+                        .HasColumnType("text")
+                        .HasColumnName("preferred_beer");
+
                     b.Property<string>("ProfilePicture")
                         .HasColumnType("text")
                         .HasColumnName("profile_picture");
 
                     b.HasKey("Id");
 
-                    b.ToTable("account", "core");
+                    b.ToTable("accounts", "core");
                 });
 
             modelBuilder.Entity("BoltonCup.WebAPI.Data.Entities.Game", b =>
@@ -298,8 +308,8 @@ namespace BoltonCup.WebAPI.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("AccountId")
-                        .HasColumnType("uuid")
+                    b.Property<int?>("AccountId")
+                        .HasColumnType("integer")
                         .HasColumnName("account_id");
 
                     b.Property<DateTime>("CreatedAt")
@@ -327,10 +337,6 @@ namespace BoltonCup.WebAPI.Migrations
                     b.Property<string>("Position")
                         .HasColumnType("text")
                         .HasColumnName("position");
-
-                    b.Property<string>("PreferredBeer")
-                        .HasColumnType("text")
-                        .HasColumnName("preferred_beer");
 
                     b.Property<int?>("TeamId")
                         .HasColumnType("integer")
@@ -378,6 +384,10 @@ namespace BoltonCup.WebAPI.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text")
                         .HasColumnName("created_by");
+
+                    b.Property<int?>("GmAccountId")
+                        .HasColumnType("integer")
+                        .HasColumnName("gm_account_id");
 
                     b.Property<string>("GoalSongUrl")
                         .HasColumnType("text")
@@ -428,6 +438,8 @@ namespace BoltonCup.WebAPI.Migrations
                         .HasColumnName("tournament_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GmAccountId");
 
                     b.HasIndex("TournamentId");
 
@@ -588,9 +600,7 @@ namespace BoltonCup.WebAPI.Migrations
                 {
                     b.HasOne("BoltonCup.WebAPI.Data.Entities.Account", "Account")
                         .WithMany("Players")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AccountId");
 
                     b.HasOne("BoltonCup.WebAPI.Data.Entities.Team", "Team")
                         .WithMany("Players")
@@ -611,15 +621,23 @@ namespace BoltonCup.WebAPI.Migrations
 
             modelBuilder.Entity("BoltonCup.WebAPI.Data.Entities.Team", b =>
                 {
+                    b.HasOne("BoltonCup.WebAPI.Data.Entities.Account", "GeneralManager")
+                        .WithMany("ManagedTeams")
+                        .HasForeignKey("GmAccountId");
+
                     b.HasOne("BoltonCup.WebAPI.Data.Entities.Tournament", "Tournament")
                         .WithMany("Teams")
                         .HasForeignKey("TournamentId");
+
+                    b.Navigation("GeneralManager");
 
                     b.Navigation("Tournament");
                 });
 
             modelBuilder.Entity("BoltonCup.WebAPI.Data.Entities.Account", b =>
                 {
+                    b.Navigation("ManagedTeams");
+
                     b.Navigation("Players");
                 });
 

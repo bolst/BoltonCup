@@ -21,7 +21,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
         modelBuilder.Entity<Account>(entity =>
         {
             entity
-                .ToTable("account")
+                .ToTable("accounts")
                 .HasKey(e => e.Id);
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.FirstName).HasColumnName("first_name");
@@ -29,7 +29,9 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.Phone).HasColumnName("phone");
             entity.Property(e => e.Birthday).HasColumnName("birthday");
+            entity.Property(e => e.HighestLevel).HasColumnName("highest_level");
             entity.Property(e => e.ProfilePicture).HasColumnName("profile_picture");
+            entity.Property(e => e.PreferredBeer).HasColumnName("preferred_beer");
         });
 
         modelBuilder.Entity<Game>(entity =>
@@ -136,7 +138,6 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.Position).HasColumnName("position");
-            entity.Property(e => e.PreferredBeer).HasColumnName("preferred_beer");
             entity.Property(e => e.JerseyNumber).HasColumnName("jersey_number");
         });
         
@@ -149,11 +150,16 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Tournament)
                 .WithMany(e => e.Teams)
                 .HasForeignKey(e => e.TournamentId);
+            entity
+                .HasOne(e => e.GeneralManager)
+                .WithMany(e => e.ManagedTeams)
+                .HasForeignKey(e => e.GmAccountId);
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.NameShort).HasColumnName("name_short");
             entity.Property(e => e.Abbreviation).HasColumnName("abbreviation");
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.GmAccountId).HasColumnName("gm_account_id");
             entity.Property(e => e.LogoUrl).HasColumnName("logo_url");
             entity.Property(e => e.BannerUrl).HasColumnName("banner_url");
             entity.Property(e => e.PrimaryColorHex).HasColumnName("primary_hex");

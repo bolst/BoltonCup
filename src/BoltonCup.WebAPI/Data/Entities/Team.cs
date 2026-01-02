@@ -7,6 +7,7 @@ public class Team : EntityBase
     public required string NameShort { get; set; }
     public required string Abbreviation { get; set; }
     public int? TournamentId { get; set; }
+    public int? GmAccountId { get; set; }
     public string? LogoUrl { get; set; }
     public string? BannerUrl { get; set; }
     public required string PrimaryColorHex { get; set; }
@@ -16,6 +17,7 @@ public class Team : EntityBase
     public string? PenaltySongUrl { get; set; }
     
     public Tournament Tournament { get; set; }
+    public Account? GeneralManager { get; set; }
     public ICollection<Player> Players { get; set; }
     public ICollection<Game> HomeGames { get; set; }
     public ICollection<Game> AwayGames { get; set; }

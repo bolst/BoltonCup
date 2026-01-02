@@ -16,17 +16,20 @@ namespace BoltonCup.WebAPI.Migrations
                 name: "core");
 
             migrationBuilder.CreateTable(
-                name: "account",
+                name: "accounts",
                 schema: "core",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     first_name = table.Column<string>(type: "text", nullable: false),
                     last_name = table.Column<string>(type: "text", nullable: false),
                     email = table.Column<string>(type: "text", nullable: false),
                     phone = table.Column<string>(type: "text", nullable: true),
                     birthday = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    highest_level = table.Column<string>(type: "text", nullable: true),
                     profile_picture = table.Column<string>(type: "text", nullable: true),
+                    preferred_beer = table.Column<string>(type: "text", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now() AT TIME ZONE 'UTC'"),
                     created_by = table.Column<string>(type: "text", nullable: true),
                     last_modified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -34,7 +37,7 @@ namespace BoltonCup.WebAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_account", x => x.id);
+                    table.PrimaryKey("PK_accounts", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -76,6 +79,7 @@ namespace BoltonCup.WebAPI.Migrations
                     name_short = table.Column<string>(type: "text", nullable: false),
                     abbreviation = table.Column<string>(type: "text", nullable: false),
                     tournament_id = table.Column<int>(type: "integer", nullable: true),
+                    gm_account_id = table.Column<int>(type: "integer", nullable: true),
                     logo_url = table.Column<string>(type: "text", nullable: true),
                     banner_url = table.Column<string>(type: "text", nullable: true),
                     primary_hex = table.Column<string>(type: "text", nullable: false),
@@ -91,6 +95,12 @@ namespace BoltonCup.WebAPI.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_teams", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_teams_accounts_gm_account_id",
+                        column: x => x.gm_account_id,
+                        principalSchema: "core",
+                        principalTable: "accounts",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_teams_tournaments_tournament_id",
                         column: x => x.tournament_id,
@@ -149,11 +159,10 @@ namespace BoltonCup.WebAPI.Migrations
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    account_id = table.Column<Guid>(type: "uuid", nullable: false),
                     tournament_id = table.Column<int>(type: "integer", nullable: false),
+                    account_id = table.Column<int>(type: "integer", nullable: true),
                     team_id = table.Column<int>(type: "integer", nullable: true),
                     position = table.Column<string>(type: "text", nullable: true),
-                    preferred_beer = table.Column<string>(type: "text", nullable: true),
                     jersey_number = table.Column<int>(type: "integer", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now() AT TIME ZONE 'UTC'"),
                     created_by = table.Column<string>(type: "text", nullable: true),
@@ -164,12 +173,11 @@ namespace BoltonCup.WebAPI.Migrations
                 {
                     table.PrimaryKey("PK_players", x => x.id);
                     table.ForeignKey(
-                        name: "FK_players_account_account_id",
+                        name: "FK_players_accounts_account_id",
                         column: x => x.account_id,
                         principalSchema: "core",
-                        principalTable: "account",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalTable: "accounts",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_players_teams_team_id",
                         column: x => x.team_id,
@@ -348,6 +356,12 @@ namespace BoltonCup.WebAPI.Migrations
                 column: "tournament_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_teams_gm_account_id",
+                schema: "core",
+                table: "teams",
+                column: "gm_account_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_teams_tournament_id",
                 schema: "core",
                 table: "teams",
@@ -374,11 +388,11 @@ namespace BoltonCup.WebAPI.Migrations
                 schema: "core");
 
             migrationBuilder.DropTable(
-                name: "account",
+                name: "teams",
                 schema: "core");
 
             migrationBuilder.DropTable(
-                name: "teams",
+                name: "accounts",
                 schema: "core");
 
             migrationBuilder.DropTable(

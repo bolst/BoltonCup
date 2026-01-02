@@ -3,14 +3,13 @@ namespace BoltonCup.WebAPI.Data.Entities;
 public class Player : EntityBase
 {
     public required int Id { get; set; }
-    public required Guid AccountId { get; set; }
     public required int TournamentId { get; set; }
+    public int? AccountId { get; set; }
     public int? TeamId { get; set; }
     public string? Position { get; set; }
-    public string? PreferredBeer { get; set; }
     public int? JerseyNumber { get; set; }
     
-    public Account Account { get; set; }
+    public Account? Account { get; set; }
     public Tournament Tournament { get; set; }
     public Team? Team { get; set; }
     public ICollection<Goal> Goals { get; set; }
