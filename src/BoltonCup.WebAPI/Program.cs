@@ -1,6 +1,7 @@
 using BoltonCup.WebAPI;
 using BoltonCup.WebAPI.Data;
 using BoltonCup.WebAPI.Middleware;
+using BoltonCup.WebAPI.Data.Entities;
 using BoltonCup.WebAPI.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi;

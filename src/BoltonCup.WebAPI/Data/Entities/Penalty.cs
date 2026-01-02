@@ -1,0 +1,17 @@
+namespace BoltonCup.WebAPI.Data.Entities;
+
+public class Penalty : EntityBase
+{
+    public required int Id { get; set; }
+    public required int GameId { get; set; }
+    public required int Period { get; set; }
+    public required string PeriodLabel  { get; set; }
+    public required TimeSpan PeriodTimeRemaining { get; set; }
+    public required Guid PlayerId { get; set; }
+    public required string InfractionName { get; set; }
+    public required int DurationMinutes { get; set; }
+    public string? Notes { get; set; }
+    
+    public Game Game { get; set; }
+    public Player Player { get; set; }
+}

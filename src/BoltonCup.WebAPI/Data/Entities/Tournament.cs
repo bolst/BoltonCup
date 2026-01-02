@@ -1,9 +1,6 @@
-using System.ComponentModel.DataAnnotations.Schema;
+namespace BoltonCup.WebAPI.Data.Entities;
 
-namespace BoltonCup.WebAPI.Models;
-
-[Table("tournaments", Schema = "core")]
-public class Tournament
+public class Tournament : EntityBase
 {
     public required int Id { get; set; }
     public required string Name { get; set; }
@@ -17,4 +14,8 @@ public class Tournament
     public string? GoaliePaymentLink { get; set; }
     public int? SkaterLimit { get; set; }
     public int? GoalieLimit { get; set; }
+    
+    public ICollection<Player> Players { get; set; }
+    public ICollection<Team> Teams { get; set; }
+    public ICollection<Game> Games  { get; set; }
 }

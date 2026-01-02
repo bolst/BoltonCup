@@ -1,9 +1,6 @@
-using System.ComponentModel.DataAnnotations.Schema;
+namespace BoltonCup.WebAPI.Data.Entities;
 
-namespace BoltonCup.WebAPI.Models;
-
-[Table("teams", Schema = "core")]
-public class Team
+public class Team : EntityBase
 {
     public required int Id { get; set; }
     public required string Name { get; set; }
@@ -17,4 +14,9 @@ public class Team
     public string? TertiaryColorHex { get; set; }
     public string? GoalSongUrl { get; set; }
     public string? PenaltySongUrl { get; set; }
+    
+    public Tournament Tournament { get; set; }
+    public ICollection<Player> Players { get; set; }
+    public ICollection<Game> HomeGames { get; set; }
+    public ICollection<Game> AwayGames { get; set; }
 }
