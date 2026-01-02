@@ -2,7 +2,7 @@ using BoltonCup.WebAPI.Data.Entities;
 
 namespace BoltonCup.WebAPI.Dtos;
 
-public class TournamentDetailDto
+public record TournamentDetailDto
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -20,17 +20,27 @@ public class TournamentDetailDto
 }
 
 
-public class PlayerDetailDto
+public record PlayerDetailDto
 {
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    public int Id { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? Position { get; set; }
+    public int? JerseyNumber { get; set; }
 }
 
 
-public class TeamDetailDto
+public record TeamDetailDto
 {
     public int Id { get; set; }
     public string Name { get; set; }
+    public string? NameShort { get; set; }
+    public string? Abbreviation { get; set; }
+    public string? LogoUrl { get; set; }
+    public string? BannerUrl { get; set; }
+    public string? PrimaryHex { get; set; }
+    public string? SecondaryHex { get; set; }
+    public string? TertiaryHex { get; set; }
 }
 
 
@@ -59,8 +69,11 @@ public static class TournamentDetailDtoExtensions
     {
         return new PlayerDetailDto()
         {
-            FirstName = player.Account.FirstName,
-            LastName = player.Account.LastName,
+            Id = player.Id,
+            FirstName = player?.Account?.FirstName,
+            LastName = player?.Account?.LastName,
+            Position = player?.Position,
+            JerseyNumber = player?.JerseyNumber,
         };
     }
 
@@ -70,6 +83,13 @@ public static class TournamentDetailDtoExtensions
         {
             Id = team.Id,
             Name = team.Name,
+            NameShort = team.NameShort,
+            Abbreviation = team.Abbreviation,
+            LogoUrl = team.LogoUrl,
+            BannerUrl = team.BannerUrl,
+            PrimaryHex = team.PrimaryColorHex,
+            SecondaryHex = team.SecondaryColorHex,
+            TertiaryHex = team.TertiaryColorHex,
         };
     }
 }

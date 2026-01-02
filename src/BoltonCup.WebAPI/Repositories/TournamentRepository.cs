@@ -25,7 +25,9 @@ public class TournamentRepository : ITournamentRepository
     {
         return await _context.Tournaments
             .Include(e => e.Players)
+                .ThenInclude(e => e.Account)
             .Include(e => e.Teams)
+                .ThenInclude(e => e.GeneralManager)
             .Include(e => e.Games)
             .FirstOrDefaultAsync(e => e.Id == id);
     }
