@@ -3,6 +3,8 @@ src/BoltonCup.sln.DotSettings.user
 src/BoltonCup.App/appsettings.txt
 
 appSettings.Development*
+.env
+.venv
 
  
 # ------
