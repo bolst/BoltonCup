@@ -14,8 +14,8 @@ public class Tournament : EntityBase
     public string? GoaliePaymentLink { get; set; }
     public int? SkaterLimit { get; set; }
     public int? GoalieLimit { get; set; }
-    
-    public ICollection<Player> Players { get; set; }
-    public ICollection<Team> Teams { get; set; }
-    public ICollection<Game> Games  { get; set; }
+
+    public ICollection<Player> Players { get; set; } = [];
+    public ICollection<Team> Teams { get; set; } = [];
+    public ICollection<Game> Games { get; set; } = [];
 }

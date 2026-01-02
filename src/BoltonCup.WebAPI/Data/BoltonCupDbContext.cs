@@ -145,6 +145,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .ToTable("teams")
                 .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Tournament)
+                .WithMany(e => e.Teams)
+                .HasForeignKey(e => e.TournamentId);
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.NameShort).HasColumnName("name_short");

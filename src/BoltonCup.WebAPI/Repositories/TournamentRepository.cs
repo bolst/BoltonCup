@@ -23,7 +23,11 @@ public class TournamentRepository : ITournamentRepository
     
     public async Task<Tournament?> GetByIdAsync(int id)
     {
-        return await _context.Tournaments.FindAsync(id);
+        return await _context.Tournaments
+            .Include(e => e.Players)
+            .Include(e => e.Teams)
+            .Include(e => e.Games)
+            .FirstOrDefaultAsync(e => e.Id == id);
     }
 
     public async Task<bool> AddAsync(Tournament entity)

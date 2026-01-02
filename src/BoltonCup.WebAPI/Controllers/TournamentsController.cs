@@ -1,5 +1,6 @@
 using BoltonCup.WebAPI.Interfaces;
 using BoltonCup.WebAPI.Data.Entities;
+using BoltonCup.WebAPI.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,7 @@ public class TournamentsController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Tournament?>> Get(int id)
+    public async Task<ActionResult<TournamentDetailDto?>> Get(int id)
     {
         var result = await _tournaments.GetByIdAsync(id);
         if (result is null)
@@ -33,7 +34,8 @@ public class TournamentsController : ControllerBase
             return NotFound();
         }
 
-        return Ok(result);
+        var response = result.ToTournamentDetailDto();
+        return Ok(response);
     }
 
     [HttpPost]
