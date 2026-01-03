@@ -17,8 +17,12 @@ public class TeamRepository : ITeamRepository
     public async Task<IEnumerable<Team>> GetAllAsync()
     {
         return await _context.Teams
-            .OrderBy(t => t.TournamentId)
-            .ThenBy(t => t.Id)
+            .Include(e => e.GeneralManager)
+            .Include(e => e.Tournament)
+            .Include(e => e.HomeGames)
+            .Include(e => e.AwayGames)
+            .Include(e => e.Players)
+                .ThenInclude(p => p.Account)
             .ToListAsync();
     }
     
@@ -26,14 +30,25 @@ public class TeamRepository : ITeamRepository
     {
         return await _context.Teams
             .Where(t => t.TournamentId == tournamentId)
-            .OrderBy(t => t.TournamentId)
-            .ThenBy(t => t.Id)
+            .Include(e => e.GeneralManager)
+            .Include(e => e.Tournament)
+            .Include(e => e.HomeGames)
+            .Include(e => e.AwayGames)
+            .Include(e => e.Players)
+                .ThenInclude(p => p.Account)
             .ToListAsync();
     }
 
     public async Task<Team?> GetByIdAsync(int id)
     {
-        return await _context.Teams.FindAsync(id);
+        return await _context.Teams
+            .Include(e => e.GeneralManager)
+            .Include(e => e.Tournament)
+            .Include(e => e.HomeGames)
+            .Include(e => e.AwayGames)
+            .Include(e => e.Players)
+                .ThenInclude(p => p.Account)
+            .FirstOrDefaultAsync(e => e.Id == id);
     }
 
     public async Task<bool> AddAsync(Team entity)

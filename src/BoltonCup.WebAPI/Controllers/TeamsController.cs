@@ -1,5 +1,5 @@
 using BoltonCup.WebAPI.Interfaces;
-using BoltonCup.WebAPI.Data.Entities;
+using BoltonCup.WebAPI.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,27 +7,21 @@ namespace BoltonCup.WebAPI.Controllers;
 
 [Route("api/teams")]
 [ApiController]
-public class TeamsController : ControllerBase
+public class TeamsController(ITeamRepository _teams) : ControllerBase
 {
-    private readonly ITeamRepository _teams;
-
-    public TeamsController(ITeamRepository teams)
-    {
-        _teams = teams;
-    }
-
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Team>>> Get(int? tournamentId = null)
+    public async Task<ActionResult<IEnumerable<TeamDetailDto>>> Get(int? tournamentId = null)
     {
-        return tournamentId is null 
-            ? Ok(await _teams.GetAllAsync())
-            : Ok(await _teams.GetAllAsync(tournamentId.Value));
+        var teams = tournamentId is null 
+            ? await _teams.GetAllAsync()
+            : await _teams.GetAllAsync(tournamentId.Value);
+        return Ok(teams.Select(t => t.ToTeamDetailDto()));
     }
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Team?>> Get(int id)
+    public async Task<ActionResult<TeamDetailDto?>> Get(int id)
     {
         var result = await _teams.GetByIdAsync(id);
         if (result is null)
@@ -35,30 +29,7 @@ public class TeamsController : ControllerBase
             return NotFound();
         }
 
-        return Ok(result);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Post([FromBody] Team entity)
-    {
-        var result = await _teams.AddAsync(entity);
-        if (!result)
-        {
-            return BadRequest();
-        }
-
-        return NoContent();
-    }
-
-    [HttpPut]
-    public async Task<IActionResult> Put([FromBody] Team entity)
-    {
-        var result = await _teams.UpdateAsync(entity);
-        if (!result)
-        {
-            return NotFound();
-        }
-
-        return NoContent();
+        var response = result.ToTeamDetailDto();
+        return Ok(response);
     }
 }

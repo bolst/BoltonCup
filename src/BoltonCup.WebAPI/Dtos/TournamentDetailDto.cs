@@ -15,20 +15,21 @@ public record TournamentDetailDto
     public int? SkaterLimit { get; set; }
     public int? GoalieLimit { get; set; }
     
-    public List<GameDetail> Games { get; set; }
+    public List<TournamentGameDetail> Games { get; set; }
+    public List<TournamentTeamDetail> Teams { get; set; }
 
-    public record GameDetail
+    public record TournamentGameDetail
     {
         public int Id { get; set; }
         public DateTime GameTime { get; set; }
         public string? GameType { get; set; }
         public string? Venue { get; set; }
         public string? Rink { get; set; }
-        public TeamDetail? HomeTeam { get; set; }
-        public TeamDetail? AwayTeam { get; set; }
+        public int? HomeTeamId { get; set; }
+        public int? AwayTeamId { get; set; }
     }
 
-    public record TeamDetail
+    public record TournamentTeamDetail
     {
         public int Id { get; set; }
         public string Name  { get; set; }
@@ -59,34 +60,33 @@ public static class TournamentDetailDtoExtensions
             SkaterLimit = entity.SkaterLimit,
             GoalieLimit = entity.GoalieLimit,
             Games = entity.Games
-                .Select(g => new TournamentDetailDto.GameDetail
+                .Select(g => new TournamentDetailDto.TournamentGameDetail
                 {
                     Id = g.Id,
                     GameTime = g.GameTime,
                     GameType = g.GameType,
                     Venue = g.Venue,
                     Rink = g.Rink,
-                    HomeTeam = g.HomeTeam?.ToTeamDetailDto(),
-                    AwayTeam = g.AwayTeam?.ToTeamDetailDto()
+                    HomeTeamId = g.HomeTeamId,
+                    AwayTeamId = g.AwayTeamId
                 })
                 .OrderBy(g => g.GameTime)
                 .ToList(),
+            Teams = entity.Teams
+                .Select(e => new TournamentDetailDto.TournamentTeamDetail
+                {
+                    Id = e.Id,
+                    Name =  e.Name,
+                    NameShort = e.NameShort,
+                    LogoUrl = e.LogoUrl,
+                    BannerUrl = e.BannerUrl,
+                    PrimaryHex = e.PrimaryColorHex,
+                    SecondaryHex = e.SecondaryColorHex,
+                    TertiaryHex = e.TertiaryColorHex,
+                })
+                .OrderBy(t => t.Name)
+                .ToList()
         };
     }
 
-
-    private static TournamentDetailDto.TeamDetail ToTeamDetailDto(this Team entity)
-    {
-        return new TournamentDetailDto.TeamDetail
-        {
-            Id = entity.Id,
-            Name =  entity.Name,
-            NameShort = entity.NameShort,
-            LogoUrl = entity.LogoUrl,
-            BannerUrl = entity.BannerUrl,
-            PrimaryHex = entity.PrimaryColorHex,
-            SecondaryHex = entity.SecondaryColorHex,
-            TertiaryHex = entity.TertiaryColorHex,
-        };
-    }
 }

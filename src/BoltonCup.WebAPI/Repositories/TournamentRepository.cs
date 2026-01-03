@@ -17,7 +17,9 @@ public class TournamentRepository : ITournamentRepository
     public async Task<IEnumerable<Tournament>> GetAllAsync()
     {
         return await _context.Tournaments
-            .OrderBy(t => t.Id)
+            .Include(e => e.Games)
+            .Include(e => e.Teams)
+            .OrderBy(t => t.StartDate)
             .ToListAsync();
     }
     
@@ -25,9 +27,7 @@ public class TournamentRepository : ITournamentRepository
     {
         return await _context.Tournaments
             .Include(e => e.Games)
-                .ThenInclude(e => e.HomeTeam)            
-            .Include(e => e.Games)
-                .ThenInclude(e => e.AwayTeam)
+            .Include(e => e.Teams)
             .FirstOrDefaultAsync(e => e.Id == id);
     }
 
@@ -35,9 +35,7 @@ public class TournamentRepository : ITournamentRepository
     {
         return await _context.Tournaments
             .Include(e => e.Games)
-                .ThenInclude(e => e.HomeTeam)            
-            .Include(e => e.Games)
-                .ThenInclude(e => e.AwayTeam)
+            .Include(e => e.Teams)
             .FirstOrDefaultAsync(e => e.IsActive);
     }
 
