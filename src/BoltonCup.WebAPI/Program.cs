@@ -12,10 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
 
+// FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<DefaultPaginationQuery>();
-
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
