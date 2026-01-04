@@ -17,6 +17,8 @@ public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
             .Include(e => e.Players)
                 .ThenInclude(p => p.Account)
             .ConditionalWhere(e => e.TournamentId == query.TournamentId, query.TournamentId.HasValue)
+            .OrderBy(e => e.Id)
+            .Page(query)
             .ToListAsync();
     }
     

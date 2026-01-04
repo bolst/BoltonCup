@@ -1,5 +1,6 @@
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Tournaments;

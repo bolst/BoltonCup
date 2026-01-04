@@ -1,9 +1,17 @@
 using System.Linq.Expressions;
+using BoltonCup.Core.Queries;
 
 namespace BoltonCup.Infrastructure.Extensions;
 
 public static class QueryableExtensions
 {
+    public static IQueryable<TSource> Page<TSource>(this IQueryable<TSource> source, PaginationQueryBase query)
+    {
+        var skip = (query.Page - 1) * query.Size;
+        return source.Skip(skip).Take(query.Size);
+    }
+    
+    
     /// <summary>
     /// Filters a sequence of values based on a predicate if the specified condition is true.
     /// </summary>
