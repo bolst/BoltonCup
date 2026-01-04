@@ -25,10 +25,7 @@ public class TeamsController(ITeamRepository _teams) : ControllerBase
     {
         var result = await _teams.GetByIdAsync(id);
         if (result is null)
-        {
             return NotFound();
-        }
-        var response = result.ToTeamDetailDto();
-        return Ok(response);
+        return result.ToTeamDetailDto();
     }
 }
