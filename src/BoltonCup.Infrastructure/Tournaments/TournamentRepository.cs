@@ -13,7 +13,7 @@ public class TournamentRepository : ITournamentRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Tournament>> GetAllAsync()
+    public async Task<IEnumerable<Tournament>> GetAllAsync(GetTournamentsQuery query)
     {
         return await _context.Tournaments
             .Include(e => e.Games)

@@ -11,11 +11,12 @@ public class TournamentsController(ITournamentRepository _tournaments) : Control
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TournamentDetailDto>>> Get()
+    public async Task<ActionResult<IEnumerable<TournamentDetailDto>>> Get([FromQuery] GetTournamentsQuery query)
     {
-        var result = await _tournaments.GetAllAsync();
-        var response = result.Select(t => t.ToTournamentDetailDto());
-        return Ok(response);
+        var result = await _tournaments.GetAllAsync(query);
+        return result
+            .Select(t => t.ToTournamentDetailDto())
+            .ToList();
     }
 
     [AllowAnonymous]
@@ -24,11 +25,8 @@ public class TournamentsController(ITournamentRepository _tournaments) : Control
     {
         var result = await _tournaments.GetByIdAsync(id);
         if (result is null)
-        {
             return NotFound();
-        }
-        var response = result.ToTournamentDetailDto();
-        return Ok(response);
+        return result.ToTournamentDetailDto();
     }
     
     [AllowAnonymous]
@@ -37,11 +35,8 @@ public class TournamentsController(ITournamentRepository _tournaments) : Control
     {
         var result = await _tournaments.GetActiveAsync();
         if (result is null)
-        {
             return NotFound();
-        }
-        var response = result.ToTournamentDetailDto();
-        return Ok(response);
+        return result.ToTournamentDetailDto();
     }
     
 }
