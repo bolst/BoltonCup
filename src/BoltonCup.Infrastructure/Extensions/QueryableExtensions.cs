@@ -5,7 +5,7 @@ namespace BoltonCup.Infrastructure.Extensions;
 
 public static class QueryableExtensions
 {
-    public static IQueryable<TSource> Page<TSource>(this IQueryable<TSource> source, PaginationQueryBase query)
+    public static IQueryable<TSource> Page<TSource>(this IQueryable<TSource> source, IPaginationQuery query)
     {
         var skip = (query.Page - 1) * query.Size;
         return source.Skip(skip).Take(query.Size);
