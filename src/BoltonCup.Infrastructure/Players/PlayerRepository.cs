@@ -1,5 +1,6 @@
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Players;
@@ -8,25 +9,16 @@ namespace BoltonCup.Infrastructure.Players;
 
 public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
 {
-    public async Task<IEnumerable<Player>> GetAllAsync()
+    public async Task<IEnumerable<Player>> GetAllAsync(GetPlayersQuery query)
     {
         return await _context.Players
             .Include(p => p.Account)
             .Include(p => p.Tournament)
             .Include(p => p.Team)
+            .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ToListAsync();
     }       
     
-    public async Task<IEnumerable<Player>> GetAllAsync(int tournamentId)
-    {
-        return await _context.Players
-            .Include(p => p.Account)
-            .Include(p => p.Tournament)
-            .Include(p => p.Team)
-            .Where(t => t.TournamentId == tournamentId)
-            .ToListAsync();
-    }
-
     public async Task<Player?> GetByIdAsync(int id)
     {
         return await _context.Players

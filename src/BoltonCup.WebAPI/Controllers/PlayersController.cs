@@ -11,11 +11,12 @@ public class PlayersController(IPlayerRepository _players) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Player>>> Get(int? tournamentId = null)
+    public async Task<ActionResult<IEnumerable<PlayerDetailDto>>> Get([FromQuery] GetPlayersQuery query)
     {
-        return tournamentId is null 
-            ? Ok(await _players.GetAllAsync())
-            : Ok(await _players.GetAllAsync(tournamentId.Value));
+        var players = await _players.GetAllAsync(query);
+        return players
+            .Select(t => t.ToPlayerDetailDto())
+            .ToList();
     }
 
     [AllowAnonymous]
@@ -24,10 +25,7 @@ public class PlayersController(IPlayerRepository _players) : ControllerBase
     {
         var result = await _players.GetByIdAsync(id);
         if (result is null)
-        {
             return NotFound();
-        }
-        var response = result.ToSinglePlayerDetailDto();
-        return Ok(response);
+        return result.ToSinglePlayerDetailDto();
     }
 }
