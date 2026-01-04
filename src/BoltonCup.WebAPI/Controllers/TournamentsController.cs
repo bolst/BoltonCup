@@ -13,30 +13,18 @@ public class TournamentsController(ITournamentRepository _tournaments) : Control
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TournamentDetailDto>>> Get([FromQuery] GetTournamentsQuery query)
     {
-        var result = await _tournaments.GetAllAsync(query);
-        return result
-            .Select(t => t.ToTournamentDetailDto())
-            .ToList();
+        var result = await _tournaments.GetAllAsync(query, new TournamentDetailDto());
+        return result.ToList();
     }
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<SingleTournamentDetailDto?>> Get(int id)
+    public async Task<ActionResult<TournamentDetailDto?>> Get(int id)
     {
-        var result = await _tournaments.GetByIdAsync(id);
+        var result = await _tournaments.GetByIdAsync(id, new TournamentDetailDto());
         if (result is null)
             return NotFound();
-        return result.ToSingleTournamentDetailDto();
-    }
-    
-    [AllowAnonymous]
-    [HttpGet("active")]
-    public async Task<ActionResult<TournamentDetailDto?>> GetActive()
-    {
-        var result = await _tournaments.GetActiveAsync();
-        if (result is null)
-            return NotFound();
-        return result.ToSingleTournamentDetailDto();
+        return result;
     }
     
 }

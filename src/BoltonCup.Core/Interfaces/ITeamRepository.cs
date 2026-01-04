@@ -1,6 +1,5 @@
 namespace BoltonCup.Core;
 
-public interface ITeamRepository : IRepository<Team, int>
+public interface ITeamRepository : IRepository<Team, GetTeamsQuery, int>
 {
-    Task<IEnumerable<Team>> GetAllAsync(GetTeamsQuery query);
 }

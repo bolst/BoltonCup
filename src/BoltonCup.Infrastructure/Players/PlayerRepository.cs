@@ -1,6 +1,7 @@
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Core.Mappings;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Players;
@@ -21,6 +22,16 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
             .ToListAsync();
     }       
     
+    public async Task<IEnumerable<T>> GetAllAsync<T>(GetPlayersQuery query, IMappable<Player, T> map)
+    {
+        return await _context.Players
+            .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
+            .OrderBy(p => p.Id)
+            .Page(query)
+            .ProjectTo(map)
+            .ToListAsync();
+    }       
+    
     public async Task<Player?> GetByIdAsync(int id)
     {
         return await _context.Players
@@ -33,6 +44,14 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
             .Include(p => p.Team).ThenInclude(t => t!.AwayGames).ThenInclude(g => g.Goals)
             .Include(p => p.Team).ThenInclude(t => t!.AwayGames).ThenInclude(g => g.Penalties)
             .FirstOrDefaultAsync(p => p.Id == id);
+    }
+
+    public async Task<TResult?> GetByIdAsync<TResult>(int id, IMappable<Player, TResult> map)
+    {
+        return await _context.Players
+            .Where(p => p.Id == id)
+            .ProjectTo(map)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<bool> AddAsync(Player entity)

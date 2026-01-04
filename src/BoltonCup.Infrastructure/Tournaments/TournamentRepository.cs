@@ -1,5 +1,6 @@
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
+using BoltonCup.Core.Mappings;
 using BoltonCup.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,14 @@ public class TournamentRepository : ITournamentRepository
             .OrderBy(t => t.StartDate)
             .ToListAsync();
     }
+        
+    public async Task<IEnumerable<T>> GetAllAsync<T>(GetTournamentsQuery query, IMappable<Tournament, T> map)
+    {
+        return await _context.Tournaments
+            .OrderBy(t => t.StartDate)
+            .ProjectTo(map)
+            .ToListAsync();
+    }
     
     public async Task<Tournament?> GetByIdAsync(int id)
     {
@@ -29,6 +38,14 @@ public class TournamentRepository : ITournamentRepository
             .Include(e => e.Games)
             .Include(e => e.Teams)
             .FirstOrDefaultAsync(e => e.Id == id);
+    }
+
+    public async Task<TResult?> GetByIdAsync<TResult>(int id, IMappable<Tournament, TResult> map)
+    {
+        return await _context.Tournaments
+            .Where(e => e.Id == id)
+            .ProjectTo(map)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<Tournament?> GetActiveAsync()

@@ -13,19 +13,17 @@ public class TeamsController(ITeamRepository _teams) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TeamDetailDto>>> Get([FromQuery] GetTeamsQuery query)
     {
-        var teams = await _teams.GetAllAsync(query);
-        return teams
-            .Select(t => t.ToTeamDetailDto())
-            .ToList();
+        var teams = await _teams.GetAllAsync(query, new TeamDetailDto());
+        return teams.ToList();
     }
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<SingleTeamDetailDto?>> Get(int id)
+    public async Task<ActionResult<TeamDetailDto?>> Get(int id)
     {
-        var result = await _teams.GetByIdAsync(id);
+        var result = await _teams.GetByIdAsync(id, new TeamDetailDto());
         if (result is null)
             return NotFound();
-        return result.ToSingleTeamDetailDto();
+        return result;
     }
 }

@@ -1,6 +1,5 @@
 namespace BoltonCup.Core;
 
-public interface IPlayerRepository : IRepository<Player, int>
+public interface IPlayerRepository : IRepository<Player, GetPlayersQuery, int>
 {
-    Task<IEnumerable<Player>> GetAllAsync(GetPlayersQuery query);
 }
