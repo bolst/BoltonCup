@@ -1,4 +1,4 @@
-using BoltonCup.Infrastructure.Services;
+using BoltonCup.Infrastructure;
 using BoltonCup.WebAPI.Middleware;
 using BoltonCup.WebAPI.Utilities;
 using Microsoft.AspNetCore.Identity;

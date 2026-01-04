@@ -2,7 +2,7 @@ using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
 using Microsoft.EntityFrameworkCore;
 
-namespace BoltonCup.Infrastructure.Repositories;
+namespace BoltonCup.Infrastructure.Tournaments;
 
 public class TournamentRepository : ITournamentRepository
 {

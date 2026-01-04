@@ -2,17 +2,10 @@ using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
 using Microsoft.EntityFrameworkCore;
 
-namespace BoltonCup.Infrastructure.Repositories;
+namespace BoltonCup.Infrastructure.Teams;
 
-public class TeamRepository : ITeamRepository
+public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
 {
-    private readonly BoltonCupDbContext _context;
-
-    public TeamRepository(BoltonCupDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<IEnumerable<Team>> GetAllAsync()
     {
         return await _context.Teams

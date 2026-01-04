@@ -1,16 +1,17 @@
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Repositories;
+using BoltonCup.Infrastructure.Players;
+using BoltonCup.Infrastructure.Teams;
+using BoltonCup.Infrastructure.Tournaments;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BoltonCup.Infrastructure.Services;
+namespace BoltonCup.Infrastructure;
 
 public static class ServiceCollectionExtensions
 {
-    
     public static IServiceCollection AddBoltonCupInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
@@ -26,4 +27,9 @@ public static class ServiceCollectionExtensions
             .AddTransient<ITournamentRepository, TournamentRepository>()
             .AddTransient<IPlayerRepository, PlayerRepository>();
     }   
+}
+
+public static class ConfigurationPaths
+{
+    public const string ConnectionString = "BoltonCup:ConnectionString";
 }
