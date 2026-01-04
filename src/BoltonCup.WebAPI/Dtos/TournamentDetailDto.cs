@@ -2,7 +2,7 @@ using BoltonCup.Core;
 
 namespace BoltonCup.WebAPI.Dtos;
 
-public sealed record TournamentDetailDto
+public record TournamentDetailDto
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -14,7 +14,11 @@ public sealed record TournamentDetailDto
     public bool IsPaymentOpen { get; set; }
     public int? SkaterLimit { get; set; }
     public int? GoalieLimit { get; set; }
-    
+}
+
+
+public sealed record SingleTournamentDetailDto : TournamentDetailDto
+{
     public List<TournamentGameDetail> Games { get; set; }
     public List<TournamentTeamDetail> Teams { get; set; }
 
@@ -59,8 +63,25 @@ public static class TournamentDetailDtoExtensions
             IsPaymentOpen = entity.IsPaymentOpen,
             SkaterLimit = entity.SkaterLimit,
             GoalieLimit = entity.GoalieLimit,
+        };
+    }
+    
+    public static SingleTournamentDetailDto ToSingleTournamentDetailDto(this Tournament entity)
+    {
+        return new SingleTournamentDetailDto
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            StartDate = entity.StartDate,
+            EndDate = entity.EndDate,
+            WinningTeamId = entity.WinningTeamId,
+            IsActive = entity.IsActive,
+            IsRegistrationOpen = entity.IsRegistrationOpen,
+            IsPaymentOpen = entity.IsPaymentOpen,
+            SkaterLimit = entity.SkaterLimit,
+            GoalieLimit = entity.GoalieLimit,
             Games = entity.Games
-                .Select(g => new TournamentDetailDto.TournamentGameDetail
+                .Select(g => new SingleTournamentDetailDto.TournamentGameDetail
                 {
                     Id = g.Id,
                     GameTime = g.GameTime,
@@ -73,7 +94,7 @@ public static class TournamentDetailDtoExtensions
                 .OrderBy(g => g.GameTime)
                 .ToList(),
             Teams = entity.Teams
-                .Select(e => new TournamentDetailDto.TournamentTeamDetail
+                .Select(e => new SingleTournamentDetailDto.TournamentTeamDetail
                 {
                     Id = e.Id,
                     Name =  e.Name,

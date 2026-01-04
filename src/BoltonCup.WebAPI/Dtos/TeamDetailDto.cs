@@ -2,7 +2,7 @@ using BoltonCup.Core;
 
 namespace BoltonCup.WebAPI.Dtos;
 
-public sealed record TeamDetailDto
+public record TeamDetailDto
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -21,7 +21,11 @@ public sealed record TeamDetailDto
     public int? GmAccountId { get; set; }
     public string? GmName { get; set; }
     public string? GmProfilePicture  { get; set; }
+}
 
+public sealed record SingleTeamDetailDto : TeamDetailDto
+{
+    
     public List<TeamPlayerDetail> Players { get; set; }
     public List<TeamGameDetail> Games { get; set; }
 
@@ -75,9 +79,32 @@ public static class TeamDetailDtoExtensions
             GoalSongUrl = entity.GoalSongUrl,
             PenaltySongUrl = entity.PenaltySongUrl,
             GmAccountId = entity.GmAccountId,
+            GmName = entity.GeneralManager?.FirstName + " " + entity.GeneralManager?.LastName,
+            GmProfilePicture = entity.GeneralManager?.ProfilePicture,
+        };
+    }
+    
+    public static SingleTeamDetailDto ToSingleTeamDetailDto(this Team entity)
+    {
+        return new SingleTeamDetailDto
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            NameShort = entity.NameShort,
+            Abbreviation = entity.Abbreviation,
+            TournamentId = entity.Tournament.Id,
+            TournamentName = entity.Tournament.Name,
+            LogoUrl = entity.LogoUrl,
+            BannerUrl = entity.BannerUrl,
+            PrimaryColorHex = entity.PrimaryColorHex,
+            SecondaryColorHex = entity.SecondaryColorHex,
+            TertiaryColorHex = entity.TertiaryColorHex,
+            GoalSongUrl = entity.GoalSongUrl,
+            PenaltySongUrl = entity.PenaltySongUrl,
+            GmAccountId = entity.GmAccountId,
             GmName = entity.GeneralManager?.FirstName +  " " + entity.GeneralManager?.LastName,
             GmProfilePicture = entity.GeneralManager?.ProfilePicture,
-            Players = entity.Players.Select(p => new TeamDetailDto.TeamPlayerDetail 
+            Players = entity.Players.Select(p => new SingleTeamDetailDto.TeamPlayerDetail 
                 {
                     Id = p.Id, 
                     AccountId = p.AccountId,
@@ -93,7 +120,7 @@ public static class TeamDetailDtoExtensions
                 {
                     var isHome = entity.Id == g.HomeTeamId;
                     var opponent = isHome ? g.AwayTeam : g.HomeTeam;
-                    return new TeamDetailDto.TeamGameDetail
+                    return new SingleTeamDetailDto.TeamGameDetail
                     {
                         Id = g.Id,
                         TournamentId = g.TournamentId,

@@ -21,11 +21,11 @@ public class TeamsController(ITeamRepository _teams) : ControllerBase
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TeamDetailDto?>> Get(int id)
+    public async Task<ActionResult<SingleTeamDetailDto?>> Get(int id)
     {
         var result = await _teams.GetByIdAsync(id);
         if (result is null)
             return NotFound();
-        return result.ToTeamDetailDto();
+        return result.ToSingleTeamDetailDto();
     }
 }
