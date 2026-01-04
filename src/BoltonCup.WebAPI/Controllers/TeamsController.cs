@@ -11,12 +11,12 @@ public class TeamsController(ITeamRepository _teams) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TeamDetailDto>>> Get(int? tournamentId = null)
+    public async Task<ActionResult<IEnumerable<TeamDetailDto>>> Get([FromQuery] GetTeamsQuery query)
     {
-        var teams = tournamentId is null 
-            ? await _teams.GetAllAsync()
-            : await _teams.GetAllAsync(tournamentId.Value);
-        return Ok(teams.Select(t => t.ToTeamDetailDto()));
+        var teams = await _teams.GetAllAsync(query);
+        return teams
+            .Select(t => t.ToTeamDetailDto())
+            .ToList();
     }
 
     [AllowAnonymous]
