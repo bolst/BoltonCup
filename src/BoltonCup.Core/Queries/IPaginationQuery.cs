@@ -8,7 +8,7 @@ public interface IPaginationQuery
 }
 
 
-public abstract record DefaultPaginationQuery : IPaginationQuery
+public record DefaultPaginationQuery : IPaginationQuery
 {
     public int Page { get; set; } = 1;
     public virtual int Size { get; set; } = 50;

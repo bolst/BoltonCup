@@ -1,13 +1,21 @@
+using BoltonCup.Core.Queries;
 using BoltonCup.Infrastructure;
 using BoltonCup.WebAPI.Middleware;
 using BoltonCup.WebAPI.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<DefaultPaginationQuery>();
+
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
