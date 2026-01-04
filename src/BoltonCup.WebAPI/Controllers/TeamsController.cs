@@ -28,7 +28,6 @@ public class TeamsController(ITeamRepository _teams) : ControllerBase
         {
             return NotFound();
         }
-
         var response = result.ToTeamDetailDto();
         return Ok(response);
     }

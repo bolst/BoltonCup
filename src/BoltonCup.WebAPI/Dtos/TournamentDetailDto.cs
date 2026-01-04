@@ -2,7 +2,7 @@ using BoltonCup.WebAPI.Data.Entities;
 
 namespace BoltonCup.WebAPI.Dtos;
 
-public record TournamentDetailDto
+public sealed record TournamentDetailDto
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -18,7 +18,7 @@ public record TournamentDetailDto
     public List<TournamentGameDetail> Games { get; set; }
     public List<TournamentTeamDetail> Teams { get; set; }
 
-    public record TournamentGameDetail
+    public sealed record TournamentGameDetail
     {
         public int Id { get; set; }
         public DateTime GameTime { get; set; }
@@ -29,7 +29,7 @@ public record TournamentDetailDto
         public int? AwayTeamId { get; set; }
     }
 
-    public record TournamentTeamDetail
+    public sealed record TournamentTeamDetail
     {
         public int Id { get; set; }
         public string Name  { get; set; }

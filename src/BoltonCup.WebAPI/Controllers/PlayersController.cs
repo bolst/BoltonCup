@@ -1,5 +1,6 @@
-using BoltonCup.WebAPI.Interfaces;
 using BoltonCup.WebAPI.Data.Entities;
+using BoltonCup.WebAPI.Interfaces;
+using BoltonCup.WebAPI.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,15 +8,8 @@ namespace BoltonCup.WebAPI.Controllers;
 
 [Route("api/players")]
 [ApiController]
-public class PlayersController : ControllerBase
+public class PlayersController(IPlayerRepository _players) : ControllerBase
 {
-    private readonly IPlayerRepository _players;
-
-    public PlayersController(IPlayerRepository players)
-    {
-        _players = players;
-    }
-
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Player>>> Get(int? tournamentId = null)
@@ -26,39 +20,15 @@ public class PlayersController : ControllerBase
     }
 
     [AllowAnonymous]
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<Player?>> Get(Guid id)
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<SinglePlayerDetailDto?>> Get(int id)
     {
         var result = await _players.GetByIdAsync(id);
         if (result is null)
         {
             return NotFound();
         }
-
-        return Ok(result);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Post([FromBody] Player entity)
-    {
-        var result = await _players.AddAsync(entity);
-        if (!result)
-        {
-            return BadRequest();
-        }
-
-        return NoContent();
-    }
-
-    [HttpPut]
-    public async Task<IActionResult> Put([FromBody] Player entity)
-    {
-        var result = await _players.UpdateAsync(entity);
-        if (!result)
-        {
-            return NotFound();
-        }
-
-        return NoContent();
+        var response = result.ToSinglePlayerDetailDto();
+        return Ok(response);
     }
 }

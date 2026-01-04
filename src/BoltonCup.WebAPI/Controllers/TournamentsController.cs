@@ -28,7 +28,6 @@ public class TournamentsController(ITournamentRepository _tournaments) : Control
         {
             return NotFound();
         }
-
         var response = result.ToTournamentDetailDto();
         return Ok(response);
     }
@@ -42,7 +41,6 @@ public class TournamentsController(ITournamentRepository _tournaments) : Control
         {
             return NotFound();
         }
-
         var response = result.ToTournamentDetailDto();
         return Ok(response);
     }

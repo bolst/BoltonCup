@@ -67,6 +67,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .ToTable("goals")
                 .HasKey(e => e.Id);
             entity
+                .HasOne(e => e.Team)
+                .WithMany(e => e.Goals)
+                .HasForeignKey(e => e.TeamId);
+            entity
                 .HasOne(e => e.Game)
                 .WithMany(e => e.Goals)
                 .HasForeignKey(e => e.GameId);
@@ -84,6 +88,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasForeignKey(e => e.Assist2PlayerId);
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.Period).HasColumnName("period_number");
             entity.Property(e => e.PeriodLabel).HasColumnName("period_label");
             entity.Property(e => e.PeriodTimeRemaining).HasColumnName("period_time_remaining");
@@ -99,6 +104,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .ToTable("penalties")
                 .HasKey(e => e.Id);
             entity
+                .HasOne(e => e.Team)
+                .WithMany(e => e.Penalties)
+                .HasForeignKey(e => e.TeamId);
+            entity
                 .HasOne(e => e.Game)
                 .WithMany(e => e.Penalties)
                 .HasForeignKey(e => e.GameId);
@@ -108,6 +117,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasForeignKey(e => e.PlayerId);
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.Period).HasColumnName("period_number");
             entity.Property(e => e.PeriodLabel).HasColumnName("period_label");
             entity.Property(e => e.PeriodTimeRemaining).HasColumnName("period_time_remaining");

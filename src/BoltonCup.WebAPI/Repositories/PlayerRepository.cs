@@ -5,34 +5,41 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.WebAPI.Repositories;
 
-public class PlayerRepository : IPlayerRepository
+
+
+public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
 {
-    private readonly BoltonCupDbContext _context;
-
-    public PlayerRepository(BoltonCupDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<IEnumerable<Player>> GetAllAsync()
     {
         return await _context.Players
-            .OrderBy(t => t.TournamentId)
-            .ThenBy(t => t.Id)
+            .Include(p => p.Account)
+            .Include(p => p.Tournament)
+            .Include(p => p.Team)
             .ToListAsync();
-    }
+    }       
     
     public async Task<IEnumerable<Player>> GetAllAsync(int tournamentId)
     {
         return await _context.Players
+            .Include(p => p.Account)
+            .Include(p => p.Tournament)
+            .Include(p => p.Team)
             .Where(t => t.TournamentId == tournamentId)
-            .OrderBy(t => t.Id)
             .ToListAsync();
     }
 
-    public async Task<Player?> GetByIdAsync(Guid id)
+    public async Task<Player?> GetByIdAsync(int id)
     {
-        return await _context.Players.FindAsync(id);
+        return await _context.Players
+            .Include(p => p.Account)
+            .Include(p => p.Tournament)
+            .Include(p => p.Team).ThenInclude(t => t!.HomeGames).ThenInclude(g => g.AwayTeam)            
+            .Include(p => p.Team).ThenInclude(t => t!.HomeGames).ThenInclude(g => g.Goals)
+            .Include(p => p.Team).ThenInclude(t => t!.HomeGames).ThenInclude(g => g.Penalties)
+            .Include(p => p.Team).ThenInclude(t => t!.AwayGames).ThenInclude(g => g.HomeTeam)             
+            .Include(p => p.Team).ThenInclude(t => t!.AwayGames).ThenInclude(g => g.Goals)
+            .Include(p => p.Team).ThenInclude(t => t!.AwayGames).ThenInclude(g => g.Penalties)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<bool> AddAsync(Player entity)
@@ -49,7 +56,7 @@ public class PlayerRepository : IPlayerRepository
         return result > 0;
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(int id)
     {
         var entity = await _context.Players.FindAsync(id);
         if (entity == null) return false;

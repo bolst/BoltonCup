@@ -3,6 +3,7 @@ using System;
 using BoltonCup.WebAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.WebAPI.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260103205052_EventTeamRelation")]
+    partial class EventTeamRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -216,7 +219,7 @@ namespace BoltonCup.WebAPI.Migrations
                         .HasColumnType("interval")
                         .HasColumnName("period_time_remaining");
 
-                    b.Property<int>("TeamId")
+                    b.Property<int?>("TeamId")
                         .HasColumnType("integer")
                         .HasColumnName("team_id");
 
@@ -296,7 +299,7 @@ namespace BoltonCup.WebAPI.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("player_id");
 
-                    b.Property<int>("TeamId")
+                    b.Property<int?>("TeamId")
                         .HasColumnType("integer")
                         .HasColumnName("team_id");
 
@@ -582,9 +585,7 @@ namespace BoltonCup.WebAPI.Migrations
 
                     b.HasOne("BoltonCup.WebAPI.Data.Entities.Team", "Team")
                         .WithMany("Goals")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TeamId");
 
                     b.Navigation("Assist1Player");
 
@@ -613,9 +614,7 @@ namespace BoltonCup.WebAPI.Migrations
 
                     b.HasOne("BoltonCup.WebAPI.Data.Entities.Team", "Team")
                         .WithMany("Penalties")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TeamId");
 
                     b.Navigation("Game");
 
