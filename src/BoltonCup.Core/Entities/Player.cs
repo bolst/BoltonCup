@@ -1,4 +1,4 @@
-namespace BoltonCup.Infrastructure.Data.Entities;
+namespace BoltonCup.Core;
 
 public class Player : EntityBase
 {

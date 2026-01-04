@@ -1,4 +1,4 @@
-using BoltonCup.Infrastructure.Data.Entities;
+using BoltonCup.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Data;

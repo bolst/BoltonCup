@@ -1,7 +1,7 @@
 
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BoltonCup.Infrastructure.Data.Entities;
+namespace BoltonCup.Core;
 
 public abstract class EntityBase
 {

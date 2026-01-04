@@ -1,6 +1,5 @@
 using BoltonCup.Infrastructure.Data;
-using BoltonCup.Infrastructure.Data.Entities;
-using BoltonCup.Infrastructure.Interfaces;
+using BoltonCup.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Repositories;

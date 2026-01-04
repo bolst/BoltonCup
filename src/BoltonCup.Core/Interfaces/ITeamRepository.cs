@@ -1,6 +1,6 @@
-using BoltonCup.Infrastructure.Data.Entities;
+using BoltonCup.Core;
 
-namespace BoltonCup.Infrastructure.Interfaces;
+namespace BoltonCup.Core;
 
 public interface ITeamRepository : IRepository<Team, int>
 {

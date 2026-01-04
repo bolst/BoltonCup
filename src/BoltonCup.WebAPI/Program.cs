@@ -7,7 +7,7 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddBoltonCupServices(builder.Configuration);
+builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();

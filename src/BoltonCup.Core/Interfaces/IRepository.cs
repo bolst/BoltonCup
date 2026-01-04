@@ -1,6 +1,6 @@
 
 
-namespace BoltonCup.Infrastructure.Interfaces;
+namespace BoltonCup.Core;
 
 public interface IRepository<TModel, in TKey> where TModel : class
 {

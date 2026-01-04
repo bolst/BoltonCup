@@ -1,5 +1,5 @@
 using BoltonCup.Infrastructure.Data;
-using BoltonCup.Infrastructure.Interfaces;
+using BoltonCup.Core;
 using BoltonCup.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,7 @@ namespace BoltonCup.Infrastructure.Services;
 public static class ServiceCollectionExtensions
 {
     
-    public static IServiceCollection AddBoltonCupServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddBoltonCupInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
 

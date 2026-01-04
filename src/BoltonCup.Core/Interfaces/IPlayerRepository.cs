@@ -1,6 +1,4 @@
-using BoltonCup.Infrastructure.Data.Entities;
-
-namespace BoltonCup.Infrastructure.Interfaces;
+namespace BoltonCup.Core;
 
 public interface IPlayerRepository : IRepository<Player, int>
 {
