@@ -1,4 +1,4 @@
-using BoltonCup.WebAPI.Data.Entities;
+using BoltonCup.Infrastructure.Data.Entities;
 
 namespace BoltonCup.WebAPI.Dtos;
 

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Scoresheet", "Bol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.WebAPI", "BoltonCup.WebAPI\BoltonCup.WebAPI.csproj", "{E88DDCAA-4FF7-4E74-955E-81FDA4118217}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Infrastructure", "BoltonCup.Infrastructure\BoltonCup.Infrastructure.csproj", "{FCF2951D-1DCB-417B-AF1C-8AF01DEFD2C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{E88DDCAA-4FF7-4E74-955E-81FDA4118217}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E88DDCAA-4FF7-4E74-955E-81FDA4118217}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E88DDCAA-4FF7-4E74-955E-81FDA4118217}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCF2951D-1DCB-417B-AF1C-8AF01DEFD2C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCF2951D-1DCB-417B-AF1C-8AF01DEFD2C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCF2951D-1DCB-417B-AF1C-8AF01DEFD2C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCF2951D-1DCB-417B-AF1C-8AF01DEFD2C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

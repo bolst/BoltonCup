@@ -1,7 +1,5 @@
-using BoltonCup.WebAPI;
-using BoltonCup.WebAPI.Data;
+using BoltonCup.Infrastructure.Services;
 using BoltonCup.WebAPI.Middleware;
-using BoltonCup.WebAPI.Data.Entities;
 using BoltonCup.WebAPI.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi;
@@ -9,12 +7,7 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddBoltonCupWebAPIServices(builder.Configuration);
-
-// Add identity auth
-builder.Services
-    .AddIdentityApiEndpoints<IdentityUser>()
-    .AddEntityFrameworkStores<AuthDbContext>();
+builder.Services.AddBoltonCupServices(builder.Configuration);
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();

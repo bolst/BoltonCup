@@ -1,6 +1,6 @@
-using BoltonCup.WebAPI.Data.Entities;
-using BoltonCup.WebAPI.Interfaces;
 using BoltonCup.WebAPI.Dtos;
+using BoltonCup.Infrastructure.Data.Entities;
+using BoltonCup.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
