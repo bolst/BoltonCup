@@ -17,7 +17,7 @@ public record PlayerDetailDto : IMappable<Player, PlayerDetailDto>
     public DateTime? Birthday { get; set; }
     public string? ProfilePicture { get; set; }
     public string? PreferredBeer { get; set; }
-    public string TournamentName { get; set; }
+    public required string TournamentName { get; set; }
     public string? TeamName { get; set; }
     public string? TeamNameShort { get; set; }
     public string? TeamAbbreviation { get; set; }
@@ -35,13 +35,13 @@ public record PlayerDetailDto : IMappable<Player, PlayerDetailDto>
             AccountId = player.AccountId, 
             Position = player.Position, 
             JerseyNumber = player.JerseyNumber, 
-            FirstName = player.Account.FirstName, 
+            FirstName = player.Account!.FirstName, 
             LastName = player.Account.LastName, 
             Birthday = player.Account.Birthday, 
             ProfilePicture = player.Account.ProfilePicture, 
             PreferredBeer = player.Account.PreferredBeer, 
             TournamentName = player.Tournament.Name, 
-            TeamName = player.Team.Name, 
+            TeamName = player.Team!.Name, 
             TeamNameShort = player.Team.NameShort, 
             TeamAbbreviation = player.Team.Abbreviation, 
             TeamLogoUrl = player.Team.LogoUrl, 

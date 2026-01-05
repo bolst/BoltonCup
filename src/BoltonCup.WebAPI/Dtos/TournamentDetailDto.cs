@@ -8,7 +8,7 @@ namespace BoltonCup.WebAPI.Dtos;
 public record TournamentDetailDto : IMappable<Tournament, TournamentDetailDto>
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public int? WinningTeamId { get; set; }
