@@ -16,8 +16,8 @@ public record GameDetailDto : IMappable<Game, GameDetailDto>
     public string? Venue  { get; set; }
     public string? Rink { get; set; }
     
-    public TeamGameSummary? HomeTeam { get; set; }
-    public TeamGameSummary? AwayTeam { get; set; }
+    public GameTeamSummary? HomeTeam { get; set; }
+    public GameTeamSummary? AwayTeam { get; set; }
 
     static Expression<Func<Game, GameDetailDto>> IMappable<Game, GameDetailDto>.Projection =>
         game => new GameDetailDto
@@ -29,17 +29,17 @@ public record GameDetailDto : IMappable<Game, GameDetailDto>
             GameType = game.GameType,
             Venue = game.Venue, 
             Rink = game.Rink,
-            HomeTeam = game.HomeTeam == null ? null : new TeamGameSummary(game.HomeTeam, game.Goals.Count(g => g.TeamId == game.HomeTeamId)),
-            AwayTeam = game.AwayTeam == null ? null : new TeamGameSummary(game.AwayTeam, game.Goals.Count(g => g.TeamId == game.AwayTeamId)),
+            HomeTeam = game.HomeTeam == null ? null : new GameTeamSummary(game.HomeTeam, game.Goals),
+            AwayTeam = game.AwayTeam == null ? null : new GameTeamSummary(game.AwayTeam, game.Goals),
         };
 
-    public sealed record TeamGameSummary : TeamSummary
+    public sealed record GameTeamSummary : TeamSummary
     {
         public int Goals { get; set; }
 
-        public TeamGameSummary(Team team, int goals) : base(team)
+        public GameTeamSummary(Team team, ICollection<Goal> goals) : base(team)
         {
-            Goals = goals;
+            Goals = goals.Count(g => g.TeamId == team.Id);
         }
     }
 }

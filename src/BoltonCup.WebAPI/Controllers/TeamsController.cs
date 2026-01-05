@@ -17,9 +17,9 @@ public class TeamsController(ITeamRepository _teams) : BoltonCupControllerBase
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TeamDetailDto?>> Get(int id)
+    public async Task<ActionResult<SingleTeamDetailDto?>> Get(int id)
     {
-        var result = await _teams.GetByIdAsync<TeamDetailDto>(id);
+        var result = await _teams.GetByIdAsync<SingleTeamDetailDto>(id);
         if (result is null)
             return NotFound();
         return result;
