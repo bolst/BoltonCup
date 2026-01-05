@@ -13,9 +13,9 @@ public class Goal : EntityBase
     public int? Assist2PlayerId { get; set; }
     public string? Notes { get; set; }
     
-    public Team Team { get; set; }
-    public Game Game { get; set; }
-    public Player Scorer { get; set; }
+    public Team Team { get; set; } = null!;
+    public Game Game { get; set; } = null!;
+    public Player Scorer { get; set; } = null!;
     public Player? Assist1Player { get; set; }
     public Player? Assist2Player { get; set; }
 }

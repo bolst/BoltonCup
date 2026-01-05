@@ -13,7 +13,7 @@ public class Penalty : EntityBase
     public required int DurationMinutes { get; set; }
     public string? Notes { get; set; }
     
-    public Team Team { get; set; }
-    public Game Game { get; set; }
-    public Player Player { get; set; }
+    public Team Team { get; set; } = null!;
+    public Game Game { get; set; } = null!;
+    public Player Player { get; set; } = null!;
 }

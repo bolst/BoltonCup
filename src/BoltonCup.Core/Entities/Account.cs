@@ -12,6 +12,6 @@ public class Account : EntityBase
     public string? ProfilePicture { get; set; }
     public string? PreferredBeer { get; set; }
     
-    public ICollection<Player> Players { get; set; }
-    public ICollection<Team> ManagedTeams { get; set; }
+    public ICollection<Player> Players { get; set; } = [];
+    public ICollection<Team> ManagedTeams { get; set; } = [];
 }

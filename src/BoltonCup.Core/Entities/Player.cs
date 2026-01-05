@@ -10,10 +10,10 @@ public class Player : EntityBase
     public int? JerseyNumber { get; set; }
     
     public Account? Account { get; set; }
-    public Tournament Tournament { get; set; }
+    public Tournament Tournament { get; set; } = null!;
     public Team? Team { get; set; }
-    public ICollection<Goal> Goals { get; set; }
-    public ICollection <Goal> PrimaryAssists { get; set; }
-    public ICollection <Goal> SecondaryAssists { get; set; }
-    public ICollection<Penalty> Penalties { get; set; }
+    public ICollection<Goal> Goals { get; set; } = [];
+    public ICollection <Goal> PrimaryAssists { get; set; } = [];
+    public ICollection <Goal> SecondaryAssists { get; set; } = [];
+    public ICollection<Penalty> Penalties { get; set; } = [];
 }

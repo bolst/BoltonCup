@@ -15,12 +15,12 @@ public class Team : EntityBase
     public string? TertiaryColorHex { get; set; }
     public string? GoalSongUrl { get; set; }
     public string? PenaltySongUrl { get; set; }
-    
-    public Tournament Tournament { get; set; }
+
+    public Tournament Tournament { get; set; } = null!;
     public Account? GeneralManager { get; set; }
-    public ICollection<Player> Players { get; set; }
-    public ICollection<Game> HomeGames { get; set; }
-    public ICollection<Game> AwayGames { get; set; }
-    public ICollection<Goal> Goals { get; set; }
-    public ICollection<Penalty> Penalties { get; set; }
+    public ICollection<Player> Players { get; set; } = [];
+    public ICollection<Game> HomeGames { get; set; } = [];
+    public ICollection<Game> AwayGames { get; set; } = [];
+    public ICollection<Goal> Goals { get; set; } = [];
+    public ICollection<Penalty> Penalties { get; set; } = [];
 }

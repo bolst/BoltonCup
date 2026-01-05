@@ -11,9 +11,9 @@ public class Game : EntityBase
     public string? Venue  { get; set; }
     public string? Rink { get; set; }
     
-    public Tournament Tournament { get; set; }
+    public Tournament Tournament { get; set; } = null!;
     public Team? HomeTeam { get; set; }
     public Team? AwayTeam { get; set; }
-    public ICollection<Goal> Goals { get; set; }
-    public ICollection<Penalty> Penalties { get; set; }
+    public ICollection<Goal> Goals { get; set; } = [];
+    public ICollection<Penalty> Penalties { get; set; } = [];
 }
