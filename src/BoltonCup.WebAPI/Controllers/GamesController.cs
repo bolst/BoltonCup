@@ -17,9 +17,9 @@ public class GamesController(IGameRepository _games) : BoltonCupControllerBase
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GameDetailDto?>> Get(int id)
+    public async Task<ActionResult<GameSingleDetailDto?>> Get(int id)
     {
-        var result = await _games.GetByIdAsync<GameDetailDto>(id);
+        var result = await _games.GetByIdAsync<GameSingleDetailDto>(id);
         if (result is null)
             return NotFound();
         return result;

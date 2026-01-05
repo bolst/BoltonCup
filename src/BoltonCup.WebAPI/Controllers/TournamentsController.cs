@@ -17,9 +17,9 @@ public class TournamentsController(ITournamentRepository _tournaments) : BoltonC
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TournamentDetailDto?>> Get(int id)
+    public async Task<ActionResult<TournamentSingleDetailDto?>> Get(int id)
     {
-        var result = await _tournaments.GetByIdAsync<TournamentDetailDto>(id);
+        var result = await _tournaments.GetByIdAsync<TournamentSingleDetailDto>(id);
         if (result is null)
             return NotFound();
         return result;
