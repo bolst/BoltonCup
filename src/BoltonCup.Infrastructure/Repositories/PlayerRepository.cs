@@ -4,7 +4,7 @@ using BoltonCup.Infrastructure.Extensions;
 using BoltonCup.Core.Mappings;
 using Microsoft.EntityFrameworkCore;
 
-namespace BoltonCup.Infrastructure.Players;
+namespace BoltonCup.Infrastructure.Repositories;
 
 
 

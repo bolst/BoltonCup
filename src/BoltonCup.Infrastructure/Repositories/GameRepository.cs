@@ -1,10 +1,10 @@
-using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Extensions;
 using BoltonCup.Core.Mappings;
+using BoltonCup.Infrastructure.Data;
+using BoltonCup.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace BoltonCup.Infrastructure.Games;
+namespace BoltonCup.Infrastructure.Repositories;
 
 
 

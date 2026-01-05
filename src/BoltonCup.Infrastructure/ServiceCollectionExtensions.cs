@@ -1,9 +1,6 @@
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Games;
-using BoltonCup.Infrastructure.Players;
-using BoltonCup.Infrastructure.Teams;
-using BoltonCup.Infrastructure.Tournaments;
+using BoltonCup.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
