@@ -32,14 +32,4 @@ public record GameDetailDto : IMappable<Game, GameDetailDto>
             HomeTeam = game.HomeTeam == null ? null : new GameTeamSummary(game.HomeTeam, game.Goals),
             AwayTeam = game.AwayTeam == null ? null : new GameTeamSummary(game.AwayTeam, game.Goals),
         };
-
-    public sealed record GameTeamSummary : TeamSummary
-    {
-        public int Goals { get; set; }
-
-        public GameTeamSummary(Team team, ICollection<Goal> goals) : base(team)
-        {
-            Goals = goals.Count(g => g.TeamId == team.Id);
-        }
-    }
 }

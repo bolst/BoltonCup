@@ -21,3 +21,14 @@ public record TeamSummary
         BannerUrl = team.BannerUrl;
     }
 }
+
+
+public sealed record GameTeamSummary : TeamSummary
+{
+    public int Goals { get; set; }
+
+    public GameTeamSummary(Team team, ICollection<Goal> goals) : base(team)
+    {
+        Goals = goals.Count(g => g.TeamId == team.Id);
+    }
+}
