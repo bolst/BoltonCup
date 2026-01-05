@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-[Route("api/teams")]
-[ApiController]
-public class TeamsController(ITeamRepository _teams) : ControllerBase
+public class TeamsController(ITeamRepository _teams) : BoltonCupControllerBase
 {
     [AllowAnonymous]
     [HttpGet]

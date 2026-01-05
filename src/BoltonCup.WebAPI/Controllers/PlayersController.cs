@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-[Route("api/players")]
-[ApiController]
-public class PlayersController(IPlayerRepository _players) : ControllerBase
+public class PlayersController(IPlayerRepository _players) : BoltonCupControllerBase
 {
     [AllowAnonymous]
     [HttpGet]

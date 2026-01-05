@@ -19,9 +19,9 @@ builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<DefaultPaginationQuery>();
 
 builder.Services.AddAuthorization();
-builder.Services.AddControllers(options => options
-    .Filters.Add<ApiExceptionFilterAttribute>()
-);
+builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilterAttribute>());
+
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 // https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
