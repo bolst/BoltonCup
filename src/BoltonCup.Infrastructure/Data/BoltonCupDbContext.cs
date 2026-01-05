@@ -8,6 +8,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
 {
     
     public DbSet<Account> Accounts { get; set; }
+    public DbSet<Game> Games { get; set; }
     public DbSet<Goal> Goals { get; set; }
     public DbSet<Penalty> Penalties { get; set; }
     public DbSet<Player> Players { get; set; }
