@@ -18,7 +18,7 @@ public record TournamentDetailDto : IMappable<Tournament, TournamentDetailDto>
     public int? SkaterLimit { get; set; }
     public int? GoalieLimit { get; set; }
 
-    Expression<Func<Tournament, TournamentDetailDto>> IMappable<Tournament, TournamentDetailDto>.Projection { get; } = 
+    Expression<Func<Tournament, TournamentDetailDto>> IMappable<Tournament, TournamentDetailDto>.Projection =>
         tournament => new TournamentDetailDto 
         {
             Id = tournament.Id,

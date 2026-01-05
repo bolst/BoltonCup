@@ -26,7 +26,7 @@ public record TeamDetailDto : IMappable<Team, TeamDetailDto>
     public string? GmProfilePicture  { get; set; }
 
 
-    Expression<Func<Team, TeamDetailDto>> IMappable<Team, TeamDetailDto>.Projection { get; } =
+    Expression<Func<Team, TeamDetailDto>> IMappable<Team, TeamDetailDto>.Projection =>
         team => new TeamDetailDto
         {
             Id = team.Id,

@@ -27,7 +27,7 @@ public record PlayerDetailDto : IMappable<Player, PlayerDetailDto>
     public string? TeamSecondaryHex { get; set; }
     public string? TeamTertiaryHex { get; set; }
 
-    Expression<Func<Player, PlayerDetailDto>> IMappable<Player, PlayerDetailDto>.Projection { get; } =
+    Expression<Func<Player, PlayerDetailDto>> IMappable<Player, PlayerDetailDto>.Projection =>
         player => new PlayerDetailDto
         {
             Id = player.Id, 
