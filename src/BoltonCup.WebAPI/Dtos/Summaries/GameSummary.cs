@@ -10,3 +10,12 @@ public record GameSummary
     public required string? Venue  { get; set; }
     public required string? Rink { get; set; }
 }
+
+
+public record TeamGameSummary : GameSummary
+{
+    public required bool IsHome { get; init; }
+    public required int GoalsFor { get; init; }
+    public required int GoalsAgainst { get; init; }
+    public required TeamSummary? Opponent { get; init; }
+}

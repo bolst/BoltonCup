@@ -73,14 +73,5 @@ public record TeamSingleDetailDto : TeamDetailDto, IMappable<Team, TeamSingleDet
                 })
                 .ToList(),
         };
-
-
-    public record TeamGameSummary : GameSummary
-    {
-        public required bool IsHome { get; init; }
-        public required int GoalsFor { get; init; }
-        public required int GoalsAgainst { get; init; }
-        public required TeamSummary? Opponent { get; init; }
-    }
 }
 
