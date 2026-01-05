@@ -38,17 +38,7 @@ public record TeamSingleDetailDto : TeamDetailDto, IMappable<Team, TeamSingleDet
             GmLastName = team.GeneralManager.LastName,
             GmProfilePicture = team.GeneralManager.ProfilePicture,
             Players = team.Players
-                .Select(p => new PlayerSummary
-                {
-                    Id = p.Id,
-                    AccountId = p.AccountId,
-                    Position = p.Position,
-                    JerseyNumber = p.JerseyNumber,
-                    FirstName = p.Account!.FirstName,
-                    LastName = p.Account.LastName,
-                    Birthday = p.Account.Birthday,
-                    ProfilePicture = p.Account.ProfilePicture,
-                })
+                .Select(p => new PlayerSummary(p, p.Account))
                 .ToList(),
             _homeGames = team.HomeGames
                 .Select(game => new TeamGameSummary

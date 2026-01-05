@@ -1,13 +1,30 @@
+using BoltonCup.Core;
+
 namespace BoltonCup.WebAPI.Dtos.Summaries;
 
 public record PlayerSummary
 {
-    public required int Id { get; set; }
-    public required int? AccountId { get; set; }
-    public required string? Position { get; set; }
-    public required int? JerseyNumber { get; set; }
-    public required string? FirstName { get; set; }
-    public required string? LastName { get; set; }
-    public required DateTime? Birthday { get; set; }
-    public required string? ProfilePicture { get; set; }
+    public int Id { get; set; }
+    public int? AccountId { get; set; }
+    public string? Position { get; set; }
+    public int? JerseyNumber { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public DateTime? Birthday { get; set; }
+    public string? ProfilePicture { get; set; }
+
+    public PlayerSummary(Player player, Account? account)
+    {
+        if (player.AccountId != account?.Id)
+            throw new ArgumentException("Player account doesn't match given account.");
+        
+        Id = player.Id;
+        AccountId = player.AccountId;
+        Position = player.Position;
+        JerseyNumber = player.JerseyNumber;
+        FirstName = account?.FirstName;
+        LastName = account?.LastName;
+        Birthday = account?.Birthday;
+        ProfilePicture = account?.ProfilePicture;
+    }
 }
