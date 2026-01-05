@@ -1,5 +1,6 @@
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Games;
 using BoltonCup.Infrastructure.Players;
 using BoltonCup.Infrastructure.Teams;
 using BoltonCup.Infrastructure.Tournaments;
@@ -23,9 +24,10 @@ public static class ServiceCollectionExtensions
         return services
             .AddDbContext<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
             .AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString))
+            .AddTransient<IGameRepository, GameRepository>()
+            .AddTransient<IPlayerRepository, PlayerRepository>()
             .AddTransient<ITeamRepository, TeamRepository>()
-            .AddTransient<ITournamentRepository, TournamentRepository>()
-            .AddTransient<IPlayerRepository, PlayerRepository>();
+            .AddTransient<ITournamentRepository, TournamentRepository>();
     }   
 }
 

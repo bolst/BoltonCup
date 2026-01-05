@@ -1,0 +1,83 @@
+using BoltonCup.Infrastructure.Data;
+using BoltonCup.Core;
+using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Core.Mappings;
+using Microsoft.EntityFrameworkCore;
+
+namespace BoltonCup.Infrastructure.Games;
+
+
+
+public class GameRepository(BoltonCupDbContext _context) : IGameRepository
+{
+    public async Task<IEnumerable<Game>> GetAllAsync(GetGamesQuery query)
+    {
+        return await _context.Games
+            .Include(p => p.Tournament)
+            .Include(p => p.HomeTeam)
+            .Include(p => p.AwayTeam)
+            .Include(p => p.Goals)
+            .Include(p => p.Penalties)
+            .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
+            .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
+            .OrderBy(p => p.GameTime)
+            .Page(query)
+            .ToListAsync();
+    }       
+    
+    public async Task<IEnumerable<T>> GetAllAsync<T>(GetGamesQuery query)
+        where T : IMappable<Game, T>
+    {
+        return await _context.Games
+            .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
+            .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
+            .OrderBy(p => p.GameTime)
+            .Page(query)
+            .ProjectTo<Game, T>()
+            .ToListAsync();
+    }       
+    
+    public async Task<Game?> GetByIdAsync(int id)
+    {
+        return await _context.Games
+            .Include(p => p.Tournament)
+            .Include(p => p.HomeTeam)
+            .Include(p => p.AwayTeam)
+            .Include(p => p.Goals)
+            .Include(p => p.Penalties)
+            .FirstOrDefaultAsync(p => p.Id == id);
+    }
+
+    public async Task<T?> GetByIdAsync<T>(int id)
+        where T : IMappable<Game, T>
+    {
+        return await _context.Games
+            .Where(p => p.Id == id)
+            .ProjectTo<Game, T>()
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<bool> AddAsync(Game entity)
+    {
+        await _context.Games.AddAsync(entity);
+        var result = await _context.SaveChangesAsync();
+        return result > 0;
+    }
+
+    public async Task<bool> UpdateAsync(Game entity)
+    {
+        _context.Games.Update(entity);
+        var result = await _context.SaveChangesAsync();
+        return result > 0;
+    }
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var entity = await _context.Games.FindAsync(id);
+        if (entity == null) return false;
+
+        _context.Games.Remove(entity);
+        var result = await _context.SaveChangesAsync();
+        return result > 0;
+    }
+}
