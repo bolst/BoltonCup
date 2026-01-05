@@ -17,6 +17,7 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
             .Include(p => p.Tournament)
             .Include(p => p.Team)
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
+            .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .OrderBy(p => p.Id)
             .Page(query)
             .ToListAsync();
@@ -27,6 +28,7 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
     {
         return await _context.Players
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
+            .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .OrderBy(p => p.Id)
             .Page(query)
             .ProjectTo<Player, T>()
