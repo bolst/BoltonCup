@@ -22,13 +22,14 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
             .ToListAsync();
     }       
     
-    public async Task<IEnumerable<T>> GetAllAsync<T>(GetPlayersQuery query, IMappable<Player, T> map)
+    public async Task<IEnumerable<T>> GetAllAsync<T>(GetPlayersQuery query)
+        where T : IMappable<Player, T>
     {
         return await _context.Players
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .OrderBy(p => p.Id)
             .Page(query)
-            .ProjectTo(map)
+            .ProjectTo<Player, T>()
             .ToListAsync();
     }       
     
@@ -46,11 +47,12 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<TResult?> GetByIdAsync<TResult>(int id, IMappable<Player, TResult> map)
+    public async Task<T?> GetByIdAsync<T>(int id)
+        where T : IMappable<Player, T>
     {
         return await _context.Players
             .Where(p => p.Id == id)
-            .ProjectTo(map)
+            .ProjectTo<Player, T>()
             .FirstOrDefaultAsync();
     }
 

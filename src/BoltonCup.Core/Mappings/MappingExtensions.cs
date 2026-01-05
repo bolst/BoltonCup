@@ -2,10 +2,9 @@ namespace BoltonCup.Core.Mappings;
 
 public static class MappingExtensions
 {
-    public static IQueryable<TResult> ProjectTo<TSource, TResult>(
-        this IQueryable<TSource> source, 
-        IMappable<TSource, TResult> map)
+    public static IQueryable<TResult> ProjectTo<TSource, TResult>(this IQueryable<TSource> source) 
+        where TResult : IMappable<TSource, TResult>
     {
-        return source.Select(map.Projection);
+        return source.Select(TResult.Projection);
     }    
 }

@@ -13,7 +13,7 @@ public class PlayersController(IPlayerRepository _players) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PlayerDetailDto>>> Get([FromQuery] GetPlayersQuery query)
     {
-        var players = await _players.GetAllAsync(query, new PlayerDetailDto());
+        var players = await _players.GetAllAsync<PlayerDetailDto>(query);
         return players.ToList();
     }
 
@@ -21,7 +21,7 @@ public class PlayersController(IPlayerRepository _players) : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<PlayerDetailDto?>> Get(int id)
     {
-        var result = await _players.GetByIdAsync(id, new PlayerDetailDto());
+        var result = await _players.GetByIdAsync<PlayerDetailDto>(id);
         if (result is null)
             return NotFound();
         return result;

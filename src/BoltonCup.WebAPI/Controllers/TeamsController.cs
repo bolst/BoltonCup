@@ -13,7 +13,7 @@ public class TeamsController(ITeamRepository _teams) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TeamDetailDto>>> Get([FromQuery] GetTeamsQuery query)
     {
-        var teams = await _teams.GetAllAsync(query, new TeamDetailDto());
+        var teams = await _teams.GetAllAsync<TeamDetailDto>(query);
         return teams.ToList();
     }
 
@@ -21,7 +21,7 @@ public class TeamsController(ITeamRepository _teams) : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TeamDetailDto?>> Get(int id)
     {
-        var result = await _teams.GetByIdAsync(id, new TeamDetailDto());
+        var result = await _teams.GetByIdAsync<TeamDetailDto>(id);
         if (result is null)
             return NotFound();
         return result;

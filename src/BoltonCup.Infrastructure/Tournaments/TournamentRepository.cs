@@ -24,11 +24,12 @@ public class TournamentRepository : ITournamentRepository
             .ToListAsync();
     }
         
-    public async Task<IEnumerable<T>> GetAllAsync<T>(GetTournamentsQuery query, IMappable<Tournament, T> map)
+    public async Task<IEnumerable<T>> GetAllAsync<T>(GetTournamentsQuery query)
+        where T : IMappable<Tournament, T>
     {
         return await _context.Tournaments
             .OrderBy(t => t.StartDate)
-            .ProjectTo(map)
+            .ProjectTo<Tournament, T>()
             .ToListAsync();
     }
     
@@ -40,11 +41,12 @@ public class TournamentRepository : ITournamentRepository
             .FirstOrDefaultAsync(e => e.Id == id);
     }
 
-    public async Task<TResult?> GetByIdAsync<TResult>(int id, IMappable<Tournament, TResult> map)
+    public async Task<T?> GetByIdAsync<T>(int id)
+        where T : IMappable<Tournament, T>
     {
         return await _context.Tournaments
             .Where(e => e.Id == id)
-            .ProjectTo(map)
+            .ProjectTo<Tournament, T>()
             .FirstOrDefaultAsync();
     }
 

@@ -4,5 +4,5 @@ namespace BoltonCup.Core.Mappings;
 
 public interface IMappable<TSource, TResult>
 {
-    Expression<Func<TSource, TResult>> Projection { get; }
+    static abstract Expression<Func<TSource, TResult>> Projection { get; }
 }
