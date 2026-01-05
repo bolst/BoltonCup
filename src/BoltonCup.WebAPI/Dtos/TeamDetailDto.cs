@@ -4,7 +4,7 @@ using BoltonCup.Core.Mappings;
 
 namespace BoltonCup.WebAPI.Dtos;
 
-public sealed record TeamDetailDto : IMappable<Team, TeamDetailDto>
+public record TeamDetailDto : IMappable<Team, TeamDetailDto>
 {
     public int Id { get; set; }
     public required string Name { get; set; }

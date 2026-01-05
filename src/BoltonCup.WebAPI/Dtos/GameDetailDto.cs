@@ -6,7 +6,7 @@ using BoltonCup.WebAPI.Dtos.Summaries;
 namespace BoltonCup.WebAPI.Dtos;
 
 
-public sealed record GameDetailDto : IMappable<Game, GameDetailDto>
+public record GameDetailDto : IMappable<Game, GameDetailDto>
 {
     public required int Id { get; set; }
     public required int TournamentId { get; set; }
