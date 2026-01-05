@@ -1,5 +1,6 @@
 using BoltonCup.Core.Queries;
 using BoltonCup.Infrastructure;
+using BoltonCup.WebAPI.Filters;
 using BoltonCup.WebAPI.Middleware;
 using BoltonCup.WebAPI.Utilities;
 using Microsoft.AspNetCore.Identity;
@@ -18,7 +19,9 @@ builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<DefaultPaginationQuery>();
 
 builder.Services.AddAuthorization();
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => options
+    .Filters.Add<ApiExceptionFilterAttribute>()
+);
 
 // https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -56,7 +59,13 @@ app.MapIdentityApi<IdentityUser>();
 if (app.Environment.IsDevelopment())
 {
     app.UseMiddleware<DevAuthMiddleware>();
+    app.UseExceptionHandler("/error");
 }
+else
+{
+    app.UseExceptionHandler("/error");
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 
