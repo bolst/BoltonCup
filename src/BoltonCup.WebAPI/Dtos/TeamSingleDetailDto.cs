@@ -5,7 +5,7 @@ using BoltonCup.WebAPI.Dtos.Summaries;
 
 namespace BoltonCup.WebAPI.Dtos;
 
-public record SingleTeamDetailDto : TeamDetailDto, IMappable<Team, SingleTeamDetailDto>
+public record TeamSingleDetailDto : TeamDetailDto, IMappable<Team, TeamSingleDetailDto>
 {
     private List<TeamGameSummary> _homeGames { get; init; } = [];
     private List<TeamGameSummary> _awayGames { get; init; } = [];
@@ -17,8 +17,8 @@ public record SingleTeamDetailDto : TeamDetailDto, IMappable<Team, SingleTeamDet
         _homeGames.Concat(_awayGames).OrderBy(g => g.GameTime).ToList();
     
     
-    static Expression<Func<Team, SingleTeamDetailDto>> IMappable<Team, SingleTeamDetailDto>.Projection =>
-        team => new SingleTeamDetailDto
+    static Expression<Func<Team, TeamSingleDetailDto>> IMappable<Team, TeamSingleDetailDto>.Projection =>
+        team => new TeamSingleDetailDto
         {
             Id = team.Id,
             Name = team.Name,
