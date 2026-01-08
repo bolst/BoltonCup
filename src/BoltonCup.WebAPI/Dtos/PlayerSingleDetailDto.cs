@@ -31,14 +31,7 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
             ProfilePicture = player.Account.ProfilePicture, 
             PreferredBeer = player.Account.PreferredBeer, 
             TournamentName = player.Tournament.Name, 
-            TeamName = player.Team!.Name, 
-            TeamNameShort = player.Team.NameShort, 
-            TeamAbbreviation = player.Team.Abbreviation, 
-            TeamLogoUrl = player.Team.LogoUrl, 
-            TeamBannerUrl = player.Team.BannerUrl, 
-            TeamPrimaryHex = player.Team.PrimaryColorHex, 
-            TeamSecondaryHex = player.Team.SecondaryColorHex, 
-            TeamTertiaryHex = player.Team.TertiaryColorHex,
+            Team = player.Team == null ? null : new TeamSummary(player.Team),
             TournamentStats = player.Account.Players
                 .GroupBy(p => p.Tournament)
                 .Select(g => new PlayerTournamentStats
@@ -47,7 +40,7 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
                     TournamentName = g.Key.Name,
                     Goals = g.Sum(x => x.Goals.Count),
                     Assists = g.Sum(x => x.PrimaryAssists.Count + x.SecondaryAssists.Count),
-                    Team = new TeamSummary(g.First().Team),
+                    Team = g.First().Team == null ? null : new TeamSummary(g.First().Team),
                 })
                 .ToList(),
             _homeGameByGame = player.Account.Players
@@ -69,7 +62,7 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
                         IsHome = true,
                         GoalsFor = g.Goals.Count(x => x.TeamId == p.TeamId),
                         GoalsAgainst = g.Goals.Count(x => x.TeamId != p.TeamId),
-                        Opponent = new TeamSummary(g.AwayTeam),
+                        Opponent = g.AwayTeam == null ? null : new TeamSummary(g.AwayTeam),
                     },
                     Team = new TeamSummary(p.Team)
                 }))
@@ -93,7 +86,7 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
                         IsHome = false,
                         GoalsFor = g.Goals.Count(x => x.TeamId == p.TeamId),
                         GoalsAgainst = g.Goals.Count(x => x.TeamId != p.TeamId),
-                        Opponent = new TeamSummary(g.HomeTeam),
+                        Opponent = g.HomeTeam == null ? null : new TeamSummary(g.HomeTeam),
                     },
                     Team = new TeamSummary(p.Team)
                 }))
@@ -107,7 +100,7 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
         public required int Goals { get; set; }
         public required int Assists { get; set; }
         public int Points => Goals + Assists;        
-        public required TeamSummary Team { get; set; }
+        public required TeamSummary? Team { get; set; }
     }
 
     public sealed record PlayerGameByGame
@@ -118,6 +111,6 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
         public required int Assists  { get; set; }
         public  int Points => Goals + Assists;
         public required TeamGameSummary Game { get; set; }
-        public required TeamSummary Team { get; set; }
+        public required TeamSummary? Team { get; set; }
     }
 }

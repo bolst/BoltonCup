@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using BoltonCup.Core;
 using BoltonCup.Core.Mappings;
+using BoltonCup.WebAPI.Dtos.Summaries;
 
 namespace BoltonCup.WebAPI.Dtos;
 
@@ -18,14 +19,7 @@ public record PlayerDetailDto : IMappable<Player, PlayerDetailDto>
     public string? ProfilePicture { get; set; }
     public string? PreferredBeer { get; set; }
     public required string TournamentName { get; set; }
-    public string? TeamName { get; set; }
-    public string? TeamNameShort { get; set; }
-    public string? TeamAbbreviation { get; set; }
-    public string? TeamLogoUrl { get; set; }
-    public string? TeamBannerUrl { get; set; }
-    public string? TeamPrimaryHex { get; set; }
-    public string? TeamSecondaryHex { get; set; }
-    public string? TeamTertiaryHex { get; set; }
+    public TeamSummary? Team { get; set; }
 
     static Expression<Func<Player, PlayerDetailDto>> IMappable<Player, PlayerDetailDto>.Projection =>
         player => new PlayerDetailDto
@@ -41,13 +35,6 @@ public record PlayerDetailDto : IMappable<Player, PlayerDetailDto>
             ProfilePicture = player.Account.ProfilePicture, 
             PreferredBeer = player.Account.PreferredBeer, 
             TournamentName = player.Tournament.Name, 
-            TeamName = player.Team!.Name, 
-            TeamNameShort = player.Team.NameShort, 
-            TeamAbbreviation = player.Team.Abbreviation, 
-            TeamLogoUrl = player.Team.LogoUrl, 
-            TeamBannerUrl = player.Team.BannerUrl, 
-            TeamPrimaryHex = player.Team.PrimaryColorHex, 
-            TeamSecondaryHex = player.Team.SecondaryColorHex, 
-            TeamTertiaryHex = player.Team.TertiaryColorHex,
+            Team = player.Team == null ? null : new TeamSummary(player.Team),
         };
 }
