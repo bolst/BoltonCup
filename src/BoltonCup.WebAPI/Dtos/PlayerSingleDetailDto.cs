@@ -7,6 +7,9 @@ namespace BoltonCup.WebAPI.Dtos;
 
 public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerSingleDetailDto>
 {
+
+    public List<PlayerTournamentStats> TournamentStats { get; set; } = [];
+
     static Expression<Func<Player, PlayerSingleDetailDto>> IMappable<Player, PlayerSingleDetailDto>.Projection =>
         player => new PlayerSingleDetailDto
         {
@@ -29,5 +32,24 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
             TeamPrimaryHex = player.Team.PrimaryColorHex, 
             TeamSecondaryHex = player.Team.SecondaryColorHex, 
             TeamTertiaryHex = player.Team.TertiaryColorHex,
+            TournamentStats = player.Account.Players
+                .GroupBy(p => p.Tournament)
+                .Select(g => new PlayerTournamentStats
+                {
+                    TournamentId = g.Key.Id,
+                    TournamentName = g.Key.Name,
+                    Goals = g.Sum(x => x.Goals.Count),
+                    Assists = g.Sum(x => x.PrimaryAssists.Count + x.SecondaryAssists.Count),
+                })
+                .ToList(),
         };
+
+    public sealed record PlayerTournamentStats
+    {
+        public required int TournamentId { get; set; }
+        public required string TournamentName { get; set; }
+        public required int Goals { get; set; }
+        public required int Assists { get; set; }
+        public int Points => Goals + Assists;        
+    }
 }
