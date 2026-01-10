@@ -98,6 +98,42 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Assist2PlayerId).HasColumnName("assist2_player_id");
             entity.Property(e => e.Notes).HasColumnName("notes");
         });
+        
+        modelBuilder.Entity<GoalieGameLog>(entity =>
+        {
+            entity
+                .ToTable("goalie_game_logs")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Player)
+                .WithMany(e => e.GoalieGameLogs)
+                .HasForeignKey(e => e.PlayerId);
+            entity
+                .HasOne(e => e.Team)
+                .WithMany(e => e.GoalieGameLogs)
+                .HasForeignKey(e => e.TeamId);
+            entity
+                .HasOne(e => e.OpponentTeam)
+                .WithMany()
+                .HasForeignKey(e => e.OpponentTeamId);
+            entity
+                .HasOne(e => e.Game)
+                .WithMany(e => e.GoalieGameLogs)
+                .HasForeignKey(e => e.GameId);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.PlayerId).HasColumnName("player_id");
+            entity.Property(e => e.TeamId).HasColumnName("team_id");
+            entity.Property(e => e.OpponentTeamId).HasColumnName("opponent_team_id");
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.Goals).HasColumnName("goals");
+            entity.Property(e => e.Assists).HasColumnName("assists");
+            entity.Property(e => e.PenaltyMinutes).HasColumnName("penalty_minutes");
+            entity.Property(e => e.GoalsAgainst).HasColumnName("goals_against");
+            entity.Property(e => e.ShotsAgainst).HasColumnName("shots_against");
+            entity.Property(e => e.Saves).HasColumnName("saves");
+            entity.Property(e => e.Shutout).HasColumnName("shutout");
+            entity.Property(e => e.Win).HasColumnName("win");
+        });
 
         modelBuilder.Entity<Penalty>(entity =>
         {
@@ -150,6 +186,37 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.Position).HasColumnName("position");
             entity.Property(e => e.JerseyNumber).HasColumnName("jersey_number");
+        });
+
+        modelBuilder.Entity<SkaterGameLog>(entity =>
+        {
+            entity
+                .ToTable("skater_game_logs")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Player)
+                .WithMany(e => e.SkaterGameLogs)
+                .HasForeignKey(e => e.PlayerId);
+            entity
+                .HasOne(e => e.Team)
+                .WithMany(e => e.SkaterGameLogs)
+                .HasForeignKey(e => e.TeamId);
+            entity
+                .HasOne(e => e.OpponentTeam)
+                .WithMany()
+                .HasForeignKey(e => e.OpponentTeamId);
+            entity
+                .HasOne(e => e.Game)
+                .WithMany(e => e.SkaterGameLogs)
+                .HasForeignKey(e => e.GameId);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.PlayerId).HasColumnName("player_id");
+            entity.Property(e => e.TeamId).HasColumnName("team_id");
+            entity.Property(e => e.OpponentTeamId).HasColumnName("opponent_team_id");
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.Goals).HasColumnName("goals");
+            entity.Property(e => e.Assists).HasColumnName("assists");
+            entity.Property(e => e.PenaltyMinutes).HasColumnName("penalty_minutes");
         });
         
         modelBuilder.Entity<Team>(entity =>
