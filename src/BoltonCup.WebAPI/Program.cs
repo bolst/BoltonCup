@@ -1,13 +1,14 @@
 using BoltonCup.Core.Queries;
 using BoltonCup.Infrastructure;
+using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Filters;
-using BoltonCup.WebAPI.Middleware;
-using BoltonCup.WebAPI.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,16 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<DefaultPaginationQuery>();
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthentication()
+    .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.Scheme, null);
+
+builder.Services.AddAuthorization(options =>
+{
+    options.DefaultPolicy = new AuthorizationPolicyBuilder()
+        .AddAuthenticationSchemes(IdentityConstants.BearerScheme, ApiKeyConstants.Scheme)
+        .RequireAuthenticatedUser()
+        .Build();
+});
 builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilterAttribute>());
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
@@ -36,6 +46,14 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Enter access token below."
     });
+    options.AddSecurityDefinition(ApiKeyConstants.Scheme, new OpenApiSecurityScheme
+    {
+        Name = "BoltonCup-Api-Key",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = ApiKeyConstants.Scheme,
+        In = ParameterLocation.Header,
+        Description = "Enter your API key below."
+    });
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
@@ -48,7 +66,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference("/docs", options => options
         .WithTitle("Bolton Cup API Documentation")
         .WithTheme(ScalarTheme.Purple)
-        .AddPreferredSecuritySchemes("Bearer")
+        .AddPreferredSecuritySchemes(ApiKeyConstants.Scheme)
     );
 }
 
@@ -56,15 +74,7 @@ app.UseHttpsRedirection();
 
 app.MapIdentityApi<IdentityUser>();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseMiddleware<DevAuthMiddleware>();
-    app.UseExceptionHandler("/error");
-}
-else
-{
-    app.UseExceptionHandler("/error");
-}
+app.UseExceptionHandler("/error");
 
 app.UseAuthentication();
 app.UseAuthorization();

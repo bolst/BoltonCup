@@ -7,7 +7,7 @@ namespace BoltonCup.WebAPI.Controllers;
 
 public class PlayersController(IPlayerRepository _players) : BoltonCupControllerBase
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PlayerDetailDto>>> Get([FromQuery] GetPlayersQuery query)
     {
