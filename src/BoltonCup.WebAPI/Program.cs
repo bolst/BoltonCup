@@ -48,7 +48,7 @@ builder.Services.AddSwaggerGen(options =>
     });
     options.AddSecurityDefinition(ApiKeyConstants.Scheme, new OpenApiSecurityScheme
     {
-        Name = "BoltonCup-Api-Key",
+        Name = ApiKeyConstants.Header,
         Type = SecuritySchemeType.ApiKey,
         Scheme = ApiKeyConstants.Scheme,
         In = ParameterLocation.Header,
@@ -62,11 +62,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    var defaultApiKey = app.Configuration[ApiKeyConstants.AppSettingsPath] ?? string.Empty;
     app.MapSwagger("/openapi/{documentName}.json");
     app.MapScalarApiReference("/docs", options => options
         .WithTitle("Bolton Cup API Documentation")
         .WithTheme(ScalarTheme.Purple)
         .AddPreferredSecuritySchemes(ApiKeyConstants.Scheme)
+        .AddApiKeyAuthentication(ApiKeyConstants.Scheme, scheme => scheme
+            .WithName(ApiKeyConstants.Header)
+            .WithValue(defaultApiKey)
+        )
     );
 }
 

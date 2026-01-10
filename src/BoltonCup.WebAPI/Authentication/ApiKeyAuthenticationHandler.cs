@@ -5,27 +5,23 @@ using Microsoft.Extensions.Options;
 
 namespace BoltonCup.WebAPI.Authentication;
 
-
-
 public class ApiKeyAuthenticationHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,
     UrlEncoder encoder)
     : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
-    public const string HeaderName = "BoltonCup-Api-Key";
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         // ensure header is present
-        if (!Request.Headers.TryGetValue(HeaderName, out var extractedApiKey))
+        if (!Request.Headers.TryGetValue(ApiKeyConstants.Header, out var extractedApiKey))
         {
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
         // validate
         var config = Context.RequestServices.GetRequiredService<IConfiguration>();
-        var adminKey = config["BoltonCup:Authentication:AdminApiKey"];
+        var adminKey = config[ApiKeyConstants.AppSettingsPath];
         if (string.IsNullOrEmpty(adminKey) || extractedApiKey != adminKey)
         {
             return Task.FromResult(AuthenticateResult.Fail("Invalid API Key"));
