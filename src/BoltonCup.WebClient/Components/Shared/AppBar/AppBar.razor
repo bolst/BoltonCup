@@ -1,3 +1,5 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
 <MudAppBar Elevation="1" ToolBarClass="d-flex flex-row align-center">
     <a href="/" style="height: 100%">
         <MudImage Src="img/boltoncup.png" Alt="Bolton Cup" Height="64"/>
@@ -12,7 +14,7 @@
     <MudHidden Breakpoint="Breakpoint.MdAndUp">
         <MudSpacer />
         <MudIconButton OnClick="OpenDrawer" Icon="@Icons.Material.Rounded.Menu" Variant="Variant.Text" Color="Color.Inherit" />
-        <NavMenu @bind-Open="_drawerOpen" />
+        <NavMenu @bind-Open="_drawerOpen" NavItems="_navLinks" />
     </MudHidden>
 </MudAppBar>
 
@@ -31,7 +33,5 @@
     private bool _drawerOpen;
 
     private void OpenDrawer() => _drawerOpen = true;
-    
-    private record NavLinkItem(string Title, string Href, string Icon);
 
 }

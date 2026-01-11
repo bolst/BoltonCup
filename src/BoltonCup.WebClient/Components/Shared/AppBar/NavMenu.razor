@@ -1,4 +1,5 @@
 @using MudBlazor.State
+@namespace BoltonCup.WebClient.Components.Shared
 @inherits ComponentBaseWithState
 
 <MudDrawer Open="Open" OpenChanged="OpenChanged" Anchor="Anchor.End" Elevation="1" Variant="DrawerVariant.Temporary" Width="100%">
@@ -9,6 +10,12 @@
         <MudSpacer />
         <MudIconButton OnClick="CloseDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit" />
     </MudPaper>
+    <MudNavMenu Class="mud-width-full" Color="Color.Primary" Bordered>
+        @foreach (var navItem in NavItems)
+        {
+            <MudNavLink Href="@navItem.Href" Icon="@navItem.Icon">@navItem.Title</MudNavLink>
+        }
+    </MudNavMenu>
 </MudDrawer>
 
 @code {
@@ -18,6 +25,9 @@
     
     [Parameter]
     public EventCallback<bool> OpenChanged { get; set; }
+
+    [Parameter]
+    public List<NavLinkItem> NavItems { get; set; } = [];
 
     private readonly ParameterState<bool> _openState;
     
