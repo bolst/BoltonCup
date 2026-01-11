@@ -1,0 +1,34 @@
+@using MudBlazor.State
+@inherits ComponentBaseWithState
+
+<MudDrawer Open="Open" OpenChanged="OpenChanged" Anchor="Anchor.End" Elevation="1" Variant="DrawerVariant.Temporary" Width="100%">
+    <MudPaper Class="d-flex flex-row align-center px-2 border-solid border-b" Elevation="0" Width="100%" Height="64px" Square>
+        <a href="/" onclick="location.reload()" style="height: 100%">
+            <MudImage Src="img/boltoncup.png" Alt="Bolton Cup" Height="64"/>
+        </a>
+        <MudSpacer />
+        <MudIconButton OnClick="CloseDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit" />
+    </MudPaper>
+</MudDrawer>
+
+@code {
+
+    [Parameter]
+    public bool Open { get; set; }
+    
+    [Parameter]
+    public EventCallback<bool> OpenChanged { get; set; }
+
+    private readonly ParameterState<bool> _openState;
+    
+    public NavMenu()
+    {
+        using var registerScope = CreateRegisterScope();
+        _openState = registerScope.RegisterParameter<bool>(nameof(Open))
+            .WithParameter(() => Open)
+            .WithEventCallback(() => OpenChanged);
+    }
+
+    private Task CloseDrawer() => _openState.SetValueAsync(false);
+
+}
