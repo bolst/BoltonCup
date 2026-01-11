@@ -16,11 +16,8 @@ public class SkaterStatsController(ISkaterStatRepository _skaterStats) : BoltonC
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<SkaterStatDetailDto?>> Get(int id)
+    public async Task<ActionResult<SkaterStatDetailDto>> Get(int id)
     {
-        var result = await _skaterStats.GetByIdAsync<SkaterStatDetailDto>(id);
-        if (result is null)
-            return NotFound();
-        return result;
+        return OkOrNotFound(await _skaterStats.GetByIdAsync<SkaterStatDetailDto>(id));
     }
 }

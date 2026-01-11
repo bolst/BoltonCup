@@ -16,11 +16,8 @@ public class GoalieStatsController(IGoalieStatRepository _goalieStats) : BoltonC
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GoalieStatDetailDto?>> Get(int id)
+    public async Task<ActionResult<GoalieStatDetailDto>> Get(int id)
     {
-        var result = await _goalieStats.GetByIdAsync<GoalieStatDetailDto>(id);
-        if (result is null)
-            return NotFound();
-        return result;
+        return OkOrNotFound(await _goalieStats.GetByIdAsync<GoalieStatDetailDto>(id));
     }
 }

@@ -16,11 +16,8 @@ public class PlayersController(IPlayerRepository _players) : BoltonCupController
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<PlayerSingleDetailDto?>> Get(int id)
+    public async Task<ActionResult<PlayerSingleDetailDto>> Get(int id)
     {
-        var result = await _players.GetByIdAsync<PlayerSingleDetailDto>(id);
-        if (result is null)
-            return NotFound();
-        return result;
+        return OkOrNotFound(await _players.GetByIdAsync<PlayerSingleDetailDto>(id));
     }
 }
