@@ -22,7 +22,9 @@ public static class ServiceCollectionExtensions
             .AddDbContext<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
             .AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString))
             .AddTransient<IGameRepository, GameRepository>()
+            .AddTransient<IGoalieStatRepository, GoalieStatRepository>()
             .AddTransient<IPlayerRepository, PlayerRepository>()
+            .AddTransient<ISkaterStatRepository, SkaterStatRepository>()
             .AddTransient<ITeamRepository, TeamRepository>()
             .AddTransient<ITournamentRepository, TournamentRepository>();
     }   
