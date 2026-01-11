@@ -4,7 +4,7 @@ using BoltonCup.Core.Mappings;
 
 namespace BoltonCup.Core;
 
-public interface IRepository<TModel, TGetQuery, in TKey> where TModel : class
+public interface IRepository<TModel, in TGetQuery, in TKey> where TModel : class
 {
     Task<IEnumerable<TModel>> GetAllAsync(TGetQuery query);
     Task<IEnumerable<TResult>> GetAllAsync<TResult>(TGetQuery query)
