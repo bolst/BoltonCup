@@ -11,8 +11,7 @@ public class TeamsController(ITeamRepository _teams) : BoltonCupControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TeamDetailDto>>> Get([FromQuery] GetTeamsQuery query)
     {
-        var teams = await _teams.GetAllAsync<TeamDetailDto>(query);
-        return teams.ToList();
+        return Ok(await _teams.GetAllAsync<TeamDetailDto>(query));
     }
 
     [AllowAnonymous]

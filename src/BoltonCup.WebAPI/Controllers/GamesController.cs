@@ -11,8 +11,7 @@ public class GamesController(IGameRepository _games) : BoltonCupControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GameDetailDto>>> Get([FromQuery] GetGamesQuery query)
     {
-        var players = await _games.GetAllAsync<GameDetailDto>(query);
-        return players.ToList();
+        return Ok(await _games.GetAllAsync<GameDetailDto>(query));
     }
 
     [AllowAnonymous]

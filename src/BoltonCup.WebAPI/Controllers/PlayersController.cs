@@ -11,8 +11,7 @@ public class PlayersController(IPlayerRepository _players) : BoltonCupController
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PlayerDetailDto>>> Get([FromQuery] GetPlayersQuery query)
     {
-        var players = await _players.GetAllAsync<PlayerDetailDto>(query);
-        return players.ToList();
+        return Ok(await _players.GetAllAsync<PlayerDetailDto>(query));
     }
 
     [AllowAnonymous]

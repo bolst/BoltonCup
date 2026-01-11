@@ -11,8 +11,7 @@ public class TournamentsController(ITournamentRepository _tournaments) : BoltonC
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TournamentDetailDto>>> Get([FromQuery] GetTournamentsQuery query)
     {
-        var result = await _tournaments.GetAllAsync<TournamentDetailDto>(query);
-        return result.ToList();
+        return Ok(await _tournaments.GetAllAsync<TournamentDetailDto>(query));
     }
 
     [AllowAnonymous]
