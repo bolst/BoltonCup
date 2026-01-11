@@ -9,9 +9,13 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Game> Games { get; set; }
+    public DbSet<GoalieGameLog> GoalieGameLogs { get; set; }
+    public DbSet<GoalieStat> GoalieStats { get; set; }
     public DbSet<Goal> Goals { get; set; }
     public DbSet<Penalty> Penalties { get; set; }
     public DbSet<Player> Players { get; set; }
+    public DbSet<SkaterGameLog> SkaterGameLogs { get; set; }
+    public DbSet<SkaterStat> SkaterStats { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
     
