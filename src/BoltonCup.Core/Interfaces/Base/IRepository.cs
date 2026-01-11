@@ -2,7 +2,7 @@
 
 using BoltonCup.Core.Mappings;
 
-namespace BoltonCup.Core;
+namespace BoltonCup.Core.Base;
 
 public interface IRepository<TModel, in TGetQuery, in TKey> where TModel : class
 {
