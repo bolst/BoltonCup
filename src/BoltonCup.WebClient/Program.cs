@@ -12,7 +12,8 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddScoped(sp =>
 {
-    var baseUrl = builder.Configuration["BoltonCupApi:BaseUrl"] ?? throw new InvalidOperationException("BoltonCupApi:BaseUrl configuration is missing.");
+    var baseUrl = builder.Configuration["BoltonCupApi:BaseUrl"] 
+                  ?? throw new InvalidOperationException("BoltonCupApi:BaseUrl configuration is missing.");
     var httpClient = sp.GetRequiredService<HttpClient>();
     return new BoltonCupApi(baseUrl, httpClient);
 });

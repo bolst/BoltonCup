@@ -5,6 +5,9 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+        
+        <!--github.com/RicoSuter/NSwag/issues/5301-->
+        <WasmEnableStreamingResponse>false</WasmEnableStreamingResponse>
     </PropertyGroup>
 
     <ItemGroup>
@@ -27,5 +30,5 @@
     <ItemGroup>
         <OpenApiReference Include="..\BoltonCup.WebAPI\boltoncup-v1.json" ClassName="BoltonCupApi" Namespace="BoltonCup.Sdk" SourceGenerator="NSwagCSharp" Link="OpenAPIs\boltoncup.json" />
     </ItemGroup>
-
+    
 </Project>
