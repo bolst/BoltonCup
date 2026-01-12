@@ -1,0 +1,60 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+@inject Sdk.BoltonCupApi BoltonCupApi
+
+<MudDataGrid
+    @ref="_dataGrid"
+    T="Sdk.SkaterStatDetailDto"
+    ServerData="ServerReload"
+    Breakpoint="Breakpoint.None"
+    RowStyle="height: 50px"
+    RowsPerPage="50"
+    Elevation="0"
+    ShowColumnOptions="false"
+    Striped
+    Dense>
+    <ToolBarContent>
+        <MudIconButton Icon="@Icons.Material.Rounded.FilterAlt" Variant="Variant.Outlined" />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Player.FirstName + ' ' + x.Player.LastName" Title="Player" StickyLeft/>
+        <PropertyColumn Property="x => x.Team.Name" Title="Team">
+            <CellTemplate>
+                <div class="d-flex flex-row align-center justify-space-evenly">
+                    <MudText Typo="Typo.body2">@context.Item.Team.Abbreviation</MudText>
+                    <MudImage Src="@context.Item.Team.LogoUrl" Height="24" Alt="@context.Item.Team.Abbreviation"/>
+                </div>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Player.Position" Title="Position"/>
+        <PropertyColumn Property="x => x.GamesPlayed" Title="GP" sty CellStyle="@_dataCellStyle"/>
+        <PropertyColumn Property="x => x.Goals" Title="G" CellStyle="@_dataCellStyle"/>
+        <PropertyColumn Property="x => x.Assists" Title="A" CellStyle="@_dataCellStyle"/>
+        <PropertyColumn Property="x => x.Points" Title="P" CellStyle="@_dataCellStyle"/>
+        <PropertyColumn Property="x => x.PenaltyMinutes" Title="PIM" CellStyle="@_dataCellStyle" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Sdk.SkaterStatDetailDto" PageSizeSelector="false"/>
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+
+    private MudDataGrid<Sdk.SkaterStatDetailDto> _dataGrid;
+    private const string _dataCellStyle = "max-width: 30px";
+
+    private async Task<GridData<Sdk.SkaterStatDetailDto>> ServerReload(GridState<Sdk.SkaterStatDetailDto> state)
+    {
+        var data = await BoltonCupApi.SkaterstatsAllAsync(
+            null, 
+            null, 
+            null, 
+            state.Page + 1, 
+            state.PageSize);
+        return new GridData<Sdk.SkaterStatDetailDto> {
+            TotalItems = 150,
+            Items = data
+        };
+    }
+
+}
