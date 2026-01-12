@@ -11,12 +11,21 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0-rc.1.25451.107"/>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0-rc.1.25451.107" PrivateAssets="all"/>
         <PackageReference Include="MudBlazor" Version="8.15.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+        <PackageReference Include="NSwag.ApiDescription.Client" Version="14.6.3">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
         <AdditionalFiles Include="Components\Layout\MainLayout.razor" />
         <AdditionalFiles Include="Components\Pages\Home.razor" />
         <AdditionalFiles Include="Components\Pages\NotFound.razor" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <OpenApiReference Include="..\BoltonCup.WebAPI\boltoncup-v1.json" ClassName="BoltonCupApi" Namespace="BoltonCup.Sdk" SourceGenerator="NSwagCSharp" Link="OpenAPIs\boltoncup.json" />
     </ItemGroup>
 
 </Project>
