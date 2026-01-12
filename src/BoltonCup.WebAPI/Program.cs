@@ -37,6 +37,12 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Bolton Cup",
+        Version = "v1",
+        Description = "Bolton Cup API"
+    });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
