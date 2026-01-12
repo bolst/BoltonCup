@@ -39,7 +39,10 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins(
+                    "http://localhost:5239",
+                    "https://boltoncup.ca"
+                )
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
