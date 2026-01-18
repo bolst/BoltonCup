@@ -101,7 +101,9 @@ app.UseHttpsRedirection();
 
 app.UseCors();
 
-app.MapIdentityApi<IdentityUser>();
+app.MapGroup("/api/auth")
+    .MapIdentityApi<IdentityUser>()
+    .WithTags("Auth");
 
 app.UseExceptionHandler("/error");
 
