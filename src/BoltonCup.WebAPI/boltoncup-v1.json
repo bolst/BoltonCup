@@ -6,10 +6,10 @@
     "version": "v1"
   },
   "paths": {
-    "/register": {
+    "/api/auth/register": {
       "post": {
         "tags": [
-          "BoltonCup.WebAPI"
+          "Auth"
         ],
         "requestBody": {
           "content": {
@@ -46,10 +46,10 @@
         ]
       }
     },
-    "/login": {
+    "/api/auth/login": {
       "post": {
         "tags": [
-          "BoltonCup.WebAPI"
+          "Auth"
         ],
         "parameters": [
           {
@@ -99,10 +99,10 @@
         ]
       }
     },
-    "/refresh": {
+    "/api/auth/refresh": {
       "post": {
         "tags": [
-          "BoltonCup.WebAPI"
+          "Auth"
         ],
         "requestBody": {
           "content": {
@@ -136,12 +136,11 @@
         ]
       }
     },
-    "/confirmEmail": {
+    "/api/auth/confirmEmail": {
       "get": {
         "tags": [
-          "BoltonCup.WebAPI"
+          "Auth"
         ],
-        "operationId": "MapIdentityApi-/confirmEmail",
         "parameters": [
           {
             "name": "userId",
@@ -182,10 +181,10 @@
         ]
       }
     },
-    "/resendConfirmationEmail": {
+    "/api/auth/resendConfirmationEmail": {
       "post": {
         "tags": [
-          "BoltonCup.WebAPI"
+          "Auth"
         ],
         "requestBody": {
           "content": {
@@ -212,10 +211,10 @@
         ]
       }
     },
-    "/forgotPassword": {
+    "/api/auth/forgotPassword": {
       "post": {
         "tags": [
-          "BoltonCup.WebAPI"
+          "Auth"
         ],
         "requestBody": {
           "content": {
@@ -252,10 +251,10 @@
         ]
       }
     },
-    "/resetPassword": {
+    "/api/auth/resetPassword": {
       "post": {
         "tags": [
-          "BoltonCup.WebAPI"
+          "Auth"
         ],
         "requestBody": {
           "content": {
@@ -292,10 +291,10 @@
         ]
       }
     },
-    "/manage/2fa": {
+    "/api/auth/manage/2fa": {
       "post": {
         "tags": [
-          "BoltonCup.WebAPI"
+          "Auth"
         ],
         "requestBody": {
           "content": {
@@ -342,10 +341,10 @@
         ]
       }
     },
-    "/manage/info": {
+    "/api/auth/manage/info": {
       "get": {
         "tags": [
-          "BoltonCup.WebAPI"
+          "Auth"
         ],
         "responses": {
           "200": {
@@ -383,7 +382,7 @@
       },
       "post": {
         "tags": [
-          "BoltonCup.WebAPI"
+          "Auth"
         ],
         "requestBody": {
           "content": {
@@ -435,6 +434,7 @@
         "tags": [
           "Games"
         ],
+        "operationId": "GetGames",
         "parameters": [
           {
             "name": "TournamentId",
@@ -475,26 +475,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GameDetailDto"
-                  }
+                  "$ref": "#/components/schemas/GameDetailDtoPaginatedList"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GameDetailDto"
-                  }
+                  "$ref": "#/components/schemas/GameDetailDtoPaginatedList"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GameDetailDto"
-                  }
+                  "$ref": "#/components/schemas/GameDetailDtoPaginatedList"
                 }
               }
             }
@@ -507,6 +498,7 @@
         "tags": [
           "Games"
         ],
+        "operationId": "GetGameById",
         "parameters": [
           {
             "name": "id",
@@ -547,6 +539,7 @@
         "tags": [
           "GoalieStats"
         ],
+        "operationId": "GetGoalieStats",
         "parameters": [
           {
             "name": "TournamentId",
@@ -587,66 +580,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GoalieStatDetailDto"
-                  }
+                  "$ref": "#/components/schemas/GoalieStatDetailDtoPaginatedList"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GoalieStatDetailDto"
-                  }
+                  "$ref": "#/components/schemas/GoalieStatDetailDtoPaginatedList"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GoalieStatDetailDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/goaliestats/{id}": {
-      "get": {
-        "tags": [
-          "GoalieStats"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/GoalieStatDetailDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GoalieStatDetailDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GoalieStatDetailDto"
+                  "$ref": "#/components/schemas/GoalieStatDetailDtoPaginatedList"
                 }
               }
             }
@@ -659,6 +603,7 @@
         "tags": [
           "Players"
         ],
+        "operationId": "GetPlayers",
         "parameters": [
           {
             "name": "TournamentId",
@@ -699,26 +644,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PlayerDetailDto"
-                  }
+                  "$ref": "#/components/schemas/PlayerDetailDtoPaginatedList"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PlayerDetailDto"
-                  }
+                  "$ref": "#/components/schemas/PlayerDetailDtoPaginatedList"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PlayerDetailDto"
-                  }
+                  "$ref": "#/components/schemas/PlayerDetailDtoPaginatedList"
                 }
               }
             }
@@ -731,6 +667,7 @@
         "tags": [
           "Players"
         ],
+        "operationId": "GetPlayerById",
         "parameters": [
           {
             "name": "id",
@@ -771,6 +708,7 @@
         "tags": [
           "SkaterStats"
         ],
+        "operationId": "GetSkaterStats",
         "parameters": [
           {
             "name": "TournamentId",
@@ -818,66 +756,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SkaterStatDetailDto"
-                  }
+                  "$ref": "#/components/schemas/SkaterStatDetailDtoPaginatedList"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SkaterStatDetailDto"
-                  }
+                  "$ref": "#/components/schemas/SkaterStatDetailDtoPaginatedList"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SkaterStatDetailDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/skaterstats/{id}": {
-      "get": {
-        "tags": [
-          "SkaterStats"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SkaterStatDetailDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SkaterStatDetailDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SkaterStatDetailDto"
+                  "$ref": "#/components/schemas/SkaterStatDetailDtoPaginatedList"
                 }
               }
             }
@@ -890,6 +779,7 @@
         "tags": [
           "Teams"
         ],
+        "operationId": "GetTeams",
         "parameters": [
           {
             "name": "TournamentId",
@@ -922,26 +812,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TeamDetailDto"
-                  }
+                  "$ref": "#/components/schemas/TeamDetailDtoPaginatedList"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TeamDetailDto"
-                  }
+                  "$ref": "#/components/schemas/TeamDetailDtoPaginatedList"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TeamDetailDto"
-                  }
+                  "$ref": "#/components/schemas/TeamDetailDtoPaginatedList"
                 }
               }
             }
@@ -954,6 +835,7 @@
         "tags": [
           "Teams"
         ],
+        "operationId": "GetTeamById",
         "parameters": [
           {
             "name": "id",
@@ -994,12 +876,22 @@
         "tags": [
           "Tournaments"
         ],
+        "operationId": "GetTournaments",
         "parameters": [
           {
-            "name": "query",
+            "name": "Page",
             "in": "query",
             "schema": {
-              "$ref": "#/components/schemas/GetTournamentsQuery"
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -1009,26 +901,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TournamentDetailDto"
-                  }
+                  "$ref": "#/components/schemas/TournamentDetailDtoPaginatedList"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TournamentDetailDto"
-                  }
+                  "$ref": "#/components/schemas/TournamentDetailDtoPaginatedList"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TournamentDetailDto"
-                  }
+                  "$ref": "#/components/schemas/TournamentDetailDtoPaginatedList"
                 }
               }
             }
@@ -1041,6 +924,7 @@
         "tags": [
           "Tournaments"
         ],
+        "operationId": "GetTournamentById",
         "parameters": [
           {
             "name": "id",
@@ -1166,6 +1050,31 @@
         },
         "additionalProperties": false
       },
+      "GameDetailDtoPaginatedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameDetailDto"
+            },
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "GameSingleDetailDto": {
         "required": [
           "gameTime",
@@ -1259,10 +1168,6 @@
             "format": "int32"
           }
         },
-        "additionalProperties": false
-      },
-      "GetTournamentsQuery": {
-        "type": "object",
         "additionalProperties": false
       },
       "GoalSummary": {
@@ -1380,6 +1285,31 @@
             "format": "int32"
           },
           "wins": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GoalieStatDetailDtoPaginatedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalieStatDetailDto"
+            },
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
             "type": "integer",
             "format": "int32"
           }
@@ -1581,6 +1511,31 @@
           },
           "team": {
             "$ref": "#/components/schemas/TeamSummary"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PlayerDetailDtoPaginatedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerDetailDto"
+            },
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -1896,6 +1851,31 @@
         },
         "additionalProperties": false
       },
+      "SkaterStatDetailDtoPaginatedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkaterStatDetailDto"
+            },
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "TeamDetailDto": {
         "required": [
           "abbreviation",
@@ -1975,6 +1955,31 @@
           "gmProfilePicture": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TeamDetailDtoPaginatedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamDetailDto"
+            },
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -2220,6 +2225,31 @@
         },
         "additionalProperties": false
       },
+      "TournamentDetailDtoPaginatedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TournamentDetailDto"
+            },
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "TournamentSingleDetailDto": {
         "required": [
           "name"
@@ -2345,7 +2375,7 @@
   },
   "tags": [
     {
-      "name": "BoltonCup.WebAPI"
+      "name": "Auth"
     },
     {
       "name": "Games"

@@ -10,14 +10,14 @@ public class PlayersController(IPlayerRepository _players) : BoltonCupController
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<PlayerDetailDto>>> Get([FromQuery] GetPlayersQuery query)
+    public async Task<ActionResult<PaginatedList<PlayerDetailDto>>> GetPlayers([FromQuery] GetPlayersQuery query)
     {
         return Ok(await _players.GetAllAsync<PlayerDetailDto>(query));
     }
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<PlayerSingleDetailDto>> Get(int id)
+    public async Task<ActionResult<PlayerSingleDetailDto>> GetPlayerById(int id)
     {
         return OkOrNotFound(await _players.GetByIdAsync<PlayerSingleDetailDto>(id));
     }

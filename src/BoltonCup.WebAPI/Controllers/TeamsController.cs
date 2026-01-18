@@ -10,14 +10,14 @@ public class TeamsController(ITeamRepository _teams) : BoltonCupControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<TeamDetailDto>>> Get([FromQuery] GetTeamsQuery query)
+    public async Task<ActionResult<PaginatedList<TeamDetailDto>>> GetTeams([FromQuery] GetTeamsQuery query)
     {
         return Ok(await _teams.GetAllAsync<TeamDetailDto>(query));
     }
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TeamSingleDetailDto>> Get(int id)
+    public async Task<ActionResult<TeamSingleDetailDto>> GetTeamById(int id)
     {
         return OkOrNotFound(await _teams.GetByIdAsync<TeamSingleDetailDto>(id));
     }

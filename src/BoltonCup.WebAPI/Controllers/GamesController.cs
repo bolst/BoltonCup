@@ -10,14 +10,14 @@ public class GamesController(IGameRepository _games) : BoltonCupControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<GameDetailDto>>> Get([FromQuery] GetGamesQuery query)
+    public async Task<ActionResult<PaginatedList<GameDetailDto>>> GetGames([FromQuery] GetGamesQuery query)
     {
         return Ok(await _games.GetAllAsync<GameDetailDto>(query));
     }
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GameSingleDetailDto>> Get(int id)
+    public async Task<ActionResult<GameSingleDetailDto>> GetGameById(int id)
     {
         return OkOrNotFound(await _games.GetByIdAsync<GameSingleDetailDto>(id));
     }

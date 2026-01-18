@@ -10,14 +10,14 @@ public class TournamentsController(ITournamentRepository _tournaments) : BoltonC
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<TournamentDetailDto>>> Get([FromQuery] GetTournamentsQuery query)
+    public async Task<ActionResult<PaginatedList<TournamentDetailDto>>> GetTournaments([FromQuery] GetTournamentsQuery query)
     {
         return Ok(await _tournaments.GetAllAsync<TournamentDetailDto>(query));
     }
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TournamentSingleDetailDto>> Get(int id)
+    public async Task<ActionResult<TournamentSingleDetailDto>> GetTournamentById(int id)
     {
         return OkOrNotFound(await _tournaments.GetByIdAsync<TournamentSingleDetailDto>(id));
     }

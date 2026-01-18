@@ -1,6 +1,7 @@
 using BoltonCup.Core.Queries;
 using BoltonCup.Infrastructure;
 using BoltonCup.WebAPI.Authentication;
+using BoltonCup.WebAPI.Controllers;
 using BoltonCup.WebAPI.Filters;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi;
@@ -9,6 +10,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +79,17 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Enter your API key below."
     });
     options.OperationFilter<SecurityRequirementsOperationFilter>();
+    // generate operation IDs based on method names
+    options.CustomOperationIds(description =>
+    {
+        if (description.TryGetMethodInfo(out var methodInfo))
+        {
+            var type = methodInfo.DeclaringType;
+            if (type != null && typeof(BoltonCupControllerBase).IsAssignableFrom(type))
+                return methodInfo.Name;
+        }
+        return null;
+    });
 });
 
 var app = builder.Build();

@@ -10,15 +10,8 @@ public class GoalieStatsController(IGoalieStatRepository _goalieStats) : BoltonC
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<GoalieStatDetailDto>>> Get([FromQuery] GetGoalieStatsQuery query)
+    public async Task<ActionResult<PaginatedList<GoalieStatDetailDto>>> GetGoalieStats([FromQuery] GetGoalieStatsQuery query)
     {
         return Ok(await _goalieStats.GetAllAsync<GoalieStatDetailDto>(query));
-    }
-
-    [AllowAnonymous]
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<GoalieStatDetailDto>> Get(int id)
-    {
-        return OkOrNotFound(await _goalieStats.GetByIdAsync<GoalieStatDetailDto>(id));
     }
 }
