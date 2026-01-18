@@ -1,4 +1,4 @@
-namespace BoltonCup.Core.Base;
+namespace BoltonCup.Core.Interfaces.Base;
 
 public interface IRepository<TModel, in TGetQuery, in TKey> 
     : IReadOnlyRepository<TModel, TGetQuery, TKey> where TModel : class

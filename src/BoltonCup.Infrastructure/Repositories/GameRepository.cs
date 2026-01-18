@@ -10,7 +10,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class GameRepository(BoltonCupDbContext _context) : IGameRepository
 {
-    public async Task<IEnumerable<Game>> GetAllAsync(GetGamesQuery query)
+    public async Task<CollectionResult<Game>> GetAllAsync(GetGamesQuery query)
     {
         return await _context.Games
             .Include(p => p.Tournament)
@@ -21,20 +21,18 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
             .OrderBy(p => p.GameTime)
-            .Page(query)
-            .ToListAsync();
+            .ToPaginatedListAsync(query);
     }       
     
-    public async Task<IEnumerable<T>> GetAllAsync<T>(GetGamesQuery query)
+    public async Task<CollectionResult<T>> GetAllAsync<T>(GetGamesQuery query)
         where T : IMappable<Game, T>
     {
         return await _context.Games
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
             .OrderBy(p => p.GameTime)
-            .Page(query)
             .ProjectTo<Game, T>()
-            .ToListAsync();
+            .ToPaginatedListAsync(query);
     }       
     
     public async Task<Game?> GetByIdAsync(int id)

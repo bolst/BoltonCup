@@ -15,22 +15,22 @@ public class TournamentRepository : ITournamentRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Tournament>> GetAllAsync(GetTournamentsQuery query)
+    public async Task<CollectionResult<Tournament>> GetAllAsync(GetTournamentsQuery query)
     {
         return await _context.Tournaments
             .Include(e => e.Games)
             .Include(e => e.Teams)
             .OrderBy(t => t.StartDate)
-            .ToListAsync();
+            .ToPaginatedListAsync(query);
     }
         
-    public async Task<IEnumerable<T>> GetAllAsync<T>(GetTournamentsQuery query)
+    public async Task<CollectionResult<T>> GetAllAsync<T>(GetTournamentsQuery query)
         where T : IMappable<Tournament, T>
     {
         return await _context.Tournaments
             .OrderBy(t => t.StartDate)
             .ProjectTo<Tournament, T>()
-            .ToListAsync();
+            .ToPaginatedListAsync(query);
     }
     
     public async Task<Tournament?> GetByIdAsync(int id)

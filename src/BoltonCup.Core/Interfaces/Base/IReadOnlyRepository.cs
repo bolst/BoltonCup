@@ -1,11 +1,11 @@
 using BoltonCup.Core.Mappings;
 
-namespace BoltonCup.Core.Base;
+namespace BoltonCup.Core.Interfaces.Base;
 
 public interface IReadOnlyRepository<TModel, in TGetQuery, in TKey> where TModel : class
 {
-    Task<IEnumerable<TModel>> GetAllAsync(TGetQuery query);
-    Task<IEnumerable<TResult>> GetAllAsync<TResult>(TGetQuery query)
+    Task<CollectionResult<TModel>> GetAllAsync(TGetQuery query);
+    Task<CollectionResult<TResult>> GetAllAsync<TResult>(TGetQuery query)
         where TResult : IMappable<TModel, TResult>;
     
     Task<TModel?> GetByIdAsync(TKey id);

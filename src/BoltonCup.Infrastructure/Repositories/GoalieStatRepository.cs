@@ -10,7 +10,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepository
 {
-    public async Task<IEnumerable<GoalieStat>> GetAllAsync(GetGoalieStatsQuery query)
+    public async Task<CollectionResult<GoalieStat>> GetAllAsync(GetGoalieStatsQuery query)
     {
         return await _context.GoalieStats
             .Include(p => p.Player)
@@ -23,11 +23,10 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
             .ThenByDescending(p => p.Shutouts)
             .ThenByDescending(p => p.Wins)
             .ThenByDescending(p => p.Saves)
-            .Page(query)
-            .ToListAsync();
+            .ToPaginatedListAsync(query);
     }       
     
-    public async Task<IEnumerable<T>> GetAllAsync<T>(GetGoalieStatsQuery query)
+    public async Task<CollectionResult<T>> GetAllAsync<T>(GetGoalieStatsQuery query)
         where T : IMappable<GoalieStat, T>
     {
         return await _context.GoalieStats
@@ -38,9 +37,8 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
             .ThenByDescending(p => p.Shutouts)
             .ThenByDescending(p => p.Wins)
             .ThenByDescending(p => p.Saves)
-            .Page(query)
             .ProjectTo<GoalieStat, T>()
-            .ToListAsync();
+            .ToPaginatedListAsync(query);
     }       
     
     public async Task<GoalieStat?> GetByIdAsync(int id)

@@ -1,5 +1,6 @@
 using BoltonCup.WebAPI.Dtos;
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +10,7 @@ public class SkaterStatsController(ISkaterStatRepository _skaterStats) : BoltonC
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<SkaterStatDetailDto>>> Get([FromQuery] GetSkaterStatsQuery query)
+    public async Task<ActionResult<PaginatedList<SkaterStatDetailDto>>> Get([FromQuery] GetSkaterStatsQuery query)
     {
         return Ok(await _skaterStats.GetAllAsync<SkaterStatDetailDto>(query));
     }

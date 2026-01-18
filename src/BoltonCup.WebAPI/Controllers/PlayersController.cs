@@ -1,5 +1,6 @@
 using BoltonCup.WebAPI.Dtos;
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +10,7 @@ public class PlayersController(IPlayerRepository _players) : BoltonCupController
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PlayerDetailDto>>> Get([FromQuery] GetPlayersQuery query)
+    public async Task<ActionResult<PaginatedList<PlayerDetailDto>>> Get([FromQuery] GetPlayersQuery query)
     {
         return Ok(await _players.GetAllAsync<PlayerDetailDto>(query));
     }

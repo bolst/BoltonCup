@@ -10,7 +10,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepository
 {
-    public async Task<IEnumerable<SkaterStat>> GetAllAsync(GetSkaterStatsQuery query)
+    public async Task<CollectionResult<SkaterStat>> GetAllAsync(GetSkaterStatsQuery query)
     {
         return await _context.SkaterStats
             .Include(p => p.Player)
@@ -23,11 +23,10 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
             .ThenByDescending(p => p.Goals)
             .ThenByDescending(p => p.Assists)
             .ThenBy(p => p.GamesPlayed)
-            .Page(query)
-            .ToListAsync();
+            .ToPaginatedListAsync(query);
     }       
     
-    public async Task<IEnumerable<T>> GetAllAsync<T>(GetSkaterStatsQuery query)
+    public async Task<CollectionResult<T>> GetAllAsync<T>(GetSkaterStatsQuery query)
         where T : IMappable<SkaterStat, T>
     {
         return await _context.SkaterStats
@@ -38,9 +37,8 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
             .ThenByDescending(p => p.Goals)
             .ThenByDescending(p => p.Assists)
             .ThenBy(p => p.GamesPlayed)
-            .Page(query)
             .ProjectTo<SkaterStat, T>()
-            .ToListAsync();
+            .ToPaginatedListAsync(query);
     }       
     
     public async Task<SkaterStat?> GetByIdAsync(int id)

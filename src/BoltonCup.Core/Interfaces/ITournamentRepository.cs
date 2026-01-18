@@ -1,4 +1,4 @@
-using BoltonCup.Core.Base;
+using BoltonCup.Core.Interfaces.Base;
 
 namespace BoltonCup.Core;
 

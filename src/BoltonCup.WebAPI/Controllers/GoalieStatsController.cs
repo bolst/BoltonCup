@@ -1,5 +1,6 @@
 using BoltonCup.WebAPI.Dtos;
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +10,7 @@ public class GoalieStatsController(IGoalieStatRepository _goalieStats) : BoltonC
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GoalieStatDetailDto>>> Get([FromQuery] GetGoalieStatsQuery query)
+    public async Task<ActionResult<PaginatedList<GoalieStatDetailDto>>> Get([FromQuery] GetGoalieStatsQuery query)
     {
         return Ok(await _goalieStats.GetAllAsync<GoalieStatDetailDto>(query));
     }

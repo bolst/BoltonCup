@@ -8,7 +8,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
 {
-    public async Task<IEnumerable<Team>> GetAllAsync(GetTeamsQuery query)
+    public async Task<CollectionResult<Team>> GetAllAsync(GetTeamsQuery query)
     {
         return await _context.Teams
             .Include(e => e.GeneralManager)
@@ -16,22 +16,20 @@ public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
             .Include(e => e.HomeGames)
             .Include(e => e.AwayGames)
             .Include(e => e.Players)
-                .ThenInclude(p => p.Account)
+            .ThenInclude(p => p.Account)
             .ConditionalWhere(e => e.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .OrderBy(e => e.Id)
-            .Page(query)
-            .ToListAsync();
+            .ToPaginatedListAsync(query);
     }
         
-    public async Task<IEnumerable<T>> GetAllAsync<T>(GetTeamsQuery query)
+    public async Task<CollectionResult<T>> GetAllAsync<T>(GetTeamsQuery query)
         where T : IMappable<Team, T>
     {
         return await _context.Teams
             .ConditionalWhere(e => e.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .OrderBy(e => e.Id)
-            .Page(query)
             .ProjectTo<Team, T>()
-            .ToListAsync();
+            .ToPaginatedListAsync(query);
     }
     
     public async Task<Team?> GetByIdAsync(int id)
