@@ -1006,14 +1006,9 @@
       },
       "GameDetailDto": {
         "required": [
-          "awayTeam",
           "gameTime",
-          "gameType",
-          "homeTeam",
           "id",
-          "rink",
-          "tournament",
-          "venue"
+          "tournament"
         ],
         "type": "object",
         "properties": {
@@ -1076,16 +1071,11 @@
       },
       "GameSingleDetailDto": {
         "required": [
-          "awayTeam",
           "gameTime",
-          "gameType",
           "goals",
-          "homeTeam",
           "id",
           "penalties",
-          "rink",
-          "tournament",
-          "venue"
+          "tournament"
         ],
         "type": "object",
         "properties": {
@@ -1452,15 +1442,7 @@
       },
       "PlayerDetailDto": {
         "required": [
-          "accountId",
-          "birthday",
-          "firstName",
           "id",
-          "jerseyNumber",
-          "lastName",
-          "position",
-          "preferredBeer",
-          "profilePicture",
           "team",
           "tournament"
         ],
@@ -1582,15 +1564,7 @@
       },
       "PlayerSingleDetailDto": {
         "required": [
-          "accountId",
-          "birthday",
-          "firstName",
           "id",
-          "jerseyNumber",
-          "lastName",
-          "position",
-          "preferredBeer",
-          "profilePicture",
           "team",
           "tournament",
           "tournamentStats"
@@ -1697,6 +1671,11 @@
           "profilePicture": {
             "type": "string",
             "nullable": true
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -1878,21 +1857,11 @@
       "TeamDetailDto": {
         "required": [
           "abbreviation",
-          "bannerUrl",
-          "gmAccountId",
-          "gmFirstName",
-          "gmLastName",
-          "gmProfilePicture",
-          "goalSongUrl",
           "id",
-          "logoUrl",
           "name",
           "nameShort",
-          "penaltySongUrl",
           "primaryColorHex",
-          "secondaryColorHex",
-          "tertiaryColorHex",
-          "tournament"
+          "secondaryColorHex"
         ],
         "type": "object",
         "properties": {
@@ -2052,22 +2021,12 @@
       "TeamSingleDetailDto": {
         "required": [
           "abbreviation",
-          "bannerUrl",
-          "gmAccountId",
-          "gmFirstName",
-          "gmLastName",
-          "gmProfilePicture",
-          "goalSongUrl",
           "id",
-          "logoUrl",
           "name",
           "nameShort",
-          "penaltySongUrl",
           "players",
           "primaryColorHex",
-          "secondaryColorHex",
-          "tertiaryColorHex",
-          "tournament"
+          "secondaryColorHex"
         ],
         "type": "object",
         "properties": {
@@ -2186,16 +2145,11 @@
       },
       "TournamentDetailDto": {
         "required": [
-          "endDate",
-          "goalieLimit",
           "id",
           "isActive",
           "isPaymentOpen",
           "isRegistrationOpen",
-          "name",
-          "skaterLimit",
-          "startDate",
-          "winningTeamId"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -2271,16 +2225,11 @@
       },
       "TournamentSingleDetailDto": {
         "required": [
-          "endDate",
-          "goalieLimit",
           "id",
           "isActive",
           "isPaymentOpen",
           "isRegistrationOpen",
-          "name",
-          "skaterLimit",
-          "startDate",
-          "winningTeamId"
+          "name"
         ],
         "type": "object",
         "properties": {

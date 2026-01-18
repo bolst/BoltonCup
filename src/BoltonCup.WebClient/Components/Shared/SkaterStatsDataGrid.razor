@@ -1,6 +1,6 @@
 @namespace BoltonCup.WebClient.Components.Shared
 
-@inject Sdk.BoltonCupApi BoltonCupApi
+@inject IBoltonCupApi BoltonCupApi
 
 <MudDataGrid
     @ref="_dataGrid"
@@ -17,7 +17,7 @@
         <MudIconButton Icon="@Icons.Material.Rounded.FilterAlt" Variant="Variant.Outlined" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.Player.FirstName + ' ' + x.Player.LastName" Title="Player" StickyLeft/>
+        <PropertyColumn Property="x => x.Player.FullName" Title="Player" StickyLeft/>
         <PropertyColumn Property="x => x.Team.Name" Title="Team">
             <CellTemplate>
                 <div class="d-flex flex-row align-center justify-space-evenly">
