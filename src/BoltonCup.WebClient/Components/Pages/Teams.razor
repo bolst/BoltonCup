@@ -4,16 +4,22 @@
 
 <PageTitle>Teams | Bolton Cup</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large">
-    <MudGrid>
-        @foreach (var group in _teamsByTournament)
+<MudContainer MaxWidth="MaxWidth.Medium">
+    @foreach (var group in _teamsByTournament)
+    {
+        var tournamentId = group.Key;
+        var tournamentName = "Unnamed Tournament";
+        var dateRange = "Aug. 20 - 23";
+        if (tournamentId.HasValue)
         {
-            var tournamentId = group.Key;
-            var tournamentName = tournamentId.HasValue ? group.First().TournamentName : "Unassigned Tournament";
-            <MudItem xs="12">
-                <MudText Typo="Typo.h4" Class="mt-4 mb-n2">@tournamentName</MudText>
-            </MudItem>
-            foreach (var team in group)
+            tournamentName = group.First().TournamentName;
+        }
+        <div class="mud-width-full d-flex flex-row gap-3 align-center mt-6 mb-1">
+            <MudText Typo="Typo.h5"><b>@tournamentName</b></MudText>
+            <MudChip T="string" Text="@dateRange" Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Rounded.CalendarMonth" Label="true" />
+        </div>
+        <MudGrid Spacing="3">
+            @foreach (var team in group)
             {
                 <MudItem xs="12" md="6">
                     <MudPaper Class="d-flex flex-row align-center gap-3 px-1 py-8" Width="100%" Height="100px" Elevation="0" Outlined>
@@ -30,8 +36,8 @@
                     </MudPaper>
                 </MudItem>
             }
-        }
-    </MudGrid>
+        </MudGrid>
+    }
 </MudContainer>
 
 
