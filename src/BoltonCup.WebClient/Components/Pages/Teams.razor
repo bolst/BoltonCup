@@ -41,8 +41,8 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        var teams = await BoltonCupApi.TeamsAllAsync(null, null, null);
-        _teamsByTournament = teams
+        var teams = await BoltonCupApi.GetTeamsAsync(null, null, null);
+        _teamsByTournament = teams.Items
             .OrderByDescending(t => t.TournamentId)
             .ThenBy(t => t.Name)
             .GroupBy(t => t.TournamentId);

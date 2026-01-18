@@ -45,15 +45,13 @@
 
     private async Task<GridData<Sdk.SkaterStatDetailDto>> ServerReload(GridState<Sdk.SkaterStatDetailDto> state)
     {
-        var data = await BoltonCupApi.SkaterstatsAllAsync(
-            null, 
-            null, 
-            null, 
-            state.Page + 1, 
-            state.PageSize);
+        var data = await BoltonCupApi.GetSkaterStatsAsync(
+            page: state.Page + 1, 
+            size: state.PageSize
+        );
         return new GridData<Sdk.SkaterStatDetailDto> {
-            TotalItems = 150,
-            Items = data
+            TotalItems = data.Total,
+            Items = data.Items,
         };
     }
 
