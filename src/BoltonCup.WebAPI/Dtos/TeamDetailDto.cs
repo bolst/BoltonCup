@@ -1,29 +1,29 @@
 using System.Linq.Expressions;
 using BoltonCup.Core;
 using BoltonCup.Core.Mappings;
+using BoltonCup.WebAPI.Dtos.Summaries;
 
 namespace BoltonCup.WebAPI.Dtos;
 
 public record TeamDetailDto : IMappable<Team, TeamDetailDto>
 {
-    public int Id { get; set; }
-    public required string Name { get; set; }
-    public required string NameShort { get; set; }
-    public required string Abbreviation { get; set; }
-    public int? TournamentId { get; set; }
-    public string? TournamentName { get; set; }
-    public string? LogoUrl { get; set; }
-    public string? BannerUrl { get; set; }
-    public required string PrimaryColorHex { get; set; }
-    public required string SecondaryColorHex { get; set; }
-    public string? TertiaryColorHex { get; set; }
-    public string? GoalSongUrl { get; set; }
-    public string? PenaltySongUrl { get; set; }
+    public required int Id { get; init; }
+    public required string Name { get; init; }
+    public required string NameShort { get; init; }
+    public required string Abbreviation { get; init; }
+    public TournamentSummary? Tournament { get; init; }
+    public string? LogoUrl { get; init; }
+    public string? BannerUrl { get; init; }
+    public required string PrimaryColorHex { get; init; }
+    public required string SecondaryColorHex { get; init; }
+    public string? TertiaryColorHex { get; init; }
+    public string? GoalSongUrl { get; init; }
+    public string? PenaltySongUrl { get; init; }
     
-    public int? GmAccountId { get; set; }
-    public string? GmFirstName { get; set; }
-    public string? GmLastName { get; set; }
-    public string? GmProfilePicture  { get; set; }
+    public int? GmAccountId { get; init; }
+    public string? GmFirstName { get; init; }
+    public string? GmLastName { get; init; }
+    public string? GmProfilePicture  { get; init; }
 
 
     static Expression<Func<Team, TeamDetailDto>> IMappable<Team, TeamDetailDto>.Projection =>
@@ -33,8 +33,7 @@ public record TeamDetailDto : IMappable<Team, TeamDetailDto>
             Name = team.Name,
             NameShort = team.NameShort,
             Abbreviation = team.Abbreviation,
-            TournamentId = team.Tournament.Id,
-            TournamentName = team.Tournament.Name,
+            Tournament = new TournamentSummary(team.Tournament),
             LogoUrl = team.LogoUrl,
             BannerUrl = team.BannerUrl,
             PrimaryColorHex = team.PrimaryColorHex,

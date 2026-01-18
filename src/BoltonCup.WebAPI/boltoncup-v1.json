@@ -1006,10 +1006,14 @@
       },
       "GameDetailDto": {
         "required": [
+          "awayTeam",
           "gameTime",
+          "gameType",
+          "homeTeam",
           "id",
-          "tournamentId",
-          "tournamentName"
+          "rink",
+          "tournament",
+          "venue"
         ],
         "type": "object",
         "properties": {
@@ -1017,17 +1021,12 @@
             "type": "integer",
             "format": "int32"
           },
-          "tournamentId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tournamentName": {
-            "type": "string",
-            "nullable": true
-          },
           "gameTime": {
             "type": "string",
             "format": "date-time"
+          },
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
           },
           "gameType": {
             "type": "string",
@@ -1077,10 +1076,16 @@
       },
       "GameSingleDetailDto": {
         "required": [
+          "awayTeam",
           "gameTime",
+          "gameType",
+          "goals",
+          "homeTeam",
           "id",
-          "tournamentId",
-          "tournamentName"
+          "penalties",
+          "rink",
+          "tournament",
+          "venue"
         ],
         "type": "object",
         "properties": {
@@ -1088,17 +1093,12 @@
             "type": "integer",
             "format": "int32"
           },
-          "tournamentId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tournamentName": {
-            "type": "string",
-            "nullable": true
-          },
           "gameTime": {
             "type": "string",
             "format": "date-time"
+          },
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
           },
           "gameType": {
             "type": "string",
@@ -1224,8 +1224,7 @@
           "shotsAgainst",
           "shutouts",
           "team",
-          "tournamentId",
-          "tournamentName",
+          "tournament",
           "wins"
         ],
         "type": "object",
@@ -1236,13 +1235,8 @@
           "team": {
             "$ref": "#/components/schemas/TeamSummary"
           },
-          "tournamentId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tournamentName": {
-            "type": "string",
-            "nullable": true
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
           },
           "gamesPlayed": {
             "type": "integer",
@@ -1458,15 +1452,21 @@
       },
       "PlayerDetailDto": {
         "required": [
-          "tournamentName"
+          "accountId",
+          "birthday",
+          "firstName",
+          "id",
+          "jerseyNumber",
+          "lastName",
+          "position",
+          "preferredBeer",
+          "profilePicture",
+          "team",
+          "tournament"
         ],
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tournamentId": {
             "type": "integer",
             "format": "int32"
           },
@@ -1505,9 +1505,8 @@
             "type": "string",
             "nullable": true
           },
-          "tournamentName": {
-            "type": "string",
-            "nullable": true
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
           },
           "team": {
             "$ref": "#/components/schemas/TeamSummary"
@@ -1583,15 +1582,22 @@
       },
       "PlayerSingleDetailDto": {
         "required": [
-          "tournamentName"
+          "accountId",
+          "birthday",
+          "firstName",
+          "id",
+          "jerseyNumber",
+          "lastName",
+          "position",
+          "preferredBeer",
+          "profilePicture",
+          "team",
+          "tournament",
+          "tournamentStats"
         ],
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tournamentId": {
             "type": "integer",
             "format": "int32"
           },
@@ -1630,19 +1636,11 @@
             "type": "string",
             "nullable": true
           },
-          "tournamentName": {
-            "type": "string",
-            "nullable": true
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
           },
           "team": {
             "$ref": "#/components/schemas/TeamSummary"
-          },
-          "tournamentStats": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PlayerTournamentStats"
-            },
-            "nullable": true
           },
           "gameByGame": {
             "type": "array",
@@ -1651,6 +1649,13 @@
             },
             "nullable": true,
             "readOnly": true
+          },
+          "tournamentStats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerTournamentStats"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1809,8 +1814,7 @@
           "player",
           "points",
           "team",
-          "tournamentId",
-          "tournamentName"
+          "tournament"
         ],
         "type": "object",
         "properties": {
@@ -1820,13 +1824,8 @@
           "team": {
             "$ref": "#/components/schemas/TeamSummary"
           },
-          "tournamentId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tournamentName": {
-            "type": "string",
-            "nullable": true
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
           },
           "gamesPlayed": {
             "type": "integer",
@@ -1879,10 +1878,21 @@
       "TeamDetailDto": {
         "required": [
           "abbreviation",
+          "bannerUrl",
+          "gmAccountId",
+          "gmFirstName",
+          "gmLastName",
+          "gmProfilePicture",
+          "goalSongUrl",
+          "id",
+          "logoUrl",
           "name",
           "nameShort",
+          "penaltySongUrl",
           "primaryColorHex",
-          "secondaryColorHex"
+          "secondaryColorHex",
+          "tertiaryColorHex",
+          "tournament"
         ],
         "type": "object",
         "properties": {
@@ -1902,14 +1912,8 @@
             "type": "string",
             "nullable": true
           },
-          "tournamentId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "tournamentName": {
-            "type": "string",
-            "nullable": true
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
           },
           "logoUrl": {
             "type": "string",
@@ -2048,10 +2052,22 @@
       "TeamSingleDetailDto": {
         "required": [
           "abbreviation",
+          "bannerUrl",
+          "gmAccountId",
+          "gmFirstName",
+          "gmLastName",
+          "gmProfilePicture",
+          "goalSongUrl",
+          "id",
+          "logoUrl",
           "name",
           "nameShort",
+          "penaltySongUrl",
+          "players",
           "primaryColorHex",
-          "secondaryColorHex"
+          "secondaryColorHex",
+          "tertiaryColorHex",
+          "tournament"
         ],
         "type": "object",
         "properties": {
@@ -2071,14 +2087,8 @@
             "type": "string",
             "nullable": true
           },
-          "tournamentId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "tournamentName": {
-            "type": "string",
-            "nullable": true
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
           },
           "logoUrl": {
             "type": "string",
@@ -2125,13 +2135,6 @@
             "type": "string",
             "nullable": true
           },
-          "players": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PlayerSummary"
-            },
-            "nullable": true
-          },
           "games": {
             "type": "array",
             "items": {
@@ -2139,6 +2142,13 @@
             },
             "nullable": true,
             "readOnly": true
+          },
+          "players": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerSummary"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2176,7 +2186,16 @@
       },
       "TournamentDetailDto": {
         "required": [
-          "name"
+          "endDate",
+          "goalieLimit",
+          "id",
+          "isActive",
+          "isPaymentOpen",
+          "isRegistrationOpen",
+          "name",
+          "skaterLimit",
+          "startDate",
+          "winningTeamId"
         ],
         "type": "object",
         "properties": {
@@ -2252,7 +2271,16 @@
       },
       "TournamentSingleDetailDto": {
         "required": [
-          "name"
+          "endDate",
+          "goalieLimit",
+          "id",
+          "isActive",
+          "isPaymentOpen",
+          "isRegistrationOpen",
+          "name",
+          "skaterLimit",
+          "startDate",
+          "winningTeamId"
         ],
         "type": "object",
         "properties": {
@@ -2297,6 +2325,39 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TournamentSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "winningTeamId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

@@ -6,14 +6,14 @@ namespace BoltonCup.WebAPI.Dtos;
 
 public record TournamentDetailDto : IMappable<Tournament, TournamentDetailDto>
 {
-    public int Id { get; set; }
+    public required int Id { get; set; }
     public required string Name { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public int? WinningTeamId { get; set; }
-    public bool IsActive { get; set; }
-    public bool IsRegistrationOpen { get; set; }
-    public bool IsPaymentOpen { get; set; }
+    public required bool IsActive { get; set; }
+    public required bool IsRegistrationOpen { get; set; }
+    public required bool IsPaymentOpen { get; set; }
     public int? SkaterLimit { get; set; }
     public int? GoalieLimit { get; set; }
 

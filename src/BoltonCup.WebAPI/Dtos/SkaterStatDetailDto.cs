@@ -9,8 +9,7 @@ public record SkaterStatDetailDto : IMappable<SkaterStat, SkaterStatDetailDto>
 {
     public required PlayerSummary Player { get; init; }
     public required TeamSummary Team { get; init; }
-    public required int TournamentId { get; init; }
-    public required string TournamentName { get; init; }
+    public required TournamentSummary Tournament { get; init; }
     public required int GamesPlayed { get; init; }
     public required int Goals { get; init; }
     public required int Assists { get; init; }
@@ -22,8 +21,7 @@ public record SkaterStatDetailDto : IMappable<SkaterStat, SkaterStatDetailDto>
         {
             Player = new PlayerSummary(skater.Player, skater.Player.Account),
             Team = new TeamSummary(skater.Team),
-            TournamentId = skater.TournamentId,
-            TournamentName = skater.Tournament.Name,
+            Tournament = new TournamentSummary(skater.Tournament),
             GamesPlayed = skater.GamesPlayed,
             Goals = skater.Goals,
             Assists = skater.Assists,

@@ -8,24 +8,22 @@ namespace BoltonCup.WebAPI.Dtos;
 
 public record PlayerDetailDto : IMappable<Player, PlayerDetailDto>
 {
-    public int Id { get; set; }
-    public int TournamentId { get; set; }
-    public int? AccountId { get; set; }
-    public string? Position { get; set; }
-    public int? JerseyNumber { get; set; }
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
-    public DateTime? Birthday { get; set; }
-    public string? ProfilePicture { get; set; }
-    public string? PreferredBeer { get; set; }
-    public required string TournamentName { get; set; }
-    public TeamSummary? Team { get; set; }
+    public required int Id { get; init; }
+    public int? AccountId { get; init; }
+    public string? Position { get; init; }
+    public int? JerseyNumber { get; init; }
+    public string? FirstName { get; init; }
+    public string? LastName { get; init; }
+    public DateTime? Birthday { get; init; }
+    public string? ProfilePicture { get; init; }
+    public string? PreferredBeer { get; init; }
+    public required TournamentSummary Tournament { get; init; }
+    public required TeamSummary? Team { get; init; }
 
     static Expression<Func<Player, PlayerDetailDto>> IMappable<Player, PlayerDetailDto>.Projection =>
         player => new PlayerDetailDto
         {
             Id = player.Id, 
-            TournamentId = player.TournamentId, 
             AccountId = player.AccountId, 
             Position = player.Position, 
             JerseyNumber = player.JerseyNumber, 
@@ -34,7 +32,7 @@ public record PlayerDetailDto : IMappable<Player, PlayerDetailDto>
             Birthday = player.Account.Birthday, 
             ProfilePicture = player.Account.ProfilePicture, 
             PreferredBeer = player.Account.PreferredBeer, 
-            TournamentName = player.Tournament.Name, 
+            Tournament = new TournamentSummary(player.Tournament),
             Team = player.Team == null ? null : new TeamSummary(player.Team),
         };
 }

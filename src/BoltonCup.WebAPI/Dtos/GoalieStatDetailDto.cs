@@ -9,8 +9,7 @@ public record GoalieStatDetailDto : IMappable<GoalieStat, GoalieStatDetailDto>
 {
     public required PlayerSummary Player { get; init; }
     public required TeamSummary Team { get; init; }
-    public required int TournamentId { get; init; }
-    public required string TournamentName { get; init; }
+    public required TournamentSummary Tournament { get; init; }
     public required int GamesPlayed { get; init; }
     public required int Goals { get; init; }
     public required int Assists { get; init; }
@@ -24,22 +23,21 @@ public record GoalieStatDetailDto : IMappable<GoalieStat, GoalieStatDetailDto>
     public required int Wins { get; init; }
     
     static Expression<Func<GoalieStat, GoalieStatDetailDto>> IMappable<GoalieStat, GoalieStatDetailDto>.Projection =>
-        skater => new GoalieStatDetailDto
+        goalie => new GoalieStatDetailDto
         {
-            Player = new PlayerSummary(skater.Player, skater.Player.Account),
-            Team = new TeamSummary(skater.Team),
-            TournamentId = skater.TournamentId,
-            TournamentName = skater.Tournament.Name,
-            GamesPlayed = skater.GamesPlayed,
-            Goals = skater.Goals,
-            Assists = skater.Assists,
-            PenaltyMinutes = skater.PenaltyMinutes,
-            GoalsAgainst = skater.GoalsAgainst,
-            GoalsAgainstAverage = skater.GoalsAgainstAverage,
-            ShotsAgainst = skater.ShotsAgainst,
-            Saves = skater.Saves,
-            SavePercentage = skater.SavePercentage,
-            Shutouts = skater.Shutouts,
-            Wins = skater.Wins
+            Player = new PlayerSummary(goalie.Player, goalie.Player.Account),
+            Team = new TeamSummary(goalie.Team),
+            Tournament = new TournamentSummary(goalie.Tournament),
+            GamesPlayed = goalie.GamesPlayed,
+            Goals = goalie.Goals,
+            Assists = goalie.Assists,
+            PenaltyMinutes = goalie.PenaltyMinutes,
+            GoalsAgainst = goalie.GoalsAgainst,
+            GoalsAgainstAverage = goalie.GoalsAgainstAverage,
+            ShotsAgainst = goalie.ShotsAgainst,
+            Saves = goalie.Saves,
+            SavePercentage = goalie.SavePercentage,
+            Shutouts = goalie.Shutouts,
+            Wins = goalie.Wins
         };
 }

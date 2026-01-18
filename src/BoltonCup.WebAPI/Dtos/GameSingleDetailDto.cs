@@ -8,15 +8,14 @@ namespace BoltonCup.WebAPI.Dtos;
 public record GameSingleDetailDto : GameDetailDto, IMappable<Game, GameSingleDetailDto>
 {
 
-    public List<GoalSummary> Goals { get; set; } = [];
-    public List<PenaltySummary> Penalties { get; set; } = [];
+    public required List<GoalSummary> Goals { get; init; } = [];
+    public required List<PenaltySummary> Penalties { get; init; } = [];
 
     static Expression<Func<Game, GameSingleDetailDto>> IMappable<Game, GameSingleDetailDto>.Projection =>
         game => new GameSingleDetailDto
         {
             Id = game.Id,
-            TournamentId = game.TournamentId,
-            TournamentName = game.Tournament.Name,
+            Tournament = new TournamentSummary(game.Tournament),
             GameTime = game.GameTime,
             GameType = game.GameType,
             Venue = game.Venue,

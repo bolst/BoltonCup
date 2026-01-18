@@ -13,6 +13,8 @@ public record PlayerSummary
     public DateTime? Birthday { get; set; }
     public string? ProfilePicture { get; set; }
 
+    public string FullName => FirstName + " " + LastName;
+
     public PlayerSummary(Player player, Account? account)
     {
         if (player.AccountId != account?.Id)

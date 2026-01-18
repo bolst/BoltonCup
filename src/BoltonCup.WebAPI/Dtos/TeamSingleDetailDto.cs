@@ -10,12 +10,10 @@ public record TeamSingleDetailDto : TeamDetailDto, IMappable<Team, TeamSingleDet
     private List<TeamGameSummary> _homeGames { get; init; } = [];
     private List<TeamGameSummary> _awayGames { get; init; } = [];
     
-    
-    public List<PlayerSummary> Players { get; init; } = [];
-    
     public List<TeamGameSummary> Games => 
         _homeGames.Concat(_awayGames).OrderBy(g => g.GameTime).ToList();
     
+    public required List<PlayerSummary> Players { get; init; } = [];
     
     static Expression<Func<Team, TeamSingleDetailDto>> IMappable<Team, TeamSingleDetailDto>.Projection =>
         team => new TeamSingleDetailDto
@@ -24,8 +22,7 @@ public record TeamSingleDetailDto : TeamDetailDto, IMappable<Team, TeamSingleDet
             Name = team.Name,
             NameShort = team.NameShort,
             Abbreviation = team.Abbreviation,
-            TournamentId = team.Tournament.Id,
-            TournamentName = team.Tournament.Name,
+            Tournament = new TournamentSummary(team.Tournament),
             LogoUrl = team.LogoUrl,
             BannerUrl = team.BannerUrl,
             PrimaryColorHex = team.PrimaryColorHex,

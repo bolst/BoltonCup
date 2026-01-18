@@ -8,23 +8,20 @@ namespace BoltonCup.WebAPI.Dtos;
 
 public record GameDetailDto : IMappable<Game, GameDetailDto>
 {
-    public required int Id { get; set; }
-    public required int TournamentId { get; set; }
-    public required string TournamentName { get; set; }
-    public required DateTime GameTime { get; set; }
-    public string? GameType { get; set; }
-    public string? Venue  { get; set; }
-    public string? Rink { get; set; }
-    
-    public GameTeamSummary? HomeTeam { get; set; }
-    public GameTeamSummary? AwayTeam { get; set; }
+    public required int Id { get; init; }
+    public required DateTime GameTime { get; init; }
+    public required TournamentSummary Tournament { get; init; }
+    public string? GameType { get; init; }
+    public string? Venue  { get; init; }
+    public string? Rink { get; init; }
+    public GameTeamSummary? HomeTeam { get; init; }
+    public GameTeamSummary? AwayTeam { get; init; }
 
     static Expression<Func<Game, GameDetailDto>> IMappable<Game, GameDetailDto>.Projection =>
         game => new GameDetailDto
         {
             Id = game.Id,
-            TournamentId = game.TournamentId,
-            TournamentName = game.Tournament.Name,
+            Tournament = new TournamentSummary(game.Tournament),
             GameTime = game.GameTime,
             GameType = game.GameType,
             Venue = game.Venue, 

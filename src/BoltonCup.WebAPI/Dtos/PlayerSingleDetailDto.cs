@@ -7,20 +7,18 @@ namespace BoltonCup.WebAPI.Dtos;
 
 public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerSingleDetailDto>
 {
-
-    public List<PlayerTournamentStats> TournamentStats { get; set; } = [];
-
+    private List<PlayerGameByGame> _homeGameByGame { get; init; } = [];
+    private List<PlayerGameByGame> _awayGameByGame { get; init; } = [];
+    
     public List<PlayerGameByGame> GameByGame =>
         _homeGameByGame.Concat(_awayGameByGame).OrderBy(g => g.Game.GameTime).ToList();
 
-    private List<PlayerGameByGame> _homeGameByGame { get; set; } = [];
-    private List<PlayerGameByGame> _awayGameByGame { get; set; } = [];
+    public required List<PlayerTournamentStats> TournamentStats { get; init; } = [];
 
     static Expression<Func<Player, PlayerSingleDetailDto>> IMappable<Player, PlayerSingleDetailDto>.Projection =>
         player => new PlayerSingleDetailDto
         {
             Id = player.Id, 
-            TournamentId = player.TournamentId, 
             AccountId = player.AccountId, 
             Position = player.Position, 
             JerseyNumber = player.JerseyNumber, 
@@ -29,7 +27,7 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
             Birthday = player.Account.Birthday, 
             ProfilePicture = player.Account.ProfilePicture, 
             PreferredBeer = player.Account.PreferredBeer, 
-            TournamentName = player.Tournament.Name, 
+            Tournament = new TournamentSummary(player.Tournament),
             Team = player.Team == null ? null : new TeamSummary(player.Team),
             TournamentStats = player.Account.Players
                 .GroupBy(p => p.Tournament)
@@ -39,7 +37,7 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
                     TournamentName = g.Key.Name,
                     Goals = g.Sum(x => x.Goals.Count),
                     Assists = g.Sum(x => x.PrimaryAssists.Count + x.SecondaryAssists.Count),
-                    Team = g.First().Team == null ? null : new TeamSummary(g.First().Team),
+                    Team = g.First().Team == null ? null : new TeamSummary(g.First().Team!),
                 })
                 .ToList(),
             _homeGameByGame = player.Account.Players
