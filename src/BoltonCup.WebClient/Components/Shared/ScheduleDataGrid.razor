@@ -1,0 +1,55 @@
+@inject IBoltonCupApi BoltonCupApi
+
+<MudDataGrid
+    @ref="_dataGrid"
+    T="Sdk.GameDetailDto"
+    ServerData="ServerReload"
+    Breakpoint="Breakpoint.None"
+    RowsPerPage="50"
+    Elevation="0"
+    ShowColumnOptions="false"
+    Striped>
+    <Columns>
+        <TemplateColumn Title="Matchup">
+            <CellTemplate>
+                <div class="mud-width-full d-flex flex-row align-center justify-center gap-4">
+                    <div class="d-flex flex-row align-center justify-end gap-2" style="width: 100px">
+                        <MudText Typo="Typo.body2"><b>@context.Item.AwayTeam.NameShort</b></MudText>
+                        <MudImage Src="@context.Item.AwayTeam.LogoUrl" Height="48" Alt="@context.Item.AwayTeam.Abbreviation"/>
+                    </div>
+                    @@
+                    <div class="d-flex flex-row-reverse align-center justify-end gap-2" style="width: 100px">
+                        <MudText Typo="Typo.body2"><b>@context.Item.HomeTeam.NameShort</b></MudText>
+                        <MudImage Src="@context.Item.HomeTeam.LogoUrl" Height="48" Alt="@context.Item.HomeTeam.Abbreviation"/>
+                    </div>
+                </div>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.GameTime" Title="Time" Format="hh:mm tt EST" />
+        <PropertyColumn Property="x => x.Venue" Title="Location">
+            <CellTemplate>
+                <MudText Typo="Typo.body2">@context.Item.Venue (@context.Item.Rink)</MudText>
+            </CellTemplate>
+        </PropertyColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+
+    private MudDataGrid<Sdk.GameDetailDto> _dataGrid = null!;
+
+    private async Task<GridData<Sdk.GameDetailDto>> ServerReload(GridState<Sdk.GameDetailDto> state)
+    {
+        var data = await BoltonCupApi.GetGamesAsync(
+            tournamentId: null,
+            teamId: null,
+            page: null,
+            size: null);
+        var result = data.Items
+            .OrderBy(x => x.GameTime);
+        return new GridData<Sdk.GameDetailDto> {
+            Items = result
+        };
+    }
+
+}
