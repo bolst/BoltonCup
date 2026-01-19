@@ -1,0 +1,159 @@
+@using BoltonCup.Sdk
+@namespace BoltonCup.WebClient.Components.Shared
+@typeparam T
+@inject IBoltonCupApi BoltonCupApi
+
+
+
+@if (_skaterCategory is not null)
+{
+    <MudList T="SkaterStatDetailDto" @bind-SelectedValue="_selectedSkater" Color="Color.Primary" Style="width: 100%; height: 100%" Dense>
+        <MudListSubheader>
+            <div class="d-flex flex-row align-center justify-space-between">
+                @if (_selectedSkater is not null)
+                {
+                    <MudAvatar>
+                        <MudImage Src="@_selectedSkater.Player.ProfilePicture" Alt="@_selectedSkater.Player.FullName" Height="80" Width="80" />
+                    </MudAvatar>
+                    <div class="d-flex flex-column align-start justify-space-evenly">
+                        <MudText Typo="Typo.subtitle2" Color="Color.Info"><b>@Label</b></MudText>
+                        <MudText Typo="Typo.subtitle2" Color="Color.Primary">@_selectedSkater.Player.FullName</MudText>
+                        <div class="d-flex flex-row align-center gap-1">
+                            <MudImage Src="@_selectedSkater.Team.LogoUrl" Alt="@_selectedSkater.Team.Name" Width="20" Height="20" />
+                            <MudText Typo="Typo.caption">@_selectedSkater.Player.Position.ToUpper().First()</MudText>
+                            <MudText Typo="Typo.caption">@($"#{_selectedSkater.Player.JerseyNumber.ToString() ?? string.Empty}")</MudText>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column align-center justify-space-evenly">
+                        <MudText Typo="Typo.h6" Color="Color.Primary">@_skaterCategory(_selectedSkater)</MudText>
+                        <MudText Typo="Typo.caption">@Label?.ToUpper()</MudText>
+                    </div>
+                }
+            </div>
+        </MudListSubheader>
+        @foreach (var (i, skater) in _skaterStats.Index())
+        {
+            <MudListItem Value="skater">
+                <div class="d-flex flex-row align-center justify-space-between">
+                    <MudText>@(i + 1). @skater.Player.FullName</MudText>
+                    <MudText>@_skaterCategory(skater)</MudText>
+                </div>
+            </MudListItem>
+        }
+    </MudList>
+}
+else if (_goalieCategory is not null)
+{
+    <MudList T="GoalieStatDetailDto" @bind-SelectedValue="_selectedGoalie" Color="Color.Primary" Style="width: 100%; height: 100%" Dense>
+        <MudListSubheader>
+            <div class="d-flex flex-row align-center justify-space-between">
+                @if (_selectedGoalie is not null)
+                {
+                    <MudAvatar>
+                        <MudImage Src="@_selectedGoalie.Player.ProfilePicture" Alt="@_selectedGoalie.Player.FullName" Height="40" Width="40" />
+                    </MudAvatar>
+                    <div class="d-flex flex-column align-start justify-space-evenly">
+                        <MudText Typo="Typo.subtitle2" Color="Color.Info"><b>@Label</b></MudText>
+                        <MudText Typo="Typo.subtitle2" Color="Color.Primary">@_selectedGoalie.Player.FullName</MudText>
+                        <div class="d-flex flex-row align-center gap-1">
+                            <MudImage Src="@_selectedGoalie.Team.LogoUrl" Alt="@_selectedGoalie.Team.Name" Width="20" Height="20" />
+                            <MudText Typo="Typo.caption">@_selectedGoalie.Player.Position.ToUpper().First()</MudText>
+                            <MudText Typo="Typo.caption">@($"#{_selectedGoalie.Player.JerseyNumber.ToString() ?? string.Empty}")</MudText>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column align-center justify-space-evenly">
+                        <MudText Typo="Typo.h6" Color="Color.Primary">@_goalieCategory(_selectedGoalie)</MudText>
+                        <MudText Typo="Typo.caption">@Label?.ToUpper()</MudText>
+                    </div>
+                }
+            </div>
+        </MudListSubheader>
+        @foreach (var (i, goalie) in _goalieStats.Index())
+        {
+            <MudListItem Value="goalie">
+                <div class="d-flex flex-row align-center justify-space-between">
+                    <MudText>@(i + 1). @goalie.Player.FullName</MudText>
+                    <MudText>@_goalieCategory(goalie)</MudText>
+                </div>
+            </MudListItem>
+        }
+    </MudList>
+}
+
+@code {
+    
+    [Parameter]
+    public string? Label { get; set; }
+    
+    [Parameter]
+    public int? TournamentId { get; set; }
+
+    [Parameter]
+    public int Players { get; set; } = 5;
+    
+    [Parameter]
+    public bool Descending { get; set; }
+
+    [Parameter]
+    public Func<SkaterStatDetailDto, T>? SkaterCategory { get; set; }
+    
+    [Parameter]
+    public Func<GoalieStatDetailDto, T>? GoalieCategory { get; set; }
+
+    private Func<SkaterStatDetailDto, T>? _skaterCategory;
+    private Func<GoalieStatDetailDto, T>? _goalieCategory;
+
+    private List<SkaterStatDetailDto> _skaterStats = [];
+    private List<GoalieStatDetailDto> _goalieStats = [];
+
+    private SkaterStatDetailDto? _selectedSkater;
+    private GoalieStatDetailDto? _selectedGoalie;
+    
+    protected override Task OnParametersSetAsync()
+    {
+        if (SkaterCategory is not null)
+            return OnSkaterParametersSetAsync();
+        if (GoalieCategory is not null)
+            return OnGoalieParametersSetAsync();
+        return Task.CompletedTask;
+    }
+    
+    private async Task OnSkaterParametersSetAsync()
+    {
+        if (_skaterCategory == SkaterCategory)
+            return;
+        _skaterCategory = SkaterCategory;
+        if (_skaterCategory is null)
+            return;
+
+        var data = await BoltonCupApi.GetSkaterStatsAsync(
+            tournamentId: TournamentId
+        );
+        _skaterStats = Descending 
+            ? data.Items.OrderByDescending(_skaterCategory).Take(Players).ToList()
+            : data.Items.OrderBy(_skaterCategory).Take(Players).ToList();
+        _selectedSkater = _skaterStats.FirstOrDefault();
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task OnGoalieParametersSetAsync()
+    {
+        if (_goalieCategory == GoalieCategory)
+            return;
+        _goalieCategory = GoalieCategory;
+        if (_goalieCategory is null)
+            return;
+        
+        var data = await BoltonCupApi.GetGoalieStatsAsync(
+            tournamentId: TournamentId
+        );
+
+        _goalieStats = Descending 
+            ? data.Items.OrderByDescending(_goalieCategory).Take(Players).ToList()
+            : data.Items.OrderBy(_goalieCategory).Take(Players).ToList();
+        
+        _selectedGoalie = _goalieStats.FirstOrDefault();
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

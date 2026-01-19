@@ -1,35 +1,37 @@
 @page "/"
 
+@inject IBoltonCupApi BoltonCupApi
+
 <PageTitle>Bolton Cup</PageTitle>
 
 
 <MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
-    <MudPaper Class="d-flex flex-column align-start justify-space-evenly gap-3 border-y mud-border-lines-default pa-4 overflow-x-scroll" Elevation="0" Square>
-        <MudButton Color="Color.Primary" Href="video" EndIcon="@Icons.Material.Rounded.KeyboardArrowRight" Size="Size.Large">Must Watch</MudButton>
-        <div class="d-flex flex-row align-center justify-space-evenly gap-3">
-            <MudSkeleton Height="225px" Width="400px" />
-            <MudSkeleton Height="225px" Width="400px" />
-            <MudSkeleton Height="225px" Width="400px" />
-            <MudSkeleton Height="225px" Width="400px" />
-        </div>
-    </MudPaper>   
-    
-    <MudPaper Class="d-flex flex-column align-start justify-space-evenly gap-3 border-y mud-border-lines-default pa-4 overflow-x-scroll" Elevation="0" Square>
-        <MudButton Color="Color.Primary" Href="video" EndIcon="@Icons.Material.Rounded.KeyboardArrowRight" Size="Size.Large">2025 Leaders</MudButton>
+    <Highlight Title="Must Watch" Href="video" Class="d-flex flex-row align-center justify-space-evenly gap-3">
+        <MudSkeleton Height="225px" Width="400px"/>
+        <MudSkeleton Height="225px" Width="400px"/>
+        <MudSkeleton Height="225px" Width="400px"/>
+        <MudSkeleton Height="225px" Width="400px"/>
+    </Highlight>
+
+    <Highlight Title="2025 Leaders" Href="leaders">
         <MudGrid>
             <MudItem xs="3">
-                <MudSkeleton Height="200px" Width="100%" />
+                <TopPlayers Label="Points" TournamentId="2" SkaterCategory="x => x.Points" Descending />
             </MudItem>
             <MudItem xs="3">
-                <MudSkeleton Height="200px" Width="100%" />
+                <TopPlayers Label="Goals" TournamentId="2" SkaterCategory="x => x.Goals" Descending />
             </MudItem>
             <MudItem xs="3">
-                <MudSkeleton Height="200px" Width="100%" />
+                <TopPlayers Label="PIM" TournamentId="2" SkaterCategory="x => x.PenaltyMinutes" Descending />
             </MudItem>
             <MudItem xs="3">
-                <MudSkeleton Height="200px" Width="100%" />
+                <TopPlayers Label="GAA" TournamentId="2" GoalieCategory="x => x.GoalsAgainstAverage" />
             </MudItem>
         </MudGrid>
-    </MudPaper>
-    
+    </Highlight>
 </MudContainer>
+
+
+@code {
+    
+}
