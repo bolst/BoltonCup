@@ -18,11 +18,13 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
             .Include(p => p.Team)
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
-            .OrderByDescending(p => p.SavePercentage)
-            .ThenBy(p => p.GoalsAgainstAverage)
-            .ThenByDescending(p => p.Shutouts)
-            .ThenByDescending(p => p.Wins)
-            .ThenByDescending(p => p.Saves)
+            .ApplySorting(query, x => x
+                .OrderByDescending(p => p.SavePercentage)
+                .ThenBy(p => p.GoalsAgainstAverage)
+                .ThenByDescending(p => p.Shutouts)
+                .ThenByDescending(p => p.Wins)
+                .ThenByDescending(p => p.Saves)
+            )
             .ToPaginatedListAsync(query);
     }       
     
@@ -32,11 +34,13 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
         return await _context.GoalieStats
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
-            .OrderByDescending(p => p.SavePercentage)
-            .ThenBy(p => p.GoalsAgainstAverage)
-            .ThenByDescending(p => p.Shutouts)
-            .ThenByDescending(p => p.Wins)
-            .ThenByDescending(p => p.Saves)
+            .ApplySorting(query, x => x
+                .OrderByDescending(p => p.SavePercentage)
+                .ThenBy(p => p.GoalsAgainstAverage)
+                .ThenByDescending(p => p.Shutouts)
+                .ThenByDescending(p => p.Wins)
+                .ThenByDescending(p => p.Saves)
+            )
             .ProjectTo<GoalieStat, T>()
             .ToPaginatedListAsync(query);
     }       

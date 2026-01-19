@@ -19,10 +19,12 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ConditionalWhere(p => p.Player.Position == query.Position, !string.IsNullOrEmpty(query.Position))
-            .OrderByDescending(p => p.Points)
-            .ThenByDescending(p => p.Goals)
-            .ThenByDescending(p => p.Assists)
-            .ThenBy(p => p.GamesPlayed)
+            .ApplySorting(query, x => x
+                .OrderByDescending(p => p.Points)
+                .ThenByDescending(p => p.Goals)
+                .ThenByDescending(p => p.Assists)
+                .ThenBy(p => p.GamesPlayed)
+            )
             .ToPaginatedListAsync(query);
     }       
     
@@ -33,10 +35,12 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ConditionalWhere(p => p.Player.Position == query.Position, !string.IsNullOrEmpty(query.Position))
-            .OrderByDescending(p => p.Points)
-            .ThenByDescending(p => p.Goals)
-            .ThenByDescending(p => p.Assists)
-            .ThenBy(p => p.GamesPlayed)
+            .ApplySorting(query, x => x
+                .OrderByDescending(p => p.Points)
+                .ThenByDescending(p => p.Goals)
+                .ThenByDescending(p => p.Assists)
+                .ThenBy(p => p.GamesPlayed)
+            )
             .ProjectTo<SkaterStat, T>()
             .ToPaginatedListAsync(query);
     }       

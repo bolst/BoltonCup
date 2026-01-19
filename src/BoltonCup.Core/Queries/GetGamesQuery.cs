@@ -1,4 +1,3 @@
-using BoltonCup.Core.Queries;
 using BoltonCup.Core.Queries.Base;
 
 namespace BoltonCup.Core;

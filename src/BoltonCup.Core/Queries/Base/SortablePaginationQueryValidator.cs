@@ -3,10 +3,10 @@ using FluentValidation;
 
 namespace BoltonCup.Core.Queries.Base;
 
-public abstract class PaginationQueryValidator<T> : AbstractValidator<T>
-    where T : IPaginationQuery
+public abstract class SortablePaginationQueryValidator<T> : AbstractValidator<T>
+    where T : ISortablePaginationQuery
 {
-    protected PaginationQueryValidator()
+    protected SortablePaginationQueryValidator()
     {
         RuleFor(x => x.Page)
             .GreaterThanOrEqualTo(1)
