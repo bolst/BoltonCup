@@ -13,7 +13,7 @@
             <div class="d-flex flex-row align-center justify-space-between">
                 @if (_selectedSkater is not null)
                 {
-                    <MudAvatar>
+                    <MudAvatar Size="Size.Large">
                         <MudImage Src="@_selectedSkater.Player.ProfilePicture" Alt="@_selectedSkater.Player.FullName" Height="80" Width="80" />
                     </MudAvatar>
                     <div class="d-flex flex-column align-start justify-space-evenly">
@@ -50,7 +50,7 @@ else if (_goalieCategoryFunc is not null)
             <div class="d-flex flex-row align-center justify-space-between">
                 @if (_selectedGoalie is not null)
                 {
-                    <MudAvatar>
+                    <MudAvatar Size="Size.Large">
                         <MudImage Src="@_selectedGoalie.Player.ProfilePicture" Alt="@_selectedGoalie.Player.FullName" Height="40" Width="40" />
                     </MudAvatar>
                     <div class="d-flex flex-column align-start justify-space-evenly">
@@ -131,11 +131,11 @@ else if (_goalieCategoryFunc is not null)
             return;
         _skaterCategoryFunc = _skaterCategory.Compile();
 
-        var sort = GetMemberName(_skaterCategory);
+        var sortBy = GetExpressionPropertyName(_skaterCategory);
         var data = await BoltonCupApi.GetSkaterStatsAsync(
             tournamentId: TournamentId,
             size: Players,
-            sortBy: sort,
+            sortBy: sortBy,
             descending: Descending
         );
         _skaterStats = data.Items.ToList();
@@ -152,11 +152,11 @@ else if (_goalieCategoryFunc is not null)
             return;
         _goalieCategoryFunc = _goalieCategory.Compile();
         
-        var sort = GetMemberName(_goalieCategory);
+        var sortBy = GetExpressionPropertyName(_goalieCategory);
         var data = await BoltonCupApi.GetGoalieStatsAsync(
             tournamentId: TournamentId,
             size: Players,
-            sortBy: sort,
+            sortBy: sortBy,
             descending: Descending
         );
         _goalieStats = data.Items.ToList();
@@ -165,29 +165,15 @@ else if (_goalieCategoryFunc is not null)
     }
 
     
-    private static string GetMemberName<TSource>(Expression<Func<TSource, T>> expression)
+    private static string GetExpressionPropertyName<TSource>(Expression<Func<TSource, T>> expression)
     {
         if (expression == null)
             throw new ArgumentNullException(nameof(expression));
-
-        MemberExpression memberExp;
-
-        // The expression is a UnaryExpression if the property is a Value Type (int, bool, etc.)
-        // because LINQ wraps it in a Convert() to cast it to 'object'.
-        if (expression.Body is UnaryExpression unaryExp)
-        {
-            memberExp = (MemberExpression)unaryExp.Operand;
-        }
-        // The expression is a MemberExpression if the property is a Reference Type (string, class, etc.)
-        else if (expression.Body is MemberExpression member)
-        {
-            memberExp = member;
-        }
-        else
-        {
-            throw new ArgumentException("Expression body must be a member access (e.g. x => x.Prop)");
-        }
-
-        return memberExp.Member.Name;
+        var memberExpression = (MemberExpression)(
+            expression.Body is UnaryExpression ue 
+                ? ue.Operand
+                : expression.Body
+        );
+        return memberExpression.Member.Name;
     }
 }
