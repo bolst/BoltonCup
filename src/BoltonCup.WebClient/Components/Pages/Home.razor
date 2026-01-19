@@ -6,13 +6,6 @@
 
 
 <MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
-    <Highlight Title="Must Watch" Href="video" Class="d-flex flex-row align-center justify-space-evenly gap-3">
-        <MudSkeleton Height="225px" Width="400px"/>
-        <MudSkeleton Height="225px" Width="400px"/>
-        <MudSkeleton Height="225px" Width="400px"/>
-        <MudSkeleton Height="225px" Width="400px"/>
-    </Highlight>
-
     <Highlight Title="2025 Leaders" Href="leaders">
         <MudGrid>
             <MudItem xs="3">
@@ -28,6 +21,13 @@
                 <TopPlayers Label="GAA" TournamentId="2" GoalieCategory="x => x.GoalsAgainstAverage" />
             </MudItem>
         </MudGrid>
+    </Highlight>
+
+    <Highlight Title="Must Watch" Href="video" Class="d-flex flex-row align-center justify-space-evenly gap-3">
+        <MudSkeleton Height="225px" Width="400px"/>
+        <MudSkeleton Height="225px" Width="400px"/>
+        <MudSkeleton Height="225px" Width="400px"/>
+        <MudSkeleton Height="225px" Width="400px"/>
     </Highlight>
 </MudContainer>
 
