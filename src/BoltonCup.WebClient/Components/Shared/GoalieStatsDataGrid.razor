@@ -4,14 +4,13 @@
 
 <MudDataGrid
     @ref="_dataGrid"
-    T="Sdk.SkaterStatDetailDto"
+    T="Sdk.GoalieStatDetailDto"
     ServerData="ServerReload"
     Breakpoint="Breakpoint.None"
     RowStyle="height: 50px"
     RowsPerPage="50"
     Elevation="0"
     ShowColumnOptions="false"
-    AllowUnsorted
     Striped
     Dense>
     <ToolBarContent>
@@ -29,22 +28,22 @@
         </PropertyColumn>
         <PropertyColumn Property="x => x.Player.Position" Title="Position"/>
         <PropertyColumn Property="x => x.GamesPlayed" Title="GP" sty CellStyle="@_dataCellStyle"/>
-        <PropertyColumn Property="x => x.Goals" Title="G" CellStyle="@_dataCellStyle"/>
-        <PropertyColumn Property="x => x.Assists" Title="A" CellStyle="@_dataCellStyle"/>
-        <PropertyColumn Property="x => x.Points" Title="P" CellStyle="@_dataCellStyle" InitialDirection="SortDirection.Descending" />
+        <PropertyColumn Property="x => x.GoalsAgainstAverage" Title="GAA" CellStyle="@_dataCellStyle" InitialDirection="SortDirection.Ascending"/>
+        <PropertyColumn Property="x => x.Shutouts" Title="SO" CellStyle="@_dataCellStyle" />
+        <PropertyColumn Property="x => x.Wins" Title="W" CellStyle="@_dataCellStyle" />
         <PropertyColumn Property="x => x.PenaltyMinutes" Title="PIM" CellStyle="@_dataCellStyle" />
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="Sdk.SkaterStatDetailDto" PageSizeSelector="false"/>
+        <MudDataGridPager T="Sdk.GoalieStatDetailDto" PageSizeSelector="false"/>
     </PagerContent>
 </MudDataGrid>
 
 @code {
 
-    private MudDataGrid<Sdk.SkaterStatDetailDto> _dataGrid;
+    private MudDataGrid<Sdk.GoalieStatDetailDto> _dataGrid;
     private const string _dataCellStyle = "max-width: 30px";
 
-    private async Task<GridData<Sdk.SkaterStatDetailDto>> ServerReload(GridState<Sdk.SkaterStatDetailDto> state)
+    private async Task<GridData<Sdk.GoalieStatDetailDto>> ServerReload(GridState<Sdk.GoalieStatDetailDto> state)
     {
         string? sortBy = null;
         bool? descending = null;
@@ -55,13 +54,13 @@
             descending = sortDefinition.Descending;
         }
         
-        var data = await BoltonCupApi.GetSkaterStatsAsync(
+        var data = await BoltonCupApi.GetGoalieStatsAsync(
             page: state.Page + 1, 
             size: state.PageSize,
             sortBy: sortBy,
             descending: descending
         );
-        return new GridData<Sdk.SkaterStatDetailDto> {
+        return new GridData<Sdk.GoalieStatDetailDto> {
             TotalItems = data.Total,
             Items = data.Items,
         };
