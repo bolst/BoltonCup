@@ -1,4 +1,4 @@
-namespace BoltonCup.Core.Queries;
+namespace BoltonCup.Core.Queries.Base;
 
 
 public interface IPaginationQuery

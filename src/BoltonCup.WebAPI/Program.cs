@@ -1,4 +1,4 @@
-using BoltonCup.Core.Queries;
+using BoltonCup.Core.Queries.Base;
 using BoltonCup.Infrastructure;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Controllers;

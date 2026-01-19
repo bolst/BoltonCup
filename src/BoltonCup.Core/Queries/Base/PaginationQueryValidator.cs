@@ -1,3 +1,4 @@
+using BoltonCup.Core.Queries.Base;
 using FluentValidation;
 
 namespace BoltonCup.Core.Queries;

@@ -1,6 +1,5 @@
-using System.Collections;
 using BoltonCup.Core.Mappings;
-using BoltonCup.Core.Queries;
+using BoltonCup.Core.Queries.Base;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Extensions;
