@@ -6,7 +6,7 @@
     ServerData="ServerReload"
     GroupBy="_groupDefinition"
     Breakpoint="Breakpoint.None"
-    RowsPerPage="50"
+    RowsPerPage="25"
     Elevation="0"
     Striped>
     <HeaderContent>
@@ -48,6 +48,9 @@
             </div>
         </MudHidden>
     </RowTemplate>
+    <PagerContent>
+        <MudTablePager HideRowsPerPage />
+    </PagerContent>
 </MudTable>
 
 @code {
@@ -76,7 +79,11 @@
 
     private async Task<TableData<Sdk.GameDetailDto>> ServerReload(TableState state, CancellationToken cancellationToken)
     {
-        var data = await BoltonCupApi.GetGamesAsync(cancellationToken: cancellationToken);
+        var data = await BoltonCupApi.GetGamesAsync(
+            page: state.Page + 1,
+            size: state.PageSize,
+            cancellationToken: cancellationToken
+        );
         var result = data.Items
             .OrderByDescending(x => x.Tournament.StartDate)
             .ThenBy(x => x.GameTime);
