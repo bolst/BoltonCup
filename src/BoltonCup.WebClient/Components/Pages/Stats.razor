@@ -5,14 +5,16 @@
 
 <MudText Typo="Typo.h4">Statistics</MudText>
 
-<MudTabs Rounded>
-    <MudTabPanel Text="Skaters">
-        <SkaterStatsDataGrid />
-    </MudTabPanel>
-    <MudTabPanel Text="Goalies">
-        
-    </MudTabPanel>
-</MudTabs>
+<MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
+    <MudTabs Rounded KeepPanelsAlive>
+        <MudTabPanel Text="Skaters">
+            <SkaterStatsDataGrid />
+        </MudTabPanel>
+        <MudTabPanel Text="Goalies">
+            
+        </MudTabPanel>
+    </MudTabs>
+</MudContainer>
 
 @code {
     
