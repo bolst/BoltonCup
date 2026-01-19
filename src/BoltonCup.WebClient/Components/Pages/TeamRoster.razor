@@ -1,0 +1,67 @@
+@page "/teams/{TeamId:int}/roster"
+@inject IBoltonCupApi BoltonCupApi
+
+@if (_team is null)
+{
+    <PageTitle>Roster</PageTitle>
+    
+    @:loading...
+}
+else
+{
+    <PageTitle>Roster | @_team.Name</PageTitle>
+
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="my-4" Gutters="false">
+        <div class="d-flex flex-row align-center gap-3">
+            <MudText Typo="Typo.h6">Roster</MudText>
+            <MudImage Src="@_team.LogoUrl" Alt="@_team.Abbreviation" Height="32" />
+        </div>
+
+        <MudDataGrid
+            T="Sdk.PlayerSummary"
+            Items="_team.Players"
+            Breakpoint="Breakpoint.None"
+            Elevation="0"
+            ShowColumnOptions="false"
+            AllowUnsorted
+            Striped
+            Dense>
+            <Columns>
+                <PropertyColumn Property="x => x.FullName" Title="Player">
+                    <CellTemplate>
+                        <div class="d-flex flex-row align-center justify-start gap-3">
+                            <MudAvatar>
+                                <MudImage Src="@context.Item.ProfilePicture" Alt="@context.Item.FullName" />
+                            </MudAvatar>
+                            <MudLink Typo="Typo.body2" Href="@($"/players/{context.Item.Id}")" Underline="Underline.None"><b>@context.Item.FullName</b></MudLink>
+                        </div>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.JerseyNumber" Title="#" />
+                <PropertyColumn Property="x => x.Position" Title="Pos"/>
+                <PropertyColumn Property="x => x.Birthday" Title="Born" Format="d" />
+            </Columns>
+        </MudDataGrid>
+    </MudContainer>
+}
+
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required int TeamId { get; set; }
+
+    private int? _teamId;
+    
+    private Sdk.TeamSingleDetailDto? _team;
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_teamId == TeamId)
+            return;
+        _teamId = TeamId;
+        
+        _team = await BoltonCupApi.GetTeamByIdAsync(TeamId);
+    }
+}

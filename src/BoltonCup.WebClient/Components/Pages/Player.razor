@@ -1,0 +1,50 @@
+@page "/players/{PlayerId:int}"
+
+@inject IBoltonCupApi BoltonCupApi
+
+@if (_player is null)
+{
+    @:loading...
+}
+else
+{
+    <PageTitle>@_player.FullName</PageTitle>
+    
+    <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+        <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+            <div class="d-flex flex-row align-center gap-6">
+                <MudText Typo="Typo.h4">@_player.FullName</MudText>
+                <MudDivider Vertical FlexItem/>
+                @if (_player.Team is not null)
+                {
+                    <MudImage Src="@_player.Team.LogoUrl" Alt="@_player.Team.Abbreviation" Height="64"/>
+                    <MudDivider Vertical FlexItem/>
+                }
+                <MudText Typo="Typo.h4">@_player.JerseyNumberLabel</MudText>
+                <MudDivider Vertical FlexItem/>
+                <MudText Typo="Typo.h4">@_player.Position</MudText>
+            </div>
+        </MudHidden>
+    </MudContainer>
+}
+
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required int PlayerId { get; set; }
+
+    private int? _playerId;
+
+    private Sdk.PlayerSingleDetailDto? _player;
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_playerId == PlayerId)
+            return;
+        _playerId = PlayerId;
+
+        _player = await BoltonCupApi.GetPlayerByIdAsync(PlayerId);
+    }
+
+}

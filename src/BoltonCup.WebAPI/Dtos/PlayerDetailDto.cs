@@ -18,7 +18,10 @@ public record PlayerDetailDto : IMappable<Player, PlayerDetailDto>
     public string? ProfilePicture { get; init; }
     public string? PreferredBeer { get; init; }
     public required TournamentSummary Tournament { get; init; }
-    public required TeamSummary? Team { get; init; }
+    public TeamSummary? Team { get; init; }
+
+    public string FullName => FirstName + " " + LastName;
+    public string JerseyNumberLabel => JerseyNumber.HasValue ? $"#{JerseyNumber.Value}" : string.Empty;
 
     static Expression<Func<Player, PlayerDetailDto>> IMappable<Player, PlayerDetailDto>.Projection =>
         player => new PlayerDetailDto
