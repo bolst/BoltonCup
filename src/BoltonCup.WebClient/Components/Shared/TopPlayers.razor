@@ -1,3 +1,4 @@
+@using System.Linq.Expressions
 @using BoltonCup.Sdk
 @namespace BoltonCup.WebClient.Components.Shared
 @typeparam T
@@ -5,7 +6,7 @@
 
 
 
-@if (_skaterCategory is not null)
+@if (_skaterCategoryFunc is not null)
 {
     <MudList T="SkaterStatDetailDto" @bind-SelectedValue="_selectedSkater" Color="Color.Primary" Style="width: 100%; height: 100%" Dense>
         <MudListSubheader>
@@ -25,7 +26,7 @@
                         </div>
                     </div>
                     <div class="d-flex flex-column align-center justify-space-evenly">
-                        <MudText Typo="Typo.h6" Color="Color.Primary">@_skaterCategory(_selectedSkater)</MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Primary">@_skaterCategoryFunc(_selectedSkater)</MudText>
                         <MudText Typo="Typo.caption">@Label?.ToUpper()</MudText>
                     </div>
                 }
@@ -36,13 +37,13 @@
             <MudListItem Value="skater">
                 <div class="d-flex flex-row align-center justify-space-between">
                     <MudText>@(i + 1). @skater.Player.FullName</MudText>
-                    <MudText>@_skaterCategory(skater)</MudText>
+                    <MudText>@_skaterCategoryFunc(skater)</MudText>
                 </div>
             </MudListItem>
         }
     </MudList>
 }
-else if (_goalieCategory is not null)
+else if (_goalieCategoryFunc is not null)
 {
     <MudList T="GoalieStatDetailDto" @bind-SelectedValue="_selectedGoalie" Color="Color.Primary" Style="width: 100%; height: 100%" Dense>
         <MudListSubheader>
@@ -62,7 +63,7 @@ else if (_goalieCategory is not null)
                         </div>
                     </div>
                     <div class="d-flex flex-column align-center justify-space-evenly">
-                        <MudText Typo="Typo.h6" Color="Color.Primary">@_goalieCategory(_selectedGoalie)</MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Primary">@_goalieCategoryFunc(_selectedGoalie)</MudText>
                         <MudText Typo="Typo.caption">@Label?.ToUpper()</MudText>
                     </div>
                 }
@@ -73,7 +74,7 @@ else if (_goalieCategory is not null)
             <MudListItem Value="goalie">
                 <div class="d-flex flex-row align-center justify-space-between">
                     <MudText>@(i + 1). @goalie.Player.FullName</MudText>
-                    <MudText>@_goalieCategory(goalie)</MudText>
+                    <MudText>@_goalieCategoryFunc(goalie)</MudText>
                 </div>
             </MudListItem>
         }
@@ -95,13 +96,16 @@ else if (_goalieCategory is not null)
     public bool Descending { get; set; }
 
     [Parameter]
-    public Func<SkaterStatDetailDto, T>? SkaterCategory { get; set; }
+    public Expression<Func<SkaterStatDetailDto, T>>? SkaterCategory { get; set; }
     
     [Parameter]
-    public Func<GoalieStatDetailDto, T>? GoalieCategory { get; set; }
+    public Expression<Func<GoalieStatDetailDto, T>>? GoalieCategory { get; set; }
 
-    private Func<SkaterStatDetailDto, T>? _skaterCategory;
-    private Func<GoalieStatDetailDto, T>? _goalieCategory;
+    private Expression<Func<SkaterStatDetailDto, T>>? _skaterCategory;
+    private Expression<Func<GoalieStatDetailDto, T>>? _goalieCategory;
+    
+    private Func<SkaterStatDetailDto, T>? _skaterCategoryFunc;
+    private Func<GoalieStatDetailDto, T>? _goalieCategoryFunc;
 
     private List<SkaterStatDetailDto> _skaterStats = [];
     private List<GoalieStatDetailDto> _goalieStats = [];
@@ -125,13 +129,16 @@ else if (_goalieCategory is not null)
         _skaterCategory = SkaterCategory;
         if (_skaterCategory is null)
             return;
+        _skaterCategoryFunc = _skaterCategory.Compile();
 
+        var sort = GetMemberName(_skaterCategory);
         var data = await BoltonCupApi.GetSkaterStatsAsync(
-            tournamentId: TournamentId
+            tournamentId: TournamentId,
+            size: Players,
+            sortBy: sort,
+            descending: Descending
         );
-        _skaterStats = Descending 
-            ? data.Items.OrderByDescending(_skaterCategory).Take(Players).ToList()
-            : data.Items.OrderBy(_skaterCategory).Take(Players).ToList();
+        _skaterStats = data.Items.ToList();
         _selectedSkater = _skaterStats.FirstOrDefault();
         await InvokeAsync(StateHasChanged);
     }
@@ -143,17 +150,44 @@ else if (_goalieCategory is not null)
         _goalieCategory = GoalieCategory;
         if (_goalieCategory is null)
             return;
+        _goalieCategoryFunc = _goalieCategory.Compile();
         
+        var sort = GetMemberName(_goalieCategory);
         var data = await BoltonCupApi.GetGoalieStatsAsync(
-            tournamentId: TournamentId
+            tournamentId: TournamentId,
+            size: Players,
+            sortBy: sort,
+            descending: Descending
         );
-
-        _goalieStats = Descending 
-            ? data.Items.OrderByDescending(_goalieCategory).Take(Players).ToList()
-            : data.Items.OrderBy(_goalieCategory).Take(Players).ToList();
-        
+        _goalieStats = data.Items.ToList();
         _selectedGoalie = _goalieStats.FirstOrDefault();
         await InvokeAsync(StateHasChanged);
     }
 
+    
+    private static string GetMemberName<TSource>(Expression<Func<TSource, T>> expression)
+    {
+        if (expression == null)
+            throw new ArgumentNullException(nameof(expression));
+
+        MemberExpression memberExp;
+
+        // The expression is a UnaryExpression if the property is a Value Type (int, bool, etc.)
+        // because LINQ wraps it in a Convert() to cast it to 'object'.
+        if (expression.Body is UnaryExpression unaryExp)
+        {
+            memberExp = (MemberExpression)unaryExp.Operand;
+        }
+        // The expression is a MemberExpression if the property is a Reference Type (string, class, etc.)
+        else if (expression.Body is MemberExpression member)
+        {
+            memberExp = member;
+        }
+        else
+        {
+            throw new ArgumentException("Expression body must be a member access (e.g. x => x.Prop)");
+        }
+
+        return memberExp.Member.Name;
+    }
 }
