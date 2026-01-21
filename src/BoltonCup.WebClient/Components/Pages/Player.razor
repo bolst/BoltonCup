@@ -10,21 +10,89 @@ else
 {
     <PageTitle>@_player.FullName</PageTitle>
     
-    <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="my-4 py-4" Gutters="false">
         <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-            <div class="d-flex flex-row align-center gap-6">
-                <MudText Typo="Typo.h4">@_player.FullName</MudText>
+            <div class="d-flex flex-row align-center gap-6 px-4">
+                <MudText Typo="Typo.h4"><b>@_player.FullName</b></MudText>
                 <MudDivider Vertical FlexItem/>
                 @if (_player.Team is not null)
                 {
                     <MudImage Src="@_player.Team.LogoUrl" Alt="@_player.Team.Abbreviation" Height="64"/>
                     <MudDivider Vertical FlexItem/>
                 }
-                <MudText Typo="Typo.h4">@_player.JerseyNumberLabel</MudText>
+                <MudText Typo="Typo.h4"><b>@_player.JerseyNumberLabel</b></MudText>
                 <MudDivider Vertical FlexItem/>
-                <MudText Typo="Typo.h4">@_player.Position</MudText>
+                <MudText Typo="Typo.h4"><b>@_player.Position</b></MudText>
             </div>
         </MudHidden>
+        
+        <div class="action-shot-container d-flex flex-row align-end">
+            <MudImage Src="/img/action-cover-temp.jpg" Class="action-shot" ObjectFit="ObjectFit.None" />
+            <MudSpacer />
+            <div class="d-flex flex-column align-center mud-width-full flex-grow-1 gap-2 absolute pa-4 action-shot-caption">
+                <div class="d-flex flex-row align-center justify-space-evenly flex-wrap gap-6">
+                    <div class="d-flex flex-column align-center gap-2">
+                        <MudAvatar Size="Size.Large">
+                            <MudImage Src="@_player.ProfilePicture" Alt="@_player.FullName"/>
+                        </MudAvatar>
+                        <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
+                            <MudText Typo="Typo.h6"><b>@_player.FullName.ToUpper()</b></MudText>
+                        </MudHidden>
+                    </div>
+                    <div class="d-flex flex-column align-start justify-space-evenly">
+                        @InfoItem("Born", _player.Birthday?.ToString("d"))
+                        @InfoItem("Favourite Beer", _player.PreferredBeer)
+                    </div>
+                    <MudDivider Vertical FlexItem/>
+                    <div class="d-flex flex-column align-center gap-1 flex-grow-1" style="min-width: 300px">
+                        @* <div>season</div> *@
+                        @* <div>career</div> *@
+                        @* TODO *@
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="my-6 px-4">
+            <MudText Typo="Typo.h6">Last 5 Games</MudText>
+            <MudDataGrid Items="_last5Games" Breakpoint="Breakpoint.None" SortMode="SortMode.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Dense Bordered Striped Square>
+                <Columns>
+                    <PropertyColumn Property="x => x.Game.GameTime.Date" Title="Date" Format="d" CellStyle="width: 50px" />
+                    <PropertyColumn Property="x => x.Game.Opponent.Name" Title="Opp" CellStyle="width: 120px">
+                        <CellTemplate>
+                            @{
+                                var prefix = context.Item.Game.IsHome ? "vs." : "@";
+                            }
+                            <MudLink Href="@($"/game/{context.Item.Game.Id}")" Color="Color.Info" Underline="Underline.None">@prefix @context.Item.Game.Opponent.Abbreviation</MudLink>
+                        </CellTemplate>
+                    </PropertyColumn>
+                    @if (_player.Position == "goalie")
+                    {
+                        <PropertyColumn Property="@(x => x.Game.GoalsFor > x.Game.GoalsAgainst ? 'W' : 'L')" Title="DEC" CellStyle="width: 50px"/>
+                        <PropertyColumn Property="x => x.Game.GoalsAgainst" Title="GA" CellStyle="width: 50px"/>
+                    }
+                    else
+                    {
+                        <PropertyColumn Property="x => x.Goals" Title="G" CellStyle="width: 50px" />
+                        <PropertyColumn Property="x => x.Assists" Title="A" CellStyle="width: 50px"/>
+                        <PropertyColumn Property="x => x.Points" Title="P" CellStyle="width: 50px"/>
+                    }
+                </Columns>
+            </MudDataGrid>
+        </div>
+        <div class="my-6 px-4">
+            <div class="d-flex flex-column align-center mud-width-full">
+                <MudText Typo="Typo.h4"><b>STATS</b></MudText>
+                <MudTabs Elevation="0" KeepPanelsAlive Centered>
+                    <MudTabPanel Text="Career">
+                        
+                    </MudTabPanel>
+                    <MudTabPanel Text="Game Logs">
+                        
+                    </MudTabPanel>
+                </MudTabs>
+            </div>
+        </div>
     </MudContainer>
 }
 
@@ -37,6 +105,7 @@ else
     private int? _playerId;
 
     private Sdk.PlayerSingleDetailDto? _player;
+    private IEnumerable<Sdk.PlayerGameByGame> _last5Games = [];
     
     protected override async Task OnParametersSetAsync()
     {
@@ -45,6 +114,13 @@ else
         _playerId = PlayerId;
 
         _player = await BoltonCupApi.GetPlayerByIdAsync(PlayerId);
+        _last5Games = _player.GameByGame
+            .OrderBy(p => p.Game.GameTime)
+            .Take(5);
     }
+
+
+    private RenderFragment InfoItem(string label, string? value)
+        => @<MudText Typo="Typo.subtitle1"><b>@label:</b> @value</MudText>;
 
 }
