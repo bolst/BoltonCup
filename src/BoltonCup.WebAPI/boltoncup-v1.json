@@ -1729,10 +1729,15 @@
       "PlayerTournamentStats": {
         "required": [
           "assists",
+          "gamesPlayed",
           "goals",
+          "goalsAgainstAverage",
+          "penaltyMinutes",
+          "shutouts",
           "team",
           "tournamentId",
-          "tournamentName"
+          "tournamentName",
+          "wins"
         ],
         "type": "object",
         "properties": {
@@ -1743,6 +1748,10 @@
           "tournamentName": {
             "type": "string",
             "nullable": true
+          },
+          "gamesPlayed": {
+            "type": "integer",
+            "format": "int32"
           },
           "goals": {
             "type": "integer",
@@ -1756,6 +1765,23 @@
             "type": "integer",
             "format": "int32",
             "readOnly": true
+          },
+          "penaltyMinutes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "wins": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shutouts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "goalsAgainstAverage": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           },
           "team": {
             "$ref": "#/components/schemas/TeamSummary"

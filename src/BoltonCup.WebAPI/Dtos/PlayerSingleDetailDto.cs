@@ -35,8 +35,13 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
                 {
                     TournamentId = g.Key.Id,
                     TournamentName = g.Key.Name,
+                    GamesPlayed = g.Sum(x => x.SkaterGameLogs.Count + x.GoalieGameLogs.Count),
                     Goals = g.Sum(x => x.Goals.Count),
                     Assists = g.Sum(x => x.PrimaryAssists.Count + x.SecondaryAssists.Count),
+                    PenaltyMinutes = g.Sum(x => x.Penalties.Sum(p => p.DurationMinutes)),
+                    Wins = g.Sum(x => x.GoalieGameLogs.Count(gl => gl.Win)),
+                    Shutouts = g.Sum(x => x.GoalieGameLogs.Count(gl => gl.Shutout)),
+                    GoalsAgainstAverage = g.SelectMany(x => x.GoalieGameLogs).Average(x => x.GoalsAgainst),
                     Team = g.First().Team == null ? null : new TeamSummary(g.First().Team!),
                 })
                 .ToList(),
@@ -94,9 +99,14 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
     {
         public required int TournamentId { get; set; }
         public required string TournamentName { get; set; }
+        public required int GamesPlayed { get; set; }
         public required int Goals { get; set; }
         public required int Assists { get; set; }
-        public int Points => Goals + Assists;        
+        public int Points => Goals + Assists;       
+        public required int PenaltyMinutes { get; set; }
+        public required int Wins { get; set; }
+        public required int Shutouts { get; set; }
+        public required double? GoalsAgainstAverage { get; set; }
         public required TeamSummary? Team { get; set; }
     }
 

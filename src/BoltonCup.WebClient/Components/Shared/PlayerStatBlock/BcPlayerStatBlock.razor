@@ -9,7 +9,7 @@
             {
                 @TitleContent
             }
-            <MudPaper Class="d-flex flex-row align-center justify-space-evenly gap-6 px-6 py-1">
+            <MudPaper Class="d-flex flex-row align-center justify-space-evenly gap-6 px-6 py-1" Style="background-color: rgba(255,255,255,0.5);">
                 @if (!string.IsNullOrEmpty(Title) && InlineTitle)
                 {
                     <div class="d-flex flex-column align-center" style="width: 150px">
@@ -21,11 +21,11 @@
                 {
                     if (GoalieStats is null)
                     {
-                        <PlayerStatItem Title="GP" Property="x => 0" HideDivider="!InlineTitle"/>
-                        <PlayerStatItem Title="W" Property="x => 0"/>
-                        <PlayerStatItem Title="SO" Property="x => 0"/>
-                        <PlayerStatItem Title="GAA" Property="x => 0"/>
-                        <PlayerStatItem Title="PIM" Property="x => 0"/>
+                        <PlayerStatItem Title="GP" Property="x => x.GamesPlayed" HideDivider="!InlineTitle"/>
+                        <PlayerStatItem Title="W" Property="x => x.Wins"/>
+                        <PlayerStatItem Title="SO" Property="x => x.Shutouts"/>
+                        <PlayerStatItem Title="GAA" Property="x => x.GoalsAgainstAverage.GetValueOrDefault()" Format="N2" />
+                        <PlayerStatItem Title="PIM" Property="x => x.PenaltyMinutes"/>
                     }
                     else
                     {
@@ -36,11 +36,11 @@
                 {
                     if (SkaterStats is null)
                     {
-                        <PlayerStatItem Title="GP" Property="x => 0" HideDivider="!InlineTitle"/>
+                        <PlayerStatItem Title="GP" Property="x => x.GamesPlayed" HideDivider="!InlineTitle"/>
                         <PlayerStatItem Title="G" Property="x => x.Goals"/>
                         <PlayerStatItem Title="A" Property="x => x.Assists"/>
                         <PlayerStatItem Title="P" Property="x => x.Points"/>
-                        <PlayerStatItem Title="PIM" Property="x => 0"/>
+                        <PlayerStatItem Title="PIM" Property="x => x.PenaltyMinutes"/>
                     }
                     else
                     {

@@ -8,7 +8,7 @@
     <MudText Typo="Typo.caption">@Title</MudText>
     @if (Property is not null)
     {
-        <MudText Typo="Typo.h5"><b>@TournamentStats.Sum(Property)</b></MudText>
+        <MudText Typo="Typo.h5"><b>@TournamentStats.Sum(Property).ToString(Format)</b></MudText>
     }
 </div>
 
@@ -22,7 +22,10 @@
     public string? Title { get; set; }
     
     [Parameter]
-    public Func<Sdk.PlayerTournamentStats, int>? Property { get; set; }
+    public Func<Sdk.PlayerTournamentStats, double>? Property { get; set; }
+    
+    [Parameter]
+    public string? Format { get; set; }
     
     [Parameter]
     public bool HideDivider { get; set; }
