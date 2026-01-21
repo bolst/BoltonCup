@@ -1529,6 +1529,10 @@
             "type": "string",
             "nullable": true,
             "readOnly": true
+          },
+          "isGoalie": {
+            "type": "boolean",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -1563,20 +1567,15 @@
           "assists",
           "game",
           "goals",
+          "goalsAgainst",
+          "penaltyMinutes",
+          "shutouts",
           "team",
-          "tournamentId",
-          "tournamentName"
+          "tournament",
+          "win"
         ],
         "type": "object",
         "properties": {
-          "tournamentId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tournamentName": {
-            "type": "string",
-            "nullable": true
-          },
           "goals": {
             "type": "integer",
             "format": "int32"
@@ -1589,6 +1588,24 @@
             "type": "integer",
             "format": "int32",
             "readOnly": true
+          },
+          "penaltyMinutes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "win": {
+            "type": "boolean"
+          },
+          "shutouts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "goalsAgainst": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
           },
           "game": {
             "$ref": "#/components/schemas/TeamGameSummary"
@@ -1660,6 +1677,10 @@
           "jerseyNumberLabel": {
             "type": "string",
             "nullable": true,
+            "readOnly": true
+          },
+          "isGoalie": {
+            "type": "boolean",
             "readOnly": true
           },
           "gameByGame": {
@@ -1735,20 +1756,11 @@
           "penaltyMinutes",
           "shutouts",
           "team",
-          "tournamentId",
-          "tournamentName",
+          "tournament",
           "wins"
         ],
         "type": "object",
         "properties": {
-          "tournamentId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tournamentName": {
-            "type": "string",
-            "nullable": true
-          },
           "gamesPlayed": {
             "type": "integer",
             "format": "int32"
@@ -1782,6 +1794,9 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          },
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
           },
           "team": {
             "$ref": "#/components/schemas/TeamSummary"

@@ -33,8 +33,6 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
                 .GroupBy(p => p.Tournament)
                 .Select(g => new PlayerTournamentStats
                 {
-                    TournamentId = g.Key.Id,
-                    TournamentName = g.Key.Name,
                     GamesPlayed = g.Sum(x => x.SkaterGameLogs.Count + x.GoalieGameLogs.Count),
                     Goals = g.Sum(x => x.Goals.Count),
                     Assists = g.Sum(x => x.PrimaryAssists.Count + x.SecondaryAssists.Count),
@@ -42,16 +40,20 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
                     Wins = g.Sum(x => x.GoalieGameLogs.Count(gl => gl.Win)),
                     Shutouts = g.Sum(x => x.GoalieGameLogs.Count(gl => gl.Shutout)),
                     GoalsAgainstAverage = g.SelectMany(x => x.GoalieGameLogs).Average(x => x.GoalsAgainst),
+                    Tournament = new TournamentSummary(g.Key),
                     Team = g.First().Team == null ? null : new TeamSummary(g.First().Team!),
                 })
                 .ToList(),
             _homeGameByGame = player.Account.Players
                 .SelectMany(p => p.Team!.HomeGames.Select(g => new PlayerGameByGame
                 {
-                    TournamentId = g.TournamentId,
-                    TournamentName = g.Tournament.Name,
                     Goals = g.Goals.Count(x => x.GoalPlayerId == p.Id),
                     Assists = g.Goals.Count(x => x.Assist1PlayerId == p.Id || x.Assist2PlayerId == p.Id),
+                    PenaltyMinutes = g.Penalties.Where(x => x.PlayerId == p.Id).Sum(x => x.DurationMinutes),
+                    Win = g.Goals.Count(x => x.TeamId == p.TeamId) > g.Goals.Count(x => x.TeamId != p.TeamId),
+                    Shutouts = g.Goals.All(x => x.TeamId == p.TeamId) ? 1 : 0,
+                    GoalsAgainst = g.Goals.Count(x => x.TeamId != p.TeamId),
+                    Tournament = new TournamentSummary(g.Tournament),
                     Game = new TeamGameSummary
                     {
                         Id = g.Id,
@@ -72,10 +74,13 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
             _awayGameByGame = player.Account.Players
                 .SelectMany(p => p.Team!.AwayGames.Select(g => new PlayerGameByGame
                 {
-                    TournamentId = g.TournamentId,
-                    TournamentName = g.Tournament.Name,
                     Goals = g.Goals.Count(x => x.GoalPlayerId == p.Id),
                     Assists = g.Goals.Count(x => x.Assist1PlayerId == p.Id || x.Assist2PlayerId == p.Id),
+                    PenaltyMinutes = g.Penalties.Where(x => x.PlayerId == p.Id).Sum(x => x.DurationMinutes),
+                    Win = g.Goals.Count(x => x.TeamId == p.TeamId) > g.Goals.Count(x => x.TeamId != p.TeamId),
+                    Shutouts = g.Goals.All(x => x.TeamId == p.TeamId) ? 1 : 0,
+                    GoalsAgainst = g.Goals.Count(x => x.TeamId != p.TeamId),
+                    Tournament = new TournamentSummary(g.Tournament),
                     Game = new TeamGameSummary
                     {
                         Id = g.Id,
@@ -97,8 +102,6 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
 
     public sealed record PlayerTournamentStats
     {
-        public required int TournamentId { get; set; }
-        public required string TournamentName { get; set; }
         public required int GamesPlayed { get; set; }
         public required int Goals { get; set; }
         public required int Assists { get; set; }
@@ -107,16 +110,20 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
         public required int Wins { get; set; }
         public required int Shutouts { get; set; }
         public required double? GoalsAgainstAverage { get; set; }
+        public required TournamentSummary Tournament { get; set; }
         public required TeamSummary? Team { get; set; }
     }
 
     public sealed record PlayerGameByGame
     {
-        public required int TournamentId { get; set; }
-        public required string TournamentName { get; set; }
         public required int Goals  { get; set; }
         public required int Assists  { get; set; }
         public  int Points => Goals + Assists;
+        public required int PenaltyMinutes { get; set; }
+        public required bool Win { get; set; }
+        public required int Shutouts { get; set; }
+        public required int GoalsAgainst { get; set; }
+        public required TournamentSummary Tournament { get; set; }
         public required TeamGameSummary Game { get; set; }
         public required TeamSummary? Team { get; set; }
     }

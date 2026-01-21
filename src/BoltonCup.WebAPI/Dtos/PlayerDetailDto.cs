@@ -22,6 +22,7 @@ public record PlayerDetailDto : IMappable<Player, PlayerDetailDto>
 
     public string FullName => FirstName + " " + LastName;
     public string JerseyNumberLabel => JerseyNumber.HasValue ? $"#{JerseyNumber.Value}" : string.Empty;
+    public bool IsGoalie => Position == "goalie";
 
     static Expression<Func<Player, PlayerDetailDto>> IMappable<Player, PlayerDetailDto>.Projection =>
         player => new PlayerDetailDto

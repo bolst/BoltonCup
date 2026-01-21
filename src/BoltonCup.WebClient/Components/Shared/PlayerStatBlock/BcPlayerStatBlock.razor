@@ -85,7 +85,7 @@
         _player = Player;
         _tournamentId = TournamentId;
         _tournamentStats = _tournamentId.HasValue
-            ? _player.TournamentStats.Where(x => x.TournamentId == _tournamentId.Value)
+            ? _player.TournamentStats.Where(x => x.Tournament.Id == _tournamentId.Value)
             : _player.TournamentStats;
     }
 
