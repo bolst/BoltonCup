@@ -4,13 +4,13 @@
 
 <PageTitle>Teams | Bolton Cup</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Medium" Gutters="false">
+<MudContainer MaxWidth="MaxWidth.Medium" Class="px-1" Gutters="false">
     @foreach (var group in _teamsByTournament)
     {
         var tournament = group.First().Tournament;
         var tournamentName = tournament.Name ?? "Unnamed Tournament";
         var dateRange = new DateRange(tournament.StartDate, tournament.EndDate);
-        <div class="mud-width-full d-flex flex-row gap-3 align-center mt-6 mb-1">
+        <div class="mud-width-full d-flex flex-row gap-3 align-center mt-6 mb-1 ml-2">
             <MudText Typo="Typo.h5"><b>@tournamentName</b></MudText>
             @DateRangeChip(dateRange)
         </div>
