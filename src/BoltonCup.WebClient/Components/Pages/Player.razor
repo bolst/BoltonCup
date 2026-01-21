@@ -63,7 +63,7 @@ else
                             @{
                                 var prefix = context.Item.Game.IsHome ? "vs." : "@";
                             }
-                            <MudLink Href="@($"/game/{context.Item.Game.Id}")" Color="Color.Info" Underline="Underline.None">@prefix @context.Item.Game.Opponent.Abbreviation</MudLink>
+                            <MudLink Href="@($"/games/{context.Item.Game.Id}")" Color="Color.Info" Underline="Underline.None">@prefix @context.Item.Game.Opponent.Abbreviation</MudLink>
                         </CellTemplate>
                     </PropertyColumn>
                     @if (_player.Position == "goalie")

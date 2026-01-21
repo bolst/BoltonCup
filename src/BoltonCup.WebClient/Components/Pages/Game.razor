@@ -1,0 +1,23 @@
+@page "/games/{GameId:int}"
+
+@inject IBoltonCupApi BoltonCupApi
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required int GameId { get; set; }
+    
+    private int? _gameId;
+
+    private Sdk.GameSingleDetailDto? _game;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_gameId == GameId)
+            return;
+        _gameId = GameId;
+        
+        _game = await BoltonCupApi.GetGameByIdAsync(GameId);
+    }
+
+}
