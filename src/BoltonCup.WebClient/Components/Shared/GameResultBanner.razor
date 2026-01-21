@@ -1,0 +1,52 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+<MudPaper Class="@_classname" Width="100%" Height="100px" Elevation="0" Outlined>
+    <div class="d-flex flex-row align-center justify-center flex-wrap gap-1">
+        <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+            <MudImage Src="@Game.AwayTeam.LogoUrl" Height="72"/>
+        </MudHidden>
+        <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
+            <MudImage Src="@Game.AwayTeam.LogoUrl" Height="48" />
+        </MudHidden>
+        <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+            <MudText Align="Align.Center"><b>@Game.AwayTeam.Name</b></MudText>
+        </MudHidden>
+        <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
+            <MudFlexBreak />
+            <MudText Align="Align.Center"><b>@Game.AwayTeam.Abbreviation</b></MudText>
+        </MudHidden>
+    </div>
+    <MudText Typo="Typo.h4">@Game.AwayTeam.Goals</MudText>
+    <div class="d-flex flex-column align-center justify-space-evenly">
+        <MudChip T="string" Text="FINAL" Variant="Variant.Text" Size="Size.Small" Label="true" />
+        <MudText Typo="Typo.caption">@Game.GameTime.ToString("d")</MudText>
+    </div>
+    <MudText Typo="Typo.h4">@Game.HomeTeam.Goals</MudText>
+    <div class="d-flex flex-row-reverse align-center justify-center flex-wrap gap-1">
+        <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+            <MudImage Src="@Game.HomeTeam.LogoUrl" Height="72"/>
+        </MudHidden>
+        <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
+            <MudImage Src="@Game.HomeTeam.LogoUrl" Height="48" />
+        </MudHidden>
+        <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+            <MudText Align="Align.Center"><b>@Game.HomeTeam.Name</b></MudText>
+        </MudHidden>
+        <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
+            <MudFlexBreak />
+            <MudText Align="Align.Center"><b>@Game.HomeTeam.Abbreviation</b></MudText>
+        </MudHidden>
+    </div>
+</MudPaper>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required Sdk.GameSingleDetailDto Game { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string _classname => $"d-flex flex-row align-center justify-space-evenly gap-3 {Class}";
+
+}

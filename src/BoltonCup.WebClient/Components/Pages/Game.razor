@@ -2,6 +2,35 @@
 
 @inject IBoltonCupApi BoltonCupApi
 
+
+@if (_game is not null)
+{
+    <PageTitle>@_game.AwayTeam.NameShort @@ @_game.HomeTeam.NameShort | Bolton Cup</PageTitle>
+    
+    <div class="mud-full-width" style="background-color: var(--mud-palette-appbar-background)">
+        <MudContainer MaxWidth="MaxWidth.Medium" Class="py-2" Style="background-color: white">
+            <GameResultBanner Game="_game" />
+            
+            <MudGrid Class="mt-2">
+                <MudItem xs="12" md="8">
+                    <MudTabs Style="max-width: 100%" Elevation="0" KeepPanelsAlive>
+                        <MudTabPanel Text="Summary">
+                            
+                        </MudTabPanel>
+                        <MudTabPanel Text="Box Score">
+                            
+                        </MudTabPanel>
+                    </MudTabs>
+                </MudItem>
+                <MudItem xs="0" md="4">
+                    
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+    </div>
+}
+
+
 @code {
 
     [Parameter, EditorRequired]
