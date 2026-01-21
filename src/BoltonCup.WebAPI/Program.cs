@@ -126,4 +126,11 @@ app.UseAuthorization();
 app.MapControllers()
     .RequireAuthorization();
 
+// for now
+app.MapGet("/", async context =>
+{
+    context.Response.Redirect("/docs");
+    await Task.CompletedTask;
+});
+
 app.Run();
