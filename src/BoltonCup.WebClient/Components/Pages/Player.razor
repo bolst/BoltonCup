@@ -12,7 +12,7 @@ else
     
     <MudContainer MaxWidth="MaxWidth.Medium" Class="my-4 py-4" Gutters="false">
         <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-            <div class="d-flex flex-row align-center gap-6 px-4">
+            <div class="d-flex flex-row align-center gap-6 pa-4">
                 <MudText Typo="Typo.h4"><b>@_player.FullName</b></MudText>
                 <MudDivider Vertical FlexItem/>
                 @if (_player.Team is not null)
@@ -29,33 +29,53 @@ else
         <div class="action-shot-container d-flex flex-row align-end">
             <MudImage Src="/img/action-cover-temp.jpg" Class="action-shot" ObjectFit="ObjectFit.None" />
             <MudSpacer />
-            <div class="d-flex flex-column align-center mud-width-full flex-grow-1 gap-2 absolute pa-4 action-shot-caption">
-                <div class="d-flex flex-row align-center justify-space-evenly flex-wrap gap-6">
-                    <div class="d-flex flex-column align-center gap-2">
-                        <MudAvatar Size="Size.Large">
-                            <MudImage Src="@_player.ProfilePicture" Alt="@_player.FullName"/>
-                        </MudAvatar>
-                        <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
-                            <MudText Typo="Typo.h6"><b>@_player.FullName.ToUpper()</b></MudText>
-                        </MudHidden>
+            <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+                <div class="d-flex flex-row align-center justify-space-evenly mud-width-full gap-2 absolute pa-4 action-shot-caption">
+                    <div class="d-flex flex-row align-center justify-space-evenly gap-6">
+                        <div class="d-flex flex-column align-center gap-2">
+                            <MudAvatar Style="width: 100px; height: 100px">
+                                <MudImage Src="@_player.ProfilePicture" Alt="@_player.FullName"/>
+                            </MudAvatar>
+                        </div>
+                        @InfoItems(_player)
                     </div>
-                    <div class="d-flex flex-column align-start justify-space-evenly">
-                        @InfoItem("Born", _player.Birthday?.ToString("d"))
-                        @InfoItem("Favourite Beer", _player.PreferredBeer)
-                    </div>
-                    <MudDivider Vertical FlexItem/>
-                    <div class="d-flex flex-column align-center gap-1 flex-grow-1" style="min-width: 300px">
-                        @* <div>season</div> *@
-                        @* <div>career</div> *@
-                        @* TODO *@
+                    <MudDivider Light Vertical FlexItem/>
+                    <div class="d-flex flex-column align-center gap-1">
+                        <BcPlayerStatBlock Player="_player" Title="@_player.Tournament.Name" TournamentId="@_player.Tournament.Id" InlineTitle />
+                        <BcPlayerStatBlock Player="_player" Title="Career" InlineTitle />
                     </div>
                 </div>
-            </div>
+            </MudHidden>
         </div>
+        
+        <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
+            <div class="d-flex flex-column align-center gap-3 mt-n20">
+                <MudAvatar Style="width: 160px; height: 160px">
+                    <MudImage Src="@_player.ProfilePicture" Alt="@_player.FullName"/>
+                </MudAvatar>
+                <MudText Typo="Typo.h4"><b>@_player.FullName.ToUpper()</b></MudText>
+                <div class="d-flex flex-row align-center gap-3">
+                    @if (_player.Team is not null)
+                    {
+                        <MudImage Src="@_player.Team.LogoUrl" Alt="@_player.Team.Abbreviation" Height="48" />
+                        <MudDivider Vertical FlexItem/>
+                    }
+                    <MudText Typo="Typo.h6"><b>@_player.JerseyNumberLabel</b></MudText>
+                    <MudDivider Vertical FlexItem/>
+                    <MudText Typo="Typo.h6"><b>@_player.Position</b></MudText>
+                </div>
+                <MudDivider />
+                <div class="d-flex flex-column align-center gap-1 mud-width-full">
+                    <BcPlayerStatBlock Player="_player" Title="@_player.Tournament.Name" TournamentId="@_player.Tournament.Id" />
+                    <BcPlayerStatBlock Player="_player" Title="Career" />
+                </div>
+                @InfoItems(_player)
+            </div>
+        </MudHidden>
         
         <div class="my-6 px-4">
             <MudText Typo="Typo.h6">Last 5 Games</MudText>
-            <MudDataGrid Items="_last5Games" Breakpoint="Breakpoint.None" SortMode="SortMode.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Dense Bordered Striped Square>
+            <MudDataGrid Items="_last5Games" Breakpoint="Breakpoint.None" SortMode="SortMode.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Dense Striped Square>
                 <Columns>
                     <PropertyColumn Property="x => x.Game.GameTime.Date" Title="Date" Format="d" CellStyle="width: 50px" />
                     <PropertyColumn Property="x => x.Game.Opponent.Name" Title="Opp" CellStyle="width: 120px">
@@ -63,7 +83,7 @@ else
                             @{
                                 var prefix = context.Item.Game.IsHome ? "vs." : "@";
                             }
-                            <MudLink Href="@($"/games/{context.Item.Game.Id}")" Color="Color.Info" Underline="Underline.None">@prefix @context.Item.Game.Opponent.Abbreviation</MudLink>
+                            <MudLink Href="@($"/games/{context.Item.Game.Id}")" Color="Color.Info" Underline="Underline.Always">@prefix @context.Item.Game.Opponent.Abbreviation</MudLink>
                         </CellTemplate>
                     </PropertyColumn>
                     @if (_player.Position == "goalie")
@@ -115,12 +135,14 @@ else
 
         _player = await BoltonCupApi.GetPlayerByIdAsync(PlayerId);
         _last5Games = _player.GameByGame
-            .OrderBy(p => p.Game.GameTime)
+            .OrderByDescending(p => p.Game.GameTime)
             .Take(5);
     }
 
-
-    private RenderFragment InfoItem(string label, string? value)
-        => @<MudText Typo="Typo.subtitle1"><b>@label:</b> @value</MudText>;
+    private RenderFragment InfoItems(Sdk.PlayerSingleDetailDto player)
+        =>@<div class="d-flex flex-column align-start mud-width-full px-4">
+              <MudText Typo="Typo.subtitle1"><b>Born:</b> @player.Birthday?.ToString("d")</MudText>
+              <MudText Typo="Typo.subtitle1"><b>Favourite Beer:</b> @player.PreferredBeer</MudText>
+          </div>;
 
 }

@@ -1,0 +1,30 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+@if (!HideDivider)
+{
+    <MudDivider FlexItem Vertical />
+}
+<div class="d-flex flex-column align-center justify-space-evenly">
+    <MudText Typo="Typo.caption">@Title</MudText>
+    @if (Property is not null)
+    {
+        <MudText Typo="Typo.h5"><b>@TournamentStats.Sum(Property)</b></MudText>
+    }
+</div>
+
+
+@code {
+
+    [CascadingParameter]
+    public IEnumerable<Sdk.PlayerTournamentStats> TournamentStats { get; set; } = [];
+
+    [Parameter]
+    public string? Title { get; set; }
+    
+    [Parameter]
+    public Func<Sdk.PlayerTournamentStats, int>? Property { get; set; }
+    
+    [Parameter]
+    public bool HideDivider { get; set; }
+
+}
