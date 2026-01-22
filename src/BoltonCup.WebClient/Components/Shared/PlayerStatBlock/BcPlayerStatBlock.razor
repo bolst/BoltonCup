@@ -4,12 +4,12 @@
 @if (_player is not null)
 {
     <CascadingValue Value="_tournamentStats">
-        <div class="d-flex flex-column align-center gap-2 mud-width-full">
+        <div class="d-flex flex-column align-center gap-2">
             @if (!InlineTitle)
             {
                 @TitleContent
             }
-            <MudPaper Class="d-flex flex-row align-center justify-space-evenly gap-6 px-6 py-1 mud-width-full" Style="background-color: rgba(255,255,255,0.5);">
+            <MudPaper Class="d-flex flex-row align-center justify-space-evenly gap-6 px-6 py-1" Style="background-color: rgba(255,255,255,0.5);">
                 @if (!string.IsNullOrEmpty(Title) && InlineTitle)
                 {
                     <div class="d-flex flex-column align-center" style="width: 150px">

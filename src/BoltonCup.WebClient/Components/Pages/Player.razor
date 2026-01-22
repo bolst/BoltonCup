@@ -98,13 +98,13 @@ else
                     <MudText Typo="Typo.h4"><b>STATS</b></MudText>
                     <MudTabs Style="max-width: 100%" Elevation="0" KeepPanelsAlive Centered>
                         <MudTabPanel Text="Career">
-                            <MudDataGrid Items="_player.TournamentStats" Breakpoint="Breakpoint.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Dense Striped Square>
+                            <MudDataGrid Items="_player.TournamentStats" Breakpoint="Breakpoint.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Height="400px" FixedHeader Dense Striped Square>
                                 <ToolBarContent>
                                     <MudText Typo="Typo.h6"><b>Career Stats</b></MudText>
                                 </ToolBarContent>
                                 <Columns>
                                     <PropertyColumn Property="x => x.Tournament.Name" Title="Tournament" CellStyle="width: 100px" />
-                                    <PropertyColumn Property="x => x.Team.Name" Title="Team" CellStyle="width: 100px" />
+                                    <PropertyColumn Property="x => x.Team.Name" Title="Team" />
                                     <PropertyColumn Property="x => x.GamesPlayed" Title="GP" CellStyle="width: 50px" />
                                     
                                     <PropertyColumn Property="x => x.Wins" Title="W" CellStyle="width: 50px" Hidden="!_player.IsGoalie" />
@@ -120,7 +120,7 @@ else
                             </MudDataGrid>
                         </MudTabPanel>
                         <MudTabPanel Text="Game Logs">
-                            <MudDataGrid Items="_player.GameByGame" Breakpoint="Breakpoint.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Dense Striped Square>
+                            <MudDataGrid Items="_player.GameByGame" Breakpoint="Breakpoint.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Height="400px" FixedHeader Dense Striped Square>
                                 <ToolBarContent>
                                     <MudText Typo="Typo.h6"><b>Game Logs</b></MudText>
                                 </ToolBarContent>
