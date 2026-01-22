@@ -21,4 +21,11 @@ public class GamesController(IGameRepository _games) : BoltonCupControllerBase
     {
         return OkOrNotFound(await _games.GetByIdAsync<GameSingleDetailDto>(id));
     }
+
+    [AllowAnonymous]
+    [HttpGet("{id:int}/boxscore")]
+    public async Task<ActionResult<GameBoxScoreDto>> GetGameBoxScore(int id)
+    {
+        return OkOrNotFound(await _games.GetByIdAsync<GameBoxScoreDto>(id));
+    }
 }

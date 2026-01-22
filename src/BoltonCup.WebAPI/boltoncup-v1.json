@@ -534,6 +534,47 @@
         }
       }
     },
+    "/api/games/{id}/boxscore": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "GetGameBoxScore",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameBoxScoreDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameBoxScoreDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameBoxScoreDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/goaliestats": {
       "get": {
         "tags": [
@@ -1032,6 +1073,54 @@
         },
         "additionalProperties": false
       },
+      "GameBoxScoreDto": {
+        "required": [
+          "gameTime",
+          "id",
+          "tournament"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gameTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
+          },
+          "gameType": {
+            "type": "string",
+            "nullable": true
+          },
+          "venue": {
+            "type": "string",
+            "nullable": true
+          },
+          "rink": {
+            "type": "string",
+            "nullable": true
+          },
+          "homeTeam": {
+            "$ref": "#/components/schemas/GameTeamSummary"
+          },
+          "awayTeam": {
+            "$ref": "#/components/schemas/GameTeamSummary"
+          },
+          "gameLogs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameLogSummary"
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
       "GameDetailDto": {
         "required": [
           "gameTime",
@@ -1097,12 +1186,74 @@
         },
         "additionalProperties": false
       },
+      "GameLogSummary": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "teamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "opponentTeamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gameId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "goals": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assists": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "points": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "penaltyMinutes": {
+            "type": "number",
+            "format": "double"
+          },
+          "goalsAgainst": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shotsAgainst": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "saves": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shutout": {
+            "type": "boolean"
+          },
+          "win": {
+            "type": "boolean"
+          },
+          "player": {
+            "$ref": "#/components/schemas/PlayerSummary"
+          }
+        },
+        "additionalProperties": false
+      },
       "GameSingleDetailDto": {
         "required": [
           "gameTime",
+          "goalieStats",
           "goals",
           "id",
           "penalties",
+          "skaterStats",
           "tournament"
         ],
         "type": "object",
@@ -1147,6 +1298,20 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PenaltySummary"
+            },
+            "nullable": true
+          },
+          "skaterStats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameLogSummary"
+            },
+            "nullable": true
+          },
+          "goalieStats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameLogSummary"
             },
             "nullable": true
           }
@@ -1510,6 +1675,10 @@
             "type": "string",
             "nullable": true
           },
+          "bannerPicture": {
+            "type": "string",
+            "nullable": true
+          },
           "preferredBeer": {
             "type": "string",
             "nullable": true
@@ -1659,6 +1828,10 @@
             "type": "string",
             "nullable": true
           },
+          "bannerPicture": {
+            "type": "string",
+            "nullable": true
+          },
           "preferredBeer": {
             "type": "string",
             "nullable": true
@@ -1738,6 +1911,10 @@
           "profilePicture": {
             "type": "string",
             "nullable": true
+          },
+          "isGoalie": {
+            "type": "boolean",
+            "readOnly": true
           },
           "fullName": {
             "type": "string",

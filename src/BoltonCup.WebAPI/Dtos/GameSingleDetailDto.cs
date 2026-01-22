@@ -10,6 +10,8 @@ public record GameSingleDetailDto : GameDetailDto, IMappable<Game, GameSingleDet
 
     public required List<GoalSummary> Goals { get; init; } = [];
     public required List<PenaltySummary> Penalties { get; init; } = [];
+    public required List<GameLogSummary> SkaterStats { get; init; } = [];
+    public required List<GameLogSummary> GoalieStats { get; init; } = [];
 
     static Expression<Func<Game, GameSingleDetailDto>> IMappable<Game, GameSingleDetailDto>.Projection =>
         game => new GameSingleDetailDto
@@ -50,6 +52,8 @@ public record GameSingleDetailDto : GameDetailDto, IMappable<Game, GameSingleDet
                 .OrderBy(penalty => penalty.Period)
                 .ThenByDescending(penalty => penalty.TimeRemaining)
                 .ToList(),
+            SkaterStats = game.SkaterGameLogs.Select(s => new GameLogSummary(s, s.Player, s.Player.Account)).ToList(),
+            GoalieStats = game.GoalieGameLogs.Select(s => new GameLogSummary(s, s.Player, s.Player.Account)).ToList(),
         };
     
 }

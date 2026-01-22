@@ -26,6 +26,7 @@ public record PlayerSingleDetailDto : PlayerDetailDto, IMappable<Player, PlayerS
             LastName = player.Account.LastName, 
             Birthday = player.Account.Birthday, 
             ProfilePicture = player.Account.ProfilePicture, 
+            BannerPicture = null,
             PreferredBeer = player.Account.PreferredBeer, 
             Tournament = new TournamentSummary(player.Tournament),
             Team = player.Team == null ? null : new TeamSummary(player.Team),

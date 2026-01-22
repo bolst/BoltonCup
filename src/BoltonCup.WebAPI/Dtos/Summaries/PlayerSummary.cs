@@ -12,6 +12,7 @@ public record PlayerSummary
     public string? LastName { get; set; }
     public DateTime? Birthday { get; set; }
     public string? ProfilePicture { get; set; }
+    public bool IsGoalie => Position == Core.Values.Position.Goalie;
 
     public string FullName => FirstName + " " + LastName;
 

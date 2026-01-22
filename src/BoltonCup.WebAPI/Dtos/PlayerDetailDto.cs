@@ -16,6 +16,7 @@ public record PlayerDetailDto : IMappable<Player, PlayerDetailDto>
     public string? LastName { get; init; }
     public DateTime? Birthday { get; init; }
     public string? ProfilePicture { get; init; }
+    public string? BannerPicture { get; init; }
     public string? PreferredBeer { get; init; }
     public required TournamentSummary Tournament { get; init; }
     public TeamSummary? Team { get; init; }
@@ -35,6 +36,7 @@ public record PlayerDetailDto : IMappable<Player, PlayerDetailDto>
             LastName = player.Account.LastName, 
             Birthday = player.Account.Birthday, 
             ProfilePicture = player.Account.ProfilePicture, 
+            BannerPicture = null,
             PreferredBeer = player.Account.PreferredBeer, 
             Tournament = new TournamentSummary(player.Tournament),
             Team = player.Team == null ? null : new TeamSummary(player.Team),
