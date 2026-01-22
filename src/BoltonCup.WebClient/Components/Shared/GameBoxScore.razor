@@ -1,0 +1,30 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+@inject IBoltonCupApi BoltonCupApi
+
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required Sdk.GameSingleDetailDto Game { get; set; }
+
+    private int? _gameId;    
+
+    private Sdk.GameTeamSummary? _selectedTeam;
+
+    protected override void OnParametersSet()
+    {
+        if (Game.Id == _gameId)
+            return;
+        _gameId = Game.Id;
+        
+        _selectedTeam = Game.AwayTeam;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void SelectedTeamChanged(Sdk.GameTeamSummary? team)
+    {
+        _selectedTeam = team;
+    }
+    
+}

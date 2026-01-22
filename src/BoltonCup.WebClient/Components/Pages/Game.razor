@@ -10,15 +10,14 @@
     <div class="mud-full-width" style="background-color: var(--mud-palette-appbar-background)">
         <MudContainer MaxWidth="MaxWidth.Medium" Class="py-2" Style="background-color: white">
             <GameResultBanner Game="_game" />
-            
             <MudGrid Class="mt-2">
                 <MudItem xs="12" md="8">
                     <MudTabs Style="max-width: 100%" Elevation="0" KeepPanelsAlive>
                         <MudTabPanel Text="Summary">
-                            
+                            @GameSummary(_game)
                         </MudTabPanel>
                         <MudTabPanel Text="Box Score">
-                            
+                            <GameBoxScore Game="_game" />
                         </MudTabPanel>
                     </MudTabs>
                 </MudItem>
@@ -48,5 +47,9 @@
         
         _game = await BoltonCupApi.GetGameByIdAsync(GameId);
     }
+
+
+    private RenderFragment GameSummary(Sdk.GameSingleDetailDto game) =>
+        @<div></div>;
 
 }
