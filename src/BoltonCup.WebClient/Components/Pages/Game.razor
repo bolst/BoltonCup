@@ -23,7 +23,7 @@ else
     {
         <PageTitle>@_game.AwayTeam.NameShort @@ @_game.HomeTeam.NameShort | Bolton Cup</PageTitle>
 
-        <div class="mud-full-width" style="background-color: var(--mud-palette-appbar-background)">
+        <BackgroundContainer>
             <MudContainer MaxWidth="MaxWidth.Large" Class="py-2" Style="background-color: white">
                 <GameResultBanner Game="_game"/>
                 <MudGrid Class="mt-2">
@@ -75,7 +75,7 @@ else
                     </MudItem>
                 </MudGrid>
             </MudContainer>
-        </div>
+        </BackgroundContainer>
     }
 }
 

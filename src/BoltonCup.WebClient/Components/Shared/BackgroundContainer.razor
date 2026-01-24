@@ -1,0 +1,33 @@
+@using MudBlazor.Utilities
+@namespace BoltonCup.WebClient.Components.Shared
+
+
+<div class="@Classname" style="@StyleName">
+    @ChildContent
+</div>
+
+
+@code {
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+    
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+    
+    private string Classname => 
+        new CssBuilder()
+            .AddClass("mud-full-width")
+            .AddClass(Class)
+            .Build();
+    
+    private string StyleName => 
+        new StyleBuilder()
+            .AddStyle("background-color", "var(--mud-palette-appbar-background)")
+            .AddStyle(Style)
+            .Build();
+
+}
