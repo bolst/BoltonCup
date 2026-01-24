@@ -10,7 +10,7 @@ public class SkaterGameLogsController(ISkaterGameLogRepository _skaterGameLogs) 
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<SkaterGameLogDetailDto>>> GetSkaterGameLogs([FromQuery] GetSkaterGameLogsQuery query)
+    public async Task<ActionResult<CollectionResult<SkaterGameLogDetailDto>>> GetSkaterGameLogs([FromQuery] GetSkaterGameLogsQuery query)
     {
         return Ok(await _skaterGameLogs.GetAllAsync<SkaterGameLogDetailDto>(query));
     }

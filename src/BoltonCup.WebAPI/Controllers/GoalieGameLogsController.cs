@@ -10,7 +10,7 @@ public class GoalieGameLogsController(IGoalieGameLogRepository _goalieGameLogs) 
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<GoalieGameLogDetailDto>>> GetGoalieGameLogs([FromQuery] GetGoalieGameLogsQuery query)
+    public async Task<ActionResult<CollectionResult<GoalieGameLogDetailDto>>> GetGoalieGameLogs([FromQuery] GetGoalieGameLogsQuery query)
     {
         return Ok(await _goalieGameLogs.GetAllAsync<GoalieGameLogDetailDto>(query));
     }

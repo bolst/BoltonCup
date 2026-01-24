@@ -643,17 +643,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/GoalieGameLogDetailDtoPaginatedList"
+                  "$ref": "#/components/schemas/GoalieGameLogDetailDtoCollectionResult"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GoalieGameLogDetailDtoPaginatedList"
+                  "$ref": "#/components/schemas/GoalieGameLogDetailDtoCollectionResult"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GoalieGameLogDetailDtoPaginatedList"
+                  "$ref": "#/components/schemas/GoalieGameLogDetailDtoCollectionResult"
                 }
               }
             }
@@ -919,17 +919,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/SkaterGameLogDetailDtoPaginatedList"
+                  "$ref": "#/components/schemas/SkaterGameLogDetailDtoCollectionResult"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SkaterGameLogDetailDtoPaginatedList"
+                  "$ref": "#/components/schemas/SkaterGameLogDetailDtoCollectionResult"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SkaterGameLogDetailDtoPaginatedList"
+                  "$ref": "#/components/schemas/SkaterGameLogDetailDtoCollectionResult"
                 }
               }
             }
@@ -1644,7 +1644,7 @@
         },
         "additionalProperties": false
       },
-      "GoalieGameLogDetailDtoPaginatedList": {
+      "GoalieGameLogDetailDtoCollectionResult": {
         "type": "object",
         "properties": {
           "items": {
@@ -1653,18 +1653,6 @@
               "$ref": "#/components/schemas/GoalieGameLogDetailDto"
             },
             "nullable": true
-          },
-          "total": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "page": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "size": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -2361,7 +2349,7 @@
         },
         "additionalProperties": false
       },
-      "SkaterGameLogDetailDtoPaginatedList": {
+      "SkaterGameLogDetailDtoCollectionResult": {
         "type": "object",
         "properties": {
           "items": {
@@ -2370,18 +2358,6 @@
               "$ref": "#/components/schemas/SkaterGameLogDetailDto"
             },
             "nullable": true
-          },
-          "total": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "page": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "size": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false

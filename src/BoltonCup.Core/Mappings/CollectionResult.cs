@@ -1,4 +1,4 @@
-namespace BoltonCup.Core.Mappings;
+namespace BoltonCup.Core;
 
 
 public class CollectionResult<T>(IEnumerable<T> items)

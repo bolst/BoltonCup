@@ -1,4 +1,4 @@
-using BoltonCup.Core.Mappings;
+using BoltonCup.Core;
 using BoltonCup.Core.Queries.Base;
 using Microsoft.EntityFrameworkCore;
 
