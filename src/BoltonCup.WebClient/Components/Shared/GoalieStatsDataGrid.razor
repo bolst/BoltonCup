@@ -44,7 +44,7 @@
 
 @code {
 
-    private MudDataGrid<Sdk.GoalieStatDetailDto> _dataGrid;
+    private MudDataGrid<Sdk.GoalieStatDetailDto> _dataGrid = null!;
     private const string _dataCellStyle = "max-width: 30px";
 
     private async Task<GridData<Sdk.GoalieStatDetailDto>> ServerReload(GridState<Sdk.GoalieStatDetailDto> state)

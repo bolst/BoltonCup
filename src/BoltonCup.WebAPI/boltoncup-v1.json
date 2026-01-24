@@ -1560,10 +1560,12 @@
         "required": [
           "goalsAgainst",
           "goalsAgainstAverage",
+          "player",
           "savePercentage",
           "saves",
           "shotsAgainst",
           "shutout",
+          "team",
           "win"
         ],
         "type": "object",
@@ -2131,8 +2133,7 @@
           },
           "accountId": {
             "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "format": "int32"
           },
           "position": {
             "type": "string",
@@ -2153,8 +2154,7 @@
           },
           "birthday": {
             "type": "string",
-            "format": "date-time",
-            "nullable": true
+            "format": "date-time"
           },
           "profilePicture": {
             "type": "string",
@@ -2297,6 +2297,10 @@
         "additionalProperties": false
       },
       "SkaterGameLogDetailDto": {
+        "required": [
+          "player",
+          "team"
+        ],
         "type": "object",
         "properties": {
           "player": {

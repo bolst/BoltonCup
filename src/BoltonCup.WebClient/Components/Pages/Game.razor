@@ -13,7 +13,7 @@
         {
             <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100px" Width="100%" />
         }
-        else
+        else if (_game is not null)
         {
             <GameResultBanner Game="_game"/>
         }
@@ -27,7 +27,7 @@
                         @if (_loading)
                         {
                         }
-                        else
+                        else if (_game is not null)
                         {
                             <GameBoxScore Game="_game"/>
                         }
@@ -42,7 +42,7 @@
                     {
                         <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="250px" Width="100%" />
                     }
-                    else
+                    else if (_game is not null)
                     {
                         <MudSimpleTable Elevation="0" Dense Striped Square>
                             <thead>

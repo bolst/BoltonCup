@@ -1,108 +1,116 @@
 @namespace BoltonCup.WebClient.Components.Shared
 @inject IBoltonCupApi BoltonCupApi
 
-@if (_game is not null)
+@if (_loading)
 {
-    <div>
-        <div class="d-flex flex-row align-center px-1 py-2 mud-width-full">
-            <MudText Typo="Typo.h6"><b>Game Sheet</b></MudText>
-            <MudSpacer />
-            <MudToggleGroup T="Sdk.GameTeamSummary" Value="_selectedTeam" ValueChanged="SetSelectedTeam" Size="Size.Small">
-                <MudToggleItem Value="_game.AwayTeam" Text="@_game.AwayTeam.NameShort" />
-                <MudToggleItem Value="_game.HomeTeam" Text="@_game.HomeTeam.NameShort" />
-            </MudToggleGroup>
-        </div>
-        <MudSimpleTable Elevation="0" Striped Square>
-            <thead>
-            <tr>
-                <th>#</th>
-                <th>FORWARDS</th>
-                <th>G</th>
-                <th>A</th>
-                <th>P</th>
-                <th>PIM</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var forward in _forwardLogs)
-            {
+    
+}
+else
+{
+        
+    if (_game is not null)
+    {
+        <div>
+            <div class="d-flex flex-row align-center px-1 py-2 mud-width-full">
+                <MudText Typo="Typo.h6"><b>Game Sheet</b></MudText>
+                <MudSpacer />
+                <MudToggleGroup T="Sdk.GameTeamSummary" Value="_selectedTeam" ValueChanged="SetSelectedTeam" Size="Size.Small">
+                    <MudToggleItem Value="_game.AwayTeam" Text="@_game.AwayTeam.NameShort" />
+                    <MudToggleItem Value="_game.HomeTeam" Text="@_game.HomeTeam.NameShort" />
+                </MudToggleGroup>
+            </div>
+            <MudSimpleTable Elevation="0" Striped Square>
+                <thead>
                 <tr>
-                    <td>@forward.Player.JerseyNumber</td>
-                    <td><PlayerLink Player="forward.Player" ToStringFunc="GetFormattedPlayerName" /></td>
-                    <td>@forward.Goals</td>
-                    <td>@forward.Assists</td>
-                    <td>@forward.Points</td>
-                    <td>@forward.PenaltyMinutes</td>
+                    <th>#</th>
+                    <th>FORWARDS</th>
+                    <th>G</th>
+                    <th>A</th>
+                    <th>P</th>
+                    <th>PIM</th>
                 </tr>
-            }
-            </tbody>
-            <thead class="border-t-4 mud-border-lines-default">
-            <tr>
-                <th>#</th>
-                <th>DEFENSE</th>
-                <th>G</th>
-                <th>A</th>
-                <th>P</th>
-                <th>PIM</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var defense in _defenseLogs)
-            {
+                </thead>
+                <tbody>
+                @foreach (var forward in _forwardLogs)
+                {
+                    <tr>
+                        <td>@forward.Player.JerseyNumber</td>
+                        <td><PlayerLink Player="forward.Player" ToStringFunc="GetFormattedPlayerName" /></td>
+                        <td>@forward.Goals</td>
+                        <td>@forward.Assists</td>
+                        <td>@forward.Points</td>
+                        <td>@forward.PenaltyMinutes</td>
+                    </tr>
+                }
+                </tbody>
+                <thead class="border-t-4 mud-border-lines-default">
                 <tr>
-                    <td>@defense.Player.JerseyNumber</td>
-                    <td><PlayerLink Player="defense.Player" ToStringFunc="GetFormattedPlayerName" /></td>
+                    <th>#</th>
+                    <th>DEFENSE</th>
+                    <th>G</th>
+                    <th>A</th>
+                    <th>P</th>
+                    <th>PIM</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var defense in _defenseLogs)
+                {
+                    <tr>
+                        <td>@defense.Player.JerseyNumber</td>
+                        <td><PlayerLink Player="defense.Player" ToStringFunc="GetFormattedPlayerName" /></td>
 
-                    <td>@defense.Goals</td>
-                    <td>@defense.Assists</td>
-                    <td>@defense.Points</td>
-                    <td>@defense.PenaltyMinutes</td>
-                </tr>
-            }
-            </tbody>
-            <thead class="border-t-4 mud-border-lines-default">
-            <tr>
-                <th>#</th>
-                <th>GOALIE</th>
-                <th>GA</th>
-                <th>W</th>
-                <th>SO</th>
-                <th>PIM</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var goalie in _goalieLogs)
-            {
+                        <td>@defense.Goals</td>
+                        <td>@defense.Assists</td>
+                        <td>@defense.Points</td>
+                        <td>@defense.PenaltyMinutes</td>
+                    </tr>
+                }
+                </tbody>
+                <thead class="border-t-4 mud-border-lines-default">
                 <tr>
-                    <td>@goalie.Player.JerseyNumber</td>
-                    <td><PlayerLink Player="goalie.Player" ToStringFunc="GetFormattedPlayerName" /></td>
-                    <td>@goalie.GoalsAgainst</td>
-                    <td>
-                        @if (goalie.Win)
-                        {
-                            <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
-                        }
-                        else
-                        {
-                            <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
-                        }
-                    </td>
-                    <td>
-                        @if (goalie.Shutout)
-                        {
-                            <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
-                        }
-                        else
-                        {
-                            <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
-                        }
-                    </td>
-                    <td>@goalie.PenaltyMinutes</td>
+                    <th>#</th>
+                    <th>GOALIE</th>
+                    <th>GA</th>
+                    <th>W</th>
+                    <th>SO</th>
+                    <th>PIM</th>
                 </tr>
-            }
-            </tbody>
-        </MudSimpleTable>
-    </div>
+                </thead>
+                <tbody>
+                @foreach (var goalie in _goalieLogs)
+                {
+                    <tr>
+                        <td>@goalie.Player.JerseyNumber</td>
+                        <td><PlayerLink Player="goalie.Player" ToStringFunc="GetFormattedPlayerName" /></td>
+                        <td>@goalie.GoalsAgainst</td>
+                        <td>
+                            @if (goalie.Win)
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
+                            }
+                        </td>
+                        <td>
+                            @if (goalie.Shutout)
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
+                            }
+                        </td>
+                        <td>@goalie.PenaltyMinutes</td>
+                    </tr>
+                }
+                </tbody>
+            </MudSimpleTable>
+        </div>
+    }
 }
 
 
@@ -175,6 +183,5 @@
         var last = player.LastName;
         return $"{first}. {last}";
     }
-    
     
 }

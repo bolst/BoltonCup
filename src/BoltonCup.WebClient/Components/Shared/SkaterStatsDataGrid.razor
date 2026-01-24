@@ -45,7 +45,7 @@
 
 @code {
 
-    private MudDataGrid<Sdk.SkaterStatDetailDto> _dataGrid;
+    private MudDataGrid<Sdk.SkaterStatDetailDto> _dataGrid = null!;
     private const string _dataCellStyle = "max-width: 30px";
 
     private async Task<GridData<Sdk.SkaterStatDetailDto>> ServerReload(GridState<Sdk.SkaterStatDetailDto> state)

@@ -19,7 +19,7 @@ public record GameLogSummary
     public bool Win { get; set; }
     public PlayerSummary Player { get; init; }
 
-    public GameLogSummary(SkaterGameLog gameLog, Player player, Account? account)
+    public GameLogSummary(SkaterGameLog gameLog, Player player, Account account)
     {
         if (gameLog.PlayerId != player.Id)
             throw new ArgumentException("Player ID does not match GameLog Player ID", nameof(player));
@@ -39,7 +39,7 @@ public record GameLogSummary
     }
     
     
-    public GameLogSummary(GoalieGameLog gameLog, Player player, Account? account)
+    public GameLogSummary(GoalieGameLog gameLog, Player player, Account account)
     {
         if (gameLog.PlayerId != player.Id)
             throw new ArgumentException("Player ID does not match GameLog Player ID", nameof(player));

@@ -8,8 +8,8 @@ namespace BoltonCup.WebAPI.Dtos;
 
 public record SkaterGameLogDetailDto : IMappable<SkaterGameLog, SkaterGameLogDetailDto>
 {
-    public PlayerSummary Player { get; init; }
-    public TeamSummary Team { get; init; }
+    public required PlayerSummary Player { get; init; }
+    public required TeamSummary Team { get; init; }
     public int OpponentTeamId { get; init; }
     public int GameId { get; init; }
     public int Goals { get; init; }
