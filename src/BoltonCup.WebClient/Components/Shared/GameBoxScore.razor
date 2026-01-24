@@ -2,50 +2,105 @@
 
 @inject IBoltonCupApi BoltonCupApi
 
-<MudTable Items="_renderedGameLogs" Breakpoint="Breakpoint.None" GroupBy="_groupDefinition" GroupHeaderClass="py-4" Elevation="0" Striped Square>
-    <ToolBarContent>
+<div>
+    <div class="d-flex flex-row align-center px-1 mud-width-full">
         <MudText Typo="Typo.h6"><b>Game Sheet</b></MudText>
         <MudSpacer />
         <MudToggleGroup T="Sdk.GameTeamSummary" Value="_selectedTeam" ValueChanged="SetSelectedTeam" Size="Size.Small">
             <MudToggleItem Value="Game.AwayTeam" Text="@Game.AwayTeam.NameShort" />
             <MudToggleItem Value="Game.HomeTeam" Text="@Game.HomeTeam.NameShort" />
         </MudToggleGroup>
-    </ToolBarContent>
-    <GroupHeaderTemplate>
-        <MudTh><MudText Typo="Typo.body1"><b>#</b></MudText></MudTh>
-        <MudTh><MudText Typo="Typo.body1"><b>@context.Key?.ToString()?.ToUpper()</b></MudText></MudTh>
-        @if (context.Key?.ToString() == "goalie")
+    </div>
+    <MudSimpleTable Elevation="0" Striped Square>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>FORWARDS</th>
+            <th>G</th>
+            <th>A</th>
+            <th>P</th>
+            <th>PIM</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var forward in _forwardLogs)
         {
-            <MudTh><MudText Typo="Typo.body1"><b>GA</b></MudText></MudTh>
-            <MudTh><MudText Typo="Typo.body1"><b>W</b></MudText></MudTh>
-            <MudTh><MudText Typo="Typo.body1"><b>SO</b></MudText></MudTh>
+            <tr>
+                <td>@forward.Player.JerseyNumber</td>
+                <td>@forward.Player.FullName</td>
+                <td>@forward.Goals</td>
+                <td>@forward.Assists</td>
+                <td>@forward.Points</td>
+                <td>@forward.PenaltyMinutes</td>
+            </tr>
         }
-        else
+        </tbody>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>DEFENSE</th>
+            <th>G</th>
+            <th>A</th>
+            <th>P</th>
+            <th>PIM</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var defense in _defenseLogs)
         {
-            <MudTh><MudText Typo="Typo.body1"><b>G</b></MudText></MudTh>
-            <MudTh><MudText Typo="Typo.body1"><b>A</b></MudText></MudTh>
-            <MudTh><MudText Typo="Typo.body1"><b>P</b></MudText></MudTh>
+            <tr>
+                <td>@defense.Player.JerseyNumber</td>
+                <td>@defense.Player.FullName</td>
+                <td>@defense.Goals</td>
+                <td>@defense.Assists</td>
+                <td>@defense.Points</td>
+                <td>@defense.PenaltyMinutes</td>
+            </tr>
         }
-        <MudTh><MudText Typo="Typo.body1"><b>PIM</b></MudText></MudTh>
-    </GroupHeaderTemplate>
-    <RowTemplate>
-        <MudTd DataLabel="#">@context.Player.JerseyNumber</MudTd>
-        <MudTd DataLabel="Name">@context.Player.FirstName.ToUpper().First(). @context.Player.LastName</MudTd>
-        @if (context.Player.IsGoalie)
+        </tbody>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>GOALIE</th>
+            <th>GA</th>
+            <th>W</th>
+            <th>SO</th>
+            <th>PIM</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var goalie in _goalieLogs)
         {
-            <MudTd DataLabel="GA">@context.GoalsAgainst</MudTd>
-            <MudTd DataLabel="SV">@(context.Win ? 1 : 0)</MudTd>
-            <MudTd DataLabel="SO">@(context.Shutout ? 1 : 0)</MudTd>
+            <tr>
+                <td>@goalie.Player.JerseyNumber</td>
+                <td>@goalie.Player.FullName</td>
+                <td>@goalie.GoalsAgainst</td>
+                <td>
+                    @if (goalie.Win)
+                    {
+                        <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
+                    }
+                </td>
+                <td>
+                    @if (goalie.Shutout)
+                    {
+                        <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
+                    }
+                </td>
+                <td>@goalie.PenaltyMinutes</td>
+            </tr>
         }
-        else
-        {
-            <MudTd DataLabel="G">@context.Goals</MudTd>
-            <MudTd DataLabel="A">@context.Assists</MudTd>
-            <MudTd DataLabel="P">@context.Points</MudTd>
-        }
-        <MudTd DataLabel="PIM">@context.PenaltyMinutes</MudTd>
-    </RowTemplate>
-</MudTable>
+        </tbody>
+    </MudSimpleTable>
+</div>
 
 
 @code {
@@ -56,24 +111,30 @@
     private int? _gameId;    
 
     private Sdk.GameTeamSummary? _selectedTeam;
-    private Sdk.GameBoxScoreDto? _boxScore;
-    private IEnumerable<Sdk.GameLogSummary> _renderedGameLogs = [];
+    private Sdk.SkaterGameLogDetailDtoPaginatedList? _skaterLog;
+    private Sdk.GoalieGameLogDetailDtoPaginatedList? _goalieLog;
     
-    private TableGroupDefinition<Sdk.GameLogSummary> _groupDefinition = new()
-    {
-        GroupName = "Position",
-        Selector = x => x.Player.Position,
-        Indentation = false,
-        Expandable = false,
-    };
+    private List<Sdk.SkaterGameLogDetailDto> _forwardLogs = [];
+    private List<Sdk.SkaterGameLogDetailDto> _defenseLogs = [];
+    private List<Sdk.GoalieGameLogDetailDto> _goalieLogs = [];
 
     protected override async Task OnParametersSetAsync()
     {
         if (Game.Id == _gameId)
             return;
         _gameId = Game.Id;
-        _boxScore = await BoltonCupApi.GetGameBoxScoreAsync(Game.Id);
+        await Task.WhenAll(GetAndSetSkaterLogsAsync(), GetAndSetGoalieLogsAsync());
         SetSelectedTeam(Game.AwayTeam);
+    }
+
+    private async Task GetAndSetSkaterLogsAsync()
+    {
+        _skaterLog = await BoltonCupApi.GetSkaterGameLogsAsync(Game.Id);
+    }
+    
+    private async Task GetAndSetGoalieLogsAsync()
+    {
+        _goalieLog = await BoltonCupApi.GetGoalieGameLogsAsync(Game.Id);
     }
 
     private void SetSelectedTeam(Sdk.GameTeamSummary? team)
@@ -81,20 +142,24 @@
         _selectedTeam = team;
         if (_selectedTeam is null)
         {
-            _renderedGameLogs = [];
+            _forwardLogs = [];
+            _defenseLogs = [];
+            _goalieLogs = [];
             return;
         }
-        
-        if (_boxScore is not null)
-            _renderedGameLogs = _boxScore.GameLogs
-                .Where(x => x.TeamId == team?.Id)
-                .OrderBy(x => x.Player.Position switch
-                {
-                    "forward" => 0,
-                    "defense" => 1,
-                    "goalie" => 2,
-                    _ => 3,
-                });
+
+        _forwardLogs = (_skaterLog?.Items ?? [])
+            .Where(p => p.Player.Position == "forward" && p.Team.Id == _selectedTeam.Id)
+            .ToList();
+        _defenseLogs = (_skaterLog?.Items ?? [])
+            .Where(p => p.Player.Position == "defense" && p.Team.Id == _selectedTeam.Id)
+            .ToList();
+        _goalieLogs = (_goalieLog?.Items ?? [])
+            .Where(p => p.Team.Id == _selectedTeam.Id)
+            .ToList();
     }
+    
+    
+    
     
 }

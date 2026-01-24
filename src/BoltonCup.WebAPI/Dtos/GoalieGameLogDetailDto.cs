@@ -38,7 +38,7 @@ public record GoalieGameLogDetailDto : IMappable<GoalieGameLog, GoalieGameLogDet
             GoalsAgainstAverage = game.GoalsAgainst / 60.0,
             ShotsAgainst = game.ShotsAgainst,
             Saves = game.Saves,
-            SavePercentage = (double)game.ShotsAgainst / game.Saves,
+            SavePercentage = game.Saves == 0 ? 0 : (double)game.ShotsAgainst / game.Saves,
             Shutout = game.Shutout,
             Win = game.Win,
         };

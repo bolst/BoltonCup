@@ -575,6 +575,92 @@
         }
       }
     },
+    "/api/goaliegamelogs": {
+      "get": {
+        "tags": [
+          "GoalieGameLogs"
+        ],
+        "operationId": "GetGoalieGameLogs",
+        "parameters": [
+          {
+            "name": "GameId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "HomeOrAway",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "TeamId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SortBy",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Descending",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalieGameLogDetailDtoPaginatedList"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalieGameLogDetailDtoPaginatedList"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalieGameLogDetailDtoPaginatedList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/goaliestats": {
       "get": {
         "tags": [
@@ -751,6 +837,99 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PlayerSingleDetailDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/skatergamelogs": {
+      "get": {
+        "tags": [
+          "SkaterGameLogs"
+        ],
+        "operationId": "GetSkaterGameLogs",
+        "parameters": [
+          {
+            "name": "GameId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "HomeOrAway",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "TeamId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Position",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SortBy",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Descending",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkaterGameLogDetailDtoPaginatedList"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkaterGameLogDetailDtoPaginatedList"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkaterGameLogDetailDtoPaginatedList"
                 }
               }
             }
@@ -1389,6 +1568,103 @@
           },
           "secondaryAssist": {
             "$ref": "#/components/schemas/PlayerSummary"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GoalieGameLogDetailDto": {
+        "required": [
+          "goalsAgainst",
+          "goalsAgainstAverage",
+          "savePercentage",
+          "saves",
+          "shotsAgainst",
+          "shutout",
+          "win"
+        ],
+        "type": "object",
+        "properties": {
+          "player": {
+            "$ref": "#/components/schemas/PlayerSummary"
+          },
+          "team": {
+            "$ref": "#/components/schemas/TeamSummary"
+          },
+          "opponentTeamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gameId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "goals": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assists": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "points": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "penaltyMinutes": {
+            "type": "number",
+            "format": "double"
+          },
+          "goalsAgainst": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "goalsAgainstAverage": {
+            "type": "number",
+            "format": "double"
+          },
+          "shotsAgainst": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "saves": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "savePercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "shutout": {
+            "type": "boolean"
+          },
+          "win": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GoalieGameLogDetailDtoPaginatedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalieGameLogDetailDto"
+            },
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -2048,6 +2324,68 @@
         },
         "additionalProperties": false
       },
+      "SkaterGameLogDetailDto": {
+        "type": "object",
+        "properties": {
+          "player": {
+            "$ref": "#/components/schemas/PlayerSummary"
+          },
+          "team": {
+            "$ref": "#/components/schemas/TeamSummary"
+          },
+          "opponentTeamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gameId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "goals": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assists": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "points": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "penaltyMinutes": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SkaterGameLogDetailDtoPaginatedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkaterGameLogDetailDto"
+            },
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "SkaterStatDetailDto": {
         "required": [
           "assists",
@@ -2655,10 +2993,16 @@
       "name": "Games"
     },
     {
+      "name": "GoalieGameLogs"
+    },
+    {
       "name": "GoalieStats"
     },
     {
       "name": "Players"
+    },
+    {
+      "name": "SkaterGameLogs"
     },
     {
       "name": "SkaterStats"
