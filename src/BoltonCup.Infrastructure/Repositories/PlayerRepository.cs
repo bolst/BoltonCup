@@ -13,6 +13,7 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
     public async Task<CollectionResult<Player>> GetAllAsync(GetPlayersQuery query)
     {
         return await _context.Players
+            .AsNoTracking()
             .Include(p => p.Account)
             .Include(p => p.Tournament)
             .Include(p => p.Team)
@@ -26,6 +27,7 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
         where T : IMappable<Player, T>
     {
         return await _context.Players
+            .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .OrderBy(p => p.Id)
@@ -36,6 +38,7 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
     public async Task<Player?> GetByIdAsync(int id)
     {
         return await _context.Players
+            .AsNoTracking()
             .Include(p => p.Account)
             .Include(p => p.Tournament)
             .Include(p => p.Team).ThenInclude(t => t!.HomeGames).ThenInclude(g => g.AwayTeam)            
@@ -51,6 +54,7 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
         where T : IMappable<Player, T>
     {
         return await _context.Players
+            .AsNoTracking()
             .Where(p => p.Id == id)
             .ProjectTo<Player, T>()
             .FirstOrDefaultAsync();

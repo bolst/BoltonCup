@@ -13,6 +13,7 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
     public async Task<CollectionResult<SkaterStat>> GetAllAsync(GetSkaterStatsQuery query)
     {
         return await _context.SkaterStats
+            .AsNoTracking()
             .Include(p => p.Player)
             .Include(p => p.Tournament)
             .Include(p => p.Team)
@@ -32,6 +33,7 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
         where T : IMappable<SkaterStat, T>
     {
         return await _context.SkaterStats
+            .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ConditionalWhere(p => p.Player.Position == query.Position, !string.IsNullOrEmpty(query.Position))
@@ -48,6 +50,7 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
     public async Task<SkaterStat?> GetByIdAsync(int id)
     {
         return await _context.SkaterStats
+            .AsNoTracking()
             .Include(p => p.Player)
             .Include(p => p.Team)
             .Include(p => p.Tournament)
@@ -58,6 +61,7 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
         where T : IMappable<SkaterStat, T>
     {
         return await _context.SkaterStats
+            .AsNoTracking()
             .Where(p => p.PlayerId == id)
             .ProjectTo<SkaterStat, T>()
             .FirstOrDefaultAsync();

@@ -11,6 +11,7 @@ public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
     public async Task<CollectionResult<Team>> GetAllAsync(GetTeamsQuery query)
     {
         return await _context.Teams
+            .AsNoTracking()
             .Include(e => e.GeneralManager)
             .Include(e => e.Tournament)
             .Include(e => e.HomeGames)
@@ -26,6 +27,7 @@ public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
         where T : IMappable<Team, T>
     {
         return await _context.Teams
+            .AsNoTracking()
             .ConditionalWhere(e => e.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .OrderBy(e => e.Id)
             .ProjectTo<Team, T>()
@@ -35,6 +37,7 @@ public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
     public async Task<Team?> GetByIdAsync(int id)
     {
         return await _context.Teams
+            .AsNoTracking()
             .Include(e => e.GeneralManager)
             .Include(e => e.Tournament)
             .Include(e => e.HomeGames)
@@ -47,6 +50,7 @@ public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
         where T : IMappable<Team, T>
     {
         return await _context.Teams
+            .AsNoTracking()
             .Where(e => e.Id == id)
             .ProjectTo<Team, T>()
             .FirstOrDefaultAsync();

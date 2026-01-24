@@ -18,6 +18,7 @@ public class TournamentRepository : ITournamentRepository
     public async Task<CollectionResult<Tournament>> GetAllAsync(GetTournamentsQuery query)
     {
         return await _context.Tournaments
+            .AsNoTracking()
             .Include(e => e.Games)
             .Include(e => e.Teams)
             .OrderBy(t => t.StartDate)
@@ -28,6 +29,7 @@ public class TournamentRepository : ITournamentRepository
         where T : IMappable<Tournament, T>
     {
         return await _context.Tournaments
+            .AsNoTracking()
             .OrderBy(t => t.StartDate)
             .ProjectTo<Tournament, T>()
             .ToPaginatedListAsync(query);
@@ -36,6 +38,7 @@ public class TournamentRepository : ITournamentRepository
     public async Task<Tournament?> GetByIdAsync(int id)
     {
         return await _context.Tournaments
+            .AsNoTracking()
             .Include(e => e.Games)
             .Include(e => e.Teams)
             .FirstOrDefaultAsync(e => e.Id == id);
@@ -45,6 +48,7 @@ public class TournamentRepository : ITournamentRepository
         where T : IMappable<Tournament, T>
     {
         return await _context.Tournaments
+            .AsNoTracking()
             .Where(e => e.Id == id)
             .ProjectTo<Tournament, T>()
             .FirstOrDefaultAsync();
@@ -53,6 +57,7 @@ public class TournamentRepository : ITournamentRepository
     public async Task<Tournament?> GetActiveAsync()
     {
         return await _context.Tournaments
+            .AsNoTracking()
             .Include(e => e.Games)
             .Include(e => e.Teams)
             .FirstOrDefaultAsync(e => e.IsActive);

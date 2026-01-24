@@ -13,6 +13,7 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
     public async Task<CollectionResult<Game>> GetAllAsync(GetGamesQuery query)
     {
         return await _context.Games
+            .AsNoTracking()
             .Include(p => p.Tournament)
             .Include(p => p.HomeTeam)
             .Include(p => p.AwayTeam)
@@ -28,6 +29,7 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
         where T : IMappable<Game, T>
     {
         return await _context.Games
+            .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
             .OrderBy(p => p.GameTime)
@@ -38,6 +40,7 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
     public async Task<Game?> GetByIdAsync(int id)
     {
         return await _context.Games
+            .AsNoTracking()
             .Include(p => p.Tournament)
             .Include(p => p.HomeTeam)
             .Include(p => p.AwayTeam)
@@ -50,6 +53,7 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
         where T : IMappable<Game, T>
     {
         return await _context.Games
+            .AsNoTracking()
             .Where(p => p.Id == id)
             .ProjectTo<Game, T>()
             .FirstOrDefaultAsync();

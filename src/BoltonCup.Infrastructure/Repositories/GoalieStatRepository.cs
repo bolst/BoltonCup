@@ -13,6 +13,7 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
     public async Task<CollectionResult<GoalieStat>> GetAllAsync(GetGoalieStatsQuery query)
     {
         return await _context.GoalieStats
+            .AsNoTracking()
             .Include(p => p.Player)
             .Include(p => p.Tournament)
             .Include(p => p.Team)
@@ -32,6 +33,7 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
         where T : IMappable<GoalieStat, T>
     {
         return await _context.GoalieStats
+            .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ApplySorting(query, x => x
@@ -48,6 +50,7 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
     public async Task<GoalieStat?> GetByIdAsync(int id)
     {
         return await _context.GoalieStats
+            .AsNoTracking()
             .Include(p => p.Player)
             .Include(p => p.Team)
             .Include(p => p.Tournament)
@@ -58,6 +61,7 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
         where T : IMappable<GoalieStat, T>
     {
         return await _context.GoalieStats
+            .AsNoTracking()
             .Where(p => p.PlayerId == id)
             .ProjectTo<GoalieStat, T>()
             .FirstOrDefaultAsync();
