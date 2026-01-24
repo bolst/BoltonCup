@@ -1428,11 +1428,9 @@
       "GameSingleDetailDto": {
         "required": [
           "gameTime",
-          "goalieStats",
           "goals",
           "id",
           "penalties",
-          "skaterStats",
           "tournament"
         ],
         "type": "object",
@@ -1477,20 +1475,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PenaltySummary"
-            },
-            "nullable": true
-          },
-          "skaterStats": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GameLogSummary"
-            },
-            "nullable": true
-          },
-          "goalieStats": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GameLogSummary"
             },
             "nullable": true
           }

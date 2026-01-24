@@ -1,130 +1,139 @@
 @namespace BoltonCup.WebClient.Components.Shared
-
 @inject IBoltonCupApi BoltonCupApi
 
-<div>
-    <div class="d-flex flex-row align-center px-1 mud-width-full">
-        <MudText Typo="Typo.h6"><b>Game Sheet</b></MudText>
-        <MudSpacer />
-        <MudToggleGroup T="Sdk.GameTeamSummary" Value="_selectedTeam" ValueChanged="SetSelectedTeam" Size="Size.Small">
-            <MudToggleItem Value="Game.AwayTeam" Text="@Game.AwayTeam.NameShort" />
-            <MudToggleItem Value="Game.HomeTeam" Text="@Game.HomeTeam.NameShort" />
-        </MudToggleGroup>
+@if (_game is not null)
+{
+    <div>
+        <div class="d-flex flex-row align-center px-1 mud-width-full">
+            <MudText Typo="Typo.h6"><b>Game Sheet</b></MudText>
+            <MudSpacer />
+            <MudToggleGroup T="Sdk.GameTeamSummary" Value="_selectedTeam" ValueChanged="SetSelectedTeam" Size="Size.Small">
+                <MudToggleItem Value="_game.AwayTeam" Text="@_game.AwayTeam.NameShort" />
+                <MudToggleItem Value="_game.HomeTeam" Text="@_game.HomeTeam.NameShort" />
+            </MudToggleGroup>
+        </div>
+        <MudSimpleTable Elevation="0" Striped Square>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>FORWARDS</th>
+                <th>G</th>
+                <th>A</th>
+                <th>P</th>
+                <th>PIM</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var forward in _forwardLogs)
+            {
+                <tr>
+                    <td>@forward.Player.JerseyNumber</td>
+                    <td>@forward.Player.FullName</td>
+                    <td>@forward.Goals</td>
+                    <td>@forward.Assists</td>
+                    <td>@forward.Points</td>
+                    <td>@forward.PenaltyMinutes</td>
+                </tr>
+            }
+            </tbody>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>DEFENSE</th>
+                <th>G</th>
+                <th>A</th>
+                <th>P</th>
+                <th>PIM</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var defense in _defenseLogs)
+            {
+                <tr>
+                    <td>@defense.Player.JerseyNumber</td>
+                    <td>@defense.Player.FullName</td>
+                    <td>@defense.Goals</td>
+                    <td>@defense.Assists</td>
+                    <td>@defense.Points</td>
+                    <td>@defense.PenaltyMinutes</td>
+                </tr>
+            }
+            </tbody>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>GOALIE</th>
+                <th>GA</th>
+                <th>W</th>
+                <th>SO</th>
+                <th>PIM</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var goalie in _goalieLogs)
+            {
+                <tr>
+                    <td>@goalie.Player.JerseyNumber</td>
+                    <td>@goalie.Player.FullName</td>
+                    <td>@goalie.GoalsAgainst</td>
+                    <td>
+                        @if (goalie.Win)
+                        {
+                            <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
+                        }
+                    </td>
+                    <td>
+                        @if (goalie.Shutout)
+                        {
+                            <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
+                        }
+                    </td>
+                    <td>@goalie.PenaltyMinutes</td>
+                </tr>
+            }
+            </tbody>
+        </MudSimpleTable>
     </div>
-    <MudSimpleTable Elevation="0" Striped Square>
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>FORWARDS</th>
-            <th>G</th>
-            <th>A</th>
-            <th>P</th>
-            <th>PIM</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var forward in _forwardLogs)
-        {
-            <tr>
-                <td>@forward.Player.JerseyNumber</td>
-                <td>@forward.Player.FullName</td>
-                <td>@forward.Goals</td>
-                <td>@forward.Assists</td>
-                <td>@forward.Points</td>
-                <td>@forward.PenaltyMinutes</td>
-            </tr>
-        }
-        </tbody>
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>DEFENSE</th>
-            <th>G</th>
-            <th>A</th>
-            <th>P</th>
-            <th>PIM</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var defense in _defenseLogs)
-        {
-            <tr>
-                <td>@defense.Player.JerseyNumber</td>
-                <td>@defense.Player.FullName</td>
-                <td>@defense.Goals</td>
-                <td>@defense.Assists</td>
-                <td>@defense.Points</td>
-                <td>@defense.PenaltyMinutes</td>
-            </tr>
-        }
-        </tbody>
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>GOALIE</th>
-            <th>GA</th>
-            <th>W</th>
-            <th>SO</th>
-            <th>PIM</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var goalie in _goalieLogs)
-        {
-            <tr>
-                <td>@goalie.Player.JerseyNumber</td>
-                <td>@goalie.Player.FullName</td>
-                <td>@goalie.GoalsAgainst</td>
-                <td>
-                    @if (goalie.Win)
-                    {
-                        <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
-                    }
-                    else
-                    {
-                        <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
-                    }
-                </td>
-                <td>
-                    @if (goalie.Shutout)
-                    {
-                        <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
-                    }
-                    else
-                    {
-                        <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
-                    }
-                </td>
-                <td>@goalie.PenaltyMinutes</td>
-            </tr>
-        }
-        </tbody>
-    </MudSimpleTable>
-</div>
+}
 
 
 @code {
 
     [Parameter, EditorRequired]
     public required Sdk.GameSingleDetailDto Game { get; set; }
-
-    private int? _gameId;    
-
-    private Sdk.GameTeamSummary? _selectedTeam;
-    private Sdk.SkaterGameLogDetailDtoPaginatedList? _skaterLog;
-    private Sdk.GoalieGameLogDetailDtoPaginatedList? _goalieLog;
     
+    private Sdk.GameSingleDetailDto? _game;
+
+    private bool _loading;
+
+    private Sdk.SkaterGameLogDetailDtoCollectionResult? _skaterLog;
+    private Sdk.GoalieGameLogDetailDtoCollectionResult? _goalieLog;
+    
+    private Sdk.GameTeamSummary? _selectedTeam;
     private List<Sdk.SkaterGameLogDetailDto> _forwardLogs = [];
     private List<Sdk.SkaterGameLogDetailDto> _defenseLogs = [];
     private List<Sdk.GoalieGameLogDetailDto> _goalieLogs = [];
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Game.Id == _gameId)
+        if (Game.Id == _game?.Id)
             return;
-        _gameId = Game.Id;
+        _game = Game;
+
+        
+        _loading = true;
         await Task.WhenAll(GetAndSetSkaterLogsAsync(), GetAndSetGoalieLogsAsync());
-        SetSelectedTeam(Game.AwayTeam);
+        SetSelectedTeam(_game.AwayTeam);
+        _loading = false;
+        StateHasChanged();
     }
 
     private async Task GetAndSetSkaterLogsAsync()
