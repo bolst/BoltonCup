@@ -142,7 +142,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
         modelBuilder.Entity<GoalieStat>(entity =>
         {
             entity
-                .ToTable("goalie_stats_leaderboard")
+                .ToView("goalie_stats_leaderboard")
                 .HasKey(e => e.PlayerId);
             entity
                 .HasOne(e => e.Player)
@@ -259,7 +259,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
         modelBuilder.Entity<SkaterStat>(entity =>
         {
             entity
-                .ToTable("skater_stats_leaderboard")
+                .ToView("skater_stats_leaderboard")
                 .HasKey(e => e.PlayerId);
             entity
                 .HasOne(e => e.Player)
