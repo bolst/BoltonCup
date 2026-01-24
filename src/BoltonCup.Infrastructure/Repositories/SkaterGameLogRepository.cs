@@ -32,10 +32,6 @@ public class SkaterGameLogRepository(BoltonCupDbContext _context) : ISkaterGameL
     {
         return await _context.SkaterGameLogs
             .AsNoTracking()
-            .Include(p => p.Player)
-            .Include(p => p.Team)
-            .Include(p => p.OpponentTeam)
-            .Include(p => p.Game)
             .Where(p => p.GameId == query.GameId)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ConditionalWhere(p => p.Player.Position == query.Position, !string.IsNullOrEmpty(query.Position))
@@ -61,12 +57,6 @@ public class SkaterGameLogRepository(BoltonCupDbContext _context) : ISkaterGameL
     {
         return await _context.SkaterGameLogs
             .AsNoTracking()
-            .Include(p => p.Player)
-            .Include(p => p.Team)
-            .Include(p => p.OpponentTeam)
-            .Include(p => p.Game)
-            .Where(p => p.Id == id)
-            .ProjectTo<SkaterGameLog, T>()
-            .FirstOrDefaultAsync();
+            .ProjectToFirstOrDefaultAsync<SkaterGameLog, T>(p => p.Id == id);
     }
 }

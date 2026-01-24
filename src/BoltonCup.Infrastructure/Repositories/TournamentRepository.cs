@@ -49,9 +49,7 @@ public class TournamentRepository : ITournamentRepository
     {
         return await _context.Tournaments
             .AsNoTracking()
-            .Where(e => e.Id == id)
-            .ProjectTo<Tournament, T>()
-            .FirstOrDefaultAsync();
+            .ProjectToFirstOrDefaultAsync<Tournament, T>(e => e.Id == id);
     }
 
     public async Task<Tournament?> GetActiveAsync()

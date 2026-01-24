@@ -63,8 +63,6 @@ public class GoalieGameLogRepository(BoltonCupDbContext _context) : IGoalieGameL
             .Include(p => p.Team)
             .Include(p => p.OpponentTeam)
             .Include(p => p.Game)
-            .Where(p => p.Id == id)
-            .ProjectTo<GoalieGameLog, T>()
-            .FirstOrDefaultAsync();
+            .ProjectToFirstOrDefaultAsync<GoalieGameLog, T>(p => p.Id == id);
     }
 }

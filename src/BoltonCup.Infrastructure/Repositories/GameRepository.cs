@@ -54,9 +54,7 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
     {
         return await _context.Games
             .AsNoTracking()
-            .Where(p => p.Id == id)
-            .ProjectTo<Game, T>()
-            .FirstOrDefaultAsync();
+            .ProjectToFirstOrDefaultAsync<Game, T>(p => p.Id == id);
     }
 
     public async Task<bool> AddAsync(Game entity)

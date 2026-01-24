@@ -62,8 +62,6 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
     {
         return await _context.GoalieStats
             .AsNoTracking()
-            .Where(p => p.PlayerId == id)
-            .ProjectTo<GoalieStat, T>()
-            .FirstOrDefaultAsync();
+            .ProjectToFirstOrDefaultAsync<GoalieStat, T>(p => p.PlayerId == id);
     }
 }

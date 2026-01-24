@@ -51,9 +51,7 @@ public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
     {
         return await _context.Teams
             .AsNoTracking()
-            .Where(e => e.Id == id)
-            .ProjectTo<Team, T>()
-            .FirstOrDefaultAsync();
+            .ProjectToFirstOrDefaultAsync<Team, T>(e => e.Id == id);
     }
 
     public async Task<bool> AddAsync(Team entity)

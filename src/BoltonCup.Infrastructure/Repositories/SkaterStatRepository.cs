@@ -62,8 +62,6 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
     {
         return await _context.SkaterStats
             .AsNoTracking()
-            .Where(p => p.PlayerId == id)
-            .ProjectTo<SkaterStat, T>()
-            .FirstOrDefaultAsync();
+            .ProjectToFirstOrDefaultAsync<SkaterStat, T>(p => p.PlayerId == id);
     }
 }

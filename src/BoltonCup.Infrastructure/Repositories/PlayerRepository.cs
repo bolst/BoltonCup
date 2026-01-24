@@ -55,9 +55,7 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
     {
         return await _context.Players
             .AsNoTracking()
-            .Where(p => p.Id == id)
-            .ProjectTo<Player, T>()
-            .FirstOrDefaultAsync();
+            .ProjectToFirstOrDefaultAsync<Player, T>(p => p.Id == id);
     }
 
     public async Task<bool> AddAsync(Player entity)
