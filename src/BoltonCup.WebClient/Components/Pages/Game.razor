@@ -2,82 +2,65 @@
 
 @inject IBoltonCupApi BoltonCupApi
 
-
-@if (_loading)
+@if (_game is not null)
 {
-    <div class="d-flex flex-column align-center justify-center mud-width-full pa-4">
-        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100px" Width="100%"/>
+    <PageTitle>@_game.AwayTeam.NameShort @@ @_game.HomeTeam.NameShort | Bolton Cup</PageTitle>
+}
+
+
+<BackgroundContainer>
+    <MudContainer MaxWidth="MaxWidth.Large" Class="py-2" Style="background-color: white">
+        <GameResultBanner Game="_game"/>
         <MudGrid Class="mt-2">
             <MudItem xs="12" md="8">
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="500px" Width="100%" />
+                <MudTabs Style="max-width: 100%" Elevation="0" KeepPanelsAlive>
+                    <MudTabPanel Text="Summary">
+                        <GameSummary GameId="GameId" />
+                    </MudTabPanel>
+                    <MudTabPanel Text="Box Score">
+                        <GameBoxScore Game="_game"/>
+                    </MudTabPanel>
+                </MudTabs>
             </MudItem>
             <MudItem xs="0" md="4">
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="500px" Width="100%" />
+                <MudPaper Class="pa-4" Elevation="0" Square Outlined>
+                    <MudText Typo="Typo.h6"><b>Linescore</b></MudText>
+                    <MudDivider Class="my-2"/>
+                    <MudSimpleTable Elevation="0" Dense Striped Square>
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th>1st</th>
+                            <th>2nd</th>
+                            <th>3rd</th>
+                            <th><b>T</b></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><MudImage Src="@_game.AwayTeam.LogoUrl" Alt="@_game.AwayTeam.Abbreviation" Height="32"/></td>
+                            <td><MudText Typo="Typo.body2"><b>@_game.AwayTeam.Abbreviation</b></MudText></td>
+                            <td>@_awayGoals.Count(x => x.Period == 1)</td>
+                            <td>@_awayGoals.Count(x => x.Period == 2)</td>
+                            <td>@_awayGoals.Count(x => x.Period == 3)</td>
+                            <td><b>@_awayGoals.Count()</b></td>
+                        </tr>
+                        <tr>
+                            <td><MudImage Src="@_game.HomeTeam.LogoUrl" Alt="@_game.HomeTeam.Abbreviation" Height="32"/></td>
+                            <td><MudText Typo="Typo.body2"><b>@_game.HomeTeam.Abbreviation</b></MudText></td>
+                            <td>@_homeGoals.Count(x => x.Period == 1)</td>
+                            <td>@_homeGoals.Count(x => x.Period == 2)</td>
+                            <td>@_homeGoals.Count(x => x.Period == 3)</td>
+                            <td><b>@_homeGoals.Count()</b></td>
+                        </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudPaper>
             </MudItem>
         </MudGrid>
-    </div>
-}
-else
-{
-    if (_game is not null)
-    {
-        <PageTitle>@_game.AwayTeam.NameShort @@ @_game.HomeTeam.NameShort | Bolton Cup</PageTitle>
-
-        <BackgroundContainer>
-            <MudContainer MaxWidth="MaxWidth.Large" Class="py-2" Style="background-color: white">
-                <GameResultBanner Game="_game"/>
-                <MudGrid Class="mt-2">
-                    <MudItem xs="12" md="8">
-                        <MudTabs Style="max-width: 100%" Elevation="0" KeepPanelsAlive>
-                            <MudTabPanel Text="Summary">
-                                @GameSummary(_game)
-                            </MudTabPanel>
-                            <MudTabPanel Text="Box Score">
-                                <GameBoxScore Game="_game"/>
-                            </MudTabPanel>
-                        </MudTabs>
-                    </MudItem>
-                    <MudItem xs="0" md="4">
-                        <MudPaper Class="pa-4" Elevation="0" Square Outlined>
-                            <MudText Typo="Typo.h6"><b>Linescore</b></MudText>
-                            <MudDivider Class="my-2"/>
-                            <MudSimpleTable Elevation="0" Dense Striped Square>
-                                <thead>
-                                <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th>1st</th>
-                                    <th>2nd</th>
-                                    <th>3rd</th>
-                                    <th><b>T</b></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td><MudImage Src="@_game.AwayTeam.LogoUrl" Alt="@_game.AwayTeam.Abbreviation" Height="32"/></td>
-                                    <td><MudText Typo="Typo.body2"><b>@_game.AwayTeam.Abbreviation</b></MudText></td>
-                                    <td>@_awayGoals.Count(x => x.Period == 1)</td>
-                                    <td>@_awayGoals.Count(x => x.Period == 2)</td>
-                                    <td>@_awayGoals.Count(x => x.Period == 3)</td>
-                                    <td><b>@_awayGoals.Count()</b></td>
-                                </tr>
-                                <tr>
-                                    <td><MudImage Src="@_game.HomeTeam.LogoUrl" Alt="@_game.HomeTeam.Abbreviation" Height="32"/></td>
-                                    <td><MudText Typo="Typo.body2"><b>@_game.HomeTeam.Abbreviation</b></MudText></td>
-                                    <td>@_homeGoals.Count(x => x.Period == 1)</td>
-                                    <td>@_homeGoals.Count(x => x.Period == 2)</td>
-                                    <td>@_homeGoals.Count(x => x.Period == 3)</td>
-                                    <td><b>@_homeGoals.Count()</b></td>
-                                </tr>
-                                </tbody>
-                            </MudSimpleTable>
-                        </MudPaper>
-                    </MudItem>
-                </MudGrid>
-            </MudContainer>
-        </BackgroundContainer>
-    }
-}
+    </MudContainer>
+</BackgroundContainer>
 
 @code {
 
@@ -103,9 +86,5 @@ else
         _loading = false;
         StateHasChanged();
     }
-
-
-    private RenderFragment GameSummary(Sdk.GameSingleDetailDto game) =>
-        @<div></div>;
 
 }
