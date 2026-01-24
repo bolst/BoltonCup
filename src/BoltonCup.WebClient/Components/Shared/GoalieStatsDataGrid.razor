@@ -17,7 +17,11 @@
         <MudIconButton Icon="@Icons.Material.Rounded.FilterAlt" Variant="Variant.Outlined" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.Player.FullName" Title="Player" Sortable="false" StickyLeft/>
+        <PropertyColumn Property="x => x.Player.FullName" Title="Player" Sortable="false" StickyLeft>
+            <CellTemplate>
+                <PlayerLink Player="context.Item.Player" />
+            </CellTemplate>
+        </PropertyColumn>
         <PropertyColumn Property="x => x.Team.Name" Title="Team">
             <CellTemplate>
                 <div class="d-flex flex-row align-center justify-space-evenly">

@@ -41,7 +41,7 @@ else
                         <MudAvatar>
                             <MudImage Src="@context.ProfilePicture" Alt="@context.FullName"/>
                         </MudAvatar>
-                        <MudLink Typo="Typo.body2" Href="@($"/players/{context.Id}")" Underline="Underline.None"><b>@context.FullName</b></MudLink>
+                        <PlayerLink Player="context" />
                     </div>
                 </MudTd>
                 <MudTd DataLabel="#">@context.JerseyNumber</MudTd>
