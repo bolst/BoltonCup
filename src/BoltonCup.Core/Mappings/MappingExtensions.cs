@@ -7,4 +7,11 @@ public static class MappingExtensions
     {
         return source.Select(TResult.Projection);
     }    
+    
+    public static Task<CollectionResult<TSource>> ToCollectionResultAsync<TSource>(
+        this IQueryable<TSource> source,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(new CollectionResult<TSource>(source));
+    }
 }
