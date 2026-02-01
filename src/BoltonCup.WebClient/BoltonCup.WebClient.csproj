@@ -28,7 +28,7 @@
     
     <ItemGroup>
         <OpenApiReference 
-                Include="..\BoltonCup.WebAPI\boltoncup-v1.json" 
+                Include="..\BoltonCup.WebAPI\BoltonCup.WebAPI.json" 
                 ClassName="BoltonCupApi" 
                 Namespace="BoltonCup.Sdk" 
                 SourceGenerator="NSwagCSharp" 

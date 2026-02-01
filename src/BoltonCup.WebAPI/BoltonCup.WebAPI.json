@@ -739,6 +739,103 @@
         }
       }
     },
+    "/api/infoguides": {
+      "get": {
+        "tags": [
+          "InfoGuides"
+        ],
+        "operationId": "GetInfoGuides",
+        "parameters": [
+          {
+            "name": "TournamentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoGuideDetailDtoPaginatedList"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoGuideDetailDtoPaginatedList"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoGuideDetailDtoPaginatedList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/infoguides/{id}": {
+      "get": {
+        "tags": [
+          "InfoGuides"
+        ],
+        "operationId": "GetInfoGuideById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoGuideSingleDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoGuideSingleDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoGuideSingleDetailDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/players": {
       "get": {
         "tags": [
@@ -1779,6 +1876,85 @@
           }
         },
         "additionalProperties": { }
+      },
+      "InfoGuideDetailDto": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "tournamentId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
+          }
+        },
+        "additionalProperties": false
+      },
+      "InfoGuideDetailDtoPaginatedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InfoGuideDetailDto"
+            },
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "InfoGuideSingleDetailDto": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "tournamentId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
+          },
+          "markdownContent": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "InfoRequest": {
         "type": "object",
@@ -2961,6 +3137,9 @@
     },
     {
       "name": "GoalieStats"
+    },
+    {
+      "name": "InfoGuides"
     },
     {
       "name": "Players"
