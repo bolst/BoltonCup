@@ -1,0 +1,56 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="d-flex flex-row align-center justify-center flex-wrap flex-wrap gap-10">
+    @TimeUnitRF("days")
+    @TimeUnitRF("hours")
+    @TimeUnitRF("minutes")
+    @TimeUnitRF("seconds")
+</div>
+
+@code {
+    
+    [Parameter]
+    public DateTime? To { get; set; }
+
+    private IJSObjectReference? _module;
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_module is null)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./Components/Shared/Countdown.razor.js"
+            );
+            await BeginTimer();
+        }
+    }
+
+    private async Task BeginTimer()
+    {
+        if (_module is null)
+            return;
+        if (To is null)
+            return;
+        
+        var dateStr = To.Value.ToString("MM/dd/yyyy hh:mm:ss tt").Replace('-', '/');
+        await _module.InvokeVoidAsync("initCountdown", dateStr);
+    }
+
+
+    private RenderFragment TimeUnitRF(string id) =>
+        @<div class="d-flex justify-center">
+            <MudStack Class="px-1" AlignItems="AlignItems.Center" Spacing="1">
+                <MudText Color="Color.Secondary" Typo="Typo.h1" Style="@($"font-size: 5rem")" HtmlTag="i"><b><span id="@id"></span></b></MudText>
+                <MudText Color="Color.Secondary" Typo="Typo.h6" Style="font-size: 1rem" HtmlTag="i">@id</MudText>
+            </MudStack>
+        </div>;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is not null)
+        {
+            await _module.DisposeAsync();
+        }
+    }
+}

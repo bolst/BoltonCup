@@ -4,19 +4,28 @@
 
 
 <MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
+    
+    <div class="home-banner-background">
+        <div class="d-flex align-center justify-center mud-width-full" style="height: 500px">
+            <div class="flex-grow-1">
+                <Countdown To="new DateTime(2026, 07, 01)" />
+            </div>
+        </div>
+    </div>
+    
     <Highlight Title="2025 Leaders" Href="stats">
         <MudGrid>
             <MudItem xs="12" md="6" lg="3">
-                <TopPlayers Label="Points" TournamentId="2" SkaterCategory="x => x.Points" Descending />
+                <TopPlayers Label="Points" TournamentId="2" SkaterCategory="x => x.Points" Descending/>
             </MudItem>
             <MudItem xs="12" md="6" lg="3">
-                <TopPlayers Label="Goals" TournamentId="2" SkaterCategory="x => x.Goals" Descending />
+                <TopPlayers Label="Goals" TournamentId="2" SkaterCategory="x => x.Goals" Descending/>
             </MudItem>
             <MudItem xs="12" md="6" lg="3">
-                <TopPlayers Label="PIM" TournamentId="2" SkaterCategory="x => x.PenaltyMinutes" Descending />
+                <TopPlayers Label="PIM" TournamentId="2" SkaterCategory="x => x.PenaltyMinutes" Descending/>
             </MudItem>
             <MudItem xs="12" md="6" lg="3">
-                <TopPlayers Label="GAA" TournamentId="2" GoalieCategory="x => x.GoalsAgainstAverage" />
+                <TopPlayers Label="GAA" TournamentId="2" GoalieCategory="x => x.GoalsAgainstAverage"/>
             </MudItem>
         </MudGrid>
     </Highlight>
