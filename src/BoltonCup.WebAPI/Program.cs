@@ -1,4 +1,3 @@
-using BoltonCup.Core.Queries.Base;
 using BoltonCup.Infrastructure;
 using BoltonCup.WebAPI;
 using BoltonCup.WebAPI.Authentication;
@@ -7,10 +6,6 @@ using BoltonCup.WebAPI.Filters;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
