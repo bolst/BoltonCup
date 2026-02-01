@@ -2,7 +2,7 @@ name: BoltonCup.WebAPI Docker Image CI
 
 on:
   push:
-    branches: [ "separation" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
