@@ -53,24 +53,31 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddRateLimitingServices(this IServiceCollection services)
     {
-        return services.AddRateLimiter(options =>
-        {
-            options.RejectionStatusCode = 429;
-            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        return services
+            .Configure<ForwardedHeadersOptions>(options =>
             {
-                string partitionKey = context.User.Identity?.Name ??
-                                      context.Connection.RemoteIpAddress?.ToString() ?? 
-                                      "anon";
-                return RateLimitPartition.GetSlidingWindowLimiter(partitionKey, _ => new SlidingWindowRateLimiterOptions
+                options.ForwardedHeaders =
+                    Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
+                    Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+            })
+            .AddRateLimiter(options => 
+            {
+                options.RejectionStatusCode = 429;
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
                 {
-                    PermitLimit = 100, 
-                    SegmentsPerWindow = 4,
-                    Window = TimeSpan.FromMinutes(1),
-                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                    QueueLimit = 2,
+                    string partitionKey = context.User.Identity?.Name ??
+                                          context.Connection.RemoteIpAddress?.ToString() ?? 
+                                          "anon";
+                    return RateLimitPartition.GetSlidingWindowLimiter(partitionKey, _ => new SlidingWindowRateLimiterOptions
+                    {
+                        PermitLimit = 100, 
+                        SegmentsPerWindow = 4,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                        QueueLimit = 2,
+                    });
                 });
             });
-        });
     }
     
     public static IServiceCollection AddBoltonCupWebAPIServices(this IServiceCollection services)
