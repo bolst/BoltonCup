@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
             .AddTransient<IGameRepository, GameRepository>()
             .AddTransient<IGoalieGameLogRepository, GoalieGameLogRepository>()
             .AddTransient<IGoalieStatRepository, GoalieStatRepository>()
+            .AddTransient<IInfoGuideRepository, InfoGuideRepository>()
             .AddTransient<IPlayerRepository, PlayerRepository>()
             .AddTransient<ISkaterGameLogRepository, SkaterGameLogRepository>()
             .AddTransient<ISkaterStatRepository, SkaterStatRepository>()
