@@ -4,19 +4,35 @@
 
 <PageTitle>Info | Bolton Cup</PageTitle>
 
-@if (_infoGuide is not null)
-{
-    <MudText Typo="Typo.h5" GutterBottom>@_infoGuide.Title</MudText>
-    <MudMarkdown Value="@_infoGuide.MarkdownContent" />
-}
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    @if (_infoGuide is not null)
+    {
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-8"><b>@_infoGuide.Title</b></MudText>
+        
+        <MudMarkdown Value="@_infoGuide.MarkdownContent" Props="_mdProperties" />
+    }
+</MudContainer>
 
 @code {
 
     private Sdk.InfoGuideSingleDetailDto? _infoGuide;
 
+    private static readonly MudMarkdownProps _mdProperties = new()
+    {
+        Heading = 
+        {
+            OverrideTypo = (x) => x switch
+            {
+                Typo.h1 => Typo.h4,
+                Typo.h2 => Typo.h5,
+                _ => Typo.h6,
+            }
+        }
+    };
+
     protected override async Task OnParametersSetAsync()
     {
-        _infoGuide = await BoltonCupApi.GetInfoGuideByTournamentIdAsync(2);
+        _infoGuide ??= await BoltonCupApi.GetInfoGuideByTournamentIdAsync(2);
     }
 
 }
