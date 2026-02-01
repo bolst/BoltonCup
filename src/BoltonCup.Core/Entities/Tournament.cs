@@ -20,4 +20,5 @@ public class Tournament : EntityBase
     public ICollection<Game> Games { get; set; } = [];
     public ICollection<SkaterStat> SkaterStats { get; set; } = [];
     public ICollection<GoalieStat> GoalieStats { get; set; } = [];
+    public ICollection<InfoGuide> InfoGuides { get; set; } = [];
 }

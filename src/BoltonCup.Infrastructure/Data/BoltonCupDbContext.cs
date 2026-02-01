@@ -3,15 +3,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Data;
 
+
+/*
+ * dotnet ef migrations add [migration_name] --project ./BoltonCup.Infrastructure --startup-project ./BoltonCup.WebAPI -c BoltonCupDbContext
+ * dotnet ef database update --project ./BoltonCup.Infrastructure --startup-project ./BoltonCup.WebAPI -c BoltonCupDbContext
+ */
+
 public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options) 
     : DbContext(options)
 {
     
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Game> Games { get; set; }
+    public DbSet<Goal> Goals { get; set; }
     public DbSet<GoalieGameLog> GoalieGameLogs { get; set; }
     public DbSet<GoalieStat> GoalieStats { get; set; }
-    public DbSet<Goal> Goals { get; set; }
+    public DbSet<InfoGuide> InfoGuides { get; set; }
     public DbSet<Penalty> Penalties { get; set; }
     public DbSet<Player> Players { get; set; }
     public DbSet<SkaterGameLog> SkaterGameLogs { get; set; }
@@ -170,6 +177,21 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.SavePercentage).HasColumnName("save_percentage");
             entity.Property(e => e.Shutouts).HasColumnName("shutouts");
             entity.Property(e => e.Wins).HasColumnName("wins");
+        });
+
+        modelBuilder.Entity<InfoGuide>(entity =>
+        {
+            entity
+                .ToTable("info_guides")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Tournament)
+                .WithMany(e => e.InfoGuides)
+                .HasForeignKey(e => e.TournamentId);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Title).HasColumnName("title");
+            entity.Property(e => e.MarkdownContent).HasColumnName("markdown_content");
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
         });
 
         modelBuilder.Entity<Penalty>(entity =>
