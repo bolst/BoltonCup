@@ -4,7 +4,7 @@
     @TeamTemplate(Game.AwayTeam, reverse: false)
     @TeamGoalText(Game.AwayTeam)
     <div class="d-flex flex-column align-center justify-space-evenly">
-        <MudChip T="string" Text="FINAL" Variant="Variant.Text" Size="Size.Small" Label="true" />
+        <MudChip T="string" Variant="Variant.Text" Size="Size.Small" Label="true"><b>FINAL</b></MudChip>
         <MudText Typo="Typo.caption">@Game.GameTime.ToString("d")</MudText>
     </div>
     @TeamGoalText(Game.HomeTeam)
