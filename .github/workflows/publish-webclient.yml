@@ -32,5 +32,5 @@ jobs:
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          BRANCH: build
+          BRANCH: webclient-build
           FOLDER: out/BoltonCupWebClient/wwwroot
