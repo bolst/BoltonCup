@@ -186,9 +186,13 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasKey(e => e.Id);
             entity
                 .HasOne(e => e.Tournament)
-                .WithMany(e => e.InfoGuides)
-                .HasForeignKey(e => e.TournamentId);
-            entity.Property(e => e.Id).HasColumnName("id");
+                .WithOne()
+                .HasForeignKey<InfoGuide>(e => e.TournamentId);
+            entity
+                .HasIndex(e => e.TournamentId)
+                .HasFilter("tournament_id IS NOT NULL")
+                .IsUnique();
+            entity.Property(e => e.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Title).HasColumnName("title");
             entity.Property(e => e.MarkdownContent).HasColumnName("markdown_content");
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
