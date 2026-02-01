@@ -1,0 +1,10 @@
+<div class="d-flex flex-row align-center justify-space-around mud-width-full">
+    @ChildContent
+</div>
+
+@code {
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+}
