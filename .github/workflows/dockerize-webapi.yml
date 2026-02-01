@@ -27,7 +27,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
-        context: ./src/.
-        file: BoltonCup.WebAPI/Dockerfile
+        context: ./src
+        file: src/BoltonCup.WebAPI/Dockerfile
         push: true
         tags: bolst/boltoncup-webapi:latest
