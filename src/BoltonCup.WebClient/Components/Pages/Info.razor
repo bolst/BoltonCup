@@ -1,3 +1,22 @@
 @page "/info"
 
+@inject IBoltonCupApi BoltonCupApi
+
 <PageTitle>Info | Bolton Cup</PageTitle>
+
+@if (_infoGuide is not null)
+{
+    <MudText Typo="Typo.h5" GutterBottom>@_infoGuide.Title</MudText>
+    <MudMarkdown Value="@_infoGuide.MarkdownContent" />
+}
+
+@code {
+
+    private Sdk.InfoGuideSingleDetailDto? _infoGuide;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _infoGuide = await BoltonCupApi.GetInfoGuideByTournamentIdAsync(2);
+    }
+
+}

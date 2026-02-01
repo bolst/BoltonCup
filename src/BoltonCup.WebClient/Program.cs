@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using BoltonCup.WebClient.Components;
 using MudBlazor.Services;
 using BoltonCup.Sdk;
+using MudBlazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -19,5 +20,6 @@ builder.Services.AddScoped<IBoltonCupApi>(sp =>
 });
 
 builder.Services.AddMudServices();
+builder.Services.AddMudMarkdownServices();
 
 await builder.Build().RunAsync();
