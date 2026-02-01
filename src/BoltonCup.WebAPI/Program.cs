@@ -1,5 +1,6 @@
 using BoltonCup.Core.Queries.Base;
 using BoltonCup.Infrastructure;
+using BoltonCup.WebAPI;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Controllers;
 using BoltonCup.WebAPI.Filters;
@@ -16,40 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
 
-// FluentValidation
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssemblyContaining<DefaultPaginationQuery>();
-
-builder.Services.AddAuthentication()
-    .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.Scheme, null);
-
-builder.Services.AddAuthorization(options =>
-{
-    options.DefaultPolicy = new AuthorizationPolicyBuilder()
-        .AddAuthenticationSchemes(IdentityConstants.BearerScheme, ApiKeyConstants.Scheme)
-        .RequireAuthenticatedUser()
-        .Build();
-});
-
-builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilterAttribute>());
-builder.Services.AddRouting(options => options.LowercaseUrls = true);
-
-// add CORS
-// TODO: configure further
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.WithOrigins(
-                    "http://localhost:5239",
-                    "https://boltoncup.ca"
-                )
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
-
+builder.Services.AddBoltonCupWebAPIServices();
 
 // https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
