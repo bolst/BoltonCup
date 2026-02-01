@@ -21,4 +21,12 @@ public class InfoGuidesController(IInfoGuideRepository _infoGuides) : BoltonCupC
     {
         return OkOrNotFound(await _infoGuides.GetByIdAsync<InfoGuideSingleDetailDto>(id));
     }
+
+    [AllowAnonymous]
+    [HttpGet("tournament/{tournamentId:int}")]
+    public async Task<ActionResult<InfoGuideSingleDetailDto>> GetInfoGuideByTournamentId(int tournamentId)
+    {
+        return OkOrNotFound(await _infoGuides.GetByTournamentIdAsync<InfoGuideSingleDetailDto>(tournamentId));
+    }
+    
 }

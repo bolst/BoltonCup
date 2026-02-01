@@ -747,14 +747,6 @@
         "operationId": "GetInfoGuides",
         "parameters": [
           {
-            "name": "TournamentId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
             "name": "Page",
             "in": "query",
             "schema": {
@@ -809,6 +801,47 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoGuideSingleDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoGuideSingleDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoGuideSingleDetailDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/infoguides/tournament/{tournamentId}": {
+      "get": {
+        "tags": [
+          "InfoGuides"
+        ],
+        "operationId": "GetInfoGuideByTournamentId",
+        "parameters": [
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],

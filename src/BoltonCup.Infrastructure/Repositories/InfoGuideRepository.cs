@@ -13,7 +13,6 @@ public class InfoGuideRepository(BoltonCupDbContext _context) : IInfoGuideReposi
         return await _context.InfoGuides
             .AsNoTracking()
             .Include(e => e.Tournament)
-            .ConditionalWhere(e => e.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .OrderByDescending(e => e.LastModified)
             .ThenByDescending(e => e.CreatedAt)
             .ToPaginatedListAsync(query);
@@ -24,7 +23,6 @@ public class InfoGuideRepository(BoltonCupDbContext _context) : IInfoGuideReposi
     {
         return await _context.InfoGuides
             .AsNoTracking()
-            .ConditionalWhere(e => e.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .OrderByDescending(e => e.LastModified)
             .ThenByDescending(e => e.CreatedAt)
             .ProjectTo<InfoGuide, T>()
@@ -47,6 +45,24 @@ public class InfoGuideRepository(BoltonCupDbContext _context) : IInfoGuideReposi
         return await _context.InfoGuides
             .AsNoTracking()
             .ProjectToFirstOrDefaultAsync<InfoGuide, T>(e => e.Id == id);
+    }
+    
+    public async Task<InfoGuide?> GetByTournamentIdAsync(int tournamentId)
+    {
+        return await _context.InfoGuides
+            .AsNoTracking()
+            .Include(e => e.Tournament)
+            .OrderByDescending(e => e.LastModified)
+            .ThenByDescending(e => e.CreatedAt)
+            .FirstOrDefaultAsync(e => e.TournamentId == tournamentId);
+    }
+
+    public async Task<T?> GetByTournamentIdAsync<T>(int tournamentId)
+        where T : IMappable<InfoGuide, T>
+    {
+        return await _context.InfoGuides
+            .AsNoTracking()
+            .ProjectToFirstOrDefaultAsync<InfoGuide, T>(e => e.TournamentId == tournamentId);
     }
 
     public async Task<bool> AddAsync(InfoGuide entity)
