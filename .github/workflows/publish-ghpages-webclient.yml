@@ -1,9 +1,9 @@
-name: Build Bolton Cup Website
+name: Build BoltonCup.WebClient
 
 on:
   push:
     branches:
-      - main
+      - separation
   pull_request:
     branches:
       - main
@@ -12,22 +12,25 @@ jobs:
   deploy-to-github-pages:
     runs-on: ubuntu-latest
     steps:
-      # Checkout the code
-      - uses: actions/checkout@v4
-
-      # Install .NET Core SDK
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-          
-      # Install dotnet wasm buildtools workload
       - name: Install .NET WASM Build Tools
         run: dotnet workload install wasm-tools
+      - name: Install dependencies
+        run: dotnet restore
           
-      # Publishes Blazor project to the release-folder
-      - name: Publish .NET Core Project
-        run: dotnet publish ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj -c:Release -p:GHPages=true -o out/BoltonCupWebClient --nologo
+      - name: Publish csproj
+        run: dotnet publish ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj -c:Release -p:GHPages=true -o out/BoltonCupWebClient --nologo --no-restore
+
+      - name: Create 404.html
+        run: 'cp -p -n out/BoltonCupWebClient/wwwroot/index.html out/BoltonCupWebClient/wwwroot/404.html'
+      #- name: Generate robots.txt
+      #  run: TODO
+      - name: 
 
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
