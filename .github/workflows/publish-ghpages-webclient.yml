@@ -33,9 +33,8 @@ jobs:
             [ -e "$f" ] || continue
             cp "$f" "${f/index/404}"
           done
-        # run: 'cp -p -n out/BoltonCupWebClient/wwwroot/index.html out/BoltonCupWebClient/wwwroot/404.html'
-      #- name: Generate robots.txt
-      #  run: TODO
+      - name: Generate sitemap
+        run: dotnet run --project ./src/BoltonCup.WebClient.SitemapGenerator/BoltonCup.WebClient.SitemapGenerator.csproj -- -o out/BoltonCupWebClient/wwwroot
 
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
