@@ -3,7 +3,7 @@ name: Build Bolton Cup Website
 on:
   push:
     branches:
-      - separation
+      - main
   pull_request:
     branches:
       - main
