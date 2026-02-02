@@ -58,7 +58,7 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (true) //(app.Environment.IsDevelopment())
 {
     var defaultApiKey = app.Configuration[ApiKeyConstants.AppSettingsPath] ?? string.Empty;
     app.MapSwagger("/openapi/{documentName}.json");
