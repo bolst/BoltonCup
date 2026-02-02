@@ -1,8 +1,7 @@
 export function initCountdown(dateEnd) {
     let days, hours, minutes, seconds;
 
-    dateEnd = new Date(dateEnd);
-    dateEnd = dateEnd.getTime();
+    dateEnd = new Date(dateEnd).getTime();
 
     if (isNaN(dateEnd)) {
         return;

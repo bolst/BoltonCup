@@ -17,10 +17,10 @@
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (_module is null)
+        if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>(
-                "import", "../Components/Shared/Countdown.razor.js"
+                "import", "./Components/Shared/Countdown.razor.js"
             );
             await BeginTimer();
         }
@@ -33,7 +33,7 @@
         if (To is null)
             return;
         
-        var dateStr = To.Value.ToString("MM/dd/yyyy hh:mm:ss tt").Replace('-', '/');
+        var dateStr = To.Value.ToString("o");
         await _module.InvokeVoidAsync("initCountdown", dateStr);
     }
 
