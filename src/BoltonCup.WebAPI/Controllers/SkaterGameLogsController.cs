@@ -8,6 +8,9 @@ namespace BoltonCup.WebAPI.Controllers;
 
 public class SkaterGameLogsController(ISkaterGameLogRepository _skaterGameLogs) : BoltonCupControllerBase
 {
+    /// <remarks>
+    /// Gets a collection of skater game logs.
+    /// </remarks>
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<CollectionResult<SkaterGameLogDetailDto>>> GetSkaterGameLogs([FromQuery] GetSkaterGameLogsQuery query)

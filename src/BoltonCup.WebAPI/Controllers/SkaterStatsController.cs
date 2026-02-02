@@ -8,6 +8,9 @@ namespace BoltonCup.WebAPI.Controllers;
 
 public class SkaterStatsController(ISkaterStatRepository _skaterStats) : BoltonCupControllerBase
 {
+    /// <remarks>
+    /// Gets a paginated list of skater statistics.
+    /// </remarks>
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<PaginatedList<SkaterStatDetailDto>>> GetSkaterStats([FromQuery] GetSkaterStatsQuery query)

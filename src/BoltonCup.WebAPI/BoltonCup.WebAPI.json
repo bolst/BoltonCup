@@ -434,6 +434,7 @@
         "tags": [
           "Games"
         ],
+        "description": "Gets a paginated list of games.",
         "operationId": "GetGames",
         "parameters": [
           {
@@ -498,6 +499,7 @@
         "tags": [
           "Games"
         ],
+        "description": "Gets a single game by its ID.",
         "operationId": "GetGameById",
         "parameters": [
           {
@@ -539,6 +541,7 @@
         "tags": [
           "Games"
         ],
+        "description": "Gets the box score for a game by its ID.",
         "operationId": "GetGameBoxScore",
         "parameters": [
           {
@@ -580,6 +583,7 @@
         "tags": [
           "GoalieGameLogs"
         ],
+        "description": "Gets a collection of goalie game logs.",
         "operationId": "GetGoalieGameLogs",
         "parameters": [
           {
@@ -666,6 +670,7 @@
         "tags": [
           "GoalieStats"
         ],
+        "description": "Gets a paginated list of goalie statistics.",
         "operationId": "GetGoalieStats",
         "parameters": [
           {
@@ -744,6 +749,7 @@
         "tags": [
           "InfoGuides"
         ],
+        "description": "Gets a paginated list of info guides.",
         "operationId": "GetInfoGuides",
         "parameters": [
           {
@@ -792,6 +798,7 @@
         "tags": [
           "InfoGuides"
         ],
+        "description": "Gets a single info guide by its ID.",
         "operationId": "GetInfoGuideById",
         "parameters": [
           {
@@ -833,6 +840,7 @@
         "tags": [
           "InfoGuides"
         ],
+        "description": "Gets an info guide by tournament ID.",
         "operationId": "GetInfoGuideByTournamentId",
         "parameters": [
           {
@@ -874,6 +882,7 @@
         "tags": [
           "Players"
         ],
+        "description": "Gets a paginated list of players.",
         "operationId": "GetPlayers",
         "parameters": [
           {
@@ -938,6 +947,7 @@
         "tags": [
           "Players"
         ],
+        "description": "Gets a single player by its ID.",
         "operationId": "GetPlayerById",
         "parameters": [
           {
@@ -979,6 +989,7 @@
         "tags": [
           "SkaterGameLogs"
         ],
+        "description": "Gets a collection of skater game logs.",
         "operationId": "GetSkaterGameLogs",
         "parameters": [
           {
@@ -1072,6 +1083,7 @@
         "tags": [
           "SkaterStats"
         ],
+        "description": "Gets a paginated list of skater statistics.",
         "operationId": "GetSkaterStats",
         "parameters": [
           {
@@ -1157,6 +1169,7 @@
         "tags": [
           "Teams"
         ],
+        "description": "Gets a paginated list of teams.",
         "operationId": "GetTeams",
         "parameters": [
           {
@@ -1213,6 +1226,7 @@
         "tags": [
           "Teams"
         ],
+        "description": "Gets a single team by its ID.",
         "operationId": "GetTeamById",
         "parameters": [
           {
@@ -1254,6 +1268,7 @@
         "tags": [
           "Tournaments"
         ],
+        "description": "Gets a paginated list of tournaments.",
         "operationId": "GetTournaments",
         "parameters": [
           {
@@ -1302,6 +1317,7 @@
         "tags": [
           "Tournaments"
         ],
+        "description": "Gets a single tournament by its ID.",
         "operationId": "GetTournamentById",
         "parameters": [
           {

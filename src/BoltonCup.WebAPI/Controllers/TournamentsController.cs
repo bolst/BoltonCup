@@ -8,6 +8,9 @@ namespace BoltonCup.WebAPI.Controllers;
 
 public class TournamentsController(ITournamentRepository _tournaments) : BoltonCupControllerBase
 {
+    /// <remarks>
+    /// Gets a paginated list of tournaments.
+    /// </remarks>
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<PaginatedList<TournamentDetailDto>>> GetTournaments([FromQuery] GetTournamentsQuery query)
@@ -15,6 +18,9 @@ public class TournamentsController(ITournamentRepository _tournaments) : BoltonC
         return Ok(await _tournaments.GetAllAsync<TournamentDetailDto>(query));
     }
 
+    /// <remarks>
+    /// Gets a single tournament by its ID.
+    /// </remarks>
     [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TournamentSingleDetailDto>> GetTournamentById(int id)

@@ -8,6 +8,9 @@ namespace BoltonCup.WebAPI.Controllers;
 
 public class GoalieGameLogsController(IGoalieGameLogRepository _goalieGameLogs) : BoltonCupControllerBase
 {
+    /// <remarks>
+    /// Gets a collection of goalie game logs.
+    /// </remarks>
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<CollectionResult<GoalieGameLogDetailDto>>> GetGoalieGameLogs([FromQuery] GetGoalieGameLogsQuery query)

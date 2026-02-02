@@ -8,6 +8,9 @@ namespace BoltonCup.WebAPI.Controllers;
 
 public class TeamsController(ITeamRepository _teams) : BoltonCupControllerBase
 {
+    /// <remarks>
+    /// Gets a paginated list of teams.
+    /// </remarks>
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<PaginatedList<TeamDetailDto>>> GetTeams([FromQuery] GetTeamsQuery query)
@@ -15,6 +18,9 @@ public class TeamsController(ITeamRepository _teams) : BoltonCupControllerBase
         return Ok(await _teams.GetAllAsync<TeamDetailDto>(query));
     }
 
+    /// <remarks>
+    /// Gets a single team by its ID.
+    /// </remarks>
     [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TeamSingleDetailDto>> GetTeamById(int id)

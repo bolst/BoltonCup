@@ -8,6 +8,9 @@ namespace BoltonCup.WebAPI.Controllers;
 
 public class PlayersController(IPlayerRepository _players) : BoltonCupControllerBase
 {
+    /// <remarks>
+    /// Gets a paginated list of players.
+    /// </remarks>
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<PaginatedList<PlayerDetailDto>>> GetPlayers([FromQuery] GetPlayersQuery query)
@@ -15,6 +18,9 @@ public class PlayersController(IPlayerRepository _players) : BoltonCupController
         return Ok(await _players.GetAllAsync<PlayerDetailDto>(query));
     }
 
+    /// <remarks>
+    /// Gets a single player by its ID.
+    /// </remarks>
     [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<ActionResult<PlayerSingleDetailDto>> GetPlayerById(int id)
