@@ -22,20 +22,10 @@ jobs:
         run: dotnet workload install wasm-tools
       - name: Install dependencies
         run: dotnet restore ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj
-          
       - name: Publish csproj
         run: dotnet publish ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj -c:Release -p:GHPages=true -o out/BoltonCupWebClient --nologo --no-restore
-
-      - name: Create 404.html*
-        working-directory: out/BoltonCupWebClient/wwwroot
-        run: |
-          for f in index.html*; do
-            [ -e "$f" ] || continue
-            cp "$f" "${f/index/404}"
-          done
       - name: Generate sitemap
         run: dotnet run --project ./src/BoltonCup.WebClient.SitemapGenerator/BoltonCup.WebClient.SitemapGenerator.csproj -- -o out/BoltonCupWebClient/wwwroot
-
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
