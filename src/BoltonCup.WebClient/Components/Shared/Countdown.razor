@@ -20,7 +20,7 @@
         if (_module is null)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>(
-                "import", "/Components/Shared/Countdown.razor.js"
+                "import", "../Components/Shared/Countdown.razor.js"
             );
             await BeginTimer();
         }
