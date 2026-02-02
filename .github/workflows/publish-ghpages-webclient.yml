@@ -26,8 +26,14 @@ jobs:
       - name: Publish csproj
         run: dotnet publish ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj -c:Release -p:GHPages=true -o out/BoltonCupWebClient --nologo --no-restore
 
-      - name: Create 404.html
-        run: 'cp -p -n out/BoltonCupWebClient/wwwroot/index.html out/BoltonCupWebClient/wwwroot/404.html'
+      - name: Create 404.html*
+        working-directory: out/BoltonCupWebClient/wwwroot
+        run: |
+          for f in index.html*; do
+            [ -e "$f" ] || continue
+            cp "$f" "${f/index/404}"
+          done
+        # run: 'cp -p -n out/BoltonCupWebClient/wwwroot/index.html out/BoltonCupWebClient/wwwroot/404.html'
       #- name: Generate robots.txt
       #  run: TODO
 
