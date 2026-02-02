@@ -1,5 +1,5 @@
 @page "/games/{GameId:int}"
-
+@attribute [Sitemap(SitemapChangeFrequency.Yearly, LastModified = "2026-02-01")]
 @inject IBoltonCupApi BoltonCupApi
 
 @if (_game is not null)
