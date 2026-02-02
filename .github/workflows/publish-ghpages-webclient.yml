@@ -21,7 +21,7 @@ jobs:
       - name: Install .NET WASM Build Tools
         run: dotnet workload install wasm-tools
       - name: Install dependencies
-        run: dotnet restore
+        run: dotnet restore ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj
           
       - name: Publish csproj
         run: dotnet publish ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj -c:Release -p:GHPages=true -o out/BoltonCupWebClient --nologo --no-restore
