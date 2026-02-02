@@ -30,7 +30,6 @@ jobs:
         run: 'cp -p -n out/BoltonCupWebClient/wwwroot/index.html out/BoltonCupWebClient/wwwroot/404.html'
       #- name: Generate robots.txt
       #  run: TODO
-      - name: 
 
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
