@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260202231552_ReapplyStatisticIndexes")]
+    partial class ReapplyStatisticIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -395,10 +398,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("opponent_id");
 
-                    b.Property<string>("OpponentLogoUrl")
-                        .HasColumnType("text")
-                        .HasColumnName("opponent_logo_url");
-
                     b.Property<string>("OpponentName")
                         .HasColumnType("text")
                         .HasColumnName("opponent_name");
@@ -450,10 +449,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<int>("TeamId")
                         .HasColumnType("integer")
                         .HasColumnName("team_id");
-
-                    b.Property<string>("TeamLogoUrl")
-                        .HasColumnType("text")
-                        .HasColumnName("team_logo_url");
 
                     b.Property<string>("TeamName")
                         .HasColumnType("text")
@@ -797,10 +792,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("opponent_id");
 
-                    b.Property<string>("OpponentLogoUrl")
-                        .HasColumnType("text")
-                        .HasColumnName("opponent_logo_url");
-
                     b.Property<string>("OpponentName")
                         .HasColumnType("text")
                         .HasColumnName("opponent_name");
@@ -836,10 +827,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<int>("TeamId")
                         .HasColumnType("integer")
                         .HasColumnName("team_id");
-
-                    b.Property<string>("TeamLogoUrl")
-                        .HasColumnType("text")
-                        .HasColumnName("team_logo_url");
 
                     b.Property<string>("TeamName")
                         .HasColumnType("text")

@@ -17,20 +17,21 @@
         <MudIconButton Icon="@Icons.Material.Rounded.FilterAlt" Variant="Variant.Outlined" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.Player.FullName" Title="Player" Sortable="false" StickyLeft>
+        <PropertyColumn Property="x => x.FullName" Title="Player" Sortable="false" StickyLeft>
             <CellTemplate>
-                <PlayerLink Player="context.Item.Player" />
+                @* <PlayerLink Player="context.Item.Player" /> *@
+                <MudText>@context.Item.FullName</MudText>
             </CellTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.Team.Name" Title="Team">
-            <CellTemplate>
-                <div class="d-flex flex-row align-center justify-space-evenly">
-                    <MudText Typo="Typo.body2">@context.Item.Team.Abbreviation</MudText>
-                    <MudImage Src="@context.Item.Team.LogoUrl" Height="24" Alt="@context.Item.Team.Abbreviation"/>
-                </div>
-            </CellTemplate>
-        </PropertyColumn>
-        <PropertyColumn Property="x => x.Player.Position" Title="Position"/>
+        @* <PropertyColumn Property="x => x.Team.Name" Title="Team"> *@
+        @*     <CellTemplate> *@
+        @*         <div class="d-flex flex-row align-center justify-space-evenly"> *@
+        @*             <MudText Typo="Typo.body2">@context.Item.Team.Abbreviation</MudText> *@
+        @*             <MudImage Src="@context.Item.Team.LogoUrl" Height="24" Alt="@context.Item.Team.Abbreviation"/> *@
+        @*         </div> *@
+        @*     </CellTemplate> *@
+        @* </PropertyColumn> *@
+        <PropertyColumn Property="x => x.Position" Title="Position"/>
         <PropertyColumn Property="x => x.GamesPlayed" Title="GP" sty CellStyle="@_dataCellStyle"/>
         <PropertyColumn Property="x => x.GoalsAgainstAverage" Title="GAA" CellStyle="@_dataCellStyle" InitialDirection="SortDirection.Ascending"/>
         <PropertyColumn Property="x => x.Shutouts" Title="SO" CellStyle="@_dataCellStyle" />

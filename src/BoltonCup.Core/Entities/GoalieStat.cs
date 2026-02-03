@@ -2,22 +2,42 @@ namespace BoltonCup.Core;
 
 public class GoalieStat
 {
-    public required int PlayerId { get; set; }
-    public required int TeamId { get; set; }
-    public required int TournamentId { get; set; }
-    public int GamesPlayed { get; set; }
-    public int Goals { get; set; }
-    public int Assists { get; set; }
-    public double PenaltyMinutes { get; set; }
-    public int GoalsAgainst { get; set; }
-    public double GoalsAgainstAverage { get; set; }
-    public int ShotsAgainst { get; set; }
-    public int Saves { get; set; }
-    public double SavePercentage { get; set; }
-    public int Shutouts { get; set; }
-    public int Wins { get; set; }
-    
-    public Player Player { get; set; } = null!;
-    public Team Team { get; set; } = null!;
-    public Tournament Tournament { get; set; } = null!;
+    public required int PlayerId { get; init; }
+    public required int GoalsAgainst { get; init; }
+    public required int ShotsAgainst { get; init; }
+    public required int Saves { get; init; }
+    public required int Shutouts { get; init; }
+    public required int Wins { get; init; }
+    public required double SavePercentage { get; init; }
+    public required double GoalsAgainstAverage { get; init; }
+    public required int GamesPlayed { get; init; }
+    public required int Goals { get; init; }
+    public required int Assists { get; init; }
+    public required int Points { get; init; }
+    public required double PenaltyMinutes { get; init; }
+    public required int AccountId { get; init; }
+    public required string FirstName { get; init; }
+    public required string LastName { get; init; }
+    public required string? Position { get; init; }
+    public required int? JerseyNumber { get; init; }
+    public required DateTime Birthday { get; init; }
+    public required string? ProfilePicture { get; init; }
+    public int TeamId { get; init; }
+    public string? TeamName { get; init; }
+    public string? TeamNameShort { get; init; }
+    public string? TeamAbbreviation { get; init; }
+    public string? TeamLogoUrl { get; init; }
+    public int OpponentId { get; init; }
+    public string? OpponentName { get; init; }
+    public string? OpponentNameShort { get; init; }
+    public string? OpponentAbbreviation { get; init; }
+    public string? OpponentLogoUrl { get; init; }
+    public int GameId { get; init; }
+    public DateTime GameTime { get; init; }
+    public string? GameType { get; init; }
+    public string? GameVenue { get; init; }
+    public string? GameRink { get; init; }
+    public int TournamentId { get; init; }
+    public string? TournamentName { get; init; }
+    public bool TournamentActive { get; init; }
 }

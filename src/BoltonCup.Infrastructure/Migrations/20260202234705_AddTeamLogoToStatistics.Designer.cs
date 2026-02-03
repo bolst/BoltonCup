@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260202234705_AddTeamLogoToStatistics")]
+    partial class AddTeamLogoToStatistics
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -394,10 +397,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<int>("OpponentId")
                         .HasColumnType("integer")
                         .HasColumnName("opponent_id");
-
-                    b.Property<string>("OpponentLogoUrl")
-                        .HasColumnType("text")
-                        .HasColumnName("opponent_logo_url");
 
                     b.Property<string>("OpponentName")
                         .HasColumnType("text")
@@ -796,10 +795,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<int>("OpponentId")
                         .HasColumnType("integer")
                         .HasColumnName("opponent_id");
-
-                    b.Property<string>("OpponentLogoUrl")
-                        .HasColumnType("text")
-                        .HasColumnName("opponent_logo_url");
 
                     b.Property<string>("OpponentName")
                         .HasColumnType("text")

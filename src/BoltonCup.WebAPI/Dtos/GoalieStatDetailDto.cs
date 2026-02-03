@@ -7,9 +7,17 @@ namespace BoltonCup.WebAPI.Dtos;
 
 public record GoalieStatDetailDto : IMappable<GoalieStat, GoalieStatDetailDto>
 {
-    public required PlayerSummary Player { get; init; }
-    public required TeamSummary Team { get; init; }
-    public required TournamentSummary Tournament { get; init; }
+    public required int PlayerId { get; init; }
+    public required int AccountId { get; init; }
+    public required string FirstName { get; init; }
+    public required string LastName { get; init; }
+    public required string? Position { get; init; }
+    public required int? JerseyNumber { get; init; }
+    public required DateTime Birthday { get; init; }
+    public required string? ProfilePicture { get; init; }
+    public int? TeamId { get; init; }
+    public string? TeamName { get; init; }
+    public string? TeamLogoUrl { get; init; }
     public required int GamesPlayed { get; init; }
     public required int Goals { get; init; }
     public required int Assists { get; init; }
@@ -22,12 +30,23 @@ public record GoalieStatDetailDto : IMappable<GoalieStat, GoalieStatDetailDto>
     public required int Shutouts { get; init; }
     public required int Wins { get; init; }
     
+    public string FullName => FirstName + " " + LastName;
+
+    
     static Expression<Func<GoalieStat, GoalieStatDetailDto>> IMappable<GoalieStat, GoalieStatDetailDto>.Projection =>
         goalie => new GoalieStatDetailDto
         {
-            Player = new PlayerSummary(goalie.Player, goalie.Player.Account),
-            Team = new TeamSummary(goalie.Team),
-            Tournament = new TournamentSummary(goalie.Tournament),
+            PlayerId = goalie.PlayerId,
+            AccountId = goalie.AccountId,
+            FirstName = goalie.FirstName,
+            LastName = goalie.LastName,
+            Position = goalie.Position,
+            JerseyNumber = goalie.JerseyNumber,
+            Birthday = goalie.Birthday,
+            ProfilePicture = goalie.ProfilePicture,
+            TeamId = goalie.TeamId,
+            TeamName = goalie.TeamName,
+            TeamLogoUrl = goalie.TeamLogoUrl,
             GamesPlayed = goalie.GamesPlayed,
             Goals = goalie.Goals,
             Assists = goalie.Assists,

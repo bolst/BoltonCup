@@ -14,17 +14,39 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
     {
         return await _context.GoalieStats
             .AsNoTracking()
-            .Include(p => p.Player)
-            .Include(p => p.Tournament)
-            .Include(p => p.Team)
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
+            .OrderBy(x => x.AccountId)
+            .ThenByDescending(x => x.GameTime)
+            .GroupBy(x => x.AccountId)
+            .Select(g => new GoalieStat
+            {
+                PlayerId = g.First().PlayerId,
+                GoalsAgainst = g.Sum(x => x.GoalsAgainst),
+                ShotsAgainst = g.Sum(x => x.ShotsAgainst),
+                Saves = g.Sum(x => x.Saves),
+                Shutouts = g.Sum(x => x.Shutouts),
+                Wins = g.Sum(x => x.Wins),
+                SavePercentage = g.Sum(x => x.Saves) / (double)g.Sum(x => x.ShotsAgainst),
+                GoalsAgainstAverage = g.Average(x => x.GoalsAgainst),
+                GamesPlayed = g.Sum(x => x.GamesPlayed),
+                Goals = g.Sum(x => x.Goals),
+                Assists = g.Sum(x => x.Assists),
+                Points = g.Sum(x => x.Points),
+                PenaltyMinutes = g.Sum(x => x.PenaltyMinutes),
+                AccountId = g.Key,
+                FirstName = g.First().FirstName,
+                LastName = g.First().LastName,
+                Position = g.First().Position,
+                JerseyNumber = g.First().JerseyNumber,
+                Birthday = g.First().Birthday,
+                ProfilePicture = g.First().ProfilePicture
+            })
             .ApplySorting(query, x => x
-                .OrderByDescending(p => p.SavePercentage)
-                .ThenBy(p => p.GoalsAgainstAverage)
-                .ThenByDescending(p => p.Shutouts)
-                .ThenByDescending(p => p.Wins)
+                .OrderByDescending(p => p.Shutouts)
                 .ThenByDescending(p => p.Saves)
+                .ThenByDescending(p => p.Wins)
+                .ThenBy(p => p.GamesPlayed)
             )
             .ToPaginatedListAsync(query);
     }       
@@ -36,12 +58,37 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
             .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
+            .OrderBy(x => x.AccountId)
+            .ThenByDescending(x => x.GameTime)
+            .GroupBy(x => x.AccountId)
+            .Select(g => new GoalieStat
+            {
+                PlayerId = g.First().PlayerId,
+                GoalsAgainst = g.Sum(x => x.GoalsAgainst),
+                ShotsAgainst = g.Sum(x => x.ShotsAgainst),
+                Saves = g.Sum(x => x.Saves),
+                Shutouts = g.Sum(x => x.Shutouts),
+                Wins = g.Sum(x => x.Wins),
+                SavePercentage = g.Sum(x => x.ShotsAgainst) == 0 ? 0 : g.Sum(x => x.Saves) / (double)g.Sum(x => x.ShotsAgainst),
+                GoalsAgainstAverage = g.Average(x => x.GoalsAgainst),
+                GamesPlayed = g.Sum(x => x.GamesPlayed),
+                Goals = g.Sum(x => x.Goals),
+                Assists = g.Sum(x => x.Assists),
+                Points = g.Sum(x => x.Points),
+                PenaltyMinutes = g.Sum(x => x.PenaltyMinutes),
+                AccountId = g.Key,
+                FirstName = g.First().FirstName,
+                LastName = g.First().LastName,
+                Position = g.First().Position,
+                JerseyNumber = g.First().JerseyNumber,
+                Birthday = g.First().Birthday,
+                ProfilePicture = g.First().ProfilePicture
+            })
             .ApplySorting(query, x => x
-                .OrderByDescending(p => p.SavePercentage)
-                .ThenBy(p => p.GoalsAgainstAverage)
-                .ThenByDescending(p => p.Shutouts)
-                .ThenByDescending(p => p.Wins)
+                .OrderByDescending(p => p.Shutouts)
                 .ThenByDescending(p => p.Saves)
+                .ThenByDescending(p => p.Wins)
+                .ThenBy(p => p.GamesPlayed)
             )
             .ProjectTo<GoalieStat, T>()
             .ToPaginatedListAsync(query);
@@ -51,9 +98,6 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
     {
         return await _context.GoalieStats
             .AsNoTracking()
-            .Include(p => p.Player)
-            .Include(p => p.Team)
-            .Include(p => p.Tournament)
             .FirstOrDefaultAsync(p => p.PlayerId == id);
     }
 

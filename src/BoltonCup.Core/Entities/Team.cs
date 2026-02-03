@@ -25,6 +25,4 @@ public class Team : EntityBase
     public ICollection<Penalty> Penalties { get; set; } = [];
     public ICollection<SkaterGameLog> SkaterGameLogs { get; set; } = [];
     public ICollection<GoalieGameLog> GoalieGameLogs { get; set; } = [];
-    public ICollection<SkaterStat> SkaterStats { get; set; } = [];
-    public ICollection<GoalieStat> GoalieStats { get; set; } = [];
 }

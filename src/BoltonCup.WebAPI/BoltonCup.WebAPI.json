@@ -1791,31 +1791,73 @@
       },
       "GoalieStatDetailDto": {
         "required": [
+          "accountId",
           "assists",
+          "birthday",
+          "firstName",
           "gamesPlayed",
           "goals",
           "goalsAgainst",
           "goalsAgainstAverage",
+          "jerseyNumber",
+          "lastName",
           "penaltyMinutes",
-          "player",
+          "playerId",
+          "position",
+          "profilePicture",
           "savePercentage",
           "saves",
           "shotsAgainst",
           "shutouts",
-          "team",
-          "tournament",
           "wins"
         ],
         "type": "object",
         "properties": {
-          "player": {
-            "$ref": "#/components/schemas/PlayerSummary"
+          "playerId": {
+            "type": "integer",
+            "format": "int32"
           },
-          "team": {
-            "$ref": "#/components/schemas/TeamSummary"
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
           },
-          "tournament": {
-            "$ref": "#/components/schemas/TournamentSummary"
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "jerseyNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "profilePicture": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "teamName": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamLogoUrl": {
+            "type": "string",
+            "nullable": true
           },
           "gamesPlayed": {
             "type": "integer",
@@ -1860,6 +1902,11 @@
           "wins": {
             "type": "integer",
             "format": "int32"
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -2577,25 +2624,67 @@
       },
       "SkaterStatDetailDto": {
         "required": [
+          "accountId",
           "assists",
+          "birthday",
+          "firstName",
           "gamesPlayed",
           "goals",
+          "jerseyNumber",
+          "lastName",
           "penaltyMinutes",
-          "player",
+          "playerId",
           "points",
-          "team",
-          "tournament"
+          "position",
+          "profilePicture"
         ],
         "type": "object",
         "properties": {
-          "player": {
-            "$ref": "#/components/schemas/PlayerSummary"
+          "playerId": {
+            "type": "integer",
+            "format": "int32"
           },
-          "team": {
-            "$ref": "#/components/schemas/TeamSummary"
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
           },
-          "tournament": {
-            "$ref": "#/components/schemas/TournamentSummary"
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "jerseyNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "profilePicture": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "teamName": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamLogoUrl": {
+            "type": "string",
+            "nullable": true
           },
           "gamesPlayed": {
             "type": "integer",
@@ -2616,6 +2705,11 @@
           "penaltyMinutes": {
             "type": "number",
             "format": "double"
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false
