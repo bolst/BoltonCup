@@ -82,7 +82,12 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
                 Position = g.First().Position,
                 JerseyNumber = g.First().JerseyNumber,
                 Birthday = g.First().Birthday,
-                ProfilePicture = g.First().ProfilePicture
+                ProfilePicture = g.First().ProfilePicture,
+                TeamId = g.First().TeamId,
+                TeamName = g.First().TeamName,
+                TeamNameShort = g.First().TeamNameShort,
+                TeamAbbreviation = g.First().TeamAbbreviation,
+                TeamLogoUrl = g.First().TeamLogoUrl,
             })
             .ApplySorting(query, x => x
                 .OrderByDescending(p => p.Shutouts)
