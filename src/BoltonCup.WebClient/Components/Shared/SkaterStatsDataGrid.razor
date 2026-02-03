@@ -20,8 +20,7 @@
     <Columns>
         <PropertyColumn Property="x => x.FullName" Title="Player" Sortable="false" StickyLeft>
             <CellTemplate>
-                @* <PlayerLink Player="context.Item.Player" /> *@
-                <MudText>@context.Item.FullName</MudText>
+                <PlayerLink Label="@context.Item.FullName" PlayerId="context.Item.PlayerId" />
             </CellTemplate>
         </PropertyColumn>
         @* <PropertyColumn Property="x => x.Team.Name" Title="Team"> *@

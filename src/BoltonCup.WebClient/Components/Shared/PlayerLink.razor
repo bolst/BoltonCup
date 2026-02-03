@@ -9,12 +9,21 @@
     
     [Parameter]
     public Func<Sdk.PlayerSummary?, string>? ToStringFunc { get; set; }
+    
+    [Parameter]
+    public string? Label { get; set; }
+    
+    [Parameter]
+    public int? PlayerId { get; set; }
 
-    private string? _link => Player is not null 
-        ? $"/players/{Player.Id}" 
+    private int? _playerId => Player?.Id ?? PlayerId;
+    private string? _label => Player is not null ? _playerLabel : Label;
+    
+    private string? _link => _playerId is not null 
+        ? $"/players/{_playerId}" 
         : null;
 
-    private string? _label => ToStringFunc is not null
+    private string? _playerLabel => ToStringFunc is not null
         ? ToStringFunc(Player)
         : Player?.FullName;
 
