@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.WebClient", "Bolt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.WebClient.SitemapGenerator", "BoltonCup.WebClient.SitemapGenerator\BoltonCup.WebClient.SitemapGenerator.csproj", "{DFA7EE36-137A-4A60-AD52-7C7CA9647440}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Common", "BoltonCup.Common\BoltonCup.Common.csproj", "{20B85910-5478-4C6B-9B7D-03A2C8093439}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.WebAuth", "BoltonCup.WebAuth\BoltonCup.WebAuth.csproj", "{4EC3FAB1-772D-4399-B416-1712E1D5D538}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +67,14 @@ Global
 		{DFA7EE36-137A-4A60-AD52-7C7CA9647440}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFA7EE36-137A-4A60-AD52-7C7CA9647440}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFA7EE36-137A-4A60-AD52-7C7CA9647440}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20B85910-5478-4C6B-9B7D-03A2C8093439}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20B85910-5478-4C6B-9B7D-03A2C8093439}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20B85910-5478-4C6B-9B7D-03A2C8093439}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20B85910-5478-4C6B-9B7D-03A2C8093439}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EC3FAB1-772D-4399-B416-1712E1D5D538}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EC3FAB1-772D-4399-B416-1712E1D5D538}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EC3FAB1-772D-4399-B416-1712E1D5D538}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EC3FAB1-772D-4399-B416-1712E1D5D538}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
