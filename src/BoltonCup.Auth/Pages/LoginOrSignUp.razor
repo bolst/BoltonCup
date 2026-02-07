@@ -1,0 +1,53 @@
+@page "/log-in-or-sign-up"
+@inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
+@inject AuthFlowStateService AuthFlowState
+
+<PageTitle>Log in or sign up | Bolton Cup</PageTitle>
+
+<MudText Typo="Typo.h4">Log in or sign up</MudText>
+
+<EditForm Model="_model" class="mud-width-full" OnValidSubmit="OnSubmit">
+    <DataAnnotationsValidator />
+    <MudStack AlignItems="AlignItems.Center" Spacing="6" Class="mud-width-full">
+        <MudTextField Label="Email" @bind-Value="_model.Email" For="() => _model.Email" InputType="InputType.Email" Variant="Variant.Outlined" OnlyValidateIfDirty AutoFocus FullWidth/>
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" FullWidth>Continue</MudButton>
+    </MudStack>
+</EditForm>
+
+
+@code {
+    
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
+    private readonly LogInOrSignUpForm _model = new();
+    
+    protected override void OnInitialized()
+    {
+        AuthFlowState.Reset();
+    }
+
+    private async Task OnSubmit(EditContext context)
+    {
+        AuthFlowState.Initialize(_model.Email);
+        
+        try
+        {
+            var user = await BoltonCupApi.GetUserAsync(_model.Email);
+            if (string.IsNullOrEmpty(user?.Email))
+            {
+                Navigation.NavigateTo($"/create-account/password?returnUrl={ReturnUrl}");
+                return;
+            }
+            
+            Navigation.NavigateTo($"log-in/password?returnUrl={ReturnUrl}");
+        }
+        catch (ApiException e)
+            when (e.StatusCode is 204 or 404)
+        {
+            Navigation.NavigateTo($"/create-account/password?returnUrl={ReturnUrl}");
+        }
+    }
+
+}
