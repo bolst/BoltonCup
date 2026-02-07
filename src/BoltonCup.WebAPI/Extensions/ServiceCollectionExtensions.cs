@@ -20,18 +20,40 @@ public static class ServiceCollectionExtensions
             .AddValidatorsFromAssemblyContaining<DefaultPaginationQuery>();
     }
 
-    private static IServiceCollection AddAuthServices(this IServiceCollection services)
+    private static IServiceCollection AddAuthServices(this IServiceCollection services, IHostEnvironment environment)
     {
         services
             .AddAuthentication()
             .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.Scheme, null);
-        return services.AddAuthorization(options =>
-        {
-            options.DefaultPolicy = new AuthorizationPolicyBuilder()
-                .AddAuthenticationSchemes(IdentityConstants.BearerScheme, ApiKeyConstants.Scheme)
-                .RequireAuthenticatedUser()
-                .Build();
-        });
+        
+        return services
+            .ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.Name = ".BoltonCup.Auth";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                if (environment.IsProduction())
+                {
+                    options.Cookie.Domain = ".boltoncup.ca";
+                }
+
+                options.ExpireTimeSpan = TimeSpan.FromDays(14);
+                options.SlidingExpiration = true;
+
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                };
+            })
+            .AddAuthorization(options => 
+            {
+                options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                    .AddAuthenticationSchemes(IdentityConstants.ApplicationScheme, ApiKeyConstants.Scheme)
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
     }
     
     private static IServiceCollection AddCorsServices(this IServiceCollection services)
@@ -42,10 +64,15 @@ public static class ServiceCollectionExtensions
             {
                 policy.WithOrigins(
                         "http://localhost:5239",
-                        "https://boltoncup.ca"
+                        "https://localhost:7266",
+                        "https://localhost:7269",
+                        "https://boltoncup.ca",
+                        "https://www.boltoncup.ca",
+                        "https://auth.boltoncup.ca"
                     )
                     .AllowAnyHeader()
-                    .AllowAnyMethod();
+                    .AllowAnyMethod()
+                    .AllowCredentials();
             });
         });
         return services;
@@ -80,11 +107,11 @@ public static class ServiceCollectionExtensions
             });
     }
     
-    public static IServiceCollection AddBoltonCupWebAPIServices(this IServiceCollection services)
+    public static IServiceCollection AddBoltonCupWebAPIServices(this IServiceCollection services, IHostEnvironment environment)
     {
         services
             .AddFluentValidationServices()
-            .AddAuthServices()
+            .AddAuthServices(environment)
             .AddCorsServices()
             .AddRateLimitingServices()
             .AddRouting(options => options.LowercaseUrls = true)

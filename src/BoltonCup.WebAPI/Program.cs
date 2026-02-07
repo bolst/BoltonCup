@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
 
-builder.Services.AddBoltonCupWebAPIServices();
+builder.Services.AddBoltonCupWebAPIServices(builder.Environment);
 
 // https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
