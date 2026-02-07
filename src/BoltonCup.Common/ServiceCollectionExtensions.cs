@@ -1,5 +1,6 @@
 using BoltonCup.Common.Auth;
 using BoltonCup.Common.Handlers;
+using BoltonCup.Common.Theme;
 using BoltonCup.Sdk;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +23,10 @@ public static class ServiceCollectionExtensions
         var apiBaseUrl = bcConfig?.ApiBaseUrl
             ?? throw new ArgumentException("Missing API base URL.", nameof(BoltonCupConfiguration.ApiBaseUrl));
         
+        // theming
+        services.AddSingleton<BoltonCupTheme>();
+        
+        // auth
         services
             .AddAuthorizationCore()
             .AddScoped<AuthenticationStateProvider, CookieAuthenticationStateProvider>()

@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
+@inject Common.Theme.BoltonCupTheme Theme
 
-<MudThemeProvider Theme="_theme" />
+<MudThemeProvider Theme="Theme.MudTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -12,19 +13,3 @@
     </MudMainContent>
     <Footer />
 </MudLayout>
-
-
-@code {
-
-    private MudTheme _theme = new()
-    {
-        PaletteLight = new PaletteLight
-        {
-            Primary = "#0B2551",
-            Secondary = "#EB443A",
-            Tertiary = "#DDCBA4",
-            AppbarBackground = "#191A21",
-        }
-    };
-
-}

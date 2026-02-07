@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@inject Common.Theme.BoltonCupTheme Theme
 
-<MudThemeProvider Theme="_theme" />
+<MudThemeProvider Theme="GetTheme()" />
 
 <MudLayout Class="d-flex flex-column" Style="min-height: 100vh">
     <MudAppBar Elevation="0">
@@ -19,13 +20,12 @@
 
 @code {
 
-    private readonly MudTheme _theme = new()
+    private MudTheme GetTheme()
     {
-        PaletteLight = new PaletteLight()
-        {
-            AppbarBackground = "#FFFFFF",
-            AppbarText = "#000000"
-        }
-    };
+        var theme = Theme.MudTheme;
+        theme.PaletteLight.AppbarBackground = "#FFFFFF";
+        theme.PaletteLight.AppbarText = "#000000";
+        return theme;
+    }
 
 }
