@@ -23,7 +23,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.WebClient.Sitemap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Common", "BoltonCup.Common\BoltonCup.Common.csproj", "{20B85910-5478-4C6B-9B7D-03A2C8093439}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.WebAuth", "BoltonCup.WebAuth\BoltonCup.WebAuth.csproj", "{4EC3FAB1-772D-4399-B416-1712E1D5D538}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Auth", "BoltonCup.Auth\BoltonCup.Auth.csproj", "{4EC3FAB1-772D-4399-B416-1712E1D5D538}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
