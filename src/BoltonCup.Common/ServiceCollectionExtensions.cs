@@ -9,20 +9,18 @@ namespace BoltonCup.Common;
 
 public static class ServiceCollectionExtensions
 {
-
     /// <summary>
-    /// Looks for the base URL of the Bolton Cup API in the configuration under "BoltonCupApi:BaseUrl".
-    /// If not found, an exception is thrown.
+    /// Adds common services for Bolton Cup applications.
+    /// Requires appsettings with a <see cref="BoltonCupConfiguration"/>.
     /// </summary>
     public static IServiceCollection AddBoltonCupCommonServices(this IServiceCollection services, IConfiguration configuration)
     {
-        return AddBoltonCupCommonServices(services, configuration["BoltonCupApi:BaseUrl"]);
-    }
-    
-    public static IServiceCollection AddBoltonCupCommonServices(this IServiceCollection services, string? apiBaseUrl)
-    {
-        if (string.IsNullOrEmpty(apiBaseUrl)) 
-            throw new ArgumentException("API base URL must be provided.", nameof(apiBaseUrl));
+        var configSection = configuration.GetSection(BoltonCupConfiguration.SectionName);
+        services.Configure<BoltonCupConfiguration>(configSection);
+        
+        var bcConfig = configSection.Get<BoltonCupConfiguration>();
+        var apiBaseUrl = bcConfig?.ApiBaseUrl
+            ?? throw new ArgumentException("Missing API base URL.", nameof(BoltonCupConfiguration.ApiBaseUrl));
         
         services
             .AddAuthorizationCore()
@@ -34,6 +32,7 @@ public static class ServiceCollectionExtensions
             })
             .AddHttpMessageHandler<CookieHandler>()
             .AddTypedClient<IBoltonCupApi>((http, sp) => new BoltonCupApi(apiBaseUrl, http));
+        
         return services;
     }
 }
