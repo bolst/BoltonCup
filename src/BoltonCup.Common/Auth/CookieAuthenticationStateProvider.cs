@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 using BoltonCup.Sdk;
@@ -25,9 +24,10 @@ public class CookieAuthenticationStateProvider(IBoltonCupApi _api) : Authenticat
                 return new AuthenticationState(new ClaimsPrincipal(identity));
             }
         }
-        catch 
+        catch
         {
             // 401 Unauthorized or Network error -> Not Logged In
+            // TODO: log
         }
 
         return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));

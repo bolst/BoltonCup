@@ -11,16 +11,15 @@ public static class ServiceCollectionExtensions
 {
 
     /// <summary>
-    /// Adds Bolton Cup authentication.
     /// Looks for the base URL of the Bolton Cup API in the configuration under "BoltonCupApi:BaseUrl".
     /// If not found, an exception is thrown.
     /// </summary>
-    public static IServiceCollection AddBoltonCupAuth(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddBoltonCupCommonServices(this IServiceCollection services, IConfiguration configuration)
     {
-        return AddBoltonCupAuth(services, configuration["BoltonCupApi:BaseUrl"]);
+        return AddBoltonCupCommonServices(services, configuration["BoltonCupApi:BaseUrl"]);
     }
     
-    public static IServiceCollection AddBoltonCupAuth(this IServiceCollection services, string? apiBaseUrl)
+    public static IServiceCollection AddBoltonCupCommonServices(this IServiceCollection services, string? apiBaseUrl)
     {
         if (string.IsNullOrEmpty(apiBaseUrl)) 
             throw new ArgumentException("API base URL must be provided.", nameof(apiBaseUrl));

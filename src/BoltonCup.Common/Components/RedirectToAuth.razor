@@ -1,0 +1,10 @@
+@inject NavigationManager Navigation
+
+@code {
+    protected override void OnInitialized()
+    {
+        var currentUrl = Navigation.Uri;
+        var loginUrl = $"https://localhost:7269/login?returnUrl={Uri.EscapeDataString(currentUrl)}";
+        Navigation.NavigateTo(loginUrl, forceLoad: true);
+    }
+}
