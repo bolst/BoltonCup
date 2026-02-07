@@ -5,15 +5,15 @@
 <AuthorizeView>
     <Authorized>
         <MudMenu Label="@context.User.Identity?.Name" 
-                 Variant="Variant.Filled" 
-                 Color="Color.Primary" 
-                 EndIcon="@Icons.Material.Filled.KeyboardArrowDown">
+                 Variant="Variant.Text" 
+                 Color="Color.Inherit" 
+                 EndIcon="@Icons.Material.Rounded.KeyboardArrowDown">
             <MudMenuItem OnClick="GoToProfile">My Profile</MudMenuItem>
             <MudMenuItem OnClick="LogOut">Log Out</MudMenuItem>
         </MudMenu>
     </Authorized>
     <NotAuthorized>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToLogin">Log In</MudButton>
+        <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="GoToLogin">Log In</MudButton>
     </NotAuthorized>
 </AuthorizeView>
 
