@@ -1,7 +1,7 @@
 using BoltonCup.Common;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using BoltonCup.Auth;
+using BoltonCup.Auth.Components;
 using BoltonCup.Auth.Services;
 using MudBlazor.Services;
 
