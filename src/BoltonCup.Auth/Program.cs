@@ -11,7 +11,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
 
-builder.Services.AddScoped<AuthFlowStateService>();
+builder.Services.AddScoped<AuthSessionStateService>();
 
 builder.Services.AddMudServices();
 

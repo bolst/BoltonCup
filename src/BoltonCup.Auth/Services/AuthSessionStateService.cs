@@ -1,6 +1,6 @@
 namespace BoltonCup.Auth.Services;
 
-public class AuthFlowStateService
+public class AuthSessionStateService
 {
     public string? Email { get; private set; }
     

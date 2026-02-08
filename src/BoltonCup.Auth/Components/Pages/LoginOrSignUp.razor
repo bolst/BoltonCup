@@ -1,7 +1,7 @@
 @page "/log-in-or-sign-up"
 @inject IBoltonCupApi BoltonCupApi
 @inject NavigationManager Navigation
-@inject AuthFlowStateService AuthFlowState
+@inject AuthSessionStateService AuthSessionState
 
 <PageTitle>Log in or sign up | Bolton Cup</PageTitle>
 
@@ -25,12 +25,12 @@
     
     protected override void OnInitialized()
     {
-        AuthFlowState.Reset();
+        AuthSessionState.Reset();
     }
 
     private async Task OnSubmit(EditContext context)
     {
-        AuthFlowState.Initialize(_model.Email);
+        AuthSessionState.Initialize(_model.Email);
         
         try
         {
