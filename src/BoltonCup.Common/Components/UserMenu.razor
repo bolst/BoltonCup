@@ -1,6 +1,7 @@
 @namespace BoltonCup.Common.Components
 @inject NavigationManager Navigation
 @inject IBoltonCupApi Api
+@inject IOptions<BoltonCupConfiguration> Config
 
 <AuthorizeView>
     <Authorized>
@@ -8,7 +9,7 @@
                  Variant="Variant.Text" 
                  Color="Color.Inherit" 
                  EndIcon="@Icons.Material.Rounded.KeyboardArrowDown">
-            <MudMenuItem OnClick="GoToProfile">My Profile</MudMenuItem>
+            <MudMenuItem Href="@($"{Config.Value.WebBaseUrl}profile")">My Profile</MudMenuItem>
             <MudMenuItem OnClick="LogOut">Log Out</MudMenuItem>
         </MudMenu>
     </Authorized>
@@ -22,12 +23,7 @@
     private void GoToLogin()
     {
         var returnUrl = Uri.EscapeDataString(Navigation.Uri);
-        Navigation.NavigateTo($"https://localhost:7269/log-in-or-sign-up?returnUrl={returnUrl}", forceLoad: true);
-    }
-
-    private void GoToProfile()
-    {
-        Navigation.NavigateTo("https://localhost:7269/profile", forceLoad: true);
+        Navigation.NavigateTo($"{Config.Value.AuthBaseUrl}log-in-or-sign-up?returnUrl={returnUrl}", forceLoad: true);
     }
 
     private async Task LogOut()

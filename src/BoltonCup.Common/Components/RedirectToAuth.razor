@@ -1,10 +1,11 @@
 @inject NavigationManager Navigation
+@inject IOptions<BoltonCupConfiguration> Config
 
 @code {
     protected override void OnInitialized()
     {
         var currentUrl = Navigation.Uri;
-        var loginUrl = $"https://localhost:7269/login?returnUrl={Uri.EscapeDataString(currentUrl)}";
+        var loginUrl = $"{Config.Value.AuthBaseUrl}login?returnUrl={Uri.EscapeDataString(currentUrl)}";
         Navigation.NavigateTo(loginUrl, forceLoad: true);
     }
 }
