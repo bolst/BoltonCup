@@ -32,7 +32,7 @@
             var user = await BoltonCupApi.GetUserAsync(_model.Email);
             if (string.IsNullOrEmpty(user?.Email))
             {
-                Navigation.NavigateTo($"/create-account/password?returnUrl={ReturnUrl}");
+                Navigation.NavigateTo($"create-account/password?returnUrl={ReturnUrl}");
                 return;
             }
             
@@ -41,7 +41,7 @@
         catch (ApiException e)
             when (e.StatusCode is 204 or 404)
         {
-            Navigation.NavigateTo($"/create-account/password?returnUrl={ReturnUrl}");
+            Navigation.NavigateTo($"create-account/password?returnUrl={ReturnUrl}");
         }
     }
 
