@@ -23,6 +23,12 @@ public partial class AutoEditForm<T> where T : class, new()
 
     [Parameter]
     public RenderFragment ActionsContent { get; set; } = null!;
+    
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public bool AutoFillPageTitle { get; set; } = true;
 
     protected override void OnInitialized()
     {

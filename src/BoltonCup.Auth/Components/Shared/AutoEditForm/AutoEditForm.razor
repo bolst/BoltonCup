@@ -1,6 +1,16 @@
 @namespace BoltonCup.Auth.Components.Shared
 @typeparam T where T : class, new()
 
+@if (!string.IsNullOrEmpty(Title) && AutoFillPageTitle)
+{
+    <PageTitle>@Title | Bolton Cup</PageTitle>
+}
+
+@if (!string.IsNullOrEmpty(Title))
+{
+    <MudText Typo="Typo.h4">@Title</MudText>
+}
+
 <EditForm EditContext="EditContext" OnValidSubmit="HandleValidSubmitAsync" class="mud-width-full">
     <DataAnnotationsValidator />
     @if (_model is not null)
@@ -24,8 +34,8 @@
 </EditForm>
 
 
-@code {
 
+@code {
 
     private RenderFragment RenderFieldComponent(AutoEditForm.FieldMetadata field)
     {
@@ -55,7 +65,5 @@
         
         return builder => { };
     }
-    
-    
 
 }

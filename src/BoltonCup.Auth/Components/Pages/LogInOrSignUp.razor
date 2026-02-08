@@ -3,11 +3,7 @@
 @inject NavigationManager Navigation
 @inject AuthSessionStateService AuthSessionState
 
-<PageTitle>Log in or sign up | Bolton Cup</PageTitle>
-
-<MudText Typo="Typo.h4">Log in or sign up</MudText>
-
-<AutoEditForm T="LogInOrSignUpForm" EditContext="_editContext" OnValidSubmit="OnSubmit" />
+<AutoEditForm T="LogInOrSignUpForm" EditContext="_editContext" OnValidSubmit="OnSubmit" Title="Log in or sign up" />
 
 @code {
     
