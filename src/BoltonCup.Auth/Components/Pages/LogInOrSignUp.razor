@@ -7,14 +7,7 @@
 
 <MudText Typo="Typo.h4">Log in or sign up</MudText>
 
-<EditForm Model="_model" class="mud-width-full" OnValidSubmit="OnSubmit">
-    <DataAnnotationsValidator />
-    <MudStack AlignItems="AlignItems.Center" Spacing="6" Class="mud-width-full">
-        <MudTextField Label="Email" @bind-Value="_model.Email" For="() => _model.Email" InputType="InputType.Email" Variant="Variant.Outlined" OnlyValidateIfDirty AutoFocus FullWidth/>
-        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" FullWidth>Continue</MudButton>
-    </MudStack>
-</EditForm>
-
+<AutoEditForm T="LogInOrSignUpForm" EditContext="_editContext" OnValidSubmit="OnSubmit" />
 
 @code {
     
@@ -22,10 +15,12 @@
     public string? ReturnUrl { get; set; }
 
     private readonly LogInOrSignUpForm _model = new();
-    
-    protected override void OnInitialized()
+    private EditContext? _editContext;
+
+    protected override void OnInitialized() 
     {
-        AuthSessionState.Reset();
+        _model.Email = AuthSessionState.Email ?? string.Empty;
+        _editContext = new EditContext(_model);
     }
 
     private async Task OnSubmit(EditContext context)

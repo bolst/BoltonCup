@@ -1,0 +1,61 @@
+@namespace BoltonCup.Auth.Components.Shared
+@typeparam T where T : class, new()
+
+<EditForm EditContext="EditContext" OnValidSubmit="HandleValidSubmitAsync" class="mud-width-full">
+    <DataAnnotationsValidator />
+    @if (_model is not null)
+    {
+        <MudStack Spacing="6" Class="mud-width-full">
+            @foreach (var field in _fields)
+            {
+                @RenderFieldComponent(field)
+            }
+
+            @if (ActionsContent is not null)
+            {
+                @ActionsContent
+            }
+            else
+            {
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" Disabled="_isSubmitting" FullWidth>Continue</MudButton>
+            }
+        </MudStack>
+    }
+</EditForm>
+
+
+@code {
+
+
+    private RenderFragment RenderFieldComponent(AutoEditForm.FieldMetadata field)
+    {
+        if (field.Type == typeof(string))
+        {
+            return @<MudTextField Disabled="_isSubmitting"
+                                  T="string"
+                                  Label="@field.Label"
+                                  Value="@((string)field.PropertyInfo.GetValue(_model)!)"
+                                  ValueChanged="v => OnValueChanged(field, v)"
+                                  For="@(CreateValidationExpression<string>(field))"
+                                  InputType="field.InputType"
+                                  Variant="Variant.Outlined"
+                                  OnlyValidateIfDirty
+                                  FullWidth/>;
+        }
+       
+        if (field.Type == typeof(bool))
+        {
+            return @<MudCheckBox Disabled="_isSubmitting"
+                                 T="bool"
+                                 Label="@field.Label"
+                                 Value="@((bool)field.PropertyInfo.GetValue(_model)!)"
+                                 ValueChanged="v => OnValueChanged(field, v)"
+                                 For="@(CreateValidationExpression<bool>(field))"/>;
+        }
+        
+        return builder => { };
+    }
+    
+    
+
+}
