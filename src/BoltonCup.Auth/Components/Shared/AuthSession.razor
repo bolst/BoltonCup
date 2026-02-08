@@ -1,0 +1,19 @@
+@inject AuthSessionStateService AuthSessionState
+
+@if (AuthSessionState.IsValid())
+{
+    @ChildContent
+}
+else
+{
+    <MudImage Src="/img/boltoncup.png" Height="150" />
+    <MudText Typo="Typo.h4">Your session has ended</MudText>
+    <MudButton Href="/log-in-or-sign-up" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" FullWidth>Log in</MudButton>
+}
+
+@code {
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+}
