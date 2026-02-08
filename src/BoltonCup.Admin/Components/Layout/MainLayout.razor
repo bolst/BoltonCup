@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@inject Common.Theme.BoltonCupTheme Theme
 
-<MudThemeProvider />
+<MudThemeProvider Theme="GetTheme()" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -29,8 +30,15 @@
 
 @code {
 
-    private bool _isDrawerOpen;
+    private bool _isDrawerOpen = true;
 
     private void ToggleDrawer() => _isDrawerOpen = !_isDrawerOpen;
 
+    private MudTheme GetTheme()
+    {
+        var theme = Theme.MudTheme;
+        theme.PaletteLight.AppbarBackground = theme.PaletteLight.Primary;
+        return theme;
+    }
+    
 }

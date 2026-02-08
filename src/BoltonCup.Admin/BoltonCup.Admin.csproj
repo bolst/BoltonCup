@@ -15,4 +15,8 @@
       <Folder Include="wwwroot\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\BoltonCup.Common\BoltonCup.Common.csproj" />
+    </ItemGroup>
+
 </Project>
