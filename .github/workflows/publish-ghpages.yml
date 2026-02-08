@@ -3,7 +3,7 @@ name: Build BoltonCup.WebClient
 on:
   push:
     branches:
-      - separation
+      - main
   pull_request:
     branches:
       - main
