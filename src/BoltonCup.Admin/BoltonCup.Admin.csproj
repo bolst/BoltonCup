@@ -17,6 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BoltonCup.Common\BoltonCup.Common.csproj" />
+      <ProjectReference Include="..\BoltonCup.Infrastructure\BoltonCup.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

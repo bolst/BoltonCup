@@ -1,7 +1,33 @@
 ﻿@page "/"
+@using BoltonCup.Infrastructure.Data
+@using BoltonCup.Core
+@using Microsoft.EntityFrameworkCore
+@inject AuthDbContext DbContext
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Users</h1>
 
-Welcome to your new app.
+@if (Users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <MudDataGrid Items="Users">
+        <Columns>
+            <PropertyColumn Title="User" Property="x => x.UserName" />
+            <PropertyColumn Title="Email" Property="x => x.Email" />
+            <PropertyColumn Title="Phone" Property="x => x.PhoneNumber" />
+        </Columns>
+    </MudDataGrid>
+}
+
+@code {
+    private List<Microsoft.AspNetCore.Identity.IdentityUser>? Users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Users = await DbContext.Users.ToListAsync();
+    }
+}
