@@ -31,8 +31,6 @@
         catch (ApiException e)
             when (e.StatusCode is 204 or 404)
         {
-            Snackbar.Add("Sorry! Account creation is not set up yet :(", Severity.Error);
-            return;
             Navigation.NavigateTo($"create-account/password?returnUrl={ReturnUrl}");
         }
     }
