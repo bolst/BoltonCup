@@ -1,0 +1,26 @@
+name: Build BoltonCup.Auth
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-to-github-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Install .NET WASM Build Tools
+        run: dotnet workload install wasm-tools
+      - name: Install dependencies
+        run: dotnet restore ./src/BoltonCup.Auth/BoltonCup.Auth.csproj
+      - name: Publish csproj
+        run: dotnet publish ./src/BoltonCup.Auth/BoltonCup.Auth.csproj -c:Release -p:GHPages=true -o out/BoltonCupAuth --nologo --no-restore
+      - name: Commit wwwroot to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          BRANCH: auth-build
+          FOLDER: out/BoltonCupAuth/wwwroot
