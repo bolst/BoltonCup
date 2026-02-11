@@ -30,6 +30,9 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
 
     [Parameter]
     public bool AutoFillPageTitle { get; set; } = true;
+    
+    [Parameter]
+    public EventCallback<FieldMetadata> OnEditAdornmentClick { get; set; }
 
     protected override void OnInitialized()
     {

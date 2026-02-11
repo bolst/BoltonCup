@@ -39,6 +39,13 @@
 
     private RenderFragment RenderFieldComponent(AutoEditForm.FieldMetadata field)
     {
+        var adornment = Adornment.None;
+        string? adornmentIcon = null;
+        if (field.IsReadOnly && OnEditAdornmentClick.HasDelegate)
+        {
+            adornment = Adornment.End;
+            adornmentIcon = Icons.Material.Rounded.Edit;
+        }
         if (field.Type == typeof(string))
         {
             return @<MudTextField Disabled="_isSubmitting"
@@ -49,6 +56,9 @@
                                   For="@(CreateValidationExpression<string>(field))"
                                   ReadOnly="field.IsReadOnly"
                                   InputType="field.InputType"
+                                  Adornment="adornment"
+                                  AdornmentIcon="@adornmentIcon"
+                                  OnAdornmentClick="_ => OnEditAdornmentClick.InvokeAsync(field)"
                                   Variant="Variant.Outlined"
                                   OnlyValidateIfDirty
                                   FullWidth/>;
