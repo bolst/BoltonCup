@@ -2,6 +2,9 @@
 @inject Common.Theme.BoltonCupTheme Theme
 
 <MudThemeProvider Theme="GetTheme()" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
 <MudLayout Class="d-flex flex-column" Style="min-height: 100vh">
     <MudAppBar Elevation="0">
@@ -9,7 +12,7 @@
             <MudImage Src="img/boltoncup.png" Alt="Bolton Cup" Height="64"/>
         </a>
     </MudAppBar>
-    <MudMainContent>
+    <MudMainContent Class="mud-height-full d-flex flex-column justify-center">
         <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex flex-column align-center mud-width-full gap-3">
             @Body
         </MudContainer>
