@@ -2,6 +2,7 @@
 @inject IBoltonCupApi BoltonCupApi
 @inject NavigationManager Navigation
 @inject AuthSessionStateService AuthSessionState
+@inject ISnackbar Snackbar
 
 <AutoEditForm T="LogInOrSignUpForm" EditContext="_editContext" OnValidSubmit="OnSubmit" Title="Log in or sign up" />
 
@@ -21,22 +22,17 @@
 
     private async Task OnSubmit(EditContext context)
     {
-        AuthSessionState.Initialize(_model.Email);
-        
         try
         {
             var user = await BoltonCupApi.GetUserAsync(_model.Email);
-            if (string.IsNullOrEmpty(user?.Email))
-            {
-                Navigation.NavigateTo($"create-account/password?returnUrl={ReturnUrl}");
-                return;
-            }
-            
+            AuthSessionState.Initialize(user.Email);
             Navigation.NavigateTo($"log-in/password?returnUrl={ReturnUrl}");
         }
         catch (ApiException e)
             when (e.StatusCode is 204 or 404)
         {
+            Snackbar.Add("Sorry! Account creation is not set up yet :(", Severity.Error);
+            return;
             Navigation.NavigateTo($"create-account/password?returnUrl={ReturnUrl}");
         }
     }
