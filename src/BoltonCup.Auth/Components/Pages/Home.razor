@@ -1,9 +1,1 @@
 @page "/"
-@inject NavigationManager Navigation
-@code {
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-            Navigation.NavigateTo("/log-in-or-sign-up");
-    }
-}
