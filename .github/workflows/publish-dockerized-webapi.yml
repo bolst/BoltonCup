@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'src/BoltonCup.WebAPI/**'
+  workflow_dispatch:
 
 jobs:
 
