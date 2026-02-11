@@ -31,6 +31,7 @@
         catch (ApiException e)
             when (e.StatusCode is 204 or 404)
         {
+            AuthSessionState.Initialize(_model.Email);
             Navigation.NavigateTo($"create-account/password?returnUrl={ReturnUrl}");
         }
     }
