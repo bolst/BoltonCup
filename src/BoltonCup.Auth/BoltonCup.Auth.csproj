@@ -7,6 +7,7 @@
         <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
         <AssemblyName>BoltonCup.Auth</AssemblyName>
         <RootNamespace>BoltonCup.Auth</RootNamespace>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,6 +22,12 @@
 
     <ItemGroup>
       <_ContentIncludedByDefault Remove="wwwroot\css\app.css" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>
