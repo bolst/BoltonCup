@@ -47,6 +47,7 @@
                                   Value="@((string)field.PropertyInfo.GetValue(_model)!)"
                                   ValueChanged="v => OnValueChanged(field, v)"
                                   For="@(CreateValidationExpression<string>(field))"
+                                  ReadOnly="field.IsReadOnly"
                                   InputType="field.InputType"
                                   Variant="Variant.Outlined"
                                   OnlyValidateIfDirty
@@ -60,7 +61,8 @@
                                  Label="@field.Label"
                                  Value="@((bool)field.PropertyInfo.GetValue(_model)!)"
                                  ValueChanged="v => OnValueChanged(field, v)"
-                                 For="@(CreateValidationExpression<bool>(field))"/>;
+                                 For="@(CreateValidationExpression<bool>(field))"
+                                 ReadOnly="field.IsReadOnly" />;
         }
         
         return builder => { };

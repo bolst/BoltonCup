@@ -9,4 +9,5 @@ public record FieldMetadata
     public required Type Type { get; init; }
     public required string Label { get; init; }
     public required InputType InputType { get; init; }
+    public required bool IsReadOnly { get; init; }
 }

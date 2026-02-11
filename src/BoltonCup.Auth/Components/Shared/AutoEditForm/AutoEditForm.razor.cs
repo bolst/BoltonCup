@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -40,7 +41,8 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
                 PropertyInfo = propertyInfo,
                 Type = propertyInfo.PropertyType,
                 Label = GetDisplayName(propertyInfo),
-                InputType = GetInputType(propertyInfo)
+                InputType = GetInputType(propertyInfo),
+                IsReadOnly = GetReadOnly(propertyInfo),
             });
         }
     }
@@ -89,6 +91,13 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
             DataType.Password => InputType.Password,
             _ => InputType.Text
         };
+    }
+
+    private static bool GetReadOnly(PropertyInfo prop)
+    {
+        // only true if [ReadOnly(true)]
+        var attr = prop.GetCustomAttribute<ReadOnlyAttribute>();
+        return attr is not null && attr.IsReadOnly;
     }
 
     private void OnValueChanged(FieldMetadata field, object? value)
