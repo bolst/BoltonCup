@@ -5,6 +5,9 @@
                 <NotAuthorized>
                     <RedirectToAuth />
                 </NotAuthorized>
+                <Authorizing>
+                    @* empty (I dont want to see "Authorizing...") *@
+                </Authorizing>
             </AuthorizeRouteView>
             <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
         </Found>
