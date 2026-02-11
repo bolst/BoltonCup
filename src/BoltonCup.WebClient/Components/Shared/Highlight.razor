@@ -1,0 +1,27 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+
+<MudPaper Class="d-flex flex-column align-start justify-space-evenly gap-3 border-y mud-border-lines-default pa-4 overflow-x-scroll" Elevation="0" Square>
+    <MudButton Color="Color.Primary" Href="@Href" EndIcon="@Icons.Material.Rounded.KeyboardArrowRight" Size="Size.Large">@Title</MudButton>
+    <div class="@Class" style="width: 100%">
+        @ChildContent
+    </div>
+</MudPaper>
+
+
+
+@code {
+    
+    [Parameter]
+    public string? Title { get; set; }
+    
+    [Parameter]
+    public string? Href { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+}

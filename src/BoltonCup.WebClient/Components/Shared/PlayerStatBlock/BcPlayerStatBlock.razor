@@ -1,0 +1,94 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+
+@if (_player is not null)
+{
+    <CascadingValue Value="_tournamentStats">
+        <div class="d-flex flex-column align-center gap-2">
+            @if (!InlineTitle)
+            {
+                @TitleContent
+            }
+            <MudPaper Class="d-flex flex-row align-center justify-space-evenly gap-6 px-6 py-1" Style="background-color: rgba(255,255,255,0.5);">
+                @if (!string.IsNullOrEmpty(Title) && InlineTitle)
+                {
+                    <div class="d-flex flex-column align-center" style="width: 150px">
+                        @TitleContent
+                    </div>
+                }
+
+                @if (_player.Position == "goalie")
+                {
+                    if (GoalieStats is null)
+                    {
+                        <PlayerStatItem Title="GP" Property="x => x.GamesPlayed" HideDivider="!InlineTitle"/>
+                        <PlayerStatItem Title="W" Property="x => x.Wins"/>
+                        <PlayerStatItem Title="SO" Property="x => x.Shutouts"/>
+                        <PlayerStatItem Title="GAA" Property="x => x.GoalsAgainstAverage.GetValueOrDefault()" Format="N2" />
+                        <PlayerStatItem Title="PIM" Property="x => x.PenaltyMinutes"/>
+                    }
+                    else
+                    {
+                        @GoalieStats
+                    }
+                }
+                else
+                {
+                    if (SkaterStats is null)
+                    {
+                        <PlayerStatItem Title="GP" Property="x => x.GamesPlayed" HideDivider="!InlineTitle"/>
+                        <PlayerStatItem Title="G" Property="x => x.Goals"/>
+                        <PlayerStatItem Title="A" Property="x => x.Assists"/>
+                        <PlayerStatItem Title="P" Property="x => x.Points"/>
+                        <PlayerStatItem Title="PIM" Property="x => x.PenaltyMinutes"/>
+                    }
+                    else
+                    {
+                        @SkaterStats
+                    }
+                }
+            </MudPaper>
+        </div>
+    </CascadingValue>
+}
+
+
+@code {
+    
+    [Parameter, EditorRequired]
+    public required Sdk.PlayerSingleDetailDto Player { get; set; }
+    
+    [Parameter]
+    public string? Title { get; set; }
+    
+    [Parameter]
+    public bool InlineTitle { get; set; }
+    
+    [Parameter]
+    public int? TournamentId { get; set; }
+
+    [Parameter]
+    public RenderFragment SkaterStats { get; set; } = null!;
+    
+    [Parameter]
+    public RenderFragment GoalieStats { get; set; } = null!;
+
+    
+    private Sdk.PlayerSingleDetailDto? _player;
+    private int? _tournamentId;
+    private IEnumerable<Sdk.PlayerTournamentStats> _tournamentStats = [];
+
+    protected override void OnParametersSet()
+    {
+        if (_player == Player && _tournamentId == TournamentId)
+            return;
+        _player = Player;
+        _tournamentId = TournamentId;
+        _tournamentStats = _tournamentId.HasValue
+            ? _player.TournamentStats.Where(x => x.Tournament.Id == _tournamentId.Value)
+            : _player.TournamentStats;
+    }
+
+    private RenderFragment TitleContent => @<MudText Typo="Typo.body1" Align="Align.Center"><b>@Title</b></MudText>;
+
+}

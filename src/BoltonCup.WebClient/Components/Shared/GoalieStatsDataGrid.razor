@@ -1,0 +1,73 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+@inject IBoltonCupApi BoltonCupApi
+
+<MudDataGrid
+    @ref="_dataGrid"
+    T="Sdk.GoalieStatDetailDto"
+    ServerData="ServerReload"
+    Breakpoint="Breakpoint.None"
+    RowStyle="height: 50px"
+    RowsPerPage="50"
+    Elevation="0"
+    ShowColumnOptions="false"
+    Striped
+    Dense>
+    <ToolBarContent>
+        <MudIconButton Icon="@Icons.Material.Rounded.FilterAlt" Variant="Variant.Outlined" />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.FullName" Title="Player" Sortable="false" StickyLeft>
+            <CellTemplate>
+                <PlayerLink Label="@context.Item.FullName" PlayerId="context.Item.PlayerId" />
+            </CellTemplate>
+        </PropertyColumn>
+        @* <PropertyColumn Property="x => x.Team.Name" Title="Team"> *@
+        @*     <CellTemplate> *@
+        @*         <div class="d-flex flex-row align-center justify-space-evenly"> *@
+        @*             <MudText Typo="Typo.body2">@context.Item.Team.Abbreviation</MudText> *@
+        @*             <MudImage Src="@context.Item.Team.LogoUrl" Height="24" Alt="@context.Item.Team.Abbreviation"/> *@
+        @*         </div> *@
+        @*     </CellTemplate> *@
+        @* </PropertyColumn> *@
+        <PropertyColumn Property="x => x.Position" Title="Position"/>
+        <PropertyColumn Property="x => x.GamesPlayed" Title="GP" sty CellStyle="@_dataCellStyle"/>
+        <PropertyColumn Property="x => x.GoalsAgainstAverage" Title="GAA" CellStyle="@_dataCellStyle" InitialDirection="SortDirection.Ascending"/>
+        <PropertyColumn Property="x => x.Shutouts" Title="SO" CellStyle="@_dataCellStyle" />
+        <PropertyColumn Property="x => x.Wins" Title="W" CellStyle="@_dataCellStyle" />
+        <PropertyColumn Property="x => x.PenaltyMinutes" Title="PIM" CellStyle="@_dataCellStyle" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Sdk.GoalieStatDetailDto" PageSizeSelector="false"/>
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+
+    private MudDataGrid<Sdk.GoalieStatDetailDto> _dataGrid = null!;
+    private const string _dataCellStyle = "max-width: 30px";
+
+    private async Task<GridData<Sdk.GoalieStatDetailDto>> ServerReload(GridState<Sdk.GoalieStatDetailDto> state)
+    {
+        string? sortBy = null;
+        bool? descending = null;
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        if (sortDefinition is not null)
+        {
+            sortBy = sortDefinition.SortBy;
+            descending = sortDefinition.Descending;
+        }
+        
+        var data = await BoltonCupApi.GetGoalieStatsAsync(
+            page: state.Page + 1, 
+            size: state.PageSize,
+            sortBy: sortBy,
+            descending: descending
+        );
+        return new GridData<Sdk.GoalieStatDetailDto> {
+            TotalItems = data.Total,
+            Items = data.Items,
+        };
+    }
+
+}

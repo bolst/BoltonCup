@@ -1,0 +1,36 @@
+name: Build BoltonCup.WebClient
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_run:
+    workflows: [Build]
+    types: [completed]
+
+jobs:
+  deploy-to-github-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Install .NET WASM Build Tools
+        run: dotnet workload install wasm-tools
+      - name: Install dependencies
+        run: dotnet restore ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj
+      - name: Publish csproj
+        run: dotnet publish ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj -c:Release -p:GHPages=true -o out/BoltonCupWebClient --nologo --no-restore
+      - name: Generate sitemap
+        run: dotnet run --project ./src/BoltonCup.WebClient.SitemapGenerator/BoltonCup.WebClient.SitemapGenerator.csproj -- -o out/BoltonCupWebClient/wwwroot
+      - name: Commit wwwroot to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          BRANCH: webclient-build
+          FOLDER: out/BoltonCupWebClient/wwwroot

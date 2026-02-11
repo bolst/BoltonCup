@@ -1,0 +1,52 @@
+<MudAppBar Elevation="1" ToolBarClass="d-flex flex-row align-center">
+    <a href="/" style="height: 100%">
+        <MudImage Src="img/boltoncup.png" Alt="Bolton Cup" Height="64"/>
+    </a>
+    
+    <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+        @foreach (var navLink in _navLinks)
+        {
+            <MudButton Href="@navLink.Href" Variant="Variant.Text" Color="Color.Inherit" Size="Size.Large">@navLink.Title</MudButton>
+        }
+        <MudSpacer />
+        <UserMenu />
+    </MudHidden>
+    <MudHidden Breakpoint="Breakpoint.MdAndUp">
+        <MudSpacer />
+        <MudIconButton OnClick="OpenDrawer" Icon="@Icons.Material.Rounded.Menu" Variant="Variant.Text" Color="Color.Inherit" />
+        <MudDrawer @bind-Open="_drawerOpen" Anchor="Anchor.End" Elevation="1" Variant="DrawerVariant.Temporary" Width="100%">
+            <MudPaper Class="d-flex flex-row align-center px-2 border-solid border-b" Elevation="0" Width="100%" Height="64px" Square>
+                <a href="/" onclick="location.reload()" style="height: 100%">
+                    <MudImage Src="img/boltoncup.png" Alt="Bolton Cup" Height="64"/>
+                </a>
+                <MudSpacer />
+                <MudIconButton OnClick="CloseDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit" />
+            </MudPaper>
+            <MudNavMenu Class="mud-width-full" Color="Color.Primary" Bordered>
+                @foreach (var navLink in _navLinks)
+                {
+                    <MudNavLink Href="@navLink.Href" Icon="@navLink.Icon">@navLink.Title</MudNavLink>
+                }
+            </MudNavMenu>
+        </MudDrawer>
+    </MudHidden>
+</MudAppBar>
+
+
+@code{
+    
+    private readonly List<NavLinkItem> _navLinks =
+    [
+        new("Home", "/", Icons.Material.Rounded.Home),
+        new("Info", "/info", Icons.Material.Rounded.Info),
+        new("Teams", "/teams", Icons.Material.Rounded.Groups),
+        new("Schedule", "/schedule", Icons.Material.Rounded.CalendarMonth),
+        new("Stats", "/stats", Icons.Material.Rounded.QueryStats)
+    ];
+    
+    private bool _drawerOpen;
+
+    private void OpenDrawer() => _drawerOpen = true;
+    private void CloseDrawer() => _drawerOpen = false;
+
+}

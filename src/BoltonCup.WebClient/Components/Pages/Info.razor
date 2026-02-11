@@ -1,0 +1,39 @@
+@page "/info"
+@attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-02-01")]
+
+@inject IBoltonCupApi BoltonCupApi
+
+<PageTitle>Info | Bolton Cup</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    @if (_infoGuide is not null)
+    {
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-8"><b>@_infoGuide.Title</b></MudText>
+        
+        <MudMarkdown Value="@_infoGuide.MarkdownContent" Props="_mdProperties" />
+    }
+</MudContainer>
+
+@code {
+
+    private Sdk.InfoGuideSingleDetailDto? _infoGuide;
+
+    private static readonly MudMarkdownProps _mdProperties = new()
+    {
+        Heading = 
+        {
+            OverrideTypo = (x) => x switch
+            {
+                Typo.h1 => Typo.h4,
+                Typo.h2 => Typo.h5,
+                _ => Typo.h6,
+            }
+        }
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _infoGuide ??= await BoltonCupApi.GetInfoGuideByTournamentIdAsync(2);
+    }
+
+}

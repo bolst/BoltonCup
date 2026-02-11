@@ -1,0 +1,40 @@
+@page "/log-in-or-sign-up"
+@inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
+@inject AuthSessionStateService AuthSessionState
+@inject ISnackbar Snackbar
+
+<AutoEditForm T="LogInOrSignUpForm" EditContext="_editContext" OnValidSubmit="OnSubmit" Title="Log in or sign up" />
+
+@code {
+    
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
+    private readonly LogInOrSignUpForm _model = new();
+    private EditContext? _editContext;
+
+    protected override void OnInitialized() 
+    {
+        _model.Email = AuthSessionState.Email ?? string.Empty;
+        _editContext = new EditContext(_model);
+    }
+
+    private async Task OnSubmit(EditContext context)
+    {
+        try
+        {
+            var user = await BoltonCupApi.GetUserAsync(_model.Email);
+            AuthSessionState.Initialize(user.Email);
+            Navigation.NavigateTo($"log-in/password?returnUrl={ReturnUrl}");
+        }
+        catch (ApiException e)
+            when (e.StatusCode is 204 or 404)
+        {
+            Snackbar.Add("Sorry! Account creation is not set up yet :(", Severity.Error);
+            return;
+            Navigation.NavigateTo($"create-account/password?returnUrl={ReturnUrl}");
+        }
+    }
+
+}

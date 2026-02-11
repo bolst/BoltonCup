@@ -1,0 +1,35 @@
+@namespace BoltonCup.Common.Components
+@inject NavigationManager Navigation
+@inject IBoltonCupApi Api
+@inject IOptions<BoltonCupConfiguration> Config
+
+<AuthorizeView>
+    <Authorized>
+        <MudMenu Label="@context.User.Identity?.Name" 
+                 Variant="Variant.Text" 
+                 Color="Color.Inherit" 
+                 EndIcon="@Icons.Material.Rounded.KeyboardArrowDown">
+            <MudMenuItem Href="@($"{Config.Value.WebBaseUrl}profile")">My Profile</MudMenuItem>
+            <MudMenuItem OnClick="LogOut">Log Out</MudMenuItem>
+        </MudMenu>
+    </Authorized>
+    <NotAuthorized>
+        <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="GoToLogin">Log In</MudButton>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    
+    private void GoToLogin()
+    {
+        var returnUrl = Uri.EscapeDataString(Navigation.Uri);
+        Navigation.NavigateTo($"{Config.Value.AuthBaseUrl}log-in-or-sign-up?returnUrl={returnUrl}", forceLoad: true);
+    }
+
+    private async Task LogOut()
+    {
+        await Api.LogoutAsync();
+        // force refresh to clear state and update UI
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+}
