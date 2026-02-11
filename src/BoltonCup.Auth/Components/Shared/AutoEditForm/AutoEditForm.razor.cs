@@ -8,7 +8,7 @@ using BoltonCup.Auth.Components.Shared.AutoEditForm;
 
 namespace BoltonCup.Auth.Components.Shared;
 
-public partial class AutoEditForm<T> where T : class, new()
+public partial class AutoEditForm<T> : ComponentBase where T : class, new()
 {
     private T? _model { get; set; }
     private readonly List<FieldMetadata> _fields = [];

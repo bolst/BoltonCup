@@ -3,12 +3,21 @@ using BoltonCup.WebAPI;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Controllers;
 using BoltonCup.WebAPI.Filters;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var keyDirectory = builder.Configuration["DataProtection:KeyDirectory"];
+if (!string.IsNullOrEmpty(keyDirectory))
+{
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo(keyDirectory))
+        .SetApplicationName("BoltonCup.SharedAuth");
+}
 
 builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
 
