@@ -1,6 +1,6 @@
 <MudAppBar Elevation="1" ToolBarClass="d-flex flex-row align-center">
     <a href="/" style="height: 100%">
-        <MudImage Src="img/boltoncup.png" Alt="Bolton Cup" Height="64"/>
+        <BoltonCupLogo Height="64" />
     </a>
     
     <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
@@ -17,7 +17,7 @@
         <MudDrawer @bind-Open="_drawerOpen" Anchor="Anchor.End" Elevation="1" Variant="DrawerVariant.Temporary" Width="100%">
             <MudPaper Class="d-flex flex-row align-center px-2 border-solid border-b" Elevation="0" Width="100%" Height="64px" Square>
                 <a href="/" onclick="location.reload()" style="height: 100%">
-                    <MudImage Src="img/boltoncup.png" Alt="Bolton Cup" Height="64"/>
+                    <BoltonCupLogo Height="64" />
                 </a>
                 <MudSpacer />
                 <MudIconButton OnClick="CloseDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit" />
