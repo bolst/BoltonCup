@@ -62,7 +62,7 @@
         if (dateRange.Start.HasValue)
         {
             month = dateRange.Start.Value.Month;
-            text = dateRange.Start.Value.ToString("MMM. dd");
+            text = dateRange.Start.Value.ToString("MMM dd");
         }
         if (dateRange.End.HasValue)
         {
@@ -70,7 +70,7 @@
                 text += " - ";
             var format = dateRange.End.Value.Month == month
                 ? "dd"
-                : "MMM. dd";
+                : "MMM dd";
             text += dateRange.End.Value.ToString(format);
         }
         
