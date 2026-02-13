@@ -1,0 +1,21 @@
+<MudDrawer Open="Open" OpenChanged="OpenChanged" Elevation="2">
+    <MudDrawerHeader>
+        <BoltonCupLogo Width="72" />
+    </MudDrawerHeader>
+    <MudNavMenu Class="px-1" Margin="Margin.Normal" Rounded Dense>
+        <MudNavLink Href="/" Icon="@Icons.Material.Rounded.Home" Match="NavLinkMatch.All">Home</MudNavLink>
+        <MudNavLink Href="/accounts" Icon="@Icons.Material.Rounded.ManageAccounts" Match="NavLinkMatch.Prefix">Accounts</MudNavLink>
+        <MudNavLink Href="/tournaments" Icon="@Icons.Material.Rounded.Lan" Match="NavLinkMatch.Prefix">Tournaments</MudNavLink>
+        <MudNavLink Href="/games" Icon="@Icons.Material.Rounded.Stadium" Match="NavLinkMatch.Prefix">Games</MudNavLink>
+    </MudNavMenu>
+</MudDrawer>
+
+@code {
+
+    [Parameter]
+    public bool Open { get; set; }
+    
+    [Parameter]
+    public EventCallback<bool> OpenChanged { get; set; }
+
+}
