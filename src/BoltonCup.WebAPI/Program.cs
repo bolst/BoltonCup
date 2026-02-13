@@ -23,6 +23,14 @@ builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
 
 builder.Services.AddBoltonCupWebAPIServices(builder.Environment);
 
+builder.WebHost.UseSentry(options =>
+{
+    options.Dsn = builder.Configuration["Sentry:Dsn"];
+    options.Environment = builder.Environment.EnvironmentName;
+    options.TracesSampleRate = builder.Environment.IsProduction() ? 0.2 : 1.0;
+    options.SendDefaultPii = true;
+});
+
 // https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -70,6 +78,8 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+app.UseSentryTracing();
+
 // Configure the HTTP request pipeline.
 if (true) //(app.Environment.IsDevelopment())
 {
@@ -91,6 +101,7 @@ app.UseHttpsRedirection();
 app.UseForwardedHeaders();
 app.UseRateLimiter();
 app.UseCors();
+
 
 app.MapGroup("/api/auth")
     .MapIdentityApi<IdentityUser>()
