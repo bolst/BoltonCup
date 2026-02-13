@@ -1,5 +1,23 @@
 @page "/profile"
+@using System.Security.Claims
 @attribute [Authorize]
 @inject IBoltonCupApi BoltonCupApi
 
-<PageTitle>Profile | Bolton Cup</PageTitle>
+<PageTitle>Edit Profile | Bolton Cup</PageTitle>
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateTask;
+        var user = authState.User;
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+        }
+    }
+
+}
