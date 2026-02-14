@@ -1,12 +1,11 @@
-using BoltonCup.Core.Queries.Base;
 using FluentValidation;
 
 namespace BoltonCup.Core.Queries.Base;
 
-public abstract class SortablePaginationQueryValidator<T> : AbstractValidator<T>
-    where T : ISortablePaginationQuery
+public abstract class QueryBaseValidator<T> : AbstractValidator<T>
+    where T : IQueryBase
 {
-    protected SortablePaginationQueryValidator()
+    protected QueryBaseValidator()
     {
         RuleFor(x => x.Page)
             .GreaterThanOrEqualTo(1)
