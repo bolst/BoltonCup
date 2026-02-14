@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
         return services
             .AddDbContext<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
             .AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString))
+            .AddTransient<IAccountRepository, AccountRepository>()
             .AddTransient<IGameRepository, GameRepository>()
             .AddTransient<IGoalieGameLogRepository, GoalieGameLogRepository>()
             .AddTransient<IGoalieStatRepository, GoalieStatRepository>()
