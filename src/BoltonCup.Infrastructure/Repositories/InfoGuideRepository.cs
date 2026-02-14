@@ -13,8 +13,9 @@ public class InfoGuideRepository(BoltonCupDbContext _context) : IInfoGuideReposi
         return await _context.InfoGuides
             .AsNoTracking()
             .Include(e => e.Tournament)
-            .OrderByDescending(e => e.LastModified)
-            .ThenByDescending(e => e.CreatedAt)
+            .ApplySorting(query, x => x
+                .OrderByDescending(e => e.LastModified)
+                .ThenByDescending(e => e.CreatedAt))
             .ToPaginatedListAsync(query);
     }
         
@@ -23,8 +24,9 @@ public class InfoGuideRepository(BoltonCupDbContext _context) : IInfoGuideReposi
     {
         return await _context.InfoGuides
             .AsNoTracking()
-            .OrderByDescending(e => e.LastModified)
-            .ThenByDescending(e => e.CreatedAt)
+            .ApplySorting(query, x => x
+                .OrderByDescending(e => e.LastModified)
+                .ThenByDescending(e => e.CreatedAt))
             .ProjectTo<InfoGuide, T>()
             .ToPaginatedListAsync(query);
     }
@@ -52,8 +54,6 @@ public class InfoGuideRepository(BoltonCupDbContext _context) : IInfoGuideReposi
         return await _context.InfoGuides
             .AsNoTracking()
             .Include(e => e.Tournament)
-            .OrderByDescending(e => e.LastModified)
-            .ThenByDescending(e => e.CreatedAt)
             .FirstOrDefaultAsync(e => e.TournamentId == tournamentId);
     }
 

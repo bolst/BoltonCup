@@ -18,7 +18,7 @@ public class AccountRepository(BoltonCupDbContext _context) : IAccountRepository
             .Include(a => a.ManagedTeams)
             .ConditionalWhere(a => a.Players.Any(p => p.TournamentId == query.TournamentId), query.TournamentId.HasValue)
             .ConditionalWhere(a => a.Players.Any(p => p.TeamId == query.TeamId), query.TeamId.HasValue)
-            .OrderBy(a => a.Id)
+            .ApplySorting(query, x => x.OrderBy(a => a.Id))
             .ToPaginatedListAsync(query);
     }       
     
@@ -31,7 +31,7 @@ public class AccountRepository(BoltonCupDbContext _context) : IAccountRepository
             .Include(a => a.ManagedTeams)
             .ConditionalWhere(a => a.Players.Any(p => p.TournamentId == query.TournamentId), query.TournamentId.HasValue)
             .ConditionalWhere(a => a.Players.Any(p => p.TeamId == query.TeamId), query.TeamId.HasValue)
-            .OrderBy(a => a.Id)
+            .ApplySorting(query, x => x.OrderBy(a => a.Id))
             .ProjectTo<Account, T>()
             .ToPaginatedListAsync(query);
     }       

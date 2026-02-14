@@ -1,5 +1,5 @@
 using System.Threading.RateLimiting;
-using BoltonCup.Core.Queries.Base;
+using BoltonCup.Core;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Filters;
 using FluentValidation;
@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
         return services
             .AddFluentValidationAutoValidation()
             .AddFluentValidationClientsideAdapters()
-            .AddValidatorsFromAssemblyContaining<DefaultPaginationQuery>();
+            .AddValidatorsFromAssemblyContaining<EntityBase>();
     }
 
     private static IServiceCollection AddAuthServices(this IServiceCollection services, IHostEnvironment environment)

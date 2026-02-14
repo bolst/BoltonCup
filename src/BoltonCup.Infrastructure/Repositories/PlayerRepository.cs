@@ -19,7 +19,7 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
             .Include(p => p.Team)
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
-            .OrderBy(p => p.Id)
+            .ApplySorting(query, x => x.OrderBy(p => p.Id))
             .ToPaginatedListAsync(query);
     }       
     
@@ -30,7 +30,7 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
             .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
-            .OrderBy(p => p.Id)
+            .ApplySorting(query, x => x.OrderBy(p => p.Id))
             .ProjectTo<Player, T>()
             .ToPaginatedListAsync(query);
     }       
