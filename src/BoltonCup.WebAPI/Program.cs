@@ -1,4 +1,5 @@
 using BoltonCup.Infrastructure;
+using BoltonCup.Infrastructure.Data;
 using BoltonCup.WebAPI;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Controllers;
@@ -18,6 +19,10 @@ if (!string.IsNullOrEmpty(keyDirectory))
         .PersistKeysToFileSystem(new DirectoryInfo(keyDirectory))
         .SetApplicationName("BoltonCup.SharedAuth");
 }
+
+builder.Services
+    .AddIdentityApiEndpoints<IdentityUser>()
+    .AddEntityFrameworkStores<AuthDbContext>();
 
 builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
 

@@ -24,12 +24,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
-
-var connectionString = builder.Configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
-builder.Services
-    .AddDbContext<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
-    .AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString));
-
+builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
 
 var configSection = builder.Configuration.GetSection(BoltonCupConfiguration.SectionName);
 var bcConfig = configSection.Get<BoltonCupConfiguration>() 
