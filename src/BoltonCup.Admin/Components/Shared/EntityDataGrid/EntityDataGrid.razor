@@ -1,0 +1,37 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam T
+@inherits ComponentBaseWithState
+
+<MudDataGrid 
+    @ref="_dataGrid" 
+    T="T" 
+    ServerData="ServerFunc" 
+    CommittedItemChanges="OnItemEdited" 
+    Height="@_height" 
+    EditMode="DataGridEditMode.Cell" 
+    SortMode="SortMode.Single" 
+    Breakpoint="Breakpoint.None" 
+    ColumnResizeMode="ResizeMode.Container" 
+    ReadOnly="false" 
+    Hideable 
+    Bordered 
+    Dense>
+    <ToolBarContent>
+        <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+            <MudTooltip Text="Save">
+                <MudIconButton OnClick="SaveChangesAsync" Icon="@Icons.Material.Rounded.Save" Color="Color.Primary" Disabled="!_isDirty"/>
+            </MudTooltip>
+            <MudTooltip Text="Revert">
+                <MudIconButton OnClick="RevertChangesAsync" Icon="@Icons.Material.Rounded.Undo" Color="Color.Error" Disabled="!_isDirty"/>
+            </MudTooltip>
+        </MudButtonGroup>
+        <MudSpacer/>
+        <MudTextField @bind-Value="_search" Label="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable/>
+    </ToolBarContent>
+    <Columns>
+        @Columns
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="T" PageSizeOptions="_pageSizeOptions"/>
+    </PagerContent>
+</MudDataGrid>

@@ -1,1 +1,60 @@
 @page "/games"
+@inject IGameRepository GameRepo
+
+<EntityDataGrid
+    T="Game"
+    ServerFunc="ServerFunc"
+    OnSave="OnSave"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Date" Property="x => x.GameTime" />
+        <PropertyColumn Title="Type" Property="x => x.GameType" />
+        <PropertyColumn Title="Venue" Property="x => x.Venue" />
+        <PropertyColumn Title="Rink" Property="x => x.Rink" />
+    </Columns>
+</EntityDataGrid>
+
+@code {
+    
+    private readonly ItemComparer _comparer = new();
+
+    private async Task<GridData<Game>> ServerFunc(GridState<Game> state)
+    {
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        var data = await GameRepo.GetAllAsync(new GetGamesQuery
+        {
+            Page = state.Page + 1,
+            Size = state.PageSize,
+            SortBy = sortDefinition?.SortBy,
+            Descending = sortDefinition?.Descending ?? false,
+        });
+        
+        var totalItems = data.Items.Count();
+        if (data is PaginatedList<Game> pageList)
+            totalItems = pageList.Total;
+
+        return new GridData<Game>
+        {
+            Items = data.Items,
+            TotalItems = totalItems
+        };
+    }
+
+    private async Task OnSave(HashSet<Game> changes)
+    {
+        
+    }
+    
+    public class ItemComparer : IEqualityComparer<Game>
+    {
+        public bool Equals(Game? item1, Game? item2)
+        {
+            if (ReferenceEquals(item1, item2)) 
+                return true;
+            return item1 is not null && item2 is not null && item1.Id == item2.Id;
+        }
+        
+        public int GetHashCode(Game item) => item.Id;
+    }
+
+}

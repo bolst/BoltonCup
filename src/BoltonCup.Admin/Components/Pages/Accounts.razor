@@ -1,1 +1,72 @@
 @page "/accounts"
+@inject IAccountRepository AccountRepo
+
+<EntityDataGrid 
+    @ref="_dataGrid" 
+    T="Account" 
+    ServerFunc="GetItemsAsync" 
+    OnSave="OnSave" 
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="First" Property="x => x.FirstName"/>
+        <PropertyColumn Title="Last" Property="x => x.LastName"/>
+        <PropertyColumn Title="Email" Property="x => x.Email"/>
+        <PropertyColumn Title="Phone" Property="x => x.Phone" Required="false"/>
+        <PropertyColumn Title="Born" Property="x => x.Birthday" />
+        <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel">
+            <EditTemplate>
+                <HighestLevelSelect 
+                    Value="@context.Item.HighestLevel"
+                    ValueChanged="v => { context.Item.HighestLevel = v; _dataGrid.NotifyItemChangedAsync(context.Item); }"/>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Beer" Property="x => x.PreferredBeer"/>
+    </Columns>
+</EntityDataGrid>
+
+@code {
+
+    private EntityDataGrid<Account> _dataGrid = null!;
+    private readonly ItemComparer _comparer = new();
+
+    private async Task<GridData<Account>> GetItemsAsync(GridState<Account> state)
+    {
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        var data = await AccountRepo.GetAllAsync(new GetAccountsQuery
+        {
+            Page = state.Page + 1,
+            Size = state.PageSize,
+            SortBy = sortDefinition?.SortBy,
+            Descending = sortDefinition?.Descending ?? false,
+        });
+        
+        var totalItems = data.Items.Count();
+        if (data is PaginatedList<Account> pageList)
+            totalItems = pageList.Total;
+
+        return new GridData<Account>
+        {
+            Items = data.Items,
+            TotalItems = totalItems
+        };
+    }
+
+
+    private async Task OnSave(HashSet<Account> changes)
+    {
+    }
+
+
+    public class ItemComparer : IEqualityComparer<Account>
+    {
+        public bool Equals(Account? item1, Account? item2)
+        {
+            if (ReferenceEquals(item1, item2)) 
+                return true;
+            return item1 is not null && item2 is not null && item1.Id == item2.Id;
+        }
+        
+        public int GetHashCode(Account item) => item.Id;
+    }
+
+}
