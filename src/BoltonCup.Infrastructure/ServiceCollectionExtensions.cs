@@ -12,6 +12,11 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddBoltonCupInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services
+            .AddIdentityCore<IdentityUser>()
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<AuthDbContext>();
+        
         var connectionString = configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
         return services
             .AddDbContext<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
