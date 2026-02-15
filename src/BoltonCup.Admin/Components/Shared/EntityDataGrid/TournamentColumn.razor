@@ -1,0 +1,18 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam T where T : EntityBase
+@inherits EntityColumn<T, Tournament>
+
+@code {
+    protected override RenderFragment EntityEditTemplate(Tournament? tournament)
+    {
+        if (tournament is null)
+        {
+            return @<div></div>;
+        }
+    
+        return @<div class="d-flex flex-row align-center gap-1">
+                   <BoltonCupLogo Height="24" />
+                   <MudText Typo="Typo.body2">@tournament.Name</MudText>
+               </div>;
+    }
+}
