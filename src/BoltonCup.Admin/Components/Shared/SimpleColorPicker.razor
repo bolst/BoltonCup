@@ -1,0 +1,89 @@
+@using MudBlazor.State
+@using MudBlazor.Utilities
+@namespace BoltonCup.Admin.Components.Shared
+@inherits ComponentBaseWithState
+
+<div class="@Classname" style="@Stylename" @onclick="ShowDialogAsync">
+    <div class="mud-width-full rounded py-4" style="@($"background-color:{_text};")"></div>
+</div>
+
+<MudMessageBox @ref="_mudMessageBox" YesText="@(null)">
+    <MessageContent>
+        <div class="d-flex justify-center">
+            <MudColorPicker 
+                Text="@_text"
+                TextChanged="SetTextAsync"
+                ColorPickerView="ColorPickerView.Grid"
+                Margin="Margin.Dense"
+                Placeholder="Select Color"
+                PickerVariant="PickerVariant.Static"
+                ShowAlpha="false"
+                ShowToolbar />
+        </div>
+    </MessageContent>
+</MudMessageBox>
+
+
+@code {
+    
+    [Parameter]
+    public string? Text { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> TextChanged { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public string? Height { get; set; }
+
+    [Parameter]
+    public string? Width { get; set; }
+
+    private string Classname => new CssBuilder()
+    .AddClass(Class)
+    .Build();
+
+    private string Stylename => new StyleBuilder()
+    .AddStyle("height", Height)
+    .AddStyle("width", Width)
+    .AddStyle(Style)
+    .Build();
+
+    private MudMessageBox _mudMessageBox = null!;
+
+    private string? _text;
+    private readonly ParameterState<string?> _textState;
+
+    public SimpleColorPicker()
+    {
+        using var registerScope = CreateRegisterScope();
+        _textState = registerScope.RegisterParameter<string?>(nameof(Text))
+            .WithParameter(() => Text)
+            .WithEventCallback(() => TextChanged)
+            .WithChangeHandler(OnTextChange);
+    }
+
+    private void OnTextChange(ParameterChangedEventArgs<string?> args)
+    {
+        _text = args.Value;
+        StateHasChanged();
+    }
+
+    private Task SetTextAsync(string text)
+    {
+        if (text.Equals(_text, StringComparison.OrdinalIgnoreCase))
+            return Task.CompletedTask;
+        _text = text;
+        return _textState.SetValueAsync(_text);
+    }
+
+    private Task ShowDialogAsync()
+    {
+        return _mudMessageBox.ShowAsync();
+    }
+}
