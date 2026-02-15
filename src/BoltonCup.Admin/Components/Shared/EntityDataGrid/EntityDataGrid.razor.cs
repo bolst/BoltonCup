@@ -10,7 +10,6 @@ namespace BoltonCup.Admin.Components.Shared;
 [CascadingTypeParameter(nameof(T))]
 public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T> 
     : ComponentBaseWithState
-    where T : EntityBase
 {
     private string _itemChangedStyle = new StyleBuilder()
         .AddStyle("background-color", "var(--mud-palette-dark-lighten)")
@@ -18,6 +17,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         .AddStyle("background-size", "20px 20px")
         .Build();
     private const string _height = "calc(100vh - 64px - 52px - var(--mud-appbar-height))";
+    private const string _noPagerHeight = "calc(100vh - 64px - var(--mud-appbar-height))";
     private readonly int[] _pageSizeOptions = [15, 50, 100];
     private HashSet<T> _changes;
     private MudDataGrid<T> _dataGrid = null!;
@@ -58,8 +58,14 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public EventCallback<string?> SearchChanged { get; set; }
     
     [Parameter]
-    public IEqualityComparer<T> Comparer { get; set; } = EqualityComparer<T>.Default; 
+    public IEqualityComparer<T> Comparer { get; set; } = EqualityComparer<T>.Default;
 
+    [Parameter]
+    public ResizeMode ColumnResizeMode { get; set; } = ResizeMode.Container;
+    
+    [Parameter]
+    public bool HidePagerContent { get; set; }
+    
     public Task NotifyItemChangedAsync(T item) => _dataGrid.CommittedItemChanges.InvokeAsync(item);
 
     private Task OnSearchChange(ParameterChangedEventArgs<string?> args)
@@ -109,5 +115,10 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         return !_changes.Contains(item) 
             ? string.Empty 
             : _itemChangedStyle;
+    }
+
+    private string GetHeight()
+    {
+        return HidePagerContent ? _noPagerHeight : _height;
     }
 }

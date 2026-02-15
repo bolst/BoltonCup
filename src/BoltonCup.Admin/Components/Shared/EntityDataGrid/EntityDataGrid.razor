@@ -5,15 +5,15 @@
 <CascadingValue Value="this" IsFixed="true">
     <MudDataGrid 
         @ref="_dataGrid" 
-        T="T" 
+        T="T"
         ServerData="ServerFunc" 
         CommittedItemChanges="OnItemEdited" 
-        Height="@_height" 
+        Height="@GetHeight()" 
         RowStyleFunc="RowStyleFunc"
         EditMode="DataGridEditMode.Cell" 
         SortMode="SortMode.Single" 
         Breakpoint="Breakpoint.None" 
-        ColumnResizeMode="ResizeMode.Container" 
+        ColumnResizeMode="@ColumnResizeMode" 
         ReadOnly="false" 
         ShowColumnOptions="false"
         Hideable 
@@ -35,7 +35,10 @@
             @Columns
         </Columns>
         <PagerContent>
-            <MudDataGridPager T="T" PageSizeOptions="_pageSizeOptions"/>
+            @if (!HidePagerContent)
+            {
+                <MudDataGridPager T="T" PageSizeOptions="_pageSizeOptions"/>
+            }
         </PagerContent>
     </MudDataGrid>
 </CascadingValue>
