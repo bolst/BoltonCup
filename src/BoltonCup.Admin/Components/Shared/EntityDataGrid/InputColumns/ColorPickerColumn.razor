@@ -3,6 +3,13 @@
 @inherits InputColumnBase<T, string>
 
 @code {
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Sortable = false;
+    }
+    
     protected override RenderFragment EntityEditTemplate(CellContext<T> context)
     {
         var property = PropertyFunc(context.Item);
