@@ -1,6 +1,6 @@
 @namespace BoltonCup.Admin.Components.Shared
 @typeparam T where T : class
-@inherits InputColumnBase<T, DateTime>
+@inherits InputColumnBase<T, DateTime?>
 
 @code {
     protected override RenderFragment EntityEditTemplate(CellContext<T> context)
