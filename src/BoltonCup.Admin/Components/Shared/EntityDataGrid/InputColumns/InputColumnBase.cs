@@ -12,9 +12,9 @@ public abstract partial class InputColumnBase<[DynamicallyAccessedMembers(Dynami
     : Column<T> 
     where T : class
 {
-    private Expression<Func<T, TProperty?>>? _lastAssignedProperty;
-    private Func<T, TProperty?>? _compiledExpression;
     private string? _propertyName;
+    private Expression<Func<T, TProperty>>? _lastAssignedProperty;
+    private Func<T, TProperty>? _compiledExpression;
 
     protected abstract RenderFragment EntityEditTemplate(CellContext<T> context);
     
@@ -23,7 +23,7 @@ public abstract partial class InputColumnBase<[DynamicallyAccessedMembers(Dynami
     
     [Parameter]
     [EditorRequired]
-    public required Expression<Func<T, TProperty?>> Property { get; set; } = Expression.Lambda<Func<T, TProperty?>>(Expression.Default(typeof(TProperty)), Expression.Parameter(typeof(T)));
+    public required Expression<Func<T, TProperty>> Property { get; set; } = Expression.Lambda<Func<T, TProperty>>(Expression.Default(typeof(TProperty)), Expression.Parameter(typeof(T)));
     
 
     protected override void OnInitialized()
@@ -87,7 +87,8 @@ public abstract partial class InputColumnBase<[DynamicallyAccessedMembers(Dynami
             return;
         if (memberExpression.Member is not PropertyInfo propertyInfo) 
             return;
-        
+
+        var rootItem = item;
         item = RecursiveGetSubProperties(memberExpression, item);
         if (value == null)
         { 
@@ -95,11 +96,15 @@ public abstract partial class InputColumnBase<[DynamicallyAccessedMembers(Dynami
         }
         else
         {
-            var actualType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? PropertyType;
-            propertyInfo.SetValue(item, Convert.ChangeType(value, actualType), null);
+            var targetType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) 
+                             ?? propertyInfo.PropertyType;
+            var safeValue = targetType.IsInstanceOfType(value) 
+                ? value 
+                : Convert.ChangeType(value, targetType);
+            propertyInfo.SetValue(item, safeValue);
         }
 
-        if (EntityDataGrid is not null && item is T entity)
+        if (EntityDataGrid is not null && rootItem is T entity)
         {
             InvokeAsync(() => EntityDataGrid.NotifyItemChangedAsync(entity));
         }
