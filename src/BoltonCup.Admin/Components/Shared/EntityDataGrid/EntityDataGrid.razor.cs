@@ -3,6 +3,7 @@ using BoltonCup.Core;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using MudBlazor.State;
+using MudBlazor.Utilities;
 
 namespace BoltonCup.Admin.Components.Shared;
 
@@ -11,6 +12,11 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     : ComponentBaseWithState
     where T : EntityBase
 {
+    private string _itemChangedStyle = new StyleBuilder()
+        .AddStyle("background-color", "var(--mud-palette-dark-lighten)")
+        .AddStyle("background-image", "linear-gradient(135deg, hsla(0, 0%, 100%, 0.05) 25%, transparent 0, transparent 50%, hsla(0, 0%, 100%, 0.05) 0, hsla(0, 0%, 100%, 0.05) 75%, transparent 0, transparent)")
+        .AddStyle("background-size", "20px 20px")
+        .Build();
     private readonly string _height = "calc(100vh - 64px - 52px - var(--mud-appbar-height))";
     private readonly int[] _pageSizeOptions = [15, 50, 100];
     private HashSet<T> _changes;
@@ -96,5 +102,12 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         _changes.Clear();
         _isDirty = false;
         await _dataGrid.ReloadServerData();
+    }
+    
+    private string RowStyleFunc(T item, int row)
+    {
+        return !_changes.Contains(item) 
+            ? string.Empty 
+            : _itemChangedStyle;
     }
 }
