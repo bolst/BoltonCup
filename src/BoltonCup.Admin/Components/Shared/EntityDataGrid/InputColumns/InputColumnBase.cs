@@ -10,7 +10,7 @@ namespace BoltonCup.Admin.Components.Shared;
 
 public abstract partial class InputColumnBase<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T, TProperty>
     : Column<T> 
-    where T : EntityBase
+    where T : class
 {
     private Expression<Func<T, TProperty?>>? _lastAssignedProperty;
     private Func<T, TProperty?>? _compiledExpression;
