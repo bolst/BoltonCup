@@ -6,11 +6,12 @@
     protected override RenderFragment EntityEditTemplate(CellContext<T> context)
     {
         var property = PropertyFunc(context.Item);
-        if (property is not DateTime item)
+        if (property is not DateTime and not null)
         {
             return @<div></div>;
         }
 
+        var item = property as DateTime?;
         return @<MudDatePicker Date="item" DateChanged="d => SetProperty(context.Item, d)"
                                IconSize="Size.Small" Margin="Margin.Dense" Underline="false" Rounded Editable />;
     }
