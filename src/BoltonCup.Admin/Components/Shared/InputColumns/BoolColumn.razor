@@ -1,0 +1,21 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam T where T : EntityBase
+@inherits InputColumnBase<T, bool>
+
+@code {
+    
+    [Parameter]
+    public bool TriState { get; set; }
+    
+    protected override RenderFragment EntityEditTemplate(CellContext<T> context)
+    {
+        var property = PropertyFunc(context.Item);
+        if (property is not bool item)
+        {
+            return @<div></div>;
+        }
+
+        return @<MudCheckBox T="bool" Value="@item" ValueChanged="t => SetProperty(context.Item, t)" Color="Color.Primary"
+                             Class="rounded" TriState="TriState" Size="Size.Small" />;
+    }
+}

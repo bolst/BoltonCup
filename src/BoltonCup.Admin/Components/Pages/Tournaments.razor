@@ -10,9 +10,9 @@
         <PropertyColumn Title="Tournament" Property="x => x.Name" />
         <DatePickerColumn Title="Start" Property="x => x.StartDate ?? DateTime.Now" />
         <DatePickerColumn Title="End" Property="x => x.EndDate ?? DateTime.Now" />
-        <PropertyColumn Title="Active?" Property="x => x.IsActive" />
-        <PropertyColumn Title="Registration Open?" Property="x => x.IsRegistrationOpen" />
-        <PropertyColumn Title="Payment Open" Property="x => x.IsPaymentOpen" />
+        <BoolColumn Title="Active?" Property="x => x.IsActive" />
+        <BoolColumn Title="Registration Open?" Property="x => x.IsRegistrationOpen" />
+        <BoolColumn Title="Payment Open" Property="x => x.IsPaymentOpen" />
         <PropertyColumn Title="Skater Limit" Property="x => x.SkaterLimit" />
         <PropertyColumn Title="Goalie Limit" Property="x => x.GoalieLimit" />
         <PropertyColumn Title="Skater Payment Link" Property="x => x.SkaterPaymentLink" />
