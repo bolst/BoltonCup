@@ -19,3 +19,15 @@ public class Game : EntityBase
     public ICollection<SkaterGameLog> SkaterGameLogs { get; set; } = [];
     public ICollection<GoalieGameLog> GoalieGameLogs { get; set; } = [];
 }
+
+public class GameComparer : IEqualityComparer<Game>
+{
+    public bool Equals(Game? item1, Game? item2)
+    {
+        if (ReferenceEquals(item1, item2)) 
+            return true;
+        return item1 is not null && item2 is not null && item1.Id == item2.Id;
+    }
+        
+    public int GetHashCode(Game item) => item.Id;
+}

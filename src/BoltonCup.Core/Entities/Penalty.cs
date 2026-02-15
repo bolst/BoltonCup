@@ -17,3 +17,15 @@ public class Penalty : EntityBase
     public Game Game { get; set; } = null!;
     public Player Player { get; set; } = null!;
 }
+
+public class PenaltyComparer : IEqualityComparer<Penalty>
+{
+    public bool Equals(Penalty? item1, Penalty? item2)
+    {
+        if (ReferenceEquals(item1, item2)) 
+            return true;
+        return item1 is not null && item2 is not null && item1.Id == item2.Id;
+    }
+        
+    public int GetHashCode(Penalty item) => item.Id;
+}

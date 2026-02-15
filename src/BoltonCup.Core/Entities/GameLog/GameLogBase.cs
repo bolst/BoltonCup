@@ -16,3 +16,15 @@ public abstract class GameLogBase : EntityBase
     public Team OpponentTeam { get; set; } = null!;
     public Game Game { get; set; } = null!;
 }
+
+public class GameLogComparer : IEqualityComparer<GameLogBase>
+{
+    public bool Equals(GameLogBase? item1, GameLogBase? item2)
+    {
+        if (ReferenceEquals(item1, item2)) 
+            return true;
+        return item1 is not null && item2 is not null && item1.Id == item2.Id;
+    }
+        
+    public int GetHashCode(GameLogBase item) => item.Id;
+}

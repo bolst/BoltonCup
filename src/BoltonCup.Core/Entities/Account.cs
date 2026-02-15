@@ -15,3 +15,15 @@ public class Account : EntityBase
     public ICollection<Player> Players { get; set; } = [];
     public ICollection<Team> ManagedTeams { get; set; } = [];
 }
+
+public class AccountComparer : IEqualityComparer<Account>
+{
+    public bool Equals(Account? item1, Account? item2)
+    {
+        if (ReferenceEquals(item1, item2)) 
+            return true;
+        return item1 is not null && item2 is not null && item1.Id == item2.Id;
+    }
+        
+    public int GetHashCode(Account item) => item.Id;
+}
