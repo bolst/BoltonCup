@@ -1,0 +1,51 @@
+@page "/teams"
+@inject ITeamRepository TeamRepo
+
+<EntityDataGrid
+    T="Team"
+    ServerFunc="ServerFunc"
+    OnSave="OnSave"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Team" Property="x => x.Name" />
+        <PropertyColumn Title="Name (short)" Property="x => x.NameShort" />
+        <PropertyColumn Title="Abbreviation" Property="x => x.Abbreviation" />
+        <ColorPickerColumn Title="Primary" Property="x => x.PrimaryColorHex" Sortable="false" />
+        <ColorPickerColumn Title="Secondary" Property="x => x.SecondaryColorHex" />
+        <ColorPickerColumn Title="Tertiary" Property="x => x.TertiaryColorHex" /> 
+        <TournamentColumn Property="x => x.Tournament" />
+    </Columns>
+</EntityDataGrid>
+
+@code {
+    
+    private readonly TeamComparer _comparer = new();
+
+    private async Task<GridData<Team>> ServerFunc(GridState<Team> state)
+    {
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        var data = await TeamRepo.GetAllAsync(new GetTeamsQuery
+        {
+            Page = state.Page + 1,
+            Size = state.PageSize,
+            SortBy = sortDefinition?.SortBy,
+            Descending = sortDefinition?.Descending ?? false,
+        });
+        
+        var totalItems = data.Items.Count();
+        if (data is PaginatedList<Team> pageList)
+            totalItems = pageList.Total;
+
+        return new GridData<Team>
+        {
+            Items = data.Items,
+            TotalItems = totalItems
+        };
+    }
+
+    private async Task OnSave(HashSet<Team> changes)
+    {
+        
+    }
+    
+}

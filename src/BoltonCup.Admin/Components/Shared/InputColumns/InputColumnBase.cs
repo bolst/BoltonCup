@@ -7,15 +7,17 @@ using MudBlazor;
 
 namespace BoltonCup.Admin.Components.Shared;
 
-public abstract partial class EntityColumn<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T, TProperty>
-    : Column<T>
-where T : EntityBase
-where TProperty : EntityBase
+public abstract partial class InputColumnBase<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T, TProperty>
+    : Column<T> 
+    where T : EntityBase
 {
     private Expression<Func<T, TProperty?>>? _lastAssignedProperty;
     private Func<T, TProperty?>? _compiledExpression;
 
-    protected abstract RenderFragment EntityEditTemplate(TProperty? context);
+    protected abstract RenderFragment EntityEditTemplate(CellContext<T> context);
+    
+    [CascadingParameter]
+    public EntityDataGrid<T>? EntityDataGrid { get; set; }
     
     [Parameter]
     [EditorRequired]
@@ -25,11 +27,7 @@ where TProperty : EntityBase
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        EditTemplate = context =>
-        {
-            var item = _compiledExpression?.Invoke(context.Item);
-            return EntityEditTemplate(item);
-        };
+        EditTemplate = EntityEditTemplate;
     }
     
     protected override void OnParametersSet()
@@ -52,6 +50,9 @@ where TProperty : EntityBase
         return _compiledExpression(item);
     }
     
+    protected override Type PropertyType
+        => typeof(TProperty);
+    
     private object? RecursiveGetSubProperties(MemberExpression memberExpression, object? item)
     {
         if (memberExpression.Expression is not MemberExpression
@@ -69,6 +70,11 @@ where TProperty : EntityBase
     {
         var expression = Property.Body;
         
+        if (expression is UnaryExpression unaryExpression)
+        {
+            expression = unaryExpression.Operand;
+        }
+        
         // Only MemberExpression is supported, MemberExpression access members like 'x.y' is accessing the member 'y'
         if (expression is not MemberExpression memberExpression) 
             return;
@@ -84,6 +90,11 @@ where TProperty : EntityBase
         {
             var actualType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? PropertyType;
             propertyInfo.SetValue(item, Convert.ChangeType(value, actualType), null);
+        }
+
+        if (EntityDataGrid is not null && item is T entity)
+        {
+            InvokeAsync(() => EntityDataGrid.NotifyItemChangedAsync(entity));
         }
     }
 

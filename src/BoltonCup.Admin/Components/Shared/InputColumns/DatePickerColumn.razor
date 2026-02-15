@@ -1,16 +1,17 @@
 @namespace BoltonCup.Admin.Components.Shared
 @typeparam T where T : EntityBase
-@inherits InputColumnBase<T, string>
+@inherits InputColumnBase<T, DateTime>
 
 @code {
     protected override RenderFragment EntityEditTemplate(CellContext<T> context)
     {
         var property = PropertyFunc(context.Item);
-        if (property is not string item)
+        if (property is not DateTime item)
         {
             return @<div></div>;
         }
 
-        return @<SimpleColorPicker Text="@item" TextChanged="t => SetProperty(context.Item, t)" Width="80px" />;
+        return @<MudDatePicker Date="item" DateChanged="d => SetProperty(context.Item, d)"
+                               Margin="Margin.Dense" Underline="false" Rounded Editable />;
     }
 }

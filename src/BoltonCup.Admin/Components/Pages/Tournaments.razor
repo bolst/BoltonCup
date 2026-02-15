@@ -8,8 +8,8 @@
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Tournament" Property="x => x.Name" />
-        <PropertyColumn Title="Start" Property="x => x.StartDate" />
-        <PropertyColumn Title="End" Property="x => x.EndDate" />
+        <DatePickerColumn Title="Start" Property="x => x.StartDate ?? DateTime.Now" />
+        <DatePickerColumn Title="End" Property="x => x.EndDate ?? DateTime.Now" />
         <PropertyColumn Title="Active?" Property="x => x.IsActive" />
         <PropertyColumn Title="Registration Open?" Property="x => x.IsRegistrationOpen" />
         <PropertyColumn Title="Payment Open" Property="x => x.IsPaymentOpen" />

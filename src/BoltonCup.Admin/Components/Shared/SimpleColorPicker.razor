@@ -18,6 +18,7 @@
                 Placeholder="Select Color"
                 PickerVariant="PickerVariant.Static"
                 ShowAlpha="false"
+                Rounded
                 ShowToolbar />
         </div>
     </MessageContent>
@@ -74,9 +75,9 @@
         StateHasChanged();
     }
 
-    private Task SetTextAsync(string text)
+    private Task SetTextAsync(string? text)
     {
-        if (text.Equals(_text, StringComparison.OrdinalIgnoreCase))
+        if ((text ?? "").Equals(_text, StringComparison.OrdinalIgnoreCase))
             return Task.CompletedTask;
         _text = text;
         return _textState.SetValueAsync(_text);
