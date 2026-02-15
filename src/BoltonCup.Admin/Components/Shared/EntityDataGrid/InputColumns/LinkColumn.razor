@@ -5,6 +5,12 @@
 
 @code {
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Sortable = false;
+    }
+
     private void OpenLink(string? url)
     {
         if (!string.IsNullOrEmpty(url))
