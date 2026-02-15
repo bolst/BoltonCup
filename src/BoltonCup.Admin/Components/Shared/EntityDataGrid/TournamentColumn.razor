@@ -10,9 +10,10 @@
             return @<div></div>;
         }
     
-        return @<div class="d-flex flex-row align-center gap-1">
+        var href = $"/tournaments?id={tournament.Id}";
+        return @<a href="@href" class="d-flex flex-row align-center gap-1">
                    <BoltonCupLogo Height="24" />
                    <MudText Typo="Typo.body2">@tournament.Name</MudText>
-               </div>;
+               </a>;
     }
 }

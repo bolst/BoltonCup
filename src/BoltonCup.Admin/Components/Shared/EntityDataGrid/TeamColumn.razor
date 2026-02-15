@@ -3,16 +3,18 @@
 @inherits EntityColumn<T, Team>
 
 @code {
+    
     protected override RenderFragment EntityEditTemplate(Team? team)
     {
         if (team is null)
         {
             return @<div></div>;
         }
-    
-        return @<div class="d-flex flex-row align-center gap-1">
+
+        var href = $"/teams?id={team.Id}";
+        return @<a href="@href" class="d-flex flex-row align-center gap-1">
             <MudImage Src="@team.LogoUrl" Height="24"/>
             <MudText Typo="Typo.body2">@team.NameShort</MudText>
-        </div>;
+        </a>;
     }
 }
