@@ -19,7 +19,7 @@
 
 @code {
     
-    private readonly ItemComparer _comparer = new();
+    private readonly GameComparer _comparer = new();
 
     private async Task<GridData<Game>> ServerFunc(GridState<Game> state)
     {
@@ -48,16 +48,4 @@
         
     }
     
-    public class ItemComparer : IEqualityComparer<Game>
-    {
-        public bool Equals(Game? item1, Game? item2)
-        {
-            if (ReferenceEquals(item1, item2)) 
-                return true;
-            return item1 is not null && item2 is not null && item1.Id == item2.Id;
-        }
-        
-        public int GetHashCode(Game item) => item.Id;
-    }
-
 }

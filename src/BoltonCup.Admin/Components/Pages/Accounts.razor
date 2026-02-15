@@ -27,7 +27,7 @@
 @code {
 
     private EntityDataGrid<Account> _dataGrid = null!;
-    private readonly ItemComparer _comparer = new();
+    private readonly AccountComparer _comparer = new();
 
     private async Task<GridData<Account>> GetItemsAsync(GridState<Account> state)
     {
@@ -54,19 +54,6 @@
 
     private async Task OnSave(HashSet<Account> changes)
     {
-    }
-
-
-    public class ItemComparer : IEqualityComparer<Account>
-    {
-        public bool Equals(Account? item1, Account? item2)
-        {
-            if (ReferenceEquals(item1, item2)) 
-                return true;
-            return item1 is not null && item2 is not null && item1.Id == item2.Id;
-        }
-        
-        public int GetHashCode(Account item) => item.Id;
     }
 
 }
