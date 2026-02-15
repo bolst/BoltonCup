@@ -17,7 +17,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         .AddStyle("background-image", "linear-gradient(135deg, hsla(0, 0%, 100%, 0.05) 25%, transparent 0, transparent 50%, hsla(0, 0%, 100%, 0.05) 0, hsla(0, 0%, 100%, 0.05) 75%, transparent 0, transparent)")
         .AddStyle("background-size", "20px 20px")
         .Build();
-    private readonly string _height = "calc(100vh - 64px - 52px - var(--mud-appbar-height))";
+    private const string _height = "calc(100vh - 64px - 52px - var(--mud-appbar-height))";
     private readonly int[] _pageSizeOptions = [15, 50, 100];
     private HashSet<T> _changes;
     private MudDataGrid<T> _dataGrid = null!;
