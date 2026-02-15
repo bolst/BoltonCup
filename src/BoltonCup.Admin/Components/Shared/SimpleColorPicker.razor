@@ -46,6 +46,7 @@
     public string? Width { get; set; }
 
     private string Classname => new CssBuilder()
+    .AddClass("cursor-pointer")
     .AddClass(Class)
     .Build();
 
