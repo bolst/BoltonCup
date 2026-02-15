@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using BoltonCup.Admin.Extensions;
 using BoltonCup.Core;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -14,6 +15,7 @@ where TProperty : EntityBase
 {
     private Expression<Func<T, TProperty?>>? _lastAssignedProperty;
     private Func<T, TProperty?>? _compiledExpression;
+    private string? _propertyName;
 
     protected abstract RenderFragment EntityEditTemplate(TProperty? context);
     
@@ -39,9 +41,14 @@ where TProperty : EntityBase
             _lastAssignedProperty = Property;
             _compiledExpression = Property.Compile();
         }
-        
-        Title ??= typeof(TProperty).Name;
+
+        var property = Property.Visit();
+        _propertyName = property.GetPath();
+        Title ??= property.GetLastMemberName();
     }
+    
+    public override string? PropertyName 
+        => _propertyName;
     
     protected override object? CellContent(T item)
         => _compiledExpression!(item);
