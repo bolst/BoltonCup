@@ -1,0 +1,30 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam T where T : EntityBase
+@inherits InputColumnBase<T, string?>
+@inject IJSRuntime JSRuntime
+
+@code {
+
+    private void OpenLink(string? url)
+    {
+        if (!string.IsNullOrEmpty(url))
+        {
+            JSRuntime.InvokeVoidAsync("open", url, "_blank");
+        }
+    }
+    
+    protected override RenderFragment EntityEditTemplate(CellContext<T> context)
+    {
+        var property = PropertyFunc(context.Item);
+        if (property is not null and not string)
+        {
+            return @<div></div>;
+        }
+        string? item = property as string;
+        var adornment = string.IsNullOrEmpty(item) ? Adornment.None : Adornment.End;
+        
+        return @<MudTextField T="string?" Value="@item" ValueChanged="v => SetProperty(context.Item, v)"
+                              Adornment="adornment" AdornmentIcon="@Icons.Material.Rounded.Link" AdornmentColor="Color.Info"
+                              OnAdornmentClick="_ => OpenLink(item)" IconSize="Size.Small" Margin="Margin.Dense" Underline="false" />;
+    }
+}
