@@ -21,7 +21,7 @@
     
     private readonly TeamComparer _comparer = new();
 
-    private async Task<GridData<Team>> ServerFunc(GridState<Team> state)
+    private async Task<GridData<Team>> ServerFunc(GridState<Team> state, CancellationToken cancellationToken)
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
         var data = await TeamRepo.GetAllAsync(new GetTeamsQuery

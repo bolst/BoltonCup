@@ -21,7 +21,7 @@
     
     private readonly GameComparer _comparer = new();
 
-    private async Task<GridData<Game>> ServerFunc(GridState<Game> state)
+    private async Task<GridData<Game>> ServerFunc(GridState<Game> state, CancellationToken cancellationToken)
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
         var data = await GameRepo.GetAllAsync(new GetGamesQuery

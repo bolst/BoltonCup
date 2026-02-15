@@ -9,8 +9,9 @@ namespace BoltonCup.Admin.Components.Shared;
 
 [CascadingTypeParameter(nameof(T))]
 public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T> 
-    : ComponentBaseWithState
+    : ComponentBaseWithState, IDisposable
 {
+    private CancellationTokenSource _cts;
     private string _itemChangedStyle = new StyleBuilder()
         .AddStyle("background-color", "var(--mud-palette-dark-lighten)")
         .AddStyle("background-image", "linear-gradient(135deg, hsla(0, 0%, 100%, 0.05) 25%, transparent 0, transparent 50%, hsla(0, 0%, 100%, 0.05) 0, hsla(0, 0%, 100%, 0.05) 75%, transparent 0, transparent)")
@@ -28,6 +29,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
 
     public EntityDataGrid()
     {
+        _cts = new CancellationTokenSource();
         _changes = new HashSet<T>(Comparer);
         using var registerScope = CreateRegisterScope();
         _searchState = registerScope.RegisterParameter<string?>(nameof(Search))
@@ -49,7 +51,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public EventCallback<HashSet<T>> OnRevert { get; set; }
     
     [Parameter]
-    public Func<GridState<T>, Task<GridData<T>>> ServerFunc { get; set; } = null!;
+    public Func<GridState<T>, CancellationToken, Task<GridData<T>>> ServerFunc { get; set; } = null!;
 
     [Parameter]
     public string? Search { get; set; }
@@ -68,6 +70,22 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     
     public Task NotifyItemChangedAsync(T item) => _dataGrid.CommittedItemChanges.InvokeAsync(item);
 
+    private Task<GridData<T>> ServerFuncWrapper(GridState<T> state)
+    { 
+        _cts.Cancel();
+        _cts.Dispose();
+        _cts = new CancellationTokenSource();
+        try
+        {
+            return ServerFunc(state, _cts.Token);
+        }
+        catch (Exception e)
+        when (e is OperationCanceledException or ObjectDisposedException)
+        {
+            return Task.FromResult(new GridData<T>());
+        }
+    }
+    
     private Task OnSearchChange(ParameterChangedEventArgs<string?> args)
     {
         _search = args.Value;
@@ -121,4 +139,11 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     {
         return HidePagerContent ? _noPagerHeight : _height;
     }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+    
 }

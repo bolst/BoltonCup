@@ -25,7 +25,7 @@
     
     private readonly TournamentComparer _comparer = new();
 
-    private async Task<GridData<Tournament>> ServerFunc(GridState<Tournament> state)
+    private async Task<GridData<Tournament>> ServerFunc(GridState<Tournament> state, CancellationToken cancellationToken)
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
         var data = await TournamentRepo.GetAllAsync(new GetTournamentsQuery

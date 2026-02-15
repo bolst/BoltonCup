@@ -6,7 +6,7 @@
     <MudDataGrid 
         @ref="_dataGrid" 
         T="T"
-        ServerData="ServerFunc" 
+        ServerData="ServerFuncWrapper" 
         CommittedItemChanges="OnItemEdited" 
         Height="@GetHeight()" 
         RowStyleFunc="RowStyleFunc"

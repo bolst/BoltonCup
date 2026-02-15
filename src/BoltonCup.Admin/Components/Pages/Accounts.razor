@@ -29,7 +29,7 @@
     private EntityDataGrid<Account> _dataGrid = null!;
     private readonly AccountComparer _comparer = new();
 
-    private async Task<GridData<Account>> GetItemsAsync(GridState<Account> state)
+    private async Task<GridData<Account>> GetItemsAsync(GridState<Account> state, CancellationToken cancellationToken)
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
         var data = await AccountRepo.GetAllAsync(new GetAccountsQuery
