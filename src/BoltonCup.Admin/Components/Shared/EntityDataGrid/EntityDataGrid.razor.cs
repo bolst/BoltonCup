@@ -20,6 +20,8 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     private const string _noPagerHeight = "calc(100vh - 64px - var(--mud-appbar-height))";
     private readonly int[] _pageSizeOptions = [15, 100, 500];
     private HashSet<T> _changes;
+    private HashSet<T> _deletedItems;
+    private HashSet<T> _selectedItems;
     private MudDataGrid<T> _dataGrid = null!;
     private bool _isDirty;
     private string? _search;
@@ -30,6 +32,8 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     {
         _cts = new CancellationTokenSource();
         _changes = new HashSet<T>(Comparer);
+        _deletedItems = new HashSet<T>(Comparer);
+        _selectedItems = new HashSet<T>(Comparer);
         using var registerScope = CreateRegisterScope();
         _searchState = registerScope.RegisterParameter<string?>(nameof(Search))
             .WithParameter(() => Search)
@@ -118,6 +122,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     {
         await OnSave.InvokeAsync(_changes);
         _changes.Clear();
+        _deletedItems.Clear();
         _isDirty = false;
         await _dataGrid.ReloadServerData();
     }
@@ -126,15 +131,25 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     {
         await OnRevert.InvokeAsync(_changes);
         _changes.Clear();
+        _deletedItems.Clear();
         _isDirty = false;
         await _dataGrid.ReloadServerData();
+    }
+
+    public void DeleteSelectedItems()
+    {
+        _isDirty = true;
+        _deletedItems.UnionWith(_selectedItems);
+        _selectedItems.Clear();
     }
     
     private string RowStyleFunc(T item, int row)
     {
-        return !_changes.Contains(item) 
-            ? string.Empty 
-            : _itemChangedStyle;
+        if (_deletedItems.Contains(item))
+            return "background-color: #FF000055";
+        if (_changes.Contains(item))
+            return _itemChangedStyle;
+        return string.Empty;
     }
 
     private string GetHeight()

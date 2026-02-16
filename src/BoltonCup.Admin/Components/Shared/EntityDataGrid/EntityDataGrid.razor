@@ -9,7 +9,8 @@
         ServerData="ServerFuncWrapper" 
         CommittedItemChanges="OnItemEdited" 
         Height="@GetHeight()" 
-        RowStyleFunc="RowStyleFunc"
+        RowStyleFunc="RowStyleFunc" 
+        @bind-SelectedItems="_selectedItems"
         EditMode="DataGridEditMode.Cell" 
         SortMode="SortMode.Single" 
         Breakpoint="Breakpoint.None" 
@@ -31,6 +32,11 @@
                 </MudTooltip>
                 <MudTooltip Text="Revert">
                     <MudIconButton OnClick="RevertChangesAsync" Icon="@Icons.Material.Rounded.Undo" Color="Color.Error" Disabled="!_isDirty"/>
+                </MudTooltip>
+            </MudButtonGroup>
+            <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                <MudTooltip Text="Delete Selected">
+                    <MudIconButton OnClick="DeleteSelectedItems" Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Disabled="_selectedItems.Count == 0" />
                 </MudTooltip>
             </MudButtonGroup>
             <MudSpacer/>
