@@ -27,20 +27,20 @@
         Dense>
         <ToolBarContent>
             <MudButtonGroup OverrideStyles="false" Size="Size.Small">
-                <MudTooltip Text="Save">
-                    <MudIconButton OnClick="SaveChangesAsync" Icon="@Icons.Material.Rounded.Save" Color="Color.Primary" Disabled="!_isDirty"/>
-                </MudTooltip>
-                <MudTooltip Text="Revert">
-                    <MudIconButton OnClick="RevertChangesAsync" Icon="@Icons.Material.Rounded.Undo" Color="Color.Error" Disabled="!_isDirty"/>
-                </MudTooltip>
-            </MudButtonGroup>
-            <MudButtonGroup OverrideStyles="false" Size="Size.Small">
                 <MudTooltip Text="Delete Selected">
                     <MudIconButton OnClick="DeleteSelectedItems" Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Disabled="_selectedItems.Count == 0" />
                 </MudTooltip>
             </MudButtonGroup>
             <MudSpacer/>
-            <MudTextField @bind-Value="_search" Label="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable/>
+            <MudTextField Class="mx-1" @bind-Value="_search" Label="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable/>
+            <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                <MudTooltip Text="Revert">
+                    <MudIconButton OnClick="RevertChangesAsync" Icon="@Icons.Material.Rounded.Undo" Color="Color.Error" Disabled="!_isDirty"/>
+                </MudTooltip>
+                <MudTooltip Text="Save">
+                    <MudIconButton OnClick="SaveChangesAsync" Icon="@Icons.Material.Rounded.Save" Color="Color.Primary" Disabled="!_isDirty"/>
+                </MudTooltip>
+            </MudButtonGroup>
         </ToolBarContent>
         <Columns>
             @if (Selectable)
