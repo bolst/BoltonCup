@@ -1,6 +1,6 @@
 @namespace BoltonCup.Admin.Components.Shared
 @typeparam T where T : EntityBase
-@inherits EntityColumn<T, Tournament>
+@inherits EntityColumnBase<T, Tournament>
 
 @code {
     protected override RenderFragment EntityEditTemplate(Tournament? tournament)

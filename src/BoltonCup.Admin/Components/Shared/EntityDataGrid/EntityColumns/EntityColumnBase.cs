@@ -8,7 +8,7 @@ using MudBlazor;
 
 namespace BoltonCup.Admin.Components.Shared;
 
-public abstract partial class EntityColumn<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T, TProperty>
+public abstract partial class EntityColumnBase<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T, TProperty>
     : Column<T>
 where T : EntityBase
 where TProperty : EntityBase
