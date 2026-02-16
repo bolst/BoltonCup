@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using BoltonCup.Core;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using MudBlazor.State;
@@ -19,7 +18,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         .Build();
     private const string _height = "calc(100vh - 64px - 52px - var(--mud-appbar-height))";
     private const string _noPagerHeight = "calc(100vh - 64px - var(--mud-appbar-height))";
-    private readonly int[] _pageSizeOptions = [15, 50, 100];
+    private readonly int[] _pageSizeOptions = [15, 100, 500];
     private HashSet<T> _changes;
     private MudDataGrid<T> _dataGrid = null!;
     private bool _isDirty;
