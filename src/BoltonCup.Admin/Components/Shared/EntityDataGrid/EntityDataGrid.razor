@@ -16,6 +16,8 @@
         ColumnResizeMode="@ColumnResizeMode" 
         ReadOnly="false" 
         ShowColumnOptions="false"
+        MultiSelection="Selectable"
+        SelectOnRowClick="false"
         RowsPerPage="50"
         FixedHeader
         FixedFooter
@@ -35,6 +37,10 @@
             <MudTextField @bind-Value="_search" Label="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable/>
         </ToolBarContent>
         <Columns>
+            @if (Selectable)
+            {
+                <SelectColumn T="T" ShowInHeader/>
+            }
             @Columns
         </Columns>
         <NoRecordsContent>
@@ -45,7 +51,7 @@
         <PagerContent>
             @if (!HidePagerContent)
             {
-                <MudDataGridPager T="T" PageSizeOptions="_pageSizeOptions"/>
+                <MudDataGridPager T="T" PageSizeOptions="_pageSizeOptions" />
             }
         </PagerContent>
     </MudDataGrid>

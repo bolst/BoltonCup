@@ -66,6 +66,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     
     [Parameter]
     public bool HidePagerContent { get; set; }
+
+    [Parameter]
+    public bool Selectable { get; set; } = true;
     
     public Task NotifyItemChangedAsync(T item) => _dataGrid.CommittedItemChanges.InvokeAsync(item);
 
