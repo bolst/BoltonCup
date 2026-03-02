@@ -10,26 +10,13 @@
     {
         <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-8"><b>@_infoGuide.Title</b></MudText>
         
-        <MudMarkdown Value="@_infoGuide.MarkdownContent" Props="_mdProperties" />
+        <MarkdownView Value="@_infoGuide.MarkdownContent" />
     }
 </MudContainer>
 
 @code {
 
     private Sdk.InfoGuideSingleDetailDto? _infoGuide;
-
-    private static readonly MudMarkdownProps _mdProperties = new()
-    {
-        Heading = 
-        {
-            OverrideTypo = (x) => x switch
-            {
-                Typo.h1 => Typo.h4,
-                Typo.h2 => Typo.h5,
-                _ => Typo.h6,
-            }
-        }
-    };
 
     protected override async Task OnParametersSetAsync()
     {
