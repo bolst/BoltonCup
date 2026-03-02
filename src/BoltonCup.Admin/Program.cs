@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,6 +65,7 @@ builder.Services.AddAuthentication("Identity.Application")
 builder.Services.AddAuthorization();
 
 builder.Services.AddMudServices();
+builder.Services.AddMudMarkdownServices();
 
 var app = builder.Build();
 
