@@ -57,7 +57,7 @@ builder.Services.AddAuthentication("Identity.Application")
         {
             var returnUrl = Uri.EscapeDataString(context.Request.GetEncodedUrl());
             
-            context.Response.Redirect($"{bcConfig.AuthBaseUrl}?returnUrl={returnUrl}");
+            context.Response.Redirect($"{bcConfig.AuthBaseUrl}log-in-or-sign-up?returnUrl={returnUrl}");
             return Task.CompletedTask;
         };
     });

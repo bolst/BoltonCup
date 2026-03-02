@@ -5,7 +5,7 @@
     protected override void OnInitialized()
     {
         var currentUrl = Navigation.Uri;
-        var loginUrl = $"{Config.Value.AuthBaseUrl}login?returnUrl={Uri.EscapeDataString(currentUrl)}";
+        var loginUrl = $"{Config.Value.AuthBaseUrl}log-in-or-sign-up?returnUrl={Uri.EscapeDataString(currentUrl)}";
         Navigation.NavigateTo(loginUrl, forceLoad: true);
     }
 }
