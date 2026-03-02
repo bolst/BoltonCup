@@ -8,6 +8,11 @@
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Tournament" Property="x => x.Name" />
+        <TemplateColumn Title="Info">
+            <EditTemplate>
+                <TournamentInfoEditButton TournamentId="@context.Item.Id" />
+            </EditTemplate>
+        </TemplateColumn>
         <DatePickerColumn Title="Start" Property="x => x.StartDate" />
         <DatePickerColumn Title="End" Property="x => x.EndDate" />
         <BoolColumn Title="Active?" Property="x => x.IsActive" />
