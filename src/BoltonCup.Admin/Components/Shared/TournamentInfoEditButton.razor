@@ -27,22 +27,27 @@
         else
         {
             <MudTabs Class="mud-width-full" Style="height: 90vh" MinimumTabWidth="20px" Rounded>
-                <MudTabPanel Icon="@Icons.Material.Rounded.VerticalShades" ToolTip="Split View">
-                    <MudGrid Class="ma-0">
-                        <MudItem xs="6">
-                            <MudTextField @bind-Value="_infoGuide.MarkdownContent" Underline="false" Immediate AutoGrow FullWidth/>
-                        </MudItem>
-                        <MudItem xs="6">
-                            <MarkdownView Value="@_infoGuide.MarkdownContent"/>
-                        </MudItem>
-                    </MudGrid>
-                </MudTabPanel>
-                <MudTabPanel Icon="@Icons.Material.Rounded.EditNote" ToolTip="Editor">
-                    <MudTextField @bind-Value="_infoGuide.MarkdownContent" Underline="false" Immediate AutoGrow FullWidth/>
-                </MudTabPanel>
-                <MudTabPanel Icon="@Icons.Material.Rounded.Preview" ToolTip="Preview">
-                    <MarkdownView Value="@_infoGuide.MarkdownContent" />
-                </MudTabPanel>
+                <Header>
+                    <MudTextField @bind-Value="@_infoGuide.Title" Label="Title" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate />
+                </Header>
+                <ChildContent>
+                    <MudTabPanel Icon="@Icons.Material.Rounded.VerticalShades" ToolTip="Split View">
+                        <MudGrid Class="ma-0">
+                            <MudItem xs="6">
+                                <MudTextField @bind-Value="_infoGuide.MarkdownContent" Underline="false" Immediate AutoGrow FullWidth/>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MarkdownView Value="@_infoGuide.MarkdownContent"/>
+                            </MudItem>
+                        </MudGrid>
+                    </MudTabPanel>
+                    <MudTabPanel Icon="@Icons.Material.Rounded.EditNote" ToolTip="Editor">
+                        <MudTextField @bind-Value="_infoGuide.MarkdownContent" Underline="false" Immediate AutoGrow FullWidth/>
+                    </MudTabPanel>
+                    <MudTabPanel Icon="@Icons.Material.Rounded.Preview" ToolTip="Preview">
+                        <MarkdownView Value="@_infoGuide.MarkdownContent"/>
+                    </MudTabPanel>
+                </ChildContent>
             </MudTabs>
         }
     </DialogContent>
@@ -50,7 +55,7 @@
         <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="CloseDialog">Cancel</MudButton>
         @if (_infoGuide is not null)
         {
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveChanges">Save Changes</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveAndClose">Save Changes</MudButton>
         }
     </DialogActions>
 </MudDialog>
@@ -144,14 +149,18 @@
 
     private async Task SaveChanges()
     {
-        if (_infoGuide is not null)
-        {
-            var success = await InfoGuideRepo.UpdateAsync(_infoGuide);
-            if (success)
-                Snackbar.Add("Info guide updated!", Severity.Success);
-            else
-                Snackbar.Add("Failed to update info guide.", Severity.Error);
-        }
+        if (_infoGuide is null)
+            return;
+        var success = await InfoGuideRepo.UpdateAsync(_infoGuide);
+        if (success)
+            Snackbar.Add("Info guide updated!", Severity.Success);
+        else
+            Snackbar.Add("Failed to update info guide.", Severity.Error);
+    }
+
+    private async Task SaveAndClose()
+    {
+        await SaveChanges();
         CloseDialog();
     }
 }
