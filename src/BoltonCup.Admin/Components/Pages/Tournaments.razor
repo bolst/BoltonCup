@@ -52,7 +52,16 @@
         };
     }
 
-    private async Task OnSave(HashSet<Tournament> changes)
+    private async Task<Tournament?> NewItemFunc()
+    {
+        return new Tournament
+        {
+            Id = -1,
+            Name = "New Tournament",
+        };
+    }
+
+    private async Task OnSave(ChangeTracker<Tournament> changes)
     {
         
     }

@@ -19,9 +19,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     private const string _height = "calc(100vh - 64px - 64px - var(--mud-appbar-height))";
     private const string _noPagerHeight = "calc(100vh - 64px - var(--mud-appbar-height))";
     private readonly int[] _pageSizeOptions = [15, 50, 100, 500];
-    private HashSet<T> _changes;
-    private HashSet<T> _deletedItems;
-    private HashSet<T> _newItems;
+    private ChangeTracker<T> _changeTracker;
     private HashSet<T> _selectedItems;
     private MudDataGrid<T> _dataGrid = null!;
     private bool _isDirty;
@@ -31,9 +29,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public EntityDataGrid()
     {
         _cts = new CancellationTokenSource();
-        _changes = new HashSet<T>(Comparer);
-        _deletedItems = new HashSet<T>(Comparer);
-        _newItems = new HashSet<T>(Comparer);
+        _changeTracker = new ChangeTracker<T>(Comparer);
         _selectedItems = new HashSet<T>(Comparer);
         using var registerScope = CreateRegisterScope();
         _searchState = registerScope.RegisterParameter<string?>(nameof(Search))
@@ -49,10 +45,10 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public RenderFragment? Columns { get; set; }
 
     [Parameter]
-    public EventCallback<HashSet<T>> OnSave { get; set; }
+    public EventCallback<ChangeTracker<T>> OnSave { get; set; }
     
     [Parameter]
-    public EventCallback<HashSet<T>> OnRevert { get; set; }
+    public EventCallback<ChangeTracker<T>> OnRevert { get; set; }
     
     [Parameter]
     public Func<GridState<T>, CancellationToken, Task<GridData<T>>> ServerFunc { get; set; } = null!;
@@ -88,7 +84,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         try
         {
             var gridData = await ServerFunc(state, _cts.Token);
-            var items = _newItems.Concat(gridData.Items);
+            var items = _changeTracker.NewItems.Concat(gridData.Items);
             return new GridData<T>
             {
                 Items = items,
@@ -110,7 +106,8 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
 
     private void OnComparerChange(ParameterChangedEventArgs<IEqualityComparer<T>> args)
     {
-        _changes = new HashSet<T>(args.Value);
+        _changeTracker = new ChangeTracker<T>(args.Value);
+        _selectedItems = new HashSet<T>(args.Value);
     }
 
     private async Task SetSearchAsync(string search)
@@ -124,26 +121,22 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     
     private void OnItemEdited(T item)
     {
-        _changes.Add(item);
+        _changeTracker.TrackEdit(item);
         _isDirty = true;
     }
     
     public async Task SaveChangesAsync()
     {
-        await OnSave.InvokeAsync(_changes);
-        _changes.Clear();
-        _deletedItems.Clear();
-        _newItems.Clear();
+        await OnSave.InvokeAsync(_changeTracker);
+        _changeTracker.Clear();
         _isDirty = false;
         await _dataGrid.ReloadServerData();
     }
 
     public async Task RevertChangesAsync()
     {
-        await OnRevert.InvokeAsync(_changes);
-        _changes.Clear();
-        _deletedItems.Clear();
-        _newItems.Clear();
+        await OnRevert.InvokeAsync(_changeTracker);
+        _changeTracker.Clear();
         _isDirty = false;
         await _dataGrid.ReloadServerData();
     }
@@ -151,7 +144,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public void DeleteSelectedItems()
     {
         _isDirty = true;
-        _deletedItems.UnionWith(_selectedItems);
+        _changeTracker.TrackDeletes(_selectedItems);
         _selectedItems.Clear();
     }
 
@@ -162,18 +155,18 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         var newItem = await NewItemFunc();
         if (newItem is not null)
         {
-            _newItems.Add(newItem);
+            _changeTracker.TrackNew(newItem);
             _isDirty = true;
         }
     }
     
     private string RowStyleFunc(T item, int row)
     {
-        if (_deletedItems.Contains(item))
+        if (_changeTracker.DeleteItems.Contains(item))
             return "background-color: #FF000055";
-        if (_changes.Contains(item))
+        if (_changeTracker.EditItems.Contains(item))
             return _itemChangedStyle;
-        if (_newItems.Contains(item))
+        if (_changeTracker.NewItems.Contains(item))
             return "background-color: #88FFAA55";
         return string.Empty;
     }
