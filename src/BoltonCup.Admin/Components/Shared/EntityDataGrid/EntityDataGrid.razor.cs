@@ -16,23 +16,24 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         .AddStyle("background-image", "linear-gradient(135deg, hsla(0, 0%, 100%, 0.05) 25%, transparent 0, transparent 50%, hsla(0, 0%, 100%, 0.05) 0, hsla(0, 0%, 100%, 0.05) 75%, transparent 0, transparent)")
         .AddStyle("background-size", "20px 20px")
         .Build();
-    private const string _height = "calc(100vh - 64px - 52px - var(--mud-appbar-height))";
+    private const string _height = "calc(100vh - 64px - 64px - var(--mud-appbar-height))";
     private const string _noPagerHeight = "calc(100vh - 64px - var(--mud-appbar-height))";
-    private readonly int[] _pageSizeOptions = [15, 100, 500];
+    private readonly int[] _pageSizeOptions = [15, 50, 100, 500];
     private HashSet<T> _changes;
     private HashSet<T> _deletedItems;
+    private HashSet<T> _newItems;
     private HashSet<T> _selectedItems;
     private MudDataGrid<T> _dataGrid = null!;
     private bool _isDirty;
     private string? _search;
     private readonly ParameterState<string?> _searchState;
-    private readonly ParameterState<IEqualityComparer<T>> _comparerState;
 
     public EntityDataGrid()
     {
         _cts = new CancellationTokenSource();
         _changes = new HashSet<T>(Comparer);
         _deletedItems = new HashSet<T>(Comparer);
+        _newItems = new HashSet<T>(Comparer);
         _selectedItems = new HashSet<T>(Comparer);
         using var registerScope = CreateRegisterScope();
         _searchState = registerScope.RegisterParameter<string?>(nameof(Search))
@@ -74,21 +75,30 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     [Parameter]
     public bool Selectable { get; set; } = true;
     
+    [Parameter]
+    public Func<Task<T?>>? NewItemFunc { get; set; }
+    
     public Task NotifyItemChangedAsync(T item) => _dataGrid.CommittedItemChanges.InvokeAsync(item);
 
-    private Task<GridData<T>> ServerFuncWrapper(GridState<T> state)
+    private async Task<GridData<T>> ServerFuncWrapper(GridState<T> state)
     { 
-        _cts.Cancel();
+        await _cts.CancelAsync();
         _cts.Dispose();
         _cts = new CancellationTokenSource();
         try
         {
-            return ServerFunc(state, _cts.Token);
+            var gridData = await ServerFunc(state, _cts.Token);
+            var items = _newItems.Concat(gridData.Items);
+            return new GridData<T>
+            {
+                Items = items,
+                TotalItems = gridData.TotalItems,
+            };
         }
         catch (Exception e)
         when (e is OperationCanceledException or ObjectDisposedException)
         {
-            return Task.FromResult(new GridData<T>());
+            return new GridData<T>();
         }
     }
     
@@ -123,6 +133,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         await OnSave.InvokeAsync(_changes);
         _changes.Clear();
         _deletedItems.Clear();
+        _newItems.Clear();
         _isDirty = false;
         await _dataGrid.ReloadServerData();
     }
@@ -132,6 +143,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         await OnRevert.InvokeAsync(_changes);
         _changes.Clear();
         _deletedItems.Clear();
+        _newItems.Clear();
         _isDirty = false;
         await _dataGrid.ReloadServerData();
     }
@@ -142,6 +154,18 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         _deletedItems.UnionWith(_selectedItems);
         _selectedItems.Clear();
     }
+
+    public async Task AddNewItem()
+    {
+        if (NewItemFunc is null)
+            return;
+        var newItem = await NewItemFunc();
+        if (newItem is not null)
+        {
+            _newItems.Add(newItem);
+            _isDirty = true;
+        }
+    }
     
     private string RowStyleFunc(T item, int row)
     {
@@ -149,6 +173,8 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
             return "background-color: #FF000055";
         if (_changes.Contains(item))
             return _itemChangedStyle;
+        if (_newItems.Contains(item))
+            return "background-color: #88FFAA55";
         return string.Empty;
     }
 

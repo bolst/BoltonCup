@@ -3,33 +3,39 @@
 @inherits ComponentBaseWithState
 
 <CascadingValue Value="this" IsFixed="true">
-    <MudDataGrid 
-        @ref="_dataGrid" 
+    <MudDataGrid
+        @ref="_dataGrid"
         T="T"
-        ServerData="ServerFuncWrapper" 
-        CommittedItemChanges="OnItemEdited" 
-        Height="@GetHeight()" 
-        RowStyleFunc="RowStyleFunc" 
+        ServerData="ServerFuncWrapper"
+        CommittedItemChanges="OnItemEdited"
+        Height="@GetHeight()"
+        RowStyleFunc="RowStyleFunc"
         @bind-SelectedItems="_selectedItems"
-        EditMode="DataGridEditMode.Cell" 
-        SortMode="SortMode.Single" 
-        Breakpoint="Breakpoint.None" 
-        ColumnResizeMode="@ColumnResizeMode" 
-        ReadOnly="false" 
+        EditMode="DataGridEditMode.Cell"
+        SortMode="SortMode.Single"
+        Breakpoint="Breakpoint.None"
+        ColumnResizeMode="@ColumnResizeMode"
+        ReadOnly="false"
         ShowColumnOptions="false"
         MultiSelection="Selectable"
         SelectOnRowClick="false"
         RowsPerPage="50"
         FixedHeader
         FixedFooter
-        Hideable 
-        Bordered 
+        Hideable
+        Bordered
         Dense>
         <ToolBarContent>
             <MudButtonGroup OverrideStyles="false" Size="Size.Small">
                 <MudTooltip Text="Delete Selected">
-                    <MudIconButton OnClick="DeleteSelectedItems" Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Disabled="_selectedItems.Count == 0" />
+                    <MudIconButton OnClick="DeleteSelectedItems" Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Disabled="_selectedItems.Count == 0"/>
                 </MudTooltip>
+                @if (NewItemFunc is not null)
+                {
+                    <MudTooltip Text="New Item">
+                        <MudIconButton OnClick="AddNewItem" Icon="@Icons.Material.Rounded.Add" Color="Color.Primary"/>
+                    </MudTooltip>
+                }
             </MudButtonGroup>
             <MudSpacer/>
             <MudTextField Class="mx-1" @bind-Value="_search" Label="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable/>
@@ -57,7 +63,7 @@
         <PagerContent>
             @if (!HidePagerContent)
             {
-                <MudDataGridPager T="T" PageSizeOptions="_pageSizeOptions" />
+                <MudDataGridPager T="T" PageSizeOptions="_pageSizeOptions"/>
             }
         </PagerContent>
     </MudDataGrid>
