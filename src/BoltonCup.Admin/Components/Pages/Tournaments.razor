@@ -4,6 +4,7 @@
 <EntityDataGrid
     T="Tournament"
     ServerFunc="ServerFunc"
+    NewItemFunc="NewItemFunc"
     OnSave="OnSave"
     Comparer="_comparer">
     <Columns>
@@ -54,11 +55,7 @@
 
     private async Task<Tournament?> NewItemFunc()
     {
-        return new Tournament
-        {
-            Id = -1,
-            Name = "New Tournament",
-        };
+        return null;
     }
 
     private async Task OnSave(ChangeTracker<Tournament> changes)
