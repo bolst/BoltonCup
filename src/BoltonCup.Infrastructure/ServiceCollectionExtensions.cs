@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
         
         var connectionString = configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
         return services
-            .AddDbContext<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
+            .AddDbContextFactory<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
             .AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString))
             .AddTransient<IAccountRepository, AccountRepository>()
             .AddTransient<IGameRepository, GameRepository>()
