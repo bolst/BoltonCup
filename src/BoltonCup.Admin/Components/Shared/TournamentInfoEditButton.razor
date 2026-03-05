@@ -1,6 +1,6 @@
+@using Microsoft.EntityFrameworkCore
 @namespace BoltonCup.Admin.Components.Shared
-@inject IInfoGuideRepository InfoGuideRepo
-@inject ITournamentRepository TournamentRepo
+@inject Db.BoltonCupDbContext DbContext
 @inject ISnackbar Snackbar
 
 <MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="ShowDialog" Size="Size.Small" />
@@ -67,7 +67,7 @@
 
     private Tournament? _tournament;
     private InfoGuide? _infoGuide;
-    private CollectionResult<InfoGuide>? _copyInfoGuides;
+    private List<InfoGuide>? _copyInfoGuides;
 
     private bool _dialogVisible;
 
@@ -90,27 +90,25 @@
     
     private async Task ShowDialog()
     {
-        _tournament ??= await TournamentRepo.GetByIdAsync(TournamentId);
+        _tournament ??= await DbContext.Tournaments
+            .Include(t => t.InfoGuide)
+            .FirstOrDefaultAsync(x => x.Id == TournamentId);
         if (_tournament is null)
         {
             Snackbar.Add($"No tournament with id = {TournamentId} was found.", Severity.Error);
             return;
         }
-        _infoGuide ??= await InfoGuideRepo.GetByTournamentIdAsync(TournamentId);
+        _infoGuide ??= await DbContext.InfoGuides.FirstOrDefaultAsync(x => x.TournamentId == TournamentId);
         if (_infoGuide is null)
         {
-            _copyInfoGuides ??= await InfoGuideRepo.GetAllAsync(new GetInfoGuidesQuery
-            {
-                Page = 1,
-                Size = 10,
-            });
+            _copyInfoGuides ??= await DbContext.InfoGuides.ToListAsync();
         }
         _dialogVisible = true;
     }
     
     private List<InfoGuide> GetCopyInfoGuides()
     {
-        var all = _copyInfoGuides?.Items ?? [];
+        var all = _copyInfoGuides ?? [];
         return all.Where(x => x.TournamentId != TournamentId).ToList();
     }
 
@@ -118,27 +116,25 @@
     {
         if (_tournament is null)
             return;
-        _infoGuide = new InfoGuide()
+        _infoGuide = new InfoGuide
         {
-            Id = Guid.NewGuid(),
             TournamentId = TournamentId,
             Title = $"{_tournament.Name} Information"
         };
-        await InfoGuideRepo.AddAsync(_infoGuide);
+        await DbContext.InfoGuides.AddAsync(_infoGuide);
     }
 
     private async Task CreateInfoGuideFromExisting(InfoGuide source)
     {
         if (_tournament is null)
             return;
-        _infoGuide = new InfoGuide()
+        _infoGuide = new InfoGuide
         {
-            Id = Guid.NewGuid(),
             TournamentId = TournamentId,
             Title = $"{_tournament.Name} Information",
             MarkdownContent = source.MarkdownContent
         };
-        await InfoGuideRepo.AddAsync(_infoGuide);
+        await DbContext.InfoGuides.AddAsync(_infoGuide);
     }
 
     private void CloseDialog()
@@ -151,8 +147,8 @@
     {
         if (_infoGuide is null)
             return;
-        var success = await InfoGuideRepo.UpdateAsync(_infoGuide);
-        if (success)
+        var updates = await DbContext.SaveChangesAsync();
+        if (updates > 0)
             Snackbar.Add("Info guide updated!", Severity.Success);
         else
             Snackbar.Add("Failed to update info guide.", Severity.Error);
