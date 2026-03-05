@@ -4,52 +4,46 @@
 
 @code {
 
-    private List<Tournament>? _tournaments;
-    
-    private async Task MenuOpenChanged(bool open)
+    private async Task<IEnumerable<Tournament>> Search(string value, CancellationToken cancellationToken)
     {
-        if (!open)
-            return;
-        if (_tournaments is not null)
-            return;
         if (EntityDataGrid is null)
-            return;
-        await using var dbContext = await EntityDataGrid.DbContextFactory.CreateDbContextAsync();
-        _tournaments = await dbContext
+            return [];
+        await using var dbContext = await EntityDataGrid.DbContextFactory.CreateDbContextAsync(cancellationToken);
+        return await dbContext
             .Set<Tournament>()
             .AsNoTracking()
+            .Where(t => t.Name.Contains(value))
             .OrderBy(t => t.Name)
-            .ToListAsync();
-        await InvokeAsync(StateHasChanged);
+            .ToListAsync(cancellationToken);
     }
     
     protected override RenderFragment EntityEditTemplate(CellContext<T> context)
     {
         var obj = PropertyFunc(context.Item);
-        if (obj is not Tournament tournament)
+        if (obj is not Tournament and not null)
         {
-            return @<div></div>;
+            return @<div>bad data</div>;
         }
-        
-        var href = $"/tournaments?id={tournament.Id}";
-        return @<MudButtonGroup OverrideStyles="false" Size="Size.Small" FullWidth>
-                   <MudButton Class="d-flex flex-row justify-start" Href="@href">
-                       <div class="d-flex flex-row align-center gap-1">
-                           <BoltonCupLogo Height="24" />
-                           <MudText Typo="Typo.body2">@tournament.Name</MudText>
-                       </div>
-                   </MudButton>
-                   <MudMenu Icon="@Icons.Material.Rounded.ArrowDropDown" OpenChanged="MenuOpenChanged" Dense>
-                       @foreach (var option in (_tournaments ?? []).Where(t => t.Id != tournament.Id))
-                       {
-                           <MudMenuItem OnClick="_ => SetProperty(context.Item, option)" Class="d-flex flex-row justify-start">
-                               <div class="d-flex flex-row align-center gap-1">
-                                   <BoltonCupLogo Height="24" />
-                                   <MudText Typo="Typo.body2">@option.Name</MudText>
-                               </div>
-                           </MudMenuItem>
-                       }
-                   </MudMenu>
-               </MudButtonGroup>;
+        var tournament = obj as Tournament;
+
+        return @<div class="d-flex flex-row align-center gap-2">
+                   @if (tournament is not null)
+                   {
+                       <MudLink Href="@($"/tournaments?id={tournament.Id}")" Underline="Underline.None">
+                           <BoltonCupLogo Height="24"/>
+                       </MudLink>
+                   }
+                   <MudAutocomplete T="Tournament" Placeholder="Tournament" SearchFunc="Search"
+                                    Value="tournament" ValueChanged="x => SetProperty(context.Item, x)"
+                                    IconSize="Size.Small" Margin="Margin.Dense" Strict="false"
+                                    Required="Required" Clearable="!Required" SelectValueOnTab Dense FullWidth>
+                       <ItemTemplate Context="itemContext">
+                           <div class="d-flex flex-row align-center gap-1">
+                               <BoltonCupLogo Height="24"/>
+                               <MudText Typo="Typo.body2">@itemContext.Name</MudText>
+                           </div>
+                       </ItemTemplate>
+                   </MudAutocomplete>
+               </div>;
     }
 }
