@@ -1,11 +1,9 @@
 @page "/tournaments"
-@inject Db.BoltonCupDbContext DbContext
 
 <EntityDataGrid
     T="Tournament"
     ServerFunc="ServerFunc"
     NewItemFunc="NewItemFunc"
-    OnSave="OnSave"
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Tournament" Property="x => x.Name" />
@@ -31,10 +29,10 @@
     
     private readonly TournamentComparer _comparer = new();
 
-    private async Task<GridData<Tournament>> ServerFunc(GridState<Tournament> state, CancellationToken cancellationToken)
+    private async Task<GridData<Tournament>> ServerFunc(IQueryable<Tournament> tournaments, GridState<Tournament> state, CancellationToken cancellationToken)
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
-        var data = await DbContext.Tournaments
+        var data = await tournaments
             .ToPaginatedListAsync(new GetTournamentsQuery
             {
                 Page = state.Page + 1,
@@ -56,10 +54,4 @@
             Name = "New Tournament"
         };
     }
-
-    private async Task OnSave(ChangeTracker<Tournament> changes)
-    {
-        
-    }
-    
 }

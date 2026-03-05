@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using BoltonCup.Infrastructure.Data;
 using Microsoft.AspNetCore.Components;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.State;
 using MudBlazor.Utilities;
@@ -9,6 +11,7 @@ namespace BoltonCup.Admin.Components.Shared;
 [CascadingTypeParameter(nameof(T))]
 public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T> 
     : ComponentBaseWithState, IDisposable
+    where T : class
 {
     private CancellationTokenSource _cts;
     private string _itemChangedStyle = new StyleBuilder()
@@ -22,7 +25,6 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     private ChangeTracker<T> _changeTracker;
     private HashSet<T> _selectedItems;
     private MudDataGrid<T> _dataGrid = null!;
-    private bool _isDirty;
     private string? _search;
     private readonly ParameterState<string?> _searchState;
 
@@ -40,6 +42,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
             .WithParameter(() => Comparer)
             .WithChangeHandler(OnComparerChange);
     }
+    
+    [Inject]
+    public IDbContextFactory<BoltonCupDbContext> DbContextFactory { get; set; } = null!;
 
     [Parameter]
     public RenderFragment? Columns { get; set; }
@@ -51,7 +56,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public EventCallback<ChangeTracker<T>> OnRevert { get; set; }
     
     [Parameter]
-    public Func<GridState<T>, CancellationToken, Task<GridData<T>>> ServerFunc { get; set; } = null!;
+    public Func<IQueryable<T>, GridState<T>, CancellationToken, Task<GridData<T>>> ServerFunc { get; set; } = null!;
 
     [Parameter]
     public string? Search { get; set; }
@@ -83,7 +88,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         _cts = new CancellationTokenSource();
         try
         {
-            var gridData = await ServerFunc(state, _cts.Token);
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            var dbSet = dbContext.Set<T>().AsNoTracking();
+            var gridData = await ServerFunc(dbSet, state, _cts.Token);
             var items = _changeTracker.NewItems.Concat(gridData.Items);
             return new GridData<T>
             {
@@ -122,14 +129,12 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     private void OnItemEdited(T item)
     {
         _changeTracker.TrackEdit(item);
-        _isDirty = true;
     }
     
     public async Task SaveChangesAsync()
     {
         await OnSave.InvokeAsync(_changeTracker);
-        _changeTracker.Clear();
-        _isDirty = false;
+        await _changeTracker.SaveChangesAsync(DbContextFactory);
         await _dataGrid.ReloadServerData();
     }
 
@@ -137,13 +142,11 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     {
         await OnRevert.InvokeAsync(_changeTracker);
         _changeTracker.Clear();
-        _isDirty = false;
         await _dataGrid.ReloadServerData();
     }
 
     public void DeleteSelectedItems()
     {
-        _isDirty = true;
         _changeTracker.TrackDeletes(_selectedItems);
         _selectedItems.Clear();
     }
@@ -156,7 +159,6 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         if (newItem is not null)
         {
             _changeTracker.TrackNew(newItem);
-            _isDirty = true;
         }
     }
     

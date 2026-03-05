@@ -1,31 +1,28 @@
 @page "/authentication/users"
-@using BoltonCup.Infrastructure.Data
 @using Microsoft.AspNetCore.Identity
-@using Microsoft.EntityFrameworkCore
 @inject AuthDbContext AuthData
 
-<EntityDataGrid
-    T="IdentityUserWithRoles"
-    ServerFunc="ServerFunc"
-    OnSave="OnSave">
-    <Columns>
-        <PropertyColumn Title="Id" Property="x => x.User.Id" Editable="false" />
-        <PropertyColumn Title="User" Property="x => x.User.UserName" />
-        <PropertyColumn Title="Email" Property="x => x.User.Email" />
-        <BoolColumn Title="Email Confirmed" Property="x => x.User.EmailConfirmed" />
-        <PropertyColumn Title="Phone" Property="x => x.User.PhoneNumber" />
-        <BoolColumn Title="Phone Confirmed" Property="x => x.User.PhoneNumberConfirmed" />
-        <BoolColumn Title="Lockout?" Property="x => x.User.LockoutEnabled" />
-        <DateTimeOffsetColumn Title="Lockout End" Property="x => x.User.LockoutEnd" />
-        <PropertyColumn Title="Access Failed Count" Property="x => x.User.AccessFailedCount" Editable="false" />
-    </Columns>
-</EntityDataGrid>
+@* <EntityDataGrid *@
+@*     T="IdentityUserWithRoles" *@
+@*     ServerFunc="ServerFunc"> *@
+@*     <Columns> *@
+@*         <PropertyColumn Title="Id" Property="x => x.User.Id" Editable="false" /> *@
+@*         <PropertyColumn Title="User" Property="x => x.User.UserName" /> *@
+@*         <PropertyColumn Title="Email" Property="x => x.User.Email" /> *@
+@*         <BoolColumn Title="Email Confirmed" Property="x => x.User.EmailConfirmed" /> *@
+@*         <PropertyColumn Title="Phone" Property="x => x.User.PhoneNumber" /> *@
+@*         <BoolColumn Title="Phone Confirmed" Property="x => x.User.PhoneNumberConfirmed" /> *@
+@*         <BoolColumn Title="Lockout?" Property="x => x.User.LockoutEnabled" /> *@
+@*         <DateTimeOffsetColumn Title="Lockout End" Property="x => x.User.LockoutEnd" /> *@
+@*         <PropertyColumn Title="Access Failed Count" Property="x => x.User.AccessFailedCount" Editable="false" /> *@
+@*     </Columns> *@
+@* </EntityDataGrid> *@
 
 @code {
 
     private int? _totalItems;
     
-    private async Task<GridData<IdentityUserWithRoles>> ServerFunc(GridState<IdentityUserWithRoles> state, CancellationToken cancellationToken)
+    private async Task<GridData<IdentityUserWithRoles>> ServerFunc(BoltonCupDbContext dbContext, GridState<IdentityUserWithRoles> state, CancellationToken cancellationToken)
     {
         var users = await AuthData.Users
             .OrderBy(u => u.UserName)
@@ -62,10 +59,6 @@
             Items = data,
             TotalItems = _totalItems.Value
         };
-    }
-
-    private async Task OnSave(ChangeTracker<IdentityUserWithRoles> changes)
-    {
     }
 
     private class IdentityUserWithRoles

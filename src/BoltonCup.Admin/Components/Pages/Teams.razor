@@ -1,11 +1,9 @@
 @page "/teams"
-@inject Db.BoltonCupDbContext DbContext
 
 <EntityDataGrid
     T="Team"
     ServerFunc="ServerFunc"
     NewItemFunc="NewItemFunc"
-    OnSave="OnSave"
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Team" Property="x => x.Name" />
@@ -22,10 +20,10 @@
     
     private readonly TeamComparer _comparer = new();
 
-    private async Task<GridData<Team>> ServerFunc(GridState<Team> state, CancellationToken cancellationToken)
+    private async Task<GridData<Team>> ServerFunc(IQueryable<Team> teams, GridState<Team> state, CancellationToken cancellationToken)
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
-        var data = await DbContext.Teams
+        var data = await teams
             .ToPaginatedListAsync(new GetTeamsQuery
             {
                 Page = state.Page + 1,
@@ -50,11 +48,6 @@
             PrimaryColorHex = "#CE1126",
             SecondaryColorHex = "#FFFFFF"
         };
-    }
-
-    private async Task OnSave(ChangeTracker<Team> changes)
-    {
-        
     }
     
 }

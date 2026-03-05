@@ -41,10 +41,10 @@
             <MudTextField Class="mx-1" @bind-Value="_search" Label="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable/>
             <MudButtonGroup OverrideStyles="false" Size="Size.Small">
                 <MudTooltip Text="Revert">
-                    <MudIconButton OnClick="RevertChangesAsync" Icon="@Icons.Material.Rounded.Undo" Color="Color.Error" Disabled="!_isDirty"/>
+                    <MudIconButton OnClick="RevertChangesAsync" Icon="@Icons.Material.Rounded.Undo" Color="Color.Error" Disabled="!_changeTracker.IsDirty"/>
                 </MudTooltip>
                 <MudTooltip Text="Save">
-                    <MudIconButton OnClick="SaveChangesAsync" Icon="@Icons.Material.Rounded.Save" Color="Color.Primary" Disabled="!_isDirty"/>
+                    <MudIconButton OnClick="SaveChangesAsync" Icon="@Icons.Material.Rounded.Save" Color="Color.Primary" Disabled="!_changeTracker.IsDirty"/>
                 </MudTooltip>
             </MudButtonGroup>
         </ToolBarContent>

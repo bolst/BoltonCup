@@ -1,11 +1,9 @@
 @page "/games/schedules"
-@inject Db.BoltonCupDbContext DbContext
 
 <EntityDataGrid
     T="Game"
     ServerFunc="ServerFunc"
     NewItemFunc="NewItemFunc"
-    OnSave="OnSave"
     Comparer="_comparer">
     <Columns>
         <TeamColumn Title="Home" Property="x => x.HomeTeam" />
@@ -22,10 +20,10 @@
     
     private readonly GameComparer _comparer = new();
 
-    private async Task<GridData<Game>> ServerFunc(GridState<Game> state, CancellationToken cancellationToken)
+    private async Task<GridData<Game>> ServerFunc(IQueryable<Game> games, GridState<Game> state, CancellationToken cancellationToken)
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
-        var data = await DbContext.Games
+        var data = await games
             .ToPaginatedListAsync(new GetGamesQuery
         {
             Page = state.Page + 1,
@@ -47,10 +45,6 @@
             TournamentId = 1,
             GameTime = DateTime.Now,
         };
-    }
-
-    private async Task OnSave(ChangeTracker<Game> changes)
-    {
     }
     
 }

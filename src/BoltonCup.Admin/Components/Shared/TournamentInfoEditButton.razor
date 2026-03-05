@@ -1,6 +1,5 @@
-@using Microsoft.EntityFrameworkCore
 @namespace BoltonCup.Admin.Components.Shared
-@inject Db.BoltonCupDbContext DbContext
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
 @inject ISnackbar Snackbar
 
 <MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="ShowDialog" Size="Size.Small" />
@@ -17,7 +16,7 @@
                 <MudText>No info guide exists!</MudText>
                 <MudButton OnClick="CreateInfoGuide" Variant="Variant.Filled" EndIcon="@Icons.Material.Rounded.Add" Color="Color.Primary">Create New</MudButton>
                 <MudMenu Label="Copy existing" Variant="Variant.Filled" EndIcon="@Icons.Material.Rounded.KeyboardArrowDown" Color="Color.Primary">
-                    @foreach(var copyInfoGuide in GetCopyInfoGuides())
+                    @foreach(var copyInfoGuide in _copyInfoGuides)
                     {
                         <MudMenuItem OnClick="() => CreateInfoGuideFromExisting(copyInfoGuide)">@copyInfoGuide.Tournament?.Name</MudMenuItem>
                     }
@@ -90,7 +89,8 @@
     
     private async Task ShowDialog()
     {
-        _tournament ??= await DbContext.Tournaments
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        _tournament ??= await dbContext.Tournaments
             .Include(t => t.InfoGuide)
             .FirstOrDefaultAsync(x => x.Id == TournamentId);
         if (_tournament is null)
@@ -98,20 +98,20 @@
             Snackbar.Add($"No tournament with id = {TournamentId} was found.", Severity.Error);
             return;
         }
-        _infoGuide ??= await DbContext.InfoGuides.FirstOrDefaultAsync(x => x.TournamentId == TournamentId);
+        _infoGuide ??= await dbContext.InfoGuides
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.TournamentId == TournamentId);
         if (_infoGuide is null)
         {
-            _copyInfoGuides ??= await DbContext.InfoGuides.ToListAsync();
+            _copyInfoGuides ??= await dbContext.InfoGuides
+                .AsNoTracking()
+                .Include(i => i.Tournament)
+                .Where(x => x.TournamentId != TournamentId)
+                .ToListAsync();
         }
         _dialogVisible = true;
     }
     
-    private List<InfoGuide> GetCopyInfoGuides()
-    {
-        var all = _copyInfoGuides ?? [];
-        return all.Where(x => x.TournamentId != TournamentId).ToList();
-    }
-
     private async Task CreateInfoGuide()
     {
         if (_tournament is null)
@@ -121,7 +121,8 @@
             TournamentId = TournamentId,
             Title = $"{_tournament.Name} Information"
         };
-        await DbContext.InfoGuides.AddAsync(_infoGuide);
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        await dbContext.InfoGuides.AddAsync(_infoGuide);
     }
 
     private async Task CreateInfoGuideFromExisting(InfoGuide source)
@@ -134,7 +135,8 @@
             Title = $"{_tournament.Name} Information",
             MarkdownContent = source.MarkdownContent
         };
-        await DbContext.InfoGuides.AddAsync(_infoGuide);
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        await dbContext.InfoGuides.AddAsync(_infoGuide);
     }
 
     private void CloseDialog()
@@ -147,7 +149,9 @@
     {
         if (_infoGuide is null)
             return;
-        var updates = await DbContext.SaveChangesAsync();
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        dbContext.InfoGuides.Update(_infoGuide);
+        var updates = await dbContext.SaveChangesAsync();
         if (updates > 0)
             Snackbar.Add("Info guide updated!", Severity.Success);
         else

@@ -1,6 +1,10 @@
+using BoltonCup.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace BoltonCup.Admin.Components.Shared;
 
-public sealed class ChangeTracker<T>
+public sealed class ChangeTracker<T> 
+    where T : class
 {
     public HashSet<T> EditItems { get; private set; }
     public HashSet<T> DeleteItems { get; private set; }
@@ -37,6 +41,17 @@ public sealed class ChangeTracker<T>
     {
         NewItems.Add(item);
         IsDirty = true;
+    }
+
+    public async Task SaveChangesAsync(IDbContextFactory<BoltonCupDbContext> dbContextFactory)
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+        var dbSet = dbContext.Set<T>();
+        dbSet.UpdateRange(EditItems);
+        dbSet.RemoveRange(DeleteItems);
+        dbSet.AddRange(NewItems);
+        await dbContext.SaveChangesAsync();
+        Clear();
     }
 
     public void Clear()
