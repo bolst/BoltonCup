@@ -55,7 +55,10 @@
 
     private async Task<Tournament?> NewItemFunc()
     {
-        return null;
+        return new Tournament
+        {
+            Name = "New Tournament"
+        };
     }
 
     private async Task OnSave(ChangeTracker<Tournament> changes)

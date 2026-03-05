@@ -4,6 +4,7 @@
 <EntityDataGrid
     T="Team"
     ServerFunc="ServerFunc"
+    NewItemFunc="NewItemFunc"
     OnSave="OnSave"
     Comparer="_comparer">
     <Columns>
@@ -40,6 +41,18 @@
         {
             Items = data.Items,
             TotalItems = totalItems
+        };
+    }
+    
+    private async Task<Team?> NewItemFunc()
+    {
+        return new Team
+        {
+            Name = "Detroit Red Wings",
+            NameShort = "Red Wings",
+            Abbreviation = "DRW",
+            PrimaryColorHex = "#CE1126",
+            SecondaryColorHex = "#FFFFFF"
         };
     }
 

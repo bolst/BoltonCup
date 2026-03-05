@@ -4,6 +4,7 @@
 <EntityDataGrid
     T="Game"
     ServerFunc="ServerFunc"
+    NewItemFunc="NewItemFunc"
     OnSave="OnSave"
     Comparer="_comparer">
     <Columns>
@@ -42,10 +43,18 @@
             TotalItems = totalItems
         };
     }
+    
+    private async Task<Game?> NewItemFunc()
+    {
+        return new Game
+        {
+            TournamentId = 1,
+            GameTime = DateTime.Now,
+        };
+    }
 
     private async Task OnSave(ChangeTracker<Game> changes)
     {
-        
     }
     
 }
