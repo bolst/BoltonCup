@@ -19,6 +19,8 @@ public class Tournament : EntityBase
     public ICollection<Team> Teams { get; set; } = [];
     public ICollection<Game> Games { get; set; } = [];
     public InfoGuide? InfoGuide { get; set; }
+
+    public override string ToString() => Name;
 }
 
 public class TournamentComparer : IEqualityComparer<Tournament>
