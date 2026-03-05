@@ -18,6 +18,7 @@ public class Tournament : EntityBase
     public ICollection<Player> Players { get; set; } = [];
     public ICollection<Team> Teams { get; set; } = [];
     public ICollection<Game> Games { get; set; } = [];
+    public InfoGuide? InfoGuide { get; set; }
 }
 
 public class TournamentComparer : IEqualityComparer<Tournament>

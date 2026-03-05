@@ -198,7 +198,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasKey(e => e.Id);
             entity
                 .HasOne(e => e.Tournament)
-                .WithOne()
+                .WithOne(e => e.InfoGuide)
                 .HasForeignKey<InfoGuide>(e => e.TournamentId);
             entity
                 .HasIndex(e => e.TournamentId)
