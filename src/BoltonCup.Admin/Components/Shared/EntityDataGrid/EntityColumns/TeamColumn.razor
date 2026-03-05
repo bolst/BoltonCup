@@ -4,17 +4,52 @@
 
 @code {
     
-    protected override RenderFragment EntityEditTemplate(Team? team)
+    private List<Team>? _teams;
+    
+    private async Task MenuOpenChanged(bool open)
     {
-        if (team is null)
+        if (!open)
+            return;
+        if (_teams is not null)
+            return;
+        if (EntityDataGrid is null)
+            return;
+        await using var dbContext = await EntityDataGrid.DbContextFactory.CreateDbContextAsync();
+        _teams = await dbContext
+            .Set<Team>()
+            .AsNoTracking()
+            .OrderBy(t => t.Name)
+            .ToListAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    protected override RenderFragment EntityEditTemplate(CellContext<T> context)
+    {
+        var obj = PropertyFunc(context.Item);
+        if (obj is not Team team)
         {
             return @<div></div>;
         }
 
         var href = $"/teams?id={team.Id}";
-        return @<a href="@href" class="d-flex flex-row align-center gap-1">
-            <MudImage Src="@team.LogoUrl" Height="24"/>
-            <MudText Typo="Typo.body2">@team.NameShort</MudText>
-        </a>;
+        return @<MudButtonGroup OverrideStyles="false" Size="Size.Small" FullWidth>
+                   <MudButton Class="d-flex flex-row justify-start" Href="@href">
+                       <div class="d-flex flex-row align-center gap-1">
+                           <MudImage Src="@team.LogoUrl" Height="24"/>
+                           <MudText Typo="Typo.body2">@team.NameShort</MudText>
+                       </div>
+                   </MudButton>
+                   <MudMenu Icon="@Icons.Material.Rounded.ArrowDropDown" OpenChanged="MenuOpenChanged" Dense>
+                       @foreach (var option in (_teams ?? []).Where(t => t.Id != team.Id))
+                       {
+                           <MudMenuItem OnClick="_ => SetProperty(context.Item, option)" Class="d-flex flex-row justify-start">
+                               <div class="d-flex flex-row align-center gap-1">
+                                   <MudImage Src="@option.LogoUrl" Height="24"/>
+                                   <MudText Typo="Typo.body2">@option.Name</MudText>
+                               </div>
+                           </MudMenuItem>
+                       }
+                   </MudMenu>
+               </MudButtonGroup>;
     }
 }

@@ -13,11 +13,14 @@ public abstract partial class EntityColumnBase<[DynamicallyAccessedMembers(Dynam
 where T : EntityBase
 where TProperty : EntityBase
 {
+    private string? _propertyName;
     private Expression<Func<T, TProperty?>>? _lastAssignedProperty;
     private Func<T, TProperty?>? _compiledExpression;
-    private string? _propertyName;
 
-    protected abstract RenderFragment EntityEditTemplate(TProperty? context);
+    protected abstract RenderFragment EntityEditTemplate(CellContext<T> context);
+    
+    [CascadingParameter]
+    public EntityDataGrid<T>? EntityDataGrid { get; set; }
     
     [Parameter]
     [EditorRequired]
@@ -27,11 +30,7 @@ where TProperty : EntityBase
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        EditTemplate = context =>
-        {
-            var item = _compiledExpression?.Invoke(context.Item);
-            return EntityEditTemplate(item);
-        };
+        EditTemplate = EntityEditTemplate;
     }
     
     protected override void OnParametersSet()
@@ -59,6 +58,9 @@ where TProperty : EntityBase
         return _compiledExpression(item);
     }
     
+    protected override Type PropertyType
+        => typeof(TProperty);
+    
     private object? RecursiveGetSubProperties(MemberExpression memberExpression, object? item)
     {
         if (memberExpression.Expression is not MemberExpression
@@ -82,6 +84,7 @@ where TProperty : EntityBase
         if (memberExpression.Member is not PropertyInfo propertyInfo) 
             return;
         
+        var rootItem = item;
         item = RecursiveGetSubProperties(memberExpression, item);
         if (value == null)
         { 
@@ -91,6 +94,11 @@ where TProperty : EntityBase
         {
             var actualType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? PropertyType;
             propertyInfo.SetValue(item, Convert.ChangeType(value, actualType), null);
+        }
+        
+        if (EntityDataGrid is not null && rootItem is T entity)
+        {
+            InvokeAsync(() => EntityDataGrid.NotifyItemChangedAsync(entity));
         }
     }
 

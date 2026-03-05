@@ -3,17 +3,53 @@
 @inherits EntityColumnBase<T, Tournament>
 
 @code {
-    protected override RenderFragment EntityEditTemplate(Tournament? tournament)
+
+    private List<Tournament>? _tournaments;
+    
+    private async Task MenuOpenChanged(bool open)
     {
-        if (tournament is null)
+        if (!open)
+            return;
+        if (_tournaments is not null)
+            return;
+        if (EntityDataGrid is null)
+            return;
+        await using var dbContext = await EntityDataGrid.DbContextFactory.CreateDbContextAsync();
+        _tournaments = await dbContext
+            .Set<Tournament>()
+            .AsNoTracking()
+            .OrderBy(t => t.Name)
+            .ToListAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    protected override RenderFragment EntityEditTemplate(CellContext<T> context)
+    {
+        var obj = PropertyFunc(context.Item);
+        if (obj is not Tournament tournament)
         {
             return @<div></div>;
         }
-    
+        
         var href = $"/tournaments?id={tournament.Id}";
-        return @<a href="@href" class="d-flex flex-row align-center gap-1">
-                   <BoltonCupLogo Height="24" />
-                   <MudText Typo="Typo.body2">@tournament.Name</MudText>
-               </a>;
+        return @<MudButtonGroup OverrideStyles="false" Size="Size.Small" FullWidth>
+                   <MudButton Class="d-flex flex-row justify-start" Href="@href">
+                       <div class="d-flex flex-row align-center gap-1">
+                           <BoltonCupLogo Height="24" />
+                           <MudText Typo="Typo.body2">@tournament.Name</MudText>
+                       </div>
+                   </MudButton>
+                   <MudMenu Icon="@Icons.Material.Rounded.ArrowDropDown" OpenChanged="MenuOpenChanged" Dense>
+                       @foreach (var option in (_tournaments ?? []).Where(t => t.Id != tournament.Id))
+                       {
+                           <MudMenuItem OnClick="_ => SetProperty(context.Item, option)" Class="d-flex flex-row justify-start">
+                               <div class="d-flex flex-row align-center gap-1">
+                                   <BoltonCupLogo Height="24" />
+                                   <MudText Typo="Typo.body2">@option.Name</MudText>
+                               </div>
+                           </MudMenuItem>
+                       }
+                   </MudMenu>
+               </MudButtonGroup>;
     }
 }
