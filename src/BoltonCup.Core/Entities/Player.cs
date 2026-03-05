@@ -2,7 +2,7 @@ namespace BoltonCup.Core;
 
 public class Player : EntityBase
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required int TournamentId { get; set; }
     public required int AccountId { get; set; }
     public int? TeamId { get; set; }

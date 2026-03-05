@@ -2,7 +2,7 @@ namespace BoltonCup.Core;
 
 public abstract class GameLogBase : EntityBase
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required int PlayerId { get; set; }
     public required int TeamId { get; set; }
     public required int OpponentTeamId { get; set; }

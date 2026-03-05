@@ -2,7 +2,7 @@ namespace BoltonCup.Core;
 
 public class Tournament : EntityBase
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required string Name { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }

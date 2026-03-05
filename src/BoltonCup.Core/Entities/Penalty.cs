@@ -2,7 +2,7 @@ namespace BoltonCup.Core;
 
 public class Penalty : EntityBase
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required int GameId { get; set; }
     public required int TeamId { get; set; }
     public required int Period { get; set; }
