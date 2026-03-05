@@ -3,6 +3,13 @@
 @inherits InputColumnBase<T, DateTime?>
 
 @code {
+
+    private void SetDateTime(T item, DateTime? dateTime)
+    {
+        dateTime = dateTime?.ToUniversalTime();
+        SetProperty(item, dateTime);
+    }
+    
     protected override RenderFragment EntityEditTemplate(CellContext<T> context)
     {
         var property = PropertyFunc(context.Item);
@@ -12,7 +19,7 @@
         }
 
         var item = property as DateTime?;
-        return @<MudDatePicker Date="item" DateChanged="d => SetProperty(context.Item, d)"
+        return @<MudDatePicker Date="item" DateChanged="d => SetDateTime(context.Item, d)"
                                IconSize="Size.Small" Margin="Margin.Dense" Underline="false" Rounded Editable />;
     }
 }
