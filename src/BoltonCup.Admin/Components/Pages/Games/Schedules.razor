@@ -1,5 +1,5 @@
 @page "/games/schedules"
-@inject IGameRepository GameRepo
+@inject Db.BoltonCupDbContext DbContext
 
 <EntityDataGrid
     T="Game"
@@ -25,22 +25,18 @@
     private async Task<GridData<Game>> ServerFunc(GridState<Game> state, CancellationToken cancellationToken)
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
-        var data = await GameRepo.GetAllAsync(new GetGamesQuery
+        var data = await DbContext.Games
+            .ToPaginatedListAsync(new GetGamesQuery
         {
             Page = state.Page + 1,
             Size = state.PageSize,
             SortBy = sortDefinition?.SortBy,
             Descending = sortDefinition?.Descending ?? false,
-        });
-        
-        var totalItems = data.Items.Count();
-        if (data is PaginatedList<Game> pageList)
-            totalItems = pageList.Total;
-
+        }, cancellationToken: cancellationToken);
         return new GridData<Game>
         {
             Items = data.Items,
-            TotalItems = totalItems
+            TotalItems = data.Total
         };
     }
     

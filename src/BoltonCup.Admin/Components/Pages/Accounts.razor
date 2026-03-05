@@ -1,5 +1,5 @@
 @page "/accounts"
-@inject IAccountRepository AccountRepo
+@inject Db.BoltonCupDbContext DbContext
 
 <EntityDataGrid 
     @ref="_dataGrid" 
@@ -32,22 +32,18 @@
     private async Task<GridData<Account>> GetItemsAsync(GridState<Account> state, CancellationToken cancellationToken)
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
-        var data = await AccountRepo.GetAllAsync(new GetAccountsQuery
-        {
-            Page = state.Page + 1,
-            Size = state.PageSize,
-            SortBy = sortDefinition?.SortBy,
-            Descending = sortDefinition?.Descending ?? false,
-        });
-        
-        var totalItems = data.Items.Count();
-        if (data is PaginatedList<Account> pageList)
-            totalItems = pageList.Total;
-
+        var data = await DbContext.Accounts
+            .ToPaginatedListAsync(new GetAccountsQuery
+            {
+                Page = state.Page + 1,
+                Size = state.PageSize,
+                SortBy = sortDefinition?.SortBy,
+                Descending = sortDefinition?.Descending ?? false,
+            }, cancellationToken: cancellationToken);
         return new GridData<Account>
         {
             Items = data.Items,
-            TotalItems = totalItems
+            TotalItems = data.Total
         };
     }
 

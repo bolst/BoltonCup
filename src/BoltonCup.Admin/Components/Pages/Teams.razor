@@ -1,5 +1,5 @@
 @page "/teams"
-@inject ITeamRepository TeamRepo
+@inject Db.BoltonCupDbContext DbContext
 
 <EntityDataGrid
     T="Team"
@@ -25,22 +25,18 @@
     private async Task<GridData<Team>> ServerFunc(GridState<Team> state, CancellationToken cancellationToken)
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
-        var data = await TeamRepo.GetAllAsync(new GetTeamsQuery
-        {
-            Page = state.Page + 1,
-            Size = state.PageSize,
-            SortBy = sortDefinition?.SortBy,
-            Descending = sortDefinition?.Descending ?? false,
-        });
-        
-        var totalItems = data.Items.Count();
-        if (data is PaginatedList<Team> pageList)
-            totalItems = pageList.Total;
-
+        var data = await DbContext.Teams
+            .ToPaginatedListAsync(new GetTeamsQuery
+            {
+                Page = state.Page + 1,
+                Size = state.PageSize,
+                SortBy = sortDefinition?.SortBy,
+                Descending = sortDefinition?.Descending ?? false,
+            }, cancellationToken: cancellationToken);
         return new GridData<Team>
         {
             Items = data.Items,
-            TotalItems = totalItems
+            TotalItems = data.Total
         };
     }
     
