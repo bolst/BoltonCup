@@ -24,6 +24,7 @@
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
         var data = await teams
+            .Include(t => t.Tournament)
             .ToPaginatedListAsync(new GetTeamsQuery
             {
                 Page = state.Page + 1,

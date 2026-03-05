@@ -24,13 +24,16 @@
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
         var data = await games
+            .Include(g => g.HomeTeam)
+            .Include(g => g.AwayTeam)
+            .Include(g => g.Tournament)
             .ToPaginatedListAsync(new GetGamesQuery
-        {
-            Page = state.Page + 1,
-            Size = state.PageSize,
-            SortBy = sortDefinition?.SortBy,
-            Descending = sortDefinition?.Descending ?? false,
-        }, cancellationToken: cancellationToken);
+            {
+                Page = state.Page + 1,
+                Size = state.PageSize,
+                SortBy = sortDefinition?.SortBy,
+                Descending = sortDefinition?.Descending ?? false,
+            }, cancellationToken: cancellationToken);
         return new GridData<Game>
         {
             Items = data.Items,
