@@ -35,7 +35,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .ToTable("accounts")
                 .HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.FirstName).HasColumnName("first_name");
             entity.Property(e => e.LastName).HasColumnName("last_name");
             entity.Property(e => e.Email).HasColumnName("email");
@@ -63,7 +63,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.AwayTeam)
                 .WithMany(e => e.AwayGames)
                 .HasForeignKey(e => e.AwayTeamId);
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.GameTime).HasColumnName("game_time");
             entity.Property(e => e.HomeTeamId).HasColumnName("home_team_id");
@@ -98,7 +98,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Assist2Player)
                 .WithMany(e => e.SecondaryAssists)
                 .HasForeignKey(e => e.Assist2PlayerId);
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.GameId).HasColumnName("game_id");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.Period).HasColumnName("period_number");
@@ -131,7 +131,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Game)
                 .WithMany(e => e.GoalieGameLogs)
                 .HasForeignKey(e => e.GameId);
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.OpponentTeamId).HasColumnName("opponent_team_id");
@@ -227,7 +227,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Player)
                 .WithMany(e => e.Penalties)
                 .HasForeignKey(e => e.PlayerId);
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.GameId).HasColumnName("game_id");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.Period).HasColumnName("period_number");
@@ -255,7 +255,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Team)
                 .WithMany(e => e.Players)
                 .HasForeignKey(e => e.TeamId);
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.AccountId).HasColumnName("account_id");
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
@@ -284,7 +284,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Game)
                 .WithMany(e => e.SkaterGameLogs)
                 .HasForeignKey(e => e.GameId);
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.OpponentTeamId).HasColumnName("opponent_team_id");
@@ -345,7 +345,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.GeneralManager)
                 .WithMany(e => e.ManagedTeams)
                 .HasForeignKey(e => e.GmAccountId);
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.NameShort).HasColumnName("name_short");
             entity.Property(e => e.Abbreviation).HasColumnName("abbreviation");
@@ -365,7 +365,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .ToTable("tournaments")
                 .HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.EndDate).HasColumnName("end_date");
