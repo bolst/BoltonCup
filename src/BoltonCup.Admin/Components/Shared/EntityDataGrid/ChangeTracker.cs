@@ -21,24 +21,30 @@ public sealed class ChangeTracker<T>
     
     public void TrackEdit(T item)
     {
+        if (DeleteItems.Contains(item) || NewItems.Contains(item))
+            return;
         EditItems.Add(item);
         IsDirty = true;
     }
 
     public void TrackDelete(T item)
     {
+        EditItems.Remove(item);
         DeleteItems.Add(item);
         IsDirty = true;
     }
     
     public void TrackDeletes(IEnumerable<T> items)
     {
-        DeleteItems.UnionWith(items);
+        var enumerable = items.ToHashSet();
+        EditItems.ExceptWith(enumerable);
+        DeleteItems.UnionWith(enumerable);
         IsDirty = true;
     }
 
     public void TrackNew(T item)
     {
+        EditItems.Remove(item);
         NewItems.Add(item);
         IsDirty = true;
     }
