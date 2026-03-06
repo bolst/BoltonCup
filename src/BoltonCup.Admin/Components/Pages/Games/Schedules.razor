@@ -6,13 +6,13 @@
     NewItemFunc="NewItemFunc"
     Comparer="_comparer">
     <Columns>
-        <TeamColumn Title="Home" Property="x => x.HomeTeam" />
-        <TeamColumn Title="Away" Property="x => x.AwayTeam" />
+        <TeamColumn Title="Home" Entity="x => x.HomeTeam" />
+        <TeamColumn Title="Away" Entity="x => x.AwayTeam" />
         <DatePickerColumn Title="Date" Property="x => x.GameTime"/>
         <PropertyColumn Title="Type" Property="x => x.GameType"/>
         <PropertyColumn Title="Venue" Property="x => x.Venue"/>
         <PropertyColumn Title="Rink" Property="x => x.Rink"/>
-        <TournamentColumn Property="x => x.Tournament" />
+        <TournamentColumn Entity="x => x.Tournament" />
     </Columns>
 </EntityDataGrid>
 

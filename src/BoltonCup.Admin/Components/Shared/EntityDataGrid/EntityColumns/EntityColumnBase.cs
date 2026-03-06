@@ -8,14 +8,14 @@ using MudBlazor;
 
 namespace BoltonCup.Admin.Components.Shared;
 
-public abstract partial class EntityColumnBase<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T, TProperty>
+public abstract partial class EntityColumnBase<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T, TEntity>
     : Column<T>
 where T : EntityBase
-where TProperty : EntityBase
+where TEntity : EntityBase
 {
     private string? _propertyName;
-    private Expression<Func<T, TProperty?>>? _lastAssignedProperty;
-    private Func<T, TProperty?>? _compiledExpression;
+    private Expression<Func<T, TEntity?>>? _lastAssignedProperty;
+    private Func<T, TEntity?>? _compiledExpression;
 
     protected abstract RenderFragment EntityEditTemplate(CellContext<T> context);
     
@@ -24,7 +24,7 @@ where TProperty : EntityBase
     
     [Parameter]
     [EditorRequired]
-    public required Expression<Func<T, TProperty?>> Property { get; set; } = Expression.Lambda<Func<T, TProperty?>>(Expression.Default(typeof(TProperty)), Expression.Parameter(typeof(T)));
+    public required Expression<Func<T, TEntity?>> Entity { get; set; } = Expression.Lambda<Func<T, TEntity?>>(Expression.Default(typeof(TEntity)), Expression.Parameter(typeof(T)));
     
 
     protected override void OnInitialized()
@@ -35,13 +35,13 @@ where TProperty : EntityBase
     
     protected override void OnParametersSet()
     {
-        if (_lastAssignedProperty != Property)
+        if (_lastAssignedProperty != Entity)
         {
-            _lastAssignedProperty = Property;
-            _compiledExpression = Property.Compile();
+            _lastAssignedProperty = Entity;
+            _compiledExpression = Entity.Compile();
         }
 
-        var property = Property.Visit();
+        var property = Entity.Visit();
         _propertyName = property.GetPath();
         Title ??= property.GetLastMemberName();
     }
@@ -54,12 +54,12 @@ where TProperty : EntityBase
     
     protected override object? PropertyFunc(T item)
     {
-        _compiledExpression ??= Property.Compile();
+        _compiledExpression ??= Entity.Compile();
         return _compiledExpression(item);
     }
     
     protected override Type PropertyType
-        => typeof(TProperty);
+        => typeof(TEntity);
     
     private object? RecursiveGetSubProperties(MemberExpression memberExpression, object? item)
     {
@@ -71,12 +71,12 @@ where TProperty : EntityBase
         
         var subObject = RecursiveGetSubProperties(subMemberExpress, item);
         return propertyInfo.GetValue(subObject) 
-               ?? throw new NullReferenceException($"Unable to get property value, value of '{propertyInfo.Name}' is null in '{Property}'");
+               ?? throw new NullReferenceException($"Unable to get property value, value of '{propertyInfo.Name}' is null in '{Entity}'");
     }
     
     protected override void SetProperty(object? item, object? value)
     {
-        var expression = Property.Body;
+        var expression = Entity.Body;
         
         // Only MemberExpression is supported, MemberExpression access members like 'x.y' is accessing the member 'y'
         if (expression is not MemberExpression memberExpression) 
