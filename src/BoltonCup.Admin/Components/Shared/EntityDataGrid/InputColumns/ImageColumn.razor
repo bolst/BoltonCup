@@ -1,0 +1,26 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam T where T : class
+@inherits InputColumnBase<T, string?>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Sortable = false;
+    }
+    
+    protected override RenderFragment EntityEditTemplate(CellContext<T> context)
+    {
+        var property = PropertyFunc(context.Item);
+        if (property is not string and not null)
+        {
+            return @<div></div>;
+        }
+
+        var item = property as string;
+        return @<div class="mud-width-full d-flex flex-column align-center justify-center">
+                   <EditableImage Src="@item" SrcChanged="t => SetProperty(context.Item, t)" Height="24"/>
+               </div>;
+    }
+}
