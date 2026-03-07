@@ -1,6 +1,6 @@
 @namespace BoltonCup.Common.Components
 
-<MudImage Src="_content/BoltonCup.Common/images/boltoncup.png" Alt="Bolton Cup" Height="@Height" Width="@Width" />
+<MudImage Src="@Src" Alt="Bolton Cup" Height="@Height" Width="@Width" />
 
 @code {
 
@@ -9,5 +9,7 @@
     
     [Parameter]
     public int? Height { get; set; }
+
+    public const string Src = "_content/BoltonCup.Common/images/boltoncup.png";
 
 }

@@ -6,13 +6,16 @@
     NewItemFunc="NewItemFunc"
     Comparer="_comparer">
     <Columns>
-        <TeamColumn Title="Home" Entity="x => x.HomeTeam" />
-        <TeamColumn Title="Away" Entity="x => x.AwayTeam" />
+        <ForeignColumn Title="Home" Property="x => x.HomeTeam" PropertySetter="(game, team) => game.HomeTeam = team" 
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.LogoUrl" />
+        <ForeignColumn Title="Away" Property="x => x.AwayTeam" PropertySetter="(game, team) => game.AwayTeam = team" 
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.LogoUrl" />
         <DatePickerColumn Title="Date" Property="x => x.GameTime"/>
         <PropertyColumn Title="Type" Property="x => x.GameType"/>
         <PropertyColumn Title="Venue" Property="x => x.Venue"/>
         <PropertyColumn Title="Rink" Property="x => x.Rink"/>
-        <TournamentColumn Entity="x => x.Tournament" />
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament" 
+                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="_ => BoltonCupLogo.Src" />
     </Columns>
 </EntityDataGrid>
 

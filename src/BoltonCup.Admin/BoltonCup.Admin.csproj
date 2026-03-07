@@ -20,4 +20,9 @@
       <ProjectReference Include="..\BoltonCup.Infrastructure\BoltonCup.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\Shared\EntityDataGrid\EntityColumns\TeamColumn.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\EntityDataGrid\EntityColumns\TournamentColumn.razor" />
+    </ItemGroup>
+
 </Project>

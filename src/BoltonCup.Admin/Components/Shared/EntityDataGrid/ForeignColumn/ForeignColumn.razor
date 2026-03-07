@@ -1,0 +1,49 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam T
+@typeparam TEntity
+@inherits Column<T>
+
+@code {
+
+    protected virtual RenderFragment EntityEditTemplate(CellContext<T> context)
+    {
+        var item = PropertyFunc(context.Item);
+        if (item is not TEntity entity)
+        {
+            return @<div>not T :(</div>;
+        }
+        
+        return @<div>
+                   <MudSelect T="TEntity"
+                              Value="entity"
+                              ValueChanged="@(val => OnValueChangedAsync(context.Item, val))"
+                              Comparer="EqualityComparer"
+                              Margin="Margin.Dense"
+                              Clearable="!Required"
+                              Required="Required"
+                              Dense>
+                       <MudSelectItem Value="entity">
+                           <div class="d-flex flex-row align-center gap-1">
+                               @if (ImageSrcFunc is not null)
+                               {
+                                   <MudImage Src="@ImageSrcFunc(entity)" Height="24"/>
+                               }
+                               <span>@entity.ToString()</span>
+                           </div>
+                       </MudSelectItem>
+                       @foreach (var option in _options.Where(x => !EqualityComparer?.Equals(x, entity) ?? false))
+                       {
+                           <MudSelectItem Value="@option">
+                               <div class="d-flex flex-row align-center gap-1">
+                                   @if (ImageSrcFunc is not null)
+                                   {
+                                       <MudImage Src="@ImageSrcFunc(option)" Height="24"/>
+                                   }
+                                   <span>@option.ToString()</span>
+                               </div>
+                           </MudSelectItem>
+                       }
+                   </MudSelect>
+        </div>;
+    }
+}
