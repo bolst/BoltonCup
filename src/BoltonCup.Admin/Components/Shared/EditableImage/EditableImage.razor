@@ -4,16 +4,16 @@
 
 @if (Disabled)
 {
-    <MudImage Src="@Src" Height="@Height" Width="@Width" />
+    <MudImage Src="@_src" Height="@Height" Width="@Width" />
 }
 else
 {
-    <div class="container" onclick="@OnClick">
-        <MudImage Src="@Src" Height="@Height" Width="@Width" />
+    <MudLink Class="container" OnClick="OnClick">
+        <MudImage Src="@_src" Height="@Height" Width="@Width" />
         <div class="middle">
             <MudIcon Icon="@Icons.Material.Filled.Edit" />
         </div>
-    </div>
+    </MudLink>
 }
 
 
@@ -35,11 +35,10 @@ else
     public RenderFragment ChildContent { get; set; } = null!;
 
     [Parameter]
-    public EventCallback OnClick { get; set; }
-
-    [Parameter]
     public bool Disabled { get; set; }
 
+    private string? _src;
+    
     private readonly ParameterState<string?> _srcState;
     
 
@@ -52,7 +51,13 @@ else
             .WithChangeHandler(OnSrcChange);
     }
 
-    private void OnSrcChange(ParameterChangedEventArgs<string> args)
+    private void OnSrcChange(ParameterChangedEventArgs<string?> args)
+    {
+        _src = args.Value;
+        StateHasChanged();
+    }
+
+    private async Task OnClick()
     {
         
     }
