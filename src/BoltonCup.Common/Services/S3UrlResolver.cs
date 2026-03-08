@@ -1,19 +1,12 @@
-using Microsoft.Extensions.Configuration;
-
 namespace BoltonCup.Common.Services;
 
-public interface IS3PathResolver
-{
-    string? GetFullUrl(string? s3Key);
-}
-
-public class PublicCdnUrlResolver : IS3PathResolver
+public class S3UrlResolver : IS3UrlResolver
 {
     private readonly string? _baseUrl;
 
-    public PublicCdnUrlResolver(IConfiguration config)
+    public S3UrlResolver(BoltonCupConfiguration configuration)
     {
-        _baseUrl = config["CdnBaseUrl"];
+        _baseUrl = configuration.S3BaseUrl;
     }
 
     public string? GetFullUrl(string? s3Key)
