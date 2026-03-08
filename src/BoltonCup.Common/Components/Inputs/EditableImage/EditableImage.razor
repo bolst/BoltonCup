@@ -3,7 +3,7 @@
 @inherits ComponentBaseWithState
 @inject IDialogService DialogService
 
-@if (Disabled)
+@if (!Editable)
 {
     <MudImage Src="@_src" Height="@Height" Width="@Width" />
 }
@@ -36,7 +36,7 @@ else
     public RenderFragment ChildContent { get; set; } = null!;
 
     [Parameter]
-    public bool Disabled { get; set; }
+    public bool Editable { get; set; }
 
     private string? _src;
     
