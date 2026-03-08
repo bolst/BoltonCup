@@ -20,7 +20,7 @@
 
         var item = property as string;
         return @<div class="mud-width-full d-flex flex-column align-center justify-center">
-                   <EditableImage Src="@item" SrcChanged="t => SetProperty(context.Item, t)" Height="24"/>
+                   <BoltonCupImage Src="@item" SrcChanged="t => SetProperty(context.Item, t)" Height="24"/>
                </div>;
     }
 }

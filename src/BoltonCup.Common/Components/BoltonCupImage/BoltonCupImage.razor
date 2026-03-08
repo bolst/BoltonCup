@@ -43,7 +43,7 @@ else
     private readonly ParameterState<string?> _srcState;
     
 
-    public EditableImage()
+    public BoltonCupImage()
     {
         using var registerScope = CreateRegisterScope();
         _srcState = registerScope.RegisterParameter<string?>(nameof(Src))
