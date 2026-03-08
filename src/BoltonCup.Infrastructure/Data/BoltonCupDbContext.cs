@@ -43,6 +43,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Birthday).HasColumnName("birthday");
             entity.Property(e => e.HighestLevel).HasColumnName("highest_level");
             entity.Property(e => e.ProfilePicture).HasColumnName("profile_picture");
+            entity.Property(e => e.ProfilePictureS3Key).HasColumnName("profile_picture_s3_key");
             entity.Property(e => e.PreferredBeer).HasColumnName("preferred_beer");
         });
 
@@ -352,12 +353,16 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.GmAccountId).HasColumnName("gm_account_id");
             entity.Property(e => e.LogoUrl).HasColumnName("logo_url");
+            entity.Property(e => e.LogoS3Key).HasColumnName("logo_s3_key");
             entity.Property(e => e.BannerUrl).HasColumnName("banner_url");
+            entity.Property(e => e.BannerS3Key).HasColumnName("banner_s3_key");
             entity.Property(e => e.PrimaryColorHex).HasColumnName("primary_hex");
             entity.Property(e => e.SecondaryColorHex).HasColumnName("secondary_hex");
             entity.Property(e => e.TertiaryColorHex).HasColumnName("tertiary_hex");
             entity.Property(e => e.GoalSongUrl).HasColumnName("goal_song_url");
+            entity.Property(e => e.GoalSongS3Key).HasColumnName("goal_song_s3_key");
             entity.Property(e => e.PenaltySongUrl).HasColumnName("penalty_song_url");
+            entity.Property(e => e.PenaltySongS3Key).HasColumnName("penalty_song_s3_key");
         });
 
         modelBuilder.Entity<Tournament>(entity =>
@@ -367,6 +372,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasKey(e => e.Id);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.LogoS3Key).HasColumnName("logo_s3_key");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.EndDate).HasColumnName("end_date");
             entity.Property(e => e.WinningTeamId).HasColumnName("winning_team_id");
