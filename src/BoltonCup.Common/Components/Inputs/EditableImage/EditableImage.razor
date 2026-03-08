@@ -1,6 +1,7 @@
-@namespace BoltonCup.Admin.Components.Shared
+@namespace BoltonCup.Common.Components
 @using MudBlazor.State
 @inherits ComponentBaseWithState
+@inject IDialogService DialogService
 
 @if (Disabled)
 {
@@ -8,12 +9,12 @@
 }
 else
 {
-    <MudLink Class="container" OnClick="OnClick">
-        <MudImage Src="@_src" Height="@Height" Width="@Width" />
-        <div class="middle">
+    <div class="edit-image-container" @onclick="OnClick">
+        <MudImage Class="edit-image" Src="@_src" Height="@Height" Width="@Width" />
+        <div class="overlay-container">
             <MudIcon Icon="@Icons.Material.Filled.Edit" />
         </div>
-    </MudLink>
+    </div>
 }
 
 
@@ -59,7 +60,11 @@ else
 
     private async Task OnClick()
     {
-        
+        var dialog = await DialogService.ShowAsync<EditImageDialog>("Edit Image", new DialogParameters<EditImageDialog>
+        {
+            { x => x.Src, _src }
+        });
+        var result = await dialog.Result;
     }
     
 }

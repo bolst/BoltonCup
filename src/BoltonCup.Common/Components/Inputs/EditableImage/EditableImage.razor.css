@@ -1,0 +1,32 @@
+.edit-image-container {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.edit-image {
+    opacity: 1;
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: .5s ease;
+    backface-visibility: hidden;
+}
+
+.overlay-container {
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity .5s ease;
+    cursor: pointer;
+}
+
+.edit-image-container:hover .overlay-container {
+    opacity: 1;
+}

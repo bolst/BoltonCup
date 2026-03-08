@@ -1,0 +1,50 @@
+@using Microsoft.AspNetCore.Components.Forms
+@namespace BoltonCup.Common.Components
+
+<MudDialog>
+    <TitleContent>
+        Edit Image
+    </TitleContent>
+    <DialogContent>
+        <div class="mud-width-full d-flex flex-column align-center justify-center">
+            <MudImage Src="@Src" Width="300" />
+            <MudFileUpload T="IBrowserFile" FilesChanged="FilesChanged" Accept=".png, .jpg, .webp, .svg">
+                <ActivatorContent>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.CloudUpload">
+                        Upload Image
+                    </MudButton>
+                </ActivatorContent>
+            </MudFileUpload>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">OK</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance DialogInstance { get; set; } = null!;
+    
+    [Parameter]
+    public string? Src { get; set; }
+
+    private void FilesChanged(IBrowserFile? file)
+    {
+        
+    }
+    
+    private void Cancel() => DialogInstance.Close();
+
+    private void Submit()
+    {
+        DialogInstance.Close(Src);
+    }
+
+}
