@@ -1,5 +1,7 @@
+@using BoltonCup.Common.Utilities
 @using Microsoft.AspNetCore.Components.Forms
 @namespace BoltonCup.Common.Components
+@inject ISnackbar Snackbar
 
 <MudDialog>
     <TitleContent>
@@ -7,21 +9,29 @@
     </TitleContent>
     <DialogContent>
         <div class="mud-width-full d-flex flex-column align-center justify-center">
-            <MudImage Src="@Src" Width="300" />
+            <MudImage Src="@_src" Width="300" />
             <MudFileUpload T="IBrowserFile" FilesChanged="FilesChanged" Accept=".png, .jpg, .webp, .svg">
                 <ActivatorContent>
                     <MudButton Variant="Variant.Filled"
                                Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.CloudUpload">
-                        Upload Image
+                               StartIcon="@Icons.Material.Filled.CloudUpload"
+                               Disabled="_loading">
+                        @if (string.IsNullOrEmpty(_uploadFilename))
+                        {
+                            <MudText Typo="Typo.button">Upload</MudText>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.button">@_uploadFilename</MudText>
+                        }
                     </MudButton>
                 </ActivatorContent>
             </MudFileUpload>
         </div>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">OK</MudButton>
+        <MudButton OnClick="Cancel" Disabled="_loading">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Disabled="_loading">OK</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -35,16 +45,59 @@
     [Parameter]
     public string? Src { get; set; }
 
-    private void FilesChanged(IBrowserFile? file)
+    /// <summary>
+    /// Defaults to 5000 KB (5 MB).
+    /// </summary>
+    [Parameter]
+    public int MaxSizeKB { get; set; } = 5 * 1024 * 1024;
+
+    private bool _loading;
+    private string? _src;
+    private string? _uploadFilename;
+
+    protected override void OnParametersSet()
     {
+        _src ??= Src;
+    }
+
+    private async Task FilesChanged(IBrowserFile? file)
+    {
+        if (file is null)
+            return;
+        if (!file.ContentType.StartsWith("image/"))
+        {
+            Snackbar.Add($"{file.Name} is not an image.", Severity.Error);
+            return;
+        }
         
+        _loading = true;
+        StateHasChanged();
+
+        try
+        {
+            var resizer = new ImageResizer();
+            await using var fileStream = file.OpenReadStream(MaxSizeKB);
+            var bytes = await resizer.ResizeAsync(fileStream, (int)(MaxSizeKB * 0.9));
+            _src = $"data:image/*;base64,{Convert.ToBase64String(bytes)}";
+            _uploadFilename = file.Name;
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add($"Error: {e.Message}", Severity.Error);
+            throw;
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
     }
     
     private void Cancel() => DialogInstance.Close();
 
     private void Submit()
     {
-        DialogInstance.Close(Src);
+        DialogInstance.Close(_src);
     }
 
 }

@@ -62,9 +62,13 @@ else
     {
         var dialog = await DialogService.ShowAsync<EditImageDialog>("Edit Image", new DialogParameters<EditImageDialog>
         {
-            { x => x.Src, _src }
+            { x => x.Src, _src },
         });
         var result = await dialog.Result;
+        if (result?.Data is string newSrc)
+        {
+            await _srcState.SetValueAsync(newSrc);
+        }
     }
     
 }
