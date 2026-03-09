@@ -6,12 +6,12 @@
 
 @if (!Editable)
 {
-    <MudImage Src="@GetImageSrc()" Height="@Height" Width="@Width" />
+    <MudImage Src="@S3UrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" />
 }
 else
 {
     <div class="edit-image-container" @onclick="OnClick">
-        <MudImage Class="edit-image" Src="@GetImageSrc()" Height="@Height" Width="@Width" />
+        <MudImage Class="edit-image" Src="@S3UrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" />
         <div class="overlay-container">
             <MudIcon Icon="@Icons.Material.Filled.Edit" />
         </div>
@@ -62,18 +62,11 @@ else
         StateHasChanged();
     }
 
-    private string? GetImageSrc()
-    {
-        if (!ResolveUrl)
-            return _src;
-        return S3UrlResolver.GetFullUrl(_src);
-    }
-
     private async Task OnClick()
     {
         var dialog = await DialogService.ShowAsync<EditImageDialog>("Edit Image", new DialogParameters<EditImageDialog>
         {
-            { x => x.Src, GetImageSrc() },
+            { x => x.Src, _src },
         });
         var result = await dialog.Result;
         if (result?.Data is string newSrc)
