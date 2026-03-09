@@ -16,32 +16,37 @@ public class ImageResizer
     private const int QUALITY_STEP = 10;
     
 
-    public async Task<byte[]> ResizeAsync(Stream imageStream, long targetSizeKB = 500)
+    public async Task<Stream> ResizeAsync(Stream imageStream, long targetSizeKB = 500)
     {
-        using var memoryStream = new MemoryStream();
+        var memoryStream = new MemoryStream();
         await imageStream.CopyToAsync(memoryStream);
-        var originalBytes = memoryStream.ToArray();
+        memoryStream.Position = 0;
         
-        // if image is alr smaller than target size, return
-        if (originalBytes.Length <= targetSizeKB * 1024)
-            return originalBytes;
-        
-        using var originalBitmap = SKBitmap.Decode(new MemoryStream(originalBytes));
+        var targetSizeBytes = targetSizeKB * 1024;
+        if (memoryStream.Length <= targetSizeBytes)
+            return memoryStream;
+
+        var originalBitmap = SKBitmap.Decode(memoryStream);
+
         // start with high quality and no scaling
         var quality = INIT_QUALITY;
         var scaleFactor = 1.0f;
 
         long imageSizeBytes;
-        byte[] imageBytes;
+        MemoryStream finalStream = null!;
 
         do
         {
-            var resizedBitmap = scaleFactor < 1.0f 
-                ? ResizeBitmap(originalBitmap, scaleFactor) 
-                : originalBitmap;
-            imageBytes = BitmapToByteArray(resizedBitmap, quality);
-            imageSizeBytes = imageBytes.Length;
+            await finalStream.DisposeAsync();
 
+            var isResized = scaleFactor < 1.0f;
+            using var resizedBitmap = isResized 
+                ? originalBitmap.ResizeBitmap(scaleFactor) 
+                : originalBitmap;
+            
+            finalStream = resizedBitmap.EncodeToStream(quality);
+            imageSizeBytes = finalStream.Length;
+            
             if (imageSizeBytes > targetSizeKB * 1024 && quality > MIN_QUALITY)
                 quality -= QUALITY_STEP;
             else if (imageSizeBytes < targetSizeKB * 1024 / 2 && scaleFactor > MIN_SCALE_FACTOR)
@@ -49,24 +54,30 @@ public class ImageResizer
             else
                 break;
 
-        } while (imageSizeBytes > targetSizeKB * 1024 || imageSizeBytes < targetSizeKB * 1024 / 2);
+        } while (imageSizeBytes > targetSizeBytes || imageSizeBytes < targetSizeBytes / 2);
 
-        return imageBytes;
-    }
-
-
-
-    private static SKBitmap ResizeBitmap(SKBitmap originalBitmap, float scaleFactor) 
-        => originalBitmap.Resize(
-            new SKImageInfo((int)(originalBitmap.Width * scaleFactor), (int)(originalBitmap.Height * scaleFactor)), 
-            new SKSamplingOptions(SKCubicResampler.Mitchell)
-        );
-
-    private static byte[] BitmapToByteArray(SKBitmap bitmap, int quality)
-    {
-        using var image = SKImage.FromBitmap(bitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Jpeg, quality);
-        return data.ToArray();
+        finalStream.Position = 0;
+        return finalStream;
     }
     
+}
+
+internal static class SkiaExtensions
+{
+    internal static SKBitmap ResizeBitmap(this SKBitmap originalBitmap, float scaleFactor)
+    {
+        var newWidth = (int)(originalBitmap.Width * scaleFactor);
+        var newHeight = (int)(originalBitmap.Height * scaleFactor);
+        return originalBitmap.Resize(new SKImageInfo(newWidth, newHeight), new SKSamplingOptions(SKCubicResampler.Mitchell));
+    }
+    
+    internal static MemoryStream EncodeToStream(this SKBitmap bitmap, int quality)
+    {
+        var stream = new MemoryStream();
+        using var image = SKImage.FromBitmap(bitmap);
+        using var data = image.Encode(SKEncodedImageFormat.Webp, quality);
+        data.SaveTo(stream);
+        stream.Position = 0;
+        return stream;
+    }
 }

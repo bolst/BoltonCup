@@ -20,20 +20,20 @@ public static class ServiceCollectionExtensions
             .AddValidatorsFromAssemblyContaining<EntityBase>();
     }
 
-    private static IServiceCollection AddAuthServices(this IServiceCollection services, IHostEnvironment environment)
+    private static IServiceCollection AddAuthServices(this WebApplicationBuilder builder)
     {
-        services
+        builder.Services
             .AddAuthentication()
             .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.Scheme, null);
         
-        return services
+        return builder.Services
             .ConfigureApplicationCookie(options =>
             {
                 options.Cookie.Name = ".BoltonCup.Auth";
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.SameSite = SameSiteMode.Lax;
-                if (environment.IsProduction())
+                if (builder.Environment.IsProduction())
                 {
                     options.Cookie.Domain = ".boltoncup.ca";
                 }
@@ -64,6 +64,7 @@ public static class ServiceCollectionExtensions
             {
                 policy.WithOrigins(
                         "http://localhost:5239",
+                        "https://localhost:7244",
                         "https://localhost:7266",
                         "https://localhost:7269",
                         "https://boltoncup.ca",
@@ -107,15 +108,15 @@ public static class ServiceCollectionExtensions
             });
     }
     
-    public static IServiceCollection AddBoltonCupWebAPIServices(this IServiceCollection services, IHostEnvironment environment)
+    public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
     {
-        services
+        builder
+            .AddAuthServices()
             .AddFluentValidationServices()
-            .AddAuthServices(environment)
             .AddCorsServices()
             .AddRateLimitingServices()
             .AddRouting(options => options.LowercaseUrls = true)
             .AddControllers(options => options.Filters.Add<ApiExceptionFilterAttribute>());
-        return services;
+        return builder.Services;
     }
 }

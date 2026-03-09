@@ -1,7 +1,8 @@
-@using BoltonCup.Common.Utilities
 @using Microsoft.AspNetCore.Components.Forms
 @namespace BoltonCup.Common.Components
 @inject ISnackbar Snackbar
+@inject IS3UploadService S3UploadService
+@inject IS3UrlResolver S3UrlResolver
 
 <MudDialog>
     <TitleContent>
@@ -9,7 +10,7 @@
     </TitleContent>
     <DialogContent>
         <div class="mud-width-full d-flex flex-column align-center justify-center">
-            <MudImage Src="@_src" Width="300" />
+            <MudImage Src="@S3UrlResolver.GetFullUrl(_src)" Width="300" />
             <MudFileUpload T="IBrowserFile" FilesChanged="FilesChanged" Accept=".png, .jpg, .webp, .svg">
                 <ActivatorContent>
                     <MudButton Variant="Variant.Filled"
@@ -47,12 +48,6 @@
     [Parameter]
     public string? Src { get; set; }
 
-    /// <summary>
-    /// Defaults to 5000 KB (5 MB).
-    /// </summary>
-    [Parameter]
-    public int MaxSizeKB { get; set; } = 5 * 1024 * 1024;
-
     private bool _loading;
     private string? _src;
     private string? _uploadFilename;
@@ -77,10 +72,8 @@
 
         try
         {
-            var resizer = new ImageResizer();
-            await using var fileStream = file.OpenReadStream(MaxSizeKB);
-            var bytes = await resizer.ResizeAsync(fileStream, (int)(MaxSizeKB * 0.9));
-            _src = $"data:image/*;base64,{Convert.ToBase64String(bytes)}";
+            var tempKey = await S3UploadService.UploadAsync(file);
+            _src = tempKey;
             _uploadFilename = file.Name;
         }
         catch (Exception e)

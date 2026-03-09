@@ -23,8 +23,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
-builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
-builder.Services.AddBoltonCupS3(builder.Configuration);
+builder.AddBoltonCupInfrastructure();
 
 var configSection = builder.Configuration.GetSection(BoltonCupConfiguration.SectionName);
 var bcConfig = configSection.Get<BoltonCupConfiguration>() 

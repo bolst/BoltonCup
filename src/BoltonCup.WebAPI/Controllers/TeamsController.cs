@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class TeamsController(ITeamRepository _teams) : BoltonCupControllerBase
+public class TeamsController(ITeamRepository _teams, ITeamService _teamService) : BoltonCupControllerBase
 {
     /// <remarks>
     /// Gets a paginated list of teams.
@@ -26,5 +26,27 @@ public class TeamsController(ITeamRepository _teams) : BoltonCupControllerBase
     public async Task<ActionResult<TeamSingleDetailDto>> GetTeamById(int id)
     {
         return OkOrNotFound(await _teams.GetByIdAsync<TeamSingleDetailDto>(id));
+    }
+
+    /// <remarks>
+    /// Updates a team's logo by accepting a pre-signed S3 key for the new logo image.
+    /// The client is responsible for uploading the image to S3 before calling this endpoint.
+    /// </remarks>
+    [HttpPut("{id:int}/logo")]
+    public async Task<ActionResult> UpdateTeamLogo(int id, string key)
+    {
+        await _teamService.UpdateTeamLogoAsync(id, key);
+        return Ok();
+    }
+    
+    /// <remarks>
+    /// Updates a team's logo by accepting a pre-signed S3 key for the new logo image.
+    /// The client is responsible for uploading the image to S3 before calling this endpoint.
+    /// </remarks>
+    [HttpPut("{id:int}/banner")]
+    public async Task<ActionResult> UpdateTeamBanner(int id, string key)
+    {
+        await _teamService.UpdateTeamBannerAsync(id, key);
+        return Ok();
     }
 }

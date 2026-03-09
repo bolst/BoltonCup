@@ -2,10 +2,12 @@ using BoltonCup.Common.Auth;
 using BoltonCup.Common.Handlers;
 using BoltonCup.Common.Services;
 using BoltonCup.Common.Theme;
+using BoltonCup.Core;
 using BoltonCup.Sdk;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace BoltonCup.Common;
 
@@ -28,7 +30,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<BoltonCupTheme>();
         
         // s3
-        services.AddSingleton<IS3UrlResolver, S3UrlResolver>(_ => new S3UrlResolver(bcConfig));
+        services
+            .AddSingleton<IS3UrlResolver, S3UrlResolver>(_ => new S3UrlResolver(bcConfig))
+            .AddSingleton<IS3UploadService, S3UploadService>()
+            .TryAddSingleton<IAssetUploadService, WasmAssetUploadService>();
         
         // auth
         services

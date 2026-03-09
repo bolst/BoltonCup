@@ -3,24 +3,28 @@ using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Repositories;
 using BoltonCup.Infrastructure.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace BoltonCup.Infrastructure;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddBoltonCupInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddBoltonCupInfrastructure(this WebApplicationBuilder builder)
     {
-        services
+        builder.Services
             .AddIdentityCore<IdentityUser>()
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<AuthDbContext>();
 
-        var connectionString = configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
-        return services
+        builder.AddBoltonCupS3();
+        
+        var connectionString = builder.Configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
+        return builder.Services
             .AddDbContextFactory<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
             .AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString))
             .AddTransient<IAccountRepository, AccountRepository>()
@@ -32,12 +36,13 @@ public static class ServiceCollectionExtensions
             .AddTransient<ISkaterGameLogRepository, SkaterGameLogRepository>()
             .AddTransient<ISkaterStatRepository, SkaterStatRepository>()
             .AddTransient<ITeamRepository, TeamRepository>()
-            .AddTransient<ITournamentRepository, TournamentRepository>();
+            .AddTransient<ITournamentRepository, TournamentRepository>()
+            .AddTransient<ITeamService, TeamService>();
     }
     
-    public static IServiceCollection AddBoltonCupS3(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddBoltonCupS3(this WebApplicationBuilder builder)
     {
-        var r2Config = configuration.GetRequiredSection("CloudflareR2");
+        var r2Config = builder.Configuration.GetRequiredSection("CloudflareR2");
         var accountId = r2Config["AccountId"];
         var accessKey = r2Config["AccessKey"];
         var secretKey = r2Config["SecretKey"];
@@ -48,9 +53,9 @@ public static class ServiceCollectionExtensions
             ServiceURL = $"https://{accountId}.r2.cloudflarestorage.com",
             AuthenticationRegion = "auto"
         };
-        return services
+        return builder.Services
             .AddSingleton<IAmazonS3>(_ => new AmazonS3Client(s3Credentials, s3Config))
-            .AddSingleton<IAssetUploadService, AssetUploadService>();
+            .Replace(ServiceDescriptor.Singleton<IAssetUploadService, ServerAssetUploadService>());
     }
 }
 

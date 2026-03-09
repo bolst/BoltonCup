@@ -30,4 +30,8 @@
                 Options="/GenerateOptionalParameters:true /GenerateClientInterfaces:true /DateTimeType:System.DateTime /JsonLibrary:SystemTextJson" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\BoltonCup.Core\BoltonCup.Core.csproj" />
+    </ItemGroup>
+
 </Project>

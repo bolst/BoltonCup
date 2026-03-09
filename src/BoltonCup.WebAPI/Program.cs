@@ -24,9 +24,8 @@ builder.Services
     .AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<AuthDbContext>();
 
-builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
-builder.Services.AddBoltonCupS3(builder.Configuration);
-builder.Services.AddBoltonCupWebAPIServices(builder.Environment);
+builder.AddBoltonCupInfrastructure();
+builder.AddBoltonCupWebAPIServices();
 
 // https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
