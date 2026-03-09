@@ -21,10 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Extensions\" />
-    </ItemGroup>
-
-    <ItemGroup>
         <OpenApiReference
                 Include="..\BoltonCup.WebAPI\BoltonCup.WebAPI.json"
                 ClassName="BoltonCupApi"
