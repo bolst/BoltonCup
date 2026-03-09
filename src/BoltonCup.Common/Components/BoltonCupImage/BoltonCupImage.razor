@@ -2,15 +2,16 @@
 @using MudBlazor.State
 @inherits ComponentBaseWithState
 @inject IDialogService DialogService
+@inject IS3UrlResolver S3UrlResolver
 
 @if (!Editable)
 {
-    <MudImage Src="@_src" Height="@Height" Width="@Width" />
+    <MudImage Src="@GetImageSrc()" Height="@Height" Width="@Width" />
 }
 else
 {
     <div class="edit-image-container" @onclick="OnClick">
-        <MudImage Class="edit-image" Src="@_src" Height="@Height" Width="@Width" />
+        <MudImage Class="edit-image" Src="@GetImageSrc()" Height="@Height" Width="@Width" />
         <div class="overlay-container">
             <MudIcon Icon="@Icons.Material.Filled.Edit" />
         </div>
@@ -37,6 +38,9 @@ else
 
     [Parameter]
     public bool Editable { get; set; }
+    
+    [Parameter]
+    public bool ResolveUrl { get; set; } = true;
 
     private string? _src;
     
@@ -58,11 +62,18 @@ else
         StateHasChanged();
     }
 
+    private string? GetImageSrc()
+    {
+        if (!ResolveUrl)
+            return _src;
+        return S3UrlResolver.GetFullUrl(_src);
+    }
+
     private async Task OnClick()
     {
         var dialog = await DialogService.ShowAsync<EditImageDialog>("Edit Image", new DialogParameters<EditImageDialog>
         {
-            { x => x.Src, _src },
+            { x => x.Src, GetImageSrc() },
         });
         var result = await dialog.Result;
         if (result?.Data is string newSrc)
