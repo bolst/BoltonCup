@@ -12,7 +12,7 @@ public class AssetUploadService : IAssetUploadService
         _s3Client = s3Client;
     }
 
-    public Task<PreSignedPutUrl> GeneratePresignedPutUrl(string fileExtension, string contentType)
+    public Task<PreSignedPutUrl> GeneratePreSignedPutUrl(string fileExtension, string contentType)
     {
         var tempKey = $"uploads/{Guid.NewGuid()}{fileExtension}";
         var uploadUrl = _s3Client.GeneratePreSignedURL(

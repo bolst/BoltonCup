@@ -11,6 +11,6 @@ public class AssetsController(IAssetUploadService _uploadService) : BoltonCupCon
     [HttpGet]
     public async Task<ActionResult<PreSignedPutUrl>> GeneratePreSignedPutUrl(string fileExtension, string contentType)
     {
-        return Ok(await _uploadService.GeneratePresignedPutUrl(fileExtension, contentType));
+        return Ok(await _uploadService.GeneratePreSignedPutUrl(fileExtension, contentType));
     }
 }
