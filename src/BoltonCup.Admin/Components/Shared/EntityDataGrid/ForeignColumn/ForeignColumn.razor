@@ -8,13 +8,14 @@
     protected virtual RenderFragment EntityEditTemplate(CellContext<T> context)
     {
         var item = PropertyFunc(context.Item);
-        if (item is not TEntity entity)
+        if (item is not null and not TEntity)
         {
             return @<div>not T :(</div>;
         }
+        var entity = (TEntity?)item;
         
         return @<div>
-                   <MudSelect T="TEntity"
+                   <MudSelect T="TEntity?"
                               Value="entity"
                               ValueChanged="@(val => OnValueChangedAsync(context.Item, val))"
                               Comparer="EqualityComparer"
@@ -22,15 +23,18 @@
                               Clearable="!Required"
                               Required="Required"
                               Dense>
-                       <MudSelectItem Value="entity">
-                           <div class="d-flex flex-row align-center gap-1">
-                               @if (ImageSrcFunc is not null)
-                               {
-                                   <MudImage Src="@ImageSrcFunc(entity)" Height="24"/>
-                               }
-                               <span>@entity.ToString()</span>
-                           </div>
-                       </MudSelectItem>
+                       @if (entity is not null)
+                       {
+                           <MudSelectItem Value="entity">
+                               <div class="d-flex flex-row align-center gap-1">
+                                   @if (ImageSrcFunc is not null)
+                                   {
+                                       <MudImage Src="@ImageSrcFunc(entity)" Height="24"/>
+                                   }
+                                   <span>@entity.ToString()</span>
+                               </div>
+                           </MudSelectItem>
+                       }
                        @foreach (var option in _options.Where(x => !EqualityComparer?.Equals(x, entity) ?? false))
                        {
                            <MudSelectItem Value="@option">
