@@ -6,6 +6,61 @@
     "version": "v1"
   },
   "paths": {
+    "/api/assets": {
+      "get": {
+        "tags": [
+          "Assets"
+        ],
+        "description": "Generates a pre-signed URL for uploads.",
+        "operationId": "GeneratePreSignedPutUrl",
+        "parameters": [
+          {
+            "name": "fileExtension",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contentType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreSignedPutUrl"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreSignedPutUrl"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreSignedPutUrl"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/auth/register": {
       "post": {
         "tags": [
@@ -2726,6 +2781,20 @@
         },
         "additionalProperties": false
       },
+      "PreSignedPutUrl": {
+        "type": "object",
+        "properties": {
+          "uploadUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "tempKey": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "RefreshRequest": {
         "required": [
           "refreshToken"
@@ -3540,6 +3609,9 @@
     }
   },
   "tags": [
+    {
+      "name": "Assets"
+    },
     {
       "name": "Auth"
     },
