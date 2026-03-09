@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<BoltonCupTheme>();
         
         // s3
-        services.AddSingleton<IS3UrlResolver, S3UrlResolver>();
+        services.AddSingleton<IS3UrlResolver, S3UrlResolver>(_ => new S3UrlResolver(bcConfig));
         
         // auth
         services
