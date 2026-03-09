@@ -85,6 +85,10 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("profile_picture");
 
+                    b.Property<string>("ProfilePictureS3Key")
+                        .HasColumnType("text")
+                        .HasColumnName("profile_picture_s3_key");
+
                     b.HasKey("Id");
 
                     b.ToTable("accounts", "core");
@@ -880,6 +884,10 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("abbreviation");
 
+                    b.Property<string>("BannerS3Key")
+                        .HasColumnType("text")
+                        .HasColumnName("banner_s3_key");
+
                     b.Property<string>("BannerUrl")
                         .HasColumnType("text")
                         .HasColumnName("banner_url");
@@ -898,6 +906,10 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("gm_account_id");
 
+                    b.Property<string>("GoalSongS3Key")
+                        .HasColumnType("text")
+                        .HasColumnName("goal_song_s3_key");
+
                     b.Property<string>("GoalSongUrl")
                         .HasColumnType("text")
                         .HasColumnName("goal_song_url");
@@ -909,6 +921,10 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text")
                         .HasColumnName("last_modified_by");
+
+                    b.Property<string>("LogoS3Key")
+                        .HasColumnType("text")
+                        .HasColumnName("logo_s3_key");
 
                     b.Property<string>("LogoUrl")
                         .HasColumnType("text")
@@ -923,6 +939,10 @@ namespace BoltonCup.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name_short");
+
+                    b.Property<string>("PenaltySongS3Key")
+                        .HasColumnType("text")
+                        .HasColumnName("penalty_song_s3_key");
 
                     b.Property<string>("PenaltySongUrl")
                         .HasColumnType("text")
@@ -1005,6 +1025,10 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text")
                         .HasColumnName("last_modified_by");
+
+                    b.Property<string>("LogoS3Key")
+                        .HasColumnType("text")
+                        .HasColumnName("logo_s3_key");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1132,7 +1156,7 @@ namespace BoltonCup.Infrastructure.Migrations
             modelBuilder.Entity("BoltonCup.Core.InfoGuide", b =>
                 {
                     b.HasOne("BoltonCup.Core.Tournament", "Tournament")
-                        .WithOne()
+                        .WithOne("InfoGuide")
                         .HasForeignKey("BoltonCup.Core.InfoGuide", "TournamentId");
 
                     b.Navigation("Tournament");
@@ -1293,6 +1317,8 @@ namespace BoltonCup.Infrastructure.Migrations
             modelBuilder.Entity("BoltonCup.Core.Tournament", b =>
                 {
                     b.Navigation("Games");
+
+                    b.Navigation("InfoGuide");
 
                     b.Navigation("Players");
 

@@ -7,4 +7,5 @@ public class BoltonCupConfiguration
     public string ApiBaseUrl { get; init; } = string.Empty;
     public string AuthBaseUrl { get; init; } = string.Empty;
     public string WebBaseUrl { get; init; } = string.Empty;
+    public string S3BaseUrl { get; init; } = string.Empty;
 }

@@ -2,19 +2,23 @@ namespace BoltonCup.Core;
 
 public class Team : EntityBase
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required string Name { get; set; }
     public required string NameShort { get; set; }
     public required string Abbreviation { get; set; }
     public int? TournamentId { get; set; }
     public int? GmAccountId { get; set; }
     public string? LogoUrl { get; set; }
+    public string? LogoS3Key { get; set; }
     public string? BannerUrl { get; set; }
+    public string? BannerS3Key { get; set; }
     public required string PrimaryColorHex { get; set; }
     public required string SecondaryColorHex { get; set; }
     public string? TertiaryColorHex { get; set; }
     public string? GoalSongUrl { get; set; }
+    public string? GoalSongS3Key { get; set; }
     public string? PenaltySongUrl { get; set; }
+    public string? PenaltySongS3Key { get; set; }
 
     public Tournament Tournament { get; set; } = null!;
     public Account? GeneralManager { get; set; }
@@ -25,4 +29,18 @@ public class Team : EntityBase
     public ICollection<Penalty> Penalties { get; set; } = [];
     public ICollection<SkaterGameLog> SkaterGameLogs { get; set; } = [];
     public ICollection<GoalieGameLog> GoalieGameLogs { get; set; } = [];
+
+    public override string ToString() => Name;
+}
+
+public class TeamComparer : IEqualityComparer<Team>
+{
+    public bool Equals(Team? item1, Team? item2)
+    {
+        if (ReferenceEquals(item1, item2)) 
+            return true;
+        return item1 is not null && item2 is not null && item1.Id == item2.Id;
+    }
+        
+    public int GetHashCode(Team item) => item.Id;
 }

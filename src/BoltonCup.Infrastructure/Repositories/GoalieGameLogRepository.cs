@@ -22,7 +22,7 @@ public class GoalieGameLogRepository(BoltonCupDbContext _context) : IGoalieGameL
             .Where(p => p.GameId == query.GameId)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ConditionalWhere(p => p.TeamId == (query.HomeOrAway == HomeOrAway.Home ? p.Game.HomeTeamId : p.Game.AwayTeamId), !string.IsNullOrEmpty(query.HomeOrAway))
-            .OrderBy(p => p.Player.JerseyNumber)
+            .ApplySorting(query, x => x.OrderBy(p => p.Player.JerseyNumber))
             .ToCollectionResultAsync();
     }       
     
@@ -38,7 +38,7 @@ public class GoalieGameLogRepository(BoltonCupDbContext _context) : IGoalieGameL
             .Where(p => p.GameId == query.GameId)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ConditionalWhere(p => p.TeamId == (query.HomeOrAway == HomeOrAway.Home ? p.Game.HomeTeamId : p.Game.AwayTeamId), !string.IsNullOrEmpty(query.HomeOrAway))
-            .OrderBy(p => p.Player.JerseyNumber)
+            .ApplySorting(query, x => x.OrderBy(p => p.Player.JerseyNumber))
             .ProjectTo<GoalieGameLog, T>()
             .ToCollectionResultAsync();
     }       

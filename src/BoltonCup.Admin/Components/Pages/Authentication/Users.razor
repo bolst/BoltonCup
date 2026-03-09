@@ -1,0 +1,75 @@
+@page "/authentication/users"
+@using Microsoft.AspNetCore.Identity
+@inject AuthDbContext AuthData
+
+@* <EntityDataGrid *@
+@*     T="IdentityUserWithRoles" *@
+@*     ServerFunc="ServerFunc"> *@
+@*     <Columns> *@
+@*         <PropertyColumn Title="Id" Property="x => x.User.Id" Editable="false" /> *@
+@*         <PropertyColumn Title="User" Property="x => x.User.UserName" /> *@
+@*         <PropertyColumn Title="Email" Property="x => x.User.Email" /> *@
+@*         <BoolColumn Title="Email Confirmed" Property="x => x.User.EmailConfirmed" /> *@
+@*         <PropertyColumn Title="Phone" Property="x => x.User.PhoneNumber" /> *@
+@*         <BoolColumn Title="Phone Confirmed" Property="x => x.User.PhoneNumberConfirmed" /> *@
+@*         <BoolColumn Title="Lockout?" Property="x => x.User.LockoutEnabled" /> *@
+@*         <DateTimeOffsetColumn Title="Lockout End" Property="x => x.User.LockoutEnd" /> *@
+@*         <PropertyColumn Title="Access Failed Count" Property="x => x.User.AccessFailedCount" Editable="false" /> *@
+@*     </Columns> *@
+@* </EntityDataGrid> *@
+
+@code {
+
+    private int? _totalItems;
+    
+    private async Task<GridData<IdentityUserWithRoles>> ServerFunc(BoltonCupDbContext dbContext, GridState<IdentityUserWithRoles> state, CancellationToken cancellationToken)
+    {
+        var users = await AuthData.Users
+            .OrderBy(u => u.UserName)
+            .Skip(state.Page * state.PageSize)
+            .Take(state.PageSize)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        if (!users.Any())
+            return new GridData<IdentityUserWithRoles>();
+
+        var userIds = users.Select(u => u.Id).ToList();
+        var userRoles = await (from ur in AuthData.UserRoles
+                join r in AuthData.Roles on ur.RoleId equals r.Id
+                where userIds.Contains(ur.UserId)
+                select new 
+                { 
+                    UserId = ur.UserId, 
+                    Role = r 
+                })
+            .ToListAsync(cancellationToken: cancellationToken);
+        
+        var data = users.Select(u => new IdentityUserWithRoles(
+            u,
+            userRoles
+                .Where(x => x.UserId == u.Id)
+                .Select(x => x.Role)
+                .ToList()
+        )).ToList();
+        
+        _totalItems ??= await AuthData.Users.CountAsync(cancellationToken: cancellationToken);
+        
+        return new GridData<IdentityUserWithRoles>
+        {
+            Items = data,
+            TotalItems = _totalItems.Value
+        };
+    }
+
+    private class IdentityUserWithRoles
+    {
+        public IdentityUser User { get; }
+        public List<IdentityRole> Roles { get; }
+        
+        public IdentityUserWithRoles(IdentityUser user, List<IdentityRole> roles)
+        {
+            User = user;
+            Roles = roles;
+        }
+    }
+}

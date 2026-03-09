@@ -1,0 +1,70 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam T
+@inherits ComponentBaseWithState
+
+<CascadingValue Value="this" IsFixed="true">
+    <MudDataGrid
+        @ref="_dataGrid"
+        T="T"
+        ServerData="ServerFuncWrapper"
+        CommittedItemChanges="OnItemEdited"
+        Height="@GetHeight()"
+        RowStyleFunc="RowStyleFunc"
+        @bind-SelectedItems="_selectedItems"
+        EditMode="DataGridEditMode.Cell"
+        SortMode="SortMode.Single"
+        Breakpoint="Breakpoint.None"
+        ColumnResizeMode="@ColumnResizeMode"
+        ReadOnly="false"
+        ShowColumnOptions="false"
+        MultiSelection="Selectable"
+        SelectOnRowClick="false"
+        RowsPerPage="50"
+        FixedHeader
+        FixedFooter
+        Hideable
+        Bordered
+        Dense>
+        <ToolBarContent>
+            <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                <MudTooltip Text="Delete Selected">
+                    <MudIconButton OnClick="DeleteSelectedItems" Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Disabled="_selectedItems.Count == 0"/>
+                </MudTooltip>
+                @if (NewItemFunc is not null)
+                {
+                    <MudTooltip Text="New Item">
+                        <MudIconButton OnClick="AddNewItem" Icon="@Icons.Material.Rounded.Add" Color="Color.Primary"/>
+                    </MudTooltip>
+                }
+            </MudButtonGroup>
+            <MudSpacer/>
+            <MudTextField Class="mx-1" @bind-Value="_search" Label="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable/>
+            <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                <MudTooltip Text="Revert">
+                    <MudIconButton OnClick="RevertChangesAsync" Icon="@Icons.Material.Rounded.Undo" Color="Color.Error" Disabled="!_changeTracker.IsDirty"/>
+                </MudTooltip>
+                <MudTooltip Text="Save">
+                    <MudIconButton OnClick="SaveChangesAsync" Icon="@Icons.Material.Rounded.Save" Color="Color.Primary" Disabled="!_changeTracker.IsDirty"/>
+                </MudTooltip>
+            </MudButtonGroup>
+        </ToolBarContent>
+        <Columns>
+            @if (Selectable)
+            {
+                <SelectColumn T="T" ShowInHeader/>
+            }
+            @Columns
+        </Columns>
+        <NoRecordsContent>
+            <div class="d-flex justify-center align-center mud-width-full" style="height: 200px">
+                <MudText Align="Align.Center">No records found</MudText>
+            </div>
+        </NoRecordsContent>
+        <PagerContent>
+            @if (!HidePagerContent)
+            {
+                <MudDataGridPager T="T" PageSizeOptions="_pageSizeOptions"/>
+            }
+        </PagerContent>
+    </MudDataGrid>
+</CascadingValue>

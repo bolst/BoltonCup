@@ -1,12 +1,10 @@
 namespace BoltonCup.Core.Queries.Base;
 
+public interface IQueryBase 
+    : IPaginationQuery, ISortQuery 
+{ }
 
-
-public interface ISortablePaginationQuery : IPaginationQuery, ISortQuery
-{
-}
-
-public record DefaultSortablePaginationQuery : ISortablePaginationQuery
+public record QueryBase : IQueryBase
 {
     public int Page { get; set; } = 1;
     public int Size { get; set; } = 50;

@@ -1,0 +1,114 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
+using System.Reflection;
+using BoltonCup.Admin.Extensions;
+using BoltonCup.Core;
+using Microsoft.AspNetCore.Components;
+using MudBlazor;
+
+namespace BoltonCup.Admin.Components.Shared;
+
+public abstract partial class InputColumnBase<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T, TProperty>
+    : Column<T> 
+    where T : class
+{
+    private string? _propertyName;
+    private Expression<Func<T, TProperty>>? _lastAssignedProperty;
+    private Func<T, TProperty>? _compiledExpression;
+
+    protected abstract RenderFragment EntityEditTemplate(CellContext<T> context);
+    
+    [CascadingParameter]
+    public EntityDataGrid<T>? EntityDataGrid { get; set; }
+    
+    [Parameter]
+    [EditorRequired]
+    public required Expression<Func<T, TProperty>> Property { get; set; } = Expression.Lambda<Func<T, TProperty>>(Expression.Default(typeof(TProperty)), Expression.Parameter(typeof(T)));
+    
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        EditTemplate = EntityEditTemplate;
+    }
+    
+    protected override void OnParametersSet()
+    {
+        if (_lastAssignedProperty != Property)
+        {
+            _lastAssignedProperty = Property;
+            _compiledExpression = Property.Compile();
+        }
+        
+        var property = Property.Visit();
+        _propertyName = property.GetPath();
+        Title ??= property.GetLastMemberName();
+    }
+    
+    public override string? PropertyName 
+        => _propertyName;
+    
+    protected override object? CellContent(T item)
+        => _compiledExpression!(item);
+    
+    protected override object? PropertyFunc(T item)
+    {
+        _compiledExpression ??= Property.Compile();
+        return _compiledExpression(item);
+    }
+    
+    protected override Type PropertyType
+        => typeof(TProperty);
+    
+    private object? RecursiveGetSubProperties(MemberExpression memberExpression, object? item)
+    {
+        if (memberExpression.Expression is not MemberExpression
+            {
+                Member: PropertyInfo propertyInfo
+            } subMemberExpress) 
+            return item;
+        
+        var subObject = RecursiveGetSubProperties(subMemberExpress, item);
+        return propertyInfo.GetValue(subObject) 
+               ?? throw new NullReferenceException($"Unable to get property value, value of '{propertyInfo.Name}' is null in '{Property}'");
+    }
+    
+    protected override void SetProperty(object? item, object? value)
+    {
+        var expression = Property.Body;
+        
+        if (expression is UnaryExpression unaryExpression)
+        {
+            expression = unaryExpression.Operand;
+        }
+        
+        // Only MemberExpression is supported, MemberExpression access members like 'x.y' is accessing the member 'y'
+        if (expression is not MemberExpression memberExpression) 
+            return;
+        if (memberExpression.Member is not PropertyInfo propertyInfo) 
+            return;
+
+        var rootItem = item;
+        item = RecursiveGetSubProperties(memberExpression, item);
+        if (value == null)
+        { 
+            propertyInfo.SetValue(item, null);
+        }
+        else
+        {
+            var targetType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) 
+                             ?? propertyInfo.PropertyType;
+            var safeValue = targetType.IsInstanceOfType(value) 
+                ? value 
+                : Convert.ChangeType(value, targetType);
+            propertyInfo.SetValue(item, safeValue);
+        }
+
+        if (EntityDataGrid is not null && rootItem is T entity)
+        {
+            InvokeAsync(() => EntityDataGrid.NotifyItemChangedAsync(entity));
+        }
+    }
+
+}
+

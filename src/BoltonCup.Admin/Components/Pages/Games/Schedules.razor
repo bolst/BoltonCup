@@ -1,0 +1,56 @@
+@page "/games/schedules"
+
+<EntityDataGrid
+    T="Game"
+    ServerFunc="ServerFunc"
+    NewItemFunc="NewItemFunc"
+    Comparer="_comparer">
+    <Columns>
+        <ForeignColumn Title="Home" Property="x => x.HomeTeam" PropertySetter="(game, team) => game.HomeTeam = team" 
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.LogoUrl" />
+        <ForeignColumn Title="Away" Property="x => x.AwayTeam" PropertySetter="(game, team) => game.AwayTeam = team" 
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.LogoUrl" />
+        <DatePickerColumn Title="Date" Property="x => x.GameTime"/>
+        <PropertyColumn Title="Type" Property="x => x.GameType"/>
+        <PropertyColumn Title="Venue" Property="x => x.Venue"/>
+        <PropertyColumn Title="Rink" Property="x => x.Rink"/>
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament" 
+                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="_ => BoltonCupLogo.Src" />
+    </Columns>
+</EntityDataGrid>
+
+@code {
+    
+    private readonly GameComparer _comparer = new();
+
+    private async Task<GridData<Game>> ServerFunc(IQueryable<Game> games, GridState<Game> state, CancellationToken cancellationToken)
+    {
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        var data = await games
+            .Include(g => g.HomeTeam)
+            .Include(g => g.AwayTeam)
+            .Include(g => g.Tournament)
+            .ToPaginatedListAsync(new GetGamesQuery
+            {
+                Page = state.Page + 1,
+                Size = state.PageSize,
+                SortBy = sortDefinition?.SortBy,
+                Descending = sortDefinition?.Descending ?? false,
+            }, cancellationToken: cancellationToken);
+        return new GridData<Game>
+        {
+            Items = data.Items,
+            TotalItems = data.Total
+        };
+    }
+    
+    private async Task<Game?> NewItemFunc()
+    {
+        return new Game
+        {
+            TournamentId = 1,
+            GameTime = DateTime.Now,
+        };
+    }
+    
+}

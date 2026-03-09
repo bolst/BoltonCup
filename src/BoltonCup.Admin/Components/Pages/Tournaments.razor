@@ -1,0 +1,57 @@
+@page "/tournaments"
+
+<EntityDataGrid
+    T="Tournament"
+    ServerFunc="ServerFunc"
+    NewItemFunc="NewItemFunc"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Tournament" Property="x => x.Name" />
+        <TemplateColumn Title="Info">
+            <EditTemplate>
+                <TournamentInfoEditButton TournamentId="@context.Item.Id" />
+            </EditTemplate>
+        </TemplateColumn>
+        <DatePickerColumn Title="Start" Property="x => x.StartDate" />
+        <DatePickerColumn Title="End" Property="x => x.EndDate" />
+        <BoolColumn Title="Active?" Property="x => x.IsActive" />
+        <BoolColumn Title="Registration Open?" Property="x => x.IsRegistrationOpen" />
+        <BoolColumn Title="Payment Open" Property="x => x.IsPaymentOpen" />
+        <PropertyColumn Title="Skater Limit" Property="x => x.SkaterLimit" />
+        <PropertyColumn Title="Goalie Limit" Property="x => x.GoalieLimit" />
+        <LinkColumn Title="Skater Payment Link" Property="x => x.SkaterPaymentLink" />
+        <LinkColumn Title="Goalie Payment Link" Property="x => x.GoaliePaymentLink" />
+        <PropertyColumn Title="Winner" Property="x => x.WinningTeamId" />
+    </Columns>
+</EntityDataGrid>
+
+@code {
+    
+    private readonly TournamentComparer _comparer = new();
+
+    private async Task<GridData<Tournament>> ServerFunc(IQueryable<Tournament> tournaments, GridState<Tournament> state, CancellationToken cancellationToken)
+    {
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        var data = await tournaments
+            .ToPaginatedListAsync(new GetTournamentsQuery
+            {
+                Page = state.Page + 1,
+                Size = state.PageSize,
+                SortBy = sortDefinition?.SortBy,
+                Descending = sortDefinition?.Descending ?? false,
+            }, cancellationToken: cancellationToken);
+        return new GridData<Tournament>
+        {
+            Items = data.Items,
+            TotalItems = data.Total
+        };
+    }
+
+    private async Task<Tournament?> NewItemFunc()
+    {
+        return new Tournament
+        {
+            Name = "New Tournament"
+        };
+    }
+}

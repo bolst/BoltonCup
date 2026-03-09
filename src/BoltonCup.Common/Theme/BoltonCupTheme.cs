@@ -15,13 +15,18 @@ public class BoltonCupTheme
         },
         PaletteDark = new PaletteDark
         {
-            Primary = "#4A6EAD", 
+            Primary = "#4A6EAD",
+            PrimaryContrastText = "#FFFFFF",
             Secondary = "#F0665E", 
             Tertiary = "#E5D8BC", 
-            Surface = "#0E1116", 
+            Surface = "#0E1116",
             DrawerBackground = "#16191F",
+            DrawerText = "#FFFFFF",
+            DrawerIcon = "#FFFFFF",
             AppbarBackground = "#020409",
-            Background = "#020409"
+            AppbarText = "#FFFFFF",
+            Background = "#020409",
+            TextPrimary = "#CDCDCD",
         }
     };
 }

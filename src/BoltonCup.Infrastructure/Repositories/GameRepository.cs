@@ -21,7 +21,7 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
             .Include(p => p.Penalties)
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
-            .OrderBy(p => p.GameTime)
+            .ApplySorting(query, x => x.OrderBy(p => p.GameTime))
             .ToPaginatedListAsync(query);
     }       
     
@@ -32,7 +32,7 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
             .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
-            .OrderBy(p => p.GameTime)
+            .ApplySorting(query, x => x.OrderBy(p => p.GameTime))
             .ProjectTo<Game, T>()
             .ToPaginatedListAsync(query);
     }       

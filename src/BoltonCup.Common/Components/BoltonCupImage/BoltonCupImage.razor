@@ -1,0 +1,85 @@
+@namespace BoltonCup.Common.Components
+@using MudBlazor.State
+@inherits ComponentBaseWithState
+@inject IDialogService DialogService
+@inject IS3UrlResolver S3UrlResolver
+
+@if (!Editable)
+{
+    <MudImage Src="@GetImageSrc()" Height="@Height" Width="@Width" />
+}
+else
+{
+    <div class="edit-image-container" @onclick="OnClick">
+        <MudImage Class="edit-image" Src="@GetImageSrc()" Height="@Height" Width="@Width" />
+        <div class="overlay-container">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" />
+        </div>
+    </div>
+}
+
+
+@code {
+    
+    [Parameter]
+    public string? Src { get; set; }
+    
+    [Parameter]
+    public EventCallback<string?> SrcChanged { get; set; }
+
+    [Parameter]
+    public int? Width { get; set; }
+
+    [Parameter]
+    public int? Height { get; set; } = 24;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+    [Parameter]
+    public bool Editable { get; set; }
+    
+    [Parameter]
+    public bool ResolveUrl { get; set; } = true;
+
+    private string? _src;
+    
+    private readonly ParameterState<string?> _srcState;
+    
+
+    public BoltonCupImage()
+    {
+        using var registerScope = CreateRegisterScope();
+        _srcState = registerScope.RegisterParameter<string?>(nameof(Src))
+            .WithParameter(() => Src)
+            .WithEventCallback(() => SrcChanged)
+            .WithChangeHandler(OnSrcChange);
+    }
+
+    private void OnSrcChange(ParameterChangedEventArgs<string?> args)
+    {
+        _src = args.Value;
+        StateHasChanged();
+    }
+
+    private string? GetImageSrc()
+    {
+        if (!ResolveUrl)
+            return _src;
+        return S3UrlResolver.GetFullUrl(_src);
+    }
+
+    private async Task OnClick()
+    {
+        var dialog = await DialogService.ShowAsync<EditImageDialog>("Edit Image", new DialogParameters<EditImageDialog>
+        {
+            { x => x.Src, GetImageSrc() },
+        });
+        var result = await dialog.Result;
+        if (result?.Data is string newSrc)
+        {
+            await _srcState.SetValueAsync(newSrc);
+        }
+    }
+    
+}

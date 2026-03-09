@@ -1,0 +1,53 @@
+@page "/accounts"
+
+<EntityDataGrid 
+    @ref="_dataGrid" 
+    T="Account" 
+    ServerFunc="GetItemsAsync" 
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="First" Property="x => x.FirstName"/>
+        <PropertyColumn Title="Last" Property="x => x.LastName"/>
+        <PropertyColumn Title="Email" Property="x => x.Email"/>
+        <PropertyColumn Title="Phone" Property="x => x.Phone" Required="false"/>
+        <DatePickerColumn Title="Born" Property="x => x.Birthday" />
+        <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel">
+            <EditTemplate>
+                <HighestLevelSelect 
+                    Value="@context.Item.HighestLevel"
+                    ValueChanged="v => { context.Item.HighestLevel = v; _dataGrid.NotifyItemChangedAsync(context.Item); }"/>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Beer" Property="x => x.PreferredBeer"/>
+    </Columns>
+</EntityDataGrid>
+
+@code {
+
+    private EntityDataGrid<Account> _dataGrid = null!;
+    private readonly AccountComparer _comparer = new();
+
+    private async Task<GridData<Account>> GetItemsAsync(IQueryable<Account> accounts, GridState<Account> state, CancellationToken cancellationToken)
+    {
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        var data = await accounts
+            .ToPaginatedListAsync(new GetAccountsQuery
+            {
+                Page = state.Page + 1,
+                Size = state.PageSize,
+                SortBy = sortDefinition?.SortBy,
+                Descending = sortDefinition?.Descending ?? false,
+            }, cancellationToken: cancellationToken);
+        return new GridData<Account>
+        {
+            Items = data.Items,
+            TotalItems = data.Total
+        };
+    }
+
+
+    private async Task OnSave(ChangeTracker<Account> changes)
+    {
+    }
+
+}

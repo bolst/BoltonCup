@@ -1,0 +1,24 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam T where T : class
+@inherits InputColumnBase<T, string>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Sortable = false;
+    }
+    
+    protected override RenderFragment EntityEditTemplate(CellContext<T> context)
+    {
+        var property = PropertyFunc(context.Item);
+        if (property is not string and not null)
+        {
+            return @<div></div>;
+        }
+
+        var item = property as string;
+        return @<SimpleColorPicker Text="@item" TextChanged="t => SetProperty(context.Item, t)" Width="80px" />;
+    }
+}

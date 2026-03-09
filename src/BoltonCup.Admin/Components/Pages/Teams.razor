@@ -1,0 +1,58 @@
+@page "/teams"
+
+<EntityDataGrid
+    T="Team"
+    ServerFunc="ServerFunc"
+    NewItemFunc="NewItemFunc"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Team" Property="x => x.Name" />
+        <PropertyColumn Title="Name (short)" Property="x => x.NameShort" />
+        <PropertyColumn Title="Abbreviation" Property="x => x.Abbreviation" />
+        <ImageColumn Title="Logo" Property="x => x.LogoS3Key" />
+        <ColorPickerColumn Title="Primary" Property="x => x.PrimaryColorHex" />
+        <ColorPickerColumn Title="Secondary" Property="x => x.SecondaryColorHex" />
+        <ColorPickerColumn Title="Tertiary" Property="x => x.TertiaryColorHex" />
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament" 
+                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="_ => BoltonCupLogo.Src" />
+    </Columns>
+</EntityDataGrid>
+
+@code {
+    
+    private readonly TeamComparer _comparer = new();
+
+    private async Task<GridData<Team>> ServerFunc(IQueryable<Team> teams, GridState<Team> state, CancellationToken cancellationToken)
+    {
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        var data = await teams
+            .Include(t => t.Tournament)
+            .OrderByDescending(t => t.TournamentId)
+            .ThenBy(t => t.Name)
+            .ToPaginatedListAsync(new GetTeamsQuery
+            {
+                Page = state.Page + 1,
+                Size = state.PageSize,
+                SortBy = sortDefinition?.SortBy,
+                Descending = sortDefinition?.Descending ?? false,
+            }, cancellationToken: cancellationToken);
+        return new GridData<Team>
+        {
+            Items = data.Items,
+            TotalItems = data.Total
+        };
+    }
+    
+    private async Task<Team?> NewItemFunc()
+    {
+        return new Team
+        {
+            Name = "Detroit Red Wings",
+            NameShort = "Red Wings",
+            Abbreviation = "DRW",
+            PrimaryColorHex = "#CE1126",
+            SecondaryColorHex = "#FFFFFF"
+        };
+    }
+    
+}

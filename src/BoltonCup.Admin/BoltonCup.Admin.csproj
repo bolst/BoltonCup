@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="MudBlazor" Version="8.15.0" />
+      <PackageReference Include="SkiaSharp" Version="3.119.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -18,6 +19,11 @@
     <ItemGroup>
       <ProjectReference Include="..\BoltonCup.Common\BoltonCup.Common.csproj" />
       <ProjectReference Include="..\BoltonCup.Infrastructure\BoltonCup.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\Shared\EntityDataGrid\EntityColumns\TeamColumn.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\EntityDataGrid\EntityColumns\TournamentColumn.razor" />
     </ItemGroup>
 
 </Project>

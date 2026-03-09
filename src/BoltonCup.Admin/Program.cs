@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,12 +25,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
-
-var connectionString = builder.Configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
-builder.Services
-    .AddDbContext<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
-    .AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString));
-
+builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
 
 var configSection = builder.Configuration.GetSection(BoltonCupConfiguration.SectionName);
 var bcConfig = configSection.Get<BoltonCupConfiguration>() 
@@ -62,13 +58,14 @@ builder.Services.AddAuthentication("Identity.Application")
         {
             var returnUrl = Uri.EscapeDataString(context.Request.GetEncodedUrl());
             
-            context.Response.Redirect($"{bcConfig.AuthBaseUrl}?returnUrl={returnUrl}");
+            context.Response.Redirect($"{bcConfig.AuthBaseUrl}log-in-or-sign-up?returnUrl={returnUrl}");
             return Task.CompletedTask;
         };
     });
 builder.Services.AddAuthorization();
 
 builder.Services.AddMudServices();
+builder.Services.AddMudMarkdownServices();
 
 var app = builder.Build();
 

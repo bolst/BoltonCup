@@ -19,7 +19,7 @@ public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
             .Include(e => e.Players)
             .ThenInclude(p => p.Account)
             .ConditionalWhere(e => e.TournamentId == query.TournamentId, query.TournamentId.HasValue)
-            .OrderBy(e => e.Id)
+            .ApplySorting(query, x => x.OrderBy(e => e.Id))
             .ToPaginatedListAsync(query);
     }
         
@@ -29,7 +29,7 @@ public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
         return await _context.Teams
             .AsNoTracking()
             .ConditionalWhere(e => e.TournamentId == query.TournamentId, query.TournamentId.HasValue)
-            .OrderBy(e => e.Id)
+            .ApplySorting(query, x => x.OrderBy(e => e.Id))
             .ProjectTo<Team, T>()
             .ToPaginatedListAsync(query);
     }

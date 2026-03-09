@@ -1,0 +1,47 @@
+@using MudBlazor.State
+@namespace BoltonCup.Common.Components
+@inherits ComponentBaseWithState
+
+<MudSelect T="string" Value="@_value" ValueChanged="SetValueAsync" Margin="Margin.Dense" Dense Clearable>
+    <MudSelectItem Value="@("House league")"/>
+    <MudSelectItem Value="@("A/AA")"/>
+    <MudSelectItem Value="@("AAA")"/>
+    <MudSelectItem Value="@("Jr. C")"/>
+    <MudSelectItem Value="@("Jr. B")"/>
+    <MudSelectItem Value="@("Jr. A or higher")"/>
+</MudSelect>
+
+
+@code {
+
+    [Parameter]
+    public string? Value { get; set; }
+    
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+    
+    private string? _value;
+    private readonly ParameterState<string?> _valueState;
+    
+    public HighestLevelSelect()
+    {
+        using var registerScope = CreateRegisterScope();
+        _valueState = registerScope.RegisterParameter<string?>(nameof(Value))
+            .WithParameter(() => Value)
+            .WithEventCallback(() => ValueChanged)
+            .WithChangeHandler(OnValueChange);
+    }
+
+    private void OnValueChange(ParameterChangedEventArgs<string?> args)
+    {
+        _value = args.Value;
+        StateHasChanged();
+    }
+
+    private Task SetValueAsync(string? value)
+    {
+        _value = value;
+        return _valueState.SetValueAsync(value);
+    }
+
+}

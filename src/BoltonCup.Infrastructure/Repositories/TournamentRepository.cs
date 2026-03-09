@@ -6,38 +6,31 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Repositories;
 
-public class TournamentRepository : ITournamentRepository
+public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepository
 {
-    private readonly BoltonCupDbContext _context;
-
-    public TournamentRepository(BoltonCupDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<CollectionResult<Tournament>> GetAllAsync(GetTournamentsQuery query)
     {
-        return await _context.Tournaments
+        return await context.Tournaments
             .AsNoTracking()
             .Include(e => e.Games)
             .Include(e => e.Teams)
-            .OrderBy(t => t.StartDate)
+            .ApplySorting(query, x => x.OrderBy(t => t.StartDate))
             .ToPaginatedListAsync(query);
     }
         
     public async Task<CollectionResult<T>> GetAllAsync<T>(GetTournamentsQuery query)
         where T : IMappable<Tournament, T>
     {
-        return await _context.Tournaments
+        return await context.Tournaments
             .AsNoTracking()
-            .OrderBy(t => t.StartDate)
+            .ApplySorting(query, x => x.OrderBy(t => t.StartDate))
             .ProjectTo<Tournament, T>()
             .ToPaginatedListAsync(query);
     }
     
     public async Task<Tournament?> GetByIdAsync(int id)
     {
-        return await _context.Tournaments
+        return await context.Tournaments
             .AsNoTracking()
             .Include(e => e.Games)
             .Include(e => e.Teams)
@@ -47,14 +40,14 @@ public class TournamentRepository : ITournamentRepository
     public async Task<T?> GetByIdAsync<T>(int id)
         where T : IMappable<Tournament, T>
     {
-        return await _context.Tournaments
+        return await context.Tournaments
             .AsNoTracking()
             .ProjectToFirstOrDefaultAsync<Tournament, T>(e => e.Id == id);
     }
 
     public async Task<Tournament?> GetActiveAsync()
     {
-        return await _context.Tournaments
+        return await context.Tournaments
             .AsNoTracking()
             .Include(e => e.Games)
             .Include(e => e.Teams)
@@ -63,25 +56,25 @@ public class TournamentRepository : ITournamentRepository
 
     public async Task<bool> AddAsync(Tournament entity)
     {
-        await _context.Tournaments.AddAsync(entity);
-        var result = await _context.SaveChangesAsync();
+        await context.Tournaments.AddAsync(entity);
+        var result = await context.SaveChangesAsync();
         return result > 0;
     }
 
     public async Task<bool> UpdateAsync(Tournament entity)
     {
-        _context.Tournaments.Update(entity);
-        var result = await _context.SaveChangesAsync();
+        context.Tournaments.Update(entity);
+        var result = await context.SaveChangesAsync();
         return result > 0;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var entity = await _context.Teams.FindAsync(id);
+        var entity = await context.Teams.FindAsync(id);
         if (entity == null) return false;
 
-        _context.Teams.Remove(entity);
-        var result = await _context.SaveChangesAsync();
+        context.Teams.Remove(entity);
+        var result = await context.SaveChangesAsync();
         return result > 0;
     }
 }

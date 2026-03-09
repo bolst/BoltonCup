@@ -23,7 +23,7 @@ public class SkaterGameLogRepository(BoltonCupDbContext _context) : ISkaterGameL
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ConditionalWhere(p => p.Player.Position == query.Position, !string.IsNullOrEmpty(query.Position))
             .ConditionalWhere(p => p.TeamId == (query.HomeOrAway == HomeOrAway.Home ? p.Game.HomeTeamId : p.Game.AwayTeamId), !string.IsNullOrEmpty(query.HomeOrAway))
-            .OrderBy(p => p.Player.JerseyNumber)
+            .ApplySorting(query, x => x.OrderBy(p => p.Player.JerseyNumber))
             .ToCollectionResultAsync();
     }       
     
@@ -36,7 +36,7 @@ public class SkaterGameLogRepository(BoltonCupDbContext _context) : ISkaterGameL
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ConditionalWhere(p => p.Player.Position == query.Position, !string.IsNullOrEmpty(query.Position))
             .ConditionalWhere(p => p.TeamId == (query.HomeOrAway == HomeOrAway.Home ? p.Game.HomeTeamId : p.Game.AwayTeamId), !string.IsNullOrEmpty(query.HomeOrAway))
-            .OrderBy(p => p.Player.JerseyNumber)
+            .ApplySorting(query, x => x.OrderBy(p => p.Player.JerseyNumber))
             .ProjectTo<SkaterGameLog, T>()
             .ToCollectionResultAsync();
     }       

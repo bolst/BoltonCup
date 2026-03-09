@@ -1,0 +1,29 @@
+@page "/authentication/roles"
+@using Microsoft.AspNetCore.Identity
+@inject RoleManager<IdentityRole> RoleManager
+
+@* <EntityDataGrid *@
+@*     T="IdentityRole" *@
+@*     ServerFunc="ServerFunc" *@
+@*     ColumnResizeMode="ResizeMode.None" *@
+@*     HidePagerContent> *@
+@*     <Columns> *@
+@*         <PropertyColumn Title="Id" Property="x => x.Id" /> *@
+@*         <PropertyColumn Title="Name" Property="x => x.Name" /> *@
+@*     </Columns> *@
+@* </EntityDataGrid> *@
+
+@code {
+    
+    private async Task<GridData<IdentityRole>> ServerFunc(IQueryable<IdentityRole> roles, GridState<IdentityRole> state, CancellationToken cancellationToken)
+    {
+        var data = await RoleManager.Roles
+            .AsNoTracking()
+            .ToListAsync(cancellationToken: cancellationToken);
+        return new GridData<IdentityRole>
+        {
+            Items = data,
+        };
+    }
+    
+}

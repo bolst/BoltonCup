@@ -1,5 +1,6 @@
 using BoltonCup.Common.Auth;
 using BoltonCup.Common.Handlers;
+using BoltonCup.Common.Services;
 using BoltonCup.Common.Theme;
 using BoltonCup.Sdk;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -25,6 +26,9 @@ public static class ServiceCollectionExtensions
         
         // theming
         services.AddSingleton<BoltonCupTheme>();
+        
+        // s3
+        services.AddSingleton<IS3UrlResolver, S3UrlResolver>(_ => new S3UrlResolver(bcConfig));
         
         // auth
         services

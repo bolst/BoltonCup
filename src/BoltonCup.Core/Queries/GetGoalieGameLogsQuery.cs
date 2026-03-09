@@ -2,7 +2,7 @@ using BoltonCup.Core.Queries.Base;
 
 namespace BoltonCup.Core;
 
-public sealed record GetGoalieGameLogsQuery : DefaultSortablePaginationQuery
+public sealed record GetGoalieGameLogsQuery : QueryBase
 {
     public required int GameId { get; set; }
     public string? HomeOrAway { get; set; }

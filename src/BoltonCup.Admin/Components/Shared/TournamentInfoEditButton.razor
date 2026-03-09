@@ -1,0 +1,166 @@
+@namespace BoltonCup.Admin.Components.Shared
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject ISnackbar Snackbar
+
+<MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="ShowDialog" Size="Size.Small" />
+
+<MudDialog @bind-Visible="_dialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.overline">TOURNAMENT INFO</MudText>
+        <MudText Typo="Typo.h6">@_tournament?.Name (@_tournament?.StartDate?.ToString("MMM dd/yy") to @_tournament?.EndDate?.ToString("MMM dd/yy"))</MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (_infoGuide is null)
+        {
+            <div class="mud-width-full d-flex flex-column align-center gap-2">
+                <MudText>No info guide exists!</MudText>
+                <MudButton OnClick="CreateInfoGuide" Variant="Variant.Filled" EndIcon="@Icons.Material.Rounded.Add" Color="Color.Primary">Create New</MudButton>
+                <MudMenu Label="Copy existing" Variant="Variant.Filled" EndIcon="@Icons.Material.Rounded.KeyboardArrowDown" Color="Color.Primary">
+                    @foreach(var copyInfoGuide in _copyInfoGuides)
+                    {
+                        <MudMenuItem OnClick="() => CreateInfoGuideFromExisting(copyInfoGuide)">@copyInfoGuide.Tournament?.Name</MudMenuItem>
+                    }
+                </MudMenu>
+            </div>
+        }
+        else
+        {
+            <MudTabs Class="mud-width-full" Style="height: 90vh" MinimumTabWidth="20px" Rounded>
+                <Header>
+                    <MudTextField @bind-Value="@_infoGuide.Title" Label="Title" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate />
+                </Header>
+                <ChildContent>
+                    <MudTabPanel Icon="@Icons.Material.Rounded.VerticalShades" ToolTip="Split View">
+                        <MudGrid Class="ma-0">
+                            <MudItem xs="6">
+                                <MudTextField @bind-Value="_infoGuide.MarkdownContent" Underline="false" Immediate AutoGrow FullWidth/>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MarkdownView Value="@_infoGuide.MarkdownContent"/>
+                            </MudItem>
+                        </MudGrid>
+                    </MudTabPanel>
+                    <MudTabPanel Icon="@Icons.Material.Rounded.EditNote" ToolTip="Editor">
+                        <MudTextField @bind-Value="_infoGuide.MarkdownContent" Underline="false" Immediate AutoGrow FullWidth/>
+                    </MudTabPanel>
+                    <MudTabPanel Icon="@Icons.Material.Rounded.Preview" ToolTip="Preview">
+                        <MarkdownView Value="@_infoGuide.MarkdownContent"/>
+                    </MudTabPanel>
+                </ChildContent>
+            </MudTabs>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="CloseDialog">Cancel</MudButton>
+        @if (_infoGuide is not null)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveAndClose">Save Changes</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [Parameter]
+    public required int TournamentId { get; set; }
+
+    private Tournament? _tournament;
+    private InfoGuide? _infoGuide;
+    private List<InfoGuide>? _copyInfoGuides;
+
+    private bool _dialogVisible;
+
+    private readonly DialogOptions _dialogOptions = new()
+    {
+        CloseButton = false,
+        BackdropClick = false,
+        MaxWidth = MaxWidth.ExtraLarge,
+        FullWidth = true,
+    };
+
+    protected override void OnParametersSet()
+    {
+        // Clear the cached info guide if the tournament ID changes
+        if (_infoGuide?.TournamentId == TournamentId) 
+            return;
+        _tournament = null;
+        _infoGuide = null;
+    }
+    
+    private async Task ShowDialog()
+    {
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        _tournament ??= await dbContext.Tournaments
+            .Include(t => t.InfoGuide)
+            .FirstOrDefaultAsync(x => x.Id == TournamentId);
+        if (_tournament is null)
+        {
+            Snackbar.Add($"No tournament with id = {TournamentId} was found.", Severity.Error);
+            return;
+        }
+        _infoGuide ??= await dbContext.InfoGuides
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.TournamentId == TournamentId);
+        if (_infoGuide is null)
+        {
+            _copyInfoGuides ??= await dbContext.InfoGuides
+                .AsNoTracking()
+                .Include(i => i.Tournament)
+                .Where(x => x.TournamentId != TournamentId)
+                .ToListAsync();
+        }
+        _dialogVisible = true;
+    }
+    
+    private async Task CreateInfoGuide()
+    {
+        if (_tournament is null)
+            return;
+        _infoGuide = new InfoGuide
+        {
+            TournamentId = TournamentId,
+            Title = $"{_tournament.Name} Information"
+        };
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        await dbContext.InfoGuides.AddAsync(_infoGuide);
+    }
+
+    private async Task CreateInfoGuideFromExisting(InfoGuide source)
+    {
+        if (_tournament is null)
+            return;
+        _infoGuide = new InfoGuide
+        {
+            TournamentId = TournamentId,
+            Title = $"{_tournament.Name} Information",
+            MarkdownContent = source.MarkdownContent
+        };
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        await dbContext.InfoGuides.AddAsync(_infoGuide);
+    }
+
+    private void CloseDialog()
+    {
+        _dialogVisible = false;
+        _infoGuide = null;
+    }
+
+    private async Task SaveChanges()
+    {
+        if (_infoGuide is null)
+            return;
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        dbContext.InfoGuides.Update(_infoGuide);
+        var updates = await dbContext.SaveChangesAsync();
+        if (updates > 0)
+            Snackbar.Add("Info guide updated!", Severity.Success);
+        else
+            Snackbar.Add("Failed to update info guide.", Severity.Error);
+    }
+
+    private async Task SaveAndClose()
+    {
+        await SaveChanges();
+        CloseDialog();
+    }
+}

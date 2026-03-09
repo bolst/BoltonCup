@@ -1,0 +1,23 @@
+@namespace BoltonCup.Common.Components
+
+<MudMarkdown Value="@Value" Props="_props" />
+
+@code {
+
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+
+    private static readonly MudMarkdownProps _props = new()
+    {
+        Heading = 
+        {
+            OverrideTypo = (x) => x switch
+            {
+                Typo.h1 => Typo.h4,
+                Typo.h2 => Typo.h5,
+                _ => Typo.h6,
+            }
+        }
+    };
+    
+}
