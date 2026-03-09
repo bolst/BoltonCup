@@ -25,7 +25,7 @@ builder.Services
     .AddEntityFrameworkStores<AuthDbContext>();
 
 builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
-builder.Services.AddBoltonCupS3Services(builder.Configuration);
+builder.Services.AddBoltonCupS3(builder.Configuration);
 builder.Services.AddBoltonCupWebAPIServices(builder.Environment);
 
 // https://aka.ms/aspnetcore/swashbuckle

@@ -1,7 +1,6 @@
 using Amazon.S3;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
-using BoltonCup.Core.Interfaces;
 using BoltonCup.Infrastructure.Repositories;
 using BoltonCup.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
@@ -20,8 +19,6 @@ public static class ServiceCollectionExtensions
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<AuthDbContext>();
 
-        services.AddBoltonCupS3Services(configuration);
-        
         var connectionString = configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
         return services
             .AddDbContextFactory<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
@@ -35,25 +32,25 @@ public static class ServiceCollectionExtensions
             .AddTransient<ISkaterGameLogRepository, SkaterGameLogRepository>()
             .AddTransient<ISkaterStatRepository, SkaterStatRepository>()
             .AddTransient<ITeamRepository, TeamRepository>()
-            .AddTransient<ITournamentRepository, TournamentRepository>()
-            .AddTransient<IAssetUploadService, AssetUploadService>();
+            .AddTransient<ITournamentRepository, TournamentRepository>();
     }
-
-    private static IServiceCollection AddBoltonCupS3Services(this IServiceCollection services,
-        IConfiguration configuration)
+    
+    public static IServiceCollection AddBoltonCupS3(this IServiceCollection services, IConfiguration configuration)
     {
-        var options = configuration.GetSection("CloudflareR2");
-        var accountId = options.GetValue<string>("AccountId");
-        var accessKey = options.GetValue<string>("AccessKey");
-        var secretKey = options.GetValue<string>("SecretKey");
+        var r2Config = configuration.GetRequiredSection("CloudflareR2");
+        var accountId = r2Config["AccountId"];
+        var accessKey = r2Config["AccessKey"];
+        var secretKey = r2Config["SecretKey"];
         
-        var credentials = new Amazon.Runtime.BasicAWSCredentials(accessKey, secretKey);
-        var config = new AmazonS3Config
+        var s3Credentials = new Amazon.Runtime.BasicAWSCredentials(accessKey, secretKey);
+        var s3Config = new AmazonS3Config
         {
             ServiceURL = $"https://{accountId}.r2.cloudflarestorage.com",
             AuthenticationRegion = "auto"
         };
-        return services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(credentials, config));
+        return services
+            .AddSingleton<IAmazonS3>(_ => new AmazonS3Client(s3Credentials, s3Config))
+            .AddSingleton<IAssetUploadService, AssetUploadService>();
     }
 }
 

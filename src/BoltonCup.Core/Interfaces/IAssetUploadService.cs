@@ -1,4 +1,4 @@
-namespace BoltonCup.Core.Interfaces;
+namespace BoltonCup.Core;
 
 public interface IAssetUploadService
 {

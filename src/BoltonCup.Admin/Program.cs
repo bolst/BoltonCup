@@ -1,13 +1,11 @@
 using BoltonCup.Admin.Components;
 using BoltonCup.Common;
 using BoltonCup.Infrastructure;
-using BoltonCup.Infrastructure.Data;
 using BoltonCup.Sdk;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
 
@@ -26,6 +24,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
 builder.Services.AddBoltonCupInfrastructure(builder.Configuration);
+builder.Services.AddBoltonCupS3(builder.Configuration);
 
 var configSection = builder.Configuration.GetSection(BoltonCupConfiguration.SectionName);
 var bcConfig = configSection.Get<BoltonCupConfiguration>() 

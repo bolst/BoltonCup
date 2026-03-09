@@ -1,4 +1,4 @@
-using BoltonCup.Core.Interfaces;
+using BoltonCup.Core;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
