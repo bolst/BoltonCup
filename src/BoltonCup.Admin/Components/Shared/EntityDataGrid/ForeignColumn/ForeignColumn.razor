@@ -22,6 +22,7 @@
                               Margin="Margin.Dense"
                               Clearable="!Required"
                               Required="Required"
+                              ReadOnly="!Editable"
                               Dense>
                        @if (entity is not null)
                        {
@@ -29,7 +30,7 @@
                                <div class="d-flex flex-row align-center gap-1">
                                    @if (ImageSrcFunc is not null)
                                    {
-                                       <MudImage Src="@ImageSrcFunc(entity)" Height="24"/>
+                                       <BoltonCupImage Src="@ImageSrcFunc(entity)" Height="24" Editable="false" />
                                    }
                                    <span>@entity.ToString()</span>
                                </div>
@@ -41,7 +42,7 @@
                                <div class="d-flex flex-row align-center gap-1">
                                    @if (ImageSrcFunc is not null)
                                    {
-                                       <MudImage Src="@ImageSrcFunc(option)" Height="24"/>
+                                       <BoltonCupImage Src="@ImageSrcFunc(option)" Height="24" Editable="false" />
                                    }
                                    <span>@option.ToString()</span>
                                </div>
