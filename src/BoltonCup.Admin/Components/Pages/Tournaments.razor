@@ -8,6 +8,7 @@
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Tournament" Property="x => x.Name" />
+        <ImageColumn T="Tournament" Title="Logo" Property="x => x.LogoS3Key" OnImageUploaded="UpdateTournamentLogo" />
         <TemplateColumn Title="Info">
             <EditTemplate>
                 <TournamentInfoEditButton TournamentId="@context.Item.Id" />
@@ -22,7 +23,8 @@
         <PropertyColumn Title="Goalie Limit" Property="x => x.GoalieLimit" />
         <LinkColumn Title="Skater Payment Link" Property="x => x.SkaterPaymentLink" />
         <LinkColumn Title="Goalie Payment Link" Property="x => x.GoaliePaymentLink" />
-        <PropertyColumn Title="Winner" Property="x => x.WinningTeamId" />
+        <ForeignColumn Title="Winner" Property="x => x.WinningTeam"
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="t => t.LogoS3Key" />
     </Columns>
 </EntityDataGrid>
 
@@ -34,6 +36,7 @@
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
         var data = await tournaments
+            .Include(t => t.WinningTeam)
             .ToPaginatedListAsync(new GetTournamentsQuery
             {
                 Page = state.Page + 1,
@@ -55,4 +58,12 @@
             Name = "New Tournament"
         };
     }
+    
+    private async Task UpdateTournamentLogo(ImageUploadResult<Tournament> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey)) 
+            return;
+        await TournamentService.UpdateLogoAsync(result.Item.Id, result.NewKey);
+    }
+
 }
