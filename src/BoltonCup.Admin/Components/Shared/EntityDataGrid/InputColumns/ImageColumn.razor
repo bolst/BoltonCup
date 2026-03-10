@@ -3,7 +3,13 @@
 @inherits InputColumnBase<T, string?>
 
 @code {
+    
+    [Parameter]
+    public EventCallback<ImageUploadResult<T>> OnImageUploaded { get; set; }
 
+    private Task HandleImageUpload(T item, string? newKey)
+        => OnImageUploaded.InvokeAsync(new ImageUploadResult<T>(item, newKey));
+    
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -20,7 +26,7 @@
 
         var item = property as string;
         return @<div class="mud-width-full d-flex flex-column align-center justify-center">
-                   <BoltonCupImage Src="@item" SrcChanged="t => SetProperty(context.Item, t)" Height="24" Editable="Editable" />
+                   <BoltonCupImage Src="@item" SrcChanged="t => HandleImageUpload(context.Item, t)" Height="24" Editable="Editable" />
                </div>;
     }
 }

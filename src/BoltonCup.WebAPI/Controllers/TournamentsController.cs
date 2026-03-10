@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class TournamentsController(ITournamentRepository _tournaments) : BoltonCupControllerBase
+public class TournamentsController(ITournamentRepository _tournaments, ITournamentService _tournamentService) : BoltonCupControllerBase
 {
     /// <remarks>
     /// Gets a paginated list of tournaments.
@@ -28,4 +28,14 @@ public class TournamentsController(ITournamentRepository _tournaments) : BoltonC
         return OkOrNotFound(await _tournaments.GetByIdAsync<TournamentSingleDetailDto>(id));
     }
     
+    /// <remarks>
+    /// Updates a tournament's logo by accepting a pre-signed S3 key.
+    /// The client is responsible for uploading the image to S3 before calling this endpoint.
+    /// </remarks>
+    [HttpPut("{id:int}/logo")]
+    public async Task<ActionResult> UpdateTournamentLogo(int id, string key)
+    {
+        await _tournamentService.UpdateLogoAsync(id, key);
+        return Ok();
+    }
 }

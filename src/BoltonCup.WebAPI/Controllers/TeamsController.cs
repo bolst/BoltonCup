@@ -29,24 +29,24 @@ public class TeamsController(ITeamRepository _teams, ITeamService _teamService) 
     }
 
     /// <remarks>
-    /// Updates a team's logo by accepting a pre-signed S3 key for the new logo image.
+    /// Updates a team's logo by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
     /// </remarks>
     [HttpPut("{id:int}/logo")]
     public async Task<ActionResult> UpdateTeamLogo(int id, string key)
     {
-        await _teamService.UpdateTeamLogoAsync(id, key);
+        await _teamService.UpdateLogoAsync(id, key);
         return Ok();
     }
     
     /// <remarks>
-    /// Updates a team's logo by accepting a pre-signed S3 key for the new logo image.
+    /// Updates a team's banner by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
     /// </remarks>
     [HttpPut("{id:int}/banner")]
     public async Task<ActionResult> UpdateTeamBanner(int id, string key)
     {
-        await _teamService.UpdateTeamBannerAsync(id, key);
+        await _teamService.UpdateBannerAsync(id, key);
         return Ok();
     }
 }

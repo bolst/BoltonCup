@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace BoltonCup.Common.Services;
 
-public class S3UploadService : IS3UploadService
+public class AssetFileUploader : IAssetFileUploader
 {
     private readonly HttpClient _httpClient;
     private readonly IAssetUploadService _assetUploadService;
     private const int _maxFileSize = 10 * 1024 * 1024; // 10 MB
 
-    public S3UploadService(IAssetUploadService assetUploadService)
+    public AssetFileUploader(IAssetUploadService assetUploadService)
     {
         _httpClient = new HttpClient();
         _assetUploadService = assetUploadService;

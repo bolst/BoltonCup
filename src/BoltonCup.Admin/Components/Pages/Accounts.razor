@@ -1,4 +1,5 @@
 @page "/accounts"
+@inject IAccountService AccountService
 
 <EntityDataGrid 
     @ref="_dataGrid" 
@@ -10,6 +11,7 @@
         <PropertyColumn Title="Last" Property="x => x.LastName"/>
         <PropertyColumn Title="Email" Property="x => x.Email"/>
         <PropertyColumn Title="Phone" Property="x => x.Phone" Required="false"/>
+        <ImageColumn T="Account" Title="Profile Picture" Property="x => x.ProfilePictureS3Key" OnImageUploaded="UpdateProfilePicture" />
         <DatePickerColumn Title="Born" Property="x => x.Birthday" />
         <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel">
             <EditTemplate>
@@ -50,4 +52,10 @@
     {
     }
 
+    private async Task UpdateProfilePicture(ImageUploadResult<Account> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey)) 
+            return;
+        await AccountService.UpdateProfilePictureAsync(result.Item.Id, result.NewKey);
+    }
 }

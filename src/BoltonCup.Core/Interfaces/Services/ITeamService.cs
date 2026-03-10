@@ -2,6 +2,6 @@ namespace BoltonCup.Core;
 
 public interface ITeamService
 {
-    Task UpdateTeamLogoAsync(int teamId, string tempKey, CancellationToken cancellationToken = default);
-    Task UpdateTeamBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default);
+    Task UpdateLogoAsync(int teamId, string tempKey, CancellationToken cancellationToken = default);
+    Task UpdateBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default);
 }

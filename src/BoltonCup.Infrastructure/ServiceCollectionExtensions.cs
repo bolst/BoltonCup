@@ -37,7 +37,9 @@ public static class ServiceCollectionExtensions
             .AddTransient<ISkaterStatRepository, SkaterStatRepository>()
             .AddTransient<ITeamRepository, TeamRepository>()
             .AddTransient<ITournamentRepository, TournamentRepository>()
-            .AddTransient<ITeamService, TeamService>();
+            .AddTransient<IAccountService, AccountService>()
+            .AddTransient<ITeamService, TeamService>()
+            .AddTransient<ITournamentService, TournamentService>();
     }
     
     private static IServiceCollection AddBoltonCupS3(this WebApplicationBuilder builder)

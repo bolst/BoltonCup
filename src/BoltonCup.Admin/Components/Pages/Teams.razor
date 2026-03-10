@@ -1,4 +1,5 @@
 @page "/teams"
+@inject ITeamService TeamService
 
 <EntityDataGrid
     T="Team"
@@ -9,7 +10,8 @@
         <PropertyColumn Title="Team" Property="x => x.Name" />
         <PropertyColumn Title="Name (short)" Property="x => x.NameShort" />
         <PropertyColumn Title="Abbreviation" Property="x => x.Abbreviation" />
-        <ImageColumn Title="Logo" Property="x => x.LogoS3Key" />
+        <ImageColumn T="Team" Title="Logo" Property="x => x.LogoS3Key" OnImageUploaded="UpdateTeamLogo" />
+        <ImageColumn T="Team" Title="Banner" Property="x => x.BannerS3Key" OnImageUploaded="UpdateTeamBanner" />
         <ColorPickerColumn Title="Primary" Property="x => x.PrimaryColorHex" />
         <ColorPickerColumn Title="Secondary" Property="x => x.SecondaryColorHex" />
         <ColorPickerColumn Title="Tertiary" Property="x => x.TertiaryColorHex" />
@@ -53,6 +55,20 @@
             PrimaryColorHex = "#CE1126",
             SecondaryColorHex = "#FFFFFF"
         };
+    }
+
+    private async Task UpdateTeamLogo(ImageUploadResult<Team> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey)) 
+            return;
+        await TeamService.UpdateLogoAsync(result.Item.Id, result.NewKey);
+    }
+    
+    private async Task UpdateTeamBanner(ImageUploadResult<Team> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey)) 
+            return;
+        await TeamService.UpdateBannerAsync(result.Item.Id, result.NewKey);
     }
     
 }

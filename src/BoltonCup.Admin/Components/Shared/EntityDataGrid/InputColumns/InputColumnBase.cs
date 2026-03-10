@@ -25,7 +25,9 @@ public abstract partial class InputColumnBase<[DynamicallyAccessedMembers(Dynami
     [EditorRequired]
     public required Expression<Func<T, TProperty>> Property { get; set; } = Expression.Lambda<Func<T, TProperty>>(Expression.Default(typeof(TProperty)), Expression.Parameter(typeof(T)));
     
-
+    [Parameter]
+    public bool OnChangeNotifyDataGrid { get; set; } = true;
+    
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -104,7 +106,7 @@ public abstract partial class InputColumnBase<[DynamicallyAccessedMembers(Dynami
             propertyInfo.SetValue(item, safeValue);
         }
 
-        if (EntityDataGrid is not null && rootItem is T entity)
+        if (OnChangeNotifyDataGrid && EntityDataGrid is not null && rootItem is T entity)
         {
             InvokeAsync(() => EntityDataGrid.NotifyItemChangedAsync(entity));
         }

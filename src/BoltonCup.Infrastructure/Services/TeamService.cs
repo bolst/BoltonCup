@@ -15,7 +15,7 @@ public class TeamService : ITeamService
         _assetUploadService = assetUploadService;
     }
     
-    public async Task UpdateTeamLogoAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
+    public async Task UpdateLogoAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
     {
         var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId, cancellationToken: cancellationToken);
         if (team == null)
@@ -30,7 +30,7 @@ public class TeamService : ITeamService
         await _assetUploadService.CommitAsync(command, cancellationToken);
     }    
     
-    public async Task UpdateTeamBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
+    public async Task UpdateBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
     {
         var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId, cancellationToken: cancellationToken);
         if (team == null)

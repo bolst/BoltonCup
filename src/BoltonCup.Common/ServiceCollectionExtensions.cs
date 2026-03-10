@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
         // s3
         services
             .AddSingleton<IS3UrlResolver, S3UrlResolver>(_ => new S3UrlResolver(bcConfig))
-            .AddSingleton<IS3UploadService, S3UploadService>()
+            .AddSingleton<IAssetFileUploader, AssetFileUploader>()
             .TryAddSingleton<IAssetUploadService, WasmAssetUploadService>();
         
         // auth
