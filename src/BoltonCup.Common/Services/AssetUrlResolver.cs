@@ -1,10 +1,10 @@
 namespace BoltonCup.Common.Services;
 
-public class S3UrlResolver : IS3UrlResolver
+public class AssetUrlResolver : IAssetUrlResolver
 {
     private readonly string? _baseUrl;
 
-    public S3UrlResolver(BoltonCupConfiguration configuration)
+    public AssetUrlResolver(BoltonCupConfiguration configuration)
     {
         _baseUrl = configuration.S3BaseUrl;
     }

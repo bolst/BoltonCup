@@ -2,7 +2,7 @@
 @namespace BoltonCup.Common.Components
 @inject ISnackbar Snackbar
 @inject IAssetFileUploader AssetFileUploader
-@inject IS3UrlResolver S3UrlResolver
+@inject IAssetUrlResolver AssetUrlResolver
 
 <MudDialog>
     <TitleContent>
@@ -10,7 +10,7 @@
     </TitleContent>
     <DialogContent>
         <div class="mud-width-full d-flex flex-column align-center justify-center">
-            <MudImage Src="@S3UrlResolver.GetFullUrl(_src)" Width="300" />
+            <MudImage Src="@AssetUrlResolver.GetFullUrl(_src)" Width="300" />
             <MudFileUpload T="IBrowserFile" FilesChanged="FilesChanged" Accept=".png, .jpg, .webp, .svg">
                 <ActivatorContent>
                     <MudButton Variant="Variant.Filled"

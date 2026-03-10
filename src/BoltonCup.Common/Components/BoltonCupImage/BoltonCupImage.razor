@@ -2,16 +2,16 @@
 @using MudBlazor.State
 @inherits ComponentBaseWithState
 @inject IDialogService DialogService
-@inject IS3UrlResolver S3UrlResolver
+@inject IAssetUrlResolver AssetUrlResolver
 
 @if (!Editable)
 {
-    <MudImage Src="@S3UrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" />
+    <MudImage Src="@AssetUrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" />
 }
 else
 {
     <div class="edit-image-container" @onclick="OnClick">
-        <MudImage Class="edit-image" Src="@S3UrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" />
+        <MudImage Class="edit-image" Src="@AssetUrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" />
         <div class="overlay-container">
             <MudIcon Icon="@Icons.Material.Filled.Edit" />
         </div>

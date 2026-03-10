@@ -1,6 +1,6 @@
 namespace BoltonCup.Common;
 
-public interface IS3UrlResolver
+public interface IAssetUrlResolver
 {
     string? GetFullUrl(string? s3Key);
 }
