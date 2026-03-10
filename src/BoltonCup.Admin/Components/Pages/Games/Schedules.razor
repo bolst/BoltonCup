@@ -7,15 +7,15 @@
     Comparer="_comparer">
     <Columns>
         <ForeignColumn Title="Home" Property="x => x.HomeTeam" PropertySetter="(game, team) => game.HomeTeam = team" 
-                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.LogoUrl" />
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.LogoS3Key" />
         <ForeignColumn Title="Away" Property="x => x.AwayTeam" PropertySetter="(game, team) => game.AwayTeam = team" 
-                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.LogoUrl" />
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.LogoS3Key" />
         <DatePickerColumn Title="Date" Property="x => x.GameTime"/>
         <PropertyColumn Title="Type" Property="x => x.GameType"/>
         <PropertyColumn Title="Venue" Property="x => x.Venue"/>
         <PropertyColumn Title="Rink" Property="x => x.Rink"/>
         <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament" 
-                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="_ => BoltonCupLogo.Src" />
+                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="t => t.LogoS3Key" />
     </Columns>
 </EntityDataGrid>
 

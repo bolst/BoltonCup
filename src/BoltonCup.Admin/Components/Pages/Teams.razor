@@ -16,7 +16,7 @@
         <ColorPickerColumn Title="Secondary" Property="x => x.SecondaryColorHex" />
         <ColorPickerColumn Title="Tertiary" Property="x => x.TertiaryColorHex" />
         <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament" 
-                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="_ => BoltonCupLogo.Src" />
+                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="t => t.LogoS3Key" />
     </Columns>
 </EntityDataGrid>
 
