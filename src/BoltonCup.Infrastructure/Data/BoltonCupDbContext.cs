@@ -370,6 +370,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .ToTable("tournaments")
                 .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.WinningTeam)
+                .WithMany()
+                .HasForeignKey(e => e.WinningTeamId);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.LogoS3Key).HasColumnName("logo_s3_key");
