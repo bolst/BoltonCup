@@ -6,6 +6,46 @@
     "version": "v1"
   },
   "paths": {
+    "/api/accounts/{id}/profile-picture": {
+      "put": {
+        "tags": [
+          "Accounts"
+        ],
+        "description": "Updates an account's profile picture by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
+        "operationId": "UpdateProfilePicture",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/assets": {
       "get": {
         "tags": [
@@ -1520,8 +1560,48 @@
         "tags": [
           "Teams"
         ],
-        "description": "Updates a team's logo by accepting a pre-signed S3 key for the new logo image.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
+        "description": "Updates a team's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTeamLogo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/teams/{id}/banner": {
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "description": "Updates a team's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
+        "operationId": "UpdateTeamBanner",
         "parameters": [
           {
             "name": "id",
@@ -1658,6 +1738,46 @@
             }
           }
         }
+      }
+    },
+    "/api/tournaments/{id}/logo": {
+      "put": {
+        "tags": [
+          "Tournaments"
+        ],
+        "description": "Updates a tournament's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
+        "operationId": "UpdateTournamentLogo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     }
   },
@@ -3649,6 +3769,9 @@
     }
   },
   "tags": [
+    {
+      "name": "Accounts"
+    },
     {
       "name": "Assets"
     },

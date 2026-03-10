@@ -1,5 +1,6 @@
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Data;
+using BoltonCup.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Services;
@@ -15,33 +16,25 @@ public class TeamService : ITeamService
         _assetUploadService = assetUploadService;
     }
     
-    public async Task UpdateLogoAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
+    public Task UpdateLogoAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
     {
-        var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId, cancellationToken: cancellationToken);
-        if (team == null)
-            throw new InvalidOperationException($"Team with ID {teamId} not found.");
-
-        var command = new AssetCommitCommand<Team>
-        {
-            Entity = team,
-            TempKey = tempKey,
-            Destination = t => t.LogoS3Key
-        };
-        await _assetUploadService.CommitAsync(command, cancellationToken);
+        return _assetUploadService.UpdateSingleAssetAsync<Team>(
+            _dbContext,
+            tempKey,
+            x => x.Id == teamId,
+            t => t.LogoS3Key,
+            cancellationToken
+        );
     }    
     
-    public async Task UpdateBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
+    public Task UpdateBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
     {
-        var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId, cancellationToken: cancellationToken);
-        if (team == null)
-            throw new InvalidOperationException($"Team with ID {teamId} not found.");
-
-        var command = new AssetCommitCommand<Team>
-        {
-            Entity = team,
-            TempKey = tempKey,
-            Destination = t => t.BannerS3Key
-        };
-        await _assetUploadService.CommitAsync(command, cancellationToken);
+        return _assetUploadService.UpdateSingleAssetAsync<Team>(
+            _dbContext,
+            tempKey,
+            x => x.Id == teamId,
+            t => t.BannerS3Key,
+            cancellationToken
+        );
     }
 }
