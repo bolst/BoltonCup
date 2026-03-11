@@ -9,7 +9,7 @@ public class ServerStorageService(IAmazonS3 _s3Client, IAssetKeyGenerator _keyGe
 {
     private const string _bucketName = "bolton-cup-assets";
 
-    public async Task<PreSignedPutUrl> GeneratePreSignedPutUrl(string fileExtension, string contentType,
+    public async Task<UploadCredentials> GenerateUploadCredentialsAsync(string fileExtension, string contentType,
         CancellationToken cancellationToken = default)
     {
         var tempKey = _keyGenerator.GenerateTempKey(fileExtension);
@@ -22,7 +22,7 @@ public class ServerStorageService(IAmazonS3 _s3Client, IAssetKeyGenerator _keyGe
             ContentType = contentType
         };
         var url = await _s3Client.GetPreSignedURLAsync(request);
-        return new PreSignedPutUrl(url, tempKey);
+        return new UploadCredentials(url, tempKey);
     }
 
     public Task CopyAssetAsync(string sourceKey, string destinationKey,

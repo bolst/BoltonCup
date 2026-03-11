@@ -20,8 +20,8 @@ public class AssetFileUploader : IAssetFileUploader
     {
         var ext = resize ? ".webp" : Path.GetExtension(file.Name);
         var mime = resize ? "image/webp" : file.ContentType;
-        var putUrl = await _storageService.GeneratePreSignedPutUrl(ext, mime, cancellationToken);
-        if (putUrl is null)
+        var upload = await _storageService.GenerateUploadCredentialsAsync(ext, mime, cancellationToken);
+        if (upload is null)
             throw new InvalidOperationException("Failed to generate pre-signed URL for upload.");
 
         await using var fileStream = file.OpenReadStream(_maxFileSize, cancellationToken);
@@ -34,9 +34,9 @@ public class AssetFileUploader : IAssetFileUploader
 
         using var content = new StreamContent(uploadStream);
         content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mime);
-        var response = await _httpClient.PutAsync(putUrl.UploadUrl, content, cancellationToken);
+        var response = await _httpClient.PutAsync(upload.UploadUrl, content, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        return putUrl.TempKey;
+        return upload.TempKey;
     }
 }
