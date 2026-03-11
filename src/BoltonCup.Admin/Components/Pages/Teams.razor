@@ -10,13 +10,13 @@
         <PropertyColumn Title="Team" Property="x => x.Name" />
         <PropertyColumn Title="Name (short)" Property="x => x.NameShort" />
         <PropertyColumn Title="Abbreviation" Property="x => x.Abbreviation" />
-        <ImageColumn T="Team" Title="Logo" Property="x => x.LogoS3Key" OnImageUploaded="UpdateTeamLogo" />
-        <ImageColumn T="Team" Title="Banner" Property="x => x.BannerS3Key" OnImageUploaded="UpdateTeamBanner" />
+        <ImageColumn T="Team" Title="Logo" Property="x => x.Logo" OnImageUploaded="UpdateTeamLogo" />
+        <ImageColumn T="Team" Title="Banner" Property="x => x.Banner" OnImageUploaded="UpdateTeamBanner" />
         <ColorPickerColumn Title="Primary" Property="x => x.PrimaryColorHex" />
         <ColorPickerColumn Title="Secondary" Property="x => x.SecondaryColorHex" />
         <ColorPickerColumn Title="Tertiary" Property="x => x.TertiaryColorHex" />
         <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament" 
-                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="t => t.LogoS3Key" />
+                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="t => t.Logo" />
     </Columns>
 </EntityDataGrid>
 

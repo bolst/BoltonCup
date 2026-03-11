@@ -24,7 +24,7 @@ public class TournamentService : ITournamentService
             _dbContext,
             _assetKeyGenerator,
             t => t.Id == tournamentId,
-            (t, newKey) => t.LogoS3Key = newKey,
+            (t, newKey) => t.Logo = newKey,
             tempKey,
             tournamentId.ToString(),
             "logo",

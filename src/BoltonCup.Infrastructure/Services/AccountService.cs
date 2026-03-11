@@ -24,7 +24,7 @@ public class AccountService : IAccountService
             _dbContext,
             _assetKeyGenerator,
             a => a.Id == accountId,
-            (a, newKey) => a.ProfilePictureS3Key = newKey,
+            (a, newKey) => a.Avatar = newKey,
             tempKey,
             accountId.ToString(),
             "profile-picture",

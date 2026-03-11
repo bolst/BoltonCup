@@ -10,7 +10,7 @@ public class Account : EntityBase
     public required DateTime Birthday { get; set; }
     public string? HighestLevel { get; set; }
     public string? ProfilePicture { get; set; }
-    public string? ProfilePictureS3Key { get; set; }
+    public string? Avatar { get; set; }
     public string? PreferredBeer { get; set; }
     
     public ICollection<Player> Players { get; set; } = [];
