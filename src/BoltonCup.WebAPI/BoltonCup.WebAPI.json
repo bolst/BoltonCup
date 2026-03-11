@@ -6,13 +6,13 @@
     "version": "v1"
   },
   "paths": {
-    "/api/accounts/{id}/profile-picture": {
+    "/api/accounts/{id}/avatar": {
       "put": {
         "tags": [
           "Accounts"
         ],
-        "description": "Updates an account's profile picture by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
-        "operationId": "UpdateProfilePicture",
+        "description": "Updates an account's avatar by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
+        "operationId": "UpdateAvatar",
         "parameters": [
           {
             "name": "id",

@@ -18,7 +18,7 @@ public class AccountService : IAccountService
         _assetKeyGenerator = assetKeyGenerator;
     }
     
-    public Task UpdateProfilePictureAsync(int accountId, string tempKey, CancellationToken cancellationToken = default)
+    public Task UpdateAvatarAsync(int accountId, string tempKey, CancellationToken cancellationToken = default)
     {
         return _storageService.UpdateAssetAsync<Account>(
             _dbContext,
