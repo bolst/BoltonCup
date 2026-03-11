@@ -24,10 +24,9 @@ public class TournamentService : ITournamentService
             _dbContext,
             _assetKeyGenerator,
             t => t.Id == tournamentId,
-            (t, newKey) => t.Logo = newKey,
+            t => t.Logo,
             tempKey,
             tournamentId.ToString(),
-            "logo",
             cancellationToken
         );
     }    

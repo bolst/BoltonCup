@@ -24,10 +24,9 @@ public class TeamService : ITeamService
             _dbContext,
             _assetKeyGenerator,
             t => t.Id == teamId,
-            (t, newKey) => t.Logo = newKey,
+            t => t.Logo,
             tempKey,
             teamId.ToString(),
-            "logo",
             cancellationToken
         );
     }    
@@ -38,10 +37,9 @@ public class TeamService : ITeamService
             _dbContext,
             _assetKeyGenerator,
             t => t.Id == teamId,
-            (t, newKey) => t.Banner = newKey,
+            t => t.Banner,
             tempKey,
             teamId.ToString(),
-            "banner",
             cancellationToken
         );
     }

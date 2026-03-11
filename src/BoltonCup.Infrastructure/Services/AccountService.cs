@@ -24,10 +24,9 @@ public class AccountService : IAccountService
             _dbContext,
             _assetKeyGenerator,
             a => a.Id == accountId,
-            (a, newKey) => a.Avatar = newKey,
+            a => a.Avatar,
             tempKey,
             accountId.ToString(),
-            "profile-picture",
             cancellationToken
         );
     }
