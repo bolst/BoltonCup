@@ -9,21 +9,27 @@ public class TournamentService : ITournamentService
 {
     private readonly BoltonCupDbContext _dbContext;
     private readonly IAssetUploadService _assetUploadService;
+    private readonly IAssetKeyGenerator _assetKeyGenerator;
 
-    public TournamentService(BoltonCupDbContext dbContext, IAssetUploadService assetUploadService)
+    public TournamentService(BoltonCupDbContext dbContext, IAssetUploadService assetUploadService, IAssetKeyGenerator assetKeyGenerator)
     {
         _dbContext = dbContext;
         _assetUploadService = assetUploadService;
+        _assetKeyGenerator = assetKeyGenerator;
     }
     
-    public Task UpdateLogoAsync(int tournamentId, string tempKey, CancellationToken cancellationToken = default)
+    public async Task UpdateLogoAsync(int tournamentId, string tempKey, CancellationToken cancellationToken = default)
     {
-        return _assetUploadService.UpdateSingleAssetAsync<Tournament>(
-            _dbContext,
-            tempKey,
-            x => x.Id == tournamentId,
-            t => t.LogoS3Key,
-            cancellationToken
-        );
+        var tournament = await _dbContext.Tournaments
+                          .Where(a => a.Id == tournamentId)
+                          .FirstOrDefaultAsync(cancellationToken) 
+                      ?? throw new InvalidOperationException($"Tournament {tournamentId} does not exist");
+        // commit asset to final location in S3
+        var extension = Path.GetExtension(tempKey);
+        var destination = _assetKeyGenerator.GenerateFinalKey<Tournament>(tournamentId.ToString(), "logo", extension);
+        await _assetUploadService.CopyAssetAsync(tempKey, destination, cancellationToken);
+        // update tournament in db
+        tournament.LogoS3Key = destination;
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }    
 }

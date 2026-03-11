@@ -12,9 +12,10 @@ public class WasmAssetUploadService(IBoltonCupApi _boltonCupApi)
         var result = await _boltonCupApi.GeneratePreSignedPutUrlAsync(fileExtension, contentType, cancellationToken);
         return new PreSignedPutUrl(result.UploadUrl, result.TempKey);
     }
-    
-    public async Task CommitAsync<TEntity>(AssetCommitCommand<TEntity> command,
-        CancellationToken cancellationToken = default) where TEntity : EntityBase
+
+    public Task CopyAssetAsync(string sourceKey, string destinationKey,
+        CancellationToken cancellationToken = default)
     {
+        return Task.CompletedTask;
     }
 }
