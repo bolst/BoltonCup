@@ -51,8 +51,8 @@
         "tags": [
           "Assets"
         ],
-        "description": "Generates a pre-signed URL for uploads.",
-        "operationId": "GeneratePreSignedPutUrl",
+        "description": "Generates a pre-signed URL and temporary key for uploads.",
+        "operationId": "GenerateUploadCredentials",
         "parameters": [
           {
             "name": "fileExtension",
@@ -75,17 +75,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PreSignedPutUrl"
+                  "$ref": "#/components/schemas/UploadCredentials"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PreSignedPutUrl"
+                  "$ref": "#/components/schemas/UploadCredentials"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PreSignedPutUrl"
+                  "$ref": "#/components/schemas/UploadCredentials"
                 }
               }
             }
@@ -2941,20 +2941,6 @@
         },
         "additionalProperties": false
       },
-      "PreSignedPutUrl": {
-        "type": "object",
-        "properties": {
-          "uploadUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "tempKey": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "RefreshRequest": {
         "required": [
           "refreshToken"
@@ -3702,6 +3688,20 @@
           },
           "isMachineRemembered": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UploadCredentials": {
+        "type": "object",
+        "properties": {
+          "uploadUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "tempKey": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
