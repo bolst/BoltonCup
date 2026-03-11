@@ -1,6 +1,6 @@
 namespace BoltonCup.Core;
 
-public interface IAssetUploadService
+public interface IStorageService
 {
     Task<PreSignedPutUrl> GeneratePreSignedPutUrl(string fileExtension, string contentType, CancellationToken cancellationToken = default);
     Task CopyAssetAsync(string sourceKey, string destinationKey, CancellationToken cancellationToken = default);

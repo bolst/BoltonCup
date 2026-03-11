@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class AssetsController(IAssetUploadService _uploadService) : BoltonCupControllerBase
+public class AssetsController(IStorageService _uploadService) : BoltonCupControllerBase
 {
     /// <remarks>
     /// Generates a pre-signed URL for uploads.

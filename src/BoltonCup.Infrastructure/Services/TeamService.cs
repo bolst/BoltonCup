@@ -8,13 +8,13 @@ namespace BoltonCup.Infrastructure.Services;
 public class TeamService : ITeamService
 {
     private readonly BoltonCupDbContext _dbContext;
-    private readonly IAssetUploadService _assetUploadService;
+    private readonly IStorageService _storageService;
     private readonly IAssetKeyGenerator _assetKeyGenerator;
 
-    public TeamService(BoltonCupDbContext dbContext, IAssetUploadService assetUploadService, IAssetKeyGenerator assetKeyGenerator)
+    public TeamService(BoltonCupDbContext dbContext, IStorageService storageService, IAssetKeyGenerator assetKeyGenerator)
     {
         _dbContext = dbContext;
-        _assetUploadService = assetUploadService;
+        _storageService = storageService;
         _assetKeyGenerator = assetKeyGenerator;
     }
     
@@ -27,7 +27,7 @@ public class TeamService : ITeamService
         // commit asset to final location in S3
         var extension = Path.GetExtension(tempKey);
         var destination = _assetKeyGenerator.GenerateFinalKey<Team>(teamId.ToString(), "logo", extension);
-        await _assetUploadService.CopyAssetAsync(tempKey, destination, cancellationToken);
+        await _storageService.CopyAssetAsync(tempKey, destination, cancellationToken);
         // update team in db
         team.LogoS3Key = destination;
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -42,7 +42,7 @@ public class TeamService : ITeamService
         // commit asset to final location in S3
         var extension = Path.GetExtension(tempKey);
         var destination = _assetKeyGenerator.GenerateFinalKey<Team>(teamId.ToString(), "banner", extension);
-        await _assetUploadService.CopyAssetAsync(tempKey, destination, cancellationToken);
+        await _storageService.CopyAssetAsync(tempKey, destination, cancellationToken);
         // update team in db
         team.BannerS3Key = destination;
         await _dbContext.SaveChangesAsync(cancellationToken);

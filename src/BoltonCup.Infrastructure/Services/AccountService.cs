@@ -8,13 +8,13 @@ namespace BoltonCup.Infrastructure.Services;
 public class AccountService : IAccountService
 {
     private readonly BoltonCupDbContext _dbContext;
-    private readonly IAssetUploadService _assetUploadService;
+    private readonly IStorageService _storageService;
     private readonly IAssetKeyGenerator _assetKeyGenerator;
 
-    public AccountService(BoltonCupDbContext dbContext, IAssetUploadService assetUploadService, IAssetKeyGenerator assetKeyGenerator)
+    public AccountService(BoltonCupDbContext dbContext, IStorageService storageService, IAssetKeyGenerator assetKeyGenerator)
     {
         _dbContext = dbContext;
-        _assetUploadService = assetUploadService;
+        _storageService = storageService;
         _assetKeyGenerator = assetKeyGenerator;
     }
     
@@ -27,7 +27,7 @@ public class AccountService : IAccountService
         // commit asset to final location in S3
         var extension = Path.GetExtension(tempKey);
         var destination = _assetKeyGenerator.GenerateFinalKey<Account>(accountId.ToString(), "profile-picture", extension);
-        await _assetUploadService.CopyAssetAsync(tempKey, destination, cancellationToken);
+        await _storageService.CopyAssetAsync(tempKey, destination, cancellationToken);
         // update account in db
         account.ProfilePictureS3Key = destination;
         await _dbContext.SaveChangesAsync(cancellationToken);

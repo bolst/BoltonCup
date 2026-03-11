@@ -33,7 +33,7 @@ public static class ServiceCollectionExtensions
         services
             .AddSingleton<IAssetUrlResolver, AssetUrlResolver>(_ => new AssetUrlResolver(bcConfig))
             .AddSingleton<IAssetFileUploader, AssetFileUploader>()
-            .TryAddSingleton<IAssetUploadService, WasmAssetUploadService>();
+            .TryAddSingleton<IStorageService, ClientStorageService>();
         
         // auth
         services

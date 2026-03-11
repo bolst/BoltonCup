@@ -4,8 +4,8 @@ using PreSignedPutUrl = BoltonCup.Core.PreSignedPutUrl;
 
 namespace BoltonCup.Common.Services;
 
-public class WasmAssetUploadService(IBoltonCupApi _boltonCupApi) 
-    : IAssetUploadService
+public class ClientStorageService(IBoltonCupApi _boltonCupApi) 
+    : IStorageService
 {
     public async Task<PreSignedPutUrl> GeneratePreSignedPutUrl(string fileExtension, string contentType, CancellationToken cancellationToken = default)
     { 
@@ -16,6 +16,7 @@ public class WasmAssetUploadService(IBoltonCupApi _boltonCupApi)
     public Task CopyAssetAsync(string sourceKey, string destinationKey,
         CancellationToken cancellationToken = default)
     {
+        // TODO
         return Task.CompletedTask;
     }
 }

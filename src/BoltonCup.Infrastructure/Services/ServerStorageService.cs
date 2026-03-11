@@ -4,8 +4,8 @@ using BoltonCup.Core;
 
 namespace BoltonCup.Infrastructure.Services;
 
-public class ServerAssetUploadService(IAmazonS3 _s3Client, IAssetKeyGenerator _keyGenerator) 
-    : IAssetUploadService
+public class ServerStorageService(IAmazonS3 _s3Client, IAssetKeyGenerator _keyGenerator) 
+    : IStorageService
 {
     private const string _bucketName = "bolton-cup-assets";
 
