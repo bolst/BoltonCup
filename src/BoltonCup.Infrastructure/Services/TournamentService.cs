@@ -18,18 +18,17 @@ public class TournamentService : ITournamentService
         _assetKeyGenerator = assetKeyGenerator;
     }
     
-    public async Task UpdateLogoAsync(int tournamentId, string tempKey, CancellationToken cancellationToken = default)
+    public Task UpdateLogoAsync(int tournamentId, string tempKey, CancellationToken cancellationToken = default)
     {
-        var tournament = await _dbContext.Tournaments
-                          .Where(a => a.Id == tournamentId)
-                          .FirstOrDefaultAsync(cancellationToken) 
-                      ?? throw new InvalidOperationException($"Tournament {tournamentId} does not exist");
-        // commit asset to final location in S3
-        var extension = Path.GetExtension(tempKey);
-        var destination = _assetKeyGenerator.GenerateFinalKey<Tournament>(tournamentId.ToString(), "logo", extension);
-        await _storageService.CopyAssetAsync(tempKey, destination, cancellationToken);
-        // update tournament in db
-        tournament.LogoS3Key = destination;
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        return _storageService.UpdateAssetAsync<Tournament>(
+            _dbContext,
+            _assetKeyGenerator,
+            t => t.Id == tournamentId,
+            (t, newKey) => t.LogoS3Key = newKey,
+            tempKey,
+            tournamentId.ToString(),
+            "logo",
+            cancellationToken
+        );
     }    
 }

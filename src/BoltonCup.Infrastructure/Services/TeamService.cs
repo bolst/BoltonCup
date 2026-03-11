@@ -18,33 +18,31 @@ public class TeamService : ITeamService
         _assetKeyGenerator = assetKeyGenerator;
     }
     
-    public async Task UpdateLogoAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
+    public Task UpdateLogoAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
     {
-        var team = await _dbContext.Teams
-            .Where(t => t.Id == teamId)
-            .FirstOrDefaultAsync(cancellationToken) 
-                   ?? throw new InvalidOperationException($"Team {teamId} does not exist");
-        // commit asset to final location in S3
-        var extension = Path.GetExtension(tempKey);
-        var destination = _assetKeyGenerator.GenerateFinalKey<Team>(teamId.ToString(), "logo", extension);
-        await _storageService.CopyAssetAsync(tempKey, destination, cancellationToken);
-        // update team in db
-        team.LogoS3Key = destination;
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        return _storageService.UpdateAssetAsync<Team>(
+            _dbContext,
+            _assetKeyGenerator,
+            t => t.Id == teamId,
+            (t, newKey) => t.LogoS3Key = newKey,
+            tempKey,
+            teamId.ToString(),
+            "logo",
+            cancellationToken
+        );
     }    
     
-    public async Task UpdateBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
+    public Task UpdateBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
     {
-        var team = await _dbContext.Teams
-                       .Where(t => t.Id == teamId)
-                       .FirstOrDefaultAsync(cancellationToken) 
-                   ?? throw new InvalidOperationException($"Team {teamId} does not exist");
-        // commit asset to final location in S3
-        var extension = Path.GetExtension(tempKey);
-        var destination = _assetKeyGenerator.GenerateFinalKey<Team>(teamId.ToString(), "banner", extension);
-        await _storageService.CopyAssetAsync(tempKey, destination, cancellationToken);
-        // update team in db
-        team.BannerS3Key = destination;
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        return _storageService.UpdateAssetAsync<Team>(
+            _dbContext,
+            _assetKeyGenerator,
+            t => t.Id == teamId,
+            (t, newKey) => t.BannerS3Key = newKey,
+            tempKey,
+            teamId.ToString(),
+            "banner",
+            cancellationToken
+        );
     }
 }
