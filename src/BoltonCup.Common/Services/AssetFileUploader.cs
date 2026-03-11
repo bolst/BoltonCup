@@ -28,8 +28,7 @@ public class AssetFileUploader : IAssetFileUploader
         var uploadStream = fileStream;
         if (resize)
         {
-            var resizer = new ImageResizer();
-            uploadStream = await resizer.ResizeAsync(fileStream);
+            uploadStream = await ImageResizer.ResizeAsync(fileStream);
         }
 
         using var content = new StreamContent(uploadStream);
