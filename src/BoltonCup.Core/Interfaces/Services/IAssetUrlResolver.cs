@@ -1,4 +1,4 @@
-namespace BoltonCup.Common;
+namespace BoltonCup.Core;
 
 public interface IAssetUrlResolver
 {

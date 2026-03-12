@@ -1,13 +1,11 @@
+using BoltonCup.Core;
+
 namespace BoltonCup.Common.Services;
 
-public class AssetUrlResolver : IAssetUrlResolver
+public class AssetUrlResolver(BoltonCupConfiguration configuration) 
+    : IAssetUrlResolver
 {
-    private readonly string? _baseUrl;
-
-    public AssetUrlResolver(BoltonCupConfiguration configuration)
-    {
-        _baseUrl = configuration.S3BaseUrl;
-    }
+    private readonly string? _baseUrl = configuration.S3BaseUrl;
 
     public string? GetFullUrl(string? s3Key)
     {
