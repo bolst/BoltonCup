@@ -1,20 +1,20 @@
-using BoltonCup.WebAPI.Dtos;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.WebAPI.Mapping.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class GoalieStatsController(IGoalieStatRepository _goalieStats) : BoltonCupControllerBase
+public class GoalieStatsController(IGoalieStatRepository _goalieStats, IGoalieStatMapper _mapper) : BoltonCupControllerBase
 {
     /// <remarks>
     /// Gets a paginated list of goalie statistics.
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<GoalieStatDetailDto>>> GetGoalieStats([FromQuery] GetGoalieStatsQuery query)
+    public async Task<ActionResult<IPagedList<GoalieStatDto>>> GetGoalieStats([FromQuery] GetGoalieStatsQuery query)
     {
-        return Ok(await _goalieStats.GetAllAsync<GoalieStatDetailDto>(query));
+        var stats = await _goalieStats.GetAllAsync(query);
+        return Ok(_mapper.ToDtoList(stats));
     }
 }

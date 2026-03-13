@@ -164,7 +164,7 @@ else
 
     private int? _playerId;
 
-    private Sdk.PlayerSingleDetailDto? _player;
+    private Sdk.PlayerSingleDto? _player;
     private IEnumerable<Sdk.PlayerGameByGame> _last5Games = [];
     
     protected override async Task OnParametersSetAsync()
@@ -179,7 +179,7 @@ else
             .Take(5);
     }
 
-    private RenderFragment InfoItems(Sdk.PlayerSingleDetailDto player)
+    private RenderFragment InfoItems(Sdk.PlayerSingleDto player)
         =>@<div class="d-flex flex-column align-start mud-width-full px-4">
               <MudText Typo="Typo.subtitle1"><b>Born:</b> @player.Birthday?.ToString("d")</MudText>
               <MudText Typo="Typo.subtitle1"><b>Favourite Beer:</b> @player.PreferredBeer</MudText>

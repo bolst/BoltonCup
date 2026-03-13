@@ -1,20 +1,20 @@
-using BoltonCup.WebAPI.Dtos;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.WebAPI.Mapping.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class SkaterGameLogsController(ISkaterGameLogRepository _skaterGameLogs) : BoltonCupControllerBase
+public class SkaterGameLogsController(ISkaterGameLogRepository _skaterGameLogs, ISkaterGameLogMapper _mapper) : BoltonCupControllerBase
 {
     /// <remarks>
     /// Gets a collection of skater game logs.
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<CollectionResult<SkaterGameLogDetailDto>>> GetSkaterGameLogs([FromQuery] GetSkaterGameLogsQuery query)
+    public async Task<ActionResult<IPagedList<SkaterGameLogDto>>> GetSkaterGameLogs([FromQuery] GetSkaterGameLogsQuery query)
     {
-        return Ok(await _skaterGameLogs.GetAllAsync<SkaterGameLogDetailDto>(query));
+        var logs = await _skaterGameLogs.GetAllAsync(query);
+        return Ok(_mapper.ToDtoList(logs));
     }
 }

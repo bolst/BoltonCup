@@ -2,7 +2,7 @@
 
 <MudTable
     @ref="_dataGrid"
-    T="Sdk.GameDetailDto"
+    T="Sdk.GameDto"
     ServerData="ServerReload"
     GroupBy="_groupDefinition"
     Breakpoint="Breakpoint.None"
@@ -55,9 +55,9 @@
 
 @code {
 
-    private MudTable<Sdk.GameDetailDto> _dataGrid = null!;
+    private MudTable<Sdk.GameDto> _dataGrid = null!;
 
-    private TableGroupDefinition<Sdk.GameDetailDto> _groupDefinition = new()
+    private TableGroupDefinition<Sdk.GameDto> _groupDefinition = new()
     {
         GroupName = "Tournament",
         Indentation = true,
@@ -72,12 +72,12 @@
         }
     };
 
-    private (Sdk.GameTeamSummary winner, Sdk.GameTeamSummary loser) GetTeamsByWin(Sdk.GameDetailDto game)
+    private (Sdk.TeamInGameDto winner, Sdk.TeamInGameDto loser) GetTeamsByWin(Sdk.GameDto game)
         => game.HomeTeam.Goals >= game.AwayTeam.Goals
             ? (game.HomeTeam, game.AwayTeam)
             : (game.AwayTeam, game.HomeTeam);
 
-    private async Task<TableData<Sdk.GameDetailDto>> ServerReload(TableState state, CancellationToken cancellationToken)
+    private async Task<TableData<Sdk.GameDto>> ServerReload(TableState state, CancellationToken cancellationToken)
     {
         var data = await BoltonCupApi.GetGamesAsync(
             page: state.Page + 1,
@@ -87,14 +87,14 @@
         var result = data.Items
             .OrderByDescending(x => x.Tournament.StartDate)
             .ThenBy(x => x.GameTime);
-        return new TableData<Sdk.GameDetailDto> {
+        return new TableData<Sdk.GameDto> {
             Items = result,
             TotalItems = data.Total,
         };
     }
 
 
-    private RenderFragment MatchupCell(Sdk.GameDetailDto context)
+    private RenderFragment MatchupCell(Sdk.GameDto context)
         => @<div class="mud-width-full d-flex flex-row align-center justify-center gap-4">
             <div class="d-flex flex-row align-center justify-end gap-2" style="width: 100px">
                 <MudText Typo="Typo.body2"><b>@context.AwayTeam.NameShort</b></MudText>
@@ -107,7 +107,7 @@
             </div>
         </div>;
     
-    private RenderFragment GameScoreText(Sdk.GameDetailDto context) => builder =>
+    private RenderFragment GameScoreText(Sdk.GameDto context) => builder =>
     {
         var teams = GetTeamsByWin(context);
         builder.OpenElement(0, "div");

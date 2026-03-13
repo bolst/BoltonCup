@@ -14,7 +14,7 @@ else
             <div class="d-flex flex-row align-center px-1 py-2 mud-width-full">
                 <MudText Typo="Typo.h6"><b>Game Sheet</b></MudText>
                 <MudSpacer />
-                <MudToggleGroup T="Sdk.GameTeamSummary" Value="_selectedTeam" ValueChanged="SetSelectedTeam" Size="Size.Small">
+                <MudToggleGroup T="Sdk.TeamInGameDto" Value="_selectedTeam" ValueChanged="SetSelectedTeam" Size="Size.Small">
                     <MudToggleItem Value="_game.AwayTeam" Text="@_game.AwayTeam.NameShort" />
                     <MudToggleItem Value="_game.HomeTeam" Text="@_game.HomeTeam.NameShort" />
                 </MudToggleGroup>
@@ -117,19 +117,19 @@ else
 @code {
 
     [Parameter, EditorRequired]
-    public required Sdk.GameSingleDetailDto Game { get; set; }
+    public required Sdk.GameSingleDto Game { get; set; }
     
-    private Sdk.GameSingleDetailDto? _game;
+    private Sdk.GameSingleDto? _game;
 
     private bool _loading;
 
-    private Sdk.SkaterGameLogDetailDtoCollectionResult? _skaterLog;
-    private Sdk.GoalieGameLogDetailDtoCollectionResult? _goalieLog;
+    private Sdk.SkaterGameLogDtoIPagedList? _skaterLog;
+    private Sdk.GoalieGameLogDtoIPagedList? _goalieLog;
     
-    private Sdk.GameTeamSummary? _selectedTeam;
-    private List<Sdk.SkaterGameLogDetailDto> _forwardLogs = [];
-    private List<Sdk.SkaterGameLogDetailDto> _defenseLogs = [];
-    private List<Sdk.GoalieGameLogDetailDto> _goalieLogs = [];
+    private Sdk.TeamInGameDto? _selectedTeam;
+    private List<Sdk.SkaterGameLogDto> _forwardLogs = [];
+    private List<Sdk.SkaterGameLogDto> _defenseLogs = [];
+    private List<Sdk.GoalieGameLogDto> _goalieLogs = [];
 
     protected override async Task OnParametersSetAsync()
     {
@@ -155,7 +155,7 @@ else
         _goalieLog = await BoltonCupApi.GetGoalieGameLogsAsync(Game.Id);
     }
 
-    private void SetSelectedTeam(Sdk.GameTeamSummary? team)
+    private void SetSelectedTeam(Sdk.TeamInGameDto? team)
     {
         _selectedTeam = team;
         if (_selectedTeam is null)
@@ -177,7 +177,7 @@ else
             .ToList();
     }
 
-    private string GetFormattedPlayerName(Sdk.PlayerSummary player)
+    private string GetFormattedPlayerName(Sdk.PlayerBriefDto player)
     {
         var first = player.FirstName.FirstOrDefault();
         var last = player.LastName;

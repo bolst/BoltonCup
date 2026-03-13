@@ -90,9 +90,9 @@
 
     private bool _loading;
 
-    private Sdk.GameSingleDetailDto? _game;
-    private IEnumerable<Sdk.GoalSummary> _awayGoals => _game?.Goals.Where(g => g.TeamId == _game.AwayTeam.Id) ?? [];
-    private IEnumerable<Sdk.GoalSummary> _homeGoals => _game?.Goals.Where(g => g.TeamId == _game.HomeTeam.Id) ?? [];
+    private Sdk.GameSingleDto? _game;
+    private IEnumerable<Sdk.GoalBriefDto> _awayGoals => _game?.Goals.Where(g => g.TeamId == _game.AwayTeam.Id) ?? [];
+    private IEnumerable<Sdk.GoalBriefDto> _homeGoals => _game?.Goals.Where(g => g.TeamId == _game.HomeTeam.Id) ?? [];
 
     protected override async Task OnParametersSetAsync()
     {

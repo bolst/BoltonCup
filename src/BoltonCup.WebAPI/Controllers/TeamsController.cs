@@ -1,21 +1,21 @@
-using BoltonCup.WebAPI.Dtos;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.WebAPI.Mapping.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class TeamsController(ITeamRepository _teams, ITeamService _teamService) : BoltonCupControllerBase
+public class TeamsController(ITeamRepository _teams, ITeamService _teamService, ITeamMapper _teamMapper) : BoltonCupControllerBase
 {
     /// <remarks>
     /// Gets a paginated list of teams.
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<TeamDetailDto>>> GetTeams([FromQuery] GetTeamsQuery query)
+    public async Task<ActionResult<IPagedList<TeamDto>>> GetTeams([FromQuery] GetTeamsQuery query)
     {
-        return Ok(await _teams.GetAllAsync<TeamDetailDto>(query));
+        var teams = await _teams.GetAllAsync(query);
+        return Ok(_teamMapper.ToDtoList(teams));
     }
 
     /// <remarks>
@@ -23,9 +23,10 @@ public class TeamsController(ITeamRepository _teams, ITeamService _teamService) 
     /// </remarks>
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TeamSingleDetailDto>> GetTeamById(int id)
+    public async Task<ActionResult<TeamSingleDto>> GetTeamById(int id)
     {
-        return OkOrNotFound(await _teams.GetByIdAsync<TeamSingleDetailDto>(id));
+        var team = await _teams.GetByIdAsync(id);
+        return OkOrNotFound(_teamMapper.ToDto(team));
     }
 
     /// <remarks>

@@ -4,7 +4,7 @@
 
 <MudDataGrid
     @ref="_dataGrid"
-    T="Sdk.SkaterStatDetailDto"
+    T="Sdk.SkaterStatDto"
     ServerData="ServerReload"
     Breakpoint="Breakpoint.None"
     RowStyle="height: 50px"
@@ -39,16 +39,16 @@
         <PropertyColumn Property="x => x.PenaltyMinutes" Title="PIM" CellStyle="@_dataCellStyle" />
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="Sdk.SkaterStatDetailDto" PageSizeSelector="false"/>
+        <MudDataGridPager T="Sdk.SkaterStatDto" PageSizeSelector="false"/>
     </PagerContent>
 </MudDataGrid>
 
 @code {
 
-    private MudDataGrid<Sdk.SkaterStatDetailDto> _dataGrid = null!;
+    private MudDataGrid<Sdk.SkaterStatDto> _dataGrid = null!;
     private const string _dataCellStyle = "max-width: 30px";
 
-    private async Task<GridData<Sdk.SkaterStatDetailDto>> ServerReload(GridState<Sdk.SkaterStatDetailDto> state)
+    private async Task<GridData<Sdk.SkaterStatDto>> ServerReload(GridState<Sdk.SkaterStatDto> state)
     {
         string? sortBy = null;
         bool? descending = null;
@@ -65,7 +65,7 @@
             sortBy: sortBy,
             descending: descending
         );
-        return new GridData<Sdk.SkaterStatDetailDto> {
+        return new GridData<Sdk.SkaterStatDto> {
             TotalItems = data.Total,
             Items = data.Items,
         };

@@ -30,7 +30,7 @@
             .Include(g => g.HomeTeam)
             .Include(g => g.AwayTeam)
             .Include(g => g.Tournament)
-            .ToPaginatedListAsync(new GetGamesQuery
+            .ToPagedListAsync(new GetGamesQuery
             {
                 Page = state.Page + 1,
                 Size = state.PageSize,

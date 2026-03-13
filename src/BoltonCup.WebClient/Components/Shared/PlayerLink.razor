@@ -5,10 +5,10 @@
 @code {
 
     [Parameter]
-    public Sdk.PlayerSummary? Player { get; set; }
+    public Sdk.PlayerBriefDto? Player { get; set; }
     
     [Parameter]
-    public Func<Sdk.PlayerSummary?, string>? ToStringFunc { get; set; }
+    public Func<Sdk.PlayerBriefDto?, string>? ToStringFunc { get; set; }
     
     [Parameter]
     public string? Label { get; set; }

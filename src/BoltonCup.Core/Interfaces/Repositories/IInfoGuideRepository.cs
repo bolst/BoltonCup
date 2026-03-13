@@ -1,11 +1,11 @@
-using BoltonCup.Core.Interfaces.Base;
-using BoltonCup.Core.Mappings;
-
 namespace BoltonCup.Core;
 
-public interface IInfoGuideRepository : IRepository<InfoGuide, GetInfoGuidesQuery, Guid>
+public interface IInfoGuideRepository
 {
+    Task<IPagedList<InfoGuide>> GetAllAsync(GetInfoGuidesQuery query);
+    Task<InfoGuide?> GetByIdAsync(Guid id);
     Task<InfoGuide?> GetByTournamentIdAsync(int tournamentId);
-    Task<TResult?> GetByTournamentIdAsync<TResult>(int tournamentId)
-        where TResult : IMappable<InfoGuide, TResult>;
+    Task<bool> AddAsync(InfoGuide entity);
+    Task<bool> UpdateAsync(InfoGuide entity);
+    Task<bool> DeleteAsync(Guid id);
 }

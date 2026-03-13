@@ -33,7 +33,7 @@
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
         var data = await accounts
-            .ToPaginatedListAsync(new GetAccountsQuery
+            .ToPagedListAsync(new GetAccountsQuery
             {
                 Page = state.Page + 1,
                 Size = state.PageSize,

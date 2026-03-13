@@ -31,7 +31,7 @@
             .Include(t => t.Tournament)
             .OrderByDescending(t => t.TournamentId)
             .ThenBy(t => t.Name)
-            .ToPaginatedListAsync(new GetTeamsQuery
+            .ToPagedListAsync(new GetTeamsQuery
             {
                 Page = state.Page + 1,
                 Size = state.PageSize,

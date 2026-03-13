@@ -1,5 +1,4 @@
 using BoltonCup.Core;
-using BoltonCup.Core.Mappings;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +9,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class GameRepository(BoltonCupDbContext _context) : IGameRepository
 {
-    public async Task<CollectionResult<Game>> GetAllAsync(GetGamesQuery query)
+    public async Task<IPagedList<Game>> GetAllAsync(GetGamesQuery query)
     {
         return await _context.Games
             .AsNoTracking()
@@ -18,23 +17,10 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
             .Include(p => p.HomeTeam)
             .Include(p => p.AwayTeam)
             .Include(p => p.Goals)
-            .Include(p => p.Penalties)
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
             .ApplySorting(query, x => x.OrderBy(p => p.GameTime))
-            .ToPaginatedListAsync(query);
-    }       
-    
-    public async Task<CollectionResult<T>> GetAllAsync<T>(GetGamesQuery query)
-        where T : IMappable<Game, T>
-    {
-        return await _context.Games
-            .AsNoTracking()
-            .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
-            .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
-            .ApplySorting(query, x => x.OrderBy(p => p.GameTime))
-            .ProjectTo<Game, T>()
-            .ToPaginatedListAsync(query);
+            .ToPagedListAsync(query);
     }       
     
     public async Task<Game?> GetByIdAsync(int id)
@@ -45,16 +31,18 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
             .Include(p => p.HomeTeam)
             .Include(p => p.AwayTeam)
             .Include(p => p.Goals)
+                .ThenInclude(g => g.Scorer)
+                .ThenInclude(p => p.Account)
+            .Include(p => p.Goals)
+                .ThenInclude(g => g.Assist1Player)
+                .ThenInclude(p => p.Account)
+            .Include(p => p.Goals)
+                .ThenInclude(g => g.Assist2Player)
+                .ThenInclude(p => p.Account)
             .Include(p => p.Penalties)
+                .ThenInclude(x => x.Player)
+                .ThenInclude(x => x.Account)
             .FirstOrDefaultAsync(p => p.Id == id);
-    }
-
-    public async Task<T?> GetByIdAsync<T>(int id)
-        where T : IMappable<Game, T>
-    {
-        return await _context.Games
-            .AsNoTracking()
-            .ProjectToFirstOrDefaultAsync<Game, T>(p => p.Id == id);
     }
 
     public async Task<bool> AddAsync(Game entity)

@@ -1,21 +1,21 @@
-using BoltonCup.WebAPI.Dtos;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.WebAPI.Mapping.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class GamesController(IGameRepository _games) : BoltonCupControllerBase
+public class GamesController(IGameRepository _games, IGameMapper _gameMapper) : BoltonCupControllerBase
 {
     /// <remarks>
     /// Gets a paginated list of games.
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<GameDetailDto>>> GetGames([FromQuery] GetGamesQuery query)
+    public async Task<ActionResult<IPagedList<GameDto>>> GetGames([FromQuery] GetGamesQuery query)
     {
-        return Ok(await _games.GetAllAsync<GameDetailDto>(query));
+        var games = await _games.GetAllAsync(query);
+        return Ok(_gameMapper.ToDtoList(games));
     }
 
     /// <remarks>
@@ -23,18 +23,9 @@ public class GamesController(IGameRepository _games) : BoltonCupControllerBase
     /// </remarks>
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GameSingleDetailDto>> GetGameById(int id)
+    public async Task<ActionResult<GameSingleDto>> GetGameById(int id)
     {
-        return OkOrNotFound(await _games.GetByIdAsync<GameSingleDetailDto>(id));
-    }
-
-    /// <remarks>
-    /// Gets the box score for a game by its ID.
-    /// </remarks>
-    [AllowAnonymous]
-    [HttpGet("{id:int}/boxscore")]
-    public async Task<ActionResult<GameBoxScoreDto>> GetGameBoxScore(int id)
-    {
-        return OkOrNotFound(await _games.GetByIdAsync<GameBoxScoreDto>(id));
+        var game = await _games.GetByIdAsync(id);
+        return OkOrNotFound(_gameMapper.ToDto(game));
     }
 }

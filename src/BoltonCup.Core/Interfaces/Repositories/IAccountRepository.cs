@@ -1,7 +1,10 @@
-using BoltonCup.Core.Interfaces.Base;
-
 namespace BoltonCup.Core;
 
-public interface IAccountRepository : IRepository<Account, GetAccountsQuery, int>
+public interface IAccountRepository
 {
+    Task<IPagedList<Account>> GetAllAsync(GetAccountsQuery query);
+    Task<Account?> GetByIdAsync(int id);
+    Task<bool> AddAsync(Account entity);
+    Task<bool> UpdateAsync(Account entity);
+    Task<bool> DeleteAsync(int id);
 }

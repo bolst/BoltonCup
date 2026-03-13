@@ -1,7 +1,6 @@
-using BoltonCup.Core.Interfaces.Base;
-
 namespace BoltonCup.Core;
 
-public interface IGoalieGameLogRepository : IReadOnlyRepository<GoalieGameLog, GetGoalieGameLogsQuery, int>
+public interface IGoalieGameLogRepository
 {
+    Task<IPagedList<GoalieGameLog>> GetAllAsync(GetGoalieGameLogsQuery query);
 }

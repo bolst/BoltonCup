@@ -37,7 +37,7 @@
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
         var data = await tournaments
             .Include(t => t.WinningTeam)
-            .ToPaginatedListAsync(new GetTournamentsQuery
+            .ToPagedListAsync(new GetTournamentsQuery
             {
                 Page = state.Page + 1,
                 Size = state.PageSize,
