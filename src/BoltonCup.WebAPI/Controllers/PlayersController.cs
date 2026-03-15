@@ -23,6 +23,7 @@ public class PlayersController(IPlayerRepository _players, IPlayerMapper _mapper
     /// </remarks>
     [AllowAnonymous]
     [HttpGet("{id:int}")]
+    [ResponseCache(Duration = 300, VaryByQueryKeys = ["id"])]
     public async Task<ActionResult<PlayerSingleDto>> GetPlayerById(int id)
     {
         var player = await _players.GetByIdAsync(id);

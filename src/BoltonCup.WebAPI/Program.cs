@@ -27,6 +27,8 @@ builder.Services
 builder.AddBoltonCupInfrastructure();
 builder.AddBoltonCupWebAPIServices();
 
+builder.Services.AddResponseCaching();
+
 // https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -101,6 +103,8 @@ app.MapGroup("/api/auth")
     .WithTags("Auth");
 
 app.UseExceptionHandler("/error");
+
+app.UseResponseCaching();
 
 app.UseAuthentication();
 app.UseAuthorization();
