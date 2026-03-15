@@ -177,6 +177,7 @@ else
         _last5Games = _player.GameByGame
             .OrderByDescending(p => p.Game.GameTime)
             .Take(5);
+        await InvokeAsync(StateHasChanged);
     }
 
     private RenderFragment InfoItems(Sdk.PlayerSingleDto player)

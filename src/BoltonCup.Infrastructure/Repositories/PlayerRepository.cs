@@ -26,6 +26,7 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
     {
         var account = await _context.Accounts
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(a => a.Players)
                 .ThenInclude(p => p.Tournament)
             .Include(a => a.Players)
