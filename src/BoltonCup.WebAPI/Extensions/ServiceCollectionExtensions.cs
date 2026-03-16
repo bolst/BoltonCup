@@ -2,6 +2,7 @@ using System.Threading.RateLimiting;
 using BoltonCup.Core;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Filters;
+using BoltonCup.WebAPI.Mapping.Auth;
 using BoltonCup.WebAPI.Mapping.Core;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -112,6 +113,7 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddMappers(this IServiceCollection services)
     {
         return services
+            .AddTransient<IIdentityUserMapper, IdentityUserMapper>()
             .AddTransient<IBriefMapper, BriefMapper>()
             .AddTransient<IGameMapper, GameMapper>()
             .AddTransient<IGoalieGameLogMapper, GoalieGameLogMapper>()
