@@ -9,7 +9,6 @@ public class Account : EntityBase
     public string? Phone { get; set; }
     public required DateTime Birthday { get; set; }
     public string? HighestLevel { get; set; }
-    public string? ProfilePicture { get; set; }
     public string? Avatar { get; set; }
     public string? PreferredBeer { get; set; }
     
