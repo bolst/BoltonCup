@@ -62,6 +62,8 @@ public static class ServiceCollectionExtensions
         
         builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
         return builder.Services
+            .AddSingleton<IEmailQueue, EmailQueue>()
+            .AddHostedService<EmailBackgroundService>()
             .AddTransient<IEmailSender<BoltonCupUser>, EmailSender>();
     }
     

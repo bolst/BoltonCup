@@ -32,6 +32,11 @@
     <ItemGroup>
         <EmbeddedResource Include="EmailTemplates\**\*.cshtml" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="EmailTemplates\PasswordResetCode\" />
+      <Folder Include="EmailTemplates\PasswordResetLink\" />
+    </ItemGroup>
     <PropertyGroup>
     </PropertyGroup>
 
