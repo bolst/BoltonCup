@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: dotnet restore ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj
       - name: Publish csproj
-        run: dotnet publish ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj -c:Debug -p:GHPages=true -o out/BoltonCupWebClient --nologo --no-restore
+        run: dotnet publish ./src/BoltonCup.WebClient/BoltonCup.WebClient.csproj -c:Release -p:GHPages=true -o out/BoltonCupWebClient --nologo --no-restore
       - name: Generate sitemap
         run: dotnet run --project ./src/BoltonCup.WebClient.SitemapGenerator/BoltonCup.WebClient.SitemapGenerator.csproj -- -o out/BoltonCupWebClient/wwwroot
       - name: Commit wwwroot to GitHub Pages
