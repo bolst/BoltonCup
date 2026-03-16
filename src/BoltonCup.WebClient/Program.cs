@@ -9,6 +9,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+Console.WriteLine("Adding bolton cup common...");
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
 
 builder.Services.AddMudServices();
