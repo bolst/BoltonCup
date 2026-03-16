@@ -19,7 +19,7 @@ else
         </div>
 
         <MudTable
-            T="Sdk.PlayerSummary"
+            T="Sdk.PlayerBriefDto"
             Items="_players"
             GroupBy="_groupDefinition"
             Breakpoint="Breakpoint.None"
@@ -61,10 +61,10 @@ else
 
     private int? _teamId;
     
-    private Sdk.TeamSingleDetailDto? _team;
-    private List<Sdk.PlayerSummary> _players = [];
+    private Sdk.TeamSingleDto? _team;
+    private List<Sdk.PlayerBriefDto> _players = [];
     
-    private readonly TableGroupDefinition<Sdk.PlayerSummary> _groupDefinition = new()
+    private readonly TableGroupDefinition<Sdk.PlayerBriefDto> _groupDefinition = new()
     {
         GroupName = "Position",
         Indentation = false,

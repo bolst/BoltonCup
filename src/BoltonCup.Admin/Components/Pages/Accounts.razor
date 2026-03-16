@@ -11,7 +11,7 @@
         <PropertyColumn Title="Last" Property="x => x.LastName"/>
         <PropertyColumn Title="Email" Property="x => x.Email"/>
         <PropertyColumn Title="Phone" Property="x => x.Phone" Required="false"/>
-        <ImageColumn T="Account" Title="Profile Picture" Property="x => x.ProfilePictureS3Key" OnImageUploaded="UpdateProfilePicture" />
+        <ImageColumn T="Account" Title="Avatar" Property="x => x.Avatar" OnImageUploaded="UpdateAvatar" />
         <DatePickerColumn Title="Born" Property="x => x.Birthday" />
         <PropertyColumn Title="Highest Level" Property="x => x.HighestLevel">
             <EditTemplate>
@@ -33,7 +33,7 @@
     {
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
         var data = await accounts
-            .ToPaginatedListAsync(new GetAccountsQuery
+            .ToPagedListAsync(new GetAccountsQuery
             {
                 Page = state.Page + 1,
                 Size = state.PageSize,
@@ -52,10 +52,10 @@
     {
     }
 
-    private async Task UpdateProfilePicture(ImageUploadResult<Account> result)
+    private async Task UpdateAvatar(ImageUploadResult<Account> result)
     {
         if (string.IsNullOrEmpty(result.NewKey)) 
             return;
-        await AccountService.UpdateProfilePictureAsync(result.Item.Id, result.NewKey);
+        await AccountService.UpdateAvatarAsync(result.Item.Id, result.NewKey);
     }
 }

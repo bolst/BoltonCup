@@ -1,21 +1,22 @@
-using BoltonCup.WebAPI.Dtos;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.WebAPI.Mapping.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class TournamentsController(ITournamentRepository _tournaments, ITournamentService _tournamentService) : BoltonCupControllerBase
+public class TournamentsController(ITournamentRepository _tournaments, ITournamentService _tournamentService, ITournamentMapper _mapper) 
+    : BoltonCupControllerBase
 {
     /// <remarks>
     /// Gets a paginated list of tournaments.
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<TournamentDetailDto>>> GetTournaments([FromQuery] GetTournamentsQuery query)
+    public async Task<ActionResult<IPagedList<TournamentDto>>> GetTournaments([FromQuery] GetTournamentsQuery query)
     {
-        return Ok(await _tournaments.GetAllAsync<TournamentDetailDto>(query));
+        var tournaments = await _tournaments.GetAllAsync(query);
+        return Ok(_mapper.ToDtoList(tournaments));
     }
 
     /// <remarks>
@@ -23,9 +24,10 @@ public class TournamentsController(ITournamentRepository _tournaments, ITourname
     /// </remarks>
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TournamentSingleDetailDto>> GetTournamentById(int id)
+    public async Task<ActionResult<TournamentSingleDto>> GetTournamentById(int id)
     {
-        return OkOrNotFound(await _tournaments.GetByIdAsync<TournamentSingleDetailDto>(id));
+        var tournament = await _tournaments.GetByIdAsync(id);
+        return OkOrNotFound(_mapper.ToDto(tournament));
     }
     
     /// <remarks>

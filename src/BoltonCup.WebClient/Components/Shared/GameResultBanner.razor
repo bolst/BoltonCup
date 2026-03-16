@@ -14,27 +14,27 @@
 @code {
 
     [Parameter, EditorRequired]
-    public required Sdk.GameSingleDetailDto Game { get; set; }
+    public required Sdk.GameSingleDto Game { get; set; }
 
     [Parameter]
     public string? Class { get; set; }
 
     private string _classname => $"d-flex flex-row align-center justify-space-evenly gap-3 {Class}";
 
-    private Sdk.GameTeamSummary WinningTeam => Game.HomeTeam.Goals > Game.AwayTeam.Goals ? Game.HomeTeam : Game.AwayTeam;
-    private RenderFragment TeamGoalText(Sdk.GameTeamSummary team) => team.Id == WinningTeam.Id 
+    private Sdk.TeamInGameDto WinningTeam => Game.HomeTeam.Goals > Game.AwayTeam.Goals ? Game.HomeTeam : Game.AwayTeam;
+    private RenderFragment TeamGoalText(Sdk.TeamInGameDto team) => team.Id == WinningTeam.Id 
         ? @<MudText Typo="Typo.h4"><b>@team.Goals</b></MudText> 
         : @<MudText Typo="Typo.h4">@team.Goals</MudText>;
 
-    private RenderFragment TeamTemplate(Sdk.GameTeamSummary team, bool reverse)
+    private RenderFragment TeamTemplate(Sdk.TeamInGameDto team, bool reverse)
     {
         var flexDirection = reverse ? "flex-row-reverse" : "flex-row";
         return @<div class="d-flex @flexDirection align-center justify-center flex-wrap gap-1">
                     <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-                        <MudImage Src="@team.LogoUrl" Height="72"/>
+                        <MudImage Src="@team.Logo" Height="72"/>
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
-                        <MudImage Src="@team.LogoUrl" Height="48" />
+                        <MudImage Src="@team.Logo" Height="48" />
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
                         <MudText Align="Align.Center"><b>@team.Name</b></MudText>

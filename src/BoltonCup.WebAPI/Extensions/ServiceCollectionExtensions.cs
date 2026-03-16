@@ -2,6 +2,7 @@ using System.Threading.RateLimiting;
 using BoltonCup.Core;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Filters;
+using BoltonCup.WebAPI.Mapping.Core;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -107,6 +108,21 @@ public static class ServiceCollectionExtensions
                 });
             });
     }
+
+    private static IServiceCollection AddMappers(this IServiceCollection services)
+    {
+        return services
+            .AddTransient<IBriefMapper, BriefMapper>()
+            .AddTransient<IGameMapper, GameMapper>()
+            .AddTransient<IGoalieGameLogMapper, GoalieGameLogMapper>()
+            .AddTransient<IGoalieStatMapper, GoalieStatMapper>()
+            .AddTransient<IInfoGuideMapper, InfoGuideMapper>()
+            .AddTransient<IPlayerMapper, PlayerMapper>()
+            .AddTransient<ISkaterGameLogMapper, SkaterGameLogMapper>()
+            .AddTransient<ISkaterStatMapper, SkaterStatMapper>()
+            .AddTransient<ITeamMapper, TeamMapper>()
+            .AddTransient<ITournamentMapper, TournamentMapper>();
+    }
     
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
     {
@@ -116,6 +132,7 @@ public static class ServiceCollectionExtensions
             .AddCorsServices()
             .AddRateLimitingServices()
             .AddRouting(options => options.LowercaseUrls = true)
+            .AddMappers()
             .AddControllers(options => options.Filters.Add<ApiExceptionFilterAttribute>());
         return builder.Services;
     }

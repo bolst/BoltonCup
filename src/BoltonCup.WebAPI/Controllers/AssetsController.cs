@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class AssetsController(IAssetUploadService _uploadService) : BoltonCupControllerBase
+public class AssetsController(IStorageService _storageService) : BoltonCupControllerBase
 {
     /// <remarks>
-    /// Generates a pre-signed URL for uploads.
+    /// Generates a pre-signed URL and temporary key for uploads.
     /// </remarks>
     [HttpGet]
-    public async Task<ActionResult<PreSignedPutUrl>> GeneratePreSignedPutUrl(string fileExtension, string contentType)
+    public async Task<ActionResult<UploadCredentials>> GenerateUploadCredentials(string fileExtension, string contentType)
     {
-        return Ok(await _uploadService.GeneratePreSignedPutUrl(fileExtension, contentType));
+        return Ok(await _storageService.GenerateUploadCredentialsAsync(fileExtension, contentType));
     }
 }

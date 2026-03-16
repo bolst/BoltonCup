@@ -8,32 +8,38 @@ namespace BoltonCup.Infrastructure.Services;
 public class TeamService : ITeamService
 {
     private readonly BoltonCupDbContext _dbContext;
-    private readonly IAssetUploadService _assetUploadService;
+    private readonly IStorageService _storageService;
+    private readonly IAssetKeyGenerator _assetKeyGenerator;
 
-    public TeamService(BoltonCupDbContext dbContext, IAssetUploadService assetUploadService)
+    public TeamService(BoltonCupDbContext dbContext, IStorageService storageService, IAssetKeyGenerator assetKeyGenerator)
     {
         _dbContext = dbContext;
-        _assetUploadService = assetUploadService;
+        _storageService = storageService;
+        _assetKeyGenerator = assetKeyGenerator;
     }
     
     public Task UpdateLogoAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
     {
-        return _assetUploadService.UpdateSingleAssetAsync<Team>(
+        return _storageService.UpdateAssetAsync<Team>(
             _dbContext,
+            _assetKeyGenerator,
+            t => t.Id == teamId,
+            t => t.Logo,
             tempKey,
-            x => x.Id == teamId,
-            t => t.LogoS3Key,
+            teamId.ToString(),
             cancellationToken
         );
     }    
     
     public Task UpdateBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
     {
-        return _assetUploadService.UpdateSingleAssetAsync<Team>(
+        return _storageService.UpdateAssetAsync<Team>(
             _dbContext,
+            _assetKeyGenerator,
+            t => t.Id == teamId,
+            t => t.Banner,
             tempKey,
-            x => x.Id == teamId,
-            t => t.BannerS3Key,
+            teamId.ToString(),
             cancellationToken
         );
     }

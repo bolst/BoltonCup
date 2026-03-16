@@ -1,7 +1,4 @@
 using System.Linq.Expressions;
-using BoltonCup.Core.Mappings;
-using BoltonCup.Core.Queries;
-using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Extensions;
 
@@ -39,16 +36,5 @@ public static class QueryableExtensions
         bool condition)
     {
         return condition ? source.Where(predicate) : source;
-    }
-    
-    public static Task<TResult?> ProjectToFirstOrDefaultAsync<TSource, TResult>(
-        this IQueryable<TSource> source,
-        Expression<Func<TSource, bool>> predicate) 
-        where TResult : IMappable<TSource, TResult>
-    {
-        return source
-            .Where(predicate)
-            .ProjectTo<TSource, TResult>()
-            .FirstOrDefaultAsync();
     }
 }

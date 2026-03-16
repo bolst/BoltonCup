@@ -1,6 +1,11 @@
 name: Build BoltonCup.WebClient
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/BoltonCup.WebClient/**'
   workflow_dispatch:
 
 jobs:

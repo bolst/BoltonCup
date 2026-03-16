@@ -2,7 +2,7 @@ using SkiaSharp;
 
 namespace BoltonCup.Common.Utilities;
 
-public class ImageResizer
+public static class ImageResizer
 {
     // do not scale below 50% original size
     private const float MIN_SCALE_FACTOR = 0.5f;
@@ -16,7 +16,7 @@ public class ImageResizer
     private const int QUALITY_STEP = 10;
     
 
-    public async Task<Stream> ResizeAsync(Stream imageStream, long targetSizeKB = 500)
+    public static async Task<Stream> ResizeAsync(Stream imageStream, long targetSizeKB = 500)
     {
         var memoryStream = new MemoryStream();
         await imageStream.CopyToAsync(memoryStream);
@@ -27,36 +27,44 @@ public class ImageResizer
             return memoryStream;
 
         var originalBitmap = SKBitmap.Decode(memoryStream);
+        await memoryStream.DisposeAsync();
 
         // start with high quality and no scaling
         var quality = INIT_QUALITY;
         var scaleFactor = 1.0f;
+        MemoryStream? finalStream = null;
 
-        long imageSizeBytes;
-        MemoryStream finalStream = null!;
-
-        do
+        while (true)
         {
-            await finalStream.DisposeAsync();
-
-            var isResized = scaleFactor < 1.0f;
-            using var resizedBitmap = isResized 
+            var previousStream = finalStream;
+            
+            var resizedBitmap = scaleFactor < 1.0f 
                 ? originalBitmap.ResizeBitmap(scaleFactor) 
-                : originalBitmap;
+                : null;
+
+            try
+            {
+                finalStream = (resizedBitmap ?? originalBitmap).EncodeToStream(quality);
+            }
+            finally
+            {
+                resizedBitmap?.Dispose();
+            }
             
-            finalStream = resizedBitmap.EncodeToStream(quality);
-            imageSizeBytes = finalStream.Length;
+            await (previousStream?.DisposeAsync() ?? ValueTask.CompletedTask);
             
-            if (imageSizeBytes > targetSizeKB * 1024 && quality > MIN_QUALITY)
-                quality -= QUALITY_STEP;
-            else if (imageSizeBytes < targetSizeKB * 1024 / 2 && scaleFactor > MIN_SCALE_FACTOR)
-                scaleFactor -= SCALE_DEC;
-            else
+            if (finalStream.Length <= targetSizeBytes)
                 break;
 
-        } while (imageSizeBytes > targetSizeBytes || imageSizeBytes < targetSizeBytes / 2);
+            if (quality > MIN_QUALITY)
+                quality = Math.Max(MIN_QUALITY, quality - QUALITY_STEP);
+            else if (scaleFactor > MIN_SCALE_FACTOR)
+                scaleFactor = MathF.Max(MIN_SCALE_FACTOR, scaleFactor - SCALE_DEC);
+            else
+                break;
+        }
 
-        finalStream.Position = 0;
+        finalStream!.Position = 0;
         return finalStream;
     }
     
@@ -64,11 +72,14 @@ public class ImageResizer
 
 internal static class SkiaExtensions
 {
-    internal static SKBitmap ResizeBitmap(this SKBitmap originalBitmap, float scaleFactor)
+    internal static SKBitmap ResizeBitmap(this SKBitmap bitmap, float scaleFactor)
     {
-        var newWidth = (int)(originalBitmap.Width * scaleFactor);
-        var newHeight = (int)(originalBitmap.Height * scaleFactor);
-        return originalBitmap.Resize(new SKImageInfo(newWidth, newHeight), new SKSamplingOptions(SKCubicResampler.Mitchell));
+        var newWidth = (int)(bitmap.Width * scaleFactor);
+        var newHeight = (int)(bitmap.Height * scaleFactor);
+        return bitmap.Resize(
+            new SKImageInfo(newWidth, newHeight), 
+            new SKSamplingOptions(SKCubicResampler.Mitchell)
+        );
     }
     
     internal static MemoryStream EncodeToStream(this SKBitmap bitmap, int quality)
@@ -77,7 +88,6 @@ internal static class SkiaExtensions
         using var image = SKImage.FromBitmap(bitmap);
         using var data = image.Encode(SKEncodedImageFormat.Webp, quality);
         data.SaveTo(stream);
-        stream.Position = 0;
         return stream;
     }
 }

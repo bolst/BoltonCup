@@ -57,7 +57,7 @@
                             </thead>
                             <tbody>
                             <tr>
-                                <td><MudImage Src="@_game.AwayTeam.LogoUrl" Alt="@_game.AwayTeam.Abbreviation" Height="32"/></td>
+                                <td><MudImage Src="@_game.AwayTeam.Logo" Alt="@_game.AwayTeam.Abbreviation" Height="32"/></td>
                                 <td><MudText Typo="Typo.body2"><b>@_game.AwayTeam.Abbreviation</b></MudText></td>
                                 <td>@_awayGoals.Count(x => x.Period == 1)</td>
                                 <td>@_awayGoals.Count(x => x.Period == 2)</td>
@@ -65,7 +65,7 @@
                                 <td><b>@_awayGoals.Count()</b></td>
                             </tr>
                             <tr>
-                                <td><MudImage Src="@_game.HomeTeam.LogoUrl" Alt="@_game.HomeTeam.Abbreviation" Height="32"/></td>
+                                <td><MudImage Src="@_game.HomeTeam.Logo" Alt="@_game.HomeTeam.Abbreviation" Height="32"/></td>
                                 <td><MudText Typo="Typo.body2"><b>@_game.HomeTeam.Abbreviation</b></MudText></td>
                                 <td>@_homeGoals.Count(x => x.Period == 1)</td>
                                 <td>@_homeGoals.Count(x => x.Period == 2)</td>
@@ -90,9 +90,9 @@
 
     private bool _loading;
 
-    private Sdk.GameSingleDetailDto? _game;
-    private IEnumerable<Sdk.GoalSummary> _awayGoals => _game?.Goals.Where(g => g.TeamId == _game.AwayTeam.Id) ?? [];
-    private IEnumerable<Sdk.GoalSummary> _homeGoals => _game?.Goals.Where(g => g.TeamId == _game.HomeTeam.Id) ?? [];
+    private Sdk.GameSingleDto? _game;
+    private IEnumerable<Sdk.GoalBriefDto> _awayGoals => _game?.Goals.Where(g => g.TeamId == _game.AwayTeam.Id) ?? [];
+    private IEnumerable<Sdk.GoalBriefDto> _homeGoals => _game?.Goals.Where(g => g.TeamId == _game.HomeTeam.Id) ?? [];
 
     protected override async Task OnParametersSetAsync()
     {

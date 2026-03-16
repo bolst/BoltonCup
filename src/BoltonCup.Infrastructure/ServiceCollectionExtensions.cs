@@ -48,6 +48,7 @@ public static class ServiceCollectionExtensions
         var accountId = r2Config["AccountId"];
         var accessKey = r2Config["AccessKey"];
         var secretKey = r2Config["SecretKey"];
+        var baseUrl = r2Config["BaseUrl"];
         
         var s3Credentials = new Amazon.Runtime.BasicAWSCredentials(accessKey, secretKey);
         var s3Config = new AmazonS3Config
@@ -57,7 +58,9 @@ public static class ServiceCollectionExtensions
         };
         return builder.Services
             .AddSingleton<IAmazonS3>(_ => new AmazonS3Client(s3Credentials, s3Config))
-            .Replace(ServiceDescriptor.Singleton<IAssetUploadService, ServerAssetUploadService>());
+            .AddSingleton<IAssetKeyGenerator, AssetKeyGenerator>()
+            .AddSingleton<IAssetUrlResolver, AssetUrlResolver>(_ => new AssetUrlResolver(baseUrl!))
+            .Replace(ServiceDescriptor.Singleton<IStorageService, ServerStorageService>());
     }
 }
 

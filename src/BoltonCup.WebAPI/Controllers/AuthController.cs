@@ -1,4 +1,4 @@
-using BoltonCup.WebAPI.Dtos.Auth;
+using BoltonCup.WebAPI.Mapping.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +9,8 @@ namespace BoltonCup.WebAPI.Controllers;
 [Tags("Auth")]
 public class AuthController(
     UserManager<IdentityUser> _userManager, 
-    SignInManager<IdentityUser> _signInManager
+    SignInManager<IdentityUser> _signInManager,
+    IIdentityUserMapper _userMapper
     ) : BoltonCupControllerBase
 {
     /// <remarks>
@@ -40,26 +41,12 @@ public class AuthController(
     
     [AllowAnonymous]
     [HttpPost("user")]
-    public async Task<ActionResult<UserDto?>> GetUser([FromBody] string email)
+    public async Task<ActionResult<UserDto>> GetUser([FromBody] string email)
     {
         // Simply check if the user exists in the DB
         var user = await _userManager.FindByEmailAsync(email);
-        if (user is null)
-            return NotFound();
-        return Ok(new UserDto
-        {
-            Email = user.Email,
-            UserName = user.UserName,
-            PhoneNumber = user.PhoneNumber,
-        });
+        return OkOrNotFound(_userMapper.ToDto(user));
     }
-}
-
-public class UserDto
-{
-    public string? Email { get; set; }
-    public string? UserName { get; set; }
-    public string? PhoneNumber { get; set; }
 }
 
 public class LoginWithCookieRequest

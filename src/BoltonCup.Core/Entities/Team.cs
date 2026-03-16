@@ -9,16 +9,16 @@ public class Team : EntityBase
     public int? TournamentId { get; set; }
     public int? GmAccountId { get; set; }
     public string? LogoUrl { get; set; }
-    public string? LogoS3Key { get; set; }
+    public string? Logo { get; set; }
     public string? BannerUrl { get; set; }
-    public string? BannerS3Key { get; set; }
+    public string? Banner { get; set; }
     public required string PrimaryColorHex { get; set; }
     public required string SecondaryColorHex { get; set; }
     public string? TertiaryColorHex { get; set; }
     public string? GoalSongUrl { get; set; }
-    public string? GoalSongS3Key { get; set; }
+    public string? GoalSong { get; set; }
     public string? PenaltySongUrl { get; set; }
-    public string? PenaltySongS3Key { get; set; }
+    public string? PenaltySong { get; set; }
 
     public Tournament Tournament { get; set; } = null!;
     public Account? GeneralManager { get; set; }

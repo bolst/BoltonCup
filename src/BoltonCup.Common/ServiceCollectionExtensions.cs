@@ -31,9 +31,9 @@ public static class ServiceCollectionExtensions
         
         // s3
         services
-            .AddSingleton<IS3UrlResolver, S3UrlResolver>(_ => new S3UrlResolver(bcConfig))
+            .AddSingleton<IAssetUrlResolver, AssetUrlResolver>(_ => new AssetUrlResolver(bcConfig))
             .AddSingleton<IAssetFileUploader, AssetFileUploader>()
-            .TryAddSingleton<IAssetUploadService, WasmAssetUploadService>();
+            .TryAddSingleton<IStorageService, ClientStorageService>();
         
         // auth
         services

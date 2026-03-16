@@ -8,7 +8,7 @@
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Tournament" Property="x => x.Name" />
-        <ImageColumn T="Tournament" Title="Logo" Property="x => x.LogoS3Key" OnImageUploaded="UpdateTournamentLogo" />
+        <ImageColumn T="Tournament" Title="Logo" Property="x => x.Logo" OnImageUploaded="UpdateTournamentLogo" />
         <TemplateColumn Title="Info">
             <EditTemplate>
                 <TournamentInfoEditButton TournamentId="@context.Item.Id" />
@@ -24,7 +24,7 @@
         <LinkColumn Title="Skater Payment Link" Property="x => x.SkaterPaymentLink" />
         <LinkColumn Title="Goalie Payment Link" Property="x => x.GoaliePaymentLink" />
         <ForeignColumn Title="Winner" Property="x => x.WinningTeam"
-                       EqualityComparer="new TeamComparer()" ImageSrcFunc="t => t.LogoS3Key" />
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="t => t.Logo" />
     </Columns>
 </EntityDataGrid>
 
@@ -37,7 +37,7 @@
         var sortDefinition = state.SortDefinitions.FirstOrDefault();
         var data = await tournaments
             .Include(t => t.WinningTeam)
-            .ToPaginatedListAsync(new GetTournamentsQuery
+            .ToPagedListAsync(new GetTournamentsQuery
             {
                 Page = state.Page + 1,
                 Size = state.PageSize,

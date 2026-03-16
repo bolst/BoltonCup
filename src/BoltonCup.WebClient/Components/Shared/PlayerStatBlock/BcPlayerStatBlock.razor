@@ -56,7 +56,7 @@
 @code {
     
     [Parameter, EditorRequired]
-    public required Sdk.PlayerSingleDetailDto Player { get; set; }
+    public required Sdk.PlayerSingleDto Player { get; set; }
     
     [Parameter]
     public string? Title { get; set; }
@@ -74,7 +74,7 @@
     public RenderFragment GoalieStats { get; set; } = null!;
 
     
-    private Sdk.PlayerSingleDetailDto? _player;
+    private Sdk.PlayerSingleDto? _player;
     private int? _tournamentId;
     private IEnumerable<Sdk.PlayerTournamentStats> _tournamentStats = [];
 

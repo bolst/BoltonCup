@@ -1,21 +1,21 @@
-using BoltonCup.WebAPI.Dtos;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.WebAPI.Mapping.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class InfoGuidesController(IInfoGuideRepository _infoGuides) : BoltonCupControllerBase
+public class InfoGuidesController(IInfoGuideRepository _infoGuides, IInfoGuideMapper _mapper) : BoltonCupControllerBase
 {
     /// <remarks>
     /// Gets a paginated list of info guides.
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<InfoGuideDetailDto>>> GetInfoGuides([FromQuery] GetInfoGuidesQuery query)
+    public async Task<ActionResult<IPagedList<InfoGuideDto>>> GetInfoGuides([FromQuery] GetInfoGuidesQuery query)
     {
-        return Ok(await _infoGuides.GetAllAsync<InfoGuideDetailDto>(query));
+        var guides = await _infoGuides.GetAllAsync(query);
+        return Ok(_mapper.ToDtoList(guides));
     }
 
     /// <remarks>
@@ -23,9 +23,10 @@ public class InfoGuidesController(IInfoGuideRepository _infoGuides) : BoltonCupC
     /// </remarks>
     [AllowAnonymous]
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<InfoGuideSingleDetailDto>> GetInfoGuideById(Guid id)
+    public async Task<ActionResult<InfoGuideSingleDto>> GetInfoGuideById(Guid id)
     {
-        return OkOrNotFound(await _infoGuides.GetByIdAsync<InfoGuideSingleDetailDto>(id));
+        var guide = await _infoGuides.GetByIdAsync(id);
+        return OkOrNotFound(_mapper.ToDto(guide));
     }
 
     /// <remarks>
@@ -33,9 +34,10 @@ public class InfoGuidesController(IInfoGuideRepository _infoGuides) : BoltonCupC
     /// </remarks>
     [AllowAnonymous]
     [HttpGet("tournament/{tournamentId:int}")]
-    public async Task<ActionResult<InfoGuideSingleDetailDto>> GetInfoGuideByTournamentId(int tournamentId)
+    public async Task<ActionResult<InfoGuideSingleDto>> GetInfoGuideByTournamentId(int tournamentId)
     {
-        return OkOrNotFound(await _infoGuides.GetByTournamentIdAsync<InfoGuideSingleDetailDto>(tournamentId));
+        var guide = await _infoGuides.GetByTournamentIdAsync(tournamentId);
+        return OkOrNotFound(_mapper.ToDto(guide));
     }
     
 }
