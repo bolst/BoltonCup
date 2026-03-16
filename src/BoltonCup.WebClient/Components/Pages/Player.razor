@@ -18,7 +18,7 @@ else
                     <MudDivider Vertical FlexItem/>
                     @if (_player.Team is not null)
                     {
-                        <MudImage Src="@_player.Team.LogoUrl" Alt="@_player.Team.Abbreviation" Height="64"/>
+                        <MudImage Src="@_player.Team.Logo" Alt="@_player.Team.Abbreviation" Height="64"/>
                         <MudDivider Vertical FlexItem/>
                     }
                     <MudText Typo="Typo.h4"><b>@_player.JerseyNumberLabel</b></MudText>
@@ -57,7 +57,7 @@ else
                     <div class="d-flex flex-row align-center gap-3">
                         @if (_player.Team is not null)
                         {
-                            <MudImage Src="@_player.Team.LogoUrl" Alt="@_player.Team.Abbreviation" Height="48" />
+                            <MudImage Src="@_player.Team.Logo" Alt="@_player.Team.Abbreviation" Height="48" />
                             <MudDivider Vertical FlexItem/>
                         }
                         <MudText Typo="Typo.h6"><b>@_player.JerseyNumberLabel</b></MudText>
@@ -131,7 +131,7 @@ else
                                         <CellTemplate>
                                             <div class="d-flex flex-row align-center gap-1">
                                                 <MudText Typo="Typo.body2">@context.Item.Team.Abbreviation</MudText>
-                                                <MudImage Src="@context.Item.Team.LogoUrl" Alt="@context.Item.Team.Abbreviation" Height="32"/>
+                                                <MudImage Src="@context.Item.Team.Logo" Alt="@context.Item.Team.Abbreviation" Height="32"/>
                                             </div>
                                         </CellTemplate>
                                     </PropertyColumn>

@@ -31,10 +31,10 @@
         var flexDirection = reverse ? "flex-row-reverse" : "flex-row";
         return @<div class="d-flex @flexDirection align-center justify-center flex-wrap gap-1">
                     <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-                        <MudImage Src="@team.LogoUrl" Height="72"/>
+                        <MudImage Src="@team.Logo" Height="72"/>
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
-                        <MudImage Src="@team.LogoUrl" Height="48" />
+                        <MudImage Src="@team.Logo" Height="48" />
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
                         <MudText Align="Align.Center"><b>@team.Name</b></MudText>
