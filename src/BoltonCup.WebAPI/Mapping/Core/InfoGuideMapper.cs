@@ -8,7 +8,7 @@ public interface IInfoGuideMapper
     InfoGuideSingleDto? ToDto(InfoGuide? guide);
 }
 
-public class InfoGuideMapper(IAssetUrlResolver _urlResolver) : IInfoGuideMapper
+public class InfoGuideMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMapper) : IInfoGuideMapper
 {
     public IPagedList<InfoGuideDto> ToDtoList(IPagedList<InfoGuide> guides)
     {
@@ -17,7 +17,7 @@ public class InfoGuideMapper(IAssetUrlResolver _urlResolver) : IInfoGuideMapper
             Id = guide.Id,
             Title = guide.Title,
             TournamentId = guide.TournamentId,
-            Tournament = guide.Tournament == null ? null : new TournamentBriefDto(guide.Tournament),
+            Tournament = guide.Tournament == null ? null : _briefMapper.ToTournamentBriefDto(guide.Tournament),
         });
     }    
     
@@ -31,7 +31,7 @@ public class InfoGuideMapper(IAssetUrlResolver _urlResolver) : IInfoGuideMapper
                 Id = guide.Id,
                 Title = guide.Title,
                 TournamentId = guide.TournamentId,
-                Tournament = guide.Tournament == null ? null : new TournamentBriefDto(guide.Tournament),
+                Tournament = guide.Tournament == null ? null : _briefMapper.ToTournamentBriefDto(guide.Tournament),
                 MarkdownContent = guide.MarkdownContent
             };
     }

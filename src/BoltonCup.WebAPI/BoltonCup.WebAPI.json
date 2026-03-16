@@ -3125,11 +3125,11 @@
             "type": "string",
             "nullable": true
           },
-          "logoUrl": {
+          "logo": {
             "type": "string",
             "nullable": true
           },
-          "bannerUrl": {
+          "banner": {
             "type": "string",
             "nullable": true
           }
@@ -3263,11 +3263,11 @@
             "type": "string",
             "nullable": true
           },
-          "logoUrl": {
+          "logo": {
             "type": "string",
             "nullable": true
           },
-          "bannerUrl": {
+          "banner": {
             "type": "string",
             "nullable": true
           },
@@ -3393,6 +3393,10 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "logo": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

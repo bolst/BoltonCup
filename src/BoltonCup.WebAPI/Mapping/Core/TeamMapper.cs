@@ -8,7 +8,7 @@ public interface ITeamMapper
     TeamSingleDto? ToDto(Team? team);
 }
 
-public class TeamMapper(IAssetUrlResolver _urlResolver) : ITeamMapper
+public class TeamMapper(IBriefMapper _briefMapper, IAssetUrlResolver _urlResolver) : ITeamMapper
 {
     public IPagedList<TeamDto> ToDtoList(IPagedList<Team> teams)
     {
@@ -18,7 +18,7 @@ public class TeamMapper(IAssetUrlResolver _urlResolver) : ITeamMapper
             Name = team.Name,
             NameShort = team.NameShort,
             Abbreviation = team.Abbreviation,
-            Tournament = new TournamentBriefDto(team.Tournament),
+            Tournament = _briefMapper.ToTournamentBriefDto(team.Tournament),
             LogoUrl = _urlResolver.GetFullUrl(team.Logo),
             BannerUrl = _urlResolver.GetFullUrl(team.Banner),
             PrimaryColorHex = team.PrimaryColorHex,
@@ -29,7 +29,7 @@ public class TeamMapper(IAssetUrlResolver _urlResolver) : ITeamMapper
             GmAccountId = team.GmAccountId,
             GmFirstName = team.GeneralManager!.FirstName,
             GmLastName = team.GeneralManager.LastName,
-            GmProfilePicture = team.GeneralManager.ProfilePicture,
+            GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager.Avatar),
         });
     }    
     
@@ -44,7 +44,7 @@ public class TeamMapper(IAssetUrlResolver _urlResolver) : ITeamMapper
                 Name = team.Name,
                 NameShort = team.NameShort,
                 Abbreviation = team.Abbreviation,
-                Tournament = new TournamentBriefDto(team.Tournament),
+                Tournament = _briefMapper.ToTournamentBriefDto(team.Tournament),
                 LogoUrl = _urlResolver.GetFullUrl(team.Logo),
                 BannerUrl = _urlResolver.GetFullUrl(team.Banner),
                 PrimaryColorHex = team.PrimaryColorHex,
@@ -55,9 +55,9 @@ public class TeamMapper(IAssetUrlResolver _urlResolver) : ITeamMapper
                 GmAccountId = team.GmAccountId,
                 GmFirstName = team.GeneralManager!.FirstName,
                 GmLastName = team.GeneralManager.LastName,
-                GmProfilePicture = team.GeneralManager.ProfilePicture,
+                GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager.Avatar),
                 Players = team.Players
-                    .Select(p => new PlayerBriefDto(p, p.Account))
+                    .Select(_briefMapper.ToPlayerBriefDto)
                     .ToList(),
             };
     }

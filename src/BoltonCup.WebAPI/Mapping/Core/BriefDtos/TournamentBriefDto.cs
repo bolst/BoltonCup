@@ -1,5 +1,3 @@
-using BoltonCup.Core;
-
 namespace BoltonCup.WebAPI.Mapping.Core;
 
 public sealed record TournamentBriefDto
@@ -10,14 +8,5 @@ public sealed record TournamentBriefDto
     public DateTime? EndDate { get; set; }
     public int? WinningTeamId { get; set; }
     public bool IsActive { get; set; }
-
-    public TournamentBriefDto(Tournament tournament)
-    {
-        Id = tournament.Id;
-        Name = tournament.Name;
-        StartDate = tournament.StartDate;
-        EndDate = tournament.EndDate;
-        WinningTeamId = tournament.WinningTeamId;
-        IsActive = tournament.IsActive;
-    }
+    public string? Logo { get; set; }
 }
