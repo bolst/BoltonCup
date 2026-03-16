@@ -22,6 +22,8 @@ public static class ServiceCollectionExtensions
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<AuthDbContext>();
 
+        builder.Services.AddTransient<IEmailSender<BoltonCupUser>, EmailSender>();
+        
         builder.AddBoltonCupS3();
         
         var connectionString = builder.Configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
