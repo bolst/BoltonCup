@@ -1,0 +1,11 @@
+@using BoltonCup.Infrastructure.EmailTemplates
+@model ConfirmationEmailViewModel
+@{
+    Layout = "_Layout.cshtml";
+}
+<h3>Welcome, @Model.FirstName!</h3>
+<p>We are excited to have you on board for the Bolton Cup.</p>
+<p>
+    Please confirm your account by 
+    <a href="@Model.ConfirmationLink" style="color: #007bff; font-weight: bold;">clicking right here</a>.
+</p>

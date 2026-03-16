@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; padding: 20px; border-radius: 8px; }
+        .header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eeeeee; }
+        .footer { text-align: center; font-size: 12px; color: #888888; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h2>Bolton Cup</h2>
+        </div>
+
+        @RenderBody()
+
+        <div class="footer">
+            <p>&copy; @DateTime.UtcNow.Year Bolton Cup. All rights reserved.</p>
+            <p>You are receiving this email because you registered an account with us.</p>
+        </div>
+    </div>
+</body>
+</html>

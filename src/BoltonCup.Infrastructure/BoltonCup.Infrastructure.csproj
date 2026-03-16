@@ -4,6 +4,9 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+
+        <!-- required for RazorLight -->
+        <PreserveCompilationContext>true</PreserveCompilationContext>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,5 +28,11 @@
     <ItemGroup>
       <ProjectReference Include="..\BoltonCup.Core\BoltonCup.Core.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <EmbeddedResource Include="EmailTemplates\**\*.cshtml" />
+    </ItemGroup>
+    <PropertyGroup>
+    </PropertyGroup>
 
 </Project>
