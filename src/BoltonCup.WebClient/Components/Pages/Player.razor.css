@@ -6,7 +6,6 @@
     height: 450px;
     background-position: center center;
     background-color: rgba(0, 0, 0, 0.6);
-    background-image: url('./img/action-cover-temp.jpg');
 }
 
 ::deep .action-shot {

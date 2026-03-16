@@ -12,4 +12,10 @@ public class AssetUrlResolver(string baseUrl) : IAssetUrlResolver
             return null;
         return $"{_baseUrl}{s3Key}";
     }
+
+
+    public static class StaticKeys
+    {
+        public const string PlayerBanner = "static/defaults/player-banner.jpg";
+    }
 }

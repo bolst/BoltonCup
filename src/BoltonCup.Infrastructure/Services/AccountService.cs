@@ -29,5 +29,18 @@ public class AccountService : IAccountService
             accountId.ToString(),
             cancellationToken
         );
+    }    
+    
+    public Task UpdateBannerAsync(int accountId, string tempKey, CancellationToken cancellationToken = default)
+    {
+        return _storageService.UpdateAssetAsync<Account>(
+            _dbContext,
+            _assetKeyGenerator,
+            a => a.Id == accountId,
+            a => a.Banner,
+            tempKey,
+            accountId.ToString(),
+            cancellationToken
+        );
     }
 }
