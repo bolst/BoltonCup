@@ -113,7 +113,7 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddMappers(this IServiceCollection services)
     {
         return services
-            .AddTransient<IIdentityUserMapper, IdentityUserMapper>()
+            .AddTransient<IBoltonCupUserMapper, BoltonCupUserMapper>()
             .AddTransient<IBriefMapper, BriefMapper>()
             .AddTransient<IGameMapper, GameMapper>()
             .AddTransient<IGoalieGameLogMapper, GoalieGameLogMapper>()

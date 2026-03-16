@@ -1,6 +1,7 @@
 using Amazon.S3;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Repositories;
 using BoltonCup.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
@@ -17,7 +18,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBoltonCupInfrastructure(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddIdentityCore<IdentityUser>()
+            .AddIdentityCore<BoltonCupUser>()
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<AuthDbContext>();
 
