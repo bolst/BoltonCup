@@ -19,7 +19,6 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddBoltonCupCommonServices(this IServiceCollection services, IConfiguration configuration)
     {
-        Console.WriteLine("Getting config section...");
         var configSection = configuration.GetSection(BoltonCupConfiguration.SectionName);
         services.Configure<BoltonCupConfiguration>(configSection);
         
@@ -28,18 +27,15 @@ public static class ServiceCollectionExtensions
             ?? throw new ArgumentException("Missing API base URL.", nameof(BoltonCupConfiguration.ApiBaseUrl));
         
         // theming
-        Console.WriteLine("Adding theming...");
         services.AddSingleton<BoltonCupTheme>();
         
         // s3
-        Console.WriteLine("Adding s3...");
         services
             .AddSingleton<IAssetUrlResolver, AssetUrlResolver>(_ => new AssetUrlResolver(bcConfig))
             .AddSingleton<IAssetFileUploader, AssetFileUploader>()
             .TryAddSingleton<IStorageService, ClientStorageService>();
         
         // auth
-        Console.WriteLine("Adding auth...");
         services
             .AddAuthorizationCore()
             .AddScoped<AuthenticationStateProvider, CookieAuthenticationStateProvider>()
