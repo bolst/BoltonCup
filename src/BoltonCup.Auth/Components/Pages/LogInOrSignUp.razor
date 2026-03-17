@@ -5,9 +5,6 @@
 
 @code {
     
-    [SupplyParameterFromQuery]
-    public string? ReturnUrl { get; set; }
-
     private readonly LogInOrSignUpForm _model = new();
     private EditContext? _editContext;
 
@@ -19,7 +16,7 @@
 
     private Task OnSubmit(EditContext _)
     {
-        return AuthSessionState.Initialize(_model, ReturnUrl);
+        return AuthSessionState.Initialize(_model);
     }
 
 }

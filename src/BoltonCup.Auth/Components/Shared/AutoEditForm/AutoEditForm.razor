@@ -41,6 +41,7 @@
     {
         if (field.Type == typeof(string))
         {
+            var adornment = field.ReadOnly ? Adornment.End : Adornment.None;
             return @<MudTextField Disabled="_isSubmitting"
                                   T="string"
                                   Label="@field.Label"
@@ -48,6 +49,11 @@
                                   ValueChanged="v => OnValueChanged(field, v)"
                                   For="@(CreateValidationExpression<string>(field))"
                                   InputType="field.InputType"
+                                  ReadOnly="field.ReadOnly"
+                                  Adornment="adornment"
+                                  AdornmentIcon="@Icons.Material.Rounded.Edit"
+                                  AdornmentColor="Color.Info"
+                                  OnAdornmentClick="AuthSessionState.Reset"
                                   Variant="Variant.Outlined"
                                   OnlyValidateIfDirty
                                   FullWidth/>;
@@ -60,10 +66,11 @@
                                  Label="@field.Label"
                                  Value="@((bool)field.PropertyInfo.GetValue(_model)!)"
                                  ValueChanged="v => OnValueChanged(field, v)"
-                                 For="@(CreateValidationExpression<bool>(field))"/>;
+                                 For="@(CreateValidationExpression<bool>(field))"
+                                 ReadOnly="field.ReadOnly" />;
         }
         
-        return builder => { };
+        return _ => { };
     }
 
 }

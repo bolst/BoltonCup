@@ -2,6 +2,7 @@ using BoltonCup.Auth.Models;
 using BoltonCup.Common;
 using BoltonCup.Sdk;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 
 namespace BoltonCup.Auth.Services;
@@ -14,23 +15,23 @@ public class AuthSessionStateService(
 {
     public string? Email { get; private set; }
     
-    public async Task Initialize(LogInOrSignUpForm model, string? returnUrl)
+    public async Task Initialize(LogInOrSignUpForm model)
     {
         try
         {
             Email = model.Email;
             // will throw 204 or 404 if user does not exist
             _ = await _api.GetUserAsync(model.Email);
-            NavigateTo($"log-in/password", returnUrl);
+            NavigateWithReturnUrl("log-in/password");
         }
         catch (ApiException e)
             when (e.StatusCode is 204 or 404)
         {
-            NavigateTo($"create-account/password", returnUrl);
+            NavigateWithReturnUrl("create-account/password");
         }
     }
 
-    public async Task CreateAccount(CreateAccountWithPasswordForm model, string? returnUrl)
+    public async Task CreateAccount(CreateAccountWithPasswordForm model)
     {
         var delayTask = Task.Delay(3000); // load for 3 seconds minimum
         var signUpTask = _api.RegisterAsync(new RegisterRequest
@@ -39,10 +40,10 @@ public class AuthSessionStateService(
             Password = model.Password
         });
         await Task.WhenAll(delayTask, signUpTask);
-        _navigation.NavigateTo(returnUrl ?? _config.Value.WebBaseUrl, forceLoad: true);
+        NavigateToReturnUrlOrDefault();
     }
 
-    public async Task LogIn(LogInWithPasswordForm model, string? returnUrl)
+    public async Task LogIn(LogInWithPasswordForm model)
     {
         var delayTask = Task.Delay(3000); // load for 3 seconds minimum
         var loginTask = _api.LoginWithCookieAsync(new LoginWithCookieRequest
@@ -51,14 +52,32 @@ public class AuthSessionStateService(
             Password = model.Password
         });
         await Task.WhenAll(delayTask, loginTask);
-        _navigation.NavigateTo(returnUrl ?? _config.Value.WebBaseUrl, true);
+        NavigateToReturnUrlOrDefault();
     }
 
-    private void NavigateTo(string destination, string? returnUrl = null)
+    public void Reset()
     {
-        var nav = destination;
+        NavigateWithReturnUrl("log-in-or-sign-up");
+    }
+
+    private string? GetReturnUrl()
+    {
+        var uriBuilder = new UriBuilder(_navigation.Uri);
+        var query = QueryHelpers.ParseQuery(uriBuilder.Query);
+        return query.GetValueOrDefault("returnUrl");
+    }
+
+    private void NavigateWithReturnUrl(string destination)
+    {
+        var returnUrl = GetReturnUrl();
         if (!string.IsNullOrEmpty(returnUrl))
-            nav += "?returnUrl=" + returnUrl;
-        _navigation.NavigateTo(nav);
+            destination += "?returnUrl=" + returnUrl;
+        _navigation.NavigateTo(destination);
+    }
+
+    private void NavigateToReturnUrlOrDefault()
+    {
+        var returnUrl = GetReturnUrl() ?? _config.Value.WebBaseUrl;
+        _navigation.NavigateTo(returnUrl, forceLoad: true);
     }
 }
