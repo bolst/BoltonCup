@@ -37,6 +37,9 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
     
     [Parameter]
     public bool LockEmail { get; set; }
+    
+    [Parameter]
+    public bool ShowForgotPasswordLink { get; set; }
 
     protected override void OnInitialized()
     {

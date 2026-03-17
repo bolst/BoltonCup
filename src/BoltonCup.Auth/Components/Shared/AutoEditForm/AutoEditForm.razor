@@ -20,6 +20,11 @@
             {
                 @RenderFieldComponent(field)
             }
+            
+            @if (ShowForgotPasswordLink)
+            {
+                <MudLink Href="/reset-password" Color="Color.Info">Forgot password?</MudLink>
+            }
 
             @if (ActionsContent is not null)
             {
