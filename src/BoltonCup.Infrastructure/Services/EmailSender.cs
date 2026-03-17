@@ -14,8 +14,6 @@ public class EmailSender(
 {
     public async Task SendConfirmationLinkAsync(BoltonCupUser user, string email, string confirmationLink)
     {
-        // TODO: verify this user exists
-        
         var model = new ConfirmationEmailViewModel
         {
             ConfirmationLink = confirmationLink,
@@ -32,8 +30,6 @@ public class EmailSender(
 
     public async Task SendPasswordResetLinkAsync(BoltonCupUser user, string email, string resetLink)
     {
-        // TODO: verify this user exists
-        
         var model = new PasswordResetLinkViewModel
         {
             ResetLink = resetLink,
@@ -50,8 +46,6 @@ public class EmailSender(
 
     public async Task SendPasswordResetCodeAsync(BoltonCupUser user, string email, string resetCode)
     {
-        // TODO: verify this user exists
-        
         var decodedBytes = WebEncoders.Base64UrlDecode(resetCode);
         var cleanCode = Encoding.UTF8.GetString(decodedBytes);
 
