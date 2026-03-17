@@ -1,3 +1,4 @@
+using BoltonCup.Infrastructure.Identity;
 using BoltonCup.WebAPI.Mapping.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,9 +9,9 @@ namespace BoltonCup.WebAPI.Controllers;
 [Route("/api/auth")]
 [Tags("Auth")]
 public class AuthController(
-    UserManager<IdentityUser> _userManager, 
-    SignInManager<IdentityUser> _signInManager,
-    IIdentityUserMapper _userMapper
+    UserManager<BoltonCupUser> _userManager, 
+    SignInManager<BoltonCupUser> _signInManager,
+    IBoltonCupUserMapper _userMapper
     ) : BoltonCupControllerBase
 {
     /// <remarks>

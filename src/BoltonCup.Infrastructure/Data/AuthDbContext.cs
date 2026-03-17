@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Identity;
+using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Data;
 
 // This context is ONLY for Identity tables
-public class AuthDbContext(DbContextOptions<AuthDbContext> options) : IdentityDbContext<IdentityUser>(options)
+public class AuthDbContext(DbContextOptions<AuthDbContext> options) : IdentityDbContext<BoltonCupUser>(options)
 {
     protected override void OnModelCreating(ModelBuilder builder)
     {

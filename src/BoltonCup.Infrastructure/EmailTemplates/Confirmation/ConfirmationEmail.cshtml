@@ -1,0 +1,21 @@
+@using BoltonCup.Infrastructure.EmailTemplates
+@using Microsoft.AspNetCore.Html
+@model ConfirmationEmailViewModel
+@{
+    // ReSharper disable once Razor.LayoutNotResolved
+    Layout = EmailConstants.SharedLayout;
+}
+
+<p style="font-size: 14px; color: #555555;">Please verify your email with the following:</p>
+
+<a href="@(new HtmlString(Model.ConfirmationLink))" style="display: inline-block; background-color: #353535; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; margin: 20px 0;">
+    Verify Email
+</a>
+
+<p>
+    Or paste this link into your browser:
+    <br>
+    <p style="text-decoration: underline">
+        @(new HtmlString(Model.ConfirmationLink))
+    </p>
+</p>
