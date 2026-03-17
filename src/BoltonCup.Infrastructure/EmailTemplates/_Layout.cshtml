@@ -1,0 +1,35 @@
+@using BoltonCup.Infrastructure.EmailTemplates
+@model EmailAuthBaseViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div style="max-width: 600px; margin: 0 auto; padding: 20px; border-radius: 8px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px;">
+    <div class="header">
+        <img
+            src="@Model.LogoUrl"
+            alt="Bolton Cup"
+            style="height: 72px; display: inline-block;" />
+    </div>
+
+    <div style="max-width: 600px; padding: 16px 0;">
+        @RenderBody()
+    </div>
+
+    <hr style="color: #CCCCCC66; margin-top: 20px;" />
+
+    <div style="font-size: 12px; color: #888888;">
+        <p style="">
+            <a href="https://boltoncup.ca" style="color: #999999; text-decoration: underline;">Bolton Cup</a>
+        </p>
+        <p style="">
+            <a href="https://boltoncup.ca/help" style="color: #999999; text-decoration: underline;">Help center</a>
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

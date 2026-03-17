@@ -1,16 +1,17 @@
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 
 namespace BoltonCup.WebAPI.Mapping.Auth;
 
-public interface IIdentityUserMapper
+public interface IBoltonCupUserMapper
 {
-    UserDto? ToDto(IdentityUser? user);
+    UserDto? ToDto(BoltonCupUser? user);
 }
 
-public class IdentityUserMapper(IAssetUrlResolver _urlResolver) : IIdentityUserMapper
+public class BoltonCupUserMapper(IAssetUrlResolver _urlResolver) : IBoltonCupUserMapper
 {
-    public UserDto? ToDto(IdentityUser? user)
+    public UserDto? ToDto(BoltonCupUser? user)
     {
         return user is null
             ? null

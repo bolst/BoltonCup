@@ -1,5 +1,6 @@
 using BoltonCup.Infrastructure;
 using BoltonCup.Infrastructure.Data;
+using BoltonCup.Infrastructure.Identity;
 using BoltonCup.WebAPI;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Controllers;
@@ -21,7 +22,7 @@ if (!string.IsNullOrEmpty(keyDirectory))
 }
 
 builder.Services
-    .AddIdentityApiEndpoints<IdentityUser>()
+    .AddIdentityApiEndpoints<BoltonCupUser>()
     .AddEntityFrameworkStores<AuthDbContext>();
 
 builder.AddBoltonCupInfrastructure();
@@ -99,7 +100,7 @@ app.UseRateLimiter();
 app.UseCors();
 
 app.MapGroup("/api/auth")
-    .MapIdentityApi<IdentityUser>()
+    .MapIdentityApi<BoltonCupUser>()
     .WithTags("Auth");
 
 app.UseExceptionHandler("/error");

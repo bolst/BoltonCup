@@ -1,14 +1,18 @@
 using Amazon.S3;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Repositories;
 using BoltonCup.Infrastructure.Services;
+using BoltonCup.Infrastructure.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using RazorLight;
 
 namespace BoltonCup.Infrastructure;
 
@@ -17,10 +21,15 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBoltonCupInfrastructure(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddIdentityCore<IdentityUser>()
+            .AddIdentityCore<BoltonCupUser>(options =>
+            {
+                options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
+            })
             .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<AuthDbContext>();
+            .AddEntityFrameworkStores<AuthDbContext>()
+            .AddDefaultTokenProviders();
 
+        builder.AddBoltonCupEmails();
         builder.AddBoltonCupS3();
         
         var connectionString = builder.Configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
@@ -40,6 +49,26 @@ public static class ServiceCollectionExtensions
             .AddTransient<IAccountService, AccountService>()
             .AddTransient<ITeamService, TeamService>()
             .AddTransient<ITournamentService, TournamentService>();
+    }
+
+    private static IServiceCollection AddBoltonCupEmails(this WebApplicationBuilder builder)
+    {
+        var razorEngine = new RazorLightEngineBuilder()
+            .UseEmbeddedResourcesProject(typeof(EmailSender).Assembly, "BoltonCup.Infrastructure.EmailTemplates")
+            .UseMemoryCachingProvider()
+            .UseOptions(new RazorLightOptions
+            {
+                EnableDebugMode = !builder.Environment.IsProduction(),
+            })
+            .Build();
+
+        builder.Services.AddSingleton<IRazorLightEngine>(razorEngine);
+        
+        builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
+        return builder.Services
+            .AddSingleton<IEmailQueue, EmailQueue>()
+            .AddHostedService<EmailBackgroundService>()
+            .AddTransient<IEmailSender<BoltonCupUser>, EmailSender>();
     }
     
     private static IServiceCollection AddBoltonCupS3(this WebApplicationBuilder builder)

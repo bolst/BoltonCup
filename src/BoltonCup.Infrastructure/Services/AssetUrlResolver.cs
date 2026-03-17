@@ -17,5 +17,6 @@ public class AssetUrlResolver(string baseUrl) : IAssetUrlResolver
     public static class StaticKeys
     {
         public const string PlayerBanner = "static/defaults/player-banner.jpg";
+        public const string Logo = "static/branding/boltoncup.png";
     }
 }

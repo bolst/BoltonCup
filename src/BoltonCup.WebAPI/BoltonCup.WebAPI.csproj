@@ -5,6 +5,9 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        
+        <!-- required for RazorLight -->
+        <PreserveCompilationContext>true</PreserveCompilationContext>
     </PropertyGroup>
     
     <PropertyGroup>

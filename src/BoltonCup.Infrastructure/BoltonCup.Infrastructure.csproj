@@ -4,11 +4,15 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+
+        <!-- required for RazorLight -->
+        <PreserveCompilationContext>true</PreserveCompilationContext>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.23" />
       <PackageReference Include="AWSSDK.S3" Version="4.0.18.7" />
+      <PackageReference Include="MailKit" Version="4.15.1" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
@@ -17,11 +21,18 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+      <PackageReference Include="RazorLight" Version="2.3.1" />
       <PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.1" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\BoltonCup.Core\BoltonCup.Core.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <EmbeddedResource Include="EmailTemplates\**\*.cshtml" />
+    </ItemGroup>
+    <PropertyGroup>
+    </PropertyGroup>
 
 </Project>
