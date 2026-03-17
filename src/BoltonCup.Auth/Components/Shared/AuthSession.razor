@@ -1,6 +1,6 @@
 @inject AuthSessionStateService AuthSessionState
 
-@if (AuthSessionState.IsValid())
+@if (!string.IsNullOrEmpty(AuthSessionState.Email))
 {
     @ChildContent
 }
