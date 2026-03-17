@@ -1,7 +1,9 @@
+using System.Text;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.EmailTemplates;
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace BoltonCup.Infrastructure.Services;
 
@@ -12,11 +14,12 @@ public class EmailSender(
 {
     public async Task SendConfirmationLinkAsync(BoltonCupUser user, string email, string confirmationLink)
     {
+        // TODO: verify this user exists
+        
         var model = new ConfirmationEmailViewModel
         {
-            FirstName = user.UserName ?? "Playa",
             ConfirmationLink = confirmationLink,
-            Logo = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? "",
+            LogoUrl = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? "",
         };
         var payload = new EmailPayload(
             Email: email,
@@ -29,12 +32,12 @@ public class EmailSender(
 
     public async Task SendPasswordResetLinkAsync(BoltonCupUser user, string email, string resetLink)
     {
+        // TODO: verify this user exists
+        
         var model = new PasswordResetLinkViewModel
         {
-            FirstName = user.UserName ?? "Playa",
-            Email = email,
             ResetLink = resetLink,
-            Logo = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? "",
+            LogoUrl = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? "",
         };
         var payload = new EmailPayload(
             Email: email,
@@ -47,16 +50,19 @@ public class EmailSender(
 
     public async Task SendPasswordResetCodeAsync(BoltonCupUser user, string email, string resetCode)
     {
+        // TODO: verify this user exists
+        
+        var decodedBytes = WebEncoders.Base64UrlDecode(resetCode);
+        var cleanCode = Encoding.UTF8.GetString(decodedBytes);
+
         var model = new PasswordResetCodeViewModel
         {
-            FirstName = user.UserName ?? "Playa",
-            Email = email,
-            ResetCode = resetCode,
-            Logo = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? "",
+            ResetCode = cleanCode,
+            LogoUrl = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? "",
         };
         var payload = new EmailPayload(
             Email: email,
-            Subject: "Password reset code for Bolton Cup",
+            Subject: $"Your Bolton Cup code is {cleanCode}",
             TemplateName: "PasswordResetCode.PasswordResetCode",
             Model: model
         );

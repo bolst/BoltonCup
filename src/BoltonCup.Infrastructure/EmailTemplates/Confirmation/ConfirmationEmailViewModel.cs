@@ -1,8 +1,6 @@
 namespace BoltonCup.Infrastructure.EmailTemplates;
 
-public class ConfirmationEmailViewModel
+public class ConfirmationEmailViewModel : EmailAuthBaseViewModel
 {
-    public string FirstName { get; set; } = string.Empty;
-    public string ConfirmationLink { get; set; } = string.Empty;
-    public string Logo { get; set; } = string.Empty;
+    public required string ConfirmationLink { get; set; }
 }

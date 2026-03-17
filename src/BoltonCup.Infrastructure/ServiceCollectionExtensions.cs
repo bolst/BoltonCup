@@ -21,9 +21,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBoltonCupInfrastructure(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddIdentityCore<BoltonCupUser>()
+            .AddIdentityCore<BoltonCupUser>(options =>
+            {
+                options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
+            })
             .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<AuthDbContext>();
+            .AddEntityFrameworkStores<AuthDbContext>()
+            .AddDefaultTokenProviders();
 
         builder.AddBoltonCupEmails();
         builder.AddBoltonCupS3();
@@ -50,7 +54,7 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddBoltonCupEmails(this WebApplicationBuilder builder)
     {
         var razorEngine = new RazorLightEngineBuilder()
-            .UseEmbeddedResourcesProject(typeof(ServiceCollectionExtensions).Assembly, "BoltonCup.Infrastructure.EmailTemplates")
+            .UseEmbeddedResourcesProject(typeof(EmailSender).Assembly, "BoltonCup.Infrastructure.EmailTemplates")
             .UseMemoryCachingProvider()
             .UseOptions(new RazorLightOptions
             {
