@@ -36,6 +36,7 @@ public class AuthController(
             : Results.Unauthorized();
     }
     
+    [AllowAnonymous]
     [HttpPost("verifyResetCode")]
     public async Task<IActionResult> VerifyResetCode([FromBody] VerifyCodeRequest request)
     {
@@ -45,6 +46,7 @@ public class AuthController(
         return Ok();
     }
 
+    [AllowAnonymous]
     [HttpPost("/resetPasswordV2")]
     public async Task<IActionResult> ResetPasswordV2([FromBody] ResetPasswordRequest request)
     {

@@ -624,15 +624,7 @@
           "200": {
             "description": "OK"
           }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
+        }
       }
     },
     "/resetpasswordv2": {
@@ -664,15 +656,7 @@
           "200": {
             "description": "OK"
           }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
+        }
       }
     },
     "/api/auth/logout": {
