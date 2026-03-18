@@ -56,6 +56,20 @@ public class AuthSessionStateService(
         NavigateToReturnUrlOrDefault();
     }
     
+    public void NavigateWithReturnUrl(string destination)
+    {
+        var returnUrl = GetReturnUrl();
+        if (!string.IsNullOrEmpty(returnUrl))
+            destination += "?returnUrl=" + returnUrl;
+        _navigation.NavigateTo(destination);
+    }
+
+    public void NavigateToReturnUrlOrDefault()
+    {
+        var returnUrl = GetReturnUrl() ?? _config.Value.WebBaseUrl;
+        _navigation.NavigateTo(returnUrl, forceLoad: true);
+    }
+    
     public void Reset()
     {
         NavigateWithReturnUrl("log-in-or-sign-up");
@@ -66,19 +80,5 @@ public class AuthSessionStateService(
         var uriBuilder = new UriBuilder(_navigation.Uri);
         var query = QueryHelpers.ParseQuery(uriBuilder.Query);
         return query.GetValueOrDefault("returnUrl");
-    }
-
-    private void NavigateWithReturnUrl(string destination)
-    {
-        var returnUrl = GetReturnUrl();
-        if (!string.IsNullOrEmpty(returnUrl))
-            destination += "?returnUrl=" + returnUrl;
-        _navigation.NavigateTo(destination);
-    }
-
-    private void NavigateToReturnUrlOrDefault()
-    {
-        var returnUrl = GetReturnUrl() ?? _config.Value.WebBaseUrl;
-        _navigation.NavigateTo(returnUrl, forceLoad: true);
     }
 }
