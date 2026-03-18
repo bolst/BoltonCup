@@ -36,7 +36,7 @@ public class AuthController(
             : Results.Unauthorized();
     }
     
-    [HttpPost("verify-reset-code")]
+    [HttpPost("verifyResetCode")]
     public async Task<IActionResult> VerifyResetCode([FromBody] VerifyCodeRequest request)
     {
         var isValid = await _userService.VerifyPasswordResetCodeAsync(request.Email, request.Code);

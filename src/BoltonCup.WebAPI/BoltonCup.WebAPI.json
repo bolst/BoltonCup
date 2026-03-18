@@ -595,7 +595,7 @@
         }
       }
     },
-    "/api/auth/verify-reset-code": {
+    "/api/auth/verifyresetcode": {
       "post": {
         "tags": [
           "Auth"
