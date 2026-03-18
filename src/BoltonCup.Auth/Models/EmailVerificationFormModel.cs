@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BoltonCup.Auth.Models;
 
-public class EmailVerificationForm
+public class EmailVerificationFormModel
 {
     [Required]
     public string Code { get; set; } = string.Empty;

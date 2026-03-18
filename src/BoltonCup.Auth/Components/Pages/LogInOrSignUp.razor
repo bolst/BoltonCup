@@ -1,11 +1,11 @@
 @page "/log-in-or-sign-up"
 @inject AuthSessionStateService AuthSessionState
 
-<AutoEditForm T="LogInOrSignUpForm" EditContext="_editContext" OnValidSubmit="OnSubmit" Title="Log in or sign up" />
+<AutoEditForm T="LogInOrSignUpFormModel" EditContext="_editContext" OnValidSubmit="OnSubmit" Title="Log in or sign up" />
 
 @code {
     
-    private readonly LogInOrSignUpForm _model = new();
+    private readonly LogInOrSignUpFormModel _model = new();
     private EditContext? _editContext;
 
     protected override void OnInitialized() 

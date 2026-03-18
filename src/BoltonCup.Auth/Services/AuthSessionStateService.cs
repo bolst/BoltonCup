@@ -15,7 +15,7 @@ public class AuthSessionStateService(
 {
     public string? Email { get; private set; }
     
-    public async Task LogInOrSignUp(LogInOrSignUpForm? model = null)
+    public async Task LogInOrSignUp(LogInOrSignUpFormModel? model = null)
     {
         try
         {
@@ -32,7 +32,7 @@ public class AuthSessionStateService(
         }
     }
 
-    public async Task CreateAccountWithPassword(CreateAccountWithPasswordForm model)
+    public async Task CreateAccountWithPassword(CreateAccountWithPasswordFormModel model)
     {
         var delayTask = Task.Delay(3000); // load for 3 seconds minimum
         var signUpTask = _api.RegisterAsync(new RegisterRequest
@@ -44,7 +44,7 @@ public class AuthSessionStateService(
         NavigateToReturnUrlOrDefault();
     }
 
-    public async Task LogInWithPassword(LogInWithPasswordForm model)
+    public async Task LogInWithPassword(LogInWithPasswordFormModel model)
     {
         var delayTask = Task.Delay(3000); // load for 3 seconds minimum
         var loginTask = _api.LoginWithCookieAsync(new LoginWithCookieRequest

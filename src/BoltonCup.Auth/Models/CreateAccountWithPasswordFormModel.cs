@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BoltonCup.Auth.Models;
 
-public class LogInWithPasswordForm
+public class CreateAccountWithPasswordFormModel
 {
     [Required]
     [EmailAddress]
