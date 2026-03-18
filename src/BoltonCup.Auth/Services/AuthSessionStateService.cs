@@ -15,13 +15,14 @@ public class AuthSessionStateService(
 {
     public string? Email { get; private set; }
     
-    public async Task Initialize(LogInOrSignUpForm model)
+    public async Task LogInOrSignUp(LogInOrSignUpForm? model = null)
     {
         try
         {
-            Email = model.Email;
+            if (model is not null)
+                Email = model.Email;
             // will throw 204 or 404 if user does not exist
-            _ = await _api.GetUserAsync(model.Email);
+            _ = await _api.GetUserAsync(Email);
             NavigateWithReturnUrl("log-in/password");
         }
         catch (ApiException e)
@@ -31,7 +32,7 @@ public class AuthSessionStateService(
         }
     }
 
-    public async Task CreateAccount(CreateAccountWithPasswordForm model)
+    public async Task CreateAccountWithPassword(CreateAccountWithPasswordForm model)
     {
         var delayTask = Task.Delay(3000); // load for 3 seconds minimum
         var signUpTask = _api.RegisterAsync(new RegisterRequest
@@ -43,7 +44,7 @@ public class AuthSessionStateService(
         NavigateToReturnUrlOrDefault();
     }
 
-    public async Task LogIn(LogInWithPasswordForm model)
+    public async Task LogInWithPassword(LogInWithPasswordForm model)
     {
         var delayTask = Task.Delay(3000); // load for 3 seconds minimum
         var loginTask = _api.LoginWithCookieAsync(new LoginWithCookieRequest
@@ -54,7 +55,7 @@ public class AuthSessionStateService(
         await Task.WhenAll(delayTask, loginTask);
         NavigateToReturnUrlOrDefault();
     }
-
+    
     public void Reset()
     {
         NavigateWithReturnUrl("log-in-or-sign-up");

@@ -1,0 +1,119 @@
+@page "/email-verification"
+@implements IDisposable
+@inject AuthSessionStateService AuthSessionState
+@inject ISnackbar Snackbar
+@inject IBoltonCupApi BoltonCupApi
+
+
+<AuthSession>
+    <AutoEditForm T="EmailVerificationForm" EditContext="_editContext" OnValidSubmit="OnSubmit" Title="Check your inbox">
+        <ActionsContent>
+            <MudStack Spacing="6" AlignItems="AlignItems.Center" Class="mud-width-full">
+                <MudText Typo="Typo.body1" Align="Align.Center">
+                    Enter the verification code we just sent to
+                    <MudText Typo="Typo.body1">@AuthSessionState.Email</MudText>
+                </MudText>
+                
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" Disabled="_isSubmitting" FullWidth>Continue</MudButton>
+
+                <MudLink OnClick="ResendEmail">Resend email</MudLink>
+
+                <MudText><b>OR</b></MudText>
+
+                <MudButton OnClick="ContinueWithPassword" Variant="Variant.Outlined" Size="Size.Large" Color="Color.Primary" Disabled="_isSubmitting" FullWidth>
+                    Continue with password
+                </MudButton>
+            </MudStack>
+        </ActionsContent>
+    </AutoEditForm>
+</AuthSession>
+
+
+@code {
+
+    private bool _isSubmitting;
+    private readonly EmailVerificationForm _model = new();
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+
+
+    protected override void OnInitialized() 
+    {
+        _editContext = new EditContext(_model);
+        _editContext.OnValidationRequested += HandleValidationRequested;
+        _messageStore = new ValidationMessageStore(_editContext);
+    }
+    
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        _messageStore?.Clear();
+    }
+
+    private async Task OnSubmit(EditContext _)
+    {
+        try
+        {
+            _isSubmitting = true;
+            await BoltonCupApi.VerifyResetCodeAsync(new VerifyCodeRequest
+            {
+                Email = AuthSessionState.Email,
+                Code = _model.Code
+            });
+            // TODO: determine Next()
+        }
+        catch (ApiException e)
+            when (e.StatusCode is 400)
+        {
+            _messageStore?.Add(() => _model.Code, "That code is incorrect.");
+            _editContext?.NotifyValidationStateChanged();
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("An unexpected error occurred.", Severity.Error);
+        }
+        finally
+        {
+            _isSubmitting = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task ResendEmail()
+    {
+        _isSubmitting = true;
+
+        var delayTask = Task.Delay(300);
+        try
+        {
+            await BoltonCupApi.ForgotPasswordAsync(new ForgotPasswordRequest
+            {
+                Email = AuthSessionState.Email
+            });
+            await delayTask;
+            Snackbar.Add($"If an account exists, an email with a code has been sent to {AuthSessionState.Email}.", Severity.Success);
+        }
+        catch
+        {
+            Snackbar.Add("Something went wrong...", Severity.Error);
+        }
+        finally
+        {
+            _isSubmitting = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private Task ContinueWithPassword()
+    {
+        return AuthSessionState.LogInOrSignUp();
+    }
+    
+    public void Dispose()
+    {
+        if (_editContext != null)
+        {
+            _editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+    }
+
+}
