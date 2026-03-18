@@ -1,12 +1,10 @@
-@page "/email-verification"
 @implements IDisposable
 @inject AuthSessionStateService AuthSessionState
 @inject ISnackbar Snackbar
 @inject IBoltonCupApi BoltonCupApi
 
-
 <AuthSession>
-    <AutoEditForm T="EmailVerificationForm" EditContext="_editContext" OnValidSubmit="OnSubmit" Title="Check your inbox">
+    <AutoEditForm T="EmailVerificationFormModel" EditContext="_editContext" OnValidSubmit="OnSubmit" Title="Check your inbox">
         <ActionsContent>
             <MudStack Spacing="6" AlignItems="AlignItems.Center" Class="mud-width-full">
                 <MudText Typo="Typo.body1" Align="Align.Center">
@@ -30,9 +28,12 @@
 
 
 @code {
+    
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
 
     private bool _isSubmitting;
-    private readonly EmailVerificationForm _model = new();
+    private readonly EmailVerificationFormModel _model = new();
     private EditContext? _editContext;
     private ValidationMessageStore? _messageStore;
 
@@ -59,7 +60,7 @@
                 Email = AuthSessionState.Email,
                 Code = _model.Code
             });
-            // TODO: determine Next()
+            await OnValidSubmit.InvokeAsync();
         }
         catch (ApiException e)
             when (e.StatusCode is 400)
