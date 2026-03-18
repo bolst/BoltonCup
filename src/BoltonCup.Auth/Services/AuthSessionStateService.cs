@@ -13,16 +13,17 @@ public class AuthSessionStateService(
     IOptions<BoltonCupConfiguration> _config
 )
 {
-    public string? Email { get; private set; }
+    private readonly AuthSessionContext _internalContext = new();
+    public IAuthSessionContext Context => _internalContext;
     
     public async Task LogInOrSignUp(LogInOrSignUpFormModel? model = null)
     {
         try
         {
             if (model is not null)
-                Email = model.Email;
+                _internalContext.Email = model.Email;
             // will throw 204 or 404 if user does not exist
-            _ = await _api.GetUserAsync(Email);
+            _ = await _api.GetUserAsync(_internalContext.Email);
             NavigateWithReturnUrl("log-in/password");
         }
         catch (ApiException e)
@@ -80,5 +81,11 @@ public class AuthSessionStateService(
         var uriBuilder = new UriBuilder(_navigation.Uri);
         var query = QueryHelpers.ParseQuery(uriBuilder.Query);
         return query.GetValueOrDefault("returnUrl");
+    }
+
+
+    private class AuthSessionContext : IAuthSessionContext
+    {
+        public string? Email { get; set; }
     }
 }

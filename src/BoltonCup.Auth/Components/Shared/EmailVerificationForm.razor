@@ -9,7 +9,7 @@
             <MudStack Spacing="6" AlignItems="AlignItems.Center" Class="mud-width-full">
                 <MudText Typo="Typo.body1" Align="Align.Center">
                     Enter the verification code we just sent to
-                    <MudText Typo="Typo.body1">@AuthSessionState.Email</MudText>
+                    <MudText Typo="Typo.body1">@AuthSessionState.Context</MudText>
                 </MudText>
                 
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" Disabled="_isSubmitting" FullWidth>Continue</MudButton>
@@ -57,7 +57,7 @@
             _isSubmitting = true;
             await BoltonCupApi.VerifyResetCodeAsync(new VerifyCodeRequest
             {
-                Email = AuthSessionState.Email,
+                Email = AuthSessionState.Context.Email,
                 Code = _model.Code
             });
             await OnValidSubmit.InvokeAsync();
@@ -88,10 +88,10 @@
         {
             await BoltonCupApi.ForgotPasswordAsync(new ForgotPasswordRequest
             {
-                Email = AuthSessionState.Email
+                Email = AuthSessionState.Context.Email
             });
             await delayTask;
-            Snackbar.Add($"If an account exists, an email with a code has been sent to {AuthSessionState.Email}.", Severity.Success);
+            Snackbar.Add($"If an account exists, an email with a code has been sent to {AuthSessionState.Context}.", Severity.Success);
         }
         catch
         {

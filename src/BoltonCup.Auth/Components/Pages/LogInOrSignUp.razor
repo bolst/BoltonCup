@@ -10,7 +10,7 @@
 
     protected override void OnInitialized() 
     {
-        _model.Email = AuthSessionState.Email ?? string.Empty;
+        _model.Email = AuthSessionState.Context.Email ?? string.Empty;
         _editContext = new EditContext(_model);
     }
 
