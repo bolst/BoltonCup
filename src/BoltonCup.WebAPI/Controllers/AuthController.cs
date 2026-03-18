@@ -1,7 +1,9 @@
 using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Infrastructure.Services;
 using BoltonCup.WebAPI.Mapping.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
@@ -9,6 +11,7 @@ namespace BoltonCup.WebAPI.Controllers;
 [Route("/api/auth")]
 [Tags("Auth")]
 public class AuthController(
+    IUserService _userService,
     UserManager<BoltonCupUser> _userManager, 
     SignInManager<BoltonCupUser> _signInManager,
     IBoltonCupUserMapper _userMapper
@@ -33,6 +36,24 @@ public class AuthController(
             : Results.Unauthorized();
     }
     
+    [HttpPost("verify-reset-code")]
+    public async Task<IActionResult> VerifyResetCode([FromBody] VerifyCodeRequest request)
+    {
+        var isValid = await _userService.VerifyPasswordResetCodeAsync(request.Email, request.Code);
+        if (!isValid)
+            return BadRequest("Invalid code or email.");
+        return Ok();
+    }
+
+    [HttpPost("/resetPasswordV2")]
+    public async Task<IActionResult> ResetPasswordV2([FromBody] ResetPasswordRequest request)
+    {
+        var result = await _userService.ResetPasswordV2Async(request.Email, request.ResetCode, request.NewPassword);
+        return result.Succeeded
+            ? Ok()
+            : BadRequest( new { Errors = result.Errors.Select(e => e.Description) });
+    }
+    
     [HttpPost("logout")]
     public async Task<IResult> Logout()
     {
@@ -50,8 +71,6 @@ public class AuthController(
     }
 }
 
-public class LoginWithCookieRequest
-{
-    public string Email { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-}
+public record VerifyCodeRequest(string Email, string Code);
+
+public record LoginWithCookieRequest(string Email, string Password);

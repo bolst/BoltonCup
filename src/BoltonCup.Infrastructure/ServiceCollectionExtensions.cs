@@ -48,7 +48,8 @@ public static class ServiceCollectionExtensions
             .AddTransient<ITournamentRepository, TournamentRepository>()
             .AddTransient<IAccountService, AccountService>()
             .AddTransient<ITeamService, TeamService>()
-            .AddTransient<ITournamentService, TournamentService>();
+            .AddTransient<ITournamentService, TournamentService>()
+            .AddTransient<IUserService, UserService>();
     }
 
     private static IServiceCollection AddBoltonCupEmails(this WebApplicationBuilder builder)
