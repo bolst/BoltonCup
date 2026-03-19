@@ -1,8 +1,9 @@
+using BoltonCup.Auth.Extensions;
 using BoltonCup.Auth.Models;
 using BoltonCup.Common;
 using BoltonCup.Sdk;
+using BoltonCup.SessionStorage;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 
 namespace BoltonCup.Auth.Services;
@@ -10,79 +11,55 @@ namespace BoltonCup.Auth.Services;
 public class AuthSessionStateService(
     NavigationManager _navigation, 
     IBoltonCupApi _api,
-    IOptions<BoltonCupConfiguration> _config
+    IOptions<BoltonCupConfiguration> _config,
+    ISessionStorageService _sessionStorage
 )
 {
-    private readonly AuthSessionContext _internalContext = new();
+    private const string _sessionKey = "authapi";
+    private AuthSessionContext _internalContext { get; set; } = new();
     public IAuthSessionContext Context => _internalContext;
+
+
+    public async Task TryLoadFromSessionAsync()
+    {
+        _internalContext = await _sessionStorage.GetItemAsync<AuthSessionContext>(_sessionKey);
+    }
     
     public async Task LogInOrSignUp(LogInOrSignUpFormModel? model = null)
     {
         try
         {
             if (model is not null)
+            {
                 _internalContext.Email = model.Email;
+                await PersistContextAsync();
+            }
             // will throw 204 or 404 if user does not exist
             _ = await _api.GetUserAsync(_internalContext.Email);
-            NavigateWithReturnUrl("log-in/password");
+            _navigation.NavigateWithReturnUrl("log-in/password");
         }
         catch (ApiException e)
             when (e.StatusCode is 204 or 404)
         {
-            NavigateWithReturnUrl("create-account/password");
+            _navigation.NavigateWithReturnUrl("create-account/password");
         }
     }
-
-    public async Task CreateAccountWithPassword(CreateAccountWithPasswordFormModel model)
-    {
-        var delayTask = Task.Delay(3000); // load for 3 seconds minimum
-        var signUpTask = _api.RegisterAsync(new RegisterRequest
-        {
-            Email = model.Email,
-            Password = model.Password
-        });
-        await Task.WhenAll(delayTask, signUpTask);
-        NavigateToReturnUrlOrDefault();
-    }
-
-    public async Task LogInWithPassword(LogInWithPasswordFormModel model)
-    {
-        var delayTask = Task.Delay(3000); // load for 3 seconds minimum
-        var loginTask = _api.LoginWithCookieAsync(new LoginWithCookieRequest
-        {
-            Email = model.Email,
-            Password = model.Password
-        });
-        await Task.WhenAll(delayTask, loginTask);
-        NavigateToReturnUrlOrDefault();
-    }
     
-    public void NavigateWithReturnUrl(string destination)
-    {
-        var returnUrl = GetReturnUrl();
-        if (!string.IsNullOrEmpty(returnUrl))
-            destination += "?returnUrl=" + returnUrl;
-        _navigation.NavigateTo(destination);
-    }
-
     public void NavigateToReturnUrlOrDefault()
     {
-        var returnUrl = GetReturnUrl() ?? _config.Value.WebBaseUrl;
+        var returnUrl = _navigation.GetReturnUrl() ?? _config.Value.WebBaseUrl;
         _navigation.NavigateTo(returnUrl, forceLoad: true);
     }
-    
+
     public void Reset()
     {
-        NavigateWithReturnUrl("log-in-or-sign-up");
+       _navigation.NavigateWithReturnUrl("log-in-or-sign-up");
     }
 
-    private string? GetReturnUrl()
+    private async Task PersistContextAsync()
     {
-        var uriBuilder = new UriBuilder(_navigation.Uri);
-        var query = QueryHelpers.ParseQuery(uriBuilder.Query);
-        return query.GetValueOrDefault("returnUrl");
+        await _sessionStorage.SetItemAsync(_sessionKey, _internalContext);
     }
-
 
     private class AuthSessionContext : IAuthSessionContext
     {

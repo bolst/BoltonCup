@@ -1,19 +1,38 @@
 @inject AuthSessionStateService AuthSessionState
 
-@if (!string.IsNullOrEmpty(AuthSessionState.Context.Email))
+@if (_context is null)
 {
-    @ChildContent
+    
 }
 else
 {
-    <BoltonCupLogo Height="150" />
-    <MudText Typo="Typo.h4">Your session has ended</MudText>
-    <MudButton Href="/log-in-or-sign-up" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" FullWidth>Log in</MudButton>
+    if (!string.IsNullOrEmpty(AuthSessionState.Context.Email))
+    {
+        @ChildContent(_context)
+    }
+    else
+    {
+        <BoltonCupLogo Height="150" />
+        <MudText Typo="Typo.h4">Your session has ended</MudText>
+        <MudButton Href="/log-in-or-sign-up" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" FullWidth>Log in</MudButton>
+    }
 }
 
 @code {
 
     [Parameter]
-    public RenderFragment ChildContent { get; set; } = null!;
+    public RenderFragment<IAuthSessionContext> ChildContent { get; set; } = null!;
 
+    private IAuthSessionContext? _context;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_context is null)
+        {
+            await AuthSessionState.TryLoadFromSessionAsync();
+            _context = AuthSessionState.Context;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+    
 }

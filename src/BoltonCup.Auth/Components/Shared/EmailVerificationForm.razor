@@ -30,7 +30,7 @@
 @code {
     
     [Parameter]
-    public EventCallback OnValidSubmit { get; set; }
+    public EventCallback<string> OnValidSubmit { get; set; }
 
     private bool _isSubmitting;
     private readonly EmailVerificationFormModel _model = new();
@@ -60,7 +60,7 @@
                 Email = AuthSessionState.Context.Email,
                 Code = _model.Code
             });
-            await OnValidSubmit.InvokeAsync();
+            await OnValidSubmit.InvokeAsync(_model.Code);
         }
         catch (ApiException e)
             when (e.StatusCode is 400)
