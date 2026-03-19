@@ -11,7 +11,7 @@
     <MudStack Spacing="6" AlignItems="AlignItems.Center" Class="mud-width-full">
         <MudText Typo="Typo.body1" Align="Align.Center">
             Click "Continue" to reset your password for
-            <MudText Typo="Typo.body1">@AuthSessionState.Context</MudText>
+            <MudText Typo="Typo.body1">@AuthSessionState.Context.Email</MudText>
         </MudText>
         
         <MudButton OnClick="OnContinue" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" Disabled="_isSubmitting" FullWidth>Continue</MudButton>
@@ -32,7 +32,7 @@
         var delayTask = Task.Delay(300);
         try
         {
-            await BoltonCupApi.ForgotPasswordAsync(new ForgotPasswordRequest
+            await BoltonCupApi.ForgotPasswordV2Async(new ForgotPasswordV2Request
             {
                 Email = AuthSessionState.Context.Email
             });
