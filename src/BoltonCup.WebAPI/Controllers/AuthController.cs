@@ -69,12 +69,14 @@ public class AuthController(
 
     [AllowAnonymous]
     [HttpPost("resetPasswordV2")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(InvalidPasswordResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResetPasswordV2([FromBody] ResetPasswordRequest request)
     {
         var result = await _userService.ResetPasswordV2Async(request.Email, request.ResetCode, request.NewPassword);
         return result.Succeeded
             ? Ok()
-            : BadRequest( new { Errors = result.Errors.Select(e => e.Description) });
+            : BadRequest(new InvalidPasswordResponse(result.Errors.Select(e => e.Description)));
     }
     
     [HttpPost("logout")]
@@ -99,3 +101,5 @@ public record VerifyCodeRequest(string Email, string Code);
 public record ForgotPasswordV2Request(string Email);
 
 public record LoginWithCookieRequest(string Email, string Password, bool Persist = true);
+
+public record InvalidPasswordResponse(IEnumerable<string> Errors);

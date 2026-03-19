@@ -19,7 +19,7 @@
             @foreach (var field in _fields)
             {
                 @RenderFieldComponent(field)
-                if (field.InputType == InputType.Password)
+                if (field.InputType == InputType.Password && ShowForgotPasswordLink)
                 {
                     <MudLink Href="/reset-password" Color="Color.Info">Forgot password?</MudLink>
                 }

@@ -1,26 +1,26 @@
-@page "/reset-password/email-verification"
+@page "/email-verification"
 @inject NavigationManager Navigation
 @inject IBoltonCupApi BoltonCupApi
 @inject ISnackbar Snackbar
 
-<EmailVerificationForm OnValidSubmit="OnValidSubmit" OnResendEmail="OnResendEmail" />
+@* <EmailVerificationDialog OnValidSubmit="OnValidSubmit" OnResendEmail="OnResendEmail" /> *@
 
 @code {
 
     private void OnValidSubmit(string code)
     {
-        Navigation.NavigateTo("/reset-password/new-password");
+        Navigation.NavigateTo("/log-in/password");
     }
 
     private async Task OnResendEmail(IAuthSessionContext context)
     {
         var delayTask = Task.Delay(300);
-        await BoltonCupApi.ForgotPasswordV2Async(new ForgotPasswordV2Request
+        await BoltonCupApi.ResendConfirmationEmailAsync(new ResendConfirmationEmailRequest
         {
             Email = context.Email
         });
         await delayTask;
         Snackbar.Add($"If an account exists, an email with a code has been sent to {context.Email}.", Severity.Success);
     }
-
+    
 }
