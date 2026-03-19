@@ -9,10 +9,10 @@ namespace BoltonCup.SessionStorage;
 [ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddBlazoredSessionStorage(this IServiceCollection services)
-        => AddBlazoredSessionStorage(services, null);
+    public static IServiceCollection AddBoltonCupSessionStorage(this IServiceCollection services)
+        => AddBoltonCupSessionStorage(services, null);
 
-    public static IServiceCollection AddBlazoredSessionStorage(this IServiceCollection services, Action<SessionStorageOptions> configure)
+    public static IServiceCollection AddBoltonCupSessionStorage(this IServiceCollection services, Action<SessionStorageOptions> configure)
     {
         return services
             .AddScoped<IJsonSerializer, SystemTextJsonSerializer>()
