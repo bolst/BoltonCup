@@ -627,7 +627,39 @@
         }
       }
     },
-    "/resetpasswordv2": {
+    "/api/auth/forgotpasswordv2": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "ForgotPasswordV2",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordV2Request"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordV2Request"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordV2Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/resetpasswordv2": {
       "post": {
         "tags": [
           "Auth"
@@ -1837,6 +1869,16 @@
         "required": [
           "email"
         ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ForgotPasswordV2Request": {
         "type": "object",
         "properties": {
           "email": {

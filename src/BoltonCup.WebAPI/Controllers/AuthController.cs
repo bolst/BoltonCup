@@ -47,7 +47,15 @@ public class AuthController(
     }
 
     [AllowAnonymous]
-    [HttpPost("/resetPasswordV2")]
+    [HttpPost("forgotPasswordV2")]
+    public async Task<IActionResult> ForgotPasswordV2([FromBody] ForgotPasswordV2Request request)
+    {
+        await _userService.ForgotPasswordV2Async(request.Email);
+        return Ok();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("resetPasswordV2")]
     public async Task<IActionResult> ResetPasswordV2([FromBody] ResetPasswordRequest request)
     {
         var result = await _userService.ResetPasswordV2Async(request.Email, request.ResetCode, request.NewPassword);
@@ -74,5 +82,7 @@ public class AuthController(
 }
 
 public record VerifyCodeRequest(string Email, string Code);
+
+public record ForgotPasswordV2Request(string Email);
 
 public record LoginWithCookieRequest(string Email, string Password);
