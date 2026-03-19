@@ -9,12 +9,15 @@
             <MudStack Spacing="6" AlignItems="AlignItems.Center" Class="mud-width-full">
                 <MudText Typo="Typo.body1" Align="Align.Center">
                     Enter the verification code we just sent to
-                    <MudText Typo="Typo.body1">@AuthSessionState.Context</MudText>
+                    <MudText Typo="Typo.body1">@AuthSessionState.Context.Email</MudText>
                 </MudText>
                 
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" Disabled="_isSubmitting" FullWidth>Continue</MudButton>
 
-                <MudLink OnClick="ResendEmail">Resend email</MudLink>
+                @if (OnResendEmail.HasDelegate)
+                {
+                    <MudLink OnClick="ResendEmail">Resend email</MudLink>
+                }
 
                 <MudText><b>OR</b></MudText>
 
@@ -31,6 +34,9 @@
     
     [Parameter]
     public EventCallback<string> OnValidSubmit { get; set; }
+
+    [Parameter] 
+    public EventCallback<IAuthSessionContext> OnResendEmail { get; set; }
 
     private bool _isSubmitting;
     private readonly EmailVerificationFormModel _model = new();
@@ -81,17 +87,14 @@
 
     private async Task ResendEmail()
     {
+        if (!OnResendEmail.HasDelegate)
+            return;
+        
         _isSubmitting = true;
 
-        var delayTask = Task.Delay(300);
         try
         {
-            await BoltonCupApi.ForgotPasswordAsync(new ForgotPasswordRequest
-            {
-                Email = AuthSessionState.Context.Email
-            });
-            await delayTask;
-            Snackbar.Add($"If an account exists, an email with a code has been sent to {AuthSessionState.Context}.", Severity.Success);
+            await OnResendEmail.InvokeAsync(AuthSessionState.Context);
         }
         catch
         {
