@@ -6,10 +6,11 @@ namespace BoltonCup.Infrastructure.Services;
 public interface IUserService
 {
     Task<bool> VerifyPasswordResetCodeAsync(string email, string code);
+    Task ForgotPasswordV2Async(string email);
     Task<IdentityResult> ResetPasswordV2Async(string email, string code, string newPassword);
 }
 
-public class UserService(UserManager<BoltonCupUser> _userManager) : IUserService
+public class UserService(UserManager<BoltonCupUser> _userManager, IEmailSender<BoltonCupUser> _emailSender) : IUserService
 {
     public async Task<bool> VerifyPasswordResetCodeAsync(string email, string code)
     {
@@ -21,6 +22,15 @@ public class UserService(UserManager<BoltonCupUser> _userManager) : IUserService
                    purpose: UserManager<BoltonCupUser>.ResetPasswordTokenPurpose,
                    token: code
                 );
+    }
+
+    public async Task ForgotPasswordV2Async(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user is null)
+            return;
+        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+        await _emailSender.SendPasswordResetCodeAsync(user, email, code);
     }
 
     public async Task<IdentityResult> ResetPasswordV2Async(string email, string code, string newPassword)
