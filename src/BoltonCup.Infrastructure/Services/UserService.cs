@@ -1,5 +1,7 @@
+using System.Text;
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace BoltonCup.Infrastructure.Services;
 
@@ -29,8 +31,12 @@ public class UserService(UserManager<BoltonCupUser> _userManager, IEmailSender<B
         var user = await _userManager.FindByEmailAsync(email);
         if (user is null)
             return;
+        // get code and encode it to base64
         var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-        await _emailSender.SendPasswordResetCodeAsync(user, email, code);
+        var encodedBytes = Encoding.UTF8.GetBytes(code);
+        var encodedCode = WebEncoders.Base64UrlEncode(encodedBytes);
+        // send email
+        await _emailSender.SendPasswordResetCodeAsync(user, email, encodedCode);
     }
 
     public async Task<IdentityResult> ResetPasswordV2Async(string email, string code, string newPassword)
