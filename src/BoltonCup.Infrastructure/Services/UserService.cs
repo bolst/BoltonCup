@@ -26,8 +26,18 @@ public class UserService(UserManager<BoltonCupUser> _userManager) : IUserService
     public async Task<IdentityResult> ResetPasswordV2Async(string email, string code, string newPassword)
     {
         var user = await _userManager.FindByEmailAsync(email);
-        return user is null
-            ? IdentityResult.Failed(new IdentityError { Description = "Invalid request." })
-            : await _userManager.ResetPasswordAsync(user, code, newPassword);
+        if (user is null)
+            return IdentityResult.Failed(new IdentityError { Description = "Invalid request." });
+
+        var result = await _userManager.ResetPasswordAsync(user, code, newPassword);
+        // a user could only get here if they got the code via email
+        // thus, confirm their account if needed
+        if (result.Succeeded && !user.EmailConfirmed)
+        {
+            user.EmailConfirmed = true;
+            await _userManager.UpdateAsync(user);
+        }
+
+        return result;
     }
 }
