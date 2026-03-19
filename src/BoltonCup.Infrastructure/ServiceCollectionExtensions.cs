@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
             .AddIdentityCore<BoltonCupUser>(options =>
             {
                 options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
+                options.SignIn.RequireConfirmedAccount = true;
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<AuthDbContext>()
