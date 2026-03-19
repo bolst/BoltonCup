@@ -2559,6 +2559,9 @@
           "password": {
             "type": "string",
             "nullable": true
+          },
+          "persist": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

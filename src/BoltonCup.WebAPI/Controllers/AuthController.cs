@@ -30,7 +30,20 @@ public class AuthController(
     [HttpPost("login-cookie")]
     public async Task<IResult> LoginWithCookie([FromBody] LoginWithCookieRequest request)
     {
-        var result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, true, false);
+        // TODO: refactor this into user service
+        
+        // check if user exists
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user is null)
+            return Results.Unauthorized();
+        // check if password is correct
+        if (!await _userManager.CheckPasswordAsync(user, request.Password))
+            return Results.Unauthorized();
+        // check if account is confirmed/verified
+        if (!await _signInManager.CanSignInAsync(user))
+            return Results.Forbid();
+        
+        var result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, request.Persist, false);
         return result.Succeeded
             ? Results.Ok()
             : Results.Unauthorized();
@@ -85,4 +98,4 @@ public record VerifyCodeRequest(string Email, string Code);
 
 public record ForgotPasswordV2Request(string Email);
 
-public record LoginWithCookieRequest(string Email, string Password);
+public record LoginWithCookieRequest(string Email, string Password, bool Persist = true);
