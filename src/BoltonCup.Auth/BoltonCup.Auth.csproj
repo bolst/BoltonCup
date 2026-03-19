@@ -19,7 +19,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BoltonCup.Common\BoltonCup.Common.csproj" />
-      <ProjectReference Include="..\BoltonCup.SessionStorage\BoltonCup.SessionStorage.csproj" />
     </ItemGroup>
 
     <ItemGroup>

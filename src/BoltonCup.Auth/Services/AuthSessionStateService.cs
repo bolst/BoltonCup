@@ -2,7 +2,6 @@ using BoltonCup.Auth.Extensions;
 using BoltonCup.Auth.Models;
 using BoltonCup.Common;
 using BoltonCup.Sdk;
-using BoltonCup.SessionStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 
@@ -11,29 +10,19 @@ namespace BoltonCup.Auth.Services;
 public class AuthSessionStateService(
     NavigationManager _navigation, 
     IBoltonCupApi _api,
-    IOptions<BoltonCupConfiguration> _config,
-    ISessionStorageService _sessionStorage
+    IOptions<BoltonCupConfiguration> _config
 )
 {
-    private const string _sessionKey = "authapi";
     private AuthSessionContext _internalContext { get; set; } = new();
     public IAuthSessionContext Context => _internalContext;
 
 
-    public async Task TryLoadFromSessionAsync()
-    {
-        _internalContext = await _sessionStorage.GetItemAsync<AuthSessionContext>(_sessionKey);
-    }
-    
     public async Task LogInOrSignUp(LogInOrSignUpFormModel? model = null)
     {
         try
         {
             if (model is not null)
-            {
                 _internalContext.Email = model.Email;
-                await PersistContextAsync();
-            }
             // will throw 204 or 404 if user does not exist
             _ = await _api.GetUserAsync(_internalContext.Email);
             _navigation.NavigateWithReturnUrl("log-in/password");
@@ -54,11 +43,6 @@ public class AuthSessionStateService(
     public void Reset()
     {
        _navigation.NavigateWithReturnUrl("log-in-or-sign-up");
-    }
-
-    private async Task PersistContextAsync()
-    {
-        await _sessionStorage.SetItemAsync(_sessionKey, _internalContext);
     }
 
     private class AuthSessionContext : IAuthSessionContext
