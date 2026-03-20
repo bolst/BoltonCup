@@ -66,7 +66,7 @@
         try
         {
             _isSubmitting = true;
-            await BoltonCupApi.ConfirmEmailV2Async(new ConfirmEmailV2Request
+            await BoltonCupApi.ConfirmEmailAsync(new ConfirmEmailRequest
             {
                 Email = Context.Email,
                 Code = _model.Code,
@@ -97,7 +97,7 @@
         try
         {
             var delayTask = Task.Delay(300);
-            await BoltonCupApi.ForgotPasswordV2Async(new ForgotPasswordV2Request
+            await BoltonCupApi.ForgotPasswordAsync(new ForgotPasswordRequest
             {
                 Email = Context.Email
             });

@@ -9,9 +9,9 @@ public interface IUserService
     Task<IdentityResult> RegisterAsync(string email, string password);
     Task ResendConfirmationEmailAsync(string email);
     Task<bool> VerifyPasswordResetCodeAsync(string email, string code);
-    Task ForgotPasswordV2Async(string email);
-    Task<IdentityResult> ResetPasswordV2Async(string email, string code, string newPassword);
-    Task<IdentityResult> ConfirmEmailV2Async(string email, string code);
+    Task ForgotPasswordAsync(string email);
+    Task<IdentityResult> ResetPasswordAsync(string email, string code, string newPassword);
+    Task<IdentityResult> ConfirmEmailAsync(string email, string code);
 }
 
 public class UserService(
@@ -60,7 +60,7 @@ public class UserService(
                 );
     }
 
-    public async Task ForgotPasswordV2Async(string email)
+    public async Task ForgotPasswordAsync(string email)
     {
         if (await _userManager.FindByEmailAsync(email) is not { } user)
             return;
@@ -68,7 +68,7 @@ public class UserService(
         await _emailer.SendPasswordResetCodeAsync(user, email, code);
     }
 
-    public async Task<IdentityResult> ResetPasswordV2Async(string email, string code, string newPassword)
+    public async Task<IdentityResult> ResetPasswordAsync(string email, string code, string newPassword)
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user is null)
@@ -86,7 +86,7 @@ public class UserService(
         return result;
     }
 
-    public async Task<IdentityResult> ConfirmEmailV2Async(string email, string code)
+    public async Task<IdentityResult> ConfirmEmailAsync(string email, string code)
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user is null)

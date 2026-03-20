@@ -28,7 +28,7 @@ public class AuthController(
     }
 
     [AllowAnonymous]
-    [HttpPost("login-cookie")]
+    [HttpPost("login")]
     public async Task<IResult> LoginWithCookie([FromBody] LoginWithCookieRequest request)
     {
         // TODO: refactor this into user service
@@ -51,7 +51,7 @@ public class AuthController(
     }
 
     [AllowAnonymous]
-    [HttpPost("registerV2")]
+    [HttpPost("register")]
     public async Task<IResult> Register([FromBody] RegisterRequest request)
     {
         var result = await _userService.RegisterAsync(request.Email, request.Password);
@@ -69,8 +69,8 @@ public class AuthController(
     }
     
     [AllowAnonymous]
-    [HttpPost("verifyResetCode")]
-    public async Task<IActionResult> VerifyResetCode([FromBody] VerifyCodeRequest request)
+    [HttpPost("verifyPasswordResetCode")]
+    public async Task<IActionResult> VerifyPasswordResetCode([FromBody] VerifyPasswordResetCodeRequest request)
     {
         var isValid = await _userService.VerifyPasswordResetCodeAsync(request.Email, request.Code);
         if (!isValid)
@@ -79,30 +79,30 @@ public class AuthController(
     }
 
     [AllowAnonymous]
-    [HttpPost("forgotPasswordV2")]
-    public async Task<IActionResult> ForgotPasswordV2([FromBody] ForgotPasswordV2Request request)
+    [HttpPost("forgotPassword")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
-        await _userService.ForgotPasswordV2Async(request.Email);
+        await _userService.ForgotPasswordAsync(request.Email);
         return Ok();
     }
 
     [AllowAnonymous]
-    [HttpPost("resetPasswordV2")]
+    [HttpPost("resetPassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(InvalidPasswordResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ResetPasswordV2([FromBody] ResetPasswordRequest request)
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
-        var result = await _userService.ResetPasswordV2Async(request.Email, request.ResetCode, request.NewPassword);
+        var result = await _userService.ResetPasswordAsync(request.Email, request.ResetCode, request.NewPassword);
         return result.Succeeded
             ? Ok()
             : BadRequest(new InvalidPasswordResponse(result.Errors.Select(e => e.Description)));
     }
 
     [AllowAnonymous]
-    [HttpPost("confirmEmailV2")]
-    public async Task<IActionResult> ConfirmEmailV2([FromBody] ConfirmEmailV2Request request)
+    [HttpPost("confirmEmail")]
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
     {
-        var result = await _userService.ConfirmEmailV2Async(request.Email, request.Code);
+        var result = await _userService.ConfirmEmailAsync(request.Email, request.Code);
         return result.Succeeded
             ? Ok()
             : BadRequest("Invalid code or email.");
@@ -125,11 +125,11 @@ public class AuthController(
     }
 }
 
-public record VerifyCodeRequest(string Email, string Code);
+public record VerifyPasswordResetCodeRequest(string Email, string Code);
 
-public record ForgotPasswordV2Request(string Email);
+public record ForgotPasswordRequest(string Email);
 
-public record ConfirmEmailV2Request(string Email, string Code);
+public record ConfirmEmailRequest(string Email, string Code);
 
 public record LoginWithCookieRequest(string Email, string Password, bool Persist = true);
 

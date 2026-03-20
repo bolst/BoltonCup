@@ -140,7 +140,7 @@
         ]
       }
     },
-    "/api/auth/login-cookie": {
+    "/api/auth/login": {
       "post": {
         "tags": [
           "Auth"
@@ -172,7 +172,7 @@
         }
       }
     },
-    "/api/auth/registerv2": {
+    "/api/auth/register": {
       "post": {
         "tags": [
           "Auth"
@@ -236,27 +236,27 @@
         }
       }
     },
-    "/api/auth/verifyresetcode": {
+    "/api/auth/verifypasswordresetcode": {
       "post": {
         "tags": [
           "Auth"
         ],
-        "operationId": "VerifyResetCode",
+        "operationId": "VerifyPasswordResetCode",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerifyCodeRequest"
+                "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerifyCodeRequest"
+                "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/VerifyCodeRequest"
+                "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
               }
             }
           }
@@ -268,27 +268,27 @@
         }
       }
     },
-    "/api/auth/forgotpasswordv2": {
+    "/api/auth/forgotpassword": {
       "post": {
         "tags": [
           "Auth"
         ],
-        "operationId": "ForgotPasswordV2",
+        "operationId": "ForgotPassword",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ForgotPasswordV2Request"
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ForgotPasswordV2Request"
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ForgotPasswordV2Request"
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
               }
             }
           }
@@ -300,12 +300,12 @@
         }
       }
     },
-    "/api/auth/resetpasswordv2": {
+    "/api/auth/resetpassword": {
       "post": {
         "tags": [
           "Auth"
         ],
-        "operationId": "ResetPasswordV2",
+        "operationId": "ResetPassword",
         "requestBody": {
           "content": {
             "application/json": {
@@ -352,27 +352,27 @@
         }
       }
     },
-    "/api/auth/confirmemailv2": {
+    "/api/auth/confirmemail": {
       "post": {
         "tags": [
           "Auth"
         ],
-        "operationId": "ConfirmEmailV2",
+        "operationId": "ConfirmEmail",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ConfirmEmailV2Request"
+                "$ref": "#/components/schemas/ConfirmEmailRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ConfirmEmailV2Request"
+                "$ref": "#/components/schemas/ConfirmEmailRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ConfirmEmailV2Request"
+                "$ref": "#/components/schemas/ConfirmEmailRequest"
               }
             }
           }
@@ -1530,7 +1530,7 @@
   },
   "components": {
     "schemas": {
-      "ConfirmEmailV2Request": {
+      "ConfirmEmailRequest": {
         "type": "object",
         "properties": {
           "email": {
@@ -1544,7 +1544,7 @@
         },
         "additionalProperties": false
       },
-      "ForgotPasswordV2Request": {
+      "ForgotPasswordRequest": {
         "type": "object",
         "properties": {
           "email": {
@@ -3285,7 +3285,7 @@
         },
         "additionalProperties": false
       },
-      "VerifyCodeRequest": {
+      "VerifyPasswordResetCodeRequest": {
         "type": "object",
         "properties": {
           "email": {
