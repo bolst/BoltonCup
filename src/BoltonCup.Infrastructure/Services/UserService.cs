@@ -1,20 +1,53 @@
-using System.Text;
+using System.ComponentModel.DataAnnotations;
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
 
 namespace BoltonCup.Infrastructure.Services;
 
 public interface IUserService
 {
+    Task<IdentityResult> RegisterAsync(string email, string password);
+    Task ResendConfirmationEmailAsync(string email);
     Task<bool> VerifyPasswordResetCodeAsync(string email, string code);
     Task ForgotPasswordV2Async(string email);
     Task<IdentityResult> ResetPasswordV2Async(string email, string code, string newPassword);
     Task<IdentityResult> ConfirmEmailV2Async(string email, string code);
 }
 
-public class UserService(UserManager<BoltonCupUser> _userManager, IEmailSender<BoltonCupUser> _emailSender) : IUserService
+public class UserService(
+    IUserStore<BoltonCupUser> _userStore,
+    UserManager<BoltonCupUser> _userManager, 
+    IEmailer _emailer) : IUserService
 {
+    private static readonly EmailAddressAttribute _emailAddressAttribute = new();
+    
+    public async Task<IdentityResult> RegisterAsync(string email, string password)
+    {
+        if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
+            return IdentityResult.Failed(_userManager.ErrorDescriber.InvalidEmail(email));
+
+        var emailStore = (IUserEmailStore<BoltonCupUser>)_userStore;
+        var user = new BoltonCupUser();
+        await _userStore.SetUserNameAsync(user, email, CancellationToken.None);
+        await emailStore.SetEmailAsync(user, email, CancellationToken.None);
+        var result = await _userManager.CreateAsync(user, password);
+
+        if (result.Succeeded)
+        {
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user); 
+            await _emailer.SendConfirmationCodeAsync(user, email, code);
+        }
+        return result;
+    }
+
+    public async Task ResendConfirmationEmailAsync(string email)
+    {
+        if (await _userManager.FindByEmailAsync(email) is not { } user)
+            return;
+        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        await _emailer.SendConfirmationCodeAsync(user, email, code);
+    }
+    
     public async Task<bool> VerifyPasswordResetCodeAsync(string email, string code)
     {
         var user = await _userManager.FindByEmailAsync(email);
@@ -29,15 +62,10 @@ public class UserService(UserManager<BoltonCupUser> _userManager, IEmailSender<B
 
     public async Task ForgotPasswordV2Async(string email)
     {
-        var user = await _userManager.FindByEmailAsync(email);
-        if (user is null)
+        if (await _userManager.FindByEmailAsync(email) is not { } user)
             return;
-        // get code and encode it to base64
         var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-        var encodedBytes = Encoding.UTF8.GetBytes(code);
-        var encodedCode = WebEncoders.Base64UrlEncode(encodedBytes);
-        // send email
-        await _emailSender.SendPasswordResetCodeAsync(user, email, encodedCode);
+        await _emailer.SendPasswordResetCodeAsync(user, email, code);
     }
 
     public async Task<IdentityResult> ResetPasswordV2Async(string email, string code, string newPassword)

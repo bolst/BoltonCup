@@ -80,7 +80,7 @@ public static class ServiceCollectionExtensions
         return builder.Services
             .AddSingleton<IEmailQueue, EmailQueue>()
             .AddHostedService<EmailBackgroundService>()
-            .AddTransient<IEmailSender<BoltonCupUser>, EmailSender>();
+            .AddTransient<IEmailer, EmailSender>();
     }
     
     private static IServiceCollection AddBoltonCupS3(this WebApplicationBuilder builder)

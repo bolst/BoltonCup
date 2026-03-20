@@ -6,7 +6,6 @@ using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Controllers;
 using BoltonCup.WebAPI.Filters;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -100,10 +99,6 @@ app.UseHttpsRedirection();
 app.UseForwardedHeaders();
 app.UseRateLimiter();
 app.UseCors();
-
-app.MapGroup("/api/auth")
-    .MapIdentityApi<BoltonCupUser>()
-    .WithTags("Auth");
 
 app.UseExceptionHandler("/error");
 

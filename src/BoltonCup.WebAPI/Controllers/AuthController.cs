@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Services;
 using BoltonCup.WebAPI.Mapping.Auth;
@@ -47,6 +48,24 @@ public class AuthController(
         return result.Succeeded
             ? Results.Ok()
             : Results.Unauthorized();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("registerV2")]
+    public async Task<IResult> Register([FromBody] RegisterRequest request)
+    {
+        var result = await _userService.RegisterAsync(request.Email, request.Password);
+        return result.Succeeded
+            ? Results.Ok()
+            : Results.BadRequest(result.Errors.Select(e => e.Description));
+    }
+
+    [AllowAnonymous]
+    [HttpPost("resendConfirmationEmail")]
+    public async Task<IResult> ResendConfirmationEmail(ResendConfirmationEmailRequest request)
+    {
+        await _userService.ResendConfirmationEmailAsync(request.Email);
+        return Results.Ok();
     }
     
     [AllowAnonymous]
