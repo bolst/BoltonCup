@@ -25,7 +25,9 @@ builder.Services
     .AddIdentityApiEndpoints<BoltonCupUser>()
     .AddEntityFrameworkStores<AuthDbContext>();
 
-builder.AddBoltonCupInfrastructure();
+builder
+    .AddBoltonCupInfrastructure()
+    .AddBoltonCupAssetUrlResolver();
 builder.AddBoltonCupWebAPIServices();
 
 builder.Services.AddResponseCaching();
