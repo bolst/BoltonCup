@@ -1,11 +1,13 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace BoltonCup.Auth.Models;
 
-public class LogInWithPasswordForm
+public class CreateAccountWithPasswordFormModel
 {
     [Required]
     [EmailAddress]
+    [ReadOnly(true)]
     public string Email { get; set; } = string.Empty;
         
     [Required]

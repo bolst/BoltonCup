@@ -1,0 +1,13 @@
+@using BoltonCup.Infrastructure.EmailTemplates
+@model ConfirmationCodeViewModel
+@{
+    // ReSharper disable once Razor.LayoutNotResolved
+    Layout = EmailConstants.SharedLayout;
+}
+
+<p style="font-size: 14px; color: #555555;">Enter this temporary verification code to confirm your account:
+</p>
+
+<div style="display: inline-block; background-color: #d1d1d1; color: #000000; padding: 14px 64px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; margin: 20px 0;">
+    @Model.ConfirmationCode
+</div>

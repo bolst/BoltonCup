@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BoltonCup.Auth.Models;
 
-public class LogInOrSignUpForm
+public class LogInOrSignUpFormModel
 {
     [Required]
     [EmailAddress]

@@ -1,44 +1,31 @@
-using System.Text;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.EmailTemplates;
 using BoltonCup.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
 
 namespace BoltonCup.Infrastructure.Services;
+
+public interface IEmailer
+{
+    Task SendConfirmationCodeAsync(BoltonCupUser user, string email, string confirmationCode);
+    Task SendPasswordResetCodeAsync(BoltonCupUser user, string email, string resetCode);
+}
 
 public class EmailSender(
     IEmailQueue _queue,
     IAssetUrlResolver _urlResolver
-) : IEmailSender<BoltonCupUser>
+) : IEmailer
 {
-    public async Task SendConfirmationLinkAsync(BoltonCupUser user, string email, string confirmationLink)
+    public async Task SendConfirmationCodeAsync(BoltonCupUser user, string email, string confirmationCode)
     {
-        var model = new ConfirmationEmailViewModel
+        var model = new ConfirmationCodeViewModel
         {
-            ConfirmationLink = confirmationLink,
+            ConfirmationCode = confirmationCode,
             LogoUrl = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? "",
         };
         var payload = new EmailPayload(
             Email: email,
-            Subject: "Confirm your email for Bolton Cup",
-            TemplateName: "Confirmation.ConfirmationEmail",
-            Model: model
-        );
-        await _queue.EnqueueAsync(payload);
-    }
-
-    public async Task SendPasswordResetLinkAsync(BoltonCupUser user, string email, string resetLink)
-    {
-        var model = new PasswordResetLinkViewModel
-        {
-            ResetLink = resetLink,
-            LogoUrl = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? "",
-        };
-        var payload = new EmailPayload(
-            Email: email,
-            Subject: "Reset your password for Bolton Cup",
-            TemplateName: "PasswordResetLink.PasswordResetLink",
+            Subject: $"{confirmationCode} is your Bolton Cup confirmation code",
+            TemplateName: "ConfirmationCode.ConfirmationCode",
             Model: model
         );
         await _queue.EnqueueAsync(payload);
@@ -46,17 +33,14 @@ public class EmailSender(
 
     public async Task SendPasswordResetCodeAsync(BoltonCupUser user, string email, string resetCode)
     {
-        var decodedBytes = WebEncoders.Base64UrlDecode(resetCode);
-        var cleanCode = Encoding.UTF8.GetString(decodedBytes);
-
         var model = new PasswordResetCodeViewModel
         {
-            ResetCode = cleanCode,
+            ResetCode = resetCode,
             LogoUrl = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? "",
         };
         var payload = new EmailPayload(
             Email: email,
-            Subject: $"Your Bolton Cup code is {cleanCode}",
+            Subject: $"{resetCode} is your Bolton Cup password reset code",
             TemplateName: "PasswordResetCode.PasswordResetCode",
             Model: model
         );

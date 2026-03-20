@@ -1,6 +1,6 @@
 @inject AuthSessionStateService AuthSessionState
 
-@if (AuthSessionState.IsValid())
+@if (!string.IsNullOrEmpty(AuthSessionState.Context.Email))
 {
     @ChildContent
 }
@@ -15,5 +15,5 @@ else
 
     [Parameter]
     public RenderFragment ChildContent { get; set; } = null!;
-
+    
 }

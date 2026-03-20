@@ -1,0 +1,26 @@
+@page "/email-verification"
+@inject NavigationManager Navigation
+@inject IBoltonCupApi BoltonCupApi
+@inject ISnackbar Snackbar
+
+@* <EmailVerificationDialog OnValidSubmit="OnValidSubmit" OnResendEmail="OnResendEmail" /> *@
+
+@code {
+
+    private void OnValidSubmit(string code)
+    {
+        Navigation.NavigateTo("/log-in/password");
+    }
+
+    private async Task OnResendEmail(IAuthSessionContext context)
+    {
+        var delayTask = Task.Delay(300);
+        await BoltonCupApi.ResendConfirmationEmailAsync(new ResendConfirmationEmailRequest
+        {
+            Email = context.Email
+        });
+        await delayTask;
+        Snackbar.Add($"If an account exists, an email with a code has been sent to {context.Email}.", Severity.Success);
+    }
+    
+}

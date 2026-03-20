@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using BoltonCup.Auth.Components.Shared.AutoEditForm;
+using BoltonCup.Auth.Services;
 
 namespace BoltonCup.Auth.Components.Shared;
 
@@ -14,7 +16,10 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
     private readonly List<FieldMetadata> _fields = [];
 
     private bool _isSubmitting;
-    
+
+    [Inject] 
+    public AuthSessionStateService AuthSessionState { get; set; } = null!;
+
     [Parameter, EditorRequired]
     public required EditContext EditContext { get; set; }
 
@@ -29,7 +34,10 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
 
     [Parameter]
     public bool AutoFillPageTitle { get; set; } = true;
-
+    
+    [Parameter]
+    public bool ShowForgotPasswordLink { get; set; }
+    
     protected override void OnInitialized()
     {
         var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -40,7 +48,8 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
                 PropertyInfo = propertyInfo,
                 Type = propertyInfo.PropertyType,
                 Label = GetDisplayName(propertyInfo),
-                InputType = GetInputType(propertyInfo)
+                InputType = GetInputType(propertyInfo),
+                ReadOnly = GetReadOnly(propertyInfo),
             });
         }
     }
@@ -89,6 +98,13 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
             DataType.Password => InputType.Password,
             _ => InputType.Text
         };
+    }
+
+    private static bool GetReadOnly(PropertyInfo prop)
+    {
+        // only read-only if [ReadOnly(true)]
+        var attr = prop.GetCustomAttribute<ReadOnlyAttribute>();
+        return attr is not null && attr.IsReadOnly;
     }
 
     private void OnValueChanged(FieldMetadata field, object? value)
