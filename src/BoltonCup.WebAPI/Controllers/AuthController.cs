@@ -78,6 +78,16 @@ public class AuthController(
             ? Ok()
             : BadRequest(new InvalidPasswordResponse(result.Errors.Select(e => e.Description)));
     }
+
+    [AllowAnonymous]
+    [HttpPost("confirmEmailV2")]
+    public async Task<IActionResult> ConfirmEmailV2([FromBody] ConfirmEmailV2Request request)
+    {
+        var result = await _userService.ConfirmEmailV2Async(request.Email, request.Code);
+        return result.Succeeded
+            ? Ok()
+            : BadRequest("Invalid code or email.");
+    }
     
     [HttpPost("logout")]
     public async Task<IResult> Logout()
@@ -99,6 +109,8 @@ public class AuthController(
 public record VerifyCodeRequest(string Email, string Code);
 
 public record ForgotPasswordV2Request(string Email);
+
+public record ConfirmEmailV2Request(string Email, string Code);
 
 public record LoginWithCookieRequest(string Email, string Password, bool Persist = true);
 

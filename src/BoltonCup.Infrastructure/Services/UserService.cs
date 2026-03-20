@@ -10,6 +10,7 @@ public interface IUserService
     Task<bool> VerifyPasswordResetCodeAsync(string email, string code);
     Task ForgotPasswordV2Async(string email);
     Task<IdentityResult> ResetPasswordV2Async(string email, string code, string newPassword);
+    Task<IdentityResult> ConfirmEmailV2Async(string email, string code);
 }
 
 public class UserService(UserManager<BoltonCupUser> _userManager, IEmailSender<BoltonCupUser> _emailSender) : IUserService
@@ -55,5 +56,13 @@ public class UserService(UserManager<BoltonCupUser> _userManager, IEmailSender<B
         }
 
         return result;
+    }
+
+    public async Task<IdentityResult> ConfirmEmailV2Async(string email, string code)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user is null)
+            return IdentityResult.Failed(new IdentityError { Description = "Invalid request." });
+        return await _userManager.ConfirmEmailAsync(user, code);
     }
 }
