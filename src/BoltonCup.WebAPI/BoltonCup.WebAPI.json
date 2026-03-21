@@ -3374,25 +3374,34 @@
         "additionalProperties": false
       },
       "UpdateAccountRequest": {
+        "required": [
+          "birthday",
+          "firstName",
+          "lastName"
+        ],
         "type": "object",
         "properties": {
           "firstName": {
-            "type": "string",
-            "nullable": true
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string"
           },
           "lastName": {
-            "type": "string",
-            "nullable": true
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string"
           },
           "birthday": {
             "type": "string",
             "format": "date-time"
           },
           "highestLevel": {
+            "maxLength": 50,
             "type": "string",
             "nullable": true
           },
           "preferredBeer": {
+            "maxLength": 100,
             "type": "string",
             "nullable": true
           }
