@@ -20,6 +20,14 @@ public class AccountsController(
         var account = await _userService.GetMeAsync(User);
         return OkOrNotFound(_accountMapper.ToDto(account, User));
     }
+
+    [HttpPut("me")]
+    public async Task<ActionResult> UpdateAccount([FromBody] UpdateAccountRequest request)
+    {
+        var command = _accountMapper.ToCommand(request, User);
+        await _accountService.UpdateAsync(command);
+        return NoContent();
+    }
     
     /// <remarks>
     /// Updates an account's avatar by accepting a pre-signed S3 key.
