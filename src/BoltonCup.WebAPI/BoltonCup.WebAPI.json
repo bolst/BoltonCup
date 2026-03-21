@@ -3253,10 +3253,19 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           },
           "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
             "type": "string",
             "nullable": true
           },
@@ -3272,6 +3281,31 @@
             "items": {
               "type": "string"
             },
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "highestLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "avatar": {
+            "type": "string",
+            "nullable": true
+          },
+          "banner": {
+            "type": "string",
+            "nullable": true
+          },
+          "preferredBeer": {
+            "type": "string",
             "nullable": true
           }
         },

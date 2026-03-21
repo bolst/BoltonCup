@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Services;
 using BoltonCup.WebAPI.Mapping.Auth;
@@ -16,16 +15,18 @@ namespace BoltonCup.WebAPI.Controllers;
 public class AuthController(
     IUserService _userService,
     UserManager<BoltonCupUser> _userManager, 
-    SignInManager<BoltonCupUser> _signInManager
+    SignInManager<BoltonCupUser> _signInManager,
+    IUserMapper _userMapper
     ) : BoltonCupControllerBase
 {
     /// <remarks>
     /// Gets the currently logged-in user
     /// </remarks>
     [HttpGet("me")]
-    public ActionResult<UserInfoDto> GetMe()
+    public async Task<ActionResult<UserInfoDto>> GetMe()
     {
-        return new UserInfoDto(User);
+        var (user, account) = await _userService.GetMeAsync(User);
+        return OkOrNotFound(_userMapper.ToDto(user, account, User));
     }
 
     [AllowAnonymous]

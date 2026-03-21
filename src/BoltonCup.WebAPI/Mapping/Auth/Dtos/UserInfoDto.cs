@@ -1,23 +1,19 @@
-using System.Security.Claims;
-
 namespace BoltonCup.WebAPI.Mapping.Auth;
 
 public class UserInfoDto
 {
-    public string Id { get; set; }
-    public string Email { get; set; }
-    public string Name { get; set; }
+    public int? Id { get; set; }
+    public string? Email { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? Name { get; set; }
     public bool IsAuthenticated { get; set; }
     public List<string> Roles { get; set; }
 
-    public UserInfoDto(ClaimsPrincipal user)
-    {
-        Id = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
-        Email = user.FindFirstValue(ClaimTypes.Email) ?? "";
-        Name = user.Identity?.Name ?? "";
-        IsAuthenticated = user.Identity?.IsAuthenticated ?? false;
-        Roles = user.FindAll(ClaimTypes.Role)
-            .Select(c => c.Value)
-            .ToList();
-    }
+    public string? Phone { get; set; }
+    public DateTime? Birthday { get; set; }
+    public string? HighestLevel { get; set; }
+    public string? Avatar { get; set; }
+    public string? Banner { get; set; }
+    public string? PreferredBeer { get; set; }
 }
