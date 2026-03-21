@@ -46,6 +46,46 @@
         ]
       }
     },
+    "/api/accounts/{id}/banner": {
+      "put": {
+        "tags": [
+          "Accounts"
+        ],
+        "description": "Updates an account's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
+        "operationId": "UpdateBanner",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "tempKey",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/assets": {
       "get": {
         "tags": [

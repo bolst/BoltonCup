@@ -15,4 +15,15 @@ public class AccountsController(IAccountService _accountService) : BoltonCupCont
         await _accountService.UpdateAvatarAsync(id, tempKey);
         return Ok();
     }
+    
+    /// <remarks>
+    /// Updates an account's banner by accepting a pre-signed S3 key.
+    /// The client is responsible for uploading the image to S3 before calling this endpoint.
+    /// </remarks>
+    [HttpPut("{id:int}/banner")]
+    public async Task<ActionResult> UpdateBanner(int id, string tempKey)
+    {
+        await _accountService.UpdateBannerAsync(id, tempKey);
+        return Ok();
+    }
 }
