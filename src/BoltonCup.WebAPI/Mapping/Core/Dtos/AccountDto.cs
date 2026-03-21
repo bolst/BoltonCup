@@ -1,6 +1,6 @@
-namespace BoltonCup.WebAPI.Mapping.Auth;
+namespace BoltonCup.WebAPI.Mapping.Core;
 
-public class UserInfoDto
+public class AccountDto
 {
     public int? Id { get; set; }
     public string? Email { get; set; }

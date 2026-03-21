@@ -1,20 +1,18 @@
 using System.Security.Claims;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Identity;
-using BoltonCup.WebAPI.Mapping.Core;
 
-namespace BoltonCup.WebAPI.Mapping.Auth;
+namespace BoltonCup.WebAPI.Mapping.Core;
 
-public interface IUserMapper
+public interface IAccountMapper
 {
-    UserInfoDto? ToDto(Account? account, ClaimsPrincipal claims);
+    AccountDto? ToDto(Account? account, ClaimsPrincipal claims);
 }
 
-public class UserMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMapper) : IUserMapper
+public class AccountMapper : IAccountMapper
 {
-    public UserInfoDto? ToDto(Account? account, ClaimsPrincipal claims)
+    public AccountDto? ToDto(Account? account, ClaimsPrincipal claims)
     {
-        return new UserInfoDto
+        return new AccountDto
         {
             Id = account?.Id,
             Email = account?.Email ?? claims.FindFirstValue(ClaimTypes.Email),

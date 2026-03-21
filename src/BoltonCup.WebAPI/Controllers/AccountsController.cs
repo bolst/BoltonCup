@@ -1,10 +1,26 @@
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Services;
+using BoltonCup.WebAPI.Mapping.Core;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class AccountsController(IAccountService _accountService) : BoltonCupControllerBase
+public class AccountsController(
+    IAccountService _accountService, 
+    IUserService _userService, 
+    IAccountMapper _accountMapper
+) : BoltonCupControllerBase
 {
+    /// <remarks>
+    /// Gets the currently logged-in user
+    /// </remarks>
+    [HttpGet("me")]
+    public async Task<ActionResult<AccountDto>> GetMe()
+    {
+        var account = await _userService.GetMeAsync(User);
+        return OkOrNotFound(_accountMapper.ToDto(account, User));
+    }
+    
     /// <remarks>
     /// Updates an account's avatar by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.

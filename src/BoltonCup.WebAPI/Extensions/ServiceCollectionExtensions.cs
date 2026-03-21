@@ -1,8 +1,6 @@
-using System.Threading.RateLimiting;
 using BoltonCup.Core;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Filters;
-using BoltonCup.WebAPI.Mapping.Auth;
 using BoltonCup.WebAPI.Mapping.Core;
 using BoltonCup.WebAPI.RateLimiting;
 using FluentValidation;
@@ -103,6 +101,7 @@ public static class ServiceCollectionExtensions
     {
         return services
             .AddTransient<IBriefMapper, BriefMapper>()
+            .AddTransient<IAccountMapper, AccountMapper>()
             .AddTransient<IGameMapper, GameMapper>()
             .AddTransient<IGoalieGameLogMapper, GoalieGameLogMapper>()
             .AddTransient<IGoalieStatMapper, GoalieStatMapper>()
@@ -111,8 +110,7 @@ public static class ServiceCollectionExtensions
             .AddTransient<ISkaterGameLogMapper, SkaterGameLogMapper>()
             .AddTransient<ISkaterStatMapper, SkaterStatMapper>()
             .AddTransient<ITeamMapper, TeamMapper>()
-            .AddTransient<ITournamentMapper, TournamentMapper>()
-            .AddTransient<IUserMapper, UserMapper>();
+            .AddTransient<ITournamentMapper, TournamentMapper>();
     }
     
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
