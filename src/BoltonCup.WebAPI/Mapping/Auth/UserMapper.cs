@@ -7,25 +7,23 @@ namespace BoltonCup.WebAPI.Mapping.Auth;
 
 public interface IUserMapper
 {
-    UserInfoDto? ToDto(BoltonCupUser? user, Account? account, ClaimsPrincipal claims);
+    UserInfoDto? ToDto(Account? account, ClaimsPrincipal claims);
 }
 
 public class UserMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMapper) : IUserMapper
 {
-    public UserInfoDto? ToDto(BoltonCupUser? user, Account? account, ClaimsPrincipal claims)
+    public UserInfoDto? ToDto(Account? account, ClaimsPrincipal claims)
     {
-        if (user is null)
-            return null;
         return new UserInfoDto
         {
             Id = account?.Id,
-            Email = user.Email,
+            Email = account?.Email ?? claims.FindFirstValue(ClaimTypes.Email),
             FirstName = account?.FirstName,
             LastName = account?.LastName,
             Name = (account?.FirstName +  " " + account?.LastName).Trim(),
             IsAuthenticated = claims.Identity?.IsAuthenticated ?? false,
-            Roles = claims.FindAll(ClaimTypes.Role) .Select(c => c.Value) .ToList(),
-            Phone = account?.Phone,
+            Roles = claims.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList(),
+            Phone = account?.Phone ?? claims.FindFirstValue(ClaimTypes.MobilePhone),
             Birthday = account?.Birthday,
             HighestLevel = account?.HighestLevel,
             Avatar = account?.Avatar,

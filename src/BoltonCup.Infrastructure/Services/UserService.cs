@@ -10,7 +10,7 @@ namespace BoltonCup.Infrastructure.Services;
 
 public interface IUserService
 {
-    Task<(BoltonCupUser? User, Account? Account)> GetMeAsync(ClaimsPrincipal claimsPrincipal);
+    Task<Account?> GetMeAsync(ClaimsPrincipal claimsPrincipal);
     Task<IdentityResult> RegisterAsync(string email, string password);
     Task ResendConfirmationEmailAsync(string email);
     Task<bool> VerifyPasswordResetCodeAsync(string email, string code);
@@ -28,18 +28,14 @@ public class UserService(
 
 
 
-    public async Task<(BoltonCupUser? User, Account? Account)> GetMeAsync(ClaimsPrincipal claimsPrincipal)
+    public async Task<Account?> GetMeAsync(ClaimsPrincipal claimsPrincipal)
     {
         var email = claimsPrincipal.FindFirstValue(ClaimTypes.Email);
         if (string.IsNullOrEmpty(email))
-            return (null, null);
-        
-        var user = await _userManager.FindByEmailAsync(email);
-        if (user?.AccountId is null)
-            return (user, null);
-        
-        var account = await _dbContext.Accounts.FindAsync(user.AccountId);
-        return (user, account);
+            return null;
+        if (await _userManager.FindByEmailAsync(email) is not { AccountId: not null } user)
+            return null;
+        return await _dbContext.Accounts.FindAsync(user.AccountId);
     }
     
     

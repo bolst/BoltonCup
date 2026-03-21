@@ -25,8 +25,8 @@ public class AuthController(
     [HttpGet("me")]
     public async Task<ActionResult<UserInfoDto>> GetMe()
     {
-        var (user, account) = await _userService.GetMeAsync(User);
-        return OkOrNotFound(_userMapper.ToDto(user, account, User));
+        var account = await _userService.GetMeAsync(User);
+        return OkOrNotFound(_userMapper.ToDto(account, User));
     }
 
     [AllowAnonymous]
