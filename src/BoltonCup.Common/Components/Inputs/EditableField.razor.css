@@ -1,0 +1,8 @@
+.mud-input.mud-input-filled {
+    border-radius: var(--mud-default-borderradius);
+}
+
+.mud-input.mud-disabled {
+    color: var(--mud-palette-text-primary);
+    cursor: default;
+}
