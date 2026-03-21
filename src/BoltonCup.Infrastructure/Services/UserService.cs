@@ -21,6 +21,8 @@ public class UserService(
 {
     private static readonly EmailAddressAttribute _emailAddressAttribute = new();
     
+    
+    
     public async Task<IdentityResult> RegisterAsync(string email, string password)
     {
         if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
@@ -40,6 +42,8 @@ public class UserService(
         return result;
     }
 
+    
+    
     public async Task ResendConfirmationEmailAsync(string email)
     {
         if (await _userManager.FindByEmailAsync(email) is not { } user)
@@ -47,6 +51,8 @@ public class UserService(
         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         await _emailer.SendConfirmationCodeAsync(user, email, code);
     }
+    
+    
     
     public async Task<bool> VerifyPasswordResetCodeAsync(string email, string code)
     {
@@ -60,6 +66,8 @@ public class UserService(
                 );
     }
 
+    
+    
     public async Task ForgotPasswordAsync(string email)
     {
         if (await _userManager.FindByEmailAsync(email) is not { } user)
@@ -68,6 +76,8 @@ public class UserService(
         await _emailer.SendPasswordResetCodeAsync(user, email, code);
     }
 
+    
+    
     public async Task<IdentityResult> ResetPasswordAsync(string email, string code, string newPassword)
     {
         var user = await _userManager.FindByEmailAsync(email);
@@ -86,6 +96,8 @@ public class UserService(
         return result;
     }
 
+    
+    
     public async Task<IdentityResult> ConfirmEmailAsync(string email, string code)
     {
         var user = await _userManager.FindByEmailAsync(email);
