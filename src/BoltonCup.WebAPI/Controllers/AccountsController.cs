@@ -10,9 +10,9 @@ public class AccountsController(IAccountService _accountService) : BoltonCupCont
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
     /// </remarks>
     [HttpPut("{id:int}/avatar")]
-    public async Task<ActionResult> UpdateAvatar(int id, string key)
+    public async Task<ActionResult> UpdateAvatar(int id, string tempKey)
     {
-        await _accountService.UpdateAvatarAsync(id, key);
+        await _accountService.UpdateAvatarAsync(id, tempKey);
         return Ok();
     }
 }

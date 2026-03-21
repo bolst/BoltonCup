@@ -24,7 +24,7 @@
             }
           },
           {
-            "name": "key",
+            "name": "tempKey",
             "in": "query",
             "schema": {
               "type": "string"
