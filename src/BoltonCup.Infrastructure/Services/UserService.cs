@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Services;
 
@@ -15,6 +17,7 @@ public interface IUserService
 }
 
 public class UserService(
+    BoltonCupDbContext _dbContext,
     UserManager<BoltonCupUser> _userManager, 
     IEmailer _emailer) : IUserService
 {
@@ -78,8 +81,7 @@ public class UserService(
     
     public async Task<IdentityResult> ResetPasswordAsync(string email, string code, string newPassword)
     {
-        var user = await _userManager.FindByEmailAsync(email);
-        if (user is null)
+        if (await _userManager.FindByEmailAsync(email) is not {} user)
             return IdentityResult.Failed(new IdentityError { Description = "Invalid request." });
 
         var result = await _userManager.ResetPasswordAsync(user, code, newPassword);
@@ -94,13 +96,24 @@ public class UserService(
         return result;
     }
 
-    
-    
+
+
     public async Task<IdentityResult> ConfirmEmailAsync(string email, string code)
     {
-        var user = await _userManager.FindByEmailAsync(email);
-        if (user is null)
+        if (await _userManager.FindByEmailAsync(email) is not { } user) 
             return IdentityResult.Failed(new IdentityError { Description = "Invalid request." });
-        return await _userManager.ConfirmEmailAsync(user, code);
+        
+        var result = await _userManager.ConfirmEmailAsync(user, code);
+        if (!result.Succeeded)
+            return result;
+        
+        // if a user already has an account, join it to them
+        if (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == user.Email) is { } account)
+        {
+            user.AccountId = account.Id;
+            await _userManager.UpdateAsync(user);
+        }
+
+        return result;
     }
 }
