@@ -15,7 +15,6 @@ public interface IUserService
 }
 
 public class UserService(
-    IUserStore<BoltonCupUser> _userStore,
     UserManager<BoltonCupUser> _userManager, 
     IEmailer _emailer) : IUserService
 {
@@ -28,10 +27,9 @@ public class UserService(
         if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
             return IdentityResult.Failed(_userManager.ErrorDescriber.InvalidEmail(email));
 
-        var emailStore = (IUserEmailStore<BoltonCupUser>)_userStore;
         var user = new BoltonCupUser();
-        await _userStore.SetUserNameAsync(user, email, CancellationToken.None);
-        await emailStore.SetEmailAsync(user, email, CancellationToken.None);
+        await _userManager.SetUserNameAsync(user, email);
+        await _userManager.SetEmailAsync(user, email);
         var result = await _userManager.CreateAsync(user, password);
 
         if (result.Succeeded)
