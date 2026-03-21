@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Services;
 
@@ -15,21 +17,22 @@ public interface IUserService
 }
 
 public class UserService(
-    IUserStore<BoltonCupUser> _userStore,
+    BoltonCupDbContext _dbContext,
     UserManager<BoltonCupUser> _userManager, 
     IEmailer _emailer) : IUserService
 {
     private static readonly EmailAddressAttribute _emailAddressAttribute = new();
+    
+    
     
     public async Task<IdentityResult> RegisterAsync(string email, string password)
     {
         if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
             return IdentityResult.Failed(_userManager.ErrorDescriber.InvalidEmail(email));
 
-        var emailStore = (IUserEmailStore<BoltonCupUser>)_userStore;
         var user = new BoltonCupUser();
-        await _userStore.SetUserNameAsync(user, email, CancellationToken.None);
-        await emailStore.SetEmailAsync(user, email, CancellationToken.None);
+        await _userManager.SetUserNameAsync(user, email);
+        await _userManager.SetEmailAsync(user, email);
         var result = await _userManager.CreateAsync(user, password);
 
         if (result.Succeeded)
@@ -40,6 +43,8 @@ public class UserService(
         return result;
     }
 
+    
+    
     public async Task ResendConfirmationEmailAsync(string email)
     {
         if (await _userManager.FindByEmailAsync(email) is not { } user)
@@ -47,6 +52,8 @@ public class UserService(
         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         await _emailer.SendConfirmationCodeAsync(user, email, code);
     }
+    
+    
     
     public async Task<bool> VerifyPasswordResetCodeAsync(string email, string code)
     {
@@ -60,6 +67,8 @@ public class UserService(
                 );
     }
 
+    
+    
     public async Task ForgotPasswordAsync(string email)
     {
         if (await _userManager.FindByEmailAsync(email) is not { } user)
@@ -68,10 +77,11 @@ public class UserService(
         await _emailer.SendPasswordResetCodeAsync(user, email, code);
     }
 
+    
+    
     public async Task<IdentityResult> ResetPasswordAsync(string email, string code, string newPassword)
     {
-        var user = await _userManager.FindByEmailAsync(email);
-        if (user is null)
+        if (await _userManager.FindByEmailAsync(email) is not {} user)
             return IdentityResult.Failed(new IdentityError { Description = "Invalid request." });
 
         var result = await _userManager.ResetPasswordAsync(user, code, newPassword);
@@ -86,11 +96,24 @@ public class UserService(
         return result;
     }
 
+
+
     public async Task<IdentityResult> ConfirmEmailAsync(string email, string code)
     {
-        var user = await _userManager.FindByEmailAsync(email);
-        if (user is null)
+        if (await _userManager.FindByEmailAsync(email) is not { } user) 
             return IdentityResult.Failed(new IdentityError { Description = "Invalid request." });
-        return await _userManager.ConfirmEmailAsync(user, code);
+        
+        var result = await _userManager.ConfirmEmailAsync(user, code);
+        if (!result.Succeeded)
+            return result;
+        
+        // if a user already has an account, join it to them
+        if (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == user.Email) is { } account)
+        {
+            user.AccountId = account.Id;
+            await _userManager.UpdateAsync(user);
+        }
+
+        return result;
     }
 }
