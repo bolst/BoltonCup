@@ -19,19 +19,13 @@ public class AuthSessionStateService(
 
     public async Task LogInOrSignUp(LogInOrSignUpFormModel? model = null)
     {
-        try
+        if (model is not null)
+            _internalContext.Email = model.Email;
+        var exists = await _api.CheckUserAsync(new CheckUserRequest
         {
-            if (model is not null)
-                _internalContext.Email = model.Email;
-            // will throw 204 or 404 if user does not exist
-            _ = await _api.GetUserAsync(_internalContext.Email);
-            _navigation.NavigateWithReturnUrl("log-in/password");
-        }
-        catch (ApiException e)
-            when (e.StatusCode is 204 or 404)
-        {
-            _navigation.NavigateWithReturnUrl("create-account/password");
-        }
+            Email = _internalContext.Email
+        });
+        _navigation.NavigateWithReturnUrl(exists ? "log-in/password" : "create-account/password");
     }
     
     public void NavigateToReturnUrlOrDefault()
