@@ -14,8 +14,7 @@ namespace BoltonCup.WebAPI.Controllers;
 public class AuthController(
     IUserService _userService,
     UserManager<BoltonCupUser> _userManager, 
-    SignInManager<BoltonCupUser> _signInManager,
-    IBoltonCupUserMapper _userMapper
+    SignInManager<BoltonCupUser> _signInManager
     ) : BoltonCupControllerBase
 {
     /// <remarks>
@@ -116,12 +115,10 @@ public class AuthController(
     }
     
     [AllowAnonymous]
-    [HttpPost("user")]
-    public async Task<ActionResult<UserDto>> GetUser([FromBody] string email)
+    [HttpPost("continue")]
+    public async Task<ActionResult<bool>> GetUser([FromBody] string email)
     {
-        // Simply check if the user exists in the DB
-        var user = await _userManager.FindByEmailAsync(email);
-        return OkOrNotFound(_userMapper.ToDto(user));
+        return await _userManager.FindByEmailAsync(email) is not null;
     }
 }
 
