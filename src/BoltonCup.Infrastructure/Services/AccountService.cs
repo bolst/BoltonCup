@@ -1,4 +1,5 @@
 using BoltonCup.Core;
+using BoltonCup.Core.Commands;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Extensions;
 
@@ -16,7 +17,20 @@ public class AccountService : IAccountService
         _storageService = storageService;
         _assetKeyGenerator = assetKeyGenerator;
     }
-    
+
+    public async Task UpdateAsync(UpdateAccountCommand command, CancellationToken cancellationToken = default)
+    {
+        var account = await _dbContext.Accounts.FindAsync([command.AccountId], cancellationToken: cancellationToken)
+            ?? throw new KeyNotFoundException("Account not found.");
+
+        account.FirstName = command.FirstName;
+        account.LastName = command.LastName;
+        account.Birthday = command.Birthday;
+        account.HighestLevel = command.HighestLevel;
+        account.PreferredBeer = command.PreferredBeer;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     public Task UpdateAvatarAsync(int accountId, string tempKey, CancellationToken cancellationToken = default)
     {
         return _storageService.UpdateAssetAsync<Account>(
