@@ -1,14 +1,13 @@
+@using BoltonCup.Core.Values
 @using MudBlazor.State
 @namespace BoltonCup.Common.Components
 @inherits ComponentBaseWithState
 
 <MudSelect T="string" Value="@_value" ValueChanged="SetValueAsync" Margin="Margin.Dense" Dense Clearable>
-    <MudSelectItem Value="@("House league")"/>
-    <MudSelectItem Value="@("A/AA")"/>
-    <MudSelectItem Value="@("AAA")"/>
-    <MudSelectItem Value="@("Jr. C")"/>
-    <MudSelectItem Value="@("Jr. B")"/>
-    <MudSelectItem Value="@("Jr. A or higher")"/>
+    @foreach (var skillLevel in SkillLevel.All)
+    {
+        <MudSelectItem Value="@skillLevel"/>
+    }
 </MudSelect>
 
 
