@@ -1,6 +1,6 @@
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Services;
-using BoltonCup.WebAPI.Mapping.Core;
+using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;

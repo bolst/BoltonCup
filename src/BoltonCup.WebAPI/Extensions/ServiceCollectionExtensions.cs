@@ -1,7 +1,7 @@
 using BoltonCup.Core;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Filters;
-using BoltonCup.WebAPI.Mapping.Core;
+using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
 using FluentValidation;
 using FluentValidation.AspNetCore;
