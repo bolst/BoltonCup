@@ -2,10 +2,12 @@ using System.Diagnostics.CodeAnalysis;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Services;
 using BoltonCup.WebAPI.Mapping.Auth;
+using BoltonCup.WebAPI.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BoltonCup.WebAPI.Controllers;
 
@@ -116,9 +118,10 @@ public class AuthController(
     
     [AllowAnonymous]
     [HttpPost("continue")]
-    public async Task<ActionResult<bool>> GetUser([FromBody] string email)
+    [EnableRateLimiting(nameof(StrictEmailCheckPolicy))]
+    public async Task<ActionResult<bool>> CheckUserAsync([FromBody] CheckUserRequest request)
     {
-        return await _userManager.FindByEmailAsync(email) is not null;
+        return await _userManager.FindByEmailAsync(request.Email) is not null;
     }
 }
 
@@ -129,5 +132,7 @@ public record ForgotPasswordRequest(string Email);
 public record ConfirmEmailRequest(string Email, string Code);
 
 public record LoginWithCookieRequest(string Email, string Password, bool Persist = true);
+
+public record CheckUserRequest(string Email);
 
 public record InvalidPasswordResponse(IEnumerable<string> Errors);

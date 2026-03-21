@@ -21,7 +21,10 @@ public class AuthSessionStateService(
     {
         if (model is not null)
             _internalContext.Email = model.Email;
-        var exists = await _api.GetUserAsync(_internalContext.Email);
+        var exists = await _api.CheckUserAsync(new CheckUserRequest
+        {
+            Email = _internalContext.Email
+        });
         _navigation.NavigateWithReturnUrl(exists ? "log-in/password" : "create-account/password");
     }
     

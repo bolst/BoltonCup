@@ -4,6 +4,7 @@ using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Filters;
 using BoltonCup.WebAPI.Mapping.Auth;
 using BoltonCup.WebAPI.Mapping.Core;
+using BoltonCup.WebAPI.RateLimiting;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -93,20 +94,8 @@ public static class ServiceCollectionExtensions
             .AddRateLimiter(options => 
             {
                 options.RejectionStatusCode = 429;
-                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-                {
-                    string partitionKey = context.User.Identity?.Name ??
-                                          context.Connection.RemoteIpAddress?.ToString() ?? 
-                                          "anon";
-                    return RateLimitPartition.GetSlidingWindowLimiter(partitionKey, _ => new SlidingWindowRateLimiterOptions
-                    {
-                        PermitLimit = 100, 
-                        SegmentsPerWindow = 4,
-                        Window = TimeSpan.FromMinutes(1),
-                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                        QueueLimit = 2,
-                    });
-                });
+                options.GlobalLimiter = GlobalRateLimiter.Create();
+                options.AddPolicy<string, StrictEmailCheckPolicy>(nameof(StrictEmailCheckPolicy));
             });
     }
 
