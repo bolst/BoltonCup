@@ -1,43 +1,112 @@
 @page "/profile"
 @using BoltonCup.Sdk
+@implements IDisposable
 @inject IBoltonCupApi BoltonCupApi
 @inject ISnackbar Snackbar
 @attribute [Authorize]
 
 <PageTitle>Profile | Bolton Cup</PageTitle>
 
-@if (_userInfo is not null)
+@if (_accountInfo is not null)
 {
-    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Gutters="false">
+    <MudContainer Class="pb-4" MaxWidth="MaxWidth.Large">
         <MudContainer MaxWidth="MaxWidth.Medium" Gutters="false">
             <div class="action-shot-container d-flex flex-row align-end">
-                <BoltonCupImage Src="@_userInfo.Banner" SrcChanged="UpdateBanner" Class="action-shot" ObjectFit="ObjectFit.Cover" Editable/>
+                <BoltonCupImage Src="@_accountInfo.Banner" SrcChanged="UpdateBanner" Class="action-shot" ObjectFit="ObjectFit.Cover" Editable/>
             </div>
             <div class="d-flex flex-column align-center gap-3 mt-n20">
-                <BoltonCupImage Src="@_userInfo.Avatar" SrcChanged="UpdateAvatar" Height="160" Avatar Editable/>
+                <BoltonCupImage Src="@_accountInfo.Avatar" SrcChanged="UpdateAvatar" Height="160" Avatar Editable/>
             </div>
         </MudContainer>
+        
+        <MudDivider Class="my-4" />
+        
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-4" Elevation="0" Outlined>
+                    <EditForm EditContext="_editContext" class="mud-width-full">
+                        <EditableField @bind-Value="_accountInfo.FirstName" Label="First"/>
+                        <EditableField @bind-Value="_accountInfo.LastName" Label="Last"/>
+                        <EditableField @bind-Value="_accountInfo.Phone" Label="Phone"/>
+                        @* <EditableField @bind-Value="_userInfo.Birthday" Label="Last"/> *@
+                        @* <EditableField @bind-Value="_userInfo.HighestLevel" Label="Highest Level"/> *@
+                        <EditableField @bind-Value="_accountInfo.PreferredBeer" Label="Favourite Beer"/>
+                    </EditForm>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="6">
+                
+            </MudItem>
+        </MudGrid>
         
     </MudContainer>
 }
 
 @code {
 
-    private UserInfoDto? _userInfo;
+    private AccountDto? _accountInfo;
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;  
 
     protected override async Task OnInitializedAsync()
     {
-        _userInfo = await BoltonCupApi.GetMeAsync();
+        _accountInfo = await BoltonCupApi.GetMeAsync();
+
+        if (_accountInfo is not null)
+        {
+            _editContext = new EditContext(_accountInfo);
+            _editContext.OnValidationRequested += HandleValidationRequested;
+            _editContext.OnFieldChanged += HandleFieldChanged;
+            _messageStore = new ValidationMessageStore(_editContext);
+        }
+    }
+    
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        _messageStore?.Clear();
     }
 
+    private async void HandleFieldChanged(object? sender, FieldChangedEventArgs args)
+    {
+        if (_accountInfo is null)
+            return;
+        var field = args.FieldIdentifier;
+        var fieldName = field.FieldName;
+        // clear errors for field
+        _messageStore?.Clear(field);
+        _editContext?.NotifyValidationStateChanged();
+
+        try
+        {
+            await BoltonCupApi.UpdateAccountAsync(new UpdateAccountRequest
+            {
+                FirstName = _accountInfo.FirstName,
+                LastName = _accountInfo.LastName,
+                Birthday = _accountInfo.Birthday,
+                HighestLevel = _accountInfo.HighestLevel,
+                PreferredBeer = _accountInfo.PreferredBeer,
+            });
+            Snackbar.Add($"{fieldName} was updated successfully!", Severity.Success);
+        }
+        catch (ApiException e)
+        {
+            // TODO: validate
+            Snackbar.Add("Validation error", Severity.Error);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add($"Something went wrong while updating {fieldName}.", Severity.Error);
+        }
+    }
+    
     private async Task UpdateBanner(string? newSrc)
     {
-        if (_userInfo?.Id is null || string.IsNullOrEmpty(newSrc))
+        if (_accountInfo is null || string.IsNullOrEmpty(newSrc))
             return;
         try
         {
-            await BoltonCupApi.UpdateBannerAsync(_userInfo.Id.Value, newSrc);
-            _userInfo.Banner = newSrc;
+            await BoltonCupApi.UpdateBannerAsync(_accountInfo.Id, newSrc);
+            _accountInfo.Banner = newSrc;
             Snackbar.Add("Your banner has been updated.", Severity.Success);
             await InvokeAsync(StateHasChanged);
         }
@@ -49,12 +118,12 @@
 
     private async Task UpdateAvatar(string? newSrc)
     {
-        if (_userInfo?.Id is null || string.IsNullOrEmpty(newSrc))
+        if (_accountInfo is null || string.IsNullOrEmpty(newSrc))
             return;
         try
         {
-            await BoltonCupApi.UpdateAvatarAsync(_userInfo.Id.Value, newSrc);
-            _userInfo.Avatar = newSrc;
+            await BoltonCupApi.UpdateAvatarAsync(_accountInfo.Id, newSrc);
+            _accountInfo.Avatar = newSrc;
             Snackbar.Add("Your avatar has been updated.", Severity.Success);
             await InvokeAsync(StateHasChanged);
         }
@@ -64,4 +133,12 @@
         }
     }
 
+    public void Dispose()
+    {
+        if (_editContext != null)
+        {
+            _editContext.OnValidationRequested -= HandleValidationRequested;
+            _editContext.OnFieldChanged -= HandleFieldChanged;
+        }
+    }
 }

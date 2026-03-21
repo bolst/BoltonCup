@@ -1,3 +1,5 @@
+@using System.Linq.Expressions
+@using Microsoft.AspNetCore.Components.Forms
 @using MudBlazor.State
 @namespace BoltonCup.Common.Components
 @inherits ComponentBaseWithState
@@ -11,9 +13,9 @@
         Label="@Label"
         Variant="@Variant"
         Disabled="!_editable"
+        ShrinkLabel="true"
         Margin="Margin.Dense"
-        Underline="false"
-    />
+        Underline="false"/>
     
     <MudButtonGroup OverrideStyles="false">
         @if (_editable)
@@ -30,11 +32,17 @@
 
 @code {
 
+    [CascadingParameter]
+    public EditContext? EditContext { get; set; }
+
     [Parameter] 
     public string? Value { get; set; }
 
     [Parameter] 
     public EventCallback<string?> ValueChanged { get; set; }
+    
+    [Parameter]
+    public Expression<Func<string?>>? ValueExpression { get; set; }
 
     [Parameter]
     public bool Editable { get; set; }
@@ -97,6 +105,13 @@
     private async Task SaveChangesAsync()
     {
         await _valueState.SetValueAsync(_value);
+
+        if (EditContext is not null && ValueExpression is not null)
+        {
+            var fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+            EditContext.NotifyFieldChanged(fieldIdentifier);
+        }
+        
         await EndEditingAsync();
     }
 
