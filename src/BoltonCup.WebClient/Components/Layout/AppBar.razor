@@ -22,10 +22,10 @@
                 <MudSpacer />
                 <MudIconButton OnClick="CloseDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit" />
             </MudPaper>
-            <MudNavMenu Class="mud-width-full" Color="Color.Primary" Bordered>
+            <MudNavMenu Class="mud-width-full" Color="Color.Primary" Margin="Margin.Normal" Rounded Bordered>
                 @foreach (var navLink in _navLinks)
                 {
-                    <MudNavLink Href="@navLink.Href" Icon="@navLink.Icon">@navLink.Title</MudNavLink>
+                    <MudNavLink Class="px-2" Href="@navLink.Href" Icon="@navLink.Icon" Match="navLink.Match">@navLink.Title</MudNavLink>
                 }
             </MudNavMenu>
             <MudSpacer />
@@ -39,7 +39,7 @@
     
     private readonly List<NavLinkItem> _navLinks =
     [
-        new("Home", "/", Icons.Material.Rounded.Home),
+        new("Home", "/", Icons.Material.Rounded.Home, NavLinkMatch.All),
         new("Info", "/info", Icons.Material.Rounded.Info),
         new("Teams", "/teams", Icons.Material.Rounded.Groups),
         new("Schedule", "/schedule", Icons.Material.Rounded.CalendarMonth),
@@ -51,4 +51,5 @@
     private void OpenDrawer() => _drawerOpen = true;
     private void CloseDrawer() => _drawerOpen = false;
 
+    public record NavLinkItem(string Title, string Href, string Icon, NavLinkMatch Match = NavLinkMatch.Prefix);
 }
