@@ -145,22 +145,22 @@
         "tags": [
           "Auth"
         ],
-        "operationId": "LoginWithCookie",
+        "operationId": "Login",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginWithCookieRequest"
+                "$ref": "#/components/schemas/LoginRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginWithCookieRequest"
+                "$ref": "#/components/schemas/LoginRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginWithCookieRequest"
+                "$ref": "#/components/schemas/LoginRequest"
               }
             }
           }
@@ -2140,7 +2140,7 @@
         },
         "additionalProperties": false
       },
-      "LoginWithCookieRequest": {
+      "LoginRequest": {
         "type": "object",
         "properties": {
           "email": {

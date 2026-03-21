@@ -30,7 +30,7 @@ public class AuthController(
 
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<IResult> LoginWithCookie([FromBody] LoginWithCookieRequest request)
+    public async Task<IResult> Login([FromBody] LoginRequest request)
     {
         // TODO: refactor this into user service
         
@@ -131,7 +131,7 @@ public record ForgotPasswordRequest(string Email);
 
 public record ConfirmEmailRequest(string Email, string Code);
 
-public record LoginWithCookieRequest(string Email, string Password, bool Persist = true);
+public record LoginRequest(string Email, string Password, bool Persist = true);
 
 public record CheckUserRequest(string Email);
 
