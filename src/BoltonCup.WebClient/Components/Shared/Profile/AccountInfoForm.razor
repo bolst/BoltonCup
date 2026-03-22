@@ -23,10 +23,13 @@
             </div>
             <AccountInfoTextField @bind-Value="@_updateRequest.FirstName" Label="First name" Disabled="!_editable" />
             <AccountInfoTextField @bind-Value="@_updateRequest.LastName" Label="Last name" Disabled="!_editable" />
-            @* <EditableField @bind-Value="_updateRequest.Phone" Label="Phone"/> *@
-            @* <EditableField @bind-Value="_userInfo.Birthday" Label="Last"/> *@
-            <HighestLevelSelect @bind-Value="_updateRequest.HighestLevel" Label="Highest Level" Disabled="!_editable" />
             <AccountInfoTextField @bind-Value="@_updateRequest.PreferredBeer" Label="Preferred beer" Disabled="!_editable" />
+            <HighestLevelSelect @bind-Value="_updateRequest.HighestLevel" Label="Highest Level" Disabled="!_editable" />
+           
+            @* <EditableField @bind-Value="_updateRequest.Phone" Label="Phone"/> *@
+            <AccountInfoTextField Value="@_updateRequest.Birthday.ToShortDateString()" Label="Birthday" Disabled />
+            <AccountInfoTextField Value="@_accountInfo?.Email" Label="Email" Disabled />
+            <AccountInfoTextField Value="@_accountInfo?.Phone" Label="Phone" Disabled />
         </EditForm>
     }
 </MudPaper>
