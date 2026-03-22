@@ -83,6 +83,53 @@
         ]
       }
     },
+    "/api/accounts/tournaments": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "GetMyTournaments",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountTournamentDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountTournamentDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountTournamentDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/accounts/{id}/avatar": {
       "put": {
         "tags": [
@@ -1671,6 +1718,21 @@
           "preferredBeer": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AccountTournamentDto": {
+        "required": [
+          "tournament"
+        ],
+        "type": "object",
+        "properties": {
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentBriefDto"
+          },
+          "team": {
+            "$ref": "#/components/schemas/TeamBriefDto"
           }
         },
         "additionalProperties": false

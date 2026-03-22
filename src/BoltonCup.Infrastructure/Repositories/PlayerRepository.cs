@@ -20,8 +20,8 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ApplySorting(query, x => x.OrderBy(p => p.Id))
             .ToPagedListAsync(query);
-    }       
-    
+    }
+
     public async Task<Player?> GetByIdAsync(int id)
     {
         var account = await _context.Accounts

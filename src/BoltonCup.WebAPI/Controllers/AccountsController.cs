@@ -1,4 +1,5 @@
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Extensions;
 using BoltonCup.Infrastructure.Services;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace BoltonCup.WebAPI.Controllers;
 
 public class AccountsController(
+    IPlayerRepository _players,
+    IAccountRepository _accounts,
     IAccountService _accountService, 
     IUserService _userService, 
     IAccountMapper _accountMapper
@@ -27,6 +30,15 @@ public class AccountsController(
         var command = _accountMapper.ToCommand(request, User);
         await _accountService.UpdateAsync(command);
         return NoContent();
+    }
+
+    [HttpGet("tournaments")]
+    public async Task<ActionResult<ICollection<AccountTournamentDto>>> GetMyTournaments()
+    {
+        var accountId = User.GetAccountId()
+                        ?? throw new KeyNotFoundException("Missing account ID claim.");
+        var account = await _accounts.GetByIdAsync(accountId);
+        return Ok(_accountMapper.ToAccountTournamentDtoList(account));
     }
     
     /// <remarks>
