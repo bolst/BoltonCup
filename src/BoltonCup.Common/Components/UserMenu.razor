@@ -5,12 +5,12 @@
 
 <AuthorizeView>
     <Authorized>
-        <MudMenu Label="@context.User.Identity?.Name" 
+        <MudMenu Label="@context.User.Identity?.Name"
                  Variant="Variant.Text" 
                  Color="Color.Inherit" 
-                 EndIcon="@Icons.Material.Rounded.KeyboardArrowDown"
+                 EndIcon="@EndIcon"
                  FullWidth>
-            <MudMenuItem Href="@($"{Config.Value.WebBaseUrl}profile")" Icon="@Icons.Material.Rounded.AccountCircle" IconColor="Color.Primary">My Profile</MudMenuItem>
+            <MudMenuItem Href="@($"{Config.Value.WebBaseUrl}profile")" Icon="@Icons.Material.Rounded.AccountCircle" IconColor="Color.Primary" OnClick="@OnItemClick">My Profile</MudMenuItem>
             <MudMenuItem OnClick="LogOut" Icon="@Icons.Material.Rounded.Logout" IconColor="Color.Error">Log Out</MudMenuItem>
         </MudMenu>
     </Authorized>
@@ -20,7 +20,13 @@
 </AuthorizeView>
 
 @code {
+
+    [Parameter]
+    public string EndIcon { get; set; } = Icons.Material.Rounded.KeyboardArrowDown;
     
+    [Parameter]
+    public EventCallback OnItemClick { get; set; }
+
     private void GoToLogin()
     {
         var returnUrl = Uri.EscapeDataString(Navigation.Uri);
