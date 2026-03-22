@@ -29,7 +29,8 @@ public static class ServiceCollectionExtensions
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<AuthDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            .AddClaimsPrincipalFactory<BoltonCupClaimsPrincipalFactory>();
 
         builder.AddBoltonCupEmails();
         builder.AddBoltonCupS3();
