@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
+using BoltonCup.Infrastructure.Extensions;
 
 namespace BoltonCup.WebAPI.Mapping;
 
@@ -36,9 +37,8 @@ public class AccountMapper : IAccountMapper
 
     public UpdateAccountCommand ToCommand(UpdateAccountRequest request, ClaimsPrincipal claims)
     {
-        var accountIdStr = claims.FindFirstValue(ClaimTypes.Sid);
-        if (int.TryParse(accountIdStr, out var accountId))
-            throw new KeyNotFoundException("Missing account ID claim.");
+        var accountId = claims.GetAccountId()
+            ?? throw new KeyNotFoundException("Missing account ID claim.");
         return new UpdateAccountCommand(
             AccountId: accountId,
             FirstName: request.FirstName,
