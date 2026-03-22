@@ -25,7 +25,7 @@
             <AccountInfoTextField @bind-Value="@_updateRequest.LastName" Label="Last name" Disabled="!_editable" />
             @* <EditableField @bind-Value="_updateRequest.Phone" Label="Phone"/> *@
             @* <EditableField @bind-Value="_userInfo.Birthday" Label="Last"/> *@
-            @* <EditableField @bind-Value="_userInfo.HighestLevel" Label="Highest Level"/> *@
+            <HighestLevelSelect @bind-Value="_updateRequest.HighestLevel" Label="Highest Level" Disabled="!_editable" />
             <AccountInfoTextField @bind-Value="@_updateRequest.PreferredBeer" Label="Preferred beer" Disabled="!_editable" />
         </EditForm>
     }
@@ -93,7 +93,10 @@
     
     private void HandleFieldChanged(object? sender, FieldChangedEventArgs args)
     {
+        var stateChange = !_isDirty;
         _isDirty = true;
+        if (stateChange)
+            StateHasChanged();
     }
 
     private async Task OnValidSubmit(EditContext _)
