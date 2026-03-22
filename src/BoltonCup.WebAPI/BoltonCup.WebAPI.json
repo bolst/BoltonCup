@@ -1469,6 +1469,13 @@
         "operationId": "GetTournaments",
         "parameters": [
           {
+            "name": "RegistrationOpen",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "Page",
             "in": "query",
             "schema": {
