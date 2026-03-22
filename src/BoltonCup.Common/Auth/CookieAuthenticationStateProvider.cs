@@ -16,7 +16,6 @@ public class CookieAuthenticationStateProvider(IBoltonCupApi _api) : Authenticat
             {
                 var claims = new List<Claim>
                 {
-                    new(ClaimTypes.Sid, userInfo.Id.ToString()),
                     new(ClaimTypes.Name, userInfo.Name),
                     new(ClaimTypes.Email, userInfo.Email),
                     new(ClaimTypes.Role, string.Join(';', userInfo.Roles))
