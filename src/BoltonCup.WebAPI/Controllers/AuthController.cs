@@ -1,7 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Services;
-using BoltonCup.WebAPI.Mapping.Auth;
 using BoltonCup.WebAPI.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,15 +17,7 @@ public class AuthController(
     SignInManager<BoltonCupUser> _signInManager
     ) : BoltonCupControllerBase
 {
-    /// <remarks>
-    /// Gets the currently logged-in user
-    /// </remarks>
-    [HttpGet("me")]
-    public ActionResult<UserInfoDto> GetMe()
-    {
-        return new UserInfoDto(User);
-    }
-
+    
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IResult> Login([FromBody] LoginRequest request)

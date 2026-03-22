@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+        <WasmBuildNative>true</WasmBuildNative>
         
         <!--github.com/RicoSuter/NSwag/issues/5301-->
         <WasmEnableStreamingResponse>false</WasmEnableStreamingResponse>
@@ -14,6 +15,8 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.2" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.2" PrivateAssets="all" />
         <PackageReference Include="MudBlazor" Version="8.15.0" />
+        <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="3.119.2" />
+        <PackageReference Include="SkiaSharp.Views.Blazor" Version="3.119.2" />
     </ItemGroup>
 
     <ItemGroup>

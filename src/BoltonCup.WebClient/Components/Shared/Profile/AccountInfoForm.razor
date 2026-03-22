@@ -1,0 +1,168 @@
+@namespace BoltonCup.WebClient.Components.Shared
+@using MudBlazor.State
+@inherits ComponentBaseWithState
+@implements IDisposable
+@inject IBoltonCupApi BoltonCupApi
+@inject ISnackbar Snackbar
+
+<MudPaper Class="pa-4" Elevation="0" Outlined>
+    @if (_updateRequest is not null)
+    {
+        <EditForm EditContext="_editContext" OnValidSubmit="OnValidSubmit" class="mud-width-full">
+            <DataAnnotationsValidator/>
+            <div class="d-flex justify-end mb-2">
+                @if (_editable)
+                {
+                    <MudButton OnClick="DiscardChangesAsync" StartIcon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small">Discard</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" StartIcon="@Icons.Material.Rounded.Save" Color="Color.Primary" Size="Size.Small" Variant="Variant.Filled" DropShadow="false" Disabled="!_isDirty">Save</MudButton>
+                }
+                else
+                {
+                    <MudButton OnClick="BeginEditingAsync" StartIcon="@Icons.Material.Rounded.Edit" Color="Color.Info" Size="Size.Small">Edit</MudButton>
+                }
+            </div>
+            <AccountInfoTextField @bind-Value="@_updateRequest.FirstName" Label="First name" Disabled="!_editable" />
+            <AccountInfoTextField @bind-Value="@_updateRequest.LastName" Label="Last name" Disabled="!_editable" />
+            <AccountInfoTextField @bind-Value="@_updateRequest.PreferredBeer" Label="Preferred beer" Disabled="!_editable" />
+            <HighestLevelSelect @bind-Value="_updateRequest.HighestLevel" Label="Highest Level" Disabled="!_editable" />
+           
+            @* <EditableField @bind-Value="_updateRequest.Phone" Label="Phone"/> *@
+            <AccountInfoTextField Value="@_updateRequest.Birthday.ToShortDateString()" Label="Birthday" Disabled />
+            <AccountInfoTextField Value="@_accountInfo?.Email" Label="Email" Disabled />
+            <AccountInfoTextField Value="@_accountInfo?.Phone" Label="Phone" Disabled />
+        </EditForm>
+    }
+</MudPaper>
+
+
+@code {
+
+    [Parameter]
+    public bool Editable { get; set; }
+    
+    [Parameter]
+    public EventCallback<bool> EditableChanged { get; set; }
+
+    private Sdk.AccountDto? _accountInfo;
+
+    private Sdk.UpdateAccountRequest? _updateRequest;
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+
+    private bool _editable;
+    private readonly ParameterState<bool> _editableState;
+
+    private bool _isDirty;
+    
+    public AccountInfoForm()
+    {
+        using var registerScope = CreateRegisterScope();
+        _editableState = registerScope.RegisterParameter<bool>(nameof(Editable))
+            .WithParameter(() => Editable)
+            .WithEventCallback(() => EditableChanged)
+            .WithChangeHandler(OnEditableChange);
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _accountInfo = await BoltonCupApi.GetMeAsync();
+        UpdateRequestModel();
+        if (_updateRequest is not null)
+        {
+            _editContext = new EditContext(_updateRequest);
+            _editContext.OnFieldChanged += HandleFieldChanged;
+            _messageStore = new ValidationMessageStore(_editContext);
+        }
+    }
+    
+    private void OnEditableChange(ParameterChangedEventArgs<bool> args)
+    {
+        _editable = args.Value;
+        StateHasChanged();
+    }
+
+    private async Task SetEditableAsync(bool value)
+    {
+        _editable = value;
+        await _editableState.SetValueAsync(value);
+        if (value)
+        {
+            // TODO: focus?
+        }
+    }
+    
+    private Task BeginEditingAsync() => SetEditableAsync(true);
+    private Task EndEditingAsync() => SetEditableAsync(false);
+    
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs args)
+    {
+        var stateChange = !_isDirty;
+        _isDirty = true;
+        if (stateChange)
+            StateHasChanged();
+    }
+
+    private async Task OnValidSubmit(EditContext _)
+    {
+        if (_isDirty)
+            await TryUpdateAccountInfo();
+        
+        _isDirty = false;
+        await EndEditingAsync();
+    }
+    
+    private async Task DiscardChangesAsync()
+    {
+        UpdateRequestModel();
+        _messageStore?.Clear();
+        _editContext?.Validate();
+        await EndEditingAsync();
+    }
+    
+    private void UpdateRequestModel()
+    {
+        if (_accountInfo is null)
+            return;
+        _updateRequest ??= new Sdk.UpdateAccountRequest();
+        _updateRequest.FirstName = _accountInfo.FirstName;
+        _updateRequest.LastName = _accountInfo.LastName;
+        _updateRequest.Birthday = _accountInfo.Birthday;
+        _updateRequest.HighestLevel = _accountInfo.HighestLevel;
+        _updateRequest.PreferredBeer = _accountInfo.PreferredBeer;
+        _isDirty = false;
+    }
+
+    private async Task TryUpdateAccountInfo()
+    {
+        if (_updateRequest is null)
+            return;
+        
+        try
+        {
+            await BoltonCupApi.UpdateAccountAsync(_updateRequest);
+            _accountInfo?.FirstName = _updateRequest.FirstName;
+            _accountInfo?.LastName = _updateRequest.LastName;
+            _accountInfo?.Birthday = _updateRequest.Birthday;
+            _accountInfo?.HighestLevel = _updateRequest.HighestLevel;
+            _accountInfo?.PreferredBeer = _updateRequest.PreferredBeer;
+        }
+        catch (Sdk.ApiException e)
+        {
+            // TODO: validate
+            Snackbar.Add($"API Error: {e.Message}");
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("Sorry, an unexpected error occurred...", Severity.Error);
+        }
+    }
+    
+    public void Dispose()
+    {
+        if (_editContext != null)
+        {
+            _editContext.OnFieldChanged -= HandleFieldChanged;
+        }
+    }
+
+}

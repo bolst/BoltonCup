@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using BoltonCup.Core;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -8,6 +10,7 @@ namespace BoltonCup.Infrastructure.Services;
 
 public interface IUserService
 {
+    Task<Account?> GetMeAsync(ClaimsPrincipal claimsPrincipal);
     Task<IdentityResult> RegisterAsync(string email, string password);
     Task ResendConfirmationEmailAsync(string email);
     Task<bool> VerifyPasswordResetCodeAsync(string email, string code);
@@ -22,7 +25,18 @@ public class UserService(
     IEmailer _emailer) : IUserService
 {
     private static readonly EmailAddressAttribute _emailAddressAttribute = new();
-    
+
+
+
+    public async Task<Account?> GetMeAsync(ClaimsPrincipal claimsPrincipal)
+    {
+        var email = claimsPrincipal.FindFirstValue(ClaimTypes.Email);
+        if (string.IsNullOrEmpty(email))
+            return null;
+        if (await _userManager.FindByEmailAsync(email) is not { AccountId: not null } user)
+            return null;
+        return await _dbContext.Accounts.FindAsync(user.AccountId);
+    }
     
     
     public async Task<IdentityResult> RegisterAsync(string email, string password)

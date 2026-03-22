@@ -1,18 +1,19 @@
 @namespace BoltonCup.Common.Components
 @using MudBlazor.State
+@using MudBlazor.Utilities
 @inherits ComponentBaseWithState
 @inject IDialogService DialogService
 @inject Core.IAssetUrlResolver AssetUrlResolver
 
 @if (!Editable)
 {
-    <MudImage Src="@AssetUrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" />
+    <MudImage Class="@Classname" Src="@AssetUrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" ObjectFit="ObjectFit" />
 }
 else
 {
     <div class="edit-image-container" @onclick="OnClick">
-        <MudImage Class="edit-image" Src="@AssetUrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" />
-        <div class="overlay-container">
+        <MudImage Class="@Classname" Src="@AssetUrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" ObjectFit="ObjectFit" />
+        <div class="@OverlayClassname">
             <MudIcon Icon="@Icons.Material.Filled.Edit" />
         </div>
     </div>
@@ -31,7 +32,7 @@ else
     public int? Width { get; set; }
 
     [Parameter]
-    public int? Height { get; set; } = 24;
+    public int? Height { get; set; }
 
     [Parameter]
     public RenderFragment ChildContent { get; set; } = null!;
@@ -41,10 +42,30 @@ else
     
     [Parameter]
     public bool ResolveUrl { get; set; } = true;
+    
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter] 
+    public ObjectFit ObjectFit { get; set; } = ObjectFit.Fill;
+    
+    [Parameter]
+    public bool Avatar { get; set; }
 
     private string? _src;
     
     private readonly ParameterState<string?> _srcState;
+
+    private string Classname => new CssBuilder()
+        .AddClass(Class)
+        .AddClass("edit-image", Editable)
+        .AddClass("rounded-circle", Avatar)
+        .Build();
+
+    private string OverlayClassname => new CssBuilder()
+        .AddClass("overlay-container")
+        .AddClass("rounded-circle", Avatar)
+        .Build();
     
 
     public BoltonCupImage()
