@@ -1,0 +1,34 @@
+@namespace BoltonCup.WebClient.Components.Shared
+@inject IBoltonCupApi BoltonCupApi
+
+<MudPaper Class="pa-4" Elevation="0" Outlined>
+    
+    <MudText Typo="Typo.body2"><b>Past Tournaments</b></MudText>
+
+    <MudList T="string" Gutters Padding ReadOnly>
+        @foreach (var (index, player) in _userTournaments.Index())
+        {
+            var color = index % 2 != 0 ? string.Empty : "gray lighten-3";
+            <MudListItem Text="@player.Tournament.Name" SecondaryText="@player.Team?.Name" Class="@color">
+                <AvatarContent>
+                    <div class="d-flex flex-column align-center" style="width: 64px">
+                        <MudImage Src="@player.Team?.Logo" Height="48"/>
+                    </div>
+                </AvatarContent>
+            </MudListItem>
+        }
+    </MudList>
+    
+</MudPaper>
+
+
+@code {
+
+    private ICollection<Sdk.AccountTournamentDto> _userTournaments = [];
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _userTournaments = await BoltonCupApi.GetMyTournamentsAsync();
+    }
+
+}
