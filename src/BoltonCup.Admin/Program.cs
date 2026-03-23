@@ -55,8 +55,13 @@ builder.Services.AddAuthentication("Identity.Application")
         options.Events.OnRedirectToLogin = context =>
         {
             var returnUrl = Uri.EscapeDataString(context.Request.GetEncodedUrl());
-            
             context.Response.Redirect($"{bcConfig.AuthBaseUrl}log-in-or-sign-up?returnUrl={returnUrl}");
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.Redirect($"{bcConfig.AuthBaseUrl}access-denied");
             return Task.CompletedTask;
         };
     });
