@@ -1507,6 +1507,104 @@
         ]
       }
     },
+    "/api/tournaments/{id}/registrations": {
+      "get": {
+        "tags": [
+          "TournamentRegistrations"
+        ],
+        "operationId": "GetMyTournamentRegistration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentRegistrationDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentRegistrationDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentRegistrationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "TournamentRegistrations"
+        ],
+        "operationId": "UpdateMyTournamentRegistration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TournamentRegistrationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TournamentRegistrationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TournamentRegistrationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/tournaments": {
       "get": {
         "tags": [
@@ -3396,6 +3494,20 @@
         },
         "additionalProperties": false
       },
+      "TournamentRegistrationDto": {
+        "type": "object",
+        "properties": {
+          "currentStep": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "payload": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "TournamentSingleDto": {
         "required": [
           "id",
@@ -3570,6 +3682,9 @@
     },
     {
       "name": "Teams"
+    },
+    {
+      "name": "TournamentRegistrations"
     },
     {
       "name": "Tournaments"
