@@ -41,7 +41,10 @@ public partial class BoltonCupEditForm<T> : ComponentBase where T : class, new()
 
     [Parameter]
     public Variant Variant { get; set; } = Variant.Outlined;
-    
+
+    [Parameter]
+    public bool ShrinkLabel { get; set; } = true;
+
 
     protected override void OnInitialized()
     {
