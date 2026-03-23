@@ -25,6 +25,6 @@ public class TournamentRegistrationsController(
         var accountId = User.GetAccountId();
         var command = new UpsertTournamentRegistrationCommand(id, accountId, data.CurrentStep, data.Payload);
         await _registrationService.UpsertAsync(command);
-        return NoContent();
+        return Ok();
     }
 }
