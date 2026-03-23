@@ -11,7 +11,14 @@
                  EndIcon="@EndIcon"
                  FullWidth>
             <MudMenuItem Href="@($"{Config.Value.WebBaseUrl}profile")" Icon="@Icons.Material.Rounded.AccountCircle" IconColor="Color.Primary" OnClick="@OnItemClick">My Profile</MudMenuItem>
-            <MudMenuItem OnClick="LogOut" Icon="@Icons.Material.Rounded.Logout" IconColor="Color.Error">Log Out</MudMenuItem>
+            @if (LogOutTemplate is null)
+            {
+                <MudMenuItem OnClick="LogOut" Icon="@Icons.Material.Rounded.Logout" IconColor="Color.Error">Log Out</MudMenuItem>
+            }
+            else
+            {
+                @LogOutTemplate(context)
+            }
         </MudMenu>
     </Authorized>
     <NotAuthorized>
@@ -26,6 +33,9 @@
     
     [Parameter]
     public EventCallback OnItemClick { get; set; }
+    
+    [Parameter]
+    public RenderFragment<AuthenticationState>? LogOutTemplate { get; set; }
 
     private void GoToLogin()
     {
