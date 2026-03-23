@@ -1,6 +1,5 @@
-@page "/tournaments/information"
+@page "/tournaments/{TournamentId:int}/information"
 @attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-03-23")]
-
 @inject IBoltonCupApi BoltonCupApi
 
 <PageTitle>Info | Bolton Cup</PageTitle>
@@ -15,17 +14,15 @@
 
 @code {
 
-    [SupplyParameterFromQuery(Name = "tournament")]
-    public int? TournamentId { get; set; }
+    [Parameter]
+    public int TournamentId { get; set; }
     
     private Sdk.InfoGuideSingleDto? _infoGuide;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (TournamentId is null)
-            return;
         if (TournamentId != _infoGuide?.TournamentId)
-            _infoGuide = await BoltonCupApi.GetInfoGuideByTournamentIdAsync(TournamentId.Value);
+            _infoGuide = await BoltonCupApi.GetInfoGuideByTournamentIdAsync(TournamentId);
     }
 
 }

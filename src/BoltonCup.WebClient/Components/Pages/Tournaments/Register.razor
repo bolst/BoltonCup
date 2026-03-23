@@ -1,4 +1,4 @@
-@page "/tournaments/register"
+@page "/tournaments/{TournamentId:int}/register"
 @attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-03-23")]
 @attribute [Authorize]
 @inject IBoltonCupApi BoltonCupApi
@@ -36,8 +36,8 @@
 
 @code {
 
-    [SupplyParameterFromQuery(Name = "tournament")]
-    public int? TournamentId { get; set; }
+    [Parameter]
+    public int TournamentId { get; set; }
 
     private Sdk.TournamentSingleDto? _tournament;
 
@@ -45,10 +45,8 @@
     
     protected override async Task OnParametersSetAsync()
     {
-        if (TournamentId is null)
-            return;
         if (_tournament?.Id != TournamentId)
-            _tournament = await BoltonCupApi.GetTournamentByIdAsync(TournamentId.Value);
+            _tournament = await BoltonCupApi.GetTournamentByIdAsync(TournamentId);
     }
 
     private void ShowTournamentInformation()

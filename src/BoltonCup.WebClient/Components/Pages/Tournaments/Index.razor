@@ -24,10 +24,10 @@
                         <div class="d-flex flex-row align-center gap-3 flex-wrap">
                             <MudButton 
                                 Color="Color.Primary"
-                                Href="@($"/tournaments/information?tournament={tournament.Id}")">Information</MudButton>
+                                Href="@($"/tournaments/{tournament.Id}/information")">Information</MudButton>
                             <MudButton
                                 Color="Color.Secondary"
-                                Href="@($"/tournaments/register?tournament={tournament.Id}")"
+                                Href="@($"/tournaments/{tournament.Id}/register")"
                                 Disabled="!tournament.IsRegistrationOpen">@registerText</MudButton>
                         </div>
                     </div>
