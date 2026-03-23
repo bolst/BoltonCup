@@ -26,7 +26,7 @@ public class TeamsController(ITeamRepository _teams, ITeamService _teamService, 
     public async Task<ActionResult<TeamSingleDto>> GetTeamById(int id)
     {
         var team = await _teams.GetByIdAsync(id);
-        return OkOrNotFound(_teamMapper.ToDto(team));
+        return OkOrNoContent(_teamMapper.ToDto(team));
     }
 
     /// <remarks>

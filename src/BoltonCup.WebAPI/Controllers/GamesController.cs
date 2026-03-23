@@ -26,6 +26,6 @@ public class GamesController(IGameRepository _games, IGameMapper _gameMapper) : 
     public async Task<ActionResult<GameSingleDto>> GetGameById(int id)
     {
         var game = await _games.GetByIdAsync(id);
-        return OkOrNotFound(_gameMapper.ToDto(game));
+        return OkOrNoContent(_gameMapper.ToDto(game));
     }
 }

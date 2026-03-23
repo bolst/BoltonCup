@@ -21,7 +21,7 @@ public class AccountsController(
     public async Task<ActionResult<AccountDto>> GetMe()
     {
         var account = await _userService.GetMeAsync(User);
-        return OkOrNotFound(_accountMapper.ToDto(account, User));
+        return OkOrNoContent(_accountMapper.ToDto(account, User));
     }
 
     [HttpPut("me")]

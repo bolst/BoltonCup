@@ -16,7 +16,7 @@ public class TournamentRegistrationsController(
     {
         var accountId = User.GetAccountId();
         var tournament = await _registrationService.GetAsync(id, accountId);
-        return Ok(_registrationMapper.ToDto(tournament));
+        return OkOrNoContent(_registrationMapper.ToDto(tournament));
     }
 
     [HttpPost]
@@ -25,6 +25,6 @@ public class TournamentRegistrationsController(
         var accountId = User.GetAccountId();
         var command = new UpsertTournamentRegistrationCommand(id, accountId, data.CurrentStep, data.Payload);
         await _registrationService.UpsertAsync(command);
-        return Ok();
+        return NoContent();
     }
 }
