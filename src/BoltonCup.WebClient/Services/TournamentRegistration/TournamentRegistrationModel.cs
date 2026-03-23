@@ -5,7 +5,14 @@ using static BoltonCup.Core.Values.Position;
 
 namespace BoltonCup.WebClient.Services;
 
+
 public class TournamentRegistrationModel
+{
+    public required UserInfoModel UserInfo { get; set; }
+}
+
+
+public class UserInfoModel
 {
     [Display(Name = "First name")]
     [ReadOnly(true)]
@@ -26,7 +33,6 @@ public class TournamentRegistrationModel
     [Display(Name = "Phone")]
     [ReadOnly(true)]
     [DataType(DataType.PhoneNumber)]
-    [Required]
     public string Phone { get; set; } = string.Empty;
     
     [Display(Name = "Birthday")]
