@@ -1,6 +1,6 @@
 @page "/tournaments/register"
 @attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-03-23")]
-
+@attribute [Authorize]
 @inject IBoltonCupApi BoltonCupApi
 
 <PageTitle>Register | Bolton Cup</PageTitle>
@@ -10,9 +10,7 @@
     {
         <div class="mb-2 ml-2 d-flex flex-row align-center gap-3">
             <MudText Typo="Typo.h5"><b>Register for @_tournament.Name</b></MudText>
-            <MudTooltip Text="Show Information">
-                <MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="ShowTournamentInformation" />
-            </MudTooltip>
+            <MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="ShowTournamentInformation" />
         </div>
     }
 </MudContainer>
