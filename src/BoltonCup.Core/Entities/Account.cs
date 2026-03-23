@@ -15,6 +15,7 @@ public class Account : EntityBase
     
     public ICollection<Player> Players { get; set; } = [];
     public ICollection<Team> ManagedTeams { get; set; } = [];
+    public ICollection<TournamentRegistration> TournamentRegistrations { get; set; } = [];
     
     public override string ToString() => FirstName + " " + LastName;
 }
