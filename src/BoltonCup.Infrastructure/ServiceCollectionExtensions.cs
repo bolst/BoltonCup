@@ -52,7 +52,7 @@ public static class ServiceCollectionExtensions
             .AddTransient<IAccountService, AccountService>()
             .AddTransient<ITeamService, TeamService>()
             .AddTransient<ITournamentService, TournamentService>()
-            .AddTransient<ITournamentRegistrationRepository, TournamentRegistrationRepository>()
+            .AddTransient<ITournamentRegistrationService, TournamentRegistrationService>()
             .AddTransient<IUserService, UserService>();
         return builder;
     }
