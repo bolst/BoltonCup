@@ -28,6 +28,9 @@ public partial class BoltonCupEditForm<T> : ComponentBase where T : class, new()
     public string? Title { get; set; }
 
     [Parameter]
+    public string SubmitText { get; set; } = "Submit";
+
+    [Parameter]
     public Margin Margin { get; set; } = Margin.None;
     
     [Parameter]
