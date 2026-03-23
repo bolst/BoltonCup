@@ -1,0 +1,27 @@
+@namespace BoltonCup.WebClient.Components.Shared
+@inject IBoltonCupApi BoltonCupApi
+
+<AuthorizeView>
+    <Authorized>
+        <MudStepper>
+            <MudStep Title="Your Info">
+
+            </MudStep>
+            <MudStep Title="Payment">
+
+            </MudStep>
+        </MudStepper>
+    </Authorized>
+    <NotAuthorized>
+        <MudAlert Severity="Severity.Error">Sorry! You are not authorized to register.</MudAlert>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public int TournamentId { get; set; }
+
+}
