@@ -391,7 +391,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
         {
             entity
                 .ToTable("tournament_registrations")
-                .HasKey(e => e.Id);
+                .HasKey(e => e.Id) ;
+            entity
+                .HasIndex(e => new { e.AccountId, e.TournamentId })
+                .IsUnique();
             entity
                 .HasOne(e => e.Tournament)
                 .WithMany(a => a.Registrations)
