@@ -35,8 +35,7 @@ public class AccountsController(
     [HttpGet("tournaments")]
     public async Task<ActionResult<ICollection<AccountTournamentDto>>> GetMyTournaments()
     {
-        var accountId = User.GetAccountId()
-                        ?? throw new KeyNotFoundException("Missing account ID claim.");
+        var accountId = User.GetAccountId();
         var account = await _accounts.GetByIdAsync(accountId);
         return Ok(_accountMapper.ToAccountTournamentDtoList(account));
     }

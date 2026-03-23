@@ -52,8 +52,7 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
 
     public UpdateAccountCommand ToCommand(UpdateAccountRequest request, ClaimsPrincipal claims)
     {
-        var accountId = claims.GetAccountId()
-            ?? throw new KeyNotFoundException("Missing account ID claim.");
+        var accountId = claims.GetAccountId();
         return new UpdateAccountCommand(
             AccountId: accountId,
             FirstName: request.FirstName,
