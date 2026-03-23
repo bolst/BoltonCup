@@ -82,7 +82,8 @@ public class TournamentRegistrationService(
                 Phone = me.Phone,
                 Birthday = me.Birthday,
                 HighestLevel = me.HighestLevel,
-            }
+            },
+            Documents = new DocumentModel()
         };
     }
 }

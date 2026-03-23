@@ -9,10 +9,13 @@
             <MudStepper @bind-ActiveIndex="_currentStep" StepClass="py-2" NonLinear>
                 <ChildContent>
                     <MudStep Title="Your Info" Completed="_currentStep > 0">
-                        <BoltonCupEditForm T="UserInfoModel" Model="_model.UserInfo" OnValidSubmit="OnValidInfoSubmit" SubmitText="Save & Continue" />
+                        <BoltonCupEditForm T="UserInfoModel" Model="_model.UserInfo" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue" />
                     </MudStep>
                     <MudStep Title="Documents" Disabled="_currentStep < 1" Completed="_currentStep > 1">
-                        
+                        <MudText>Please review and agree to the following terms and conditions, including legal documents involving a waiver.</MudText>
+                        <MudText>You can find each document <MudLink Color="Color.Info">here</MudLink>.</MudText>
+                        <MudDivider Class="my-4" />
+                        <BoltonCupEditForm T="DocumentModel" Model="_model.Documents" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue" Dense/>
                     </MudStep>
                     <MudStep Title="Checkout" Disabled="_currentStep < 2" Completed="_currentStep > 2">
 
@@ -54,7 +57,7 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task OnValidInfoSubmit(EditContext _)
+    private async Task SaveAndContinue(EditContext _)
     {
         if (_model is null)
             return;

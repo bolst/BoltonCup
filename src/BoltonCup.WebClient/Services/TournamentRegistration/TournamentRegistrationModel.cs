@@ -9,6 +9,7 @@ namespace BoltonCup.WebClient.Services;
 public class TournamentRegistrationModel
 {
     public required UserInfoModel UserInfo { get; set; }
+    public required DocumentModel Documents { get; set; }
 }
 
 
@@ -57,4 +58,23 @@ public class UserInfoModel
 
     [Display(Name = "I can play either position")]
     public bool CanPlayEitherPosition { get; set; }
+}
+
+public class DocumentModel
+{
+    [Display(Name = "I have read, understand and agree to the terms and conditions of the code of conduct.")]
+    [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree in order to register and play.")]
+    public bool HasAgreedToCodeOfConductWaiver { get; set; }
+    
+    [Display(Name = "I have read, understand and agree to the terms and conditions of the liability waiver.")]
+    [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree in order to register and play.")]
+    public bool HasAgreedToLiabilityWaiver { get; set; }
+    
+    [Display(Name = "I have read, understand and agree to the terms and conditions of the concussion waiver.")]
+    [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree in order to register and play.")]
+    public bool HasAgreedToConcussionWaiver { get; set; }
+
+    [Display(Name = "I have read, understand and agree to the terms and conditions of the communication consent form.")]
+    [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree in order to register and play.")]
+    public bool HasAgreedToCommunicationConsent { get; set; }
 }
