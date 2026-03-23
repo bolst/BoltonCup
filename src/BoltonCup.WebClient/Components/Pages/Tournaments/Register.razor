@@ -8,11 +8,29 @@
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
     @if (_tournament is not null)
     {
-        <div class="mb-2 ml-2">
+        <div class="mb-2 ml-2 d-flex flex-row align-center gap-3">
             <MudText Typo="Typo.h5"><b>Register for @_tournament.Name</b></MudText>
+            <MudTooltip Text="Show Information">
+                <MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="ShowTournamentInformation" />
+            </MudTooltip>
         </div>
     }
 </MudContainer>
+
+<MudDrawer @bind-Open="_infoDrawerOpen" Anchor="Anchor.Bottom" Elevation="1" Variant="DrawerVariant.Temporary" Width="100%" Height="100%">
+    <MudPaper Class="d-flex flex-row align-center px-2" Elevation="0" Width="100%" Height="64px" Square>
+        <BoltonCupLogo Height="64" />
+        <MudSpacer />
+        <MudIconButton OnClick="HideTournamentInformation" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit" />
+    </MudPaper>
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        @if (_tournament?.InfoGuide is not null)
+        {
+            <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-8"><b>@_tournament?.InfoGuide.Title</b></MudText>
+            <MarkdownView Value="@_tournament?.InfoGuide.MarkdownContent" />
+        }
+    </MudContainer>
+</MudDrawer>
 
 @code {
 
@@ -20,6 +38,8 @@
     public int? TournamentId { get; set; }
 
     private Sdk.TournamentSingleDto? _tournament;
+
+    private bool _infoDrawerOpen;
     
     protected override async Task OnParametersSetAsync()
     {
@@ -27,6 +47,16 @@
             return;
         if (_tournament?.Id != TournamentId)
             _tournament = await BoltonCupApi.GetTournamentByIdAsync(TournamentId.Value);
+    }
+
+    private void ShowTournamentInformation()
+    {
+        _infoDrawerOpen = true;
+    }
+
+    private void HideTournamentInformation()
+    {
+        _infoDrawerOpen = false;
     }
 
 }
