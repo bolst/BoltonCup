@@ -1,16 +1,28 @@
+@using BoltonCup.WebClient.Services
 @namespace BoltonCup.WebClient.Components.Shared
-@inject IBoltonCupApi BoltonCupApi
+@inject ITournamentRegistrationService RegistrationService
 
 <AuthorizeView>
     <Authorized>
-        <MudStepper>
-            <MudStep Title="Your Info">
+        @if (_model is not null)
+        {
+            <MudStepper @bind-ActiveIndex="_currentStep" StepClass="py-2" NonLinear>
+                <ChildContent>
+                    <MudStep Title="Your Info" Completed="_currentStep > 0">
+                        <BoltonCupEditForm T="UserInfoModel" Model="_model.UserInfo" OnValidSubmit="OnValidInfoSubmit" SubmitText="Save & Continue" />
+                    </MudStep>
+                    <MudStep Title="Documents" Disabled="_currentStep < 1" Completed="_currentStep > 1">
+                        
+                    </MudStep>
+                    <MudStep Title="Checkout" Disabled="_currentStep < 2" Completed="_currentStep > 2">
 
-            </MudStep>
-            <MudStep Title="Payment">
-
-            </MudStep>
-        </MudStepper>
+                    </MudStep>
+                </ChildContent>
+                <ActionContent Context="_">
+                    @* empty: we will control navigation manually *@
+                </ActionContent>
+            </MudStepper>
+        }
     </Authorized>
     <NotAuthorized>
         <MudAlert Severity="Severity.Error">Sorry! You are not authorized to register.</MudAlert>
@@ -24,4 +36,30 @@
     [EditorRequired]
     public int TournamentId { get; set; }
 
+    private int? _tournamentId;
+
+    private int _currentStep;
+    private TournamentRegistrationModel? _model;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (TournamentId == _tournamentId)
+            return;
+        _tournamentId = TournamentId;
+        
+        var context = await RegistrationService.GetAsync(TournamentId);
+        _currentStep = context.CurrentStep;
+        _model = context.Model;
+        
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnValidInfoSubmit(EditContext _)
+    {
+        if (_model is null)
+            return;
+        _currentStep = await RegistrationService.SaveAndContinueAsync(TournamentId, new TournamentRegistrationContext(_currentStep, _model));
+        await InvokeAsync(StateHasChanged);
+    }
+    
 }
