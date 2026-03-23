@@ -2251,6 +2251,20 @@
         },
         "additionalProperties": false
       },
+      "InfoGuideBriefDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "markdownContent": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "InfoGuideDto": {
         "required": [
           "id"
@@ -3438,6 +3452,9 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "infoGuide": {
+            "$ref": "#/components/schemas/InfoGuideBriefDto"
           }
         },
         "additionalProperties": false

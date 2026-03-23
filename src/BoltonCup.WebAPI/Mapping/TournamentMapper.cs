@@ -8,7 +8,7 @@ public interface ITournamentMapper
     TournamentSingleDto? ToDto(Tournament? tournament);
 }
 
-public class TournamentMapper(IAssetUrlResolver _urlResolver) : ITournamentMapper
+public class TournamentMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMapper) : ITournamentMapper
 {
     public IPagedList<TournamentDto> ToDtoList(IPagedList<Tournament> tournaments)
     {
@@ -46,6 +46,7 @@ public class TournamentMapper(IAssetUrlResolver _urlResolver) : ITournamentMappe
                 IsPaymentOpen = tournament.IsPaymentOpen,
                 SkaterLimit = tournament.SkaterLimit,
                 GoalieLimit = tournament.GoalieLimit,
+                InfoGuide = tournament.InfoGuide is null ? null : _briefMapper.ToInfoGuideBriefDto(tournament.InfoGuide),
             };
     }
 }
