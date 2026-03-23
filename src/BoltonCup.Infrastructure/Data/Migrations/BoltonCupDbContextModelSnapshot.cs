@@ -1044,6 +1044,58 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.ToTable("tournaments", "core");
                 });
 
+            modelBuilder.Entity("BoltonCup.Core.TournamentRegistration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("integer")
+                        .HasColumnName("account_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<int>("CurrentStep")
+                        .HasColumnType("integer")
+                        .HasColumnName("current_step");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Payload")
+                        .HasColumnType("text")
+                        .HasColumnName("payload");
+
+                    b.Property<int>("TournamentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("tournament_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TournamentId");
+
+                    b.HasIndex("AccountId", "TournamentId")
+                        .IsUnique();
+
+                    b.ToTable("tournament_registrations", "core");
+                });
+
             modelBuilder.Entity("BoltonCup.Core.Game", b =>
                 {
                     b.HasOne("BoltonCup.Core.Team", "AwayTeam")
@@ -1261,11 +1313,32 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Navigation("WinningTeam");
                 });
 
+            modelBuilder.Entity("BoltonCup.Core.TournamentRegistration", b =>
+                {
+                    b.HasOne("BoltonCup.Core.Account", "Account")
+                        .WithMany("TournamentRegistrations")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BoltonCup.Core.Tournament", "Tournament")
+                        .WithMany("Registrations")
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Tournament");
+                });
+
             modelBuilder.Entity("BoltonCup.Core.Account", b =>
                 {
                     b.Navigation("ManagedTeams");
 
                     b.Navigation("Players");
+
+                    b.Navigation("TournamentRegistrations");
                 });
 
             modelBuilder.Entity("BoltonCup.Core.Game", b =>
@@ -1318,6 +1391,8 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Navigation("InfoGuide");
 
                     b.Navigation("Players");
+
+                    b.Navigation("Registrations");
 
                     b.Navigation("Teams");
                 });

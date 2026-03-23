@@ -11,6 +11,7 @@ public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepos
     {
         return await context.Tournaments
             .AsNoTracking()
+            .ConditionalWhere(e => e.IsRegistrationOpen == query.RegistrationOpen!.Value, query.RegistrationOpen.HasValue)
             .Include(e => e.Games)
             .Include(e => e.Teams)
             .ApplySorting(query, x => x.OrderBy(t => t.StartDate))
@@ -21,6 +22,7 @@ public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepos
     {
         return await context.Tournaments
             .AsNoTracking()
+            .Include(e => e.InfoGuide)
             .Include(e => e.Games)
             .Include(e => e.Teams)
             .FirstOrDefaultAsync(e => e.Id == id);

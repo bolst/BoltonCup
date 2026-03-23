@@ -27,6 +27,6 @@ public class PlayersController(IPlayerRepository _players, IPlayerMapper _mapper
     public async Task<ActionResult<PlayerSingleDto>> GetPlayerById(int id)
     {
         var player = await _players.GetByIdAsync(id);
-        return OkOrNotFound(_mapper.ToDto(player));
+        return OkOrNoContent(_mapper.ToDto(player));
     }
 }

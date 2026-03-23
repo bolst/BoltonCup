@@ -20,9 +20,7 @@ if (!string.IsNullOrEmpty(keyDirectory))
         .SetApplicationName("BoltonCup.SharedAuth");
 }
 
-builder.Services
-    .AddIdentityApiEndpoints<BoltonCupUser>()
-    .AddEntityFrameworkStores<AuthDbContext>();
+builder.Services.AddIdentityApiEndpoints<BoltonCupUser>();
 
 builder
     .AddBoltonCupInfrastructure()
@@ -77,6 +75,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+await app.Services.SeedDatabaseAsync(app.Configuration);
 
 // Configure the HTTP request pipeline.
 if (true) //(app.Environment.IsDevelopment())

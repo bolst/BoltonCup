@@ -26,6 +26,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<SkaterStat> SkaterStats { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
+    public DbSet<TournamentRegistration> TournamentRegistrations { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -386,6 +387,29 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.GoalieLimit).HasColumnName("goalie_limit");
         });
 
+        modelBuilder.Entity<TournamentRegistration>(entity =>
+        {
+            entity
+                .ToTable("tournament_registrations")
+                .HasKey(e => e.Id) ;
+            entity
+                .HasIndex(e => new { e.AccountId, e.TournamentId })
+                .IsUnique();
+            entity
+                .HasOne(e => e.Tournament)
+                .WithMany(a => a.Registrations)
+                .HasForeignKey(e => e.TournamentId);
+            entity
+                .HasOne(e => e.Account)
+                .WithMany(a => a.TournamentRegistrations)
+                .HasForeignKey(e => e.AccountId);
+            entity.Property(e => e.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.AccountId).HasColumnName("account_id");
+            entity.Property(e => e.CurrentStep).HasColumnName("current_step");
+            entity.Property(e => e.Payload).HasColumnName("payload");
+        });
+        
         // entities deriving from EntityBase should have created_at = now() by default
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {

@@ -1,0 +1,31 @@
+@page "/tournaments/information"
+@attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-03-23")]
+
+@inject IBoltonCupApi BoltonCupApi
+
+<PageTitle>Info | Bolton Cup</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    @if (_infoGuide is not null)
+    {
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-8"><b>@_infoGuide.Title</b></MudText>
+        <MarkdownView Value="@_infoGuide.MarkdownContent" />
+    }
+</MudContainer>
+
+@code {
+
+    [SupplyParameterFromQuery(Name = "tournament")]
+    public int? TournamentId { get; set; }
+    
+    private Sdk.InfoGuideSingleDto? _infoGuide;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (TournamentId is null)
+            return;
+        if (TournamentId != _infoGuide?.TournamentId)
+            _infoGuide = await BoltonCupApi.GetInfoGuideByTournamentIdAsync(TournamentId.Value);
+    }
+
+}

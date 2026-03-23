@@ -1,0 +1,71 @@
+@namespace BoltonCup.Common.Components
+
+<MudChip
+    T="string"
+    Variant="Variant.Text"
+    Color="Color.Primary"
+    Size="Size.Small"
+    Icon="@Icons.Material.Rounded.CalendarMonth"
+    Label="true"
+    >
+    @_text
+</MudChip>
+
+@code {
+
+    [Parameter]
+    public DateTime? Start { get; set; }
+    
+    [Parameter]
+    public DateTime? End { get; set; }
+
+    private string? _text;
+    private DateTime? _start;
+    private DateTime? _end;
+    
+    
+    protected override void OnParametersSet()
+    {
+        var isDirty = false;
+        if (Start != _start)
+        {
+            _start = Start;
+            isDirty = true;
+        }
+
+        if (End != _end)
+        {
+            _end = End;
+            isDirty = true;
+        }
+
+        if (isDirty)
+            _text = GetDateString();
+    }
+
+    private string? GetDateString()
+    {
+        if (_start is null && _end is null)
+            return null;
+        
+        var text = string.Empty;
+        int? month = null;
+        if (_start.HasValue)
+        {
+            month = _start.Value.Month;
+            text = _start.Value.ToString("MMM dd");
+        }
+        if (_end.HasValue)
+        {
+            if (!string.IsNullOrEmpty(text))
+                text += " - ";
+            var format = _end.Value.Month == month
+                ? "dd"
+                : "MMM dd";
+            text += _end.Value.ToString(format);
+        }
+
+        return text;
+    }
+
+}

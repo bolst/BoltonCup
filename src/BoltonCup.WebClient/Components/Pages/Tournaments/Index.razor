@@ -1,0 +1,53 @@
+@page "/tournaments"
+@attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-03-23")]
+@inject IBoltonCupApi BoltonCupApi
+
+<PageTitle>Tournaments | Bolton Cup</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="px-1 py-2" Gutters="false">
+    <div class="mt-6 mb-1 ml-2">
+        <MudText Typo="Typo.h5"><b>Tournaments</b></MudText>
+    </div>
+    
+    <MudGrid Spacing="3">
+        @foreach (var tournament in _tournaments)
+        {
+            var registerText = tournament.IsRegistrationOpen ? "Register" : "Closed";
+            <MudItem xs="12">
+                <MudPaper Class="d-flex flex-row align-center gap-3 px-1 py-8" Width="100%" Height="160px" Elevation="0" Outlined>
+                    <div class="d-flex align-center justify-center mud-full-height" style="width: 120px">
+                        <MudImage Src="@tournament.Logo" Alt="@tournament.Name" Height="80"/>
+                    </div>
+                    <div class="d-flex flex-column align-start justify-space-between">
+                        <MudText Typo="Typo.h6"><b>@tournament.Name</b></MudText>
+                        <DateRangeChip Start="tournament.StartDate" End="tournament.EndDate"/>
+                        <div class="d-flex flex-row align-center gap-3 flex-wrap">
+                            <MudButton 
+                                Color="Color.Primary"
+                                Href="@($"/tournaments/information?tournament={tournament.Id}")">Information</MudButton>
+                            <MudButton
+                                Color="Color.Secondary"
+                                Href="@($"/tournaments/register?tournament={tournament.Id}")"
+                                Disabled="!tournament.IsRegistrationOpen">@registerText</MudButton>
+                        </div>
+                    </div>
+                </MudPaper>
+            </MudItem>
+        }
+    </MudGrid>
+</MudContainer>
+
+@code {
+
+    private List<Sdk.TournamentDto> _tournaments = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var tournamentList = await BoltonCupApi.GetTournamentsAsync();
+        _tournaments = tournamentList.Items
+            .OrderByDescending(t => t.IsRegistrationOpen)
+            .ThenByDescending(t => t.StartDate)
+            .ToList();
+    }
+
+}

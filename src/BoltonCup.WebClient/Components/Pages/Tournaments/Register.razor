@@ -1,0 +1,64 @@
+@page "/tournaments/register"
+@attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-03-23")]
+@attribute [Authorize]
+@inject IBoltonCupApi BoltonCupApi
+
+<PageTitle>Register | Bolton Cup</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
+    @if (_tournament is not null)
+    {
+        <div class="mb-2 ml-2 d-flex flex-row align-center gap-3">
+            <MudText Typo="Typo.h6"><b>Register for @_tournament.Name</b></MudText>
+            <MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="ShowTournamentInformation" Size="Size.Small" />
+        </div>
+        
+        <MudDivider Class="my-2" />
+        
+        <TournamentRegistrationForm TournamentId="_tournament.Id" />
+    }
+</MudContainer>
+
+<MudDrawer @bind-Open="_infoDrawerOpen" Anchor="Anchor.Bottom" Elevation="1" Variant="DrawerVariant.Temporary" Width="100%" Height="100%">
+    <MudPaper Class="d-flex flex-row align-center px-2" Elevation="0" Width="100%" Height="64px" Square>
+        <BoltonCupLogo Height="64" />
+        <MudSpacer />
+        <MudIconButton OnClick="HideTournamentInformation" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit" />
+    </MudPaper>
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        @if (_tournament?.InfoGuide is not null)
+        {
+            <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-8"><b>@_tournament?.InfoGuide.Title</b></MudText>
+            <MarkdownView Value="@_tournament?.InfoGuide.MarkdownContent" />
+        }
+    </MudContainer>
+</MudDrawer>
+
+@code {
+
+    [SupplyParameterFromQuery(Name = "tournament")]
+    public int? TournamentId { get; set; }
+
+    private Sdk.TournamentSingleDto? _tournament;
+
+    private bool _infoDrawerOpen;
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        if (TournamentId is null)
+            return;
+        if (_tournament?.Id != TournamentId)
+            _tournament = await BoltonCupApi.GetTournamentByIdAsync(TournamentId.Value);
+    }
+
+    private void ShowTournamentInformation()
+    {
+        _infoDrawerOpen = true;
+    }
+
+    private void HideTournamentInformation()
+    {
+        _infoDrawerOpen = false;
+    }
+
+}

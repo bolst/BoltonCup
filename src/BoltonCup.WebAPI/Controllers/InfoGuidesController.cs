@@ -26,7 +26,7 @@ public class InfoGuidesController(IInfoGuideRepository _infoGuides, IInfoGuideMa
     public async Task<ActionResult<InfoGuideSingleDto>> GetInfoGuideById(Guid id)
     {
         var guide = await _infoGuides.GetByIdAsync(id);
-        return OkOrNotFound(_mapper.ToDto(guide));
+        return OkOrNoContent(_mapper.ToDto(guide));
     }
 
     /// <remarks>
@@ -37,7 +37,7 @@ public class InfoGuidesController(IInfoGuideRepository _infoGuides, IInfoGuideMa
     public async Task<ActionResult<InfoGuideSingleDto>> GetInfoGuideByTournamentId(int tournamentId)
     {
         var guide = await _infoGuides.GetByTournamentIdAsync(tournamentId);
-        return OkOrNotFound(_mapper.ToDto(guide));
+        return OkOrNoContent(_mapper.ToDto(guide));
     }
     
 }

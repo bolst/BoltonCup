@@ -27,7 +27,7 @@ public class TournamentsController(ITournamentRepository _tournaments, ITourname
     public async Task<ActionResult<TournamentSingleDto>> GetTournamentById(int id)
     {
         var tournament = await _tournaments.GetByIdAsync(id);
-        return OkOrNotFound(_mapper.ToDto(tournament));
+        return OkOrNoContent(_mapper.ToDto(tournament));
     }
     
     /// <remarks>

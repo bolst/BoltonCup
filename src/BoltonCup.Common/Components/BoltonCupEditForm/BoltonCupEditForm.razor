@@ -1,0 +1,100 @@
+@namespace BoltonCup.Common.Components
+@using Microsoft.AspNetCore.Components.Forms
+@typeparam T where T : class, new()
+
+@if (!string.IsNullOrEmpty(Title))
+{
+    <MudText Typo="Typo.h4">@Title</MudText>
+}
+
+<EditForm EditContext="_editContext" OnValidSubmit="HandleValidSubmitAsync" class="mud-width-full">
+    <DataAnnotationsValidator />
+    @if (Model is not null)
+    {
+        <MudStack Spacing="3" Class="mud-width-full">
+            @foreach (var field in _fields)
+            {
+                @RenderFieldComponent(field)
+            }
+            
+            @if (ActionsContent is not null)
+            {
+                @ActionsContent
+            }
+            else
+            {
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="_isSubmitting" FullWidth>@SubmitText</MudButton>
+            }
+        </MudStack>
+    }
+</EditForm>
+
+
+
+@code {
+
+    private RenderFragment RenderFieldComponent(FieldContext field)
+    {
+        var disabled = _isSubmitting || field.ReadOnly;
+        var variant = field.ReadOnly ? ReadOnlyVariant : Variant;
+        if (field.Type == typeof(string))
+        {
+            if (field.AllowedValues is not null)
+            {
+                return @<MudSelect
+                            T="string"
+                            Label="@field.Label"
+                            Value="@((string)field.PropertyInfo.GetValue(Model)!)"
+                            ValueChanged="v => OnValueChanged(field, v)"
+                            For="@(CreateValidationExpression<string>(field))"
+                            ReadOnly="field.ReadOnly"
+                            Required="field.IsRequired"
+                            Variant="@variant"
+                            Margin="@Margin"
+                            Dense="@Dense"
+                            ShrinkLabel="@ShrinkLabel"
+                            Underline="false"
+                            OnlyValidateIfDirty
+                            >
+                           @foreach (var option in field.AllowedValues)
+                           {
+                               <MudSelectItem T="string" Value="option"/>
+                           }
+                       </MudSelect>;
+            }
+
+            return @<MudTextField Disabled="disabled"
+                                  T="string"
+                                  Label="@field.Label"
+                                  Value="@((string)field.PropertyInfo.GetValue(Model)!)"
+                                  ValueChanged="v => OnValueChanged(field, v)"
+                                  For="@(CreateValidationExpression<string>(field))"
+                                  InputType="field.InputType"
+                                  ReadOnly="field.ReadOnly"
+                                  Required="field.IsRequired"
+                                  Variant="@variant"
+                                  Margin="@Margin"
+                                  ShrinkLabel="@ShrinkLabel"
+                                  Underline="false"
+                                  OnlyValidateIfDirty
+                                  FullWidth/>;
+        }
+       
+        if (field.Type == typeof(bool))
+        {
+            return @<MudCheckBox Disabled="disabled"
+                                 T="bool"
+                                 Label="@field.Label"
+                                 Value="@((bool)field.PropertyInfo.GetValue(Model)!)"
+                                 ValueChanged="v => OnValueChanged(field, v)"
+                                 For="@(CreateValidationExpression<bool>(field))"
+                                 ReadOnly="field.ReadOnly"
+                                 Required="field.IsRequired"
+                                 Dense="@Dense"
+                                 />;
+        }
+        
+        return _ => { };
+    }
+
+}

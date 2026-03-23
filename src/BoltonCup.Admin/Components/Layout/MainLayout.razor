@@ -1,5 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.Extensions.Options
+@inherits LayoutComponentBase
 @inject Common.Theme.BoltonCupTheme Theme
+@inject IOptions<Common.BoltonCupConfiguration> BcConfig
+@inject NavigationManager Navigation
 
 <MudThemeProvider Theme="Theme.MudTheme" IsDarkMode="true" />
 <MudPopoverProvider />
@@ -10,7 +13,14 @@
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
         <MudSpacer />
-        <UserMenu />
+        
+        <UserMenu>
+            <LogOutTemplate>
+                <form action="@($"{BcConfig.Value.ApiBaseUrl}api/auth/logout?returnUrl={Navigation.BaseUri}")" method="post">
+                    <MudButton ButtonType="ButtonType.Submit" Color="Color.Error" FullWidth>Log Out</MudButton>
+                </form>
+            </LogOutTemplate>
+        </UserMenu>
     </MudAppBar>
     <NavMenu @bind-Open="_isDrawerOpen" />
     <MudMainContent>
@@ -30,5 +40,5 @@
     private bool _isDrawerOpen = true;
 
     private void ToggleDrawer() => _isDrawerOpen = !_isDrawerOpen;
-    
+
 }

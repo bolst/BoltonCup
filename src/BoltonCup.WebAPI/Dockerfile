@@ -15,7 +15,6 @@ WORKDIR "/src/BoltonCup.WebAPI"
 RUN dotnet build "BoltonCup.WebAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "BoltonCup.WebAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final

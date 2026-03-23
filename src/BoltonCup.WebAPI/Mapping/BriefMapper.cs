@@ -6,6 +6,7 @@ public interface IBriefMapper
 {
     GameBriefDto ToGameBriefDto(Game game);
     GoalBriefDto ToGoalBriefDto(Goal goal);
+    InfoGuideBriefDto ToInfoGuideBriefDto(InfoGuide infoGuide);
     PenaltyBriefDto ToPenaltyBriefDto(Penalty penalty);
     PlayerBriefDto ToPlayerBriefDto(Player player);
     List<PlayerGameByGame> ToPlayerGameByGameDtos(Player player);
@@ -44,6 +45,16 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
             Scorer = ToPlayerBriefDto(goal.Scorer),
             PrimaryAssist = goal.Assist1Player == null ? null : ToPlayerBriefDto(goal.Assist1Player),
             SecondaryAssist = goal.Assist2Player == null ? null : ToPlayerBriefDto(goal.Assist2Player),
+        };
+    }
+
+
+    public InfoGuideBriefDto ToInfoGuideBriefDto(InfoGuide infoGuide)
+    {
+        return new InfoGuideBriefDto
+        {
+            Title = infoGuide.Title,
+            MarkdownContent = infoGuide.MarkdownContent,
         };
     }
     

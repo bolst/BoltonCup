@@ -9,6 +9,6 @@ public class BoltonCupControllerBase : ControllerBase
     /// <summary>
     /// Returns Ok(result) if result is not null, otherwise returns NotFound().
     /// </summary>
-    protected ActionResult<T> OkOrNotFound<T>(T? result)
-        => result is null ? NotFound() : Ok(result);
+    protected ActionResult<T> OkOrNoContent<T>(T? result)
+        => result is null ? NoContent() : Ok(result);
 }

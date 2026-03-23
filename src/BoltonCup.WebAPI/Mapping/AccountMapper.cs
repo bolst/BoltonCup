@@ -8,10 +8,11 @@ namespace BoltonCup.WebAPI.Mapping;
 public interface IAccountMapper
 {
     AccountDto? ToDto(Account? account, ClaimsPrincipal claims);
+    ICollection<AccountTournamentDto> ToAccountTournamentDtoList(Account? account);
     UpdateAccountCommand ToCommand(UpdateAccountRequest request, ClaimsPrincipal claims);
 }
 
-public class AccountMapper : IAccountMapper
+public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
 {
     public AccountDto? ToDto(Account? account, ClaimsPrincipal claims)
     {
@@ -35,10 +36,23 @@ public class AccountMapper : IAccountMapper
         };
     }
 
+    public ICollection<AccountTournamentDto> ToAccountTournamentDtoList(Account? account)
+    {
+        if (account is null)
+            return [];
+        return account.Players
+            .Select(player => new AccountTournamentDto
+            {
+                Tournament = _briefMapper.ToTournamentBriefDto(player.Tournament),
+                Team = player.Team == null ? null : _briefMapper.ToTeamBriefDto(player.Team)
+            }) 
+            .OrderByDescending(x => x.Tournament.StartDate)
+            .ToList();
+    }
+
     public UpdateAccountCommand ToCommand(UpdateAccountRequest request, ClaimsPrincipal claims)
     {
-        var accountId = claims.GetAccountId()
-            ?? throw new KeyNotFoundException("Missing account ID claim.");
+        var accountId = claims.GetAccountId();
         return new UpdateAccountCommand(
             AccountId: accountId,
             FirstName: request.FirstName,

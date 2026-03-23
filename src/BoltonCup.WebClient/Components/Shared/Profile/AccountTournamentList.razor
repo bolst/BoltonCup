@@ -1,0 +1,71 @@
+@namespace BoltonCup.WebClient.Components.Shared
+@inject IBoltonCupApi BoltonCupApi
+
+<MudPaper Class="pa-4 d-flex flex-column gap-3" Elevation="0" Outlined>
+    
+    @foreach (var tournament in _openTournaments)
+    {
+        <MudPaper Class="pa-4 blue lighten-3 d-flex flex-column justify-space-evenly gap-3">
+            <MudText Typo="Typo.button">Upcoming Tournament</MudText>
+            <MudText Typo="Typo.h5"><b>@tournament.Name</b></MudText>
+            <MudText Typo="Typo.subtitle1">@GetTournamentDateLabel(tournament)</MudText>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Large" Disabled FullWidth>Register now</MudButton>
+        </MudPaper>
+    }
+
+    <MudText Typo="Typo.body2"><b>Past Tournaments</b></MudText>
+
+    <MudList T="string" Gutters Padding ReadOnly>
+        @foreach (var (index, player) in _userTournaments.Index())
+        {
+            var color = index % 2 != 0 ? string.Empty : "gray lighten-3";
+            <MudListItem Text="@player.Tournament.Name" SecondaryText="@player.Team?.Name" Class="@color">
+                <AvatarContent>
+                    <div class="d-flex flex-column align-center" style="width: 64px">
+                        <MudImage Src="@player.Team?.Logo" Height="48"/>
+                    </div>
+                </AvatarContent>
+            </MudListItem>
+        }
+    </MudList>
+
+</MudPaper>
+
+
+@code {
+
+    private ICollection<Sdk.TournamentDto> _openTournaments = [];
+    private ICollection<Sdk.AccountTournamentDto> _userTournaments = [];
+    
+    protected override Task OnInitializedAsync()
+    {
+        return Task.WhenAll(
+            GetOpenTournaments(),
+            GetMyTournaments()
+        );
+    }
+
+    private async Task GetOpenTournaments()
+    {
+        var openTournamentList = await BoltonCupApi.GetTournamentsAsync(registrationOpen: true, size: 3);
+        _openTournaments = openTournamentList.Items;
+    }
+    
+    private async Task GetMyTournaments()
+    {
+        _userTournaments = await BoltonCupApi.GetMyTournamentsAsync();
+    }
+
+    private string GetTournamentDateLabel(Sdk.TournamentDto tournament)
+    {
+        const string format = "m";
+        return tournament switch
+        {
+            { StartDate: not null, EndDate: not null } => $"{tournament.StartDate.Value.ToString(format)} to {tournament.EndDate.Value.ToString(format)}",
+            { StartDate: not null, EndDate: null} => $"{tournament.StartDate.Value.ToString(format)}",
+            { StartDate: null, EndDate: not null} => $"Ends {tournament.EndDate.Value.ToString(format)}",
+            _ => "Date TBA",
+        };
+    }
+
+}

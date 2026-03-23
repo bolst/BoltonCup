@@ -110,7 +110,8 @@ public static class ServiceCollectionExtensions
             .AddTransient<ISkaterGameLogMapper, SkaterGameLogMapper>()
             .AddTransient<ISkaterStatMapper, SkaterStatMapper>()
             .AddTransient<ITeamMapper, TeamMapper>()
-            .AddTransient<ITournamentMapper, TournamentMapper>();
+            .AddTransient<ITournamentMapper, TournamentMapper>()
+            .AddTransient<ITournamentRegistrationMapper, TournamentRegistrationMapper>();
     }
     
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
