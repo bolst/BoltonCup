@@ -100,10 +100,12 @@ public class AuthController(
     }
     
     [HttpPost("logout")]
-    public async Task<IResult> Logout()
+    public async Task<IResult> Logout([FromQuery] string? returnUrl = null)
     {
         await _signInManager.SignOutAsync();
-        return Results.Ok();
+        return !string.IsNullOrWhiteSpace(returnUrl) 
+            ? Results.Redirect(returnUrl) 
+            : Results.Ok();
     }
     
     [AllowAnonymous]
