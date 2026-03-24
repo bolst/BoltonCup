@@ -13,9 +13,11 @@ public class BoltonCupClaimsPrincipalFactory(
     protected override async Task<ClaimsIdentity> GenerateClaimsAsync(BoltonCupUser user)
     {
         var identity = await base.GenerateClaimsAsync(user);
-        if (user.AccountId is not null)
+        
+        var accountIdStr = user.AccountId?.ToString();
+        if (!string.IsNullOrEmpty(accountIdStr))
         {
-            identity.AddClaim(new Claim(BoltonCupClaimTypes.AccountId, user.AccountId.ToString()));
+            identity.AddClaim(new Claim(BoltonCupClaimTypes.AccountId, accountIdStr));
         }
 
         return identity;
