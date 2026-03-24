@@ -6,23 +6,29 @@ namespace BoltonCup.Common.Auth;
 
 public class CookieAuthenticationStateProvider(IBoltonCupApi _api) : AuthenticationStateProvider
 {
+    private static AuthenticationState AnonymousUser => new(new ClaimsPrincipal(new ClaimsIdentity()));
+    
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         try
         {
-            var userInfo = await _api.GetMeAsync();
-
-            if (userInfo is { IsAuthenticated: true })
+            var currentUser = await _api.GetCurrentUserAsync();
+            if (currentUser is not { IsAuthenticated: true })
+                return AnonymousUser;
+            
+            var claims = new List<Claim>
             {
-                var claims = new List<Claim>
-                {
-                    new(ClaimTypes.Name, userInfo.Name),
-                    new(ClaimTypes.Email, userInfo.Email),
-                    new(ClaimTypes.Role, string.Join(';', userInfo.Roles))
-                };
-                var identity = new ClaimsIdentity(claims, "ServerCookie");
-                return new AuthenticationState(new ClaimsPrincipal(identity));
-            }
+                new(ClaimTypes.Name, currentUser.Name),
+                new(ClaimTypes.Email, currentUser.Email),
+                new(ClaimTypes.Role, string.Join(';', currentUser.Roles)),
+            };
+
+            var accountIdString = currentUser.AccountId?.ToString();
+            if (!string.IsNullOrEmpty(accountIdString))
+                claims.Add(new Claim("AccountId", accountIdString));
+            
+            var identity = new ClaimsIdentity(claims, "ServerCookie");
+            return new AuthenticationState(new ClaimsPrincipal(identity));
         }
         catch
         {
@@ -30,6 +36,6 @@ public class CookieAuthenticationStateProvider(IBoltonCupApi _api) : Authenticat
             // TODO: log
         }
 
-        return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+        return AnonymousUser;
     }
 }
