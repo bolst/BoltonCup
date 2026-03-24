@@ -3,6 +3,7 @@ using System.Security.Claims;
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
 using BoltonCup.Infrastructure.Data;
+using BoltonCup.Infrastructure.Extensions;
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ namespace BoltonCup.Infrastructure.Services;
 
 public interface IUserService
 {
-    Task<Account?> GetMeAsync(ClaimsPrincipal claimsPrincipal);
+    Task<Account?> GetMyAccountAsync(ClaimsPrincipal claimsPrincipal);
     Task<IdentityResult> RegisterAsync(string email, string password);
     Task ResendConfirmationEmailAsync(string email);
     Task<bool> VerifyPasswordResetCodeAsync(string email, string code);
@@ -30,15 +31,11 @@ public class UserService(
     private static readonly EmailAddressAttribute _emailAddressAttribute = new();
 
 
-
-    public async Task<Account?> GetMeAsync(ClaimsPrincipal claimsPrincipal)
+    public async Task<Account?> GetMyAccountAsync(ClaimsPrincipal claimsPrincipal)
     {
-        var email = claimsPrincipal.FindFirstValue(ClaimTypes.Email);
-        if (string.IsNullOrEmpty(email))
+        if (!claimsPrincipal.TryGetAccountId(out var accountId))
             return null;
-        if (await _userManager.FindByEmailAsync(email) is not { AccountId: not null } user)
-            return null;
-        return await _dbContext.Accounts.FindAsync(user.AccountId);
+        return await _dbContext.Accounts.FindAsync(accountId);
     }
     
     

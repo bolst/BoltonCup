@@ -40,7 +40,7 @@ public class AccountsController(
     [HttpGet("me")]
     public async Task<ActionResult<AccountDto>> GetMe()
     {
-        var account = await _userService.GetMeAsync(User);
+        var account = await _userService.GetMyAccountAsync(User);
         return OkOrNoContent(_accountMapper.ToDto(account, User));
     }
 
