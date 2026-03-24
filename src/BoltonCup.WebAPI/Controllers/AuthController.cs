@@ -99,6 +99,7 @@ public class AuthController(
             : BadRequest("Invalid code or email.");
     }
     
+    [Authorize]
     [HttpPost("logout")]
     public async Task<IResult> Logout([FromQuery] string? returnUrl = null)
     {

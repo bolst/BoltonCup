@@ -107,8 +107,7 @@ app.UseResponseCaching();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers()
-    .RequireAuthorization();
+app.MapControllers();
 
 // for now
 app.MapGet("/", async context =>
