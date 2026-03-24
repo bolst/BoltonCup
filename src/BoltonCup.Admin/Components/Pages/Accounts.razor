@@ -30,24 +30,6 @@
     private EntityDataGrid<Account> _dataGrid = null!;
     private readonly AccountComparer _comparer = new();
 
-    private async Task<GridData<Account>> GetItemsAsync(IQueryable<Account> accounts, GridState<Account> state, CancellationToken cancellationToken)
-    {
-        var sortDefinition = state.SortDefinitions.FirstOrDefault();
-        var data = await accounts
-            .ToPagedListAsync(new GetAccountsQuery
-            {
-                Page = state.Page + 1,
-                Size = state.PageSize,
-                SortBy = sortDefinition?.SortBy,
-                Descending = sortDefinition?.Descending ?? false,
-            }, cancellationToken: cancellationToken);
-        return new GridData<Account>
-        {
-            Items = data.Items,
-            TotalItems = data.Total
-        };
-    }
-
 
     private async Task OnSave(ChangeTracker<Account> changes)
     {

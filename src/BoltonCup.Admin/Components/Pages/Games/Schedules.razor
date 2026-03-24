@@ -21,27 +21,6 @@
 @code {
     
     private readonly GameComparer _comparer = new();
-
-    private async Task<GridData<Game>> ServerFunc(IQueryable<Game> games, GridState<Game> state, CancellationToken cancellationToken)
-    {
-        var sortDefinition = state.SortDefinitions.FirstOrDefault();
-        var data = await games
-            .Include(g => g.HomeTeam)
-            .Include(g => g.AwayTeam)
-            .Include(g => g.Tournament)
-            .ToPagedListAsync(new GetGamesQuery
-            {
-                Page = state.Page + 1,
-                Size = state.PageSize,
-                SortBy = sortDefinition?.SortBy,
-                Descending = sortDefinition?.Descending ?? false,
-            }, cancellationToken: cancellationToken);
-        return new GridData<Game>
-        {
-            Items = data.Items,
-            TotalItems = data.Total
-        };
-    }
     
     private async Task<Game?> NewItemFunc()
     {
