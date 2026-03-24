@@ -11,9 +11,7 @@ internal static class RoleSeeder
         UserManager<BoltonCupUser> userManager, 
         IConfiguration configuration)
     {
-        string[] roleNames = ["Admin", "User"];
-        
-        foreach (var roleName in roleNames)
+        foreach (var roleName in BoltonCupRole.All)
         {
             if (!await roleManager.RoleExistsAsync(roleName))
                 await roleManager.CreateAsync(new IdentityRole(roleName));
