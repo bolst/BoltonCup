@@ -38,6 +38,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         _accountInfo = await BoltonCupApi.GetMeAsync();
     }
     

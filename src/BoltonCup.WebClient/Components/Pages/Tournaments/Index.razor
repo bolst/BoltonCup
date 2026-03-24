@@ -43,6 +43,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         var tournamentList = await BoltonCupApi.GetTournamentsAsync();
         _tournaments = tournamentList.Items
             .OrderByDescending(t => t.IsRegistrationOpen)

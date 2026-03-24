@@ -1,5 +1,9 @@
+@using BoltonCup.Common
+@using Microsoft.Extensions.Options
 @inherits LayoutComponentBase
 @inject Common.Theme.BoltonCupTheme Theme
+@inject NavigationManager Navigation
+@inject IOptions<BoltonCupConfiguration> BcConfig
 
 <MudThemeProvider Theme="Theme.MudTheme" />
 <MudPopoverProvider />
@@ -13,3 +17,27 @@
     </MudMainContent>
     <Footer />
 </MudLayout>
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthStateTask is null) 
+            return;
+
+        var authState = await AuthStateTask;
+        var user = authState.User;
+
+        if (user.Identity is { IsAuthenticated: true })
+        {
+            if (!user.HasClaim(c => c.Type == "AccountId"))
+            {
+                Navigation.NavigateTo($"{BcConfig.Value.AuthBaseUrl}complete-profile");
+            }
+        }
+    }
+
+}
