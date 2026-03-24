@@ -1,13 +1,52 @@
 @page "/complete-account"
-@using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 @inject IBoltonCupApi BoltonCupApi
+@inject IOptions<Common.BoltonCupConfiguration> BcConfig
+@inject IDialogService DialogService
+@inject NavigationManager Navigation
 
-<BoltonCupEditForm T="CompleteUserAccountRequest" Model="_model" OnValidSubmit="OnSubmit" Title="Complete your account" />
+<BoltonCupEditForm T="CompleteUserAccountRequest" Model="_model" OnValidSubmit="OnSubmit" Title="Complete your account" Disabled="_formDisabled" />
 
 @code {
-    
+
+    private bool _formDisabled = true;
     private readonly CompleteUserAccountRequest _model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        AccountDto? account;
+        try
+        {
+            account = await BoltonCupApi.GetMeAsync();
+        }
+        catch
+        {
+            _formDisabled = false;
+            return;
+        }
+
+        var result = await DialogService.ShowMessageBox(
+            "Hold on...",
+            (MarkupString)$"We already have an account linked to <b>{account.Email}</b>!", 
+            yesText: "Go to my profile", 
+            noText: "Sign out", 
+            options: new DialogOptions
+            {
+                CloseButton = false,
+                CloseOnEscapeKey = false,
+                BackdropClick = false,
+            });
+
+        if (result.GetValueOrDefault())
+        {
+            Navigation.NavigateTo($"{BcConfig.Value.WebBaseUrl}profile");
+        }
+        else
+        {
+            await BoltonCupApi.LogoutAsync();
+            Navigation.NavigateTo($"{BcConfig.Value.AuthBaseUrl}log-in-or-sign-up");
+        }
+    }
 
     private async Task OnSubmit(EditContext _)
     {
