@@ -26,8 +26,6 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
             FirstName = account.FirstName,
             LastName = account.LastName,
             Name = (account.FirstName +  " " + account.LastName).Trim(),
-            IsAuthenticated = claims.Identity?.IsAuthenticated ?? false,
-            Roles = claims.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList(),
             Phone = account.Phone ?? claims.FindFirstValue(ClaimTypes.MobilePhone),
             Birthday = account.Birthday,
             HighestLevel = account.HighestLevel,

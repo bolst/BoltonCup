@@ -7,9 +7,6 @@ public class AccountDto
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? Name { get; set; }
-    public bool IsAuthenticated { get; set; }
-    public List<string> Roles { get; set; }
-
     public string? Phone { get; set; }
     public DateTime Birthday { get; set; }
     public string? HighestLevel { get; set; }
