@@ -5,17 +5,27 @@ namespace BoltonCup.Infrastructure.Extensions;
 
 public static class ClaimsPrincipalExtensions
 {
-    public static int GetAccountId(this ClaimsPrincipal principal)
+    extension(ClaimsPrincipal principal)
     {
-        var accountIdString = principal.FindFirstValue(BoltonCupClaimTypes.AccountId);
-        return int.TryParse(accountIdString, out var accountId) 
-            ? accountId 
-            : throw new KeyNotFoundException("Missing account ID claim.");
-    }
+        public int GetAccountId()
+        {
+            var accountIdString = principal.FindFirstValue(BoltonCupClaimTypes.AccountId);
+            return int.TryParse(accountIdString, out var accountId) 
+                ? accountId 
+                : throw new KeyNotFoundException("Missing account ID claim.");
+        }
 
-    public static bool TryGetAccountId(this ClaimsPrincipal principal, out int accountId)
-    {
-        var accountIdString = principal.FindFirstValue(BoltonCupClaimTypes.AccountId);
-        return int.TryParse(accountIdString, out accountId);
+        public bool TryGetAccountId(out int accountId)
+        {
+            var accountIdString = principal.FindFirstValue(BoltonCupClaimTypes.AccountId);
+            return int.TryParse(accountIdString, out accountId);
+        }
+
+        public int? GetAccountIdOrDefault()
+        {
+            if (principal.TryGetAccountId(out var accountId))
+                return accountId;
+            return null;
+        }
     }
 }
