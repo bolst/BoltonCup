@@ -1,5 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
+using BoltonCup.Admin.Extensions;
+using BoltonCup.Core.Queries.Base;
 using BoltonCup.Infrastructure.Data;
+using BoltonCup.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
@@ -28,6 +32,8 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     private string? _search;
     private readonly ParameterState<string?> _searchState;
 
+    private readonly List<Func<IQueryable<T>, IQueryable<T>>> _includeQueries = [];
+
     public EntityDataGrid()
     {
         _cts = new CancellationTokenSource();
@@ -54,9 +60,6 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     
     [Parameter]
     public EventCallback<ChangeTracker<T>> OnRevert { get; set; }
-    
-    [Parameter]
-    public Func<IQueryable<T>, GridState<T>, CancellationToken, Task<GridData<T>>> ServerFunc { get; set; } = null!;
 
     [Parameter]
     public string? Search { get; set; }
@@ -79,6 +82,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     [Parameter]
     public Func<Task<T?>>? NewItemFunc { get; set; }
     
+    [Parameter]
+    public Expression<Func<T, string?>>? SearchBy { get; set; }
+    
     public Task NotifyItemChangedAsync(T item) => _dataGrid.CommittedItemChanges.InvokeAsync(item);
 
     private async Task<GridData<T>> ServerFuncWrapper(GridState<T> state)
@@ -88,14 +94,34 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         _cts = new CancellationTokenSource();
         try
         {
+            var sortDefinition = state.SortDefinitions.FirstOrDefault();
+            
             await using var dbContext = await DbContextFactory.CreateDbContextAsync();
-            var dbSet = dbContext.Set<T>().AsNoTracking();
-            var gridData = await ServerFunc(dbSet, state, _cts.Token);
-            var items = _changeTracker.NewItems.Concat(gridData.Items);
+            var dbSet = dbContext
+                .Set<T>()
+                .AsNoTracking();
+
+            dbSet = _includeQueries.Aggregate(dbSet,
+                (current, query) => query(current)
+            );
+
+            if (SearchBy is not null)
+                dbSet = dbSet.WhereContains(SearchBy, _search);
+            
+            var data = await dbSet
+                .ToPagedListAsync(new QueryBase
+                {
+                    Page = state.Page + 1,
+                    Size = state.PageSize,
+                    SortBy = sortDefinition?.SortBy,
+                    Descending = sortDefinition?.Descending ?? false,
+                });
+            
+            var items = _changeTracker.NewItems.Concat(data.Items);
             return new GridData<T>
             {
                 Items = items,
-                TotalItems = gridData.TotalItems,
+                TotalItems = data.Total,
             };
         }
         catch (Exception e)
@@ -160,6 +186,11 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         {
             _changeTracker.TrackNew(newItem);
         }
+    }
+
+    public void RegisterInclude(Func<IQueryable<T>, IQueryable<T>> includeQuery)
+    {
+        _includeQueries.Add(includeQuery);
     }
     
     private string RowStyleFunc(T item, int row)
