@@ -1,4 +1,5 @@
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Identity;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Filters;
 using BoltonCup.WebAPI.Mapping;
@@ -54,6 +55,12 @@ public static class ServiceCollectionExtensions
                     .AddAuthenticationSchemes(IdentityConstants.ApplicationScheme, ApiKeyConstants.Scheme)
                     .RequireAuthenticatedUser()
                     .Build();
+                
+                options.AddPolicy(BoltonCupPolicy.RequireCompletedAccount, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim(BoltonCupClaimTypes.AccountId);
+                });
             });
     }
     
