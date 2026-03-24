@@ -15,7 +15,8 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
 
     private string _entityName;
     private Func<T, TEntity?>? _compiledExpression;
-    private List<TEntity> _options = new();
+    private List<TEntity> _options = [];
+    private bool _pendingRegistration = true;
 
     [CascadingParameter]
     public EntityDataGrid<T> ParentGrid { get; set; } = null!;
@@ -46,6 +47,16 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
         }
 
         await LoadOptionsAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (_pendingRegistration)
+        {
+            ParentGrid.RegisterInclude(query => query.Include(Property));
+            _pendingRegistration = false;
+        }
     }
     
     public override string? PropertyName 

@@ -32,6 +32,8 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     private string? _search;
     private readonly ParameterState<string?> _searchState;
 
+    private readonly List<Func<IQueryable<T>, IQueryable<T>>> _includeQueries = [];
+
     public EntityDataGrid()
     {
         _cts = new CancellationTokenSource();
@@ -98,7 +100,11 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
             var dbSet = dbContext
                 .Set<T>()
                 .AsNoTracking();
-            
+
+            dbSet = _includeQueries.Aggregate(dbSet,
+                (current, query) => query(current)
+            );
+
             if (SearchBy is not null)
                 dbSet = dbSet.WhereContains(SearchBy, _search);
             
@@ -180,6 +186,11 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         {
             _changeTracker.TrackNew(newItem);
         }
+    }
+
+    public void RegisterInclude(Func<IQueryable<T>, IQueryable<T>> includeQuery)
+    {
+        _includeQueries.Add(includeQuery);
     }
     
     private string RowStyleFunc(T item, int row)
