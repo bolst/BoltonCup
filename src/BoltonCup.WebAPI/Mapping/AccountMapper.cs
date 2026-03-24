@@ -9,6 +9,7 @@ public interface IAccountMapper
 {
     AccountDto? ToDto(Account? account, ClaimsPrincipal claims);
     ICollection<AccountTournamentDto> ToAccountTournamentDtoList(Account? account);
+    CreateAccountCommand ToCommand(CompleteUserAccountRequest request, ClaimsPrincipal claims);
     UpdateAccountCommand ToCommand(UpdateAccountRequest request, ClaimsPrincipal claims);
 }
 
@@ -48,6 +49,20 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
             }) 
             .OrderByDescending(x => x.Tournament.StartDate)
             .ToList();
+    }
+
+    public CreateAccountCommand ToCommand(CompleteUserAccountRequest request, ClaimsPrincipal claims)
+    {
+        return new CreateAccountCommand(
+            FirstName: request.FirstName,
+            LastName: request.LastName,
+            Email: claims.FindFirstValue(ClaimTypes.Email) ?? throw new InvalidOperationException("Missing email claim"),
+            Birthday: request.Birthday,
+            Height: request.Height,
+            Weight: request.Weight,
+            HighestLevel: request.HighestLevel,
+            PreferredBeer: request.PreferredBeer
+        );
     }
 
     public UpdateAccountCommand ToCommand(UpdateAccountRequest request, ClaimsPrincipal claims)

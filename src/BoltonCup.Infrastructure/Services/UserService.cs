@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using BoltonCup.Core;
+using BoltonCup.Core.Commands;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -17,11 +18,13 @@ public interface IUserService
     Task ForgotPasswordAsync(string email);
     Task<IdentityResult> ResetPasswordAsync(string email, string code, string newPassword);
     Task<IdentityResult> ConfirmEmailAsync(string email, string code);
+    Task<BoltonCupUser> CompleteUserAccountAsync(string userId, CreateAccountCommand command);
 }
 
 public class UserService(
     BoltonCupDbContext _dbContext,
-    UserManager<BoltonCupUser> _userManager, 
+    UserManager<BoltonCupUser> _userManager,
+    IAccountService _accountService,
     IEmailer _emailer) : IUserService
 {
     private static readonly EmailAddressAttribute _emailAddressAttribute = new();
@@ -129,5 +132,17 @@ public class UserService(
         }
 
         return result;
+    }
+
+
+
+    public async Task<BoltonCupUser> CompleteUserAccountAsync(string userId, CreateAccountCommand command)
+    {
+        var user = await _userManager.FindByIdAsync(userId)
+            ?? throw new InvalidOperationException($"User with id {userId} not found.");
+        var accountId = await _accountService.CreateAsync(command);
+        user.AccountId = accountId;
+        await _userManager.UpdateAsync(user);
+        return user;
     }
 }

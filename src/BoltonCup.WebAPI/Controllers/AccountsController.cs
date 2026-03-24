@@ -1,9 +1,12 @@
+using System.Security.Claims;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Services;
 using BoltonCup.WebAPI.Mapping;
 using static BoltonCup.WebAPI.Authentication.BoltonCupPolicy;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
@@ -12,10 +15,24 @@ public class AccountsController(
     IPlayerRepository _players,
     IAccountRepository _accounts,
     IAccountService _accountService, 
-    IUserService _userService, 
-    IAccountMapper _accountMapper
+    IUserService _userService,
+    IAccountMapper _accountMapper,
+    SignInManager<BoltonCupUser> _signInManager
 ) : BoltonCupControllerBase
 {
+    [Authorize]
+    [HttpPost("complete-account")]
+    public async Task<IActionResult> CompleteMyAccount([FromBody] CompleteUserAccountRequest request)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("ID claim is missing.");
+        var command = _accountMapper.ToCommand(request, User);
+        var user = await _userService.CompleteUserAccountAsync(userId, command);
+        await _signInManager.RefreshSignInAsync(user);
+        return Ok();
+    }
+    
     /// <remarks>
     /// Gets the currently logged-in user
     /// </remarks>
