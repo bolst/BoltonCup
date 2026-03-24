@@ -53,6 +53,7 @@
         try
         {
             await BoltonCupApi.CompleteMyAccountAsync(_model);
+            Navigation.NavigateTo($"{BcConfig.Value.WebBaseUrl}profile");
         }
         catch (Exception e)
         {
