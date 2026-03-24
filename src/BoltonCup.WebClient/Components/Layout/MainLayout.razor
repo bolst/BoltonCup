@@ -35,7 +35,7 @@
         {
             if (!user.HasClaim(c => c.Type == "AccountId"))
             {
-                Navigation.NavigateTo($"{BcConfig.Value.AuthBaseUrl}complete-profile");
+                Navigation.NavigateTo($"{BcConfig.Value.AuthBaseUrl}complete-account");
             }
         }
     }
