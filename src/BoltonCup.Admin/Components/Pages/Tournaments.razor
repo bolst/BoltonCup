@@ -3,8 +3,8 @@
 
 <EntityDataGrid
     T="Tournament"
-    ServerFunc="ServerFunc"
     NewItemFunc="NewItemFunc"
+    SearchBy="x => x.Name"
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Tournament" Property="x => x.Name" />

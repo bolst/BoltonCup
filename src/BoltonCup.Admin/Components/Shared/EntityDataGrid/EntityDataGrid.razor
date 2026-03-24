@@ -38,7 +38,11 @@
                 }
             </MudButtonGroup>
             <MudSpacer/>
-            <MudTextField Class="mx-1" @bind-Value="_search" Label="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable/>
+            
+            @if (SearchBy is not null)
+            {
+                <MudTextField Class="mx-1" T="string" Value="_search" ValueChanged="SetSearchAsync" Label="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable/>
+            }
             <MudButtonGroup OverrideStyles="false" Size="Size.Small">
                 <MudTooltip Text="Revert">
                     <MudIconButton OnClick="RevertChangesAsync" Icon="@Icons.Material.Rounded.Undo" Color="Color.Error" Disabled="!_changeTracker.IsDirty"/>
