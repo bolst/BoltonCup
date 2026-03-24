@@ -44,7 +44,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Phone).HasColumnName("phone");
             entity.Property(e => e.Birthday).HasColumnName("birthday");
             entity.Property(e => e.HighestLevel).HasColumnName("highest_level");
-            entity.Property(e => e.Avatar).HasColumnName("avatar_key");
+            entity.Property(e => e.Avatar).HasColumnName("avatar_key").HasDefaultValue(AssetUrlResolver.StaticKeys.PlayerAvatar);
             entity.Property(e => e.Banner).HasColumnName("banner_key").HasDefaultValue(AssetUrlResolver.StaticKeys.PlayerBanner);
             entity.Property(e => e.PreferredBeer).HasColumnName("preferred_beer");
         });
