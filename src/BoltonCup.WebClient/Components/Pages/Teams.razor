@@ -3,6 +3,9 @@
 @inject IBoltonCupApi BoltonCupApi
 
 <PageTitle>Teams | Bolton Cup</PageTitle>
+<HeadContent>
+    <meta name="description" content="The official list of teams for the Bolton Cup.">
+</HeadContent>
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="px-1" Gutters="false">
     @foreach (var group in _teamsByTournament)
