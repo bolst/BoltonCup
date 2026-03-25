@@ -7,7 +7,7 @@ export function initCountdown(dateEnd) {
         return;
     }
 
-    setInterval(calculate);
+    const timerId = setInterval(calculate, 1000);
 
     function calculate() {
         let dateStart = new Date();
@@ -29,10 +29,25 @@ export function initCountdown(dateEnd) {
             seconds = parseInt(timeRemaining);
 
             const daySlice = days >= 100 ? -3 : -2;
-            document.getElementById("days").innerHTML = ("0" + days).slice(daySlice);
-            document.getElementById("hours").innerHTML = ("0" + hours).slice(-2);
-            document.getElementById("minutes").innerHTML = ("0" + minutes).slice(-2);
-            document.getElementById("seconds").innerHTML = ("0" + seconds).slice(-2);
+            
+            // make sure element exists before updating
+            const daysElem = document.getElementById("days");
+            if (daysElem) {
+                daysElem.innerHTML = ("0" + days).slice(daySlice);
+                document.getElementById("hours").innerHTML = ("0" + hours).slice(-2);
+                document.getElementById("minutes").innerHTML = ("0" + minutes).slice(-2);
+                document.getElementById("seconds").innerHTML = ("0" + seconds).slice(-2);
+            } else {
+                clearInterval(timerId);
+            }
         }
+    }
+    
+    return timerId;
+}
+
+export function stopCountdown(timerId) {
+    if (timerId) {
+        clearInterval(timerId);
     }
 }
