@@ -22,7 +22,7 @@
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>(
-                "import", "./Components/Shared/Countdown.razor.js"
+                "import", "./Components/Shared/Countdown.razor.js?v=1.0.0"
             );
             await BeginTimer();
         }
