@@ -56,7 +56,7 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
             LastName: request.LastName,
             Email: claims.FindFirstValue(ClaimTypes.Email) ?? throw new InvalidOperationException("Missing email claim"),
             Birthday: request.Birthday,
-            Height: request.Height,
+            Height: $"{request.HeightFeet}'{request.HeightInches}\"",
             Weight: request.Weight,
             HighestLevel: request.HighestLevel,
             PreferredBeer: request.PreferredBeer

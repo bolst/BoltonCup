@@ -1926,7 +1926,8 @@
         "required": [
           "birthday",
           "firstName",
-          "height",
+          "heightFeet",
+          "heightInches",
           "lastName",
           "weight"
         ],
@@ -1946,9 +1947,17 @@
             "type": "string",
             "format": "date-time"
           },
-          "height": {
-            "minLength": 1,
-            "type": "string"
+          "heightFeet": {
+            "maximum": 8,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "heightInches": {
+            "maximum": 11,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
           },
           "weight": {
             "maximum": 1000000,
