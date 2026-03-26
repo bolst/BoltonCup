@@ -34,43 +34,48 @@
                 Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false" 
                 ShrinkLabel Required ImmediateText Editable />
             
-            <div class="d-flex flex-row align-center justify-space-evenly gap-3">
-                <MudSelect
-                    @bind-Value="@_model.HeightFeet" For="() => _model.HeightFeet" Label="Height"
-                    Adornment="Adornment.End" AdornmentText="ft" RequiredError="Required" 
-                    Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false"
-                    ShrinkLabel OnlyValidateIfDirty FullWidth Required>
-                    @foreach (var foot in Enumerable.Range(3, 5))
-                    {
-                        <MudSelectItem Value="@foot" />
-                    }
-                </MudSelect>
-                <MudSelect
-                    @bind-Value="@_model.HeightInches" For="() => _model.HeightInches"
-                    Adornment="Adornment.End" AdornmentText="in" RequiredError="Required" 
-                    Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false"
-                    ShrinkLabel OnlyValidateIfDirty FullWidth Required>
-                    @foreach (var inch in Enumerable.Range(0, 11))
-                    {
-                        if (_model.HeightFeet == 5 && inch == 11)
-                            continue;
-                        <MudSelectItem Value="@inch" />
-                    }
-                </MudSelect>
+            <div>
+                <MudText Typo="Typo.caption">Height</MudText>
+                <div class="d-flex flex-row align-center justify-space-evenly gap-3">
+                    <MudSelect
+                        @bind-Value="@_model.HeightFeet" For="() => _model.HeightFeet"
+                        Adornment="Adornment.End" AdornmentText="ft" RequiredError="Required" 
+                        Variant="Variant.Outlined" Margin="Margin.None" Underline="false"
+                        ShrinkLabel OnlyValidateIfDirty FullWidth Required>
+                        @foreach (var foot in Enumerable.Range(3, 5))
+                        {
+                            if (foot == 5 && _model.HeightInches == 11)
+                                continue;
+                            <MudSelectItem Value="@foot" />
+                        }
+                    </MudSelect>
+                    <MudSelect
+                        @bind-Value="@_model.HeightInches" For="() => _model.HeightInches"
+                        Adornment="Adornment.End" AdornmentText="in" RequiredError="Required" 
+                        Variant="Variant.Outlined" Margin="Margin.None" Underline="false"
+                        ShrinkLabel OnlyValidateIfDirty FullWidth Required>
+                        @foreach (var inch in Enumerable.Range(0, 12))
+                        {
+                            if (_model.HeightFeet == 5 && inch == 11)
+                                continue;
+                            <MudSelectItem Value="@inch" />
+                        }
+                    </MudSelect>
+                </div>
             </div>
             
-            <MudNumericField 
+            <MudNumericField
                 @bind-Value="@_model.Weight" For="() => _model.Weight" Label="Weight"
-                Adornment="Adornment.End" AdornmentText="lb" Min="0" RequiredError="Required" 
+                Adornment="Adornment.End" AdornmentText="lb" Min="1" RequiredError="Required" 
                 Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false" 
-                ShrinkLabel OnlyValidateIfDirty FullWidth Required />
+                ShrinkLabel OnlyValidateIfDirty FullWidth Required HideSpinButtons />
             
             <HighestLevelSelect 
                 @bind-Value="@_model.HighestLevel" Label="Highest level played"
                 Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false"
                 ShrinkLabel OnlyValidateIfDirty FullWidth Required />
             
-            <MudTextField 
+            <MudTextField
                 @bind-Value="@_model.PreferredBeer" For="() => _model.PreferredBeer" Label="Favourite beer" 
                 Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false" 
                 ShrinkLabel OnlyValidateIfDirty FullWidth />
@@ -79,6 +84,10 @@
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="_formDisabled" FullWidth>Continue</MudButton>
         </MudStack>
     </EditForm>
+}
+else
+{
+    <MudSkeleton Height="500px" Width="300px" SkeletonType="SkeletonType.Rectangle" />
 }
 
 
