@@ -17,7 +17,7 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
 
         RuleFor(x => x.Birthday)
             .NotEmpty().WithMessage("Birthday is required.")
-            .Must(BeAValidAge).WithMessage("You must be between 18 and 100 years old to play.");
+            .Must(BeAValidAge).WithMessage("You must be between 16+ years old to play.");
 
         RuleFor(x => x.Height)
             .NotEmpty().WithMessage("Height is required.");

@@ -29,7 +29,6 @@ public record CompleteUserAccountRequest
     [Range(0, 1000000, ErrorMessage = "No")]
     public int Weight { get; set; }
 
-    [MaxLength(50)]
     [Display(Name = "Highest level played")]
     public string? HighestLevel { get; set; }
 
