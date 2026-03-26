@@ -1,16 +1,108 @@
 @page "/complete-account"
+@using BoltonCup.Common
+@implements IDisposable
 @attribute [Authorize]
 @inject IBoltonCupApi BoltonCupApi
-@inject IOptions<Common.BoltonCupConfiguration> BcConfig
+@inject IOptions<BoltonCupConfiguration> BcConfig
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
-<BoltonCupEditForm T="CompleteUserAccountRequest" Model="_model" OnValidSubmit="OnSubmit" Title="Complete your account" Disabled="_formDisabled" />
+<MudText Typo="Typo.h4">Complete your account</MudText>
+
+@if (_editContext is not null)
+{
+    <EditForm EditContext="_editContext" OnValidSubmit="OnSubmit" class="mud-width-full">
+        <DataAnnotationsValidator />
+        <MudStack Spacing="3" Class="mud-width-full">
+            
+            <MudTextField 
+                @bind-Value="@_model.FirstName" For="() => _model.FirstName" Label="First name" 
+                Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false" RequiredError="Required" 
+                ShrinkLabel OnlyValidateIfDirty FullWidth Required />
+            
+            <MudTextField 
+                @bind-Value="@_model.LastName" For="() => _model.LastName" Label="Last name" 
+                Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false" RequiredError="Required" 
+                ShrinkLabel OnlyValidateIfDirty FullWidth Required />
+            
+            <MudDatePicker 
+                @bind-Date="@_birthday" Label="Birthday"
+                Error="!string.IsNullOrEmpty(_birthdayError)" ErrorText="@_birthdayError"
+                OpenTo="OpenTo.Year" RequiredError="Required" MinDate="new DateTime(1980, 01, 01)" MaxDate="DateTime.Today"
+                PickerVariant="PickerVariant.Dialog"
+                Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false" 
+                ShrinkLabel Required ImmediateText Editable />
+            
+            <div class="d-flex flex-row align-center justify-space-evenly gap-3">
+                <MudSelect
+                    @bind-Value="@_model.HeightFeet" For="() => _model.HeightFeet" Label="Height"
+                    Adornment="Adornment.End" AdornmentText="ft" RequiredError="Required" 
+                    Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false"
+                    ShrinkLabel OnlyValidateIfDirty FullWidth Required>
+                    @foreach (var foot in Enumerable.Range(3, 5))
+                    {
+                        <MudSelectItem Value="@foot" />
+                    }
+                </MudSelect>
+                <MudSelect
+                    @bind-Value="@_model.HeightInches" For="() => _model.HeightInches"
+                    Adornment="Adornment.End" AdornmentText="in" RequiredError="Required" 
+                    Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false"
+                    ShrinkLabel OnlyValidateIfDirty FullWidth Required>
+                    @foreach (var inch in Enumerable.Range(0, 11))
+                    {
+                        if (_model.HeightFeet == 5 && inch == 11)
+                            continue;
+                        <MudSelectItem Value="@inch" />
+                    }
+                </MudSelect>
+            </div>
+            
+            <MudNumericField 
+                @bind-Value="@_model.Weight" For="() => _model.Weight" Label="Weight"
+                Adornment="Adornment.End" AdornmentText="lb" Min="0" RequiredError="Required" 
+                Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false" 
+                ShrinkLabel OnlyValidateIfDirty FullWidth Required />
+            
+            <HighestLevelSelect 
+                @bind-Value="@_model.HighestLevel" Label="Highest level played"
+                Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false"
+                ShrinkLabel OnlyValidateIfDirty FullWidth Required />
+            
+            <MudTextField 
+                @bind-Value="@_model.PreferredBeer" For="() => _model.PreferredBeer" Label="Favourite beer" 
+                Variant="Variant.Outlined" Margin="Margin.Normal" Underline="false" 
+                ShrinkLabel OnlyValidateIfDirty FullWidth />
+            
+            
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="_formDisabled" FullWidth>Continue</MudButton>
+        </MudStack>
+    </EditForm>
+}
+
 
 @code {
 
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
     private bool _formDisabled = true;
     private readonly CompleteUserAccountRequest _model = new();
+
+    private string? _birthdayError;
+    private DateTime? _birthday
+    {
+        get;
+        set
+        {
+            field = value;
+            if (value != null)
+            {
+                _model.Birthday = value.Value;
+                _birthdayError = null;
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -21,6 +113,9 @@
         }
         catch
         {
+            _editContext = new EditContext(_model);
+            _messageStore = new ValidationMessageStore(_editContext);
+            _editContext.OnValidationRequested += HandleValidationRequested;
             _formDisabled = false;
             return;
         }
@@ -50,14 +145,41 @@
 
     private async Task OnSubmit(EditContext _)
     {
+        _birthdayError = null;
+        
         try
         {
             await BoltonCupApi.CompleteMyAccountAsync(_model);
-            Navigation.NavigateTo($"{BcConfig.Value.WebBaseUrl}profile");
+            // Navigation.NavigateTo($"{BcConfig.Value.WebBaseUrl}profile");
+        }
+        catch (ApiException<ApiErrorResponse> e) when (e.StatusCode == 400)
+        {
+            if (e.Result.Errors.TryGetValue(nameof(_model.Birthday), out var bdayErrors))
+            {
+                _birthdayError = bdayErrors.FirstOrDefault();
+            }
+            
+            _messageStore?.AddApiErrorResponse(_model, e.Result);
+            _editContext?.NotifyValidationStateChanged();
         }
         catch (Exception e)
         {
             // TODO
+            Snackbar.Add("Sorry, something went wrong...", Severity.Error);
+        }
+    }
+
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        _messageStore?.Clear();
+    }
+
+    public void Dispose()
+    {
+        if (_editContext is not null)
+        {
+            _editContext.OnValidationRequested -= HandleValidationRequested;
         }
     }
 
