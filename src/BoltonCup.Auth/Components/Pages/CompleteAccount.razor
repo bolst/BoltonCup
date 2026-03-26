@@ -159,7 +159,7 @@ else
         try
         {
             await BoltonCupApi.CompleteMyAccountAsync(_model);
-            // Navigation.NavigateTo($"{BcConfig.Value.WebBaseUrl}profile");
+            Navigation.NavigateTo($"{BcConfig.Value.WebBaseUrl}profile");
         }
         catch (ApiException<ApiErrorResponse> e) when (e.StatusCode == 400)
         {
@@ -170,6 +170,7 @@ else
             
             _messageStore?.AddApiErrorResponse(_model, e.Result);
             _editContext?.NotifyValidationStateChanged();
+            Snackbar.Add("Please fix the invalid fields.", Severity.Error);
         }
         catch (Exception e)
         {
