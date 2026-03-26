@@ -1,6 +1,7 @@
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BoltonCup.Infrastructure.Data;
 
@@ -421,4 +422,28 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             }
         }
     }
+    
+    
+    
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder
+            .Properties<DateTime>()
+            .HaveConversion<DateTimeWithKindConverter>();
+
+        configurationBuilder
+            .Properties<DateTime?>()
+            .HaveConversion<NullableDateTimeWithKindConverter>();
+    }
 }
+
+
+public class DateTimeWithKindConverter() : ValueConverter<DateTime, DateTime>(
+    v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc),
+    v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+);
+
+public class NullableDateTimeWithKindConverter() : ValueConverter<DateTime?, DateTime?>(
+    v => v.HasValue ? (v.Value.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)) : v,
+    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v
+);
