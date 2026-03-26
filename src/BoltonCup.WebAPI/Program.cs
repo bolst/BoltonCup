@@ -56,7 +56,10 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Enter your API key below."
     });
+    
     options.OperationFilter<SecurityRequirementsOperationFilter>();
+    options.OperationFilter<GlobalBadRequestOperationFilter>();
+    
     // generate operation IDs based on method names
     options.CustomOperationIds(description =>
     {
