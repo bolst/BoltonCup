@@ -8,15 +8,18 @@
     ValueChanged="@ValueChanged" 
     For="@ValueExpression" 
     Label="@Label"
-    Variant="@Variant"
+    Variant="@_variant"
     Disabled="@Disabled"
-    ShrinkLabel="true"
-    Margin="Margin.Dense" 
-    Underline="false" 
     OpenIcon="@OpenIcon" 
+    Dense="@Dense"
+    ShrinkLabel="@ShrinkLabel"
+    Underline="@Underline" 
+    Margin="@Margin" 
+    Required="@Required"
+    FullWidth="@FullWidth"
+    OnlyValidateIfDirty="@OnlyValidateIfDirty"
     InputClass="disabled-select"
     Immediate
-    Dense
     >
     @foreach (var skillLevel in SkillLevel.All)
     {
@@ -47,7 +50,31 @@
     [Parameter]
     public bool Disabled { get; set; }
 
-    private Variant Variant => Disabled ? Variant.Text : Variant.Outlined;
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Outlined;
+
+    [Parameter]
+    public Margin Margin { get; set; } = Margin.Dense;
+
+    [Parameter]
+    public bool Underline { get; set; }
+
+    [Parameter]
+    public bool ShrinkLabel { get; set; } = true;
+
+    [Parameter]
+    public bool OnlyValidateIfDirty { get; set; }
+
+    [Parameter]
+    public bool FullWidth { get; set; }
+
+    [Parameter]
+    public bool Required { get; set; }
+
+    [Parameter]
+    public bool Dense { get; set; } = true;
+
+    private Variant _variant => Disabled ? Variant.Text : Variant;
 
     private string? OpenIcon => Disabled ? null : Icons.Material.Rounded.ArrowDropDown;
 
