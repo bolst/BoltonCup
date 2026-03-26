@@ -182,6 +182,7 @@ else
 
     private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
     {
+        _birthdayError = null;
         _messageStore?.Clear();
     }
 
