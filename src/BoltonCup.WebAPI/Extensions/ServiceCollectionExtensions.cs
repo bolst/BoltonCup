@@ -1,6 +1,7 @@
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.WebAPI.Authentication;
+using BoltonCup.WebAPI.Controllers;
 using BoltonCup.WebAPI.Filters;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
@@ -9,6 +10,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI;
 
@@ -19,7 +21,8 @@ public static class ServiceCollectionExtensions
         return services
             .AddFluentValidationAutoValidation()
             .AddFluentValidationClientsideAdapters()
-            .AddValidatorsFromAssemblyContaining<EntityBase>();
+            .AddValidatorsFromAssemblyContaining<EntityBase>()
+            .AddValidatorsFromAssemblyContaining<Controllers.BoltonCupControllerBase>();
     }
 
     private static IServiceCollection AddAuthServices(this WebApplicationBuilder builder)
@@ -138,6 +141,27 @@ public static class ServiceCollectionExtensions
             .AddRouting(options => options.LowercaseUrls = true)
             .AddMappers()
             .AddControllers(options => options.Filters.Add<ApiExceptionFilterAttribute>());
+
+        builder.Services.Configure<ApiBehaviorOptions>(options =>
+        {
+            options.InvalidModelStateResponseFactory = context =>
+            {
+                var errors = context.ModelState
+                    .Where(e => e.Value?.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray() ?? []
+                    );
+                var response = new ApiErrorResponse
+                {
+                    Message = "One or more validation errors occurred",
+                    Errors = errors
+                };
+
+                return new BadRequestObjectResult(response);
+            };
+        });
+        
         return builder.Services;
     }
 }
