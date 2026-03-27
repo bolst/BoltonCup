@@ -128,6 +128,7 @@ public static class ServiceCollectionExtensions
             .AddTransient<ITeamMapper, TeamMapper>()
             .AddTransient<ITournamentMapper, TournamentMapper>()
             .AddTransient<ITournamentRegistrationMapper, TournamentRegistrationMapper>()
+            .AddTransient<ITournamentPaymentMapper, TournamentPaymentMapper>()
             .AddTransient<IUserMapper, UserMapper>();
     }
     
