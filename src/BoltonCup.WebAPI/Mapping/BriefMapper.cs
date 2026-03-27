@@ -197,6 +197,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
             EndDate = tournament.EndDate,
             WinningTeamId = tournament.WinningTeamId,
             IsActive = tournament.IsActive,
+            IsRegistrationOpen = tournament.IsRegistrationOpen,
             Logo = _urlResolver.GetFullUrl(tournament.Logo),
         };
     }

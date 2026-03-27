@@ -8,5 +8,6 @@ public sealed record TournamentBriefDto
     public DateTime? EndDate { get; set; }
     public int? WinningTeamId { get; set; }
     public bool IsActive { get; set; }
+    public bool IsRegistrationOpen { get; set; }
     public string? Logo { get; set; }
 }

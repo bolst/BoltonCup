@@ -7,14 +7,21 @@
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
     @if (_tournament is not null)
     {
-        <div class="mb-2 ml-2 d-flex flex-row align-center gap-3">
-            <MudText Typo="Typo.h6"><b>Register for @_tournament.Name</b></MudText>
-            <MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="ShowTournamentInformation" Size="Size.Small" />
-        </div>
-        
-        <MudDivider Class="my-2" />
-        
-        <TournamentRegistrationForm TournamentId="_tournament.Id" />
+            <div class="mb-2 ml-2 d-flex flex-row align-center gap-3">
+                <MudText Typo="Typo.h6"><b>Register for @_tournament.Name</b></MudText>
+                <MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="ShowTournamentInformation" Size="Size.Small" />
+            </div>
+            
+            <MudDivider Class="my-2" />
+            
+        if (_tournament.IsRegistrationOpen)
+        {
+            <TournamentRegistrationForm TournamentId="_tournament.Id" />
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Error">Sorry! @_tournament.Name is not open for registration.</MudAlert>
+        }
     }
 </MudContainer>
 
