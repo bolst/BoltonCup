@@ -107,7 +107,8 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddBoltonCupPayments(this WebApplicationBuilder builder)
     { 
-        Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetRequiredSection("Stripe").GetValue<string>("ApiKey");
+        Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetRequiredSection("Stripe").GetValue<string>(nameof(StripeSettings.ApiKey));
+        builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
         return builder.Services.AddTransient<ITournamentPaymentService, TournamentPaymentService>();
     }
 }
