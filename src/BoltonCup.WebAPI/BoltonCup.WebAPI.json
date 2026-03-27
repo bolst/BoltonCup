@@ -1894,6 +1894,117 @@
         ]
       }
     },
+    "/api/tournaments/{id}/payments/createintent": {
+      "post": {
+        "tags": [
+          "TournamentPayments"
+        ],
+        "operationId": "CreateTournamentPaymentIntent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentPaymentIntentDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentPaymentIntentDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentPaymentIntentDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (Validation Errors)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/tournaments/{id}/payments/stripe/webhook": {
+      "post": {
+        "tags": [
+          "TournamentPayments"
+        ],
+        "operationId": "StripeWebhook",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request (Validation Errors)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/tournaments/{id}/registrations": {
       "get": {
         "tags": [
@@ -2358,6 +2469,16 @@
             "nullable": true
           },
           "code": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateTournamentPaymentIntentRequest": {
+        "type": "object",
+        "properties": {
+          "position": {
             "type": "string",
             "nullable": true
           }
@@ -4035,6 +4156,16 @@
         },
         "additionalProperties": false
       },
+      "TournamentPaymentIntentDto": {
+        "type": "object",
+        "properties": {
+          "clientSecret": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "TournamentRegistrationDto": {
         "type": "object",
         "properties": {
@@ -4223,6 +4354,9 @@
     },
     {
       "name": "Teams"
+    },
+    {
+      "name": "TournamentPayments"
     },
     {
       "name": "TournamentRegistrations"
