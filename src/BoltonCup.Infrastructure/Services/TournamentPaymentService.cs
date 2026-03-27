@@ -1,14 +1,23 @@
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
 using BoltonCup.Infrastructure.Data;
+using BoltonCup.Infrastructure.Settings;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Stripe;
 
 namespace BoltonCup.Infrastructure.Services;
 
 public class TournamentPaymentService(
-    BoltonCupDbContext _dbContext
+    BoltonCupDbContext _dbContext,
+    IPlayerRepository _playerRepository,
+    IOptions<StripeSettings> _stripeSettings,
+    ILogger<TournamentPaymentService> _logger
 ) : ITournamentPaymentService
 {
+    
+    private readonly string _stripeWebhookSecret = _stripeSettings.Value.WebhookSecret;
+    
     public async Task<TournamentPaymentIntent> CreateTournamentPaymentIntentAsync(
         CreateTournamentPaymentIntentCommand command, CancellationToken cancellationToken = default)
     {
@@ -38,7 +47,8 @@ public class TournamentPaymentService(
             Metadata = new Dictionary<string, string>
             {
                 { "AccountId", account.Id.ToString() },
-                { "TournamentId", tournament.Id.ToString() }
+                { "TournamentId", tournament.Id.ToString() },
+                { "Position", command.Position },
             }
         }, cancellationToken: cancellationToken);
         
@@ -48,5 +58,50 @@ public class TournamentPaymentService(
             Amount: registrationFee,
             Secret: paymentIntent.ClientSecret
         );
+    }
+
+
+    public async Task ProcessPaymentIntentAsync(string data, string signature, CancellationToken cancellationToken = default)
+    {
+        var stripeEvent = EventUtility.ConstructEvent(
+            data,
+            signature,
+            _stripeWebhookSecret
+        );
+
+        switch (stripeEvent.Type)
+        {
+            case EventTypes.PaymentIntentSucceeded:
+                var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+                await HandleSuccessfulPaymentAsync(paymentIntent!);
+                break;
+            case EventTypes.PaymentIntentPaymentFailed:
+                var failedIntent = stripeEvent.Data.Object as PaymentIntent;
+                _logger.LogError("Payment failed for Intent: {FailedIntentId}", failedIntent?.Id);
+                break;
+            default:
+                _logger.LogError("Unhandled event type: {StripeEventType}", stripeEvent.Type);
+                break;
+        }
+    }
+
+    private async Task HandleSuccessfulPaymentAsync(PaymentIntent paymentIntent)
+    {
+        if (paymentIntent.Metadata.TryGetValue("AccountId", out var accountId)
+            && paymentIntent.Metadata.TryGetValue("TournamentId", out var tournamentId)
+            && paymentIntent.Metadata.TryGetValue("Position", out var position))
+        {
+            _logger.LogInformation("Payment succeeded for account ID {AccountId} in tournament ID {TournamentId}", accountId, tournamentId);
+            await _playerRepository.AddAsync(new Player
+            {
+                TournamentId = int.Parse(tournamentId),
+                AccountId = int.Parse(accountId),
+                Position = position,
+            });
+        }
+        else
+        {
+            _logger.LogError("Payment intent {PaymentIntentId} succeeded but was missing metadata...", paymentIntent.Id);
+        }
     }
 }
