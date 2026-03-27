@@ -38,7 +38,7 @@ public static class ServiceCollectionExtensions
         var connectionString = builder.Configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
         builder.Services
             .AddDbContextFactory<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
-            .AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString))
+            .AddDbContextFactory<AuthDbContext>(options => options.UseNpgsql(connectionString))
             .AddTransient<IAccountRepository, AccountRepository>()
             .AddTransient<IGameRepository, GameRepository>()
             .AddTransient<IGoalieGameLogRepository, GoalieGameLogRepository>()
