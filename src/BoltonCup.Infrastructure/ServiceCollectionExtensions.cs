@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
 
         builder.AddBoltonCupEmails();
         builder.AddBoltonCupS3();
+        builder.AddBoltonCupPayments();
         
         var connectionString = builder.Configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
         builder.Services
@@ -102,6 +103,12 @@ public static class ServiceCollectionExtensions
             .AddSingleton<IAmazonS3>(_ => new AmazonS3Client(s3Credentials, s3Config))
             .AddSingleton<IAssetKeyGenerator, AssetKeyGenerator>()
             .Replace(ServiceDescriptor.Singleton<IStorageService, ServerStorageService>());
+    }
+
+    private static IServiceCollection AddBoltonCupPayments(this WebApplicationBuilder builder)
+    { 
+        Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetRequiredSection("Stripe").GetValue<string>("ApiKey");
+        return builder.Services.AddTransient<ITournamentPaymentService, TournamentPaymentService>();
     }
 }
 
