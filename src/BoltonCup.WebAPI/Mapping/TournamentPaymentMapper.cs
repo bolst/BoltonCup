@@ -20,8 +20,8 @@ public class TournamentPaymentMapper : ITournamentPaymentMapper
     {
         return new CreateTournamentPaymentIntentCommand(
             AccountId: accountId,
-            IsGoalie: request.IsGoalie,
-            TournamentId: tournamentId
+            TournamentId: tournamentId,
+            Position: request.Position
         );
     }
 }

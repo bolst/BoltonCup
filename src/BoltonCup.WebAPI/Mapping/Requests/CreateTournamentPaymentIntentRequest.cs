@@ -1,6 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+using static BoltonCup.Core.Values.Position;
+
 namespace BoltonCup.WebAPI.Mapping;
 
 public record CreateTournamentPaymentIntentRequest
 {
-    public bool IsGoalie { get; set; }
+    [AllowedValues(Forward, Defense, Goalie)]
+    public string Position { get; set; }
 }
