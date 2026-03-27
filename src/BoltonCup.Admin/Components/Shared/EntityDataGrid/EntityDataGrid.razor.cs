@@ -86,8 +86,11 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public Expression<Func<T, string?>>? SearchBy { get; set; }
     
     [Parameter]
-    public Func<GridData<T>, GridState<T>>? ServerFunc { get; set; }
-    
+    public Func<GridState<T>, CancellationToken, Task<GridData<T>>>? ServerFunc { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
     public Task NotifyItemChangedAsync(T item) => _dataGrid.CommittedItemChanges.InvokeAsync(item);
 
     private async Task<GridData<T>> ServerFuncWrapper(GridState<T> state)
@@ -99,6 +102,11 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         
         try
         {
+            if (ServerFunc is not null)
+            {
+                return await ServerFunc(state, cancellationToken);
+            }
+                
             var sortDefinition = state.SortDefinitions.FirstOrDefault();
             
             await using var dbContext = await DbContextFactory.CreateDbContextAsync(cancellationToken);
@@ -164,6 +172,8 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     
     public async Task SaveChangesAsync()
     {
+        if (ReadOnly)
+            return;
         await OnSave.InvokeAsync(_changeTracker);
         await _changeTracker.SaveChangesAsync(DbContextFactory);
         await _dataGrid.ReloadServerData();
@@ -178,13 +188,15 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
 
     public void DeleteSelectedItems()
     {
+        if (ReadOnly)
+            return;
         _changeTracker.TrackDeletes(_selectedItems);
         _selectedItems.Clear();
     }
 
     public async Task AddNewItem()
     {
-        if (NewItemFunc is null)
+        if (NewItemFunc is null || ReadOnly)
             return;
         var newItem = await NewItemFunc();
         if (newItem is not null)
