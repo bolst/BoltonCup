@@ -1972,39 +1972,6 @@
         ]
       }
     },
-    "/api/tournaments/{id}/payments/stripe/webhook": {
-      "post": {
-        "tags": [
-          "TournamentPayments"
-        ],
-        "operationId": "StripeWebhook",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request (Validation Errors)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/tournaments/{id}/registrations": {
       "get": {
         "tags": [
@@ -2303,6 +2270,29 @@
             "Bearer": [ ]
           }
         ]
+      }
+    },
+    "/api/webhooks/stripe": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "operationId": "StripeWebhook",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request (Validation Errors)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -4363,6 +4353,9 @@
     },
     {
       "name": "Tournaments"
+    },
+    {
+      "name": "Webhooks"
     }
   ]
 }
