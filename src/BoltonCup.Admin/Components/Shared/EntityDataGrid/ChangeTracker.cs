@@ -49,9 +49,8 @@ public sealed class ChangeTracker<T>
         IsDirty = true;
     }
 
-    public async Task SaveChangesAsync(IDbContextFactory<BoltonCupDbContext> dbContextFactory)
+    public async Task SaveChangesAsync(DbContext dbContext)
     {
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
         var dbSet = dbContext.Set<T>();
         dbSet.UpdateRange(EditItems);
         dbSet.RemoveRange(DeleteItems);

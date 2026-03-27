@@ -7,10 +7,11 @@
     SearchBy="x => x.FirstName + ' ' + x.LastName"
     Comparer="_comparer">
     <Columns>
+        <PropertyColumn Title="Id" Property="x => x.Id" Editable="false"/>
         <PropertyColumn Title="First" Property="x => x.FirstName"/>
         <PropertyColumn Title="Last" Property="x => x.LastName"/>
-        <PropertyColumn Title="Email" Property="x => x.Email"/>
-        <PropertyColumn Title="Phone" Property="x => x.Phone" Required="false"/>
+        <PropertyColumn Title="Email" Property="x => x.Email" Editable="false" />
+        <PropertyColumn Title="Phone" Property="x => x.Phone" Required="false" />
         <ImageColumn T="Account" Title="Avatar" Property="x => x.Avatar" OnImageUploaded="UpdateAvatar" />
         <ImageColumn T="Account" Title="Banner" Property="x => x.Banner" OnImageUploaded="UpdateBanner" />
         <DatePickerColumn Title="Born" Property="x => x.Birthday" />
@@ -21,7 +22,7 @@
                     ValueChanged="v => { context.Item.HighestLevel = v; _dataGrid.NotifyItemChangedAsync(context.Item); }"/>
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Title="Beer" Property="x => x.PreferredBeer"/>
+        <PropertyColumn Title="Beer" Property="x => x.PreferredBeer" />
     </Columns>
 </EntityDataGrid>
 

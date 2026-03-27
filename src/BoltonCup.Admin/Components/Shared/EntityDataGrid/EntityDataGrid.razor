@@ -15,7 +15,7 @@
         SortMode="SortMode.Single"
         Breakpoint="Breakpoint.None"
         ColumnResizeMode="@ColumnResizeMode"
-        ReadOnly="false"
+        ReadOnly="@ReadOnly"
         ShowColumnOptions="false"
         MultiSelection="Selectable"
         SelectOnRowClick="false"
@@ -28,12 +28,12 @@
         <ToolBarContent>
             <MudButtonGroup OverrideStyles="false" Size="Size.Small">
                 <MudTooltip Text="Delete Selected">
-                    <MudIconButton OnClick="DeleteSelectedItems" Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Disabled="_selectedItems.Count == 0"/>
+                    <MudIconButton OnClick="DeleteSelectedItems" Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Disabled="_selectedItems.Count == 0 || ReadOnly"/>
                 </MudTooltip>
                 @if (NewItemFunc is not null)
                 {
                     <MudTooltip Text="New Item">
-                        <MudIconButton OnClick="AddNewItem" Icon="@Icons.Material.Rounded.Add" Color="Color.Primary"/>
+                        <MudIconButton OnClick="AddNewItem" Icon="@Icons.Material.Rounded.Add" Color="Color.Primary" Disabled="ReadOnly"/>
                     </MudTooltip>
                 }
             </MudButtonGroup>
@@ -45,10 +45,10 @@
             }
             <MudButtonGroup OverrideStyles="false" Size="Size.Small">
                 <MudTooltip Text="Revert">
-                    <MudIconButton OnClick="RevertChangesAsync" Icon="@Icons.Material.Rounded.Undo" Color="Color.Error" Disabled="!_changeTracker.IsDirty"/>
+                    <MudIconButton OnClick="RevertChangesAsync" Icon="@Icons.Material.Rounded.Undo" Color="Color.Error" Disabled="!_changeTracker.IsDirty || ReadOnly"/>
                 </MudTooltip>
                 <MudTooltip Text="Save">
-                    <MudIconButton OnClick="SaveChangesAsync" Icon="@Icons.Material.Rounded.Save" Color="Color.Primary" Disabled="!_changeTracker.IsDirty"/>
+                    <MudIconButton OnClick="SaveChangesAsync" Icon="@Icons.Material.Rounded.Save" Color="Color.Primary" Disabled="!_changeTracker.IsDirty || ReadOnly"/>
                 </MudTooltip>
             </MudButtonGroup>
         </ToolBarContent>
