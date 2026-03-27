@@ -21,8 +21,8 @@
         <BoolColumn Title="Payment Open" Property="x => x.IsPaymentOpen" />
         <PropertyColumn Title="Skater Limit" Property="x => x.SkaterLimit" />
         <PropertyColumn Title="Goalie Limit" Property="x => x.GoalieLimit" />
-        <LinkColumn Title="Skater Payment Link" Property="x => x.SkaterPaymentLink" />
-        <LinkColumn Title="Goalie Payment Link" Property="x => x.GoaliePaymentLink" />
+        <PropertyColumn Title="Skater Registration Fee" Property="x => x.SkaterRegistrationFee" />
+        <PropertyColumn Title="Goalie Registration Fee" Property="x => x.GoalieRegistrationFee" />
         <ForeignColumn Title="Winner" Property="x => x.WinningTeam"
                        EqualityComparer="new TeamComparer()" ImageSrcFunc="t => t.Logo" />
     </Columns>

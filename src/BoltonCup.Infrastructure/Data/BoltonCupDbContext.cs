@@ -386,6 +386,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.GoaliePaymentLink).HasColumnName("goalie_payment_link");
             entity.Property(e => e.SkaterLimit).HasColumnName("skater_limit");
             entity.Property(e => e.GoalieLimit).HasColumnName("goalie_limit");
+            entity.Property(e => e.SkaterRegistrationFee).HasColumnName("skater_registration_fee");
+            entity.Property(e => e.GoalieRegistrationFee).HasColumnName("goalie_registration_fee");
         });
 
         modelBuilder.Entity<TournamentRegistration>(entity =>

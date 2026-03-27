@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260327191339_LongRegistrationFees")]
+    partial class LongRegistrationFees
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -994,8 +997,8 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("goalie_payment_link");
 
-                    b.Property<decimal?>("GoalieRegistrationFee")
-                        .HasColumnType("numeric")
+                    b.Property<long?>("GoalieRegistrationFee")
+                        .HasColumnType("bigint")
                         .HasColumnName("goalie_registration_fee");
 
                     b.Property<bool>("IsActive")
@@ -1035,8 +1038,8 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("skater_payment_link");
 
-                    b.Property<decimal?>("SkaterRegistrationFee")
-                        .HasColumnType("numeric")
+                    b.Property<long?>("SkaterRegistrationFee")
+                        .HasColumnType("bigint")
                         .HasColumnName("skater_registration_fee");
 
                     b.Property<DateTime?>("StartDate")
