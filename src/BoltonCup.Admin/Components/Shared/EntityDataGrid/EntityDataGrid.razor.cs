@@ -86,12 +86,19 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public Expression<Func<T, string?>>? SearchBy { get; set; }
     
     [Parameter]
-    public Func<GridState<T>, CancellationToken, Task<GridData<T>>>? ServerFunc { get; set; }
-
-    [Parameter]
     public bool ReadOnly { get; set; }
+    
+    [Parameter]
+    public Func<CancellationToken, Task<DbContext>>? DbContextFunc { get; set; }
 
     public Task NotifyItemChangedAsync(T item) => _dataGrid.CommittedItemChanges.InvokeAsync(item);
+
+    private async Task<DbContext> CreateDbContext(CancellationToken cancellationToken = default)
+    {
+        if (DbContextFunc is not null)
+            return await DbContextFunc(cancellationToken);
+        return await DbContextFactory.CreateDbContextAsync(cancellationToken);
+    }
 
     private async Task<GridData<T>> ServerFuncWrapper(GridState<T> state)
     { 
@@ -102,14 +109,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         
         try
         {
-            if (ServerFunc is not null)
-            {
-                return await ServerFunc(state, cancellationToken);
-            }
-                
             var sortDefinition = state.SortDefinitions.FirstOrDefault();
             
-            await using var dbContext = await DbContextFactory.CreateDbContextAsync(cancellationToken);
+            await using var dbContext = await CreateDbContext(cancellationToken);
             var dbSet = dbContext
                 .Set<T>()
                 .AsNoTracking();
@@ -174,8 +176,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     {
         if (ReadOnly)
             return;
+        await using var dbContext = await CreateDbContext();
         await OnSave.InvokeAsync(_changeTracker);
-        await _changeTracker.SaveChangesAsync(DbContextFactory);
+        await _changeTracker.SaveChangesAsync(dbContext);
         await _dataGrid.ReloadServerData();
     }
 
