@@ -2,6 +2,7 @@ using BoltonCup.Core;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Controllers;
 
@@ -34,6 +35,7 @@ public class TournamentsController(ITournamentRepository _tournaments, ITourname
     /// Updates a tournament's logo by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
     /// </remarks>
+    [Authorize(Roles = Admin)]
     [HttpPut("{id:int}/logo")]
     public async Task<ActionResult> UpdateTournamentLogo(int id, string key)
     {

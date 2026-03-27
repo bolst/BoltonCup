@@ -3,9 +3,9 @@ using BoltonCup.Core.Values;
 
 namespace BoltonCup.Core.Commands;
 
-public class UpdateAccountCommandValidator : AbstractValidator<UpdateAccountCommand>
+public class CreateAccountCommandValidator : AbstractValidator<CreateAccountCommand>
 {
-    public UpdateAccountCommandValidator()
+    public CreateAccountCommandValidator()
     {
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("First name is required.")
@@ -18,6 +18,12 @@ public class UpdateAccountCommandValidator : AbstractValidator<UpdateAccountComm
         RuleFor(x => x.Birthday)
             .NotEmpty().WithMessage("Birthday is required.")
             .Must(BeAValidAge).WithMessage("You must be 16+ years old to play.");
+
+        RuleFor(x => x.Height)
+            .NotEmpty().WithMessage("Height is required.");
+
+        RuleFor(x => x.Weight)
+            .InclusiveBetween(0, 100000).WithMessage("Weight must be between 0 and 100000 ???");
 
         RuleFor(x => x.HighestLevel)
             .Must(level => SkillLevel.All.Contains(level))

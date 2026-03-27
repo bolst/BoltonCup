@@ -1,6 +1,8 @@
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Extensions;
+using static BoltonCup.WebAPI.Authentication.BoltonCupPolicy;
 using BoltonCup.WebAPI.Mapping;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
@@ -11,6 +13,7 @@ public class TournamentRegistrationsController(
     ITournamentRegistrationMapper _registrationMapper
 ) : BoltonCupControllerBase
 {
+    [Authorize(Policy = RequireCompletedAccount)]
     [HttpGet]
     public async Task<ActionResult<TournamentRegistrationDto>> GetMyTournamentRegistration(int id)
     {
@@ -19,6 +22,7 @@ public class TournamentRegistrationsController(
         return OkOrNoContent(_registrationMapper.ToDto(tournament));
     }
 
+    [Authorize(Policy = RequireCompletedAccount)]
     [HttpPost]
     public async Task<IActionResult> UpdateMyTournamentRegistration(int id, [FromBody] TournamentRegistrationDto data)
     {

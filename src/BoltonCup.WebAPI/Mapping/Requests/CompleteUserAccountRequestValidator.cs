@@ -1,20 +1,12 @@
 using FluentValidation;
 using BoltonCup.Core.Values;
 
-namespace BoltonCup.Core.Commands;
+namespace BoltonCup.WebAPI.Mapping;
 
-public class UpdateAccountCommandValidator : AbstractValidator<UpdateAccountCommand>
+public class CompleteUserAccountRequestValidator : AbstractValidator<CompleteUserAccountRequest>
 {
-    public UpdateAccountCommandValidator()
+    public CompleteUserAccountRequestValidator()
     {
-        RuleFor(x => x.FirstName)
-            .NotEmpty().WithMessage("First name is required.")
-            .MaximumLength(50).WithMessage("First name cannot exceed 50 characters.");
-
-        RuleFor(x => x.LastName)
-            .NotEmpty().WithMessage("Last name is required.")
-            .MaximumLength(50).WithMessage("Last name cannot exceed 50 characters.");
-
         RuleFor(x => x.Birthday)
             .NotEmpty().WithMessage("Birthday is required.")
             .Must(BeAValidAge).WithMessage("You must be 16+ years old to play.");
@@ -23,11 +15,6 @@ public class UpdateAccountCommandValidator : AbstractValidator<UpdateAccountComm
             .Must(level => SkillLevel.All.Contains(level))
             .When(x => !string.IsNullOrWhiteSpace(x.HighestLevel))
             .WithMessage($"Highest level must be one of: {string.Join(", ", SkillLevel.All)}");
-
-        RuleFor(x => x.PreferredBeer)
-            .MaximumLength(100)
-            .When(x => !string.IsNullOrWhiteSpace(x.PreferredBeer))
-            .WithMessage("What kind of beer has over 100 characters in its name? Use a shorter one.");
     }
 
     private bool BeAValidAge(DateTime birthday)

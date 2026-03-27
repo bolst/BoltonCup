@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using BoltonCup.Core;
+using BoltonCup.Core.Commands;
 using BoltonCup.Infrastructure.Data;
+using BoltonCup.Infrastructure.Extensions;
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,32 +12,30 @@ namespace BoltonCup.Infrastructure.Services;
 
 public interface IUserService
 {
-    Task<Account?> GetMeAsync(ClaimsPrincipal claimsPrincipal);
+    Task<Account?> GetMyAccountAsync(ClaimsPrincipal claimsPrincipal);
     Task<IdentityResult> RegisterAsync(string email, string password);
     Task ResendConfirmationEmailAsync(string email);
     Task<bool> VerifyPasswordResetCodeAsync(string email, string code);
     Task ForgotPasswordAsync(string email);
     Task<IdentityResult> ResetPasswordAsync(string email, string code, string newPassword);
     Task<IdentityResult> ConfirmEmailAsync(string email, string code);
+    Task<BoltonCupUser> CompleteUserAccountAsync(string userId, CreateAccountCommand command);
 }
 
 public class UserService(
     BoltonCupDbContext _dbContext,
-    UserManager<BoltonCupUser> _userManager, 
+    UserManager<BoltonCupUser> _userManager,
+    IAccountService _accountService,
     IEmailer _emailer) : IUserService
 {
     private static readonly EmailAddressAttribute _emailAddressAttribute = new();
 
 
-
-    public async Task<Account?> GetMeAsync(ClaimsPrincipal claimsPrincipal)
+    public async Task<Account?> GetMyAccountAsync(ClaimsPrincipal claimsPrincipal)
     {
-        var email = claimsPrincipal.FindFirstValue(ClaimTypes.Email);
-        if (string.IsNullOrEmpty(email))
+        if (!claimsPrincipal.TryGetAccountId(out var accountId))
             return null;
-        if (await _userManager.FindByEmailAsync(email) is not { AccountId: not null } user)
-            return null;
-        return await _dbContext.Accounts.FindAsync(user.AccountId);
+        return await _dbContext.Accounts.FindAsync(accountId);
     }
     
     
@@ -129,5 +129,17 @@ public class UserService(
         }
 
         return result;
+    }
+
+
+
+    public async Task<BoltonCupUser> CompleteUserAccountAsync(string userId, CreateAccountCommand command)
+    {
+        var user = await _userManager.FindByIdAsync(userId)
+            ?? throw new InvalidOperationException($"User with id {userId} not found.");
+        var accountId = await _accountService.CreateAsync(command);
+        user.AccountId = accountId;
+        await _userManager.UpdateAsync(user);
+        return user;
     }
 }

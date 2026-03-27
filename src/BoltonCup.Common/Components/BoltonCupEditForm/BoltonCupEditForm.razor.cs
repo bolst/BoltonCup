@@ -44,6 +44,9 @@ public partial class BoltonCupEditForm<T> : ComponentBase where T : class, new()
 
     [Parameter]
     public bool ShrinkLabel { get; set; } = true;
+    
+    [Parameter]
+    public bool Disabled { get; set; }
 
 
     protected override void OnInitialized()

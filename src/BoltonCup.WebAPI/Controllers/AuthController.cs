@@ -1,5 +1,6 @@
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Services;
+using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,10 +14,21 @@ namespace BoltonCup.WebAPI.Controllers;
 [Tags("Auth")]
 public class AuthController(
     IUserService _userService,
+    IUserMapper _userMapper,
     UserManager<BoltonCupUser> _userManager, 
     SignInManager<BoltonCupUser> _signInManager
     ) : BoltonCupControllerBase
 {
+
+    [Authorize]
+    [HttpGet("me")]
+    public ActionResult<CurrentUserDto?> GetCurrentUser()
+    {
+        var user = _userMapper.ToDto(User);
+        return user is not null
+            ? Ok(user)
+            : Unauthorized();
+    }
     
     [AllowAnonymous]
     [HttpPost("login")]
@@ -99,6 +111,7 @@ public class AuthController(
             : BadRequest("Invalid code or email.");
     }
     
+    [Authorize]
     [HttpPost("logout")]
     public async Task<IResult> Logout([FromQuery] string? returnUrl = null)
     {

@@ -18,6 +18,23 @@ public class AccountService : IAccountService
         _assetKeyGenerator = assetKeyGenerator;
     }
 
+    public async Task<int> CreateAsync(CreateAccountCommand command, CancellationToken cancellationToken = default)
+    {
+        var newAccount = new Account
+        {
+            FirstName = command.FirstName,
+            LastName = command.LastName,
+            Email = command.Email,
+            Birthday = command.Birthday,
+            HighestLevel = command.HighestLevel,
+            PreferredBeer = command.PreferredBeer,
+        }; 
+        _dbContext.Accounts.Add(newAccount);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        return newAccount.Id;
+    }
+
     public async Task UpdateAsync(UpdateAccountCommand command, CancellationToken cancellationToken = default)
     {
         var account = await _dbContext.Accounts.FindAsync([command.AccountId], cancellationToken: cancellationToken)

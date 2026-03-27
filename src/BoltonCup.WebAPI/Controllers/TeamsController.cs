@@ -1,4 +1,5 @@
 using BoltonCup.Core;
+using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,7 @@ public class TeamsController(ITeamRepository _teams, ITeamService _teamService, 
     /// Updates a team's logo by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
     /// </remarks>
+    [Authorize(Roles = Admin)]
     [HttpPut("{id:int}/logo")]
     public async Task<ActionResult> UpdateTeamLogo(int id, string key)
     {
@@ -44,6 +46,7 @@ public class TeamsController(ITeamRepository _teams, ITeamService _teamService, 
     /// Updates a team's banner by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
     /// </remarks>
+    [Authorize(Roles = Admin)]
     [HttpPut("{id:int}/banner")]
     public async Task<ActionResult> UpdateTeamBanner(int id, string key)
     {

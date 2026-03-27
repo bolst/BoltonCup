@@ -29,28 +29,4 @@ public class AccountRepository(BoltonCupDbContext _context) : IAccountRepository
             .Include(a => a.ManagedTeams)
             .FirstOrDefaultAsync(a => a.Id == id);
     }
-    
-    public async Task<bool> AddAsync(Account entity)
-    {
-        await _context.Accounts.AddAsync(entity);
-        var result = await _context.SaveChangesAsync();
-        return result > 0;
-    }
-
-    public async Task<bool> UpdateAsync(Account entity)
-    {
-        _context.Accounts.Update(entity);
-        var result = await _context.SaveChangesAsync();
-        return result > 0;
-    }
-
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var entity = await _context.Accounts.FindAsync(id);
-        if (entity == null) return false;
-
-        _context.Accounts.Remove(entity);
-        var result = await _context.SaveChangesAsync();
-        return result > 0;
-    }
 }
