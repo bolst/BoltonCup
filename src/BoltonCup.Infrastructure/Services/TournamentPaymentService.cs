@@ -30,14 +30,15 @@ public class TournamentPaymentService(
         if (await _dbContext.Accounts.FindAsync([command.AccountId], cancellationToken) is not { } account)
             throw new ArgumentException("No account with that ID exists");
         // ensure tournament has appropriate registration fee
-        if ((command.IsGoalie ? tournament.GoalieRegistrationFee : tournament.SkaterRegistrationFee) is not { } registrationFee)
+        if ((command.IsGoalie ? tournament.GoalieRegistrationFee : tournament.SkaterRegistrationFee) is not { } registrationFeeAmount)
             throw new InvalidOperationException($"Tournament with ID {tournament.Id} does not have a registration fee.");
         
         // create payment intent using Stripe
         var service = new PaymentIntentService();
+        var adjustedAmount = GetAdjustedStripeAmount(registrationFeeAmount);
         var paymentIntent = await service.CreateAsync(new PaymentIntentCreateOptions
         {
-            Amount = (long)(registrationFee * 100),
+            Amount = (long)(adjustedAmount * 100),
             Currency = "cad",
             AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
             {
@@ -55,7 +56,7 @@ public class TournamentPaymentService(
         return new TournamentPaymentIntent(
             AccountId: account.Id,
             TournamentId: tournament.Id,
-            Amount: registrationFee,
+            Amount: registrationFeeAmount,
             Secret: paymentIntent.ClientSecret
         );
     }
@@ -103,5 +104,11 @@ public class TournamentPaymentService(
         {
             _logger.LogError("Payment intent {PaymentIntentId} succeeded but was missing metadata...", paymentIntent.Id);
         }
+    }
+
+    private static decimal GetAdjustedStripeAmount(decimal price)
+    {
+        // Stripe charges 2.9% + 0.3c, so we adjust
+        return (price + (decimal)0.3) / (decimal)(1 - 0.029);
     }
 }
