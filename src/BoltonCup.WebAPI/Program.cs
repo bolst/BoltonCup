@@ -57,6 +57,7 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Enter your API key below."
     });
     
+    options.OperationFilter<ProblemDetailsOperationFilter>();
     options.OperationFilter<SecurityRequirementsOperationFilter>();
     
     // generate operation IDs based on method names

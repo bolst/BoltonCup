@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace BoltonCup.Shared;
+namespace BoltonCup.WebAPI.Errors;
+
+// Stolen from: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ValidationProblemDetails.cs
 
 public class BoltonCupValidationProblemDetails : BoltonCupProblemDetails
 {

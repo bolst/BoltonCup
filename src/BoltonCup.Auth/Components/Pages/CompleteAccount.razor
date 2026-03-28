@@ -170,7 +170,7 @@ else
             await BoltonCupApi.CompleteMyAccountAsync(_model);
             Navigation.NavigateTo($"{BcConfig.Value.WebBaseUrl}profile");
         }
-        catch (ApiException<ApiErrorResponse> e) when (e.StatusCode == 400)
+        catch (ApiException<BoltonCupValidationProblemDetails> e)
         {
             if (e.Result.Errors.TryGetValue(nameof(_model.Birthday), out var bdayErrors))
             {

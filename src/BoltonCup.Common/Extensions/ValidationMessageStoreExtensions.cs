@@ -9,12 +9,12 @@ public static class ValidationMessageStoreExtensions
     /// <summary>
     /// Don't forget to notify that validation state has changed!
     /// </summary>
-    public static void AddApiErrorResponse<T>(this ValidationMessageStore messageStore, T model, ApiErrorResponse errorResponse)
+    public static void AddApiErrorResponse<T>(this ValidationMessageStore messageStore, T model, BoltonCupValidationProblemDetails validationProblemDetails)
     {
         if (model is null)
             return;
         
-        foreach (var (fieldName, fieldErrors) in errorResponse.Errors)
+        foreach (var (fieldName, fieldErrors) in validationProblemDetails.Errors)
         {
             var identifier = new FieldIdentifier(model, fieldName);
             messageStore.Add(identifier, fieldErrors);

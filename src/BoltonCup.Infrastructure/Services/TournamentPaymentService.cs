@@ -1,5 +1,6 @@
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
+using BoltonCup.Core.Exceptions;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -22,24 +23,28 @@ public class TournamentPaymentService(
     public async Task<TournamentPaymentIntent> CreateTournamentPaymentIntentAsync(
         CreateTournamentPaymentIntentCommand command, CancellationToken cancellationToken = default)
     {
-        // ensure tournament exists and has registration open
+        // ensure tournament exists
         var tournament = await _dbContext.Tournaments
                              .Include(p => p.Players)
                              .SingleOrDefaultAsync(t => t.Id == command.TournamentId,
                                  cancellationToken: cancellationToken)
-                         ?? throw new ArgumentException("No tournament with that ID exists");
+                         ?? throw new EntityNotFoundException(nameof(Tournament), command.TournamentId);
+        
+        // ensure tournament has registration open
         if (!tournament.IsRegistrationOpen)
-            throw new InvalidOperationException($"Tournament with ID {tournament.Id}'s registration is not open.");
+            throw new TournamentRegistrationClosedException(tournament.Id);
+        
         // ensure tournament has appropriate registration fee
         if ((command.IsGoalie ? tournament.GoalieRegistrationFee : tournament.SkaterRegistrationFee) is not { } registrationFeeAmount)
             throw new InvalidOperationException($"Tournament with ID {tournament.Id} does not have a registration fee.");
+        
         // ensure account exists
         if (await _dbContext.Accounts.FindAsync([command.AccountId], cancellationToken) is not { } account)
-            throw new ArgumentException("No account with that ID exists");
+            throw new EntityNotFoundException(nameof(Core.Account), command.AccountId);
+        
         // ensure account is not already in tournament
         if (tournament.Players.Any(x => x.AccountId == account.Id))
-            throw new InvalidOperationException(
-                $"Account with ID {account.Id} already is in tournament with ID {tournament.Id}");
+            throw new AccountAlreadyInTournamentException(account.Id, tournament.Id);
         
         // create payment intent using Stripe
         var service = new PaymentIntentService();

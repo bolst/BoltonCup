@@ -1,7 +1,9 @@
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Shared;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Errors;
+using BoltonCup.WebAPI.Extensions;
 using BoltonCup.WebAPI.Filters;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
@@ -140,9 +142,9 @@ public static class ServiceCollectionExtensions
             {
                 options.InvalidModelStateResponseFactory = context =>
                 {
-                    var problem = new ValidationProblemDetails(context.ModelState)
+                    var problem = new BoltonCupValidationProblemDetails(context.ModelState.ToErrorDictionary())
                     {
-                        Type = Shared.ErrorTypes.Validation,
+                        Type = ErrorTypes.Validation,
                         Title = "One or more validation errors occurred",
                         Status = StatusCodes.Status400BadRequest,
                         Instance = context.HttpContext.Request.Path,
