@@ -158,8 +158,7 @@
         _errorMessage = null;
         StateHasChanged();
 
-        //var paymentResult = await _module.InvokeAsync<StripePaymentResult>("confirmPayment");
-        var paymentResult = new { Success = true, Error = "" };
+        var paymentResult = await _module.InvokeAsync<StripePaymentResult>("confirmPayment");
         
         if (paymentResult.Success)
         {
