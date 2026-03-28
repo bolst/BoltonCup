@@ -3125,6 +3125,24 @@
         },
         "additionalProperties": false
       },
+      "PaymentBreakdown": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "PenaltyBriefDto": {
         "required": [
           "durationMins",
@@ -4151,6 +4169,17 @@
         "properties": {
           "clientSecret": {
             "type": "string",
+            "nullable": true
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "breakdown": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentBreakdown"
+            },
             "nullable": true
           }
         },

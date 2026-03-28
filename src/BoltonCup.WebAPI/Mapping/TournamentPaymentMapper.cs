@@ -13,7 +13,11 @@ public class TournamentPaymentMapper : ITournamentPaymentMapper
 {
     public TournamentPaymentIntentDto ToDto(TournamentPaymentIntent paymentIntent)
     {
-        return new TournamentPaymentIntentDto(paymentIntent.Secret);
+        return new TournamentPaymentIntentDto(
+            ClientSecret: paymentIntent.Secret,
+            TotalAmount: paymentIntent.Amount,
+            Breakdown: paymentIntent.AmountBreakdown
+        );
     }
     
     public CreateTournamentPaymentIntentCommand ToCommand(int tournamentId, int accountId, CreateTournamentPaymentIntentRequest request)
