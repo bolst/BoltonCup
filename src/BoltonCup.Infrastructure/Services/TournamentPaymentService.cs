@@ -56,8 +56,20 @@ public class TournamentPaymentService(
         return new TournamentPaymentIntent(
             AccountId: account.Id,
             TournamentId: tournament.Id,
-            Amount: registrationFeeAmount,
-            Secret: paymentIntent.ClientSecret
+            Amount: adjustedAmount,
+            Secret: paymentIntent.ClientSecret,
+            AmountBreakdown: 
+            [
+                new PaymentBreakdown(
+                    Amount: registrationFeeAmount, 
+                    Title: "Tournament Registration Fee"
+                ),
+                new PaymentBreakdown(
+                    Amount: adjustedAmount - registrationFeeAmount, 
+                    Title: "Service fee", 
+                    Description: "This covers the few services we use to run Bolton Cup."
+                )
+            ]
         );
     }
 

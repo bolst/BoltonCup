@@ -12,5 +12,8 @@ public record TournamentPaymentIntent(
     int AccountId,
     int TournamentId,
     decimal Amount,
-    string Secret
+    string Secret,
+    IReadOnlyList<PaymentBreakdown> AmountBreakdown
 );
+
+public record PaymentBreakdown(decimal Amount, string Title, string? Description = null);
