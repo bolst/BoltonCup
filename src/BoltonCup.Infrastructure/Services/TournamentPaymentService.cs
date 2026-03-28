@@ -1,7 +1,6 @@
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
 using BoltonCup.Infrastructure.Data;
-using BoltonCup.Infrastructure.Exceptions;
 using BoltonCup.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -28,7 +27,7 @@ public class TournamentPaymentService(
                              .Include(p => p.Players)
                              .SingleOrDefaultAsync(t => t.Id == command.TournamentId,
                                  cancellationToken: cancellationToken)
-                         ?? throw new EntityNotFoundException<Tournament>(command.TournamentId);
+                         ?? throw new ArgumentException("No tournament with that ID exists");
         if (!tournament.IsRegistrationOpen)
             throw new InvalidOperationException($"Tournament with ID {tournament.Id}'s registration is not open.");
         // ensure tournament has appropriate registration fee
@@ -36,7 +35,7 @@ public class TournamentPaymentService(
             throw new InvalidOperationException($"Tournament with ID {tournament.Id} does not have a registration fee.");
         // ensure account exists
         if (await _dbContext.Accounts.FindAsync([command.AccountId], cancellationToken) is not { } account)
-            throw new EntityNotFoundException<Core.Account>(command.AccountId);
+            throw new ArgumentException("No account with that ID exists");
         // ensure account is not already in tournament
         if (tournament.Players.Any(x => x.AccountId == account.Id))
             throw new InvalidOperationException(
