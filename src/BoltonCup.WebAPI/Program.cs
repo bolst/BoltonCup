@@ -103,7 +103,7 @@ app.UseForwardedHeaders();
 app.UseRateLimiter();
 app.UseCors();
 
-app.UseExceptionHandler();
+app.UseExceptionHandler("/error");
 
 app.UseResponseCaching();
 

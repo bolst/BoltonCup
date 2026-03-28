@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using BoltonCup.Infrastructure.Exceptions;
 
 namespace BoltonCup.WebAPI.Handlers;
@@ -14,35 +13,35 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> _logger) : I
         var controllerName = httpContext.Request.RouteValues["controller"]?.ToString() ?? "Unknown";
         var actionName = httpContext.Request.RouteValues["action"]?.ToString() ?? "Unknown";
 
-        ProblemDetails? problemDetails;
+        BoltonCupErrorResponse? problemDetails;
         if (exception is BoltonCupException apiException)
         {
-            problemDetails = new ProblemDetails
-            {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "An error occurred",
-                Detail = apiException.Message,
-            };
+            problemDetails = new BoltonCupErrorResponse(
+                Title: "An error occurred",
+                Message: apiException.Message,
+                StatusCode: StatusCodes.Status500InternalServerError
+            );
             _logger.LogError(exception, 
                 "Processed exception in {ControllerName}::{ActionName}: {ProblemDetails}", 
                 controllerName, actionName, problemDetails);
         }
         else
         {
-            problemDetails = new ProblemDetails
-            {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "An unexpected error occurred",
-                Detail = "Please try again later.",
-            };
+            problemDetails = new BoltonCupErrorResponse(
+                Title: "An unexpected error occurred.",
+                Message: "Please try again later.",
+                StatusCode: StatusCodes.Status500InternalServerError
+            );
             _logger.LogError(exception, 
                 "Unhandled exception in {ControllerName}::{ActionName}", 
                 controllerName, actionName);
         }
         
-        httpContext.Response.StatusCode = problemDetails.Status.Value;
+        httpContext.Response.StatusCode = problemDetails.StatusCode;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 
         return true; 
     }
 }
+
+public record BoltonCupErrorResponse(string Title, string Message, int StatusCode);
