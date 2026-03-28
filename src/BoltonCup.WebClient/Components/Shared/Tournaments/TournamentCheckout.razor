@@ -4,17 +4,23 @@
 @inject IBoltonCupApi BoltonCupApi
 @inject IJSRuntime JS
 
-@if (_paymentSuccessful)
-{
-    <div class="alert alert-success">
-        <h4>Payment Successful!</h4>
-        <p>You are officially registered for the tournament. A receipt has been sent to your email.</p>
-    </div>
-}
-else
-{
-    <MudPaper Class="pa-4 d-flex flex-column justify-space-evenly gap-3">
-
+<MudPaper Class="pa-4 d-flex flex-column justify-space-evenly gap-3">
+    @if (_paymentSuccessful)
+    {
+        if (SuccessContent is null)
+        {
+            <MudAlert Severity="Severity.Success">
+                <h4>Payment Successful!</h4>
+                <p>You are officially registered for the tournament. A receipt has been sent to your email.</p>
+            </MudAlert>
+        }
+        else
+        {
+            @SuccessContent
+        }
+    }
+    else
+    {
         <div id="payment-element"></div>
 
         @if (!string.IsNullOrEmpty(_errorMessage))
@@ -66,9 +72,8 @@ else
                 </div>
             </MudContainer>
         </div>
-        
-    </MudPaper>
-}
+    }
+</MudPaper>
 
 <MudDrawer Open="_breakdownDrawerOpen" OpenChanged="SetBreakdownDrawerOpen" Anchor="Anchor.Bottom" Variant="DrawerVariant.Temporary">
     <MudContainer MaxWidth="MaxWidth.Small" Class="py-8">
@@ -88,6 +93,9 @@ else
     
     [Parameter]
     public EventCallback OnValidSubmit { get; set; }
+    
+    [Parameter]
+    public RenderFragment? SuccessContent { get; set; }
     
     private bool _isProcessing;
     private bool _paymentSuccessful;
