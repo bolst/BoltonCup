@@ -18,7 +18,7 @@
                         <BoltonCupEditForm T="DocumentModel" Model="_model.Documents" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue" Dense/>
                     </MudStep>
                     <MudStep Title="Checkout" Disabled="_currentStep < 2" Completed="_currentStep > 2">
-
+                        <TournamentCheckout TournamentId="TournamentId" Position="@_model.UserInfo.Position" />
                     </MudStep>
                 </ChildContent>
                 <ActionContent Context="_">
