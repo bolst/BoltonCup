@@ -136,7 +136,25 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
     {
         return services
-            .AddProblemDetails()
+            .Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var errors = context.ModelState
+                        .Where(e => e.Value?.Errors.Count > 0)
+                        .ToDictionary(
+                            kvp => kvp.Key,
+                            kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray() ?? []
+                        );
+                    var response = new ApiErrorResponse
+                    {
+                        Message = "One or more validation errors occurred",
+                        Errors = errors
+                    };
+
+                    return new BadRequestObjectResult(response);
+                };
+            })
             .AddExceptionHandler<GlobalExceptionHandler>();
     }
     
@@ -151,26 +169,6 @@ public static class ServiceCollectionExtensions
             .AddMappers()
             .AddExceptionHandlers()
             .AddControllers();
-
-        builder.Services.Configure<ApiBehaviorOptions>(options =>
-        {
-            options.InvalidModelStateResponseFactory = context =>
-            {
-                var errors = context.ModelState
-                    .Where(e => e.Value?.Errors.Count > 0)
-                    .ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray() ?? []
-                    );
-                var response = new ApiErrorResponse
-                {
-                    Message = "One or more validation errors occurred",
-                    Errors = errors
-                };
-
-                return new BadRequestObjectResult(response);
-            };
-        });
         
         return builder.Services;
     }
