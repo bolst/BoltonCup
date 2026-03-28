@@ -5,5 +5,6 @@ namespace BoltonCup.WebAPI.Mapping;
 public record TournamentPaymentIntentDto(
     string ClientSecret,
     decimal TotalAmount,
+    string Currency,
     IReadOnlyList<PaymentBreakdown> Breakdown
 );

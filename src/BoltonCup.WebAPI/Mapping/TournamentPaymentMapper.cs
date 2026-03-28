@@ -16,6 +16,7 @@ public class TournamentPaymentMapper : ITournamentPaymentMapper
         return new TournamentPaymentIntentDto(
             ClientSecret: paymentIntent.Secret,
             TotalAmount: paymentIntent.Amount,
+            Currency: paymentIntent.Currency,
             Breakdown: paymentIntent.AmountBreakdown
         );
     }

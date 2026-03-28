@@ -55,13 +55,14 @@ public class TournamentPaymentService(
         
         return new TournamentPaymentIntent(
             AccountId: account.Id,
+            Currency: "CAD",
             TournamentId: tournament.Id,
             Amount: adjustedAmount,
             Secret: paymentIntent.ClientSecret,
             AmountBreakdown: 
             [
                 new PaymentBreakdown(
-                    Amount: registrationFeeAmount, 
+                    Amount: registrationFeeAmount,
                     Title: "Tournament Registration Fee"
                 ),
                 new PaymentBreakdown(

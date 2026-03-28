@@ -4175,6 +4175,10 @@
             "type": "number",
             "format": "double"
           },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          },
           "breakdown": {
             "type": "array",
             "items": {

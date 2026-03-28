@@ -12,6 +12,7 @@ public record TournamentPaymentIntent(
     int AccountId,
     int TournamentId,
     decimal Amount,
+    string Currency,
     string Secret,
     IReadOnlyList<PaymentBreakdown> AmountBreakdown
 );
