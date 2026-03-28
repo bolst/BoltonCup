@@ -1,9 +1,8 @@
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.WebAPI.Authentication;
-using BoltonCup.WebAPI.Controllers;
+using BoltonCup.WebAPI.Errors;
 using BoltonCup.WebAPI.Filters;
-using BoltonCup.WebAPI.Handlers;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
 using FluentValidation;
@@ -136,26 +135,27 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
     {
         return services
-            .Configure<ApiBehaviorOptions>(options =>
+            .AddProblemDetails()
+            .PostConfigure<ApiBehaviorOptions>(options =>
             {
                 options.InvalidModelStateResponseFactory = context =>
                 {
-                    var errors = context.ModelState
-                        .Where(e => e.Value?.Errors.Count > 0)
-                        .ToDictionary(
-                            kvp => kvp.Key,
-                            kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray() ?? []
-                        );
-                    var response = new ApiErrorResponse
+                    var problem = new ValidationProblemDetails(context.ModelState)
                     {
-                        Message = "One or more validation errors occurred",
-                        Errors = errors
+                        Type = Shared.ErrorTypes.Validation,
+                        Title = "One or more validation errors occurred",
+                        Status = StatusCodes.Status400BadRequest,
+                        Instance = context.HttpContext.Request.Path,
                     };
 
-                    return new BadRequestObjectResult(response);
+                    return new BadRequestObjectResult(problem)
+                    {
+                        ContentTypes = { "application/problem+json" }
+                    };
                 };
             })
-            .AddExceptionHandler<GlobalExceptionHandler>();
+            .AddExceptionHandler<BoltonCupExceptionHandler>()
+            .AddExceptionHandler<UnhandledExceptionHandler>();
     }
     
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)

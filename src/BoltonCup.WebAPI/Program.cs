@@ -58,7 +58,6 @@ builder.Services.AddSwaggerGen(options =>
     });
     
     options.OperationFilter<SecurityRequirementsOperationFilter>();
-    options.OperationFilter<GlobalBadRequestOperationFilter>();
     
     // generate operation IDs based on method names
     options.CustomOperationIds(description =>
@@ -103,7 +102,7 @@ app.UseForwardedHeaders();
 app.UseRateLimiter();
 app.UseCors();
 
-app.UseExceptionHandler("/error");
+app.UseExceptionHandler();
 
 app.UseResponseCaching();
 
