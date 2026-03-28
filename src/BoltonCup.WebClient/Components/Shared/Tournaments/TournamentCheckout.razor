@@ -30,48 +30,51 @@
 
         <MudDivider Class="my-2" />
         
-        <div class="mud-width-full d-flex justify-end">
-            <MudContainer MaxWidth="MaxWidth.ExtraSmall" Class="d-flex flex-column justify-space-evenly gap-1">
-                @foreach (var breakdown in _paymentIntent?.Breakdown ?? [])
-                {
-                    <div class="mud-width-full d-flex flex-row justify-space-between">
-                        <div class="d-flex flex-row align-center gap-1">
-                            <MudText Typo="Typo.caption">@breakdown.Title</MudText>
-                            @if (!string.IsNullOrEmpty(breakdown.Description))
-                            {
-                                <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-                                    <MudTooltip Text="@breakdown.Description" Arrow>
-                                        <MudIcon Icon="@Icons.Material.Outlined.Info" Color="Color.Default" Style="font-size: 1rem;" />
-                                    </MudTooltip>
-                                </MudHidden>
-                                <MudHidden Breakpoint="Breakpoint.MdAndUp">
-                                    <MudIcon @onclick="_ => ShowBreakdownDescription(breakdown)" Icon="@Icons.Material.Outlined.Info" Color="Color.Default" Class="cursor-pointer" Style="font-size: 1rem;" />
-                                </MudHidden>
-                            }
+        @if (_paymentIntent is not null)
+        {
+            <div class="mud-width-full d-flex justify-end">
+                <MudContainer MaxWidth="MaxWidth.ExtraSmall" Class="d-flex flex-column justify-space-evenly gap-1">
+                    @foreach (var breakdown in _paymentIntent.Breakdown ?? [])
+                    {
+                        <div class="mud-width-full d-flex flex-row justify-space-between">
+                            <div class="d-flex flex-row align-center gap-1">
+                                <MudText Typo="Typo.caption">@breakdown.Title</MudText>
+                                @if (!string.IsNullOrEmpty(breakdown.Description))
+                                {
+                                    <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+                                        <MudTooltip Text="@breakdown.Description" Arrow>
+                                            <MudIcon Icon="@Icons.Material.Outlined.Info" Color="Color.Default" Style="font-size: 1rem;" />
+                                        </MudTooltip>
+                                    </MudHidden>
+                                    <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                                        <MudIcon @onclick="_ => ShowBreakdownDescription(breakdown)" Icon="@Icons.Material.Outlined.Info" Color="Color.Default" Class="cursor-pointer" Style="font-size: 1rem;" />
+                                    </MudHidden>
+                                }
+                            </div>
+                            <MudText Typo="Typo.caption"><b>@breakdown.Amount.ToString("C")</b></MudText>
                         </div>
-                        <MudText Typo="Typo.caption"><b>@breakdown.Amount.ToString("C")</b></MudText>
+                    }
+                    
+                    <div class="mud-width-full d-flex flex-row justify-space-between">
+                        <MudText Typo="Typo.h6"><b>TOTAL</b></MudText>
+                        <MudText Typo="Typo.h6"><b>@_paymentIntent.TotalAmount.ToString("C")</b></MudText>
                     </div>
-                }
-                
-                <div class="mud-width-full d-flex flex-row justify-space-between">
-                    <MudText Typo="Typo.h6"><b>TOTAL</b></MudText>
-                    <MudText Typo="Typo.h6"><b>@_paymentIntent?.TotalAmount.ToString("C")</b></MudText>
-                </div>
-                
-                <div class="mud-width-full d-flex justify-end">
-                    <MudButton OnClick="ProcessPaymentAsync" Color="Color.Primary" Variant="Variant.Filled" Disabled="_isProcessing">
-                        @if (_isProcessing)
-                        {
-                            @:Processing...
-                        }
-                        else
-                        {
-                            @:Pay & Register
-                        }
-                    </MudButton>
-                </div>
-            </MudContainer>
-        </div>
+                    
+                    <div class="mud-width-full d-flex justify-end">
+                        <MudButton OnClick="ProcessPaymentAsync" Color="Color.Primary" Variant="Variant.Filled" Disabled="_isProcessing">
+                            @if (_isProcessing)
+                            {
+                                @:Processing...
+                            }
+                            else
+                            {
+                                @:Pay & Register
+                            }
+                        </MudButton>
+                    </div>
+                </MudContainer>
+            </div>
+        }
     }
 </MudPaper>
 
