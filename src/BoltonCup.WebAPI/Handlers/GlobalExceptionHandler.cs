@@ -19,7 +19,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> _logger) : I
         {
             problemDetails = new ProblemDetails
             {
-                Status = apiException.StatusCode,
+                Status = StatusCodes.Status500InternalServerError,
                 Title = "An error occurred",
                 Detail = apiException.Message,
             };
@@ -35,7 +35,9 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> _logger) : I
                 Title = "An unexpected error occurred",
                 Detail = "Please try again later.",
             };
-            _logger.LogError(exception, "Unhandled exception in {ControllerName}::{ActionName}.", controllerName, actionName);
+            _logger.LogError(exception, 
+                "Unhandled exception in {ControllerName}::{ActionName}", 
+                controllerName, actionName);
         }
         
         httpContext.Response.StatusCode = problemDetails.Status.Value;

@@ -1,16 +1,7 @@
-
 namespace BoltonCup.Infrastructure.Exceptions;
-    
-public class BoltonCupException : Exception
-{
-    public int StatusCode { get; }
 
-    public BoltonCupException(string message, int statusCode = 400) 
-        : base(message)
-    {
-        StatusCode = statusCode;
-    }
-}
+public class BoltonCupException(string message) 
+    : Exception(message);
 
 public class EntityNotFoundException<T>(int itemId)
-    : BoltonCupException($"No {typeof(T).Name.ToLower()} with ID {itemId} found.", 404);
+    : BoltonCupException($"No {typeof(T).Name.ToLower()} with ID {itemId} found.");

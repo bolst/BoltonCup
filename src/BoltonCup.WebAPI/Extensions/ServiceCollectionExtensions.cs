@@ -132,6 +132,13 @@ public static class ServiceCollectionExtensions
             .AddTransient<ITournamentPaymentMapper, TournamentPaymentMapper>()
             .AddTransient<IUserMapper, UserMapper>();
     }
+
+    private static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
+    {
+        return services
+            .AddProblemDetails()
+            .AddExceptionHandler<GlobalExceptionHandler>();
+    }
     
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
     {
@@ -142,8 +149,7 @@ public static class ServiceCollectionExtensions
             .AddRateLimitingServices()
             .AddRouting(options => options.LowercaseUrls = true)
             .AddMappers()
-            .AddProblemDetails()
-            .AddExceptionHandler<GlobalExceptionHandler>()
+            .AddExceptionHandlers()
             .AddControllers();
 
         builder.Services.Configure<ApiBehaviorOptions>(options =>
