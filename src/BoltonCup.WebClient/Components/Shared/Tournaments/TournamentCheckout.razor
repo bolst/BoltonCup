@@ -1,0 +1,183 @@
+@namespace BoltonCup.WebClient.Components.Shared
+@implements IAsyncDisposable
+@inject IConfiguration Configuration
+@inject IBoltonCupApi BoltonCupApi
+@inject IJSRuntime JS
+
+@if (_paymentSuccessful)
+{
+    <div class="alert alert-success">
+        <h4>Payment Successful!</h4>
+        <p>You are officially registered for the tournament. A receipt has been sent to your email.</p>
+    </div>
+}
+else
+{
+    <MudPaper Class="pa-4 d-flex flex-column justify-space-evenly gap-3">
+
+        <div id="payment-element"></div>
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <MudAlert Severity="Severity.Error">@_errorMessage</MudAlert>
+        }
+
+        <MudDivider Class="my-2" />
+        
+        <div class="mud-width-full d-flex justify-end">
+            <MudContainer MaxWidth="MaxWidth.ExtraSmall" Class="d-flex flex-column justify-space-evenly gap-1">
+                @foreach (var breakdown in _paymentIntent?.Breakdown ?? [])
+                {
+                    <div class="mud-width-full d-flex flex-row justify-space-between">
+                        <div class="d-flex flex-row align-center gap-1">
+                            <MudText Typo="Typo.caption">@breakdown.Title</MudText>
+                            @if (!string.IsNullOrEmpty(breakdown.Description))
+                            {
+                                <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+                                    <MudTooltip Text="@breakdown.Description" Arrow>
+                                        <MudIcon Icon="@Icons.Material.Outlined.Info" Color="Color.Default" Style="font-size: 1rem;" />
+                                    </MudTooltip>
+                                </MudHidden>
+                                <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                                    <MudIcon @onclick="_ => ShowBreakdownDescription(breakdown)" Icon="@Icons.Material.Outlined.Info" Color="Color.Default" Class="cursor-pointer" Style="font-size: 1rem;" />
+                                </MudHidden>
+                            }
+                        </div>
+                        <MudText Typo="Typo.caption"><b>@breakdown.Amount.ToString("C")</b></MudText>
+                    </div>
+                }
+                
+                <div class="mud-width-full d-flex flex-row justify-space-between">
+                    <MudText Typo="Typo.h6"><b>TOTAL</b></MudText>
+                    <MudText Typo="Typo.h6"><b>@_paymentIntent?.TotalAmount.ToString("C")</b></MudText>
+                </div>
+                
+                <div class="mud-width-full d-flex justify-end">
+                    <MudButton OnClick="ProcessPaymentAsync" Color="Color.Primary" Variant="Variant.Filled" Disabled="_isProcessing">
+                        @if (_isProcessing)
+                        {
+                            @:Processing...
+                        }
+                        else
+                        {
+                            @:Pay & Register
+                        }
+                    </MudButton>
+                </div>
+            </MudContainer>
+        </div>
+        
+    </MudPaper>
+}
+
+<MudDrawer Open="_breakdownDrawerOpen" OpenChanged="SetBreakdownDrawerOpen" Anchor="Anchor.Bottom" Variant="DrawerVariant.Temporary">
+    <MudContainer MaxWidth="MaxWidth.Small" Class="py-8">
+        <MudText Typo="Typo.subtitle1"><b>@_selectedBreakdown?.Title: @_selectedBreakdown?.Amount.ToString("C")</b></MudText>
+        <MudText Typo="Typo.body2">@_selectedBreakdown?.Description</MudText>
+        <MudButton Class="mt-2 mb-6" OnClick="@(_ => SetBreakdownDrawerOpen(false))" Color="Color.Primary" Variant="Variant.Filled" FullWidth>OK</MudButton>
+    </MudContainer>
+</MudDrawer>
+
+@code {
+    
+    [Parameter] 
+    public required int TournamentId { get; set; }
+    
+    [Parameter]
+    public required string Position { get; set; }
+    
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+    
+    private bool _isProcessing;
+    private bool _paymentSuccessful;
+    private string? _errorMessage;
+
+    private bool _breakdownDrawerOpen;
+    private Sdk.PaymentBreakdown? _selectedBreakdown;
+
+    private Sdk.TournamentPaymentIntentDto? _paymentIntent;
+
+    private IJSObjectReference? _module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        var stripeKey = Configuration.GetValue<string>("Stripe:PublicKey");
+        if (string.IsNullOrEmpty(stripeKey))
+            return;
+        
+        try
+        {
+            _paymentIntent = await BoltonCupApi.CreateTournamentPaymentIntentAsync(TournamentId, new Sdk.CreateTournamentPaymentIntentRequest
+            {
+                Position = Position
+            });
+
+            _module = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./Components/Shared/Tournaments/TournamentCheckout.razor.js?v=1.0.0"
+            );
+
+            await _module.InvokeVoidAsync("initializePaymentElement", stripeKey, _paymentIntent.ClientSecret);
+
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            
+        }
+    }
+
+    private async Task ProcessPaymentAsync()
+    {
+        if (_module is null)
+            return;
+        
+        _isProcessing = true;
+        _errorMessage = null;
+        StateHasChanged();
+
+        var paymentResult = await _module.InvokeAsync<StripePaymentResult>("confirmPayment");
+
+        if (paymentResult.Success)
+        {
+            _paymentSuccessful = true;
+            await OnValidSubmit.InvokeAsync();
+        }
+        else
+        {
+            _errorMessage = paymentResult.Error;
+        }
+
+        _isProcessing = false;
+        StateHasChanged();
+    }
+
+    private void ShowBreakdownDescription(Sdk.PaymentBreakdown breakdown)
+    {
+        _selectedBreakdown = breakdown;
+        _breakdownDrawerOpen = true;
+    }
+
+    private void SetBreakdownDrawerOpen(bool open)
+    {
+        _breakdownDrawerOpen = open;
+        if (!open)
+            _selectedBreakdown = null;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is null)
+            return;
+        await _module.DisposeAsync();
+    }
+    
+    public class StripePaymentResult
+    {
+        public bool Success { get; set; }
+        public string Error { get; set; }
+    }
+}
