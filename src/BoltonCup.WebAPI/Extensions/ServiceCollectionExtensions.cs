@@ -3,6 +3,7 @@ using BoltonCup.Infrastructure.Identity;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Controllers;
 using BoltonCup.WebAPI.Filters;
+using BoltonCup.WebAPI.Handlers;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
 using FluentValidation;
@@ -141,7 +142,9 @@ public static class ServiceCollectionExtensions
             .AddRateLimitingServices()
             .AddRouting(options => options.LowercaseUrls = true)
             .AddMappers()
-            .AddControllers(options => options.Filters.Add<ApiExceptionFilterAttribute>());
+            .AddProblemDetails()
+            .AddExceptionHandler<GlobalExceptionHandler>()
+            .AddControllers();
 
         builder.Services.Configure<ApiBehaviorOptions>(options =>
         {
