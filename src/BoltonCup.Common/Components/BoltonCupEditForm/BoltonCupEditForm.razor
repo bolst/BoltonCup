@@ -50,6 +50,7 @@
                 return @<MudSelect
                             T="string"
                             Label="@field.Label"
+                            HelperText="@field.HelperText"
                             Value="@((string)field.PropertyInfo.GetValue(Model)!)"
                             ValueChanged="v => OnValueChanged(field, v)"
                             For="@(CreateValidationExpression<string>(field))"
@@ -72,6 +73,7 @@
             return @<MudTextField Disabled="disabled"
                                   T="string"
                                   Label="@field.Label"
+                                  HelperText="@field.HelperText"
                                   Value="@((string)field.PropertyInfo.GetValue(Model)!)"
                                   ValueChanged="v => OnValueChanged(field, v)"
                                   For="@(CreateValidationExpression<string>(field))"
