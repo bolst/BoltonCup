@@ -181,10 +181,6 @@ else
             _editContext?.NotifyValidationStateChanged();
             Snackbar.Add("Please fix the invalid fields.", Severity.Error);
         }
-        catch (Exception e)
-        {
-            Snackbar.Add("Sorry, something went wrong...", Severity.Error);
-        }
     }
 
 
