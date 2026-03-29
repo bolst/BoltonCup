@@ -4,4 +4,4 @@ using Microsoft.AspNetCore.Identity;
 namespace BoltonCup.Infrastructure.Exceptions;
 
 public class UserRegistrationFailedException(IdentityResult identityResult) 
-    : BoltonCupException("Account is not confirmed.");
+    : BoltonCupException(identityResult.Errors.FirstOrDefault()?.Description ?? "Unable to create user.");

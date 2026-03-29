@@ -73,8 +73,8 @@
             });
             MudDialog.Close(DialogResult.Ok(true));
         }
-        catch (ApiException e)
-            when (e.StatusCode is 400)
+        catch (ApiException<BoltonCupProblemDetails> e)
+            when (e.Result.Type == ErrorTypes.Auth.InvalidCredentials)
         {
             _messageStore?.Add(() => _model.Code, "That code is incorrect.");
             _editContext?.NotifyValidationStateChanged();
