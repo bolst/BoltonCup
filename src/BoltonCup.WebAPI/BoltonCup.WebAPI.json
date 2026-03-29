@@ -6567,6 +6567,9 @@
           "payload": {
             "type": "string",
             "nullable": true
+          },
+          "isComplete": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
