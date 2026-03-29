@@ -2,6 +2,16 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace BoltonCup.WebAPI.Extensions;
 
+/*
+ * I fully stole this from:
+ * https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ValidationProblemDetails.cs
+ * I wanted to use ProblemDetails and ValidationProblemDetails to format my errors/exceptions,
+ * however to use these on the frontend I need to reference Microsoft.AspNetCore.Mvc...
+ * ValidationProblemDetails does this on construction, so we will do this
+ * before passing into BoltonCupValidationProblemDetails.
+ * For example, we would do something like:
+ * new BoltonCupValidationProblems(modelState.ToErrorDictionary()) { ... }
+ */
 
 public static class ModelStateDictionaryExtensions
 {
