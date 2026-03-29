@@ -54,6 +54,10 @@ public class UserInfoModel
 
     [Display(Name = "I can play either position")]
     public bool CanPlayEitherPosition { get; set; }
+    
+    [Display(Name = "List any players you want to be on a team with")]
+    [Description("We can't guarantee you will be drafted with them, but we will try to make it work.")]
+    public string? Friends { get; set; }
 }
 
 public class DocumentModel
