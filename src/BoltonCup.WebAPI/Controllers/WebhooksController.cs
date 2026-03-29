@@ -10,6 +10,7 @@ public class WebhooksController(ITournamentPaymentService _paymentService)
 {
     [AllowAnonymous]
     [HttpPost("stripe")]
+    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> StripeWebhook()
     {
         try
