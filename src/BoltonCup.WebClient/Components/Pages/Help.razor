@@ -1,4 +1,50 @@
 @page "/help"
 @attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-04-01")]
+@inject Core.IAssetUrlResolver AssetUrlResolver
 
-<PageTitle>Help | Bolton Cup</PageTitle>
+<PageTitle>Help Center | Bolton Cup</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4 d-flex flex-column align-center gap-4">
+    
+    <section class="d-flex flex-column align-center justify-center" style="height: 250px">
+        <BoltonCupLogo Height="96" />
+        <MudText Typo="Typo.h5"><b>Bolton Cup Help Center</b></MudText>
+    </section>
+
+    <MudDivider/>
+
+    <section id="tournament-documents" class="d-flex flex-column align-center gap-6">
+        <MudText Typo="Typo.h6">Tournament Documents</MudText>
+
+        <div class="mud-width-full d-flex flex-row align-center justify-space-evenly gap-1">
+            <MudButton
+                Href="@(AssetUrlResolver.GetFullUrl("static/tournaments/documents/code-of-conduct.pdf"))"
+                Target="_blank" EndIcon="@Icons.Material.Rounded.NorthEast"
+                Variant="Variant.Outlined" Color="Color.Primary">
+                Code of Conduct
+            </MudButton>
+
+            <MudButton
+                Href="@(AssetUrlResolver.GetFullUrl("static/tournaments/documents/liability-waiver.pdf"))"
+                Target="_blank" EndIcon="@Icons.Material.Rounded.NorthEast"
+                Variant="Variant.Outlined" Color="Color.Primary">
+                Liability Waiver
+            </MudButton>
+
+            <MudButton
+                Href="@(AssetUrlResolver.GetFullUrl("static/tournaments/documents/concussion-waiver.pdf"))"
+                Target="_blank" EndIcon="@Icons.Material.Rounded.NorthEast"
+                Variant="Variant.Outlined" Color="Color.Primary">
+                Concussion Waiver
+            </MudButton>
+
+            <MudButton
+                Href="@(AssetUrlResolver.GetFullUrl("static/tournaments/documents/communication-consent.pdf"))"
+                Target="_blank" EndIcon="@Icons.Material.Rounded.NorthEast"
+                Variant="Variant.Outlined" Color="Color.Primary">
+                Communication Consent
+            </MudButton>
+        </div>
+    </section>
+
+</MudContainer>

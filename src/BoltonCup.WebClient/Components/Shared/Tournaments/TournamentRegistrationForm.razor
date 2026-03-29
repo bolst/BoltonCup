@@ -14,14 +14,14 @@
         {
             if (_context is not null)
             {
-                <MudStepper @bind-ActiveIndex="CurrentStep" StepClass="py-2" NavClass="justify-center" CenterLabels>
+                <MudStepper @bind-ActiveIndex="CurrentStep" StepClass="py-2" NavClass="justify-center" CenterLabels NonLinear>
                     <ChildContent>
                         <MudStep Title="Your Info" Disabled="_context.IsComplete" Completed="CurrentStep > 0 || _context.IsComplete">
                             <BoltonCupEditForm T="UserInfoModel" Model="_context.Model.UserInfo" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue"/>
                         </MudStep>
                         <MudStep Title="Documents" Disabled="CurrentStep < 1 || _context.IsComplete" Completed="CurrentStep > 1 || _context.IsComplete">
                             <MudText>Please review and agree to the following terms and conditions, including legal documents involving a waiver.</MudText>
-                            <MudText>You can find each document <MudLink Color="Color.Info">here</MudLink>.</MudText>
+                            <MudText>You can find each document <MudLink Href="/help#tournament-documents" Color="Color.Info">here</MudLink>.</MudText>
                             <MudDivider Class="my-4"/>
                             <BoltonCupEditForm T="DocumentModel" Model="_context.Model.Documents" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue" Dense/>
                         </MudStep>
