@@ -32,25 +32,10 @@ public class AuthController(
     
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<IResult> Login([FromBody] LoginRequest request)
+    public async Task<ActionResult> Login([FromBody] LoginRequest request)
     {
-        // TODO: refactor this into user service
-        
-        // check if user exists
-        var user = await _userManager.FindByEmailAsync(request.Email);
-        if (user is null)
-            return Results.Unauthorized();
-        // check if password is correct
-        if (!await _userManager.CheckPasswordAsync(user, request.Password))
-            return Results.Unauthorized();
-        // check if account is confirmed/verified
-        if (!await _signInManager.CanSignInAsync(user))
-            return Results.Forbid();
-        
-        var result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, request.Persist, false);
-        return result.Succeeded
-            ? Results.Ok()
-            : Results.Unauthorized();
+        await _userService.LoginAsync(request.Email, request.Password, request.Persist);
+        return Ok();
     }
 
     [AllowAnonymous]

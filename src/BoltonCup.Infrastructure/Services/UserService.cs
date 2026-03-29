@@ -3,6 +3,7 @@ using System.Security.Claims;
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
 using BoltonCup.Infrastructure.Data;
+using BoltonCup.Infrastructure.Exceptions;
 using BoltonCup.Infrastructure.Extensions;
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +14,7 @@ namespace BoltonCup.Infrastructure.Services;
 public interface IUserService
 {
     Task<Account?> GetMyAccountAsync(ClaimsPrincipal claimsPrincipal);
+    Task LoginAsync(string email, string password, bool persist, bool lockoutOnFailure = false);
     Task<IdentityResult> RegisterAsync(string email, string password);
     Task ResendConfirmationEmailAsync(string email);
     Task<bool> VerifyPasswordResetCodeAsync(string email, string code);
@@ -25,6 +27,7 @@ public interface IUserService
 public class UserService(
     BoltonCupDbContext _dbContext,
     UserManager<BoltonCupUser> _userManager,
+    SignInManager<BoltonCupUser> _signInManager,
     IAccountService _accountService,
     IEmailer _emailer) : IUserService
 {
@@ -36,6 +39,18 @@ public class UserService(
         if (!claimsPrincipal.TryGetAccountId(out var accountId))
             return null;
         return await _dbContext.Accounts.FindAsync(accountId);
+    }
+
+
+    public async Task LoginAsync(string email, string password, bool persist, bool lockoutOnFailure = false)
+    {
+        var result = await _signInManager.PasswordSignInAsync(email, password, persist, lockoutOnFailure);
+
+        if (result == SignInResult.Failed)
+            throw new InvalidCredentialsException();
+
+        if (result == SignInResult.NotAllowed)
+            throw new AccountNotConfirmedException();
     }
     
     
