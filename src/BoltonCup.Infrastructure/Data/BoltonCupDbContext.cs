@@ -414,6 +414,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.AccountId).HasColumnName("account_id");
             entity.Property(e => e.CurrentStep).HasColumnName("current_step");
             entity.Property(e => e.Payload).HasColumnName("payload");
+            entity.Property(e => e.IsComplete).HasColumnName("is_complete");
         });
         
         // entities deriving from EntityBase should have created_at = now() by default
