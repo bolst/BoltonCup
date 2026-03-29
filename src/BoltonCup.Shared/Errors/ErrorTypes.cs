@@ -8,6 +8,16 @@ public static class ErrorTypes
     public const string Validation = $"{Base}/validation";
     public const string Unexpected = $"{Base}/unexpected";
 
+    public static class Auth
+    {
+        private const string Base = $"{ErrorTypes.Base}/auth";
+        
+        public const string AccountNotConfirmed = $"{Base}/account-not-confirmed";
+        public const string InvalidCredentials = $"{Base}/invalid-credentials";
+    }
+    
+    
+    
     public static class Tournaments
     {
         private const string Base = $"{ErrorTypes.Base}/tournaments";

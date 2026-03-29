@@ -1,4 +1,5 @@
 using BoltonCup.Core.Exceptions;
+using BoltonCup.Infrastructure.Exceptions;
 using BoltonCup.Shared;
 
 namespace BoltonCup.WebAPI.Errors;
@@ -15,6 +16,23 @@ public static class BoltonCupExceptionMappings
             ErrorType: ErrorTypes.NotFound,
             Title: "Entity not found."
         ),
+        
+        // Auth
+        new(
+            ExceptionType: typeof(AccountNotConfirmedException),
+            StatusCode: StatusCodes.Status403Forbidden,
+            ErrorType: ErrorTypes.Auth.AccountNotConfirmed,
+            Title: "Account not confirmed."
+        ),
+        
+        new(
+            ExceptionType: typeof(InvalidCredentialsException),
+            StatusCode: StatusCodes.Status401Unauthorized,
+            ErrorType: ErrorTypes.Auth.InvalidCredentials,
+            Title: "Invalid credentials."
+        ),
+        
+        // Tournaments
         new( 
             ExceptionType: typeof(AccountAlreadyInTournamentException), 
             StatusCode: StatusCodes.Status409Conflict, 
