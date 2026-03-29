@@ -8,6 +8,7 @@ public interface ITournamentRegistrationService
 {
     Task<TournamentRegistrationContext> GetAsync(int tournamentId);
     Task<TournamentRegistrationContext> SaveAndContinueAsync(TournamentRegistrationContext context);
+    Task<TournamentRegistrationContext> CompleteAsync(TournamentRegistrationContext context);
 }
 
 
@@ -41,10 +42,26 @@ public class TournamentRegistrationService(
 
     public async Task<TournamentRegistrationContext> SaveAndContinueAsync(TournamentRegistrationContext context)
     {
-        var newContext = context with { CurrentStep = context.CurrentStep + 1 };
+        var newContext = context with { CurrentStep = context.CurrentStep + 1, IsComplete = false};
         await _api.UpdateMyTournamentRegistrationAsync(context.TournamentId, new TournamentRegistrationDto
         {
             CurrentStep = newContext.CurrentStep,
+            IsComplete = newContext.IsComplete,
+            Payload = Serialize(context.Model),
+        });
+        return newContext;
+    }
+
+    public async Task<TournamentRegistrationContext> CompleteAsync(TournamentRegistrationContext context)
+    {
+        if (context.CurrentStep != 2)
+            return context;
+        
+        var newContext = context with { CurrentStep = context.CurrentStep + 1, IsComplete = true };
+        await _api.UpdateMyTournamentRegistrationAsync(context.TournamentId, new TournamentRegistrationDto
+        {
+            CurrentStep = newContext.CurrentStep,
+            IsComplete = newContext.IsComplete,
             Payload = Serialize(context.Model),
         });
         return newContext;
