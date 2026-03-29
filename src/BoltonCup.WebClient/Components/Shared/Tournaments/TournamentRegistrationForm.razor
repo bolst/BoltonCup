@@ -4,21 +4,21 @@
 
 <AuthorizeView Context="_">
     <Authorized>
-        @if (_model is not null)
+        @if (_context is not null)
         {
-            <MudStepper @bind-ActiveIndex="_currentStep" StepClass="py-2" NavClass="justify-center" NonLinear CenterLabels>
+            <MudStepper @bind-ActiveIndex="CurrentStep" StepClass="py-2" NavClass="justify-center" NonLinear CenterLabels>
                 <ChildContent>
-                    <MudStep Title="Your Info" Completed="_currentStep > 0">
-                        <BoltonCupEditForm T="UserInfoModel" Model="_model.UserInfo" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue"/>
+                    <MudStep Title="Your Info" Completed="CurrentStep > 0">
+                        <BoltonCupEditForm T="UserInfoModel" Model="_context.Model.UserInfo" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue"/>
                     </MudStep>
-                    <MudStep Title="Documents" Disabled="_currentStep < 1" Completed="_currentStep > 1">
+                    <MudStep Title="Documents" Disabled="CurrentStep < 1" Completed="CurrentStep > 1">
                         <MudText>Please review and agree to the following terms and conditions, including legal documents involving a waiver.</MudText>
                         <MudText>You can find each document <MudLink Color="Color.Info">here</MudLink>.</MudText>
                         <MudDivider Class="my-4"/>
-                        <BoltonCupEditForm T="DocumentModel" Model="_model.Documents" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue" Dense/>
+                        <BoltonCupEditForm T="DocumentModel" Model="_context.Model.Documents" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue" Dense/>
                     </MudStep>
-                    <MudStep Title="Checkout" Disabled="_currentStep < 2" Completed="_currentStep > 2">
-                        <TournamentCheckout TournamentId="TournamentId" Position="@_model.UserInfo.Position">
+                    <MudStep Title="Checkout" Disabled="CurrentStep < 2" Completed="CurrentStep > 2">
+                        <TournamentCheckout TournamentId="TournamentId" Position="@_context.Model.UserInfo.Position" OnValidSubmit="OnValidPayment">
                             <SuccessContent>
                                 <MudAlert Severity="Severity.Success" NoIcon>
                                     <div class="d-flex flex-row align-center gap-3">
@@ -56,8 +56,18 @@
 
     private int? _tournamentId;
 
-    private int _currentStep;
-    private TournamentRegistrationModel? _model;
+    private TournamentRegistrationContext? _context;
+
+    private int CurrentStep
+    {
+        get => _context?.CurrentStep ?? 0;
+        set
+        {
+            if (_context is null)
+                return;
+            _context = _context with { CurrentStep = value };
+        }
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -65,18 +75,24 @@
             return;
         _tournamentId = TournamentId;
         
-        var context = await RegistrationService.GetAsync(TournamentId);
-        _currentStep = context.CurrentStep;
-        _model = context.Model;
+        _context = await RegistrationService.GetAsync(TournamentId);
         
         await InvokeAsync(StateHasChanged);
     }
 
     private async Task SaveAndContinue(EditContext _)
     {
-        if (_model is null)
+        if (_context is null)
             return;
-        _currentStep = await RegistrationService.SaveAndContinueAsync(TournamentId, new TournamentRegistrationContext(_currentStep, _model));
+        _context = await RegistrationService.SaveAndContinueAsync(_context);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnValidPayment()
+    {
+        if (_context is null)
+            return;
+        
         await InvokeAsync(StateHasChanged);
     }
     
