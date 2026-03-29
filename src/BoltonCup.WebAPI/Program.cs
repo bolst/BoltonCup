@@ -100,8 +100,8 @@ if (true) //(app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseForwardedHeaders();
-app.UseRateLimiter();
 app.UseCors();
+app.UseRateLimiter();
 
 app.UseExceptionHandler();
 
