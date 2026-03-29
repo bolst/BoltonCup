@@ -109,9 +109,12 @@ public static class ServiceCollectionExtensions
             })
             .AddRateLimiter(options => 
             {
-                options.RejectionStatusCode = 429;
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
                 options.GlobalLimiter = GlobalRateLimiter.Create();
                 options.AddPolicy<string, StrictEmailCheckPolicy>(nameof(StrictEmailCheckPolicy));
+
+                options.OnRejected = (context, cancellationToken) =>
+                    RateLimitResponder.WriteResponseAsync(context, cancellationToken: cancellationToken);
             });
     }
 

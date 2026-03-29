@@ -27,9 +27,21 @@ public sealed class ProblemDetailsOperationFilter : IOperationFilter
             };
         }
 
-        // Let there be a single schema for every defined exception 
+        // Let there be a single schema for every defined exception AND rate limiting.
         var problemSchema = context.SchemaGenerator
             .GenerateSchema(typeof(BoltonCupProblemDetails), context.SchemaRepository);
+
+        if (!operation.Responses.ContainsKey("429"))
+        {
+            operation.Responses["429"] = new OpenApiResponse
+            {
+                Description = "Too Many Requests",
+                Content = new Dictionary<string, OpenApiMediaType>
+                {
+                    ["application/json"] = new() { Schema = problemSchema }
+                }
+            };
+        }
         
         BoltonCupExceptionMappings.Values
             .Select(m => m.StatusCode.ToString())

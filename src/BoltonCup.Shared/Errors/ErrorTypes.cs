@@ -5,8 +5,9 @@ public static class ErrorTypes
     private const string Base = "https://api.boltoncup.ca/errors";
 
     public const string NotFound = $"{Base}/not-found";
-    public const string Validation = $"{Base}/validation";
+    public const string TooManyRequests = $"{Base}/too-many-requests";
     public const string Unexpected = $"{Base}/unexpected";
+    public const string Validation = $"{Base}/validation";
 
     public static class Auth
     {
