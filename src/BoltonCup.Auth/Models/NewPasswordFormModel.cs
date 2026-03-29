@@ -6,6 +6,7 @@ public class NewPasswordFormModel
 {
     [Required]
     [DataType(DataType.Password)]
+    [MinLength(8, ErrorMessage = "Password must have at least 8 characters")]
     public string Password { get; set; } = string.Empty;
     
     [Required]
