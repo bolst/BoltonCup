@@ -17,7 +17,7 @@ public class AuthSessionStateService(
     public IAuthSessionContext Context => _internalContext;
 
 
-    public async Task LogInOrSignUp(LogInOrSignUpFormModel? model = null)
+    public async Task LogInOrSignUpAsync(LogInOrSignUpFormModel? model = null)
     {
         if (model is not null)
             _internalContext.Email = model.Email;
