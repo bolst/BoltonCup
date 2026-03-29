@@ -127,7 +127,7 @@
         var stripeKey = Configuration.GetValue<string>("Stripe:PublicKey");
         if (string.IsNullOrEmpty(stripeKey))
             return;
-        
+
         try
         {
             _paymentIntent = await BoltonCupApi.CreateTournamentPaymentIntentAsync(TournamentId, new Sdk.CreateTournamentPaymentIntentRequest
@@ -140,12 +140,19 @@
             );
 
             await _module.InvokeVoidAsync("initializePaymentElement", stripeKey, _paymentIntent.ClientSecret);
-
-            await InvokeAsync(StateHasChanged);
         }
-        catch (Exception ex)
+        catch (Sdk.ApiException<Sdk.BoltonCupProblemDetails> e)
+        when (e.Result.Type == ErrorTypes.Tournaments.AccountAlreadyRegistered)
         {
-            
+            _errorMessage = "You are already registered for this tournament!";
+        }
+        catch (Exception e)
+        {
+            _errorMessage = "Sorry, there was a problem while setting up payment...";
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
         }
     }
 
