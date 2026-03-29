@@ -93,7 +93,8 @@ public class TournamentPaymentService(
         var stripeEvent = EventUtility.ConstructEvent(
             data,
             signature,
-            _stripeWebhookSecret, throwOnApiVersionMismatch:false
+            _stripeWebhookSecret, 
+            throwOnApiVersionMismatch: false
         );
 
         switch (stripeEvent.Type)
