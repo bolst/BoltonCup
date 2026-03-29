@@ -32,6 +32,7 @@ public class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITou
         entry.AccountId = command.AccountId;
         entry.CurrentStep = command.CurrentStep;
         entry.Payload = command.Payload;
+        entry.IsComplete = command.IsComplete;
 
         if (addNew)
             await _dbContext.TournamentRegistrations.AddAsync(entry, cancellationToken);

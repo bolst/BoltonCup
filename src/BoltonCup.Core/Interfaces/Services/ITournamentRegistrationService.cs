@@ -6,4 +6,4 @@ public interface ITournamentRegistrationService
     Task UpsertAsync(UpsertTournamentRegistrationCommand command, CancellationToken cancellationToken = default);
 }
 
-public record UpsertTournamentRegistrationCommand(int TournamentId, int AccountId, int CurrentStep, string? Payload);
+public record UpsertTournamentRegistrationCommand(int TournamentId, int AccountId, int CurrentStep, bool IsComplete, string? Payload);

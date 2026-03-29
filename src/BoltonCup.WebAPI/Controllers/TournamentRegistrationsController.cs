@@ -27,7 +27,7 @@ public class TournamentRegistrationsController(
     public async Task<IActionResult> UpdateMyTournamentRegistration(int id, [FromBody] TournamentRegistrationDto data)
     {
         var accountId = User.GetAccountId();
-        var command = new UpsertTournamentRegistrationCommand(id, accountId, data.CurrentStep, data.Payload);
+        var command = new UpsertTournamentRegistrationCommand(id, accountId, data.CurrentStep, data.IsComplete, data.Payload);
         await _registrationService.UpsertAsync(command);
         return Ok();
     }
