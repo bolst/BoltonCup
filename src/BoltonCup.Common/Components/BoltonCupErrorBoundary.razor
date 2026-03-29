@@ -1,0 +1,47 @@
+@using Microsoft.Extensions.Logging
+@inherits ErrorBoundary
+@inject ILogger<BoltonCupErrorBoundary> Logger
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.ExtraSmall" Class="d-flex flex-column align-center justify-center gap-3">
+        <BoltonCupLogo Height="96" />
+        
+        <MudText Typo="Typo.h5"><b>Oops, an error occurred!</b></MudText>
+        
+        @if (TryGetExceptionMessage(out var message))
+        {
+            <MudAlert NoIcon>@message</MudAlert>
+        }
+        
+        <MudButton OnClick="Recover" Color="Color.Error" Variant="Variant.Outlined" Size="Size.Large">Try again</MudButton>
+    </MudContainer>
+}
+
+@code {
+
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        // TODO: configure logging then uncomment this
+        // Logger.LogError(exception, "BoltonCupErrorBoundary caught an exception.");
+        return base.OnErrorAsync(exception);
+    }
+
+    private bool TryGetExceptionMessage(out string? message)
+    {
+        message = null;
+
+        if (CurrentException is Sdk.ApiException { StatusCode: 429 })
+        {
+            message = "Rate limit exceeded, please try again later.";
+            return true;
+        }
+        
+        return false;
+    }
+
+}
