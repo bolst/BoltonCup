@@ -24,12 +24,17 @@ public static class BoltonCupExceptionMappings
             ErrorType: ErrorTypes.Auth.AccountNotConfirmed,
             Title: "Account not confirmed."
         ),
-        
         new(
             ExceptionType: typeof(InvalidCredentialsException),
             StatusCode: StatusCodes.Status401Unauthorized,
             ErrorType: ErrorTypes.Auth.InvalidCredentials,
             Title: "Invalid credentials."
+        ),
+        new(
+            ExceptionType: typeof(UserRegistrationFailedException),
+            StatusCode: StatusCodes.Status400BadRequest,
+            ErrorType: ErrorTypes.Auth.UserRegistrationFailed,
+            Title: "Unable to register."
         ),
         
         // Tournaments
