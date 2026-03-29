@@ -31,7 +31,7 @@ public sealed class ProblemDetailsOperationFilter : IOperationFilter
         var problemSchema = context.SchemaGenerator
             .GenerateSchema(typeof(BoltonCupProblemDetails), context.SchemaRepository);
         
-        BoltonCupExceptionMapper.ExceptionMappings
+        BoltonCupExceptionMappings.Values
             .Select(m => m.StatusCode.ToString())
             .Distinct()
             .Where(statusCode => !operation.Responses.ContainsKey(statusCode))

@@ -10,7 +10,7 @@ public sealed class BoltonCupExceptionHandler(ILogger<BoltonCupExceptionHandler>
         Exception exception,
         CancellationToken cancellationToken)
     {
-        if (BoltonCupExceptionMapper.GetProblemDetails(exception) is not { } problem)
+        if (BoltonCupExceptionMappings.GetProblemDetails(exception) is not { } problem)
             return false;
 
         _logger.LogWarning(exception, "Bolton Cup exception: {Type}", exception.GetType().Name);

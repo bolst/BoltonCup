@@ -5,9 +5,9 @@ namespace BoltonCup.WebAPI.Errors;
 
 // Let there be a defined list of exceptions with associated status codes.
 
-public static class BoltonCupExceptionMapper
+public static class BoltonCupExceptionMappings
 {
-    public static readonly IReadOnlyList<ExceptionMappingConfig> ExceptionMappings =
+    public static readonly IReadOnlyList<ExceptionMappingConfig> Values =
     [
         new( 
             ExceptionType: typeof(EntityNotFoundException), 
@@ -39,7 +39,7 @@ public static class BoltonCupExceptionMapper
     
     public static BoltonCupProblemDetails? GetProblemDetails(Exception exception)
     {
-        var mapping = ExceptionMappings.FirstOrDefault(m => 
+        var mapping = Values.FirstOrDefault(m => 
             m.ExceptionType.IsAssignableFrom(exception.GetType()));
 
         if (mapping is null)
