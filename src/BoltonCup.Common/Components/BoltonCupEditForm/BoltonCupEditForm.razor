@@ -37,6 +37,12 @@
     {
         var disabled = _isSubmitting || field.ReadOnly;
         var variant = field.ReadOnly ? ReadOnlyVariant : Variant;
+        IMask? mask = field.InputType switch
+        {
+            InputType.Telephone => new PatternMask("(000) 000-0000") { CleanDelimiters = true },
+            _ => null,
+        };
+        
         if (field.Type == typeof(string))
         {
             if (field.AllowedValues is not null)
@@ -44,6 +50,7 @@
                 return @<MudSelect
                             T="string"
                             Label="@field.Label"
+                            HelperText="@field.HelperText"
                             Value="@((string)field.PropertyInfo.GetValue(Model)!)"
                             ValueChanged="v => OnValueChanged(field, v)"
                             For="@(CreateValidationExpression<string>(field))"
@@ -66,6 +73,7 @@
             return @<MudTextField Disabled="disabled"
                                   T="string"
                                   Label="@field.Label"
+                                  HelperText="@field.HelperText"
                                   Value="@((string)field.PropertyInfo.GetValue(Model)!)"
                                   ValueChanged="v => OnValueChanged(field, v)"
                                   For="@(CreateValidationExpression<string>(field))"
@@ -73,6 +81,7 @@
                                   ReadOnly="field.ReadOnly"
                                   Required="field.IsRequired"
                                   Variant="@variant"
+                                  Mask="@mask"
                                   Margin="@Margin"
                                   ShrinkLabel="@ShrinkLabel"
                                   Underline="false"

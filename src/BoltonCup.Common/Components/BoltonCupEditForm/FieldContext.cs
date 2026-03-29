@@ -10,6 +10,7 @@ public record FieldContext
     public PropertyInfo PropertyInfo { get; }
     public Type Type { get; }
     public string Label { get; }
+    public string? HelperText { get; }
     public InputType InputType { get; }
     public bool ReadOnly { get; }
     public bool IsRequired { get; }
@@ -20,6 +21,7 @@ public record FieldContext
         PropertyInfo = propertyInfo;
         Type = propertyInfo.PropertyType;
         Label = GetDisplayName(propertyInfo);
+        HelperText = GetDescription(propertyInfo);
         InputType = GetInputType(propertyInfo);
         ReadOnly = GetReadOnly(propertyInfo);
         IsRequired = propertyInfo.GetCustomAttribute<RequiredAttribute>() is not null;
@@ -30,6 +32,12 @@ public record FieldContext
     {
         var attr = prop.GetCustomAttribute<DisplayAttribute>();
         return attr?.Name ?? prop.Name;
+    }
+
+    private static string? GetDescription(PropertyInfo prop)
+    {
+        var attr = prop.GetCustomAttribute<DescriptionAttribute>();
+        return attr?.Description;
     }
 
     private static InputType GetInputType(PropertyInfo prop)

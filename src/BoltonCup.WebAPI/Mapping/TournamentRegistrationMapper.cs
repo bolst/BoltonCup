@@ -17,6 +17,7 @@ public class TournamentRegistrationMapper(IAssetUrlResolver _urlResolver) : ITou
             { 
                 CurrentStep = registration.CurrentStep,
                 Payload = registration.Payload,
+                IsComplete = registration.IsComplete,
             };
     }
 }

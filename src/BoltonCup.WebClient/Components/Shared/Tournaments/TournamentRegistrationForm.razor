@@ -2,29 +2,52 @@
 @namespace BoltonCup.WebClient.Components.Shared
 @inject ITournamentRegistrationService RegistrationService
 
-<AuthorizeView>
+<AuthorizeView Context="_">
     <Authorized>
-        @if (_model is not null)
+        @if (_alreadyCompleted)
         {
-            <MudStepper @bind-ActiveIndex="_currentStep" StepClass="py-2" NonLinear>
-                <ChildContent>
-                    <MudStep Title="Your Info" Completed="_currentStep > 0">
-                        <BoltonCupEditForm T="UserInfoModel" Model="_model.UserInfo" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue" />
-                    </MudStep>
-                    <MudStep Title="Documents" Disabled="_currentStep < 1" Completed="_currentStep > 1">
-                        <MudText>Please review and agree to the following terms and conditions, including legal documents involving a waiver.</MudText>
-                        <MudText>You can find each document <MudLink Color="Color.Info">here</MudLink>.</MudText>
-                        <MudDivider Class="my-4" />
-                        <BoltonCupEditForm T="DocumentModel" Model="_model.Documents" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue" Dense/>
-                    </MudStep>
-                    <MudStep Title="Checkout" Disabled="_currentStep < 2" Completed="_currentStep > 2">
-
-                    </MudStep>
-                </ChildContent>
-                <ActionContent Context="_">
-                    @* empty: we will control navigation manually *@
-                </ActionContent>
-            </MudStepper>
+            <MudAlert Severity="Severity.Success">
+                <MudText>You are already registered for this tournament.</MudText>
+            </MudAlert>
+        }
+        else
+        {
+            if (_context is not null)
+            {
+                <MudStepper @bind-ActiveIndex="CurrentStep" StepClass="py-2" NavClass="justify-center" CenterLabels>
+                    <ChildContent>
+                        <MudStep Title="Your Info" Disabled="_context.IsComplete" Completed="CurrentStep > 0 || _context.IsComplete">
+                            <BoltonCupEditForm T="UserInfoModel" Model="_context.Model.UserInfo" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue"/>
+                        </MudStep>
+                        <MudStep Title="Documents" Disabled="CurrentStep < 1 || _context.IsComplete" Completed="CurrentStep > 1 || _context.IsComplete">
+                            <MudText>Please review and agree to the following terms and conditions, including legal documents involving a waiver.</MudText>
+                            <MudText>You can find each document <MudLink Color="Color.Info">here</MudLink>.</MudText>
+                            <MudDivider Class="my-4"/>
+                            <BoltonCupEditForm T="DocumentModel" Model="_context.Model.Documents" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue" Dense/>
+                        </MudStep>
+                        <MudStep Title="Checkout" Disabled="CurrentStep < 2 || _context.IsComplete" Completed="CurrentStep > 2 || _context.IsComplete">
+                            <TournamentCheckout TournamentId="TournamentId" Position="@_context.Model.UserInfo.Position" OnValidSubmit="OnValidPayment"/>
+                        </MudStep>
+                        <MudStep Title="Complete" Completed="_context.IsComplete" Disabled="!_context.IsComplete">
+                            <MudAlert Severity="Severity.Success" NoIcon>
+                                <div class="d-flex flex-row align-center gap-3">
+                                    <MudIcon Icon="@Icons.Material.Rounded.CheckCircleOutline" Size="Size.Large" Color="Color.Success"/>
+                                    <div>
+                                        <MudText Typo="Typo.h6">Payment Successful!</MudText>
+                                        <MudText>You are officially registered! A receipt has been sent to your email.</MudText>
+                                    </div>
+                                </div>
+                            </MudAlert>
+                        </MudStep>
+                    </ChildContent>
+                    <ConnectorTemplate>
+                        @* empty: renders better on mobile *@
+                    </ConnectorTemplate>
+                    <ActionContent>
+                        @* empty: we will control navigation manually *@
+                    </ActionContent>
+                </MudStepper>
+            }
         }
     </Authorized>
     <NotAuthorized>
@@ -41,8 +64,19 @@
 
     private int? _tournamentId;
 
-    private int _currentStep;
-    private TournamentRegistrationModel? _model;
+    private TournamentRegistrationContext? _context;
+    private bool _alreadyCompleted;
+
+    private int CurrentStep
+    {
+        get => _context?.CurrentStep ?? 0;
+        set
+        {
+            if (_context is null)
+                return;
+            _context = _context with { CurrentStep = value };
+        }
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -50,18 +84,25 @@
             return;
         _tournamentId = TournamentId;
         
-        var context = await RegistrationService.GetAsync(TournamentId);
-        _currentStep = context.CurrentStep;
-        _model = context.Model;
+        _context = await RegistrationService.GetAsync(TournamentId);
+        _alreadyCompleted = _context.IsComplete;
         
         await InvokeAsync(StateHasChanged);
     }
 
     private async Task SaveAndContinue(EditContext _)
     {
-        if (_model is null)
+        if (_context is null)
             return;
-        _currentStep = await RegistrationService.SaveAndContinueAsync(TournamentId, new TournamentRegistrationContext(_currentStep, _model));
+        _context = await RegistrationService.SaveAndContinueAsync(_context);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnValidPayment()
+    {
+        if (_context is null)
+            return;
+        _context = await RegistrationService.CompleteAsync(_context);
         await InvokeAsync(StateHasChanged);
     }
     

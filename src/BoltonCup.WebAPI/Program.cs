@@ -57,8 +57,8 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Enter your API key below."
     });
     
+    options.OperationFilter<ProblemDetailsOperationFilter>();
     options.OperationFilter<SecurityRequirementsOperationFilter>();
-    options.OperationFilter<GlobalBadRequestOperationFilter>();
     
     // generate operation IDs based on method names
     options.CustomOperationIds(description =>
@@ -100,10 +100,10 @@ if (true) //(app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseForwardedHeaders();
-app.UseRateLimiter();
 app.UseCors();
+app.UseRateLimiter();
 
-app.UseExceptionHandler("/error");
+app.UseExceptionHandler();
 
 app.UseResponseCaching();
 

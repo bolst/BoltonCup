@@ -1,7 +1,9 @@
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Shared;
 using BoltonCup.WebAPI.Authentication;
-using BoltonCup.WebAPI.Controllers;
+using BoltonCup.WebAPI.Errors;
+using BoltonCup.WebAPI.Extensions;
 using BoltonCup.WebAPI.Filters;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
@@ -107,9 +109,12 @@ public static class ServiceCollectionExtensions
             })
             .AddRateLimiter(options => 
             {
-                options.RejectionStatusCode = 429;
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
                 options.GlobalLimiter = GlobalRateLimiter.Create();
                 options.AddPolicy<string, StrictEmailCheckPolicy>(nameof(StrictEmailCheckPolicy));
+
+                options.OnRejected = (context, cancellationToken) =>
+                    RateLimitResponder.WriteResponseAsync(context, cancellationToken: cancellationToken);
             });
     }
 
@@ -128,7 +133,34 @@ public static class ServiceCollectionExtensions
             .AddTransient<ITeamMapper, TeamMapper>()
             .AddTransient<ITournamentMapper, TournamentMapper>()
             .AddTransient<ITournamentRegistrationMapper, TournamentRegistrationMapper>()
+            .AddTransient<ITournamentPaymentMapper, TournamentPaymentMapper>()
             .AddTransient<IUserMapper, UserMapper>();
+    }
+
+    private static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
+    {
+        return services
+            .AddProblemDetails()
+            .PostConfigure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var problem = new BoltonCupValidationProblemDetails(context.ModelState.ToErrorDictionary())
+                    {
+                        Type = ErrorTypes.Validation,
+                        Title = "One or more validation errors occurred",
+                        Status = StatusCodes.Status400BadRequest,
+                        Instance = context.HttpContext.Request.Path,
+                    };
+
+                    return new BadRequestObjectResult(problem)
+                    {
+                        ContentTypes = { "application/problem+json" }
+                    };
+                };
+            })
+            .AddExceptionHandler<BoltonCupExceptionHandler>()
+            .AddExceptionHandler<UnhandledExceptionHandler>();
     }
     
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
@@ -140,27 +172,8 @@ public static class ServiceCollectionExtensions
             .AddRateLimitingServices()
             .AddRouting(options => options.LowercaseUrls = true)
             .AddMappers()
-            .AddControllers(options => options.Filters.Add<ApiExceptionFilterAttribute>());
-
-        builder.Services.Configure<ApiBehaviorOptions>(options =>
-        {
-            options.InvalidModelStateResponseFactory = context =>
-            {
-                var errors = context.ModelState
-                    .Where(e => e.Value?.Errors.Count > 0)
-                    .ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray() ?? []
-                    );
-                var response = new ApiErrorResponse
-                {
-                    Message = "One or more validation errors occurred",
-                    Errors = errors
-                };
-
-                return new BadRequestObjectResult(response);
-            };
-        });
+            .AddExceptionHandlers()
+            .AddControllers();
         
         return builder.Services;
     }

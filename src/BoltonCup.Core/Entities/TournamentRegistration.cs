@@ -7,6 +7,7 @@ public class TournamentRegistration : EntityBase
     public int AccountId { get; set; }
     public int CurrentStep { get; set; }
     public string? Payload { get; set; }
+    public bool IsComplete { get; set; }
     
     public Tournament Tournament { get; set; } = null!;
     public Account Account { get; set; } = null!;

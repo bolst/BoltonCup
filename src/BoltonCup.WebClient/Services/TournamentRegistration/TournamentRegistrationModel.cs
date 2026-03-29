@@ -31,20 +31,16 @@ public class UserInfoModel
     [Required]
     public string Email { get; set; } = string.Empty;
     
-    [Display(Name = "Phone")]
-    [ReadOnly(true)]
-    [DataType(DataType.PhoneNumber)]
-    public string Phone { get; set; } = string.Empty;
-    
-    [Display(Name = "Birthday")]
-    [ReadOnly(true)]
-    [Required]
-    public DateTime Birthday { get; set; } = DateTime.Now;
-    
     [Display(Name = "Highest level played")]
-    [AllowedValues(SkillLevel.HouseLeague, SkillLevel.AA, SkillLevel.AAA, SkillLevel.JrC, SkillLevel.JrB, SkillLevel.JrA)]
+    [ReadOnly(true)]
     [Required]
     public string? HighestLevel { get; set; }
+    
+    [Display(Name = "Phone")]
+    [DataType(DataType.PhoneNumber)]
+    [Required]
+    [StringLength(10, MinimumLength = 10,  ErrorMessage = "Please enter a valid phone number.")]
+    public string Phone { get; set; } = string.Empty;
     
     [Display(Name = "Jersey size")]
     [AllowedValues("S", "M", "L", "XL", "XXL")]
@@ -58,6 +54,10 @@ public class UserInfoModel
 
     [Display(Name = "I can play either position")]
     public bool CanPlayEitherPosition { get; set; }
+    
+    [Display(Name = "List any players you want to be on a team with")]
+    [Description("We can't guarantee you will be drafted with them, but we will try to make it work.")]
+    public string? Friends { get; set; }
 }
 
 public class DocumentModel

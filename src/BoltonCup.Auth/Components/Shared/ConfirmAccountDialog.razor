@@ -73,15 +73,11 @@
             });
             MudDialog.Close(DialogResult.Ok(true));
         }
-        catch (ApiException e)
-            when (e.StatusCode is 400)
+        catch (ApiException<BoltonCupProblemDetails> e)
+            when (e.Result.Type == ErrorTypes.Auth.InvalidCredentials)
         {
             _messageStore?.Add(() => _model.Code, "That code is incorrect.");
             _editContext?.NotifyValidationStateChanged();
-        }
-        catch (Exception e)
-        {
-            Snackbar.Add("An unexpected error occurred.", Severity.Error);
         }
         finally
         {
@@ -97,16 +93,12 @@
         try
         {
             var delayTask = Task.Delay(300);
-            await BoltonCupApi.ForgotPasswordAsync(new ForgotPasswordRequest
+            await BoltonCupApi.ResendConfirmationEmailAsync(new ResendConfirmationEmailRequest
             {
                 Email = Context.Email
             });
             await delayTask;
-            Snackbar.Add($"If an account exists, an email with a code has been sent to {Context.Email}.", Severity.Success);
-        }
-        catch
-        {
-            Snackbar.Add("Something went wrong...", Severity.Error);
+            Snackbar.Add($"An email with a code has been sent to {Context.Email}.", Severity.Success);
         }
         finally
         {

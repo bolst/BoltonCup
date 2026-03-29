@@ -17,7 +17,7 @@ public static class GlobalRateLimiter
                 SegmentsPerWindow = 4,
                 Window = TimeSpan.FromMinutes(1),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 2,
+                QueueLimit = 0,
             });
         });
     }

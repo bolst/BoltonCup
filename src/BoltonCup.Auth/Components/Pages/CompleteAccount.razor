@@ -170,7 +170,7 @@ else
             await BoltonCupApi.CompleteMyAccountAsync(_model);
             Navigation.NavigateTo($"{BcConfig.Value.WebBaseUrl}profile");
         }
-        catch (ApiException<ApiErrorResponse> e) when (e.StatusCode == 400)
+        catch (ApiException<BoltonCupValidationProblemDetails> e)
         {
             if (e.Result.Errors.TryGetValue(nameof(_model.Birthday), out var bdayErrors))
             {
@@ -180,10 +180,6 @@ else
             _messageStore?.AddApiErrorResponse(_model, e.Result);
             _editContext?.NotifyValidationStateChanged();
             Snackbar.Add("Please fix the invalid fields.", Severity.Error);
-        }
-        catch (Exception e)
-        {
-            Snackbar.Add("Sorry, something went wrong...", Severity.Error);
         }
     }
 

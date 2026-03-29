@@ -664,11 +664,12 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
-
                     b.HasIndex("TeamId");
 
                     b.HasIndex("TournamentId");
+
+                    b.HasIndex("AccountId", "TournamentId")
+                        .IsUnique();
 
                     b.ToTable("players", "core");
                 });
@@ -994,6 +995,10 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("goalie_payment_link");
 
+                    b.Property<decimal?>("GoalieRegistrationFee")
+                        .HasColumnType("numeric")
+                        .HasColumnName("goalie_registration_fee");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasColumnName("is_active");
@@ -1030,6 +1035,10 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<string>("SkaterPaymentLink")
                         .HasColumnType("text")
                         .HasColumnName("skater_payment_link");
+
+                    b.Property<decimal?>("SkaterRegistrationFee")
+                        .HasColumnType("numeric")
+                        .HasColumnName("skater_registration_fee");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("timestamp with time zone")
@@ -1071,6 +1080,10 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<int>("CurrentStep")
                         .HasColumnType("integer")
                         .HasColumnName("current_step");
+
+                    b.Property<bool>("IsComplete")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_complete");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone")

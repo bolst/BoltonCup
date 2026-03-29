@@ -13,7 +13,9 @@
 <MudLayout Class="d-flex flex-column" Style="min-height: 100vh">
     <AppBar />
     <MudMainContent>
-        @Body
+        <BoltonCupErrorBoundary>
+            @Body
+        </BoltonCupErrorBoundary>
     </MudMainContent>
     <Footer />
 </MudLayout>

@@ -16,7 +16,7 @@
 
     private Task OnSubmit(EditContext _)
     {
-        return AuthSessionState.LogInOrSignUp(_model);
+        return AuthSessionState.LogInOrSignUpAsync(_model);
     }
 
 }

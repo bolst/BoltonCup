@@ -13,9 +13,11 @@
         </a>
     </MudAppBar>
     <MudMainContent Class="mud-height-full d-flex flex-column justify-center">
-        <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex flex-column align-center mud-width-full gap-3">
-            @Body
-        </MudContainer>
+        <BoltonCupErrorBoundary>
+            <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex flex-column align-center mud-width-full gap-3">
+                @Body
+            </MudContainer>
+        </BoltonCupErrorBoundary>
     </MudMainContent>
     <Footer />
 </MudLayout>

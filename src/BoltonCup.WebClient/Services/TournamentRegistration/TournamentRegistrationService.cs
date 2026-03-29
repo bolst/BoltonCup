@@ -7,7 +7,8 @@ namespace BoltonCup.WebClient.Services;
 public interface ITournamentRegistrationService
 {
     Task<TournamentRegistrationContext> GetAsync(int tournamentId);
-    Task<int> SaveAndContinueAsync(int tournamentId, TournamentRegistrationContext context);
+    Task<TournamentRegistrationContext> SaveAndContinueAsync(TournamentRegistrationContext context);
+    Task<TournamentRegistrationContext> CompleteAsync(TournamentRegistrationContext context);
 }
 
 
@@ -29,25 +30,41 @@ public class TournamentRegistrationService(
         {
             var dto = await _api.GetMyTournamentRegistrationAsync(tournamentId);
             return TryParseDto(dto, out var model) 
-                ? new TournamentRegistrationContext(dto.CurrentStep, model) 
-                : new TournamentRegistrationContext(0, GetDefaultRegistrationModel(me));
+                ? new TournamentRegistrationContext(tournamentId, dto.CurrentStep, dto.IsComplete, model) 
+                : new TournamentRegistrationContext(tournamentId, 0,  false, GetDefaultRegistrationModel(me));
         }
         catch (ApiException e)
             when (e.StatusCode is 204)
         {
-            return new TournamentRegistrationContext(0, GetDefaultRegistrationModel(me));
+            return new TournamentRegistrationContext(tournamentId, 0, false, GetDefaultRegistrationModel(me));
         }
     }
 
-    public async Task<int> SaveAndContinueAsync(int tournamentId, TournamentRegistrationContext context)
+    public async Task<TournamentRegistrationContext> SaveAndContinueAsync(TournamentRegistrationContext context)
     {
-        var payload = Serialize(context.Model);
-        await _api.UpdateMyTournamentRegistrationAsync(tournamentId, new TournamentRegistrationDto
+        var newContext = context with { CurrentStep = context.CurrentStep + 1, IsComplete = false};
+        await _api.UpdateMyTournamentRegistrationAsync(context.TournamentId, new TournamentRegistrationDto
         {
-            CurrentStep = context.CurrentStep + 1,
-            Payload = payload,
+            CurrentStep = newContext.CurrentStep,
+            IsComplete = newContext.IsComplete,
+            Payload = Serialize(context.Model),
         });
-        return context.CurrentStep + 1;
+        return newContext;
+    }
+
+    public async Task<TournamentRegistrationContext> CompleteAsync(TournamentRegistrationContext context)
+    {
+        if (context.CurrentStep != 2)
+            return context;
+        
+        var newContext = context with { CurrentStep = context.CurrentStep + 1, IsComplete = true };
+        await _api.UpdateMyTournamentRegistrationAsync(context.TournamentId, new TournamentRegistrationDto
+        {
+            CurrentStep = newContext.CurrentStep,
+            IsComplete = newContext.IsComplete,
+            Payload = Serialize(context.Model),
+        });
+        return newContext;
     }
 
 
@@ -80,7 +97,6 @@ public class TournamentRegistrationService(
                 LastName = me.LastName,
                 Email = me.Email,
                 Phone = me.Phone,
-                Birthday = me.Birthday,
                 HighestLevel = me.HighestLevel,
             },
             Documents = new DocumentModel()

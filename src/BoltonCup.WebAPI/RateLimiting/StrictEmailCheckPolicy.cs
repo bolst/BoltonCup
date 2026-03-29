@@ -5,12 +5,8 @@ namespace BoltonCup.WebAPI.RateLimiting;
 
 public class StrictEmailCheckPolicy : IRateLimiterPolicy<string>
 {
-    public Func<OnRejectedContext, CancellationToken, ValueTask>? OnRejected { get; } = 
-        (context, cancellationToken) =>
-        {
-            context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-            return ValueTask.CompletedTask;
-        };
+    public Func<OnRejectedContext, CancellationToken, ValueTask>? OnRejected { get; } = (context, cancellationToken) =>
+        RateLimitResponder.WriteResponseAsync(context, cancellationToken: cancellationToken);
 
     public RateLimitPartition<string> GetPartition(HttpContext context)
     {

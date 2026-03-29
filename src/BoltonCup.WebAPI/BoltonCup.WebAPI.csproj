@@ -36,6 +36,7 @@
     <ItemGroup>
       <ProjectReference Include="..\BoltonCup.Core\BoltonCup.Core.csproj" />
       <ProjectReference Include="..\BoltonCup.Infrastructure\BoltonCup.Infrastructure.csproj" />
+      <ProjectReference Include="..\BoltonCup.Shared\BoltonCup.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

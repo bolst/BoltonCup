@@ -259,6 +259,9 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Team)
                 .WithMany(e => e.Players)
                 .HasForeignKey(e => e.TeamId);
+            entity
+                .HasIndex(e => new { e.AccountId, e.TournamentId })
+                .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.AccountId).HasColumnName("account_id");
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
@@ -386,6 +389,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.GoaliePaymentLink).HasColumnName("goalie_payment_link");
             entity.Property(e => e.SkaterLimit).HasColumnName("skater_limit");
             entity.Property(e => e.GoalieLimit).HasColumnName("goalie_limit");
+            entity.Property(e => e.SkaterRegistrationFee).HasColumnName("skater_registration_fee");
+            entity.Property(e => e.GoalieRegistrationFee).HasColumnName("goalie_registration_fee");
         });
 
         modelBuilder.Entity<TournamentRegistration>(entity =>
@@ -409,6 +414,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.AccountId).HasColumnName("account_id");
             entity.Property(e => e.CurrentStep).HasColumnName("current_step");
             entity.Property(e => e.Payload).HasColumnName("payload");
+            entity.Property(e => e.IsComplete).HasColumnName("is_complete");
         });
         
         // entities deriving from EntityBase should have created_at = now() by default
