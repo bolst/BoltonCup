@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Authentication;
 using System.Security.Claims;
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
+using BoltonCup.Core.Exceptions;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Exceptions;
 using BoltonCup.Infrastructure.Extensions;
@@ -15,12 +17,12 @@ public interface IUserService
 {
     Task<Account?> GetMyAccountAsync(ClaimsPrincipal claimsPrincipal);
     Task LoginAsync(string email, string password, bool persist, bool lockoutOnFailure = false);
-    Task<IdentityResult> RegisterAsync(string email, string password);
+    Task RegisterAsync(string email, string password);
     Task ResendConfirmationEmailAsync(string email);
-    Task<bool> VerifyPasswordResetCodeAsync(string email, string code);
+    Task VerifyPasswordResetCodeAsync(string email, string code);
     Task ForgotPasswordAsync(string email);
-    Task<IdentityResult> ResetPasswordAsync(string email, string code, string newPassword);
-    Task<IdentityResult> ConfirmEmailAsync(string email, string code);
+    Task ResetPasswordAsync(string email, string code, string newPassword);
+    Task ConfirmEmailAsync(string email, string code);
     Task<BoltonCupUser> CompleteUserAccountAsync(string userId, CreateAccountCommand command);
 }
 
@@ -31,8 +33,6 @@ public class UserService(
     IAccountService _accountService,
     IEmailer _emailer) : IUserService
 {
-    private static readonly EmailAddressAttribute _emailAddressAttribute = new();
-
 
     public async Task<Account?> GetMyAccountAsync(ClaimsPrincipal claimsPrincipal)
     {
@@ -54,22 +54,17 @@ public class UserService(
     }
     
     
-    public async Task<IdentityResult> RegisterAsync(string email, string password)
+    public async Task RegisterAsync(string email, string password)
     {
-        if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
-            return IdentityResult.Failed(_userManager.ErrorDescriber.InvalidEmail(email));
-
         var user = new BoltonCupUser();
         await _userManager.SetUserNameAsync(user, email);
         await _userManager.SetEmailAsync(user, email);
-        var result = await _userManager.CreateAsync(user, password);
 
-        if (result.Succeeded)
-        {
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user); 
-            await _emailer.SendConfirmationCodeAsync(user, email, code);
-        }
-        return result;
+        if (await _userManager.CreateAsync(user, password) is { Succeeded: false } failResult)
+            throw new UserRegistrationFailedException(failResult);
+        
+        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user); 
+        await _emailer.SendConfirmationCodeAsync(user, email, code);
     }
 
     
@@ -84,16 +79,19 @@ public class UserService(
     
     
     
-    public async Task<bool> VerifyPasswordResetCodeAsync(string email, string code)
+    public async Task VerifyPasswordResetCodeAsync(string email, string code)
     {
-        var user = await _userManager.FindByEmailAsync(email);
-        return user is not null 
-               && await _userManager.VerifyUserTokenAsync(
+        if (await _userManager.FindByEmailAsync(email) is not { } user)
+            throw new InvalidCredentialsException();
+
+        var isValidToken = await _userManager.VerifyUserTokenAsync(
                    user: user, 
                    tokenProvider: _userManager.Options.Tokens.PasswordResetTokenProvider,
                    purpose: UserManager<BoltonCupUser>.ResetPasswordTokenPurpose,
                    token: code
                 );
+        if (!isValidToken)
+            throw new InvalidCredentialsException();
     }
 
     
@@ -108,33 +106,32 @@ public class UserService(
 
     
     
-    public async Task<IdentityResult> ResetPasswordAsync(string email, string code, string newPassword)
+    public async Task ResetPasswordAsync(string email, string code, string newPassword)
     {
-        if (await _userManager.FindByEmailAsync(email) is not {} user)
-            return IdentityResult.Failed(new IdentityError { Description = "Invalid request." });
+        if (await _userManager.FindByEmailAsync(email) is not { } user)
+            throw new InvalidCredentialsException();
 
-        var result = await _userManager.ResetPasswordAsync(user, code, newPassword);
+        if (await _userManager.ResetPasswordAsync(user, code, newPassword) is { Succeeded: false })
+            throw new InvalidCredentialException();
+
         // a user could only get here if they got the code via email
         // thus, confirm their account if needed
-        if (result.Succeeded && !user.EmailConfirmed)
+        if (!user.EmailConfirmed)
         {
             user.EmailConfirmed = true;
             await _userManager.UpdateAsync(user);
         }
-
-        return result;
     }
 
 
 
-    public async Task<IdentityResult> ConfirmEmailAsync(string email, string code)
+    public async Task ConfirmEmailAsync(string email, string code)
     {
-        if (await _userManager.FindByEmailAsync(email) is not { } user) 
-            return IdentityResult.Failed(new IdentityError { Description = "Invalid request." });
-        
-        var result = await _userManager.ConfirmEmailAsync(user, code);
-        if (!result.Succeeded)
-            return result;
+        if (await _userManager.FindByEmailAsync(email) is not { } user)
+            throw new InvalidCredentialsException();
+
+        if (await _userManager.ConfirmEmailAsync(user, code) is { Succeeded: false })
+            throw new InvalidCredentialsException();
         
         // if a user already has an account, join it to them
         if (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == user.Email) is { } account)
@@ -142,8 +139,6 @@ public class UserService(
             user.AccountId = account.Id;
             await _userManager.UpdateAsync(user);
         }
-
-        return result;
     }
 
 
@@ -151,10 +146,12 @@ public class UserService(
     public async Task<BoltonCupUser> CompleteUserAccountAsync(string userId, CreateAccountCommand command)
     {
         var user = await _userManager.FindByIdAsync(userId)
-            ?? throw new InvalidOperationException($"User with id {userId} not found.");
+            ?? throw new EntityNotFoundException("User", userId);
+        
         var accountId = await _accountService.CreateAsync(command);
         user.AccountId = accountId;
         await _userManager.UpdateAsync(user);
+        
         return user;
     }
 }

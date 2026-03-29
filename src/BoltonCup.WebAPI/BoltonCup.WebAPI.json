@@ -1313,21 +1313,11 @@
             "description": "OK"
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Validation Error",
             "content": {
-              "text/plain": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InvalidPasswordResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvalidPasswordResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvalidPasswordResponse"
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
                 }
               }
             }
@@ -5091,19 +5081,6 @@
           },
           "markdownContent": {
             "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "InvalidPasswordResponse": {
-        "type": "object",
-        "properties": {
-          "errors": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
             "nullable": true
           }
         },

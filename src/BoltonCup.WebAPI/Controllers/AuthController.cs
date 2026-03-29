@@ -42,7 +42,7 @@ public class AuthController(
     [HttpPost("register")]
     public async Task<ActionResult> Register([FromBody] RegisterRequest request)
     {
-        var result = await _userService.RegisterAsync(request.Email, request.Password);
+        await _userService.RegisterAsync(request.Email, request.Password);
         return Ok();
     }
 
@@ -58,9 +58,7 @@ public class AuthController(
     [HttpPost("verifyPasswordResetCode")]
     public async Task<ActionResult> VerifyPasswordResetCode([FromBody] VerifyPasswordResetCodeRequest request)
     {
-        var isValid = await _userService.VerifyPasswordResetCodeAsync(request.Email, request.Code);
-        if (!isValid)
-            return BadRequest("Invalid code or email.");
+        await _userService.VerifyPasswordResetCodeAsync(request.Email, request.Code);
         return Ok();
     }
 
@@ -74,24 +72,18 @@ public class AuthController(
 
     [AllowAnonymous]
     [HttpPost("resetPassword")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(InvalidPasswordResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
-        var result = await _userService.ResetPasswordAsync(request.Email, request.ResetCode, request.NewPassword);
-        return result.Succeeded
-            ? Ok()
-            : BadRequest(new InvalidPasswordResponse(result.Errors.Select(e => e.Description)));
+        await _userService.ResetPasswordAsync(request.Email, request.ResetCode, request.NewPassword);
+        return Ok();
     }
 
     [AllowAnonymous]
     [HttpPost("confirmEmail")]
     public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
     {
-        var result = await _userService.ConfirmEmailAsync(request.Email, request.Code);
-        return result.Succeeded
-            ? Ok()
-            : BadRequest("Invalid code or email.");
+        await _userService.ConfirmEmailAsync(request.Email, request.Code);
+        return Ok();
     }
     
     [Authorize]
@@ -122,5 +114,3 @@ public record ConfirmEmailRequest(string Email, string Code);
 public record LoginRequest(string Email, string Password, bool Persist = true);
 
 public record CheckUserRequest(string Email);
-
-public record InvalidPasswordResponse(IEnumerable<string> Errors);
