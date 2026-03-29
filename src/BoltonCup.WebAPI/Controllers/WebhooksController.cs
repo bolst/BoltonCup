@@ -5,7 +5,7 @@ using Stripe;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class WebhooksController(ITournamentPaymentService _paymentService) 
+public class WebhooksController(ITournamentPaymentService _paymentService, ILogger<WebhooksController> _logger) 
     : BoltonCupControllerBase
 {
     [AllowAnonymous]
@@ -21,10 +21,12 @@ public class WebhooksController(ITournamentPaymentService _paymentService)
         }
         catch (StripeException e)
         {
+            _logger.LogError(e, "Error on stripe webhook");
             return BadRequest();
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Internal error on stripe webhook");
             return StatusCode(500);
         }
     }
