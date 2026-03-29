@@ -97,12 +97,12 @@
         try
         {
             var delayTask = Task.Delay(300);
-            await BoltonCupApi.ForgotPasswordAsync(new ForgotPasswordRequest
+            await BoltonCupApi.ResendConfirmationEmailAsync(new ResendConfirmationEmailRequest
             {
                 Email = Context.Email
             });
             await delayTask;
-            Snackbar.Add($"If an account exists, an email with a code has been sent to {Context.Email}.", Severity.Success);
+            Snackbar.Add($"An email with a code has been sent to {Context.Email}.", Severity.Success);
         }
         catch
         {
