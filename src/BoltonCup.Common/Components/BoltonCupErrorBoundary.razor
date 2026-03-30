@@ -1,6 +1,8 @@
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
 @using Microsoft.Extensions.Logging
 @inherits ErrorBoundary
 @inject ILogger<BoltonCupErrorBoundary> Logger
+@inject IWebAssemblyHostEnvironment HostEnvironment
 
 @if (CurrentException is null)
 {
@@ -12,6 +14,11 @@ else
         <BoltonCupLogo Height="96" />
         
         <MudText Typo="Typo.h5"><b>Oops, an error occurred!</b></MudText>
+        
+        @if (CurrentException is not null && HostEnvironment.IsDevelopment())
+        {
+            <MudAlert Severity="Severity.Error">@CurrentException</MudAlert>
+        }
         
         @if (TryGetExceptionMessage(out var message))
         {
