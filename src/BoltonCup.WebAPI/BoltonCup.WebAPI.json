@@ -2271,11 +2271,14 @@
             }
           },
           {
-            "name": "TeamId",
+            "name": "TeamIds",
             "in": "query",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
             }
           },
           {
@@ -3202,18 +3205,21 @@
             }
           },
           {
-            "name": "TeamId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
             "name": "Position",
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "TeamIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
             }
           },
           {

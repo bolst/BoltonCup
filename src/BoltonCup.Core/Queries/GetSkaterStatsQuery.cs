@@ -5,6 +5,6 @@ namespace BoltonCup.Core;
 public sealed record GetSkaterStatsQuery : QueryBase
 {
     public int? TournamentId { get; set; }
-    public int? TeamId { get; set; }
     public string? Position { get; set; }
+    public List<int>? TeamIds { get; set; }
 }
