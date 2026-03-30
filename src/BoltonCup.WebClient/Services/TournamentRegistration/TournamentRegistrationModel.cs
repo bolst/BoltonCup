@@ -66,9 +66,9 @@ public class DocumentModel
     [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree in order to register and play.")]
     public bool HasAgreedToCodeOfConductWaiver { get; set; }
     
-    [Display(Name = "I have read, understand and agree to the terms and conditions of the liability waiver.")]
-    [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree in order to register and play.")]
-    public bool HasAgreedToLiabilityWaiver { get; set; }
+    // [Display(Name = "I have read, understand and agree to the terms and conditions of the liability waiver.")]
+    // [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree in order to register and play.")]
+    // public bool HasAgreedToLiabilityWaiver { get; set; }
     
     [Display(Name = "I have read, understand and agree to the terms and conditions of the concussion waiver.")]
     [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree in order to register and play.")]

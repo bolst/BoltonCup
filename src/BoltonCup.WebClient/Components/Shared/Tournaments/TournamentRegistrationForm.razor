@@ -20,7 +20,7 @@
                             <BoltonCupEditForm T="UserInfoModel" Model="_context.Model.UserInfo" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue"/>
                         </MudStep>
                         <MudStep Title="Documents" Disabled="CurrentStep < 1 || _context.IsComplete" Completed="CurrentStep > 1 || _context.IsComplete">
-                            <MudText>Please review and agree to the following terms and conditions, including legal documents involving a waiver.</MudText>
+                            <MudText>Please review and agree to the following terms and conditions, including documents involving a waiver.</MudText>
                             <MudText>You can find each document <MudLink Href="/help#tournament-documents" Color="Color.Info">here</MudLink>.</MudText>
                             <MudDivider Class="my-4"/>
                             <BoltonCupEditForm T="DocumentModel" Model="_context.Model.Documents" OnValidSubmit="SaveAndContinue" SubmitText="Save & Continue" Dense/>
