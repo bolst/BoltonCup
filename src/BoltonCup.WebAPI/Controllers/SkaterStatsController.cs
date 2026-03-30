@@ -12,8 +12,9 @@ public class SkaterStatsController(ISkaterStatRepository _skaterStats, ISkaterSt
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IPagedList<SkaterStatDto>>> GetSkaterStats([FromQuery] GetSkaterStatsQuery query)
+    public async Task<ActionResult<IPagedList<SkaterStatDto>>> GetSkaterStats([FromQuery] GetSkaterStatsRequest request)
     {
+        var query = _mapper.ToQuery(request);
         var stats = await _skaterStats.GetAllAsync(query);
         return Ok(_mapper.ToDtoList(stats));
     }
