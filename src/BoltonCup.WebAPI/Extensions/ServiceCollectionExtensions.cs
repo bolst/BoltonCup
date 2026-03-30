@@ -4,7 +4,6 @@ using BoltonCup.Shared;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Errors;
 using BoltonCup.WebAPI.Extensions;
-using BoltonCup.WebAPI.Filters;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
 using FluentValidation;

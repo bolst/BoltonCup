@@ -2,7 +2,7 @@ using BoltonCup.WebAPI.Errors;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace BoltonCup.WebAPI.Filters;
+namespace BoltonCup.WebAPI.Swagger;
 
 // Let there be exception response schemas in the OpenAPI spec.
 
