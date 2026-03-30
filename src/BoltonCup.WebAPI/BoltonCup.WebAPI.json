@@ -3226,6 +3226,8 @@
             "name": "Page",
             "in": "query",
             "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
               "type": "integer",
               "format": "int32"
             }
@@ -3234,6 +3236,8 @@
             "name": "Size",
             "in": "query",
             "schema": {
+              "maximum": 100,
+              "minimum": 1,
               "type": "integer",
               "format": "int32"
             }
@@ -3270,6 +3274,106 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SkaterStatDtoIPagedList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/skaterstats/filter-schema": {
+      "get": {
+        "tags": [
+          "SkaterStats"
+        ],
+        "operationId": "GetSkaterStatFilterSchema",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilterSchemaDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilterSchemaDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilterSchemaDto"
                 }
               }
             }
@@ -4890,6 +4994,107 @@
           "accountId": {
             "type": "integer",
             "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FilterFieldDto": {
+        "required": [
+          "fieldName",
+          "label",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "fieldName": {
+            "type": "string",
+            "nullable": true
+          },
+          "label": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/FilterFieldType"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "optionsSource": {
+            "$ref": "#/components/schemas/FilterOptionsSourceDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FilterFieldType": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "FilterOptionDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "nullable": true
+          },
+          "label": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FilterOptionsSourceDto": {
+        "required": [
+          "sourceType"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceType": {
+            "$ref": "#/components/schemas/FilterOptionsSourceType"
+          },
+          "endpointPath": {
+            "type": "string",
+            "nullable": true
+          },
+          "staticOptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FilterOptionsSourceType": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "FilterSchemaDto": {
+        "type": "object",
+        "properties": {
+          "primaryFields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterFieldDto"
+            },
+            "nullable": true
+          },
+          "secondaryFields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterFieldDto"
+            },
             "nullable": true
           }
         },
