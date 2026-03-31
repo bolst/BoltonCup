@@ -15,7 +15,10 @@
     Striped
     Dense>
     <ToolBarContent>
-        <MudIconButton Icon="@Icons.Material.Rounded.FilterAlt" Variant="Variant.Outlined" />
+        @if (_schema is not null)
+        {
+            <FilterToolbar Schema="@_schema"/>
+        }
     </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.FullName" Title="Player" Sortable="false" StickyLeft>
@@ -48,7 +51,14 @@
     private MudDataGrid<Sdk.SkaterStatDto> _dataGrid = null!;
     private const string _dataCellStyle = "max-width: 30px";
 
-    private async Task<GridData<Sdk.SkaterStatDto>> ServerReload(GridState<Sdk.SkaterStatDto> state)
+    private Sdk.FilterSchemaDto? _schema;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _schema = await BoltonCupApi.GetSkaterStatFilterSchemaAsync();
+    }
+
+    private async Task<GridData<Sdk.SkaterStatDto>> ServerReload(GridState<Sdk.SkaterStatDto> state, CancellationToken cancellationToken)
     {
         string? sortBy = null;
         bool? descending = null;
