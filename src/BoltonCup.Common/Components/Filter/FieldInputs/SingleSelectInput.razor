@@ -1,0 +1,63 @@
+@namespace BoltonCup.Common.Components
+@using MudBlazor.State
+@inherits ComponentBaseWithState
+
+
+<MudSelect 
+    T="Sdk.FilterOptionDto"
+    Value="@_selectedOption" 
+    ValueChanged="@OnSelectedOptionChanged"
+    Typo="Typo.subtitle2"
+    Variant="Variant.Outlined" Margin="Margin.Dense" Dense FitContent>
+    @foreach (var option in Options)
+    {
+        <MudSelectItem T="Sdk.FilterOptionDto" Value="option">@option.Label</MudSelectItem>
+    }
+</MudSelect>
+
+
+
+@code {
+    
+    [Parameter]
+    public List<Sdk.FilterOptionDto> Options { get; set; } = [];
+
+    [Parameter]
+    public FilterValue? Value { get; set; }
+    
+    [Parameter]
+    public EventCallback<FilterValue?> ValueChanged { get; set; }
+
+    
+    private readonly ParameterState<FilterValue?> _valueState;
+    
+    private Sdk.FilterOptionDto? _selectedOption;
+
+    public SingleSelectInput()
+    {
+        using var registerScope = CreateRegisterScope();
+        _valueState = registerScope.RegisterParameter<FilterValue?>(nameof(Value))
+            .WithParameter(() => Value)
+            .WithEventCallback(() => ValueChanged)
+            .WithChangeHandler(OnValueChange);
+    }
+
+    private Task SetValueAsync(FilterValue? value)
+    {
+        _selectedOption = value?.Value;
+        return _valueState.SetValueAsync(value);
+    }
+
+    private Task OnValueChange(ParameterChangedEventArgs<FilterValue?> args)
+    {
+        _selectedOption = args.Value?.Value;
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private Task OnSelectedOptionChanged(Sdk.FilterOptionDto? option)
+    {
+        var value = new FilterValue { Value = option };
+        return SetValueAsync(value);
+    }
+    
+}

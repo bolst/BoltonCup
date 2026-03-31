@@ -1,0 +1,151 @@
+@namespace BoltonCup.Common.Components
+@using BoltonCup.Sdk
+@using MudBlazor.State
+@inherits ComponentBaseWithState
+
+<MudMenu Open="_menuOpen" OpenChanged="@SetMenuOpenAsync">
+    <ActivatorContent>
+        <MudButton Variant="Variant.Outlined" OnClick="@OpenMenuAsync" Color="@_buttonColor" Size="Size.Small">
+            <div class="d-flex flex-row align-center gap-1 mx-n1">
+                <MudIconButton Icon="@_buttonIcon"
+                               OnClick="@OnChipIconClick"
+                               Color="@_buttonColor"
+                               Size="Size.Small"
+                               ClickPropagation="false" />
+                
+                <MudText Typo="Typo.subtitle2">@FilterField.Label</MudText>
+
+                @if (_value is not null)
+                {
+                    <MudDivider Class="mx-1" FlexItem Vertical/>
+                    
+                    <MudText Typo="Typo.subtitle2">@_value.Value?.Label</MudText>
+                }
+            </div>
+        </MudButton>
+    </ActivatorContent>
+    <ChildContent>
+        <div class="pa-4 d-flex flex-column gap-2">
+            <MudText Typo="Typo.subtitle2">Filter by: @FilterField.Label</MudText>
+
+            @switch (FilterField.Type)
+            {
+                case FilterFieldType.SingleSelect:
+                    <SingleSelectInput @bind-Value="@_value" Options="@_options" />
+                    break;
+            }
+            
+            <MudButton OnClick="OnApply" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" ClickPropagation="false" FullWidth>Apply</MudButton>
+        </div>
+    </ChildContent>
+</MudMenu>
+
+@code {
+
+    [CascadingParameter]
+    public required FilterToolbar Parent { get; set; }
+    
+    [Parameter]
+    [EditorRequired]
+    public required FilterFieldDto FilterField { get; set; }
+
+    [Parameter]
+    public FilterValue? Value { get; set; }
+    
+    [Parameter]
+    public EventCallback<FilterValue?> ValueChanged { get; set; }
+    
+    [Parameter]
+    public EventCallback OnApplyClicked { get; set; }
+
+    private FilterValue? _value;
+    private readonly ParameterState<FilterValue?> _valueState;
+    
+    private List<FilterOptionDto>? _options;
+    private bool _menuOpen;
+
+    private Color _buttonColor = Color.Default;
+    private string _buttonIcon = Icons.Material.Rounded.AddCircleOutline;
+
+    public FilterToolbarField()
+    {
+        using var registerScope = CreateRegisterScope();
+        _valueState = registerScope.RegisterParameter<FilterValue?>(nameof(Value))
+            .WithParameter(() => Value)
+            .WithEventCallback(() => ValueChanged)
+            .WithChangeHandler(OnValueChange);
+    }
+
+    private void OnValueChange(ParameterChangedEventArgs<FilterValue?> args)
+    {
+        _value = args.Value;
+        if (_value is null)
+        {
+            _buttonColor = Color.Default;
+            _buttonIcon = Icons.Material.Rounded.AddCircleOutline;
+        }
+        else
+        {
+            _buttonColor = Color.Info;
+            _buttonIcon = Icons.Material.Outlined.Cancel;
+        }
+        StateHasChanged();
+    }
+
+    private Task SetValueAsync(FilterValue? value)
+    {
+        _value = value;
+        return _valueState.SetValueAsync(value);
+    }
+
+    private void ResetValueToPrevious()
+    {
+        _value = _valueState.Value;
+    }
+
+    private async Task OnMenuOpenChange(bool open)
+    {
+        if (!open)
+        {
+            ResetValueToPrevious();
+        }
+        
+        if (open && _options is null)
+        {
+            _options = await Parent.GetOptionsAsync(FilterField);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private Task SetMenuOpenAsync(bool open)
+    {
+        if (_menuOpen == open)
+            return Task.CompletedTask;
+        _menuOpen = open;
+        return OnMenuOpenChange(open);
+    }
+
+    private Task OpenMenuAsync() => SetMenuOpenAsync(true);
+    private Task CloseMenuAsync() => SetMenuOpenAsync(false);
+
+    private async Task OnChipIconClick()
+    {
+        if (_value is null)
+        {
+            await OpenMenuAsync();
+        }
+        else
+        {
+            await SetValueAsync(null);
+            await CloseMenuAsync();
+        }
+    }
+
+    private async Task OnApply()
+    {
+        await SetValueAsync(_value);
+        await CloseMenuAsync();
+        await OnApplyClicked.InvokeAsync();
+    }
+    
+}
