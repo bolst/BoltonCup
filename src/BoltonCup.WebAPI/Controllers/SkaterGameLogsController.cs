@@ -12,8 +12,9 @@ public class SkaterGameLogsController(ISkaterGameLogRepository _skaterGameLogs, 
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IPagedList<SkaterGameLogDto>>> GetSkaterGameLogs([FromQuery] GetSkaterGameLogsQuery query)
+    public async Task<ActionResult<IPagedList<SkaterGameLogDto>>> GetSkaterGameLogs([FromQuery] GetSkaterGameLogsRequest request)
     {
+        var query = _mapper.ToQuery(request);
         var logs = await _skaterGameLogs.GetAllAsync(query);
         return Ok(_mapper.ToDtoList(logs));
     }

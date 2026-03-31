@@ -12,8 +12,9 @@ public class InfoGuidesController(IInfoGuideRepository _infoGuides, IInfoGuideMa
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IPagedList<InfoGuideDto>>> GetInfoGuides([FromQuery] GetInfoGuidesQuery query)
+    public async Task<ActionResult<IPagedList<InfoGuideDto>>> GetInfoGuides([FromQuery] GetInfoGuidesRequest request)
     {
+        var query = _mapper.ToQuery(request);
         var guides = await _infoGuides.GetAllAsync(query);
         return Ok(_mapper.ToDtoList(guides));
     }

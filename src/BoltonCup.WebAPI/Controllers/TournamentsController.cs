@@ -14,8 +14,9 @@ public class TournamentsController(ITournamentRepository _tournaments, ITourname
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IPagedList<TournamentDto>>> GetTournaments([FromQuery] GetTournamentsQuery query)
+    public async Task<ActionResult<IPagedList<TournamentDto>>> GetTournaments([FromQuery] GetTournamentsRequest request)
     {
+        var query = _mapper.ToQuery(request);
         var tournaments = await _tournaments.GetAllAsync(query);
         return Ok(_mapper.ToDtoList(tournaments));
     }

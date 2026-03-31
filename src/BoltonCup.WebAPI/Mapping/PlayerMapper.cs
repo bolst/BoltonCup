@@ -4,12 +4,26 @@ namespace BoltonCup.WebAPI.Mapping;
 
 public interface IPlayerMapper
 {
+    GetPlayersQuery ToQuery(GetPlayersRequest request);
     IPagedList<PlayerDto> ToDtoList(IPagedList<Player> players);
     PlayerSingleDto? ToDto(Player? player);
 }
 
 public class PlayerMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMapper) : IPlayerMapper
 {
+    public GetPlayersQuery ToQuery(GetPlayersRequest request)
+    {
+        return new GetPlayersQuery
+        {
+            TournamentId = request.TournamentId,
+            TeamId = request.TeamId,
+            Page = request.Page,
+            Size = request.Size,
+            SortBy = request.SortBy,
+            Descending = request.Descending,
+        };
+    }
+    
     public IPagedList<PlayerDto> ToDtoList(IPagedList<Player> players)
     {
         return players.ProjectTo(player => new PlayerDto
