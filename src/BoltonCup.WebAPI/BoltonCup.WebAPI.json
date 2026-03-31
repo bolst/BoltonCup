@@ -5029,11 +5029,10 @@
       },
       "FilterFieldType": {
         "enum": [
-          0,
-          1
+          "SingleSelect",
+          "MultiSelect"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "FilterOptionDto": {
         "type": "object",
@@ -5074,11 +5073,10 @@
       },
       "FilterOptionsSourceType": {
         "enum": [
-          0,
-          1
+          "Endpoint",
+          "Static"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "FilterSchemaDto": {
         "type": "object",

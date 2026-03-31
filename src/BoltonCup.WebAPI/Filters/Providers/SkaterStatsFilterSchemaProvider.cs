@@ -27,7 +27,7 @@ public sealed class SkaterStatsFilterSchemaProvider(LinkGenerator _links, IHttpC
                 {
                     FieldName = nameof(GetSkaterStatsRequest.Position),
                     Label = "Position",
-                    Type = FilterFieldType.MultiSelect,
+                    Type = FilterFieldType.SingleSelect,
                     Required = false,
                     OptionsSource = new FilterOptionsSourceDto
                     {

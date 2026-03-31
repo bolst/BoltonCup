@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Shared;
@@ -180,7 +181,10 @@ public static class ServiceCollectionExtensions
             .AddMappers()
             .AddExceptionHandlers()
             .AddFilterProviders()
-            .AddControllers();
+            .AddControllers() .AddJsonOptions(options => 
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());    
+            });
         
         return builder.Services;
     }
