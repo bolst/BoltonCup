@@ -138,7 +138,7 @@ else
             return;
         }
 
-        var result = await DialogService.ShowMessageBox(
+        var result = await DialogService.ShowMessageBoxAsync(
             "Hold on...",
             (MarkupString)$"We already have an account linked to <b>{account.Email}</b>!", 
             yesText: "Go to my profile", 

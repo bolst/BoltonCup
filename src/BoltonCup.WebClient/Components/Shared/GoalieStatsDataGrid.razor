@@ -47,7 +47,7 @@
     private MudDataGrid<Sdk.GoalieStatDto> _dataGrid = null!;
     private const string _dataCellStyle = "max-width: 30px";
 
-    private async Task<GridData<Sdk.GoalieStatDto>> ServerReload(GridState<Sdk.GoalieStatDto> state)
+    private async Task<GridData<Sdk.GoalieStatDto>> ServerReload(GridState<Sdk.GoalieStatDto> state, CancellationToken cancellationToken)
     {
         string? sortBy = null;
         bool? descending = null;
@@ -62,8 +62,10 @@
             page: state.Page + 1, 
             size: state.PageSize,
             sortBy: sortBy,
-            descending: descending
+            descending: descending,
+            cancellationToken: cancellationToken
         );
+        
         return new GridData<Sdk.GoalieStatDto> {
             TotalItems = data.Total,
             Items = data.Items,

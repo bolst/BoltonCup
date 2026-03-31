@@ -63,8 +63,10 @@
             page: state.Page + 1, 
             size: state.PageSize,
             sortBy: sortBy,
-            descending: descending
+            descending: descending, 
+            cancellationToken: cancellationToken
         );
+        
         return new GridData<Sdk.SkaterStatDto> {
             TotalItems = data.Total,
             Items = data.Items,
