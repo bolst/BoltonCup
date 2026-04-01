@@ -8,6 +8,7 @@ public class Player : EntityBase
     public int? TeamId { get; set; }
     public string? Position { get; set; }
     public int? JerseyNumber { get; set; }
+    public string? PaymentId { get; set; }
 
     public Account Account { get; set; } = null!;
     public Tournament Tournament { get; set; } = null!;

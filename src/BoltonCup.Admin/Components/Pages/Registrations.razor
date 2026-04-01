@@ -1,0 +1,87 @@
+﻿@page "/"
+@using System.Text.Json
+
+
+<EntityDataGrid
+    T="TournamentRegistration"
+    SearchBy="@(x => x.Account.FirstName + " " + x.Account.LastName)"
+    Includes="@([x => x.Include(p => p.Account).ThenInclude(a => a.Players)])"
+    ReadOnly
+>
+    <Columns>
+        <ForeignColumn Title="Name" Property="x => x.Account" />
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" />
+        <PropertyColumn Title="Current step" Property="x => x.CurrentStep" CellStyle="text-align: right" />
+        <PropertyColumn Title="Data" Property="x => x.Payload" Sortable="false" CellStyle="text-align: center">
+            <CellTemplate>
+                @if (!string.IsNullOrEmpty(context.Item.Payload))
+                {
+                    <MudIconButton OnClick="@(_ => ViewPayload(context.Item))" Icon="@Icons.Material.Rounded.RemoveRedEye" Size="Size.Small" />
+                }
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Complete" Property="x => x.IsComplete" CellStyle="text-align: center">
+            <CellTemplate>
+                @if (context.Item.IsComplete)
+                {
+                    <MudIcon Icon="@Icons.Material.Rounded.Check" Color="Color.Success" Size="Size.Small"/>
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
+                }
+            </CellTemplate>
+        </PropertyColumn>
+        <TemplateColumn Title="Payment ID" Sortable="false">
+            <CellTemplate>
+                @{
+                    var player = context.Item.Account.Players.FirstOrDefault(p => p.TournamentId == context.Item.TournamentId);
+                    if (player is not null)
+                    {
+                        <MudText Typo="Typo.body2">@player.PaymentId</MudText>
+                    }
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Title="Created at" Property="x => x.CreatedAt" Format="g" InitialDirection="SortDirection.Descending" />
+    </Columns>
+</EntityDataGrid>
+
+
+<MudDrawer Open="_drawerOpen" OpenChanged="@OnDrawerOpenChange" Class="pa-4" Anchor="Anchor.End" Variant="DrawerVariant.Temporary" Width="320px">
+    <MudDrawerHeader>
+        <div class="mud-width-full d-flex flex-row justify-end">
+            <MudIconButton OnClick="@(_ => OnDrawerOpenChange(false))" Icon="@Icons.Material.Rounded.Close" />
+        </div>
+    </MudDrawerHeader>
+    <MudTextField Value="@_currentPayload" Variant="Variant.Text" Sizing="InputSizing.Auto" Underline="false" Typo="Typo.body2" FullWidth ReadOnly />
+</MudDrawer>
+
+@code {
+
+    private bool _drawerOpen;
+    private string? _currentPayload;
+
+    private void OnDrawerOpenChange(bool open)
+    {
+        _drawerOpen = open;
+        _currentPayload = null;
+    }
+
+    private async Task ViewPayload(TournamentRegistration registration)
+    {
+        if (string.IsNullOrEmpty(registration.Payload))
+            return;
+        
+        using JsonDocument doc = JsonDocument.Parse(registration.Payload);
+        _currentPayload = JsonSerializer.Serialize(doc, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            IndentSize = 4,
+        });
+
+        _drawerOpen = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

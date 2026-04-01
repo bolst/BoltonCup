@@ -91,6 +91,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     [Parameter]
     public Func<CancellationToken, Task<DbContext>>? DbContextFunc { get; set; }
 
+    [Parameter]
+    public List<Func<IQueryable<T>, IQueryable<T>>> Includes { get; set; } = [];
+
     public Task NotifyItemChangedAsync(T item) 
         => _dataGrid.CommittedItemChanges?.Invoke(item) ?? Task.CompletedTask;
 
@@ -112,21 +115,23 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
                 .Set<T>()
                 .AsNoTracking();
 
-            dbSet = _includeQueries.Aggregate(dbSet,
+            dbSet = _includeQueries.Concat(Includes).Aggregate(dbSet,
                 (current, query) => query(current)
             );
 
             if (SearchBy is not null)
                 dbSet = dbSet.WhereContains(SearchBy, _search);
-            
+
+            var query = new QueryBase
+            {
+                Page = state.Page + 1,
+                Size = state.PageSize,
+                SortBy = sortDefinition?.SortBy,
+                Descending = sortDefinition?.Descending ?? false,
+            };
             var data = await dbSet
-                .ToPagedListAsync(new QueryBase
-                {
-                    Page = state.Page + 1,
-                    Size = state.PageSize,
-                    SortBy = sortDefinition?.SortBy,
-                    Descending = sortDefinition?.Descending ?? false,
-                }, cancellationToken);
+                .ApplySorting(query, null)
+                .ToPagedListAsync(query, cancellationToken);
             
             var items = _changeTracker.NewItems.Concat(data.Items);
             return new GridData<T>
