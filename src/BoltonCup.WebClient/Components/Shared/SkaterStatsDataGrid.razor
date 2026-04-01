@@ -15,7 +15,7 @@
     Striped
     Dense>
     <ToolBarContent>
-        <div class="d-flex flex-row align-center gap-3">
+        <div class="d-flex flex-row align-center gap-3 flex-wrap">
             <FilterToolbarField
                 T="string?" TItem="Sdk.SkaterStatDto" Label="Position"
                 @bind-Value="@_filter.Position" OnApplyClicked="@_dataGrid.ReloadServerData">

@@ -14,7 +14,7 @@
     Striped
     Dense>
     <ToolBarContent>
-        <div class="d-flex flex-row align-center gap-3">
+        <div class="d-flex flex-row align-center gap-3 flex-wrap">
             <FilterToolbarField
                 T="Sdk.TournamentDto?" TItem="Sdk.GoalieStatDto" Label="Tournament"
                 @bind-Value="@_filter.Tournament" OnApplyClicked="@_dataGrid.ReloadServerData"
