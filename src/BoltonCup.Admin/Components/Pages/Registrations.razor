@@ -5,6 +5,7 @@
 <EntityDataGrid
     T="TournamentRegistration"
     SearchBy="@(x => x.Account.FirstName + " " + x.Account.LastName)"
+    Includes="@([x => x.Include(p => p.Account).ThenInclude(a => a.Players)])"
     ReadOnly
 >
     <Columns>
@@ -31,6 +32,17 @@
                 }
             </CellTemplate>
         </PropertyColumn>
+        <TemplateColumn Title="Payment ID">
+            <CellTemplate>
+                @{
+                    var player = context.Item.Account.Players.FirstOrDefault(p => p.TournamentId == context.Item.TournamentId);
+                    if (player is not null)
+                    {
+                        <MudText Typo="Typo.body2">@player.PaymentId</MudText>
+                    }
+                }
+            </CellTemplate>
+        </TemplateColumn>
         <PropertyColumn Title="Created at" Property="x => x.CreatedAt" Format="g" InitialDirection="SortDirection.Descending" />
     </Columns>
 </EntityDataGrid>
