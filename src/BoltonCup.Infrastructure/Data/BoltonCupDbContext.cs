@@ -268,6 +268,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.Position).HasColumnName("position");
             entity.Property(e => e.JerseyNumber).HasColumnName("jersey_number");
+            entity.Property(e => e.PaymentId).HasColumnName("payment_id");
         });
 
         modelBuilder.Entity<SkaterGameLog>(entity =>
