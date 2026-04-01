@@ -5,8 +5,8 @@ namespace BoltonCup.Common.Components;
 
 public abstract class FilterFieldBase<T> 
     : ComponentBaseWithState
-    where T : class
 {
+    
     [CascadingParameter]
     public FilterToolbarContext<T>? ToolbarContext { get; set; }
     
@@ -15,9 +15,12 @@ public abstract class FilterFieldBase<T>
     
     [Parameter]
     public EventCallback<T?> ValueChanged { get; set; }
+    
+    [Parameter]
+    public bool Disabled { get; set; }
 
-    public T? ContextValue
-        => ToolbarContext?.Value ?? Value;
+    protected T? ContextValue
+        => ToolbarContext is not null ? ToolbarContext.Value : Value;
 
     protected EventCallback<T?> ContextValueChanged =>
         ToolbarContext?.ValueChanged ?? ValueChanged;

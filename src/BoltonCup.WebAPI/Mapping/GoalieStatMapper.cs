@@ -38,6 +38,7 @@ public class GoalieStatMapper(IAssetUrlResolver _urlResolver) : IGoalieStatMappe
             TeamId = goalie.TeamId,
             TeamName = goalie.TeamName,
             TeamLogoUrl = _urlResolver.GetFullUrl(goalie.TeamLogoUrl),
+            TeamAbbreviation = goalie.TeamAbbreviation,
             GamesPlayed = goalie.GamesPlayed,
             Goals = goalie.Goals,
             Assists = goalie.Assists,

@@ -4,9 +4,9 @@
 @typeparam TItem
 @inherits ComponentBaseWithState
 
-<MudMenu Open="_menuOpen" OpenChanged="@SetMenuOpenAsync">
+<MudMenu Open="_menuOpen" OpenChanged="@SetMenuOpenAsync" RelativeWidth="DropdownWidth.Adaptive" Disabled="Disabled">
     <ActivatorContent>
-        <MudButton Variant="Variant.Outlined" OnClick="@OpenMenuAsync" Color="@_buttonColor" Size="Size.Small">
+        <MudButton Variant="Variant.Outlined" OnClick="@OpenMenuAsync" Color="@_buttonColor" Size="Size.Small" Disabled="Disabled">
             <div class="d-flex flex-row align-center gap-1 mx-n1">
                 <MudIconButton Icon="@_buttonIcon"
                                OnClick="@OnChipIconClick"
@@ -60,6 +60,9 @@
     
     [Parameter]
     public EventCallback OnApplyClicked { get; set; }
+    
+    [Parameter]
+    public bool Disabled { get; set; }
 
     private FilterToolbarContext<T> _context = null!;
 
@@ -84,6 +87,9 @@
             .WithParameter(() => Value)
             .WithEventCallback(() => ValueChanged)
             .WithChangeHandler(OnValueChange);
+        registerScope.RegisterParameter<bool>(nameof(Disabled))
+            .WithParameter(() => Disabled)
+            .WithChangeHandler(OnDisabledChange);
     }
     
     private Task OnPendingValueChangedAsync(T? value)
@@ -100,10 +106,21 @@
         return UpdateButtonState();
     }
 
+    private Task OnDisabledChange(ParameterChangedEventArgs<bool> args)
+    {
+        if (args.Value)
+        {
+            _pendingValue = default;
+            return OnApply();
+        }
+
+        return Task.CompletedTask;
+    }
+
     private Task UpdateButtonState()
     {
         _buttonColor = _pendingValue is null 
-            ? Color.Default 
+            ? Color.Surface 
             : Color.Info;
         _buttonIcon = _pendingValue is null
             ? Icons.Material.Rounded.AddCircleOutline
@@ -147,7 +164,9 @@
         _context = new FilterToolbarContext<T>(
             Label,
             _pendingValue,
-            EventCallback.Factory.Create<T?>(this, OnPendingValueChangedAsync));
+            EventCallback.Factory.Create<T?>(this, OnPendingValueChangedAsync),
+            Disabled
+        );
     }
 
     private async Task OnApply()

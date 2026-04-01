@@ -40,6 +40,7 @@ public class SkaterStatMapper(IAssetUrlResolver _urlResolver) : ISkaterStatMappe
             TeamId = skater.TeamId,
             TeamName = skater.TeamName,
             TeamLogoUrl = _urlResolver.GetFullUrl(skater.TeamLogoUrl),
+            TeamAbbreviation = skater.TeamAbbreviation,
             GamesPlayed = skater.GamesPlayed,
             Goals = skater.Goals,
             Assists = skater.Assists,

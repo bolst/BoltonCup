@@ -5539,6 +5539,10 @@
             "type": "string",
             "nullable": true
           },
+          "teamAbbreviation": {
+            "type": "string",
+            "nullable": true
+          },
           "gamesPlayed": {
             "type": "integer",
             "format": "int32"
@@ -6327,6 +6331,10 @@
             "nullable": true
           },
           "teamLogoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamAbbreviation": {
             "type": "string",
             "nullable": true
           },
