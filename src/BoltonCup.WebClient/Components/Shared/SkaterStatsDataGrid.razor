@@ -103,7 +103,10 @@
         if (teams?.Count is null or 0)
             return null;
 
-        return string.Join(", ", teams.Select(x => x.NameShort));
+        if (teams.Count <= 3)
+            return string.Join(", ", teams.Select(x => x.NameShort));
+
+        return $"{teams.First().NameShort} and {teams.Count - 1} more";
     }
 
     private class SkaterStatsFilterModel
