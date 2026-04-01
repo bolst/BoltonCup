@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
                 options.SignIn.RequireConfirmedAccount = true;
             })
             .AddRoles<IdentityRole>()
+            .AddSignInManager()
             .AddEntityFrameworkStores<AuthDbContext>()
             .AddDefaultTokenProviders()
             .AddClaimsPrincipalFactory<BoltonCupClaimsPrincipalFactory>();
