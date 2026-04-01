@@ -24,7 +24,7 @@
             
             <FilterToolbarField
                 T="Sdk.TournamentDto?" TItem="Sdk.SkaterStatDto" Label="Tournament"
-                @bind-Value="@_filter.Tournament" OnApplyClicked="@_dataGrid.ReloadServerData"
+                Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="@_dataGrid.ReloadServerData"
                 ToStringFunc="x => x?.Name">
                 <TournamentFilter/>
             </FilterToolbarField>
@@ -96,6 +96,13 @@
             TotalItems = data.Total,
             Items = data.Items,
         };
+    }
+    
+    private Task OnFilterTournamentChange(Sdk.TournamentDto? tournament)
+    {
+        _filter.Tournament = tournament;
+        _filter.Teams = null;
+        return _dataGrid.ReloadServerData();
     }
 
     private string? TeamListToStringFunc(IReadOnlyCollection<Sdk.TeamDto>? teams)

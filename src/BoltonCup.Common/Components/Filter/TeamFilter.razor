@@ -1,49 +1,85 @@
 @namespace BoltonCup.Common.Components
-@using MudBlazor.State
 @inherits FilterFieldBase<IReadOnlyCollection<Sdk.TeamDto?>>
 @inject IBoltonCupApi BoltonCupApi
 
-<MudList
-    T="Sdk.TeamDto?"
-    SelectedValues="@ContextValue"
-    SelectedValuesChanged="@ContextValueChanged"
-    Disabled="@Disabled"
-    SelectionMode="SelectionMode.MultiSelection"
-    CheckBoxColor="Color.Primary"
-    Dense>
-    @foreach (var option in _options ?? [])
-    {
-        <MudListItem Value="@option">@option.Name</MudListItem>
-    }
-</MudList>
+@if (_options is not null)
+{
+    <MudList
+        T="Sdk.TeamDto?"
+        SelectedValues="@ContextValue"
+        SelectedValuesChanged="@ContextValueChanged"
+        Disabled="@Disabled"
+        Comparer="_comparer"
+        SelectionMode="SelectionMode.MultiSelection"
+        CheckBoxColor="Color.Primary"
+        Dense>
+        @foreach (var option in _options)
+        {
+            <MudListItem Value="@option">@option.Name</MudListItem>
+        }
+    </MudList>
+}
+else
+{
+    <div class="d-flex flex-column gap-1">
+        @for (var i = 0; i < 6; i++)
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="30px" Width="160px"/>
+        }
+    </div>
+}
 
 @code {
     
     [Parameter]
     public int? TournamentId { get; set; }
 
-    private ICollection<Sdk.TeamDto>? _options;
+    private int? _tournamentId;
 
-    public TeamFilter()
-    {
-        using var registerScope = CreateRegisterScope();
-        registerScope.RegisterParameter<int?>(nameof(TournamentId))
-            .WithParameter(() => TournamentId)
-            .WithChangeHandler(OnTournamentIdChange);
-    }
+    private ICollection<Sdk.TeamDto>? _options;
+    private readonly TeamComparer _comparer = new();
+
+    private static readonly Dictionary<int, ICollection<Sdk.TeamDto>> _teamCache = new();
 
     protected override async Task OnParametersSetAsync()
     {
-        if (_options is null && TournamentId.HasValue)
+        if (_tournamentId == TournamentId)
+            return;
+        _tournamentId = TournamentId;
+
+        if (TournamentId.HasValue)
         {
-            var result = await BoltonCupApi.GetTeamsAsync();
-            _options = result.Items.Where(x => x.Tournament.Id == TournamentId.Value).ToList();
+            if (_teamCache.TryGetValue(TournamentId.Value, out var cachedTeams))
+            {
+                _options = cachedTeams;
+            }
+            else
+            {
+                var result = await BoltonCupApi.GetTeamsAsync();
+                _options = result.Items.Where(x => x.Tournament.Id == TournamentId.Value).ToList();
+                _teamCache[TournamentId.Value] = _options;
+            }
+        }
+        else
+        {
+            _options = null;
         }
     }
     
-    private Task OnTournamentIdChange(ParameterChangedEventArgs<int?> args)
+    private class TeamComparer : IEqualityComparer<Sdk.TeamDto>
     {
-        Console.WriteLine($"tournament id changed: {args.Value}");
-        return ContextValueChanged.InvokeAsync(null);
+        public bool Equals(Sdk.TeamDto? x, Sdk.TeamDto? y)
+        {
+            if (x is null && y is null)
+                return true;
+            if (x is null || y is null)
+                return false;
+            return x.Id == y.Id;
+        }
+
+        public int GetHashCode(Sdk.TeamDto obj)
+        {
+            return obj.Id.GetHashCode();
+        }
     }
 }
