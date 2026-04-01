@@ -35,9 +35,4 @@
       <ProjectReference Include="..\BoltonCup.Shared\BoltonCup.Shared.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <UpToDateCheckInput Remove="Components\Filter\Fields\EndpointSelect.razor" />
-      <UpToDateCheckInput Remove="Components\Filter\Fields\StaticSelect.razor" />
-    </ItemGroup>
-
 </Project>

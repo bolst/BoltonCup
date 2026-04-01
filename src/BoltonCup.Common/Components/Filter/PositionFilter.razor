@@ -1,10 +1,11 @@
 @namespace BoltonCup.Common.Components
-@using MudBlazor.State
 @using Position = BoltonCup.Core.Values.Position
-@inherits ComponentBaseWithState
+@inherits FilterFieldBase<string>
 
 <MudSelect
-    @bind-Value="@_value"
+    T="string?"
+    Value="@ContextValue"
+    ValueChanged="@ContextValueChanged"
     Label="Position"
     Typo="Typo.subtitle2"
     Variant="Variant.Outlined"
@@ -19,35 +20,6 @@
 
 @code {
 
-    [Parameter]
-    public string? Value { get; set; }
-    
-    [Parameter]
-    public EventCallback<string?> ValueChanged { get; set; }
-
     private readonly IReadOnlyList<string> Options = [Position.Forward, Position.Defense];
 
-    private string? _value;
-    private readonly ParameterState<string?> _valueState;
-
-    public PositionFilter()
-    {
-        using var registerScope = CreateRegisterScope();
-        _valueState = registerScope.RegisterParameter<string?>(nameof(Value))
-            .WithParameter(() => Value)
-            .WithEventCallback(() => ValueChanged)
-            .WithChangeHandler(OnValueChange);
-    }
-
-    private void OnValueChange(ParameterChangedEventArgs<string?> args)
-    {
-        _value = args.Value;
-    }
-
-    private Task SetValueAsync(string? value)
-    {
-        _value = value;
-        return _valueState.SetValueAsync(value);
-    }
-    
 }

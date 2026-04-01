@@ -15,10 +15,10 @@
     Striped
     Dense>
     <ToolBarContent>
-        @if (_schema is not null)
-        {
-            <FilterToolbar Schema="@_schema"/>
-        }
+        <FilterToolbarField 
+            T="string?" TItem="Sdk.SkaterStatDto" Label="Position" @bind-Value="@_filter.Position" OnApplyClicked="@_dataGrid.ReloadServerData">
+            <PositionFilter />
+        </FilterToolbarField>
     </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.FullName" Title="Player" Sortable="false" StickyLeft>
@@ -51,12 +51,7 @@
     private MudDataGrid<Sdk.SkaterStatDto> _dataGrid = null!;
     private const string _dataCellStyle = "max-width: 30px";
 
-    private Sdk.FilterSchemaDto? _schema;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _schema = await BoltonCupApi.GetSkaterStatFilterSchemaAsync();
-    }
+    private readonly SkaterStatsFilterModel _filter = new();
 
     private async Task<GridData<Sdk.SkaterStatDto>> ServerReload(GridState<Sdk.SkaterStatDto> state, CancellationToken cancellationToken)
     {
@@ -70,6 +65,7 @@
         }
         
         var data = await BoltonCupApi.GetSkaterStatsAsync(
+            position: _filter.Position,
             page: state.Page + 1, 
             size: state.PageSize,
             sortBy: sortBy,
@@ -81,6 +77,11 @@
             TotalItems = data.Total,
             Items = data.Items,
         };
+    }
+
+    private class SkaterStatsFilterModel
+    {
+        public string? Position { get; set; }
     }
 
 }
