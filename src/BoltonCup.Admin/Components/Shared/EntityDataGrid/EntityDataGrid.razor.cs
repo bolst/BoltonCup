@@ -91,6 +91,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     [Parameter]
     public Func<CancellationToken, Task<DbContext>>? DbContextFunc { get; set; }
 
+    [Parameter]
+    public List<Func<IQueryable<T>, IQueryable<T>>> Includes { get; set; } = [];
+
     public Task NotifyItemChangedAsync(T item) 
         => _dataGrid.CommittedItemChanges?.Invoke(item) ?? Task.CompletedTask;
 
@@ -112,7 +115,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
                 .Set<T>()
                 .AsNoTracking();
 
-            dbSet = _includeQueries.Aggregate(dbSet,
+            dbSet = _includeQueries.Concat(Includes).Aggregate(dbSet,
                 (current, query) => query(current)
             );
 
