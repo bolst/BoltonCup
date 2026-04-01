@@ -1,0 +1,76 @@
+@namespace BoltonCup.Common.Components
+@inherits FilterFieldBase<Sdk.TeamDto?>
+@inject IBoltonCupApi BoltonCupApi
+
+<MudSelect
+    T="Sdk.TeamDto?"
+    Value="@ContextValue"
+    ValueChanged="@ContextValueChanged"
+    Disabled="@Disabled"
+    Comparer="@_comparer"
+    Label="Team"
+    Typo="Typo.subtitle2"
+    Variant="Variant.Outlined"
+    Margin="Margin.Dense"
+    FitContent
+    Dense>
+    @foreach (var option in _options ?? [])
+    {
+        <MudSelectItem Value="@option">@option.Name</MudSelectItem>
+    }
+</MudSelect>
+
+@code {
+    
+    [Parameter]
+    public int? TournamentId { get; set; }
+
+    private int? _tournamentId;
+
+    private ICollection<Sdk.TeamDto>? _options;
+    private readonly TeamComparer _comparer = new();
+
+    private static readonly Dictionary<int, ICollection<Sdk.TeamDto>> _teamCache = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_tournamentId == TournamentId)
+            return;
+        _tournamentId = TournamentId;
+
+        if (TournamentId.HasValue)
+        {
+            if (_teamCache.TryGetValue(TournamentId.Value, out var cachedTeams))
+            {
+                _options = cachedTeams;
+            }
+            else
+            {
+                var result = await BoltonCupApi.GetTeamsAsync();
+                _options = result.Items.Where(x => x.Tournament.Id == TournamentId.Value).ToList();
+                _teamCache[TournamentId.Value] = _options;
+            }
+        }
+        else
+        {
+            _options = null;
+        }
+    }
+    
+    private class TeamComparer : IEqualityComparer<Sdk.TeamDto>
+    {
+        public bool Equals(Sdk.TeamDto? x, Sdk.TeamDto? y)
+        {
+            if (x is null && y is null)
+                return true;
+            if (x is null || y is null)
+                return false;
+            return x.Id == y.Id;
+        }
+
+        public int GetHashCode(Sdk.TeamDto obj)
+        {
+            return obj.Id.GetHashCode();
+        }
+    }
+}
