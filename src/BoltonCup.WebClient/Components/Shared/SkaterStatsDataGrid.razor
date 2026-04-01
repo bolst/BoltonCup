@@ -18,13 +18,13 @@
     <ToolBarContent>
         <div class="d-flex flex-row align-center gap-3 flex-wrap">
             <FilterToolbarField
-                T="string?" TItem="Sdk.SkaterStatDto" Label="Position"
+                T="string?" Label="Position"
                 @bind-Value="@_filter.Position" OnApplyClicked="@_dataGrid.ReloadServerData">
                 <PositionFilter/>
             </FilterToolbarField>
             
             <FilterToolbarField
-                T="Sdk.TournamentDto?" TItem="Sdk.SkaterStatDto" Label="Tournament"
+                T="Sdk.TournamentDto?" Label="Tournament"
                 Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="@_dataGrid.ReloadServerData"
                 ToStringFunc="x => x?.Name">
                 <TournamentFilter/>
