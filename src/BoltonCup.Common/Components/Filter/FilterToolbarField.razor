@@ -1,7 +1,6 @@
 @namespace BoltonCup.Common.Components
 @using MudBlazor.State
 @typeparam T
-@typeparam TItem
 @inherits ComponentBaseWithState
 
 <MudMenu Open="_menuOpen" OpenChanged="@SetMenuOpenAsync" RelativeWidth="DropdownWidth.Adaptive" Disabled="Disabled">
@@ -40,9 +39,6 @@
 
 @code {
     
-    [CascadingParameter]
-    public MudDataGrid<TItem>? DataGrid { get; set; }
-
     [Parameter]
     public RenderFragment ChildContent { get; set; } = null!;
 

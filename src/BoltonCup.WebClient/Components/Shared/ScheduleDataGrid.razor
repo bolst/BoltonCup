@@ -9,6 +9,23 @@
     RowsPerPage="25"
     Elevation="0"
     Striped>
+    <ToolBarContent>
+        <div class="d-flex flex-row align-center gap-3 flex-wrap">
+            <FilterToolbarField
+                T="Sdk.TournamentDto?" Label="Tournament"
+                Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="@_dataGrid.ReloadServerData"
+                ToStringFunc="x => x?.Name">
+                <TournamentFilter/>
+            </FilterToolbarField>
+
+            <FilterToolbarField
+                T="Sdk.TeamDto?" Label="Team"
+                @bind-Value="@_filter.Team" OnApplyClicked="@_dataGrid.ReloadServerData"
+                ToStringFunc="x => x?.Name" Disabled="@(_filter.Tournament?.Id is null)">
+                <TeamFilter TournamentId="@_filter.Tournament?.Id"/>
+            </FilterToolbarField>
+        </div>
+    </ToolBarContent>
     <HeaderContent>
         <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
             <MudTh Class="align-center">Matchup</MudTh>
@@ -49,13 +66,15 @@
         </MudHidden>
     </RowTemplate>
     <PagerContent>
-        <MudTablePager HideRowsPerPage />
+        <MudTablePager HideRowsPerPage/>
     </PagerContent>
 </MudTable>
 
 @code {
 
     private MudTable<Sdk.GameDto> _dataGrid = null!;
+
+    private readonly ScheduleFilterModel _filter = new();
 
     private TableGroupDefinition<Sdk.GameDto> _groupDefinition = new()
     {
@@ -80,6 +99,8 @@
     private async Task<TableData<Sdk.GameDto>> ServerReload(TableState state, CancellationToken cancellationToken)
     {
         var data = await BoltonCupApi.GetGamesAsync(
+            tournamentId: _filter.Tournament?.Id,
+            teamId: _filter.Team?.Id,
             page: state.Page + 1,
             size: state.PageSize,
             cancellationToken: cancellationToken
@@ -93,6 +114,12 @@
         };
     }
 
+    private Task OnFilterTournamentChange(Sdk.TournamentDto? tournament)
+    {
+        _filter.Tournament = tournament;
+        _filter.Team = null;
+        return _dataGrid.ReloadServerData();
+    }
 
     private RenderFragment MatchupCell(Sdk.GameDto context)
         => @<div class="mud-width-full d-flex flex-row align-center justify-center gap-4">
@@ -119,5 +146,11 @@
         builder.AddContent(5, $"{teams.loser.Abbreviation} {teams.loser.Goals}");
         builder.CloseElement();
     };
+    
+    private class ScheduleFilterModel
+    {
+        public Sdk.TournamentDto? Tournament { get; set; }
+        public Sdk.TeamDto? Team { get; set; }
+    }
 
 }
