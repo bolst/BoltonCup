@@ -3,24 +3,19 @@
 @inherits FilterFieldBase<IReadOnlyCollection<Sdk.TeamDto?>>
 @inject IBoltonCupApi BoltonCupApi
 
-<MudSelect
+<MudList
     T="Sdk.TeamDto?"
     SelectedValues="@ContextValue"
     SelectedValuesChanged="@ContextValueChanged"
-    OpenChanged="OnOpenChange"
     Disabled="@Disabled"
-    ToStringFunc="x => x?.NameShort"
-    Label="Team"
-    Typo="Typo.subtitle2"
-    Variant="Variant.Outlined"
-    Margin="Margin.Dense"
-    MultiSelection
+    SelectionMode="SelectionMode.MultiSelection"
+    CheckBoxColor="Color.Primary"
     Dense>
     @foreach (var option in _options ?? [])
     {
-        <MudSelectItem Value="@option">@option.Name</MudSelectItem>
+        <MudListItem Value="@option">@option.Name</MudListItem>
     }
-</MudSelect>
+</MudList>
 
 @code {
     
@@ -37,18 +32,18 @@
             .WithChangeHandler(OnTournamentIdChange);
     }
 
-    private Task OnTournamentIdChange(ParameterChangedEventArgs<int?> args)
+    protected override async Task OnParametersSetAsync()
     {
-        Console.WriteLine($"tournament id changed: {args.Value}");
-        return ContextValueChanged.InvokeAsync(null);
-    }
-
-    private async Task OnOpenChange(bool open)
-    {
-        if (open && _options is null && TournamentId.HasValue)
+        if (_options is null && TournamentId.HasValue)
         {
             var result = await BoltonCupApi.GetTeamsAsync();
             _options = result.Items.Where(x => x.Tournament.Id == TournamentId.Value).ToList();
         }
+    }
+    
+    private Task OnTournamentIdChange(ParameterChangedEventArgs<int?> args)
+    {
+        Console.WriteLine($"tournament id changed: {args.Value}");
+        return ContextValueChanged.InvokeAsync(null);
     }
 }
