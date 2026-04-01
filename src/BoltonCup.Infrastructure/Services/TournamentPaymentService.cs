@@ -125,6 +125,7 @@ public class TournamentPaymentService(
                 TournamentId = int.Parse(tournamentId),
                 AccountId = int.Parse(accountId),
                 Position = position,
+                PaymentId = paymentIntent.Id
             });
         }
         else
