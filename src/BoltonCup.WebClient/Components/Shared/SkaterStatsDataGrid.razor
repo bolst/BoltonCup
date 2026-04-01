@@ -34,7 +34,7 @@
                 T="IReadOnlyCollection<Sdk.TeamDto>?" TItem="Sdk.SkaterStatDto" Label="Team"
                 @bind-Value="@_filter.Teams" OnApplyClicked="@_dataGrid.ReloadServerData"
                 ToStringFunc="@TeamListToStringFunc" Disabled="@(_filter.Tournament?.Id is null)">
-                <TeamFilter TournamentId="@_filter.Tournament?.Id" />
+                <TeamsFilter TournamentId="@_filter.Tournament?.Id" />
             </FilterToolbarField>
         </div>
     </ToolBarContent>
