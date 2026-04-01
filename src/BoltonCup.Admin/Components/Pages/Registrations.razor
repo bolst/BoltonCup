@@ -10,8 +10,17 @@
 >
     <Columns>
         <ForeignColumn Title="Name" Property="x => x.Account" />
-        <ForeignColumn Title="Name" Property="x => x.Tournament" />
-        <PropertyColumn Title="Complete" Property="x => x.IsComplete">
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" />
+        <PropertyColumn Title="Current step" Property="x => x.CurrentStep" CellStyle="text-align: right" />
+        <PropertyColumn Title="Data" Property="x => x.Payload" Sortable="false" CellStyle="text-align: center">
+            <CellTemplate>
+                @if (!string.IsNullOrEmpty(context.Item.Payload))
+                {
+                    <MudIconButton OnClick="@(_ => ViewPayload(context.Item))" Icon="@Icons.Material.Rounded.RemoveRedEye" Size="Size.Small" />
+                }
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Complete" Property="x => x.IsComplete" CellStyle="text-align: center">
             <CellTemplate>
                 @if (context.Item.IsComplete)
                 {
@@ -23,16 +32,7 @@
                 }
             </CellTemplate>
         </PropertyColumn>
-        <PropertyColumn Title="Current step" Property="x => x.CurrentStep"/>
-        <PropertyColumn Title="Data" Property="x => x.Payload">
-            <CellTemplate>
-                @if (!string.IsNullOrEmpty(context.Item.Payload))
-                {
-                    <MudIconButton OnClick="@(_ => ViewPayload(context.Item))" Icon="@Icons.Material.Rounded.RemoveRedEye" Size="Size.Small" />
-                }
-            </CellTemplate>
-        </PropertyColumn>
-        <TemplateColumn Title="Payment ID">
+        <TemplateColumn Title="Payment ID" Sortable="false">
             <CellTemplate>
                 @{
                     var player = context.Item.Account.Players.FirstOrDefault(p => p.TournamentId == context.Item.TournamentId);
