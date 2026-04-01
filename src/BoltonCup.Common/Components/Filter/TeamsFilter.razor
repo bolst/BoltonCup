@@ -1,24 +1,33 @@
 @namespace BoltonCup.Common.Components
-@inherits FilterFieldBase<Sdk.TeamDto?>
+@inherits FilterFieldBase<IReadOnlyCollection<Sdk.TeamDto?>>
 @inject IBoltonCupApi BoltonCupApi
 
-<MudSelect
-    T="Sdk.TeamDto?"
-    Value="@ContextValue"
-    ValueChanged="@ContextValueChanged"
-    Disabled="@Disabled"
-    Comparer="@_comparer"
-    Label="Team"
-    Typo="Typo.subtitle2"
-    Variant="Variant.Outlined"
-    Margin="Margin.Dense"
-    FitContent
-    Dense>
-    @foreach (var option in _options ?? [])
-    {
-        <MudSelectItem Value="@option">@option.Name</MudSelectItem>
-    }
-</MudSelect>
+@if (_options is not null)
+{
+    <MudList
+        T="Sdk.TeamDto?"
+        SelectedValues="@ContextValue"
+        SelectedValuesChanged="@ContextValueChanged"
+        Disabled="@Disabled"
+        Comparer="_comparer"
+        SelectionMode="SelectionMode.MultiSelection"
+        CheckBoxColor="Color.Primary"
+        Dense>
+        @foreach (var option in _options)
+        {
+            <MudListItem Value="@option">@option.Name</MudListItem>
+        }
+    </MudList>
+}
+else
+{
+    <div class="d-flex flex-column gap-1">
+        @for (var i = 0; i < 6; i++)
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="30px" Width="160px"/>
+        }
+    </div>
+}
 
 @code {
     
