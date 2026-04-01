@@ -13,8 +13,9 @@ public class TeamsController(ITeamRepository _teams, ITeamService _teamService, 
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IPagedList<TeamDto>>> GetTeams([FromQuery] GetTeamsQuery query)
+    public async Task<ActionResult<IPagedList<TeamDto>>> GetTeams([FromQuery] GetTeamsRequest request)
     {
+        var query = _teamMapper.ToQuery(request);
         var teams = await _teams.GetAllAsync(query);
         return Ok(_teamMapper.ToDtoList(teams));
     }

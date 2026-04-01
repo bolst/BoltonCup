@@ -12,8 +12,9 @@ public class GamesController(IGameRepository _games, IGameMapper _gameMapper) : 
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IPagedList<GameDto>>> GetGames([FromQuery] GetGamesQuery query)
+    public async Task<ActionResult<IPagedList<GameDto>>> GetGames([FromQuery] GetGamesRequest request)
     {
+        var query = _gameMapper.ToQuery(request);
         var games = await _games.GetAllAsync(query);
         return Ok(_gameMapper.ToDtoList(games));
     }

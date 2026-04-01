@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace BoltonCup.WebAPI.Filters;
+namespace BoltonCup.WebAPI.Swagger;
 
 public class SecurityRequirementsOperationFilter : IOperationFilter
 {

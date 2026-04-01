@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Shared;
@@ -162,6 +163,12 @@ public static class ServiceCollectionExtensions
             .AddExceptionHandler<BoltonCupExceptionHandler>()
             .AddExceptionHandler<UnhandledExceptionHandler>();
     }
+
+    public static IServiceCollection AddFilterProviders(this IServiceCollection services)
+    {
+        return services
+            .AddTransient<SkaterStatsFilterSchemaProvider>();
+    }
     
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
     {
@@ -173,7 +180,11 @@ public static class ServiceCollectionExtensions
             .AddRouting(options => options.LowercaseUrls = true)
             .AddMappers()
             .AddExceptionHandlers()
-            .AddControllers();
+            .AddFilterProviders()
+            .AddControllers() .AddJsonOptions(options => 
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());    
+            });
         
         return builder.Services;
     }

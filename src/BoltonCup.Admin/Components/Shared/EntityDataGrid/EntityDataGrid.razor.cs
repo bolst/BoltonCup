@@ -91,7 +91,8 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     [Parameter]
     public Func<CancellationToken, Task<DbContext>>? DbContextFunc { get; set; }
 
-    public Task NotifyItemChangedAsync(T item) => _dataGrid.CommittedItemChanges.InvokeAsync(item);
+    public Task NotifyItemChangedAsync(T item) 
+        => _dataGrid.CommittedItemChanges?.Invoke(item) ?? Task.CompletedTask;
 
     private async Task<DbContext> CreateDbContext(CancellationToken cancellationToken = default)
     {
@@ -100,13 +101,8 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         return await DbContextFactory.CreateDbContextAsync(cancellationToken);
     }
 
-    private async Task<GridData<T>> ServerFuncWrapper(GridState<T> state)
+    private async Task<GridData<T>> ServerFuncWrapper(GridState<T> state, CancellationToken cancellationToken)
     { 
-        await _cts.CancelAsync();
-        _cts.Dispose();
-        _cts = new CancellationTokenSource();
-        var cancellationToken = _cts.Token;
-        
         try
         {
             var sortDefinition = state.SortDefinitions.FirstOrDefault();
@@ -167,9 +163,10 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         await _searchState.SetValueAsync(search);
     }
     
-    private void OnItemEdited(T item)
+    private Task<DataGridEditFormAction> OnItemEdited(T item)
     {
         _changeTracker.TrackEdit(item);
+        return Task.FromResult(DataGridEditFormAction.Close);
     }
     
     public async Task SaveChangesAsync()

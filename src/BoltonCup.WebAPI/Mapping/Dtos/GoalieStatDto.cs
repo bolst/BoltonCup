@@ -13,6 +13,7 @@ public record GoalieStatDto
     public int? TeamId { get; init; }
     public string? TeamName { get; init; }
     public string? TeamLogoUrl { get; init; }
+    public string? TeamAbbreviation { get; init; }
     public required int GamesPlayed { get; init; }
     public required int Goals { get; init; }
     public required int Assists { get; init; }

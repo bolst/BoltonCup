@@ -1,8 +1,6 @@
-using BoltonCup.Core.Queries.Base;
+namespace BoltonCup.WebAPI.Mapping;
 
-namespace BoltonCup.Core;
-
-public sealed record GetSkaterStatsQuery : QueryBase
+public record GetSkaterStatsRequest : RequestBase
 {
     public int? TournamentId { get; set; }
     public string? Position { get; set; }

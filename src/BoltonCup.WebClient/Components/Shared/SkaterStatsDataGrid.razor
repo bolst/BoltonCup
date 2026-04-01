@@ -15,7 +15,27 @@
     Striped
     Dense>
     <ToolBarContent>
-        <MudIconButton Icon="@Icons.Material.Rounded.FilterAlt" Variant="Variant.Outlined" />
+        <div class="d-flex flex-row align-center gap-3">
+            <FilterToolbarField
+                T="string?" TItem="Sdk.SkaterStatDto" Label="Position"
+                @bind-Value="@_filter.Position" OnApplyClicked="@_dataGrid.ReloadServerData">
+                <PositionFilter/>
+            </FilterToolbarField>
+            
+            <FilterToolbarField
+                T="Sdk.TournamentDto?" TItem="Sdk.SkaterStatDto" Label="Tournament"
+                @bind-Value="@_filter.Tournament" OnApplyClicked="@_dataGrid.ReloadServerData"
+                ToStringFunc="x => x?.Name">
+                <TournamentFilter/>
+            </FilterToolbarField>
+            
+            <FilterToolbarField
+                T="IReadOnlyCollection<Sdk.TeamDto>?" TItem="Sdk.SkaterStatDto" Label="Team"
+                @bind-Value="@_filter.Teams" OnApplyClicked="@_dataGrid.ReloadServerData"
+                ToStringFunc="@TeamListToStringFunc" Disabled="@(_filter.Tournament?.Id is null)">
+                <TeamFilter TournamentId="@_filter.Tournament?.Id" />
+            </FilterToolbarField>
+        </div>
     </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.FullName" Title="Player" Sortable="false" StickyLeft>
@@ -23,14 +43,14 @@
                 <PlayerLink Label="@context.Item.FullName" PlayerId="context.Item.PlayerId" />
             </CellTemplate>
         </PropertyColumn>
-        @* <PropertyColumn Property="x => x.Team.Name" Title="Team"> *@
-        @*     <CellTemplate> *@
-        @*         <div class="d-flex flex-row align-center justify-space-evenly"> *@
-        @*             <MudText Typo="Typo.body2">@context.Item.Team.Abbreviation</MudText> *@
-        @*             <MudImage Src="@context.Item.Team.LogoUrl" Height="24" Alt="@context.Item.Team.Abbreviation"/> *@
-        @*         </div> *@
-        @*     </CellTemplate> *@
-        @* </PropertyColumn> *@
+        <PropertyColumn Property="x => x.TeamName" Title="Team">
+            <CellTemplate>
+                <div class="d-flex flex-row align-center justify-space-evenly">
+                    <MudText Typo="Typo.body2">@context.Item.TeamAbbreviation</MudText>
+                    <MudImage Src="@context.Item.TeamLogoUrl" Height="24" Alt="@context.Item.TeamName"/>
+                </div>
+            </CellTemplate>
+        </PropertyColumn>
         <PropertyColumn Property="x => x.Position" Title="Position"/>
         <PropertyColumn Property="x => x.GamesPlayed" Title="GP" sty CellStyle="@_dataCellStyle"/>
         <PropertyColumn Property="x => x.Goals" Title="G" CellStyle="@_dataCellStyle"/>
@@ -48,7 +68,9 @@
     private MudDataGrid<Sdk.SkaterStatDto> _dataGrid = null!;
     private const string _dataCellStyle = "max-width: 30px";
 
-    private async Task<GridData<Sdk.SkaterStatDto>> ServerReload(GridState<Sdk.SkaterStatDto> state)
+    private readonly SkaterStatsFilterModel _filter = new();
+
+    private async Task<GridData<Sdk.SkaterStatDto>> ServerReload(GridState<Sdk.SkaterStatDto> state, CancellationToken cancellationToken)
     {
         string? sortBy = null;
         bool? descending = null;
@@ -58,17 +80,37 @@
             sortBy = sortDefinition.SortBy;
             descending = sortDefinition.Descending;
         }
-        
+
         var data = await BoltonCupApi.GetSkaterStatsAsync(
+            position: _filter.Position,
+            tournamentId: _filter.Tournament?.Id,
+            teamIds: _filter.Teams?.Select(x => x.Id).ToList(),
             page: state.Page + 1, 
             size: state.PageSize,
             sortBy: sortBy,
-            descending: descending
+            descending: descending, 
+            cancellationToken: cancellationToken
         );
+        
         return new GridData<Sdk.SkaterStatDto> {
             TotalItems = data.Total,
             Items = data.Items,
         };
+    }
+
+    private string? TeamListToStringFunc(IReadOnlyCollection<Sdk.TeamDto>? teams)
+    {
+        if (teams?.Count is null or 0)
+            return null;
+
+        return string.Join(", ", teams.Select(x => x.NameShort));
+    }
+
+    private class SkaterStatsFilterModel
+    {
+        public string? Position { get; set; }
+        public Sdk.TournamentDto? Tournament { get; set; }
+        public IReadOnlyCollection<Sdk.TeamDto>? Teams { get; set; }
     }
 
 }

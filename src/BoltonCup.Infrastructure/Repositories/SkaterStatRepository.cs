@@ -14,7 +14,7 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
         return await _context.SkaterStats
             .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
-            .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
+            .ConditionalWhere(p => query.TeamIds!.Contains(p.TeamId), query.TeamIds?.Count > 0)
             .ConditionalWhere(p => p.Position == query.Position, !string.IsNullOrEmpty(query.Position))
             .OrderBy(x => x.AccountId)
             .ThenByDescending(x => x.GameTime)

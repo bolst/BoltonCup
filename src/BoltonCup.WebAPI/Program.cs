@@ -1,10 +1,9 @@
 using BoltonCup.Infrastructure;
-using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.WebAPI;
 using BoltonCup.WebAPI.Authentication;
 using BoltonCup.WebAPI.Controllers;
-using BoltonCup.WebAPI.Filters;
+using BoltonCup.WebAPI.Swagger;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;

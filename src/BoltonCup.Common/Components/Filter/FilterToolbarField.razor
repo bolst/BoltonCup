@@ -1,0 +1,181 @@
+@namespace BoltonCup.Common.Components
+@using MudBlazor.State
+@typeparam T
+@typeparam TItem
+@inherits ComponentBaseWithState
+
+<MudMenu Open="_menuOpen" OpenChanged="@SetMenuOpenAsync" RelativeWidth="DropdownWidth.Adaptive" Disabled="Disabled">
+    <ActivatorContent>
+        <MudButton Variant="Variant.Outlined" OnClick="@OpenMenuAsync" Color="@_buttonColor" Size="Size.Small" Disabled="Disabled">
+            <div class="d-flex flex-row align-center gap-1 mx-n1">
+                <MudIconButton Icon="@_buttonIcon"
+                               OnClick="@OnChipIconClick"
+                               Color="@_buttonColor"
+                               Size="Size.Small"
+                               ClickPropagation="false" />
+                
+                <MudText Typo="Typo.subtitle2">@Label</MudText>
+
+                @if (ToStringFunc(_pendingValue) is {} label)
+                {
+                    <MudDivider Class="mx-1" FlexItem Vertical/>
+                    
+                    <MudText Typo="Typo.subtitle2">@label</MudText>
+                }
+            </div>
+        </MudButton>
+    </ActivatorContent>
+    <ChildContent>
+        <div class="pa-4 d-flex flex-column gap-2">
+            <MudText Typo="Typo.subtitle2">Filter by: @Label</MudText>
+
+            <CascadingValue Value="_context" IsFixed="false">
+                @ChildContent
+            </CascadingValue>
+            
+            <MudButton OnClick="@OnApply" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" ClickPropagation="false" FullWidth>Apply</MudButton>
+        </div>
+    </ChildContent>
+</MudMenu>
+
+@code {
+    
+    [CascadingParameter]
+    public MudDataGrid<TItem>? DataGrid { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public Func<T?, string?> ToStringFunc { get; set; } = x => x?.ToString();
+
+    [Parameter]
+    public T? Value { get; set; }
+    
+    [Parameter]
+    public EventCallback<T?> ValueChanged { get; set; }
+    
+    [Parameter]
+    public EventCallback OnApplyClicked { get; set; }
+    
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private FilterToolbarContext<T> _context = null!;
+
+    private T? _committedValue;
+    private T? _pendingValue;
+    private readonly ParameterState<T?> _valueState;
+    
+    private bool _menuOpen;
+
+    private Color _buttonColor = Color.Default;
+    private string _buttonIcon = Icons.Material.Rounded.AddCircleOutline;
+
+    protected override void OnParametersSet()
+    {
+        RebuildContext();
+    }
+
+    public FilterToolbarField()
+    {
+        using var registerScope = CreateRegisterScope();
+        _valueState = registerScope.RegisterParameter<T?>(nameof(Value))
+            .WithParameter(() => Value)
+            .WithEventCallback(() => ValueChanged)
+            .WithChangeHandler(OnValueChange);
+        registerScope.RegisterParameter<bool>(nameof(Disabled))
+            .WithParameter(() => Disabled)
+            .WithChangeHandler(OnDisabledChange);
+    }
+    
+    private Task OnPendingValueChangedAsync(T? value)
+    {
+        _pendingValue = value;
+        RebuildContext();
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private Task OnValueChange(ParameterChangedEventArgs<T?> args)
+    {
+        _committedValue = args.Value;
+        _pendingValue = args.Value;
+        return UpdateButtonState();
+    }
+
+    private Task OnDisabledChange(ParameterChangedEventArgs<bool> args)
+    {
+        if (args.Value)
+        {
+            _pendingValue = default;
+            return OnApply();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task UpdateButtonState()
+    {
+        _buttonColor = _pendingValue is null 
+            ? Color.Surface 
+            : Color.Info;
+        _buttonIcon = _pendingValue is null
+            ? Icons.Material.Rounded.AddCircleOutline
+            : Icons.Material.Outlined.Cancel;
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private Task SetMenuOpenAsync(bool open)
+    {
+        if (_menuOpen == open)
+            return Task.CompletedTask;
+        _menuOpen = open;
+
+        if (!open)
+        {
+            _pendingValue = _committedValue;
+            RebuildContext();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task OpenMenuAsync() => SetMenuOpenAsync(true);
+    private Task CloseMenuAsync() => SetMenuOpenAsync(false);
+
+    private async Task OnChipIconClick()
+    {
+        if (_committedValue is null)
+        {
+            await OpenMenuAsync();
+        }
+        else
+        {
+            _pendingValue = default;
+            await OnApply();
+        }
+    }
+
+    private void RebuildContext()
+    {
+        _context = new FilterToolbarContext<T>(
+            Label,
+            _pendingValue,
+            EventCallback.Factory.Create<T?>(this, OnPendingValueChangedAsync),
+            Disabled
+        );
+    }
+
+    private async Task OnApply()
+    {
+        _committedValue = _pendingValue;
+        await UpdateButtonState();
+        await _valueState.SetValueAsync(_committedValue);
+        await CloseMenuAsync();
+        await OnApplyClicked.InvokeAsync();
+    }
+    
+}

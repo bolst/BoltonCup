@@ -4,12 +4,24 @@ namespace BoltonCup.WebAPI.Mapping;
 
 public interface IInfoGuideMapper
 {
+    GetInfoGuidesQuery ToQuery(GetInfoGuidesRequest request);
     IPagedList<InfoGuideDto> ToDtoList(IPagedList<InfoGuide> guides);
     InfoGuideSingleDto? ToDto(InfoGuide? guide);
 }
 
 public class InfoGuideMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMapper) : IInfoGuideMapper
 {
+    public GetInfoGuidesQuery ToQuery(GetInfoGuidesRequest request)
+    {
+        return new GetInfoGuidesQuery
+        {
+            Page = request.Page,
+            Size = request.Size,
+            SortBy = request.SortBy,
+            Descending = request.Descending,
+        };
+    }
+    
     public IPagedList<InfoGuideDto> ToDtoList(IPagedList<InfoGuide> guides)
     {
         return guides.ProjectTo(guide => new InfoGuideDto

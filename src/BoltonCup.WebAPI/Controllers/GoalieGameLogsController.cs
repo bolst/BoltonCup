@@ -12,8 +12,9 @@ public class GoalieGameLogsController(IGoalieGameLogRepository _goalieGameLogs, 
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IPagedList<GoalieGameLogDto>>> GetGoalieGameLogs([FromQuery] GetGoalieGameLogsQuery query)
+    public async Task<ActionResult<IPagedList<GoalieGameLogDto>>> GetGoalieGameLogs([FromQuery] GetGoalieGameLogsRequest request)
     {
+        var query = _mapper.ToQuery(request);
         var logs = await _goalieGameLogs.GetAllAsync(query);
         return Ok(_mapper.ToDtoList(logs));
     }

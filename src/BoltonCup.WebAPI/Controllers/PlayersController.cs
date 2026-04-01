@@ -12,8 +12,9 @@ public class PlayersController(IPlayerRepository _players, IPlayerMapper _mapper
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IPagedList<PlayerDto>>> GetPlayers([FromQuery] GetPlayersQuery query)
+    public async Task<ActionResult<IPagedList<PlayerDto>>> GetPlayers([FromQuery] GetPlayersRequest request)
     {
+        var query = _mapper.ToQuery(request);
         var players = await _players.GetAllAsync(query);
         return Ok(_mapper.ToDtoList(players));
     }

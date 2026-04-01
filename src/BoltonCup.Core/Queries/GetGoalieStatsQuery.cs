@@ -5,5 +5,5 @@ namespace BoltonCup.Core;
 public sealed record GetGoalieStatsQuery : QueryBase
 {
     public int? TournamentId { get; set; }
-    public int? TeamId { get; set; }
+    public List<int>? TeamIds { get; set; }
 }

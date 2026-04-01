@@ -1,0 +1,25 @@
+@namespace BoltonCup.Common.Components
+@using Position = BoltonCup.Core.Values.Position
+@inherits FilterFieldBase<string>
+
+<MudSelect
+    T="string?"
+    Value="@ContextValue"
+    ValueChanged="@ContextValueChanged"
+    Label="Position"
+    Typo="Typo.subtitle2"
+    Variant="Variant.Outlined"
+    Margin="Margin.Dense"
+    FitContent
+    Dense>
+    @foreach (var option in Options)
+    {
+        <MudSelectItem Value="@option">@option</MudSelectItem>
+    }
+</MudSelect>
+
+@code {
+
+    private readonly IReadOnlyList<string> Options = [Position.Forward, Position.Defense];
+
+}

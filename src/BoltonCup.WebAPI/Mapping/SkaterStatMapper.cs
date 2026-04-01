@@ -4,11 +4,27 @@ namespace BoltonCup.WebAPI.Mapping;
 
 public interface ISkaterStatMapper
 {
+    GetSkaterStatsQuery ToQuery(GetSkaterStatsRequest request);
     IPagedList<SkaterStatDto> ToDtoList(IPagedList<SkaterStat> skaters);
 }
 
 public class SkaterStatMapper(IAssetUrlResolver _urlResolver) : ISkaterStatMapper
 {
+    public GetSkaterStatsQuery ToQuery(GetSkaterStatsRequest request)
+    {
+        return new GetSkaterStatsQuery
+        {
+            TournamentId = request.TournamentId,
+            Position = request.Position,
+            TeamIds = request.TeamIds,
+            Page = request.Page,
+            Size = request.Size,
+            SortBy = request.SortBy,
+            Descending = request.Descending
+        };
+    }
+    
+    
     public IPagedList<SkaterStatDto> ToDtoList(IPagedList<SkaterStat> skaters)
     {
         return skaters.ProjectTo(skater => new SkaterStatDto
@@ -24,6 +40,7 @@ public class SkaterStatMapper(IAssetUrlResolver _urlResolver) : ISkaterStatMappe
             TeamId = skater.TeamId,
             TeamName = skater.TeamName,
             TeamLogoUrl = _urlResolver.GetFullUrl(skater.TeamLogoUrl),
+            TeamAbbreviation = skater.TeamAbbreviation,
             GamesPlayed = skater.GamesPlayed,
             Goals = skater.Goals,
             Assists = skater.Assists,
