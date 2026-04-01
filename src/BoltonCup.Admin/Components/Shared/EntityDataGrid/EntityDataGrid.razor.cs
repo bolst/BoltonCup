@@ -121,15 +121,17 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
 
             if (SearchBy is not null)
                 dbSet = dbSet.WhereContains(SearchBy, _search);
-            
+
+            var query = new QueryBase
+            {
+                Page = state.Page + 1,
+                Size = state.PageSize,
+                SortBy = sortDefinition?.SortBy,
+                Descending = sortDefinition?.Descending ?? false,
+            };
             var data = await dbSet
-                .ToPagedListAsync(new QueryBase
-                {
-                    Page = state.Page + 1,
-                    Size = state.PageSize,
-                    SortBy = sortDefinition?.SortBy,
-                    Descending = sortDefinition?.Descending ?? false,
-                }, cancellationToken);
+                .ApplySorting(query, null)
+                .ToPagedListAsync(query, cancellationToken);
             
             var items = _changeTracker.NewItems.Concat(data.Items);
             return new GridData<T>
