@@ -1,0 +1,128 @@
+@page "/contact"
+@attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.7f, LastModified = "2026-04-02")]
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<PageTitle>Contact | Bolton Cup</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-8">
+    <MudGrid Spacing="4">
+        <MudItem xs="12" lg="5">
+            <MudPaper Class="pa-6" Elevation="0" Outlined>
+                <MudText Typo="Typo.h4" Class="mb-2"><b>Get in Touch</b></MudText>
+                <MudText Typo="Typo.subtitle1" Class="mb-6">
+                    Questions about registration, scheduling, stats, or your account? Send us a note and we will point you to the right place.
+                </MudText>
+
+                <div class="d-flex flex-column align-start gap-3">
+                    <MudButton Href="mailto:boltoncup.hockey@gmail.com" Target="_blank" StartIcon="@Icons.Material.Rounded.Email" Color="Color.Info">boltoncup.hockey@@gmail.com</MudButton>
+                    <MudButton Href="https://instagram.com/bolton_cup" Target="_blank" StartIcon="@Icons.Custom.Brands.Instagram" Color="Color.Info">@@bolton_cup</MudButton>
+                    <MudButton Href="/help" Target="_blank" StartIcon="@Icons.Material.Rounded.Help" Color="Color.Info">Visit the help center</MudButton>
+                </div>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" lg="7">
+            <MudPaper Class="pa-6" Elevation="0" Outlined>
+                <MudText Typo="Typo.h5" Class="mb-1"><b>Send a Message</b></MudText>
+                <MudText Typo="Typo.body2" Class="mb-4">
+                    This form opens your email app with a pre-filled message so you can review and send.
+                </MudText>
+
+                <EditForm Model="_model" OnValidSubmit="OpenEmailClient">
+                    <DataAnnotationsValidator />
+
+                    <MudGrid Spacing="2">
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_model.Name" Label="Your Name" Variant="Variant.Outlined"
+                                          For="@(() => _model.Name)" Required />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_model.Email" Label="Email" Variant="Variant.Outlined"
+                                          For="@(() => _model.Email)" Required />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudSelect T="string" @bind-Value="_model.Topic" Label="Topic" Variant="Variant.Outlined" Required>
+                                <MudSelectItem T="string" Value='@("General Inquiry")'>General Inquiry</MudSelectItem>
+                                <MudSelectItem T="string" Value='@("Registration")'>Registration</MudSelectItem>
+                                <MudSelectItem T="string" Value='@("Teams and Rosters")'>Teams and Rosters</MudSelectItem>
+                                <MudSelectItem T="string" Value='@("Schedule")'>Schedule</MudSelectItem>
+                                <MudSelectItem T="string" Value='@("Stats")'>Stats</MudSelectItem>
+                                <MudSelectItem T="string" Value='@("Privacy")'>Privacy</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_model.Phone" Label="Phone (Optional)" Variant="Variant.Outlined"
+                                          For="@(() => _model.Phone)" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="_model.Message" Label="Message" Variant="Variant.Outlined" Lines="6"
+                                          For="@(() => _model.Message)" Required />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" EndIcon="@Icons.Material.Rounded.Send">
+                                Draft Email
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </EditForm>
+
+                @if (_draftOpened)
+                {
+                    <MudAlert Severity="Severity.Success" Dense Class="mt-4">
+                        Your email draft was opened. If nothing appeared, you can also contact us directly at
+                        <MudLink Href="mailto:boltoncup.hockey@gmail.com" Color="Color.Inherit">boltoncup.hockey@@gmail.com</MudLink>.
+                    </MudAlert>
+                }
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+
+    private readonly ContactFormModel _model = new();
+    private bool _draftOpened;
+
+    private Task OpenEmailClient()
+    {
+        var subject = $"{_model.Topic} - {_model.Name}";
+        var body =
+            $"Name: {_model.Name}\n" +
+            $"Email: {_model.Email}\n" +
+            $"Phone: {_model.Phone}\n\n" +
+            $"Message:\n{_model.Message}";
+
+        var mailto =
+            $"mailto:boltoncup.hockey@gmail.com?subject={Uri.EscapeDataString(subject)}&body={Uri.EscapeDataString(body)}";
+
+        _draftOpened = true;
+        Navigation.NavigateTo(mailto, forceLoad: true);
+
+        return Task.CompletedTask;
+    }
+
+    private sealed class ContactFormModel
+    {
+        [Required(ErrorMessage = "Please enter your name.")]
+        [StringLength(80)]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please enter your email.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        [StringLength(120)]
+        public string Email { get; set; } = string.Empty;
+
+        [StringLength(40)]
+        public string Phone { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please select a topic.")]
+        [StringLength(60)]
+        public string Topic { get; set; } = "General Inquiry";
+
+        [Required(ErrorMessage = "Please add a message.")]
+        [StringLength(2000, MinimumLength = 20, ErrorMessage = "Please enter at least 20 characters.")]
+        public string Message { get; set; } = string.Empty;
+    }
+
+}
