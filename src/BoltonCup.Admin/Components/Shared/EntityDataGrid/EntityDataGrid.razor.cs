@@ -94,8 +94,14 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     [Parameter]
     public List<Func<IQueryable<T>, IQueryable<T>>> Includes { get; set; } = [];
 
-    public Task NotifyItemChangedAsync(T item) 
-        => _dataGrid.CommittedItemChanges?.Invoke(item) ?? Task.CompletedTask;
+    public async Task NotifyItemChangedAsync(T item)
+    {
+        if (_dataGrid.CommittedItemChanges is not null)
+        {
+            await _dataGrid.CommittedItemChanges.Invoke(item);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
 
     private async Task<DbContext> CreateDbContext(CancellationToken cancellationToken = default)
     {
