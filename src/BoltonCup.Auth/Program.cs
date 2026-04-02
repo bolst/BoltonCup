@@ -10,12 +10,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
-
-builder.Logging.AddSentry(options =>
-{
-    options.Dsn = builder.Configuration["Sentry::Dsn"] ?? string.Empty;
-    options.TracesSampleRate = 1.0;
-});
+builder.Logging.AddBoltonCupSentry(builder.Configuration);
 
 builder.Services.AddScoped<AuthSessionStateService>();
 

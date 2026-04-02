@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace BoltonCup.Common;
 
@@ -40,13 +41,27 @@ public static class ServiceCollectionExtensions
             .AddAuthorizationCore()
             .AddScoped<AuthenticationStateProvider, CookieAuthenticationStateProvider>()
             .AddTransient<CookieHandler>()
+            .AddTransient<SentryHttpMessageHandler>()
             .AddHttpClient<IBoltonCupApi, BoltonCupApi>(client => 
             {
                 client.BaseAddress = new Uri(apiBaseUrl);
             })
             .AddHttpMessageHandler<CookieHandler>()
+            .AddHttpMessageHandler<SentryHttpMessageHandler>()
             .AddTypedClient<IBoltonCupApi>((http, sp) => new BoltonCupApi(apiBaseUrl, http));
         
         return services;
+    }
+
+
+    public static ILoggingBuilder AddBoltonCupSentry(this ILoggingBuilder logging, IConfiguration configuration)
+    {
+        return logging.AddSentry(options =>
+        {
+            options.Dsn = configuration["Sentry::Dsn"] ?? string.Empty;
+            options.TracesSampleRate = 1.0;
+            if (configuration["BoltonCup::ApiBaseUrl"] is { } apiBaseUrl)
+                options.TracePropagationTargets.Add(apiBaseUrl);
+        });
     }
 }
