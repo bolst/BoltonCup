@@ -10,7 +10,7 @@
 
         if (_infoGuide.Tournament.IsRegistrationOpen)
         {
-            <MudAlert Severity="Severity.Normal" on>Registration for @_infoGuide.Tournament.Name is live! <MudLink Color="Color.Info" Typo="Typo.body2" Href="@($"/tournaments/{_infoGuide.TournamentId}/register")"><b>Register now.</b></MudLink></MudAlert>
+            <MudAlert Severity="Severity.Normal">Registration for @_infoGuide.Tournament.Name is live! <MudLink Color="Color.Info" Typo="Typo.body2" Href="@($"/tournaments/{_infoGuide.TournamentId}/register")"><b>Register now.</b></MudLink></MudAlert>
         }
         
         <MarkdownView Value="@_infoGuide.MarkdownContent" />

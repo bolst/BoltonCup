@@ -1,5 +1,6 @@
 @page "/"
 @attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-02-01")]
+@inject IBoltonCupApi BoltonCupApi
 
 <PageTitle>Bolton Cup</PageTitle>
 
@@ -7,10 +8,22 @@
 <MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
     
     <div class="home-banner-background">
-        <div class="d-flex align-center justify-center mud-width-full" style="height: 500px">
-            <div class="flex-grow-1">
-                <Countdown To="new DateTime(2026, 07, 01)" />
+        <div class="d-flex flex-column align-center justify-center gap-6 mud-width-full px-2" style="height: 500px">
+            <div class="d-flex flex-row align-center">
+                @if (_tournament is not null)
+                {
+                    <Countdown To="@_tournament.StartDate"/>
+                }
             </div>
+            @if (_tournament?.IsRegistrationOpen == true)
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Filled">
+                    Registration for @_tournament.Name is live! 
+                    <MudLink Underline="Underline.Always" Typo="Typo.body2" Href="@($"/tournaments/{_tournament.Id}/register")">
+                        <b>Register now.</b>
+                    </MudLink>
+                </MudAlert>
+            }
         </div>
     </div>
     
@@ -41,3 +54,16 @@
         </Highlight>
     }
 </MudContainer>
+
+@code {
+
+    private static Sdk.TournamentSingleDto? _tournament;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // TODO: dont hardcode this
+        _tournament ??= await BoltonCupApi.GetTournamentByIdAsync(3);
+        await InvokeAsync(StateHasChanged);
+    }
+
+}
