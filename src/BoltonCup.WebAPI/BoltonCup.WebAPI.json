@@ -6733,18 +6733,9 @@
             "type": "string",
             "nullable": true
           },
-          "heightFeet": {
-            "maximum": 7,
-            "minimum": 2,
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "heightInches": {
-            "maximum": 11,
-            "minimum": 1,
-            "type": "integer",
-            "format": "int32",
+          "height": {
+            "pattern": "^[1-9]'\\s*(1[0-1]|[0-9])$",
+            "type": "string",
             "nullable": true
           },
           "weight": {

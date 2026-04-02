@@ -10,6 +10,11 @@
     Label="@Label"
     Variant="@Variant"
     Disabled="@Disabled"
+    Mask="@Mask"
+    AdornmentText="@AdornmentText"
+    Adornment="@Adornment"
+    ErrorText="@ErrorText"
+    ErrorTextChanged="@ErrorTextChanged"
     Style="color: var(--mud-palette-text-primary)"
     ShrinkLabel="true"
     Margin="Margin.Dense"
@@ -40,6 +45,23 @@
     
     [Parameter]
     public bool Disabled { get; set; }
+    
+    [Parameter]
+    public IMask? Mask { get; set; }
+
+    [Parameter]
+    public string? AdornmentText { get; set; }
+
+    [Parameter]
+    public string? ErrorText { get; set; }
+    
+    [Parameter]
+    public EventCallback<string?> ErrorTextChanged { get; set; }
+
+    private Adornment Adornment => 
+        string.IsNullOrEmpty(AdornmentText) 
+            ? Adornment.None 
+            : Adornment.End;
 
 
     private Variant Variant => Disabled ? Variant.Text : Variant.Filled;

@@ -21,11 +21,8 @@ public record UpdateAccountRequest
     [MaxLength(100)]
     public string? PreferredBeer { get; set; }
 
-    [Range(2, 7, ErrorMessage = "Height (ft) must be between 2 and 7")]
-    public int? HeightFeet { get; set; }
-    
-    [Range(1, 11, ErrorMessage = "Height (inches) must be between 1 and 11")]
-    public int? HeightInches { get; set; }
+    [RegularExpression(@"^[1-9]'\s*(1[0-1]|[0-9])$", ErrorMessage = "Invalid format")]
+    public string? Height { get; set; }
     
     [Range(0, 600, ErrorMessage = "Weight must be between 0 and 600")]
     public int? Weight { get; set; }

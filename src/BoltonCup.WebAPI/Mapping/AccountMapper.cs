@@ -69,6 +69,7 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
 
     public UpdateAccountCommand ToCommand(UpdateAccountRequest request, ClaimsPrincipal claims)
     {
+        var (feet, inches) = ParseHeight(request.Height);
         var accountId = claims.GetAccountId();
         return new UpdateAccountCommand(
             AccountId: accountId,
@@ -77,9 +78,24 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
             Birthday: request.Birthday,
             HighestLevel: request.HighestLevel,
             PreferredBeer: request.PreferredBeer,
-            HeightFeet: request.HeightFeet,
-            HeightInches: request.HeightInches,
+            HeightFeet: feet,
+            HeightInches: inches,
             Weight: request.Weight
         );
+    }
+    
+    private static (int? Feet, int? Inches) ParseHeight(string? height)
+    {
+        if (string.IsNullOrEmpty(height))
+            return (null, null);
+
+        var data = height.Split("'");
+        if (data is not [var feetStr, var inchesStr, ..])
+            return (null, null);
+
+        if (!int.TryParse(feetStr, out var feet) || !int.TryParse(inchesStr, out var inches))
+            return (null, null);
+        
+        return (feet, inches);
     }
 }
