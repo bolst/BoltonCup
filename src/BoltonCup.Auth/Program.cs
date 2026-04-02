@@ -10,6 +10,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
+builder.Logging.AddBoltonCupSentry(builder.Configuration);
 
 builder.Services.AddScoped<AuthSessionStateService>();
 

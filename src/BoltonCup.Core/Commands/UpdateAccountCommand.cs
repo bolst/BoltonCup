@@ -6,5 +6,8 @@ public sealed record UpdateAccountCommand(
     string LastName,
     DateTime Birthday, 
     string? HighestLevel, 
-    string? PreferredBeer
+    string? PreferredBeer,
+    int? HeightFeet,
+    int? HeightInches,
+    int? Weight
 );

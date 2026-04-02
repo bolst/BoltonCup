@@ -4726,6 +4726,21 @@
           "preferredBeer": {
             "type": "string",
             "nullable": true
+          },
+          "heightFeet": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "heightInches": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "weight": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6687,35 +6702,35 @@
         "additionalProperties": false
       },
       "UpdateAccountRequest": {
-        "required": [
-          "birthday",
-          "firstName",
-          "lastName"
-        ],
         "type": "object",
         "properties": {
           "firstName": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "lastName": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "birthday": {
             "type": "string",
             "format": "date-time"
           },
           "highestLevel": {
-            "maxLength": 50,
             "type": "string",
             "nullable": true
           },
           "preferredBeer": {
-            "maxLength": 100,
             "type": "string",
+            "nullable": true
+          },
+          "height": {
+            "type": "string",
+            "nullable": true
+          },
+          "weight": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           }
         },

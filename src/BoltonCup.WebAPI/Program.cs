@@ -11,6 +11,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Sentry
+builder.WebHost.UseSentry();
+
 var keyDirectory = builder.Configuration["DataProtection:KeyDirectory"];
 if (!string.IsNullOrEmpty(keyDirectory))
 {
@@ -117,5 +120,8 @@ app.MapGet("/", async context =>
     context.Response.Redirect("/docs");
     await Task.CompletedTask;
 });
+
+// Sentry
+app.UseSentryTracing();
 
 app.Run();

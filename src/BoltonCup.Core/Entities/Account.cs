@@ -12,6 +12,9 @@ public class Account : EntityBase
     public string? Avatar { get; set; }
     public string? Banner { get; set; }
     public string? PreferredBeer { get; set; }
+    public int? HeightFeet { get; set; }
+    public int? HeightInches { get; set; }
+    public int? Weight { get; set; }
     
     public ICollection<Player> Players { get; set; } = [];
     public ICollection<Team> ManagedTeams { get; set; } = [];

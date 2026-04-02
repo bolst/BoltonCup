@@ -13,6 +13,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped<ITournamentRegistrationService, TournamentRegistrationService>();
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
+builder.Logging.AddBoltonCupSentry(builder.Configuration);
 
 builder.Services.AddMudServices();
 builder.Services.AddMudMarkdownServices();

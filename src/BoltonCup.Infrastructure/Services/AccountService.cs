@@ -28,6 +28,9 @@ public class AccountService : IAccountService
             Birthday = command.Birthday,
             HighestLevel = command.HighestLevel,
             PreferredBeer = command.PreferredBeer,
+            HeightFeet = command.HeightFeet,
+            HeightInches = command.HeightInches,
+            Weight = command.Weight,
         }; 
         _dbContext.Accounts.Add(newAccount);
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -45,6 +48,10 @@ public class AccountService : IAccountService
         account.Birthday = command.Birthday;
         account.HighestLevel = command.HighestLevel;
         account.PreferredBeer = command.PreferredBeer;
+        account.HeightFeet = command.HeightFeet;
+        account.HeightInches = command.HeightInches;
+        account.Weight = command.Weight;
+        
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 

@@ -5,8 +5,10 @@ namespace BoltonCup.WebAPI.Errors;
 
 // we shall handle the unhandled
 
-public sealed class UnhandledExceptionHandler(ILogger<UnhandledExceptionHandler> _logger)
-    : IExceptionHandler
+public sealed class UnhandledExceptionHandler(
+    ILogger<UnhandledExceptionHandler> _logger,
+    IHub _sentryHub
+) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext context,
@@ -15,14 +17,23 @@ public sealed class UnhandledExceptionHandler(ILogger<UnhandledExceptionHandler>
     {
         _logger.LogError(exception, "Unhandled exception");
 
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        await context.Response.WriteAsJsonAsync(new BoltonCupProblemDetails
+        var problemDetails = new BoltonCupProblemDetails
         {
-            Type     = ErrorTypes.Unexpected,
-            Title    = "An unexpected error occurred",
-            Status   = StatusCodes.Status500InternalServerError,
+            Type = ErrorTypes.Unexpected,
+            Title = "An unexpected error occurred",
+            Status = StatusCodes.Status500InternalServerError,
             Instance = context.TraceIdentifier
-        }, cancellationToken);
+        };
+        
+        // log to sentry
+        _sentryHub.CaptureException(exception, scope =>
+        {
+            scope.SetTag("ErrorType", problemDetails.Type);
+            scope.SetExtra("TraceIdentifier", context.TraceIdentifier);
+        });
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 
         return true;
     }
