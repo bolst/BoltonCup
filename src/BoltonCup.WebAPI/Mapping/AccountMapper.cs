@@ -32,6 +32,9 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
             Avatar = account.Avatar,
             Banner = account.Banner,
             PreferredBeer = account.PreferredBeer,
+            HeightFeet = account.HeightFeet,
+            HeightInches = account.HeightInches,
+            Weight = account.Weight
         };
     }
 
@@ -56,7 +59,8 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
             LastName: request.LastName,
             Email: claims.FindFirstValue(ClaimTypes.Email) ?? throw new InvalidOperationException("Missing email claim"),
             Birthday: request.Birthday,
-            Height: $"{request.HeightFeet}'{request.HeightInches}\"",
+            HeightFeet: request.HeightFeet,
+            HeightInches: request.HeightInches,
             Weight: request.Weight,
             HighestLevel: request.HighestLevel,
             PreferredBeer: request.PreferredBeer
@@ -72,7 +76,10 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
             LastName: request.LastName,
             Birthday: request.Birthday,
             HighestLevel: request.HighestLevel,
-            PreferredBeer: request.PreferredBeer
+            PreferredBeer: request.PreferredBeer,
+            HeightFeet: request.HeightFeet,
+            HeightInches: request.HeightInches,
+            Weight: request.Weight
         );
     }
 }

@@ -13,4 +13,7 @@ public class AccountDto
     public string? Avatar { get; set; }
     public string? Banner { get; set; }
     public string? PreferredBeer { get; set; }
+    public int? HeightFeet { get; set; }
+    public int? HeightInches { get; set; }
+    public int? Weight { get; set; }
 }
