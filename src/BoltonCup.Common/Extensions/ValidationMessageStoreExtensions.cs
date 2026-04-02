@@ -13,11 +13,14 @@ public static class ValidationMessageStoreExtensions
     {
         if (model is null)
             return;
-        
-        foreach (var (fieldName, fieldErrors) in validationProblemDetails.Errors)
+
+        if (validationProblemDetails.Errors is not null)
         {
-            var identifier = new FieldIdentifier(model, fieldName);
-            messageStore.Add(identifier, fieldErrors);
+            foreach (var (fieldName, fieldErrors) in validationProblemDetails.Errors)
+            {
+                var identifier = new FieldIdentifier(model, fieldName);
+                messageStore.Add(identifier, fieldErrors);
+            }
         }
     }
     
