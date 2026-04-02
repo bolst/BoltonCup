@@ -6702,45 +6702,33 @@
         "additionalProperties": false
       },
       "UpdateAccountRequest": {
-        "required": [
-          "birthday",
-          "firstName",
-          "lastName"
-        ],
         "type": "object",
         "properties": {
           "firstName": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "lastName": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "birthday": {
             "type": "string",
             "format": "date-time"
           },
           "highestLevel": {
-            "maxLength": 50,
             "type": "string",
             "nullable": true
           },
           "preferredBeer": {
-            "maxLength": 100,
             "type": "string",
             "nullable": true
           },
           "height": {
-            "pattern": "^[1-9]'\\s*(1[0-1]|[0-9])$",
             "type": "string",
             "nullable": true
           },
           "weight": {
-            "maximum": 600,
-            "minimum": 0,
             "type": "integer",
             "format": "int32",
             "nullable": true
