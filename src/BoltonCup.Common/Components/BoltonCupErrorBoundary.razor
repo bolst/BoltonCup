@@ -1,8 +1,10 @@
+@using BoltonCup.Sdk
 @using Microsoft.AspNetCore.Components.WebAssembly.Hosting
 @using Microsoft.Extensions.Logging
 @inherits ErrorBoundary
 @inject ILogger<BoltonCupErrorBoundary> Logger
 @inject IWebAssemblyHostEnvironment HostEnvironment
+@inject IHub SentryHub
 
 @if (CurrentException is null)
 {
@@ -25,7 +27,7 @@ else
             <MudAlert NoIcon>@message</MudAlert>
         }
         
-        <MudButton OnClick="Recover" Color="Color.Error" Variant="Variant.Outlined" Size="Size.Large">Try again</MudButton>
+        <MudButton OnClick="@Recover" Color="Color.Error" Variant="Variant.Outlined" Size="Size.Large">Try again</MudButton>
     </MudContainer>
 }
 
@@ -33,8 +35,25 @@ else
 
     protected override Task OnErrorAsync(Exception exception)
     {
-        // TODO: configure logging then uncomment this
-        // Logger.LogError(exception, "BoltonCupErrorBoundary caught an exception.");
+        Logger.LogError(exception, "BoltonCupErrorBoundary caught an exception.");
+
+        SentryHub.CaptureException(exception, scope =>
+        {
+            scope.SetTag("mechanism", "error_boundary");
+            switch (exception)
+            {
+                case ApiException<BoltonCupProblemDetails> e:
+                    scope.SetExtra("BoltonCupProblemDetails.Result.Type", e.Result.Type);
+                    scope.SetExtra("BoltonCupProblemDetails.Result.Instance", e.Result.Instance);
+                    scope.SetExtra("BoltonCupProblemDetails.Result.Title", e.Result.Title);
+                    scope.SetExtra("BoltonCupProblemDetails.Result.Detail", e.Result.Detail);
+                    break;
+                case ApiException e:
+                    scope.SetExtra("ApiException.StatusCode", e.StatusCode);
+                    break;
+            }
+        });
+        
         return base.OnErrorAsync(exception);
     }
 
