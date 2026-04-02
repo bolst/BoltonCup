@@ -147,6 +147,8 @@ public class UserService(
     {
         var user = await _userManager.FindByIdAsync(userId)
             ?? throw new EntityNotFoundException("User", userId);
+        if (user.AccountId.HasValue)
+            return user;
         
         var accountId = await _accountService.CreateAsync(command);
         user.AccountId = accountId;
