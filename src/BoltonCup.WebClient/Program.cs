@@ -14,6 +14,12 @@ builder.Services.AddScoped<ITournamentRegistrationService, TournamentRegistratio
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
 
+builder.Logging.AddSentry(options =>
+{
+    options.Dsn = builder.Configuration["Sentry::Dsn"] ?? string.Empty;
+    options.TracesSampleRate = 1.0;
+});
+
 builder.Services.AddMudServices();
 builder.Services.AddMudMarkdownServices();
 
