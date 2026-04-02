@@ -58,7 +58,9 @@ public class EmailBackgroundService : BackgroundService
             _logger.LogInformation("Processing email for {Email}", payload.Email);
 
             var htmlMessage = await razor.CompileRenderAsync(payload.TemplateName, payload.Model);
-            var textMessage = Regex.Replace(htmlMessage, "<.*?>", string.Empty).Trim();
+
+            var converter = new Html2Markdown.Converter();
+            var textMessage = converter.Convert(htmlMessage);
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(settings.SenderName, settings.SenderEmail));
