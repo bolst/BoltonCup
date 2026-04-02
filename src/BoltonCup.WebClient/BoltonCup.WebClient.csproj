@@ -15,6 +15,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.2" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.2" PrivateAssets="all" />
         <PackageReference Include="MudBlazor" Version="9.2.0" />
+        <PackageReference Include="Sentry.AspNetCore.Blazor.WebAssembly" Version="6.3.0" />
         <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="3.119.2" />
         <PackageReference Include="SkiaSharp.Views.Blazor" Version="3.119.2" />
     </ItemGroup>
