@@ -105,6 +105,8 @@ public static class ServiceCollectionExtensions
                 options.ForwardedHeaders =
                     Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
                     Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+                options.KnownIPNetworks.Clear();
+                options.KnownProxies.Clear();
             })
             .AddRateLimiter(options => 
             {
