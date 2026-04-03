@@ -15,7 +15,7 @@
                 </MudText>
 
                 <div class="d-flex flex-column align-start gap-3">
-                    <MudButton Href="mailto:boltoncup.hockey@gmail.com" Target="_blank" StartIcon="@Icons.Material.Rounded.Email" Color="Color.Info">boltoncup.hockey@@gmail.com</MudButton>
+                    <MudButton Href="@_baseMailTo" Target="_blank" StartIcon="@Icons.Material.Rounded.Email" Color="Color.Info">@_email</MudButton>
                     <MudButton Href="https://instagram.com/bolton_cup" Target="_blank" StartIcon="@Icons.Custom.Brands.Instagram" Color="Color.Info">@@bolton_cup</MudButton>
                     <MudButton Href="/help" Target="_blank" StartIcon="@Icons.Material.Rounded.Help" Color="Color.Info">Visit the help center</MudButton>
                 </div>
@@ -71,7 +71,7 @@
                 {
                     <MudAlert Severity="Severity.Success" Dense Class="mt-4">
                         Your email draft was opened. If nothing appeared, you can also contact us directly at
-                        <MudLink Href="mailto:boltoncup.hockey@gmail.com" Color="Color.Inherit">boltoncup.hockey@@gmail.com</MudLink>.
+                        <MudLink Href="@_baseMailTo" Color="Color.Inherit">@_email</MudLink>.
                     </MudAlert>
                 }
             </MudPaper>
@@ -81,25 +81,34 @@
 
 @code {
 
+    private const string _email = "info@boltoncup.ca";
+    private const string _baseMailTo = $"mailto:{_email}";
+
     private readonly ContactFormModel _model = new();
     private bool _draftOpened;
 
     private Task OpenEmailClient()
     {
-        var subject = $"{_model.Topic} - {_model.Name}";
-        var body =
-            $"Name: {_model.Name}\n" +
-            $"Email: {_model.Email}\n" +
-            $"Phone: {_model.Phone}\n\n" +
-            $"Message:\n{_model.Message}";
-
-        var mailto =
-            $"mailto:boltoncup.hockey@gmail.com?subject={Uri.EscapeDataString(subject)}&body={Uri.EscapeDataString(body)}";
-
+        var mailto = BuildMailToLink(_model);
+        
         _draftOpened = true;
         Navigation.NavigateTo(mailto, forceLoad: true);
 
         return Task.CompletedTask;
+    }
+
+    private static string BuildMailToLink(ContactFormModel model)
+    {
+        var subject = $"{model.Topic} - {model.Name}";
+        var body =
+            $"Name: {model.Name}\n" +
+            $"Email: {model.Email}\n" +
+            $"Phone: {model.Phone}\n\n" +
+            $"Message:\n{model.Message}";
+
+        var mailto =
+            $"{_baseMailTo}?subject={Uri.EscapeDataString(subject)}&body={Uri.EscapeDataString(body)}";
+        return mailto;
     }
 
     private sealed class ContactFormModel
