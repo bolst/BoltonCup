@@ -33,7 +33,7 @@
                     <MudTabPanel Icon="@Icons.Material.Rounded.VerticalShades" ToolTip="Split View">
                         <MudGrid Class="ma-0">
                             <MudItem xs="6">
-                                <MudTextField @bind-Value="_infoGuide.MarkdownContent" Underline="false" Immediate AutoGrow FullWidth/>
+                                <MudTextField @bind-Value="_infoGuide.MarkdownContent" Sizing="InputSizing.Auto" Underline="false" Immediate FullWidth/>
                             </MudItem>
                             <MudItem xs="6">
                                 <MarkdownView Value="@_infoGuide.MarkdownContent"/>
@@ -41,7 +41,7 @@
                         </MudGrid>
                     </MudTabPanel>
                     <MudTabPanel Icon="@Icons.Material.Rounded.EditNote" ToolTip="Editor">
-                        <MudTextField @bind-Value="_infoGuide.MarkdownContent" Underline="false" Immediate AutoGrow FullWidth/>
+                        <MudTextField @bind-Value="_infoGuide.MarkdownContent" Sizing="InputSizing.Auto" Underline="false" Immediate FullWidth/>
                     </MudTabPanel>
                     <MudTabPanel Icon="@Icons.Material.Rounded.Preview" ToolTip="Preview">
                         <MarkdownView Value="@_infoGuide.MarkdownContent"/>
