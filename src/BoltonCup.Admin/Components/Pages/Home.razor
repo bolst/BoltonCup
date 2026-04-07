@@ -1,0 +1,89 @@
+@page "/"
+@inject BoltonCupDbContext DbContext
+
+<MudContainer MaxWidth="MaxWidth.False">
+    
+    <div class="mud-width-full d-flex flex-column align-end">
+        <MudIconButton OnClick="@LoadDataAsync" Icon="@Icons.Material.Rounded.Refresh" Disabled="@_loading" />
+    </div>
+
+    <MudGrid>
+        <MudItem xs="6" md="3">
+            <DataCard Title="Registrations completed">
+                @_completeRegistrationCount / @(_tournament?.SkaterLimit + _tournament?.GoalieLimit)
+            </DataCard>
+        </MudItem>
+        <MudItem xs="6" md="3">
+            <DataCard Title="Incomplete registrations">
+                @_incompleteRegistrationCount
+            </DataCard>
+        </MudItem>
+        
+        <MudFlexBreak />
+        
+        <MudItem xs="6" md="3">
+            <DataCard Title="Skaters">
+                @_skaterCount / @_tournament?.SkaterLimit
+            </DataCard>
+        </MudItem>
+        <MudItem xs="6" md="3">
+            <DataCard Title="Forwards">
+                @_forwardCount
+            </DataCard>
+        </MudItem>
+        <MudItem xs="6" md="3">
+            <DataCard Title="Defensemen">
+                @_defenseCount
+            </DataCard>
+        </MudItem>
+        <MudItem xs="6" md="3">
+            <DataCard Title="Goalies">
+                @_goalieCount / @_tournament?.GoalieLimit
+            </DataCard>
+        </MudItem>
+    </MudGrid>
+    
+</MudContainer>
+
+
+@code {
+
+    private const int _tournamentId = 3;
+
+    private bool _loading;
+    
+    private Tournament? _tournament;
+
+    private int _completeRegistrationCount;
+    private int _incompleteRegistrationCount;
+    private int _skaterCount;
+    private int _goalieCount;
+    private int _forwardCount;
+    private int _defenseCount;
+    
+    protected override Task OnInitializedAsync()
+    {
+        return LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _loading = true;
+        
+        _tournament = await DbContext.Tournaments
+            .AsNoTracking()
+            .Include(t => t.Registrations)
+            .Include(t => t.Players)
+            .SingleAsync(t => t.Id == _tournamentId);
+
+        _completeRegistrationCount = _tournament.Registrations.Count(x => x.IsComplete);
+        _incompleteRegistrationCount = _tournament.Registrations.Count - _completeRegistrationCount;
+        _goalieCount = _tournament.Players.Count(p => p.Position == Core.Values.Position.Goalie);
+        _skaterCount = _tournament.Players.Count - _goalieCount;
+        _forwardCount = _tournament.Players.Count(p => p.Position == Core.Values.Position.Forward);
+        _defenseCount = _tournament.Players.Count(p => p.Position == Core.Values.Position.Defense);
+        
+        _loading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+}

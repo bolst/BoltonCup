@@ -1,0 +1,17 @@
+@namespace BoltonCup.Admin.Components.Shared
+
+<MudPaper Class="pa-4 d-flex flex-column align-start gap-5">
+    <MudText Typo="Typo.h4">@ChildContent</MudText>
+    <MudText>@Title</MudText>
+</MudPaper>
+
+
+@code {
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+}
