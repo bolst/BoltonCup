@@ -16,15 +16,22 @@
             @foreach (var uselessItem in _items)
             {
                 var item = uselessItem;
-                <div class="mud-width-full d-flex flex-column align-start gap-1">
-                    <MudText>@item.Registration.Account.ToString()</MudText>
-                    <MudChipSet @bind-SelectedValue="@item.Method" SelectionMode="SelectionMode.SingleSelection" Variant="Variant.Text" CheckMark>
-                        <MudChip Text="e-Transfer" Value="@("e-Transfer")" Color="Color.Warning" />
-                        <MudChip Text="Cash" Color="Color.Success" />
-                        <MudChip Text="Other" Color="Color.Default" />
-                    </MudChipSet>
-                    <MudTextField @bind-Value="@item.Notes" Label="Notes" Margin="Margin.Dense" Required="@(item.Method == "Other")" ShrinkLabel />
-                </div>
+                if (item.IsAlreadyRegisteredAndPlaying)
+                {
+                    <MudText>@item.Registration.Account.ToString() (already registered + playing)</MudText>
+                }
+                else
+                {
+                    <div class="mud-width-full d-flex flex-column align-start gap-1">
+                        <MudText>@item.Registration.Account.ToString()</MudText>
+                        <MudChipSet @bind-SelectedValue="@item.Method" SelectionMode="SelectionMode.SingleSelection" Variant="Variant.Text" CheckMark>
+                            <MudChip Text="e-Transfer" Value="@("e-Transfer")" Color="Color.Warning" />
+                            <MudChip Text="Cash" Color="Color.Success" />
+                            <MudChip Text="Other" Color="Color.Default" />
+                        </MudChipSet>
+                        <MudTextField @bind-Value="@item.Notes" Label="Notes" Margin="Margin.Dense" Required="@(item.Method == "Other")" ShrinkLabel />
+                    </div>
+                }
             }
         </div>
     </DialogContent>
@@ -67,19 +74,24 @@
     private async Task CompleteRegistrations()
     {
         _errorMessage = null;
-        if (_items.Any(x => string.IsNullOrEmpty(x.Method)))
+
+        var updateItems = _items
+            .Where(x => !x.IsAlreadyRegisteredAndPlaying)
+            .ToList();
+        
+        if (updateItems.Any(x => string.IsNullOrEmpty(x.Method)))
         {
             _errorMessage = "Some players are missing payment methods.";
             return;
         }
 
-        if (_items.Any(x => x.Method == "Other" && string.IsNullOrEmpty(x.Notes)))
+        if (updateItems.Any(x => x.Method == "Other" && string.IsNullOrEmpty(x.Notes)))
         {
             _errorMessage = "You must provide notes if selection is 'Other'";
             return;
         }
 
-        foreach (var item in _items)
+        foreach (var item in updateItems)
         {
             var player = new Player
             {
@@ -107,15 +119,18 @@
         
         public TournamentRegistration Registration { get; } = registration;
 
+        public bool IsAlreadyRegisteredAndPlaying { get; } = registration.Tournament.Players.Any(p => p.AccountId == registration.AccountId);
+
         public string? Message => GetMessage();
 
         private string? GetMessage()
         {
             if (string.IsNullOrEmpty(Method))
                 return null;
-            if (Method == "Other")
-                return $"Other ({Notes})";
-            return Method;
+            var retval = Method;
+            if (!string.IsNullOrEmpty(Notes))
+                retval += $" ({Notes})";
+            return retval;
         }
 
         public bool Equals(CompletedTournamentRegistration? other)
