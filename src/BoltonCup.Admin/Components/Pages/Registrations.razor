@@ -1,38 +1,44 @@
 ﻿@page "/registrations"
 @using System.Text.Json
-
+@inject IDialogService DialogService
 
 <EntityDataGrid
+    @ref="@_dataGrid"
     T="TournamentRegistration"
+    SelectedItemsChanged="@SelectedItemsChanged"
+    Comparer="@_comparer"
     SearchBy="@(x => x.Account.FirstName + " " + x.Account.LastName)"
-    Includes="@([x => x.Include(p => p.Account).ThenInclude(a => a.Players)])"
-    ReadOnly
->
+    Include="@_include"
+    NoDeleting>
+    <ActionMenu>
+        <MudMenuItem Label="Complete Registration" OnClick="@CompleteSelectedRegistrations" Disabled="@(_selectedItems.Count == 0)" />
+    </ActionMenu>
     <Columns>
-        <ForeignColumn Title="Name" Property="x => x.Account" />
-        <ForeignColumn Title="Tournament" Property="x => x.Tournament" />
-        <PropertyColumn Title="Current step" Property="x => x.CurrentStep" CellStyle="text-align: right" />
-        <PropertyColumn Title="Data" Property="x => x.Payload" Sortable="false" CellStyle="text-align: center">
+        <ForeignColumn Title="Name" Property="x => x.Account" Editable="false" />
+        <PropertyColumn Title="Current step" Property="x => x.CurrentStep" Editable="false" CellStyle="text-align: right"/>
+        <PropertyColumn Title="Data" Property="x => x.Payload" Sortable="false" Editable="false" CellStyle="text-align: center">
             <CellTemplate>
                 @if (!string.IsNullOrEmpty(context.Item.Payload))
                 {
-                    <MudIconButton OnClick="@(_ => ViewPayload(context.Item))" Icon="@Icons.Material.Rounded.RemoveRedEye" Size="Size.Small" />
+                    <MudIconButton OnClick="@(_ => ViewPayload(context.Item))" Icon="@Icons.Material.Rounded.RemoveRedEye" Size="Size.Small"/>
                 }
             </CellTemplate>
         </PropertyColumn>
-        <PropertyColumn Title="Complete" Property="x => x.IsComplete" CellStyle="text-align: center">
+        <BoolColumn Title="Completed?" Property="x => x.IsComplete" />
+        <PropertyColumn Title="Status" Property="x => x.Tournament.Players.Any(p => p.AccountId == x.AccountId)" 
+                        Editable="false" CellStyle="text-align: center">
             <CellTemplate>
-                @if (context.Item.IsComplete)
+                @if (context.Item.Tournament.Players.Any(p => p.AccountId == context.Item.AccountId))
                 {
-                    <MudIcon Icon="@Icons.Material.Rounded.Check" Color="Color.Success" Size="Size.Small"/>
+                    <MudChip T="string" Text="Playing" Color="Color.Success" Variant="Variant.Text" Size="Size.Small" Label="true" />
                 }
                 else
                 {
-                    <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
+                    <MudChip T="string" Text="Not Playing" Color="Color.Error" Variant="Variant.Text" Size="Size.Small" Label="true" />
                 }
             </CellTemplate>
         </PropertyColumn>
-        <TemplateColumn Title="Payment ID" Sortable="false">
+        <TemplateColumn Title="Payment ID" Sortable="false" Editable="false">
             <CellTemplate>
                 @{
                     var player = context.Item.Account.Players.FirstOrDefault(p => p.TournamentId == context.Item.TournamentId);
@@ -43,7 +49,8 @@
                 }
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Title="Created at" Property="x => x.CreatedAt" Format="g" InitialDirection="SortDirection.Descending" />
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" Editable="false"/>
+        <PropertyColumn Title="Created at" Property="x => x.CreatedAt" Editable="false" Format="g" InitialDirection="SortDirection.Descending"/>
     </Columns>
 </EntityDataGrid>
 
@@ -59,8 +66,19 @@
 
 @code {
 
+    private EntityDataGrid<TournamentRegistration> _dataGrid = null!;
+    
     private bool _drawerOpen;
     private string? _currentPayload;
+
+    private static readonly TournamentRegistrationComparer _comparer = new();
+    private HashSet<TournamentRegistration> _selectedItems = new(_comparer);
+
+    private static readonly Func<IQueryable<TournamentRegistration>, IQueryable<TournamentRegistration>> _include =
+        x => x
+            .Include(p => p.Account).ThenInclude(a => a.Players)
+            .Include(p => p.Tournament).ThenInclude(t => t.Players);
+    
 
     private void OnDrawerOpenChange(bool open)
     {
@@ -82,6 +100,27 @@
 
         _drawerOpen = true;
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void SelectedItemsChanged(HashSet<TournamentRegistration> items)
+    {
+        _selectedItems.Clear();
+        _selectedItems.UnionWith(items);
+    }
+
+    private async Task CompleteSelectedRegistrations()
+    {
+        if (_selectedItems.Count == 0)
+            return;
+
+        var dialog = await DialogService.ShowAsync<CompleteRegistrationsDialog>("Complete Registrations", new DialogParameters<CompleteRegistrationsDialog>
+        {
+            { x => x.Registrations, _selectedItems }
+        });
+        var result = await dialog.Result;
+
+        if (result?.Data is true)
+            await _dataGrid.ReloadAsync();
     }
 
 }

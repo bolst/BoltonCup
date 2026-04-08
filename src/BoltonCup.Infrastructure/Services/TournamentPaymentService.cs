@@ -12,7 +12,7 @@ namespace BoltonCup.Infrastructure.Services;
 
 public class TournamentPaymentService(
     BoltonCupDbContext _dbContext,
-    IPlayerRepository _playerRepository,
+    ITournamentRegistrationService _registrationService,
     IOptions<StripeSettings> _stripeSettings,
     ILogger<TournamentPaymentService> _logger
 ) : ITournamentPaymentService
@@ -115,18 +115,17 @@ public class TournamentPaymentService(
 
     private async Task HandleSuccessfulPaymentAsync(PaymentIntent paymentIntent)
     {
-        if (paymentIntent.Metadata.TryGetValue("AccountId", out var accountId)
-            && paymentIntent.Metadata.TryGetValue("TournamentId", out var tournamentId)
-            && paymentIntent.Metadata.TryGetValue("Position", out var position))
+        if (paymentIntent.Metadata.TryGetValue("AccountId", out var accountIdStr)
+            && paymentIntent.Metadata.TryGetValue("TournamentId", out var tournamentIdStr)
+            && int.TryParse(accountIdStr, out var accountId)
+            && int.TryParse(tournamentIdStr, out var tournamentId))
         {
             _logger.LogInformation("Payment succeeded for account ID {AccountId} in tournament ID {TournamentId}", accountId, tournamentId);
-            await _playerRepository.AddAsync(new Player
-            {
-                TournamentId = int.Parse(tournamentId),
-                AccountId = int.Parse(accountId),
-                Position = position,
-                PaymentId = paymentIntent.Id
-            });
+            await _registrationService.CompleteRegistrationAsync(
+                accountId: accountId,
+                tournamentId: tournamentId, 
+                paymentIntent.Id
+            );
         }
         else
         {

@@ -10,7 +10,8 @@
         CommittedItemChanges="OnItemEdited"
         Height="@GetHeight()"
         RowStyleFunc="RowStyleFunc"
-        @bind-SelectedItems="_selectedItems"
+        SelectedItems="@_selectedItemsState.Value"
+        SelectedItemsChanged="@SetSelectedItemsAsync"
         EditMode="DataGridEditMode.Cell"
         SortMode="SortMode.Single"
         Breakpoint="Breakpoint.None"
@@ -28,13 +29,19 @@
         <ToolBarContent>
             <MudButtonGroup OverrideStyles="false" Size="Size.Small">
                 <MudTooltip Text="Delete Selected">
-                    <MudIconButton OnClick="DeleteSelectedItems" Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Disabled="_selectedItems.Count == 0 || ReadOnly"/>
+                    <MudIconButton OnClick="DeleteSelectedItems" Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Disabled="@(Selection.Count == 0 || ReadOnly || NoDeleting)"/>
                 </MudTooltip>
                 @if (NewItemFunc is not null)
                 {
                     <MudTooltip Text="New Item">
                         <MudIconButton OnClick="AddNewItem" Icon="@Icons.Material.Rounded.Add" Color="Color.Primary" Disabled="ReadOnly"/>
                     </MudTooltip>
+                }
+                @if (ActionMenu is not null)
+                {
+                    <MudMenu Icon="@Icons.Material.Rounded.KeyboardArrowDown">
+                        @ActionMenu
+                    </MudMenu>
                 }
             </MudButtonGroup>
             <MudSpacer/>

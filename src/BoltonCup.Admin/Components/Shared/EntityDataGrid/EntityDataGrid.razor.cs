@@ -27,10 +27,10 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     private const string _noPagerHeight = "calc(100vh - 64px - var(--mud-appbar-height))";
     private readonly int[] _pageSizeOptions = [15, 50, 100, 500];
     private ChangeTracker<T> _changeTracker;
-    private HashSet<T> _selectedItems;
     private MudDataGrid<T> _dataGrid = null!;
     private string? _search;
     private readonly ParameterState<string?> _searchState;
+    private readonly ParameterState<HashSet<T>> _selectedItemsState;
 
     private readonly List<Func<IQueryable<T>, IQueryable<T>>> _includeQueries = [];
 
@@ -38,15 +38,17 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     {
         _cts = new CancellationTokenSource();
         _changeTracker = new ChangeTracker<T>(Comparer);
-        _selectedItems = new HashSet<T>(Comparer);
+        Selection = new HashSet<T>(Comparer);
+        SelectedItems = new HashSet<T>(Comparer);
         using var registerScope = CreateRegisterScope();
         _searchState = registerScope.RegisterParameter<string?>(nameof(Search))
             .WithParameter(() => Search)
             .WithEventCallback(() => SearchChanged)
             .WithChangeHandler(OnSearchChange);
-        registerScope.RegisterParameter<IEqualityComparer<T>>(nameof(Comparer))
-            .WithParameter(() => Comparer)
-            .WithChangeHandler(OnComparerChange);
+        _selectedItemsState = registerScope.RegisterParameter<HashSet<T>>(nameof(SelectedItems))
+            .WithParameter(() => SelectedItems)
+            .WithEventCallback(() => SelectedItemsChanged)
+            .WithChangeHandler(OnSelectedItemsChanged);
     }
     
     [Inject]
@@ -54,6 +56,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
 
     [Parameter]
     public RenderFragment? Columns { get; set; }
+    
+    [Parameter]
+    public RenderFragment? ActionMenu { get; set; }
 
     [Parameter]
     public EventCallback<ChangeTracker<T>> OnSave { get; set; }
@@ -66,7 +71,16 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     
     [Parameter]
     public EventCallback<string?> SearchChanged { get; set; }
+
+    [Parameter]
+    public HashSet<T> SelectedItems { get; set; }
     
+    [Parameter]
+    public EventCallback<HashSet<T>> SelectedItemsChanged { get; set; }
+    
+    [Parameter]
+    public HashSet<T> Selection { get; set; }
+
     [Parameter]
     public IEqualityComparer<T> Comparer { get; set; } = EqualityComparer<T>.Default;
 
@@ -92,7 +106,13 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public Func<CancellationToken, Task<DbContext>>? DbContextFunc { get; set; }
 
     [Parameter]
-    public List<Func<IQueryable<T>, IQueryable<T>>> Includes { get; set; } = [];
+    public Func<IQueryable<T>, IQueryable<T>>? Include { get; set; }
+    
+    [Parameter]
+    public Expression<Func<T, bool>>? Filter { get; set; }
+    
+    [Parameter]
+    public bool NoDeleting { get; set; }
 
     public async Task NotifyItemChangedAsync(T item)
     {
@@ -111,7 +131,10 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     }
 
     private async Task<GridData<T>> ServerFuncWrapper(GridState<T> state, CancellationToken cancellationToken)
-    { 
+    {
+        Selection.Clear();
+        await SetSelectedItemsAsync(Selection);
+        
         try
         {
             var sortDefinition = state.SortDefinitions.FirstOrDefault();
@@ -121,9 +144,15 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
                 .Set<T>()
                 .AsNoTracking();
 
-            dbSet = _includeQueries.Concat(Includes).Aggregate(dbSet,
+            if (Include is not null)
+                dbSet = Include(dbSet);
+            
+            dbSet = _includeQueries.Aggregate(dbSet,
                 (current, query) => query(current)
             );
+
+            if (Filter is not null)
+                dbSet = dbSet.Where(Filter);
 
             if (SearchBy is not null)
                 dbSet = dbSet.WhereContains(SearchBy, _search);
@@ -136,7 +165,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
                 Descending = sortDefinition?.Descending ?? false,
             };
             var data = await dbSet
-                .ApplySorting(query, null)
+                .ApplySorting(query, x => x.Order())
                 .ToPagedListAsync(query, cancellationToken);
             
             var items = _changeTracker.NewItems.Concat(data.Items);
@@ -159,10 +188,18 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         return _dataGrid.ReloadServerData();
     }
 
-    private void OnComparerChange(ParameterChangedEventArgs<IEqualityComparer<T>> args)
+    private void OnSelectedItemsChanged(ParameterChangedEventArgs<HashSet<T>> args)
     {
-        _changeTracker = new ChangeTracker<T>(args.Value);
-        _selectedItems = new HashSet<T>(args.Value);
+        Selection.Clear();
+        Selection.UnionWith(args.Value);
+    }
+
+    private Task SetSelectedItemsAsync(HashSet<T>? items)
+    {
+        items ??= new HashSet<T>(Comparer);
+        Selection.Clear();
+        Selection.UnionWith(items);
+        return _selectedItemsState.SetValueAsync(new HashSet<T>(items, Comparer));
     }
 
     private async Task SetSearchAsync(string search)
@@ -197,12 +234,13 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         await _dataGrid.ReloadServerData();
     }
 
-    public void DeleteSelectedItems()
+    public async Task DeleteSelectedItems()
     {
         if (ReadOnly)
             return;
-        _changeTracker.TrackDeletes(_selectedItems);
-        _selectedItems.Clear();
+        _changeTracker.TrackDeletes(Selection);
+        Selection.Clear();
+        await SetSelectedItemsAsync(Selection);
     }
 
     public async Task AddNewItem()
@@ -220,6 +258,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     {
         _includeQueries.Add(includeQuery);
     }
+    
+    public Task ReloadAsync()
+        => _dataGrid.ReloadServerData();
     
     private string RowStyleFunc(T item, int row)
     {

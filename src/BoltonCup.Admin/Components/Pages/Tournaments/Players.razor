@@ -1,0 +1,50 @@
+@page "/tournaments/{TournamentId:int}/players"
+@using System.Linq.Expressions
+
+
+<EntityDataGrid 
+    @ref="_dataGrid" 
+    T="Player"
+    SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"
+    Filter="@_filter"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Id" Property="x => x.Id" Editable="false"/>
+        <ForeignColumn Title="Player" Property="x => x.Account" Editable="false" />
+        <PropertyColumn Title="Position" Property="x => x.Position" Required />
+        <BoolColumn Title="Can play F/D" Property="x => x.CanPlayEitherPosition" />
+        <PropertyColumn Title="Jersey Size" Property="x => x.JerseySize" Editable="false" />
+        <PropertyColumn Title="Friends" Property="x => x.Friends" Editable="false" />
+        <PropertyColumn Title="#" Property="x => x.JerseyNumber" Required="false" />
+        <ForeignColumn Title="Team" Property="x => x.Team" PropertySetter="(game, team) => game.Team = team" 
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" Filter="x => x.TournamentId == TournamentId" />
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" Editable="false" ImageSrcFunc="x => x.Logo" />
+    </Columns>
+</EntityDataGrid>
+
+
+@code {
+
+    [Parameter]
+    public int TournamentId { get; set; }
+
+    private int? _tournamentId;
+
+    private EntityDataGrid<Player>? _dataGrid;
+    private static readonly PlayerComparer _comparer = new();
+
+    private Expression<Func<Player, bool>>? _filter;
+    
+    protected override Task OnParametersSetAsync()
+    {
+        if (_tournamentId == TournamentId)
+            return Task.CompletedTask;
+        _tournamentId = TournamentId;
+        
+        _filter = x => x.TournamentId == _tournamentId;
+        return _dataGrid is not null
+            ? _dataGrid.ReloadAsync()
+            : Task.CompletedTask;
+    }
+
+}

@@ -36,6 +36,9 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     [Parameter]
     public Func<TEntity, string?>? ImageSrcFunc { get; set; }
     
+    [Parameter]
+    public Expression<Func<TEntity, bool>>? Filter { get; set; }
+    
     protected override async Task OnInitializedAsync()
     {
         EditTemplate = EntityEditTemplate;
@@ -120,9 +123,14 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     {
         await using var dbContext = await DbContextFactory.CreateDbContextAsync();
         // Grabs all records of the target foreign entity type
-        _options = await dbContext
-            .Set<TEntity>()
-            .AsNoTracking()
+        
+        var dbSet = dbContext.Set<TEntity>().AsNoTracking();
+        if (Filter is not null)
+        {
+            dbSet = dbSet.Where(Filter);
+        }
+        
+        _options = await dbSet
             .ToListAsync();
     }
 

@@ -7,41 +7,70 @@
         <MudIconButton OnClick="@LoadDataAsync" Icon="@Icons.Material.Rounded.Refresh" Disabled="@_loading" />
     </div>
 
-    <MudGrid>
-        <MudItem xs="6" md="3">
-            <DataCard Title="Registrations completed">
-                @_completeRegistrationCount / @(_tournament?.SkaterLimit + _tournament?.GoalieLimit)
-            </DataCard>
-        </MudItem>
-        <MudItem xs="6" md="3">
-            <DataCard Title="Incomplete registrations">
-                @_incompleteRegistrationCount
-            </DataCard>
-        </MudItem>
-        
-        <MudFlexBreak />
-        
-        <MudItem xs="6" md="3">
-            <DataCard Title="Skaters">
-                @_skaterCount / @_tournament?.SkaterLimit
-            </DataCard>
-        </MudItem>
-        <MudItem xs="6" md="3">
-            <DataCard Title="Forwards">
-                @_forwardCount
-            </DataCard>
-        </MudItem>
-        <MudItem xs="6" md="3">
-            <DataCard Title="Defensemen">
-                @_defenseCount
-            </DataCard>
-        </MudItem>
-        <MudItem xs="6" md="3">
-            <DataCard Title="Goalies">
-                @_goalieCount / @_tournament?.GoalieLimit
-            </DataCard>
-        </MudItem>
-    </MudGrid>
+    @if (_loading)
+    {
+        <MudGrid>
+            <MudItem xs="6" md="3">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
+            </MudItem>
+            
+            <MudFlexBreak />
+            
+            <MudItem xs="6" md="3">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
+            </MudItem>
+        </MudGrid>
+    }
+    else
+    {
+        <MudGrid>
+            <MudItem xs="6" md="3">
+                <DataCard Title="Registrations completed">
+                    @_completeRegistrationCount
+                </DataCard>
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <DataCard Title="Incomplete registrations">
+                    @_incompleteRegistrationCount
+                </DataCard>
+            </MudItem>
+            
+            <MudFlexBreak />
+            
+            <MudItem xs="6" md="3">
+                <DataCard Title="Skaters">
+                    @_skaterCount / @_tournament?.SkaterLimit
+                </DataCard>
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <DataCard Title="Goalies">
+                    @_goalieCount / @_tournament?.GoalieLimit
+                </DataCard>
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <DataCard Title="Forwards">
+                    @_forwardCount
+                </DataCard>
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <DataCard Title="Defensemen">
+                    @_defenseCount
+                </DataCard>
+            </MudItem>
+        </MudGrid>
+    }
     
 </MudContainer>
 
@@ -50,9 +79,9 @@
 
     private const int _tournamentId = 3;
 
-    private bool _loading;
-    
     private Tournament? _tournament;
+    
+    private bool _loading = true;
 
     private int _completeRegistrationCount;
     private int _incompleteRegistrationCount;
@@ -61,14 +90,18 @@
     private int _forwardCount;
     private int _defenseCount;
     
-    protected override Task OnInitializedAsync()
+    protected override Task OnParametersSetAsync()
     {
-        return LoadDataAsync();
+        return _tournament is null
+            ? LoadDataAsync()
+            : Task.CompletedTask;
     }
 
     private async Task LoadDataAsync()
     {
         _loading = true;
+
+        var delay = Task.Delay(1000);
         
         _tournament = await DbContext.Tournaments
             .AsNoTracking()
@@ -76,6 +109,8 @@
             .Include(t => t.Players)
             .SingleAsync(t => t.Id == _tournamentId);
 
+        await delay;
+        
         _completeRegistrationCount = _tournament.Registrations.Count(x => x.IsComplete);
         _incompleteRegistrationCount = _tournament.Registrations.Count - _completeRegistrationCount;
         _goalieCount = _tournament.Players.Count(p => p.Position == Core.Values.Position.Goalie);

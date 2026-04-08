@@ -12,6 +12,11 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
 builder.Logging.AddBoltonCupSentry(builder.Configuration);
 
+if (builder.HostEnvironment.IsProduction())
+{
+    builder.Logging.SetMinimumLevel(LogLevel.None);
+}
+
 builder.Services.AddScoped<AuthSessionStateService>();
 
 builder.Services.AddMudServices();

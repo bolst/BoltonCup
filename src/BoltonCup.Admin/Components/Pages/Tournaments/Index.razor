@@ -5,6 +5,7 @@
     T="Tournament"
     NewItemFunc="NewItemFunc"
     SearchBy="x => x.Name"
+    Include="@(x => x.Include(p => p.Players))"
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Tournament" Property="x => x.Name" />
@@ -19,6 +20,14 @@
         <BoolColumn Title="Active?" Property="x => x.IsActive" />
         <BoolColumn Title="Registration Open?" Property="x => x.IsRegistrationOpen" />
         <BoolColumn Title="Payment Open" Property="x => x.IsPaymentOpen" />
+        <TemplateColumn Title="Players" Editable="false">
+            <CellTemplate>
+                <MudChip Href='@($"/tournaments/{context.Item.Id}/players")' Variant="Variant.Text" Color="Color.Info" Size="Size.Small" Label="true">
+                    @context.Item.Players.Count(p => p.Position != Core.Values.Position.Goalie)P
+                    @context.Item.Players.Count(p => p.Position == Core.Values.Position.Goalie)G
+                </MudChip>
+            </CellTemplate>
+        </TemplateColumn>
         <PropertyColumn Title="Skater Limit" Property="x => x.SkaterLimit" />
         <PropertyColumn Title="Goalie Limit" Property="x => x.GoalieLimit" />
         <PropertyColumn Title="Skater Registration Fee" Property="x => x.SkaterRegistrationFee" />

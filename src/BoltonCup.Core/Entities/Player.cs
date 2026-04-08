@@ -9,6 +9,12 @@ public class Player : EntityBase
     public string? Position { get; set; }
     public int? JerseyNumber { get; set; }
     public string? PaymentId { get; set; }
+    public string? JerseySize { get; set; }
+    public bool CanPlayEitherPosition { get; set; }
+    public string? Friends { get; set; }
+    public bool AgreedToCodeOfConduct { get; set; }
+    public bool AgreedToConcussionWaiver { get; set; }
+    public bool AgreedToCommunicationConsent { get; set; }
 
     public Account Account { get; set; } = null!;
     public Tournament Tournament { get; set; } = null!;
