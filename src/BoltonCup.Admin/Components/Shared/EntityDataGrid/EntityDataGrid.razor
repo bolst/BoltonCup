@@ -36,6 +36,12 @@
                         <MudIconButton OnClick="AddNewItem" Icon="@Icons.Material.Rounded.Add" Color="Color.Primary" Disabled="ReadOnly"/>
                     </MudTooltip>
                 }
+                @if (ActionMenu is not null)
+                {
+                    <MudMenu Icon="@Icons.Material.Rounded.KeyboardArrowDown">
+                        @ActionMenu
+                    </MudMenu>
+                }
             </MudButtonGroup>
             <MudSpacer/>
             
