@@ -12,6 +12,7 @@
     RowsPerPage="50"
     Elevation="0"
     ShowColumnOptions="false"
+    AllowUnsorted
     Striped
     Dense>
     <ToolBarContent>
@@ -37,7 +38,7 @@
                 <PlayerLink Label="@context.Item.FullName" PlayerId="context.Item.PlayerId" />
             </CellTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.TeamName" Title="Team">
+        <PropertyColumn Property="x => x.TeamName" Title="Team" Hidden="@(_filter.Tournament is null)">
             <CellTemplate>
                 <div class="d-flex flex-row align-center justify-space-evenly">
                     <MudText Typo="Typo.body2">@context.Item.TeamAbbreviation</MudText>

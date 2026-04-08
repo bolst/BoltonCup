@@ -63,6 +63,6 @@ public class UpdateAccountRequestValidator : AbstractValidator<UpdateAccountRequ
             });
 
         RuleFor(x => x.Weight)
-            .InclusiveBetween(0, 600).WithMessage("Weight must be between 0 and 600");
+            .InclusiveBetween(0, 1000).WithMessage("Weight must be between 0 and 1000");
     }
 }

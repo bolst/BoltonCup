@@ -183,6 +183,14 @@ else
         =>@<div class="d-flex flex-column align-start mud-width-full px-4">
               <MudText Typo="Typo.subtitle1"><b>Born:</b> @player.Birthday?.ToString("d")</MudText>
               <MudText Typo="Typo.subtitle1"><b>Favourite Beer:</b> @player.PreferredBeer</MudText>
+              @if (!string.IsNullOrEmpty(player.Height))
+              {
+                  <MudText Typo="Typo.subtitle1"><b>Height:</b> @player.Height</MudText>
+              }
+              @if (player.Weight.HasValue)
+              {
+                  <MudText Typo="Typo.subtitle1"><b>Weight:</b> @player.Weight lb</MudText>
+              }
           </div>;
 
     private RenderFragment<CellContext<Sdk.PlayerGameByGame>> OpponentCellTemplate => context =>
