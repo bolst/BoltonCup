@@ -5,7 +5,7 @@
     T="Tournament"
     NewItemFunc="NewItemFunc"
     SearchBy="x => x.Name"
-    Includes="[x => x.Include(p => p.Players)]"
+    Include="@(x => x.Include(p => p.Players))"
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Tournament" Property="x => x.Name" />

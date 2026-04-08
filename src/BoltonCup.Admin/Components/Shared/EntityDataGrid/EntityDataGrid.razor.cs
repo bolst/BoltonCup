@@ -106,7 +106,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public Func<CancellationToken, Task<DbContext>>? DbContextFunc { get; set; }
 
     [Parameter]
-    public List<Func<IQueryable<T>, IQueryable<T>>> Includes { get; set; } = [];
+    public Func<IQueryable<T>, IQueryable<T>>? Include { get; set; }
     
     [Parameter]
     public Expression<Func<T, bool>>? Filter { get; set; }
@@ -128,7 +128,10 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     }
 
     private async Task<GridData<T>> ServerFuncWrapper(GridState<T> state, CancellationToken cancellationToken)
-    { 
+    {
+        Selection.Clear();
+        await SetSelectedItemsAsync(Selection);
+        
         try
         {
             var sortDefinition = state.SortDefinitions.FirstOrDefault();
@@ -138,7 +141,10 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
                 .Set<T>()
                 .AsNoTracking();
 
-            dbSet = _includeQueries.Concat(Includes).Aggregate(dbSet,
+            if (Include is not null)
+                dbSet = Include(dbSet);
+            
+            dbSet = _includeQueries.Aggregate(dbSet,
                 (current, query) => query(current)
             );
 

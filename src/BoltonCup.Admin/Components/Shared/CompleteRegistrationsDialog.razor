@@ -1,0 +1,129 @@
+@namespace BoltonCup.Admin.Components.Shared
+@inject BoltonCupDbContext DbContext
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Select how each player payed</MudText>
+        
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Dense>@_errorMessage</MudAlert>
+        }
+        
+        <MudDivider Class="my-2" />
+        
+        <div class="pa-4 mud-width-full d-flex flex-column gap-6 overflow-y-scroll" style="max-height: 400px">
+            @foreach (var uselessItem in _items)
+            {
+                var item = uselessItem;
+                <div class="mud-width-full d-flex flex-column align-start gap-1">
+                    <MudText>@item.Registration.Account.ToString()</MudText>
+                    <MudChipSet @bind-SelectedValue="@item.Method" SelectionMode="SelectionMode.SingleSelection" Variant="Variant.Text" CheckMark>
+                        <MudChip Text="e-Transfer" Value="@("e-Transfer")" Color="Color.Warning" />
+                        <MudChip Text="Cash" Color="Color.Success" />
+                        <MudChip Text="Other" Color="Color.Default" />
+                    </MudChipSet>
+                    <MudTextField @bind-Value="@item.Notes" Label="Notes" Margin="Margin.Dense" Required="@(item.Method == "Other")" ShrinkLabel />
+                </div>
+            }
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Dialog.Cancel">Cancel</MudButton>
+        <MudButton OnClick="@CompleteRegistrations" Color="Color.Info">Complete Registrations</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter]
+    public IEnumerable<TournamentRegistration> Registrations { get; set; } = [];
+
+    List<CompletedTournamentRegistration> _items = [];
+
+    private string? _errorMessage;
+
+    protected override Task OnInitializedAsync()
+    {
+        return Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            NoHeader = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        });
+    }
+
+    protected override void OnParametersSet()
+    {
+        _items = Registrations.Select(r => new CompletedTournamentRegistration(r)).ToList();
+        StateHasChanged();
+    }
+
+
+    private async Task CompleteRegistrations()
+    {
+        _errorMessage = null;
+        if (_items.Any(x => string.IsNullOrEmpty(x.Method)))
+        {
+            _errorMessage = "Some players are missing payment methods.";
+            return;
+        }
+
+        if (_items.Any(x => x.Method == "Other" && string.IsNullOrEmpty(x.Notes)))
+        {
+            _errorMessage = "You must provide notes if selection is 'Other'";
+            return;
+        }
+
+        foreach (var item in _items)
+        {
+            var player = new Player
+            {
+                TournamentId = item.Registration.TournamentId,
+                AccountId = item.Registration.AccountId,
+                PaymentId = item.Message
+            };
+
+            DbContext.Players.Add(player);
+
+            var registration = item.Registration;
+            registration.IsComplete = true;
+            DbContext.TournamentRegistrations.Update(registration);
+        }
+        
+        await DbContext.SaveChangesAsync();
+
+        Dialog.Close(DialogResult.Ok(true));
+    }
+
+    public class CompletedTournamentRegistration(TournamentRegistration registration) : IEquatable<CompletedTournamentRegistration>
+    {
+        public string? Method { get; set; }
+        public string? Notes { get; set; }
+        
+        public TournamentRegistration Registration { get; } = registration;
+
+        public string? Message => GetMessage();
+
+        private string? GetMessage()
+        {
+            if (string.IsNullOrEmpty(Method))
+                return null;
+            if (Method == "Other")
+                return $"Other ({Notes})";
+            return Method;
+        }
+
+        public bool Equals(CompletedTournamentRegistration? other)
+        {
+            return other?.Registration.Id == Registration.Id;
+        }
+
+        public override int GetHashCode() => Registration.Id.GetHashCode();
+    }
+    
+}

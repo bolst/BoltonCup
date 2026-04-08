@@ -10,7 +10,7 @@
         CommittedItemChanges="OnItemEdited"
         Height="@GetHeight()"
         RowStyleFunc="RowStyleFunc"
-        SelectedItems="@Selection"
+        SelectedItems="@_selectedItemsState.Value"
         SelectedItemsChanged="@SetSelectedItemsAsync"
         EditMode="DataGridEditMode.Cell"
         SortMode="SortMode.Single"

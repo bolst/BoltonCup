@@ -11,7 +11,7 @@
     <Columns>
         <PropertyColumn Title="Id" Property="x => x.Id" Editable="false"/>
         <ForeignColumn Title="Player" Property="x => x.Account" Editable="false" />
-        <PropertyColumn Title="Position" Property="x => x.Position" Editable="false" Required />
+        <PropertyColumn Title="Position" Property="x => x.Position" Required />
         <PropertyColumn Title="#" Property="x => x.JerseyNumber" Required="false" />
         <ForeignColumn Title="Team" Property="x => x.Team" PropertySetter="(game, team) => game.Team = team" 
                        EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" Filter="x => x.TournamentId == TournamentId" />
