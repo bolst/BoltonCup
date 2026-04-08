@@ -136,7 +136,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
                 Descending = sortDefinition?.Descending ?? false,
             };
             var data = await dbSet
-                .ApplySorting(query, null)
+                .ApplySorting(query, x => x.Order())
                 .ToPagedListAsync(query, cancellationToken);
             
             var items = _changeTracker.NewItems.Concat(data.Items);
