@@ -272,6 +272,12 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Position).HasColumnName("position");
             entity.Property(e => e.JerseyNumber).HasColumnName("jersey_number");
             entity.Property(e => e.PaymentId).HasColumnName("payment_id");
+            entity.Property(e => e.JerseySize).HasColumnName("jersey_size");
+            entity.Property(e => e.CanPlayEitherPosition).HasColumnName("can_play_either_position");
+            entity.Property(e => e.Friends).HasColumnName("friends");
+            entity.Property(e => e.AgreedToCodeOfConduct).HasColumnName("agreed_code_of_conduct");
+            entity.Property(e => e.AgreedToConcussionWaiver).HasColumnName("agreed_concussion_waiver");
+            entity.Property(e => e.AgreedToCommunicationConsent).HasColumnName("agreed_communication_consent");
         });
 
         modelBuilder.Entity<SkaterGameLog>(entity =>

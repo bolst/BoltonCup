@@ -53,9 +53,17 @@ public class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITou
         CancellationToken cancellationToken = default)
     {
         var registration = await _dbContext.TournamentRegistrations
+                               .AsNoTracking()
+                               .Include(e => e.Account)
                                .FirstOrDefaultAsync(x => x.AccountId == accountId && x.TournamentId == tournamentId, cancellationToken) 
                            ?? throw new EntityNotFoundException(nameof(TournamentRegistration), new { tournamentId, accountId });
 
+        if (await _dbContext.Players.FirstOrDefaultAsync(p =>
+                p.TournamentId == registration.TournamentId && p.AccountId == registration.AccountId, cancellationToken: cancellationToken) is not null)
+        {
+            throw new AccountAlreadyInTournamentException(registration.AccountId, registration.TournamentId);
+        }
+        
         var player = new Player
         {
             TournamentId = tournamentId,
@@ -66,6 +74,15 @@ public class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITou
         if (registration.TryParsePayload(out var data))
         {
             player.Position = data.UserInfo.Position;
+            player.JerseySize = data.UserInfo.JerseySize;
+            player.CanPlayEitherPosition = data.UserInfo.CanPlayEitherPosition;
+            player.Friends = data.UserInfo.Friends;
+            player.AgreedToCodeOfConduct = data.Documents.HasAgreedToCodeOfConductWaiver;
+            player.AgreedToConcussionWaiver = data.Documents.HasAgreedToConcussionWaiver;
+            player.AgreedToCommunicationConsent = data.Documents.HasAgreedToCommunicationConsent;
+
+            registration.Account.Phone = data.UserInfo.Phone;
+            _dbContext.Accounts.Update(registration.Account);
         }
         
         _dbContext.Players.Add(player);
