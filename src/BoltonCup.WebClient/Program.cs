@@ -19,6 +19,10 @@ if (builder.HostEnvironment.IsProduction())
 {
     builder.Logging.SetMinimumLevel(LogLevel.None);
 }
+else
+{
+    builder.Logging.AddFilter("System.Net.Http", LogLevel.None);
+}
 
 builder.Services.AddMudServices();
 builder.Services.AddMudMarkdownServices();
