@@ -46,9 +46,6 @@
                     @_incompleteRegistrationCount
                 </DataCard>
             </MudItem>
-            
-            <MudFlexBreak />
-            
             <MudItem xs="6" md="3">
                 <DataCard Title="Skaters">
                     @_skaterCount / @_tournament?.SkaterLimit
@@ -67,6 +64,16 @@
             <MudItem xs="6" md="3">
                 <DataCard Title="Defensemen">
                     @_defenseCount
+                </DataCard>
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <DataCard Title="Forwards can play defense">
+                    @_forwardCanPlayDefenseCount
+                </DataCard>
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <DataCard Title="Defense can play forward">
+                    @_defenseCanPlayForwardCount
                 </DataCard>
             </MudItem>
         </MudGrid>
@@ -89,6 +96,8 @@
     private int _goalieCount;
     private int _forwardCount;
     private int _defenseCount;
+    private int _forwardCanPlayDefenseCount;
+    private int _defenseCanPlayForwardCount;
     
     protected override Task OnParametersSetAsync()
     {
@@ -115,8 +124,13 @@
         _incompleteRegistrationCount = _tournament.Registrations.Count - _completeRegistrationCount;
         _goalieCount = _tournament.Players.Count(p => p.Position == Core.Values.Position.Goalie);
         _skaterCount = _tournament.Players.Count - _goalieCount;
-        _forwardCount = _tournament.Players.Count(p => p.Position == Core.Values.Position.Forward);
-        _defenseCount = _tournament.Players.Count(p => p.Position == Core.Values.Position.Defense);
+
+        var forwards = _tournament.Players.Where(p => p.Position == Core.Values.Position.Forward).ToList();
+        var defense = _tournament.Players.Where(p => p.Position == Core.Values.Position.Defense).ToList();
+        _forwardCount = forwards.Count;
+        _defenseCount = defense.Count;
+        _forwardCanPlayDefenseCount = forwards.Count(f => f.CanPlayEitherPosition);
+        _defenseCanPlayForwardCount = defense.Count(d => d.CanPlayEitherPosition);
         
         _loading = false;
         await InvokeAsync(StateHasChanged);
