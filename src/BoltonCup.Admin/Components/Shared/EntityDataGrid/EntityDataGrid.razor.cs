@@ -185,6 +185,14 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         Selection.UnionWith(args.Value);
     }
 
+    private Task SetSelectedItemsAsync(HashSet<T>? items)
+    {
+        items ??= new HashSet<T>(Comparer);
+        Selection.Clear();
+        Selection.UnionWith(items);
+        return _selectedItemsState.SetValueAsync(new HashSet<T>(items, Comparer));
+    }
+
     private async Task SetSearchAsync(string search)
     {
         if (search.Equals(_search, StringComparison.OrdinalIgnoreCase))
@@ -223,7 +231,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
             return;
         _changeTracker.TrackDeletes(Selection);
         Selection.Clear();
-        await _selectedItemsState.SetValueAsync(new HashSet<T>(Selection, Comparer));
+        await SetSelectedItemsAsync(Selection);
     }
 
     public async Task AddNewItem()
