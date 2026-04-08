@@ -16,9 +16,12 @@
             <MudItem xs="6" md="3">
                 <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
             </MudItem>
-            
-            <MudFlexBreak />
-            
+            <MudItem xs="6" md="3">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
+            </MudItem>
+            <MudItem xs="6" md="3">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
+            </MudItem>
             <MudItem xs="6" md="3">
                 <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
             </MudItem>
@@ -68,12 +71,12 @@
             </MudItem>
             <MudItem xs="6" md="3">
                 <DataCard Title="Forwards can play defense">
-                    @_forwardCanPlayDefenseCount
+                    @_forwardCanPlayDefenseCount / @_forwardCount
                 </DataCard>
             </MudItem>
             <MudItem xs="6" md="3">
-                <DataCard Title="Defense can play forward">
-                    @_defenseCanPlayForwardCount
+                <DataCard Title="Defensemen can play forward">
+                    @_defenseCanPlayForwardCount / @_defenseCount
                 </DataCard>
             </MudItem>
         </MudGrid>
