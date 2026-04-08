@@ -5888,6 +5888,15 @@
             "type": "boolean",
             "readOnly": true
           },
+          "height": {
+            "type": "string",
+            "nullable": true
+          },
+          "weight": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "gameByGame": {
             "type": "array",
             "items": {
