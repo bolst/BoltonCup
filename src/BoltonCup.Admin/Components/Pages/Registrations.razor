@@ -9,15 +9,14 @@
     Comparer="@_comparer"
     SearchBy="@(x => x.Account.FirstName + " " + x.Account.LastName)"
     Include="@_include"
-    ReadOnly>
+    NoDeleting>
     <ActionMenu>
         <MudMenuItem Label="Complete Registration" OnClick="@CompleteSelectedRegistrations" Disabled="@(_selectedItems.Count == 0)" />
     </ActionMenu>
     <Columns>
-        <ForeignColumn Title="Name" Property="x => x.Account"/>
-        <ForeignColumn Title="Tournament" Property="x => x.Tournament"/>
-        <PropertyColumn Title="Current step" Property="x => x.CurrentStep" CellStyle="text-align: right"/>
-        <PropertyColumn Title="Data" Property="x => x.Payload" Sortable="false" CellStyle="text-align: center">
+        <ForeignColumn Title="Name" Property="x => x.Account" Editable="false" />
+        <PropertyColumn Title="Current step" Property="x => x.CurrentStep" Editable="false" CellStyle="text-align: right"/>
+        <PropertyColumn Title="Data" Property="x => x.Payload" Sortable="false" Editable="false" CellStyle="text-align: center">
             <CellTemplate>
                 @if (!string.IsNullOrEmpty(context.Item.Payload))
                 {
@@ -25,19 +24,9 @@
                 }
             </CellTemplate>
         </PropertyColumn>
-        <PropertyColumn Title="Complete" Property="x => x.IsComplete" CellStyle="text-align: center">
-            <CellTemplate>
-                @if (context.Item.IsComplete)
-                {
-                    <MudIcon Icon="@Icons.Material.Rounded.Check" Color="Color.Success" Size="Size.Small"/>
-                }
-                else
-                {
-                    <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small"/>
-                }
-            </CellTemplate>
-        </PropertyColumn>
-        <PropertyColumn Title="Status" Property="x => x.Tournament.Players.Any(p => p.AccountId == x.AccountId)" CellStyle="text-align: center">
+        <BoolColumn Title="Completed?" Property="x => x.IsComplete" />
+        <PropertyColumn Title="Status" Property="x => x.Tournament.Players.Any(p => p.AccountId == x.AccountId)" 
+                        Editable="false" CellStyle="text-align: center">
             <CellTemplate>
                 @if (context.Item.Tournament.Players.Any(p => p.AccountId == context.Item.AccountId))
                 {
@@ -49,7 +38,7 @@
                 }
             </CellTemplate>
         </PropertyColumn>
-        <TemplateColumn Title="Payment ID" Sortable="false">
+        <TemplateColumn Title="Payment ID" Sortable="false" Editable="false">
             <CellTemplate>
                 @{
                     var player = context.Item.Account.Players.FirstOrDefault(p => p.TournamentId == context.Item.TournamentId);
@@ -60,7 +49,8 @@
                 }
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Title="Created at" Property="x => x.CreatedAt" Format="g" InitialDirection="SortDirection.Descending"/>
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" Editable="false"/>
+        <PropertyColumn Title="Created at" Property="x => x.CreatedAt" Editable="false" Format="g" InitialDirection="SortDirection.Descending"/>
     </Columns>
 </EntityDataGrid>
 

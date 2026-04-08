@@ -1,5 +1,5 @@
 @namespace BoltonCup.Admin.Components.Shared
-@inject BoltonCupDbContext DbContext
+@inject ITournamentRegistrationService TournamentRegistrationService
 
 <MudDialog>
     <DialogContent>
@@ -59,6 +59,7 @@
         return Dialog.SetOptionsAsync(Dialog.Options with
         {
             NoHeader = true,
+            BackdropClick = false,
             MaxWidth = MaxWidth.Small,
             FullWidth = true
         });
@@ -93,21 +94,12 @@
 
         foreach (var item in updateItems)
         {
-            var player = new Player
-            {
-                TournamentId = item.Registration.TournamentId,
-                AccountId = item.Registration.AccountId,
-                PaymentId = item.Message
-            };
-
-            DbContext.Players.Add(player);
-
-            var registration = item.Registration;
-            registration.IsComplete = true;
-            DbContext.TournamentRegistrations.Update(registration);
+            await TournamentRegistrationService.CompleteRegistrationAsync(
+                item.Registration.AccountId, 
+                item.Registration.TournamentId, 
+                item.Message!
+            );
         }
-        
-        await DbContext.SaveChangesAsync();
 
         Dialog.Close(DialogResult.Ok(true));
     }

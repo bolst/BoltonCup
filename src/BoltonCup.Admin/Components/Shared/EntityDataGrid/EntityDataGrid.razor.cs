@@ -110,6 +110,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     
     [Parameter]
     public Expression<Func<T, bool>>? Filter { get; set; }
+    
+    [Parameter]
+    public bool NoDeleting { get; set; }
 
     public async Task NotifyItemChangedAsync(T item)
     {
