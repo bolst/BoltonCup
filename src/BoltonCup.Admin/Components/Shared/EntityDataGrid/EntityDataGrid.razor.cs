@@ -93,6 +93,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
 
     [Parameter]
     public List<Func<IQueryable<T>, IQueryable<T>>> Includes { get; set; } = [];
+    
+    [Parameter]
+    public Expression<Func<T, bool>>? Filter { get; set; }
 
     public async Task NotifyItemChangedAsync(T item)
     {
@@ -124,6 +127,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
             dbSet = _includeQueries.Concat(Includes).Aggregate(dbSet,
                 (current, query) => query(current)
             );
+
+            if (Filter is not null)
+                dbSet = dbSet.Where(Filter);
 
             if (SearchBy is not null)
                 dbSet = dbSet.WhereContains(SearchBy, _search);
@@ -220,6 +226,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     {
         _includeQueries.Add(includeQuery);
     }
+    
+    public Task ReloadAsync()
+        => _dataGrid.ReloadServerData();
     
     private string RowStyleFunc(T item, int row)
     {
