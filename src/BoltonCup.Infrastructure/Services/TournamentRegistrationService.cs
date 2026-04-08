@@ -3,7 +3,7 @@ using BoltonCup.Core;
 using BoltonCup.Core.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
-namespace BoltonCup.Infrastructure.Repositories;
+namespace BoltonCup.Infrastructure.Services;
 
 public class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITournamentRegistrationService
 {
