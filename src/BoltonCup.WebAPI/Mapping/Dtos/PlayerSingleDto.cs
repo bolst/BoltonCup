@@ -2,6 +2,8 @@ namespace BoltonCup.WebAPI.Mapping;
 
 public record PlayerSingleDto : PlayerDto
 {
+    public string? Height { get; set; }
+    public int? Weight { get; set; }
     public List<PlayerGameByGame> GameByGame { get; init; } = [];
     public List<PlayerTournamentStats> TournamentStats { get; init; } = [];
 }

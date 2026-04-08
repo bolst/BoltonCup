@@ -26,6 +26,7 @@
             <AccountInfoTextField @bind-Value="@_updateRequest.FirstName" Label="First name" Disabled="!_editable" />
             <AccountInfoTextField @bind-Value="@_updateRequest.LastName" Label="Last name" Disabled="!_editable" />
             <AccountInfoTextField @bind-Value="@_updateRequest.Height" Label="Height" Disabled="!_editable" Mask="@_heightMask" ErrorText="Enter a valid height." />
+            <AccountInfoIntField @bind-Value="@_updateRequest.Weight" Label="Weight" Disabled="!_editable" Min="0" ErrorText="Enter a valid weight." />
             <AccountInfoTextField @bind-Value="@_updateRequest.PreferredBeer" Label="Preferred beer" Disabled="!_editable" />
             <HighestLevelSelect @bind-Value="@_updateRequest.HighestLevel" Label="Highest Level" Disabled="!_editable" />
            
