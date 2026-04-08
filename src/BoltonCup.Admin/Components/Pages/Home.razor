@@ -79,9 +79,9 @@
 
     private const int _tournamentId = 3;
 
-    private bool _loading = true;
-    
     private Tournament? _tournament;
+    
+    private bool _loading = true;
 
     private int _completeRegistrationCount;
     private int _incompleteRegistrationCount;
@@ -90,9 +90,11 @@
     private int _forwardCount;
     private int _defenseCount;
     
-    protected override Task OnInitializedAsync()
+    protected override Task OnParametersSetAsync()
     {
-        return LoadDataAsync();
+        return _tournament is null
+            ? LoadDataAsync()
+            : Task.CompletedTask;
     }
 
     private async Task LoadDataAsync()
