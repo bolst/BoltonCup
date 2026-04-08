@@ -1,0 +1,27 @@
+@page "/tournaments/{TournamentId:int}/players"
+
+
+
+
+@code {
+
+
+    [Parameter]
+    public int TournamentId { get; set; }
+
+    private int? _tournamentId;
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (_tournamentId == TournamentId)
+            return Task.CompletedTask;
+        _tournamentId = TournamentId;
+        return LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        
+    }
+
+}
