@@ -12,6 +12,9 @@
         <PropertyColumn Title="Id" Property="x => x.Id" Editable="false"/>
         <ForeignColumn Title="Player" Property="x => x.Account" Editable="false" />
         <PropertyColumn Title="Position" Property="x => x.Position" Required />
+        <BoolColumn Title="Can play F/D" Property="x => x.CanPlayEitherPosition" />
+        <PropertyColumn Title="Jersey Size" Property="x => x.JerseySize" Editable="false" />
+        <PropertyColumn Title="Friends" Property="x => x.Friends" Editable="false" />
         <PropertyColumn Title="#" Property="x => x.JerseyNumber" Required="false" />
         <ForeignColumn Title="Team" Property="x => x.Team" PropertySetter="(game, team) => game.Team = team" 
                        EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" Filter="x => x.TournamentId == TournamentId" />
