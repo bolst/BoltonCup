@@ -7,6 +7,7 @@ export function initCountdown(dateEnd) {
         return;
     }
 
+    calculate();
     const timerId = setInterval(calculate, 1000);
 
     function calculate() {
