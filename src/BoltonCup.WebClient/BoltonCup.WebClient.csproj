@@ -29,4 +29,8 @@
       <ProjectReference Include="..\BoltonCup.Common\BoltonCup.Common.csproj" />
     </ItemGroup>
     
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\img\action-cover-temp.jpg" />
+    </ItemGroup>
+    
 </Project>

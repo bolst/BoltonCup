@@ -66,6 +66,11 @@ else
             message = "Rate limit exceeded, please try again later.";
             return true;
         }
+        if (CurrentException is HttpRequestException)
+        {
+            message = "Unable to connect to the server :(";
+            return true;
+        }
         
         return false;
     }
