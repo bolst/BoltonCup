@@ -108,12 +108,14 @@ else
     private readonly CompleteUserAccountRequest _model = new();
 
     private string? _birthdayError;
+
+    private DateTime? _internalBirthday;
     private DateTime? _birthday
     {
-        get;
+        get => _internalBirthday;
         set
         {
-            field = value;
+            _internalBirthday = value;
             if (value != null)
             {
                 _model.Birthday = value.Value;

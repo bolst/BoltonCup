@@ -7,6 +7,9 @@
         <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
         <WasmBuildNative>true</WasmBuildNative>
         
+        <!-- for ios 16? -->
+        <WasmEnableSIMD>false</WasmEnableSIMD>
+        
         <!--github.com/RicoSuter/NSwag/issues/5301-->
         <WasmEnableStreamingResponse>false</WasmEnableStreamingResponse>
     </PropertyGroup>
