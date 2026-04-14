@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NSwag.ApiDescription.Client" Version="14.6.3">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <OpenApiReference
+                Include="..\BoltonCup.WebAPI\BoltonCup.WebAPI.json"
+                ClassName="BoltonCupApi"
+                Namespace="BoltonCup.Sdk"
+                SourceGenerator="NSwagCSharp"
+                Link="OpenAPIs\boltoncup.json"
+                Options="/GenerateOptionalParameters:true /GenerateClientInterfaces:true /DateTimeType:System.DateTime /JsonLibrary:SystemTextJson" />
+    </ItemGroup>
+</Project>
