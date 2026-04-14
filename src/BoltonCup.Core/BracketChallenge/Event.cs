@@ -11,3 +11,15 @@ public class Event : EntityBase
 
     public ICollection<Registration> Registrations { get; set; } = [];
 }
+
+public class EventComparer : IEqualityComparer<Event>
+{
+    public bool Equals(Event? item1, Event? item2)
+    {
+        if (ReferenceEquals(item1, item2)) 
+            return true;
+        return item1 is not null && item2 is not null && item1.Id == item2.Id;
+    }
+        
+    public int GetHashCode(Event item) => item.Id.GetHashCode();
+}
