@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -16,7 +17,8 @@ namespace BoltonCup.Infrastructure.Migrations
                 schema: "core",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     title = table.Column<string>(type: "text", nullable: true),
                     link = table.Column<string>(type: "text", nullable: true),
                     password = table.Column<string>(type: "text", nullable: true),
@@ -38,7 +40,7 @@ namespace BoltonCup.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    bracket_challenge_event_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    event_id = table.Column<int>(type: "integer", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     email = table.Column<string>(type: "text", nullable: false),
                     payment_id = table.Column<string>(type: "text", nullable: true),
@@ -51,8 +53,8 @@ namespace BoltonCup.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_bracket_challenge_registrations", x => x.id);
                     table.ForeignKey(
-                        name: "FK_bracket_challenge_registrations_bracket_challenge_events_br~",
-                        column: x => x.bracket_challenge_event_id,
+                        name: "FK_bracket_challenge_registrations_bracket_challenge_events_ev~",
+                        column: x => x.event_id,
                         principalSchema: "core",
                         principalTable: "bracket_challenge_events",
                         principalColumn: "id",
@@ -60,10 +62,11 @@ namespace BoltonCup.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_bracket_challenge_registrations_bracket_challenge_event_id",
+                name: "IX_bracket_challenge_registrations_event_id_email",
                 schema: "core",
                 table: "bracket_challenge_registrations",
-                column: "bracket_challenge_event_id");
+                columns: new[] { "event_id", "email" },
+                unique: true);
         }
 
         /// <inheritdoc />

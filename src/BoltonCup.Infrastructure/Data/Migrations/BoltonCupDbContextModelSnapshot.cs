@@ -112,10 +112,12 @@ namespace BoltonCup.Infrastructure.Migrations
 
             modelBuilder.Entity("BoltonCup.Core.BracketChallenge.Event", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -167,10 +169,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("BracketChallengeId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("bracket_challenge_event_id");
-
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -185,6 +183,10 @@ namespace BoltonCup.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("email");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer")
+                        .HasColumnName("event_id");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone")
@@ -205,7 +207,7 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BracketChallengeId", "Email")
+                    b.HasIndex("EventId", "Email")
                         .IsUnique();
 
                     b.ToTable("bracket_challenge_registrations", "core");
@@ -1256,7 +1258,7 @@ namespace BoltonCup.Infrastructure.Migrations
                 {
                     b.HasOne("BoltonCup.Core.BracketChallenge.Event", "BracketChallenge")
                         .WithMany("Registrations")
-                        .HasForeignKey("BracketChallengeId")
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
