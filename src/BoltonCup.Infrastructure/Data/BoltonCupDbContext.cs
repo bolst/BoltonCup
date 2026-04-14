@@ -77,6 +77,9 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.BracketChallenge)
                 .WithMany(e => e.Registrations)
                 .HasForeignKey(e => e.BracketChallengeId);
+            entity
+                .HasIndex(e => new { e.BracketChallengeId, e.Email })
+                .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.BracketChallengeId).HasColumnName("bracket_challenge_event_id");
             entity.Property(e => e.Name).HasColumnName("name");
