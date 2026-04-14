@@ -35,7 +35,7 @@
                 }
             </a>
         </MudListSubheader>
-        @foreach (var (i, skater) in _skaterStats.Index())
+        @foreach (var (skater, i) in _skaterStats.Select((skater, i) => (skater, i)))
         {
             <MudListItem Value="skater" @onmouseover="@(() => _selectedSkater = skater)">
                 <div class="d-flex flex-row align-center justify-space-between">
@@ -74,7 +74,7 @@ else if (_goalieCategoryFunc is not null)
                 }
             </a>
         </MudListSubheader>
-        @foreach (var (i, goalie) in _goalieStats.Index())
+        @foreach (var (goalie, i) in _goalieStats.Select((goalie, i) => (goalie, i)))
         {
             <MudListItem Value="goalie" @onmouseover="@(() => _selectedGoalie = goalie)">
                 <div class="d-flex flex-row align-center justify-space-between">
