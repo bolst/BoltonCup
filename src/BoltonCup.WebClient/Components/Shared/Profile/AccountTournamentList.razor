@@ -21,7 +21,7 @@
     <MudText Typo="Typo.body2"><b>Past Tournaments</b></MudText>
 
     <MudList T="string" Gutters Padding ReadOnly>
-        @foreach (var (index, player) in _userTournaments.Where(t => t.Team is not null).Index())
+        @foreach (var (player, index) in _userTournaments.Where(t => t.Team is not null).Select((player, i) => (player ,i)))
         {
             var color = index % 2 != 0 ? string.Empty : "gray lighten-3";
             <MudListItem Text="@player.Tournament.Name" SecondaryText="@player.Team?.Name" Class="@color">

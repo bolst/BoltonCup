@@ -6,14 +6,16 @@ public class SitemapAttribute : Attribute
     public string? Location { get; }
     public string? LastModified { get; init; }
     public SitemapChangeFrequency? ChangeFrequency { get; init; }
+
+    private readonly float _priority;
     public float Priority
     {
-        get => field;
+        get => _priority;
         init
         {
             if (value is < 0.0f or > 1.0f)
                 throw new ArgumentException("Sitemap priority must be between 0.0 and 1.0");
-            field = value;
+            _priority = value;
         }
     }
 
