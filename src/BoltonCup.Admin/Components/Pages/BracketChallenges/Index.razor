@@ -1,0 +1,40 @@
+@page "/bracket-challenges"
+
+<EntityDataGrid
+    T="Core.BracketChallenge.Event"
+    NewItemFunc="NewItemFunc"
+    SearchBy="x => x.Title"
+    ColumnResizeMode="ResizeMode.Column"
+    Include="@(x => x.Include(p => p.Registrations))"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Id" Property="x => x.Id" Editable="false" />
+        <PropertyColumn Title="Title" Property="x => x.Title" />
+        <LinkColumn Title="Link" Property="x => x.Link" />
+        <PropertyColumn Title="Password" Property="x => x.Password" />
+        <PropertyColumn Title="Fee" Property="x => x.Fee" />
+        <BoolColumn Title="Is Open" Property="x => x.IsOpen" />
+        <TemplateColumn Title="Registrations" Editable="false">
+            <CellTemplate>
+                <MudChip Href='@($"/bracket-challenges/{context.Item.Id}/registrations")' Variant="Variant.Text" Color="Color.Info" Size="Size.Small" Label="true">
+                    @context.Item.Registrations.Count
+                </MudChip>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</EntityDataGrid>
+
+
+@code {
+    
+    private readonly Core.BracketChallenge.EventComparer _comparer = new();
+    
+    private async Task<Core.BracketChallenge.Event> NewItemFunc()
+    {
+        return new Core.BracketChallenge.Event
+        {
+            
+        };
+    }
+
+}

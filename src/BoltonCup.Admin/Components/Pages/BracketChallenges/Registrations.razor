@@ -1,0 +1,46 @@
+@page "/bracket-challenges/{BracketChallengeId:int}/registrations"
+@using System.Linq.Expressions
+
+
+<EntityDataGrid 
+    @ref="_dataGrid" 
+    T="Core.BracketChallenge.Registration"
+    SearchBy="x => x.Name"
+    Filter="@_filter"
+    Comparer="_comparer"
+    ColumnResizeMode="ResizeMode.Column"
+    ReadOnly>
+    <Columns>
+        <PropertyColumn Title="Id" Property="x => x.Id" />
+        <PropertyColumn Title="Name" Property="x => x.Name"  />
+        <PropertyColumn Title="Email" Property="x => x.Email"  />
+        <PropertyColumn Title="Payment Id" Property="x => x.PaymentId"  />
+    </Columns>
+</EntityDataGrid>
+
+
+@code {
+
+    [Parameter]
+    public int BracketChallengeId { get; set; }
+
+    private int? _bracketChallengeId;
+
+    private EntityDataGrid<Core.BracketChallenge.Registration>? _dataGrid;
+    private static readonly Core.BracketChallenge.RegistrationComparer _comparer = new();
+
+    private Expression<Func<Core.BracketChallenge.Registration, bool>>? _filter;
+    
+    protected override Task OnParametersSetAsync()
+    {
+        if (_bracketChallengeId == BracketChallengeId)
+            return Task.CompletedTask;
+        _bracketChallengeId = BracketChallengeId;
+        
+        _filter = x => x.EventId == _bracketChallengeId;
+        return _dataGrid is not null
+            ? _dataGrid.ReloadAsync()
+            : Task.CompletedTask;
+    }
+
+}
