@@ -124,6 +124,7 @@ public static class ServiceCollectionExtensions
         return services
             .AddTransient<IBriefMapper, BriefMapper>()
             .AddTransient<IAccountMapper, AccountMapper>()
+            .AddTransient<IBracketChallengeMapper, BracketChallengeMapper>()
             .AddTransient<IGameMapper, GameMapper>()
             .AddTransient<IGoalieGameLogMapper, GoalieGameLogMapper>()
             .AddTransient<IGoalieStatMapper, GoalieStatMapper>()
