@@ -12,19 +12,13 @@ namespace BoltonCup.Infrastructure.Services;
 
 public class BracketChallengeService(
     BoltonCupDbContext _dbContext,
-    IOptions<StripeSettings> _stripeSettings,
     ILogger<BracketChallengeService> _logger
 ) : IBracketChallengeService
 {
     
-    private readonly string? _stripeWebhookSecret = _stripeSettings.Value.BracketChallengeWebhookSecret;
-    
     public async Task<BracketChallengePaymentIntent> CreatePaymentIntentAsync(
         CreateBracketChallengePaymentIntentCommand command, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(_stripeWebhookSecret))
-            throw new ArgumentNullException("BracketChallengeWebhookSecret");
-        
         // ensure bracket challenge exists
         var bracketChallenge = await _dbContext.BracketChallenges
                              .Include(p => p.Registrations)
@@ -46,7 +40,7 @@ public class BracketChallengeService(
         
         // create payment intent using Stripe
         var service = new PaymentIntentService();
-        var adjustedAmount = GetAdjustedStripeAmount(registrationFeeAmount);
+        var adjustedAmount = FeeCalculator.GetAdjustedStripeAmount(registrationFeeAmount);
         var paymentIntent = await service.CreateAsync(new PaymentIntentCreateOptions
         {
             Amount = (long)(adjustedAmount * 100),
@@ -58,6 +52,7 @@ public class BracketChallengeService(
             ReceiptEmail = command.Email,
             Metadata = new Dictionary<string, string>
             {
+                { nameof(PurchaseType), PurchaseType.BracketChallengeRegistration },
                 { "EventId", command.BracketChallengeId.ToString() },
                 { "Name", command.Name },
                 { "Email", command.Email },
@@ -87,57 +82,15 @@ public class BracketChallengeService(
     }
 
 
-    public async Task ProcessPaymentIntentAsync(string data, string signature, CancellationToken cancellationToken = default)
+    public async Task ProcessPaymentIntentAsync(ProcessBracketChallengePaymentIntentCommand command, CancellationToken cancellationToken = default)
     {
-        var stripeEvent = EventUtility.ConstructEvent(
-            data,
-            signature,
-            _stripeWebhookSecret, 
-            throwOnApiVersionMismatch: false
-        );
-
-        switch (stripeEvent.Type)
+        _dbContext.BracketChallengeRegistrations.Add(new Core.BracketChallenge.Registration
         {
-            case EventTypes.PaymentIntentSucceeded:
-                var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-                await HandleSuccessfulPaymentAsync(paymentIntent!);
-                break;
-            case EventTypes.PaymentIntentPaymentFailed:
-                var failedIntent = stripeEvent.Data.Object as PaymentIntent;
-                _logger.LogError("Payment failed for Intent: {FailedIntentId}", failedIntent?.Id);
-                break;
-            default:
-                _logger.LogError("Unhandled event type: {StripeEventType}", stripeEvent.Type);
-                break;
-        }
-    }
-
-    private async Task HandleSuccessfulPaymentAsync(PaymentIntent paymentIntent)
-    {
-        if (paymentIntent.Metadata.TryGetValue("EventId", out var eventIdStr)
-            && paymentIntent.Metadata.TryGetValue("Name", out var name)
-            && paymentIntent.Metadata.TryGetValue("Email", out var email)
-            && int.TryParse(eventIdStr, out var eventId))
-        {
-            _logger.LogInformation("Payment succeeded for email {Email} in bracket challenge ID {EventId}", email, eventId);
-            _dbContext.BracketChallengeRegistrations.Add(new Core.BracketChallenge.Registration
-            {
-                EventId = eventId,
-                Name = name,
-                Email = email,
-                PaymentId = paymentIntent.Id,
-            });
-            await _dbContext.SaveChangesAsync();
-        }
-        else
-        {
-            _logger.LogError("Payment intent {PaymentIntentId} succeeded but was missing metadata...", paymentIntent.Id);
-        }
-    }
-
-    private static decimal GetAdjustedStripeAmount(decimal price)
-    {
-        // Stripe charges 2.9% + 0.3c, so we adjust
-        return (price + (decimal)0.3) / (decimal)(1 - 0.029);
+            EventId = command.EventId,
+            Name = command.Name,
+            Email = command.Email,
+            PaymentId = command.PaymentId,
+        });
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

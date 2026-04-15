@@ -136,7 +136,8 @@ public static class ServiceCollectionExtensions
             .AddTransient<ITournamentMapper, TournamentMapper>()
             .AddTransient<ITournamentRegistrationMapper, TournamentRegistrationMapper>()
             .AddTransient<ITournamentPaymentMapper, TournamentPaymentMapper>()
-            .AddTransient<IUserMapper, UserMapper>();
+            .AddTransient<IUserMapper, UserMapper>()
+            .AddTransient<IStripeMapper, StripeMapper>();
     }
 
     private static IServiceCollection AddExceptionHandlers(this IServiceCollection services)

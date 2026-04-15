@@ -13,12 +13,9 @@ namespace BoltonCup.Infrastructure.Services;
 public class TournamentPaymentService(
     BoltonCupDbContext _dbContext,
     ITournamentRegistrationService _registrationService,
-    IOptions<StripeSettings> _stripeSettings,
     ILogger<TournamentPaymentService> _logger
 ) : ITournamentPaymentService
 {
-    
-    private readonly string _stripeWebhookSecret = _stripeSettings.Value.WebhookSecret;
     
     public async Task<TournamentPaymentIntent> CreateTournamentPaymentIntentAsync(
         CreateTournamentPaymentIntentCommand command, CancellationToken cancellationToken = default)
@@ -48,7 +45,7 @@ public class TournamentPaymentService(
         
         // create payment intent using Stripe
         var service = new PaymentIntentService();
-        var adjustedAmount = GetAdjustedStripeAmount(registrationFeeAmount);
+        var adjustedAmount = FeeCalculator.GetAdjustedStripeAmount(registrationFeeAmount);
         var paymentIntent = await service.CreateAsync(new PaymentIntentCreateOptions
         {
             Amount = (long)(adjustedAmount * 100),
@@ -60,6 +57,7 @@ public class TournamentPaymentService(
             ReceiptEmail = account.Email,
             Metadata = new Dictionary<string, string>
             {
+                { nameof(PurchaseType), PurchaseType.TournamentRegistration },
                 { "AccountId", account.Id.ToString() },
                 { "TournamentId", tournament.Id.ToString() },
                 { "Position", command.Position },
@@ -88,54 +86,14 @@ public class TournamentPaymentService(
     }
 
 
-    public async Task ProcessPaymentIntentAsync(string data, string signature, CancellationToken cancellationToken = default)
+    public async Task ProcessPaymentIntentAsync(ProcessTournamentPaymentIntentCommand command, CancellationToken cancellationToken = default)
     {
-        var stripeEvent = EventUtility.ConstructEvent(
-            data,
-            signature,
-            _stripeWebhookSecret, 
-            throwOnApiVersionMismatch: false
+        // _logger.LogInformation("Payment succeeded for account ID {AccountId} in tournament ID {TournamentId}", command.AccountId, command.TournamentId);
+        await _registrationService.CompleteRegistrationAsync(
+            accountId: command.AccountId, 
+            tournamentId: command.TournamentId, 
+            paymentId: command.PaymentId, 
+            cancellationToken: cancellationToken
         );
-
-        switch (stripeEvent.Type)
-        {
-            case EventTypes.PaymentIntentSucceeded:
-                var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-                await HandleSuccessfulPaymentAsync(paymentIntent!);
-                break;
-            case EventTypes.PaymentIntentPaymentFailed:
-                var failedIntent = stripeEvent.Data.Object as PaymentIntent;
-                _logger.LogError("Payment failed for Intent: {FailedIntentId}", failedIntent?.Id);
-                break;
-            default:
-                _logger.LogError("Unhandled event type: {StripeEventType}", stripeEvent.Type);
-                break;
-        }
-    }
-
-    private async Task HandleSuccessfulPaymentAsync(PaymentIntent paymentIntent)
-    {
-        if (paymentIntent.Metadata.TryGetValue("AccountId", out var accountIdStr)
-            && paymentIntent.Metadata.TryGetValue("TournamentId", out var tournamentIdStr)
-            && int.TryParse(accountIdStr, out var accountId)
-            && int.TryParse(tournamentIdStr, out var tournamentId))
-        {
-            _logger.LogInformation("Payment succeeded for account ID {AccountId} in tournament ID {TournamentId}", accountId, tournamentId);
-            await _registrationService.CompleteRegistrationAsync(
-                accountId: accountId,
-                tournamentId: tournamentId, 
-                paymentIntent.Id
-            );
-        }
-        else
-        {
-            _logger.LogError("Payment intent {PaymentIntentId} succeeded but was missing metadata...", paymentIntent.Id);
-        }
-    }
-
-    private static decimal GetAdjustedStripeAmount(decimal price)
-    {
-        // Stripe charges 2.9% + 0.3c, so we adjust
-        return (price + (decimal)0.3) / (decimal)(1 - 0.029);
     }
 }
