@@ -27,5 +27,14 @@ namespace BoltonCup.Shared
             public const string AccountAlreadyRegistered = Base + "/account-already-registered";
             public const string RegistrationClosed = Base + "/registration-closed";
         }
+
+
+        public static class BracketChallenges
+        {
+            private const string Base = ErrorTypes.Base + "/bracket-challenges";
+            
+            public const string EmailAlreadyRegistered = Base + "/email-already-registered";
+            public const string RegistrationClosed = Base + "/registration-closed";
+        }
     }
 }

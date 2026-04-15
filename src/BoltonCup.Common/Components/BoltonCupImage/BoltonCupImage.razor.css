@@ -3,6 +3,7 @@
     cursor: pointer;
     overflow: hidden;
     display: inline-flex;
+    min-width: 24px;
 }
 
 .edit-image {

@@ -5,7 +5,7 @@ namespace BoltonCup.Core;
 public interface ITournamentPaymentService
 {
     Task<TournamentPaymentIntent> CreateTournamentPaymentIntentAsync(CreateTournamentPaymentIntentCommand command, CancellationToken cancellationToken = default);
-    Task ProcessPaymentIntentAsync(string data, string signature, CancellationToken cancellationToken = default);
+    Task ProcessPaymentIntentAsync(ProcessTournamentPaymentIntentCommand command, CancellationToken cancellationToken = default);
 }
 
 public record TournamentPaymentIntent(
@@ -18,3 +18,5 @@ public record TournamentPaymentIntent(
 );
 
 public record PaymentBreakdown(decimal Amount, string Title, string? Description = null);
+
+public record ProcessTournamentPaymentIntentCommand(int AccountId, int TournamentId, string PaymentId);

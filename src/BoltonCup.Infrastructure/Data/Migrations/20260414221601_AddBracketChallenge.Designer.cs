@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260414221601_AddBracketChallenge")]
+    partial class AddBracketChallenge
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -149,21 +152,9 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("link");
 
-                    b.Property<string>("Logo")
-                        .HasColumnType("text")
-                        .HasColumnName("logo");
-
                     b.Property<string>("Password")
                         .HasColumnType("text")
                         .HasColumnName("password");
-
-                    b.Property<DateTime?>("RegistrationCloseDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("registration_close_date");
-
-                    b.Property<string>("TermsOfServiceMarkdownContent")
-                        .HasColumnType("text")
-                        .HasColumnName("terms_of_service_markdown_content");
 
                     b.Property<string>("Title")
                         .HasColumnType("text")
@@ -180,10 +171,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    b.Property<bool>("AgreedToTermsOfService")
-                        .HasColumnType("boolean")
-                        .HasColumnName("agreed_terms_of_service");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()

@@ -8,6 +8,7 @@ public interface IEmailer
 {
     Task SendConfirmationCodeAsync(BoltonCupUser user, string email, string confirmationCode);
     Task SendPasswordResetCodeAsync(BoltonCupUser user, string email, string resetCode);
+    Task SendBracketChallengeCredentialsAsync(Core.BracketChallenge.Event bracketChallenge, string email);
 }
 
 public class EmailSender(
@@ -42,6 +43,25 @@ public class EmailSender(
             Email: email,
             Subject: $"{resetCode} is your Bolton Cup password reset code",
             TemplateName: "PasswordResetCode.PasswordResetCode",
+            Model: model
+        );
+        await _queue.EnqueueAsync(payload);
+    }
+
+
+    public async Task SendBracketChallengeCredentialsAsync(Core.BracketChallenge.Event bracketChallenge, string email)
+    {
+        var model = new BracketChallengeCredentialsViewModel
+        {
+            Title = bracketChallenge.Title ?? "",
+            Link = bracketChallenge.Link ?? "",
+            Password = bracketChallenge.Password ?? "", 
+            LogoUrl = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? ""
+        };
+        var payload = new EmailPayload(
+            Email: email,
+            Subject: $"{bracketChallenge.Title} Credentials",
+            TemplateName: "BracketChallengeCredentials.BracketChallengeCredentials",
             Model: model
         );
         await _queue.EnqueueAsync(payload);

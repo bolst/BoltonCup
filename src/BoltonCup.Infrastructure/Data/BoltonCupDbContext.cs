@@ -16,6 +16,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
 {
     
     public DbSet<Account> Accounts { get; set; }
+    public DbSet<Core.BracketChallenge.Event> BracketChallenges { get; set; }
+    public DbSet<Core.BracketChallenge.Registration> BracketChallengeRegistrations { get; set; }
     public DbSet<Game> Games { get; set; }
     public DbSet<Goal> Goals { get; set; }
     public DbSet<GoalieGameLog> GoalieGameLogs { get; set; }
@@ -51,6 +53,42 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.HeightFeet).HasColumnName("height_feet");
             entity.Property(e => e.HeightInches).HasColumnName("height_inches");
             entity.Property(e => e.Weight).HasColumnName("weight");
+        });
+
+        modelBuilder.Entity<Core.BracketChallenge.Event>(entity =>
+        {
+            entity
+                .ToTable("bracket_challenge_events")
+                .HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.Title).HasColumnName("title");
+            entity.Property(e => e.Link).HasColumnName("link");
+            entity.Property(e => e.Password).HasColumnName("password");
+            entity.Property(e => e.Fee).HasColumnName("fee");
+            entity.Property(e => e.IsOpen).HasColumnName("is_open");
+            entity.Property(e => e.Logo).HasColumnName("logo");
+            entity.Property(e => e.RegistrationCloseDate).HasColumnName("registration_close_date");
+            entity.Property(e => e.TermsOfServiceMarkdownContent).HasColumnName("terms_of_service_markdown_content");
+        });
+
+        modelBuilder.Entity<Core.BracketChallenge.Registration>(entity =>
+        {
+            entity
+                .ToTable("bracket_challenge_registrations")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.BracketChallenge)
+                .WithMany(e => e.Registrations)
+                .HasForeignKey(e => e.EventId);
+            entity
+                .HasIndex(e => new { e.EventId, e.Email })
+                .IsUnique();
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.EventId).HasColumnName("event_id");
+            entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.Email).HasColumnName("email");
+            entity.Property(e => e.PaymentId).HasColumnName("payment_id");
+            entity.Property(e => e.AgreedToTermsOfService).HasColumnName("agreed_terms_of_service");
         });
 
         modelBuilder.Entity<Game>(entity =>

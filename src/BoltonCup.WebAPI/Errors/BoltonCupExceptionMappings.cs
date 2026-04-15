@@ -51,6 +51,20 @@ public static class BoltonCupExceptionMappings
             Title: "Registration closed."
         ),
         
+        // Bracket Challenges
+        new(
+            ExceptionType: typeof(EmailAlreadyInBracketChallengeException),
+            StatusCode: StatusCodes.Status409Conflict,
+            ErrorType: ErrorTypes.BracketChallenges.EmailAlreadyRegistered,
+            Title: "Email already registered for this bracket challenge."
+        ),
+        new(
+            ExceptionType: typeof(BracketChallengeRegistrationClosedException),
+            StatusCode: StatusCodes.Status409Conflict,
+            ErrorType: ErrorTypes.BracketChallenges.RegistrationClosed,
+            Title: "Registration is closed for this bracket challenge."
+        ),
+        
         // Base/Fallback exception
         new( 
             ExceptionType: typeof(BoltonCupException), 

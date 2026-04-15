@@ -1,0 +1,86 @@
+@namespace BoltonCup.Admin.Components.Shared
+@inject ISnackbar Snackbar
+
+<MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="@ShowDialog" Size="Size.Small" />
+
+<MudDialog @bind-Visible="_dialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.overline">@Title</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTabs Class="mud-width-full" Style="height: 90vh" MinimumTabWidth="20px" Rounded>
+            <ChildContent>
+                <MudTabPanel Icon="@Icons.Material.Rounded.VerticalShades" ToolTip="Split View">
+                    <MudGrid Class="ma-0">
+                        <MudItem xs="6">
+                            <MudTextField @bind-Value="@_markdown" Sizing="InputSizing.Auto" Underline="false" Immediate FullWidth/>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MarkdownView Value="@_markdown"/>
+                        </MudItem>
+                    </MudGrid>
+                </MudTabPanel>
+                <MudTabPanel Icon="@Icons.Material.Rounded.EditNote" ToolTip="Editor">
+                    <MudTextField @bind-Value="@_markdown" Sizing="InputSizing.Auto" Underline="false" Immediate FullWidth/>
+                </MudTabPanel>
+                <MudTabPanel Icon="@Icons.Material.Rounded.Preview" ToolTip="Preview">
+                    <MarkdownView Value="@_markdown"/>
+                </MudTabPanel>
+            </ChildContent>
+        </MudTabs>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="@CloseDialog">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@SaveAndClose">Save Changes</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    
+    [Parameter]
+    public string? Title { get; set; }
+    
+    [Parameter]
+    public string? Markdown { get; set; }
+    
+    [Parameter]
+    public EventCallback<string?> OnSave { get; set; }
+
+    private string? _markdown;
+
+    protected override void OnParametersSet()
+    {
+        _markdown = Markdown;
+    }
+
+    private bool _dialogVisible;
+
+    private readonly DialogOptions _dialogOptions = new()
+    {
+        CloseButton = false,
+        BackdropClick = false,
+        MaxWidth = MaxWidth.ExtraLarge,
+        FullWidth = true,
+    };
+    
+    private void ShowDialog()
+    {
+        _dialogVisible = true;
+    }
+    
+    private void CloseDialog()
+    {
+        _dialogVisible = false;
+    }
+
+    private Task SaveChanges()
+    {
+        return OnSave.InvokeAsync(_markdown);
+    }
+
+    private async Task SaveAndClose()
+    {
+        await SaveChanges();
+        CloseDialog();
+    }
+}

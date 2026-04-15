@@ -1,0 +1,74 @@
+@page "/bracket-challenges"
+@inject Core.BracketChallenge.IBracketChallengeService BracketChallengeService
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+
+<EntityDataGrid
+    @ref="@_dataGrid"
+    T="Core.BracketChallenge.Event"
+    NewItemFunc="NewItemFunc"
+    SearchBy="x => x.Title"
+    Include="@(x => x.Include(p => p.Registrations))"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Id" Property="x => x.Id" Editable="false" />
+        <PropertyColumn Title="Title" Property="x => x.Title" />
+        <LinkColumn Title="Link" Property="x => x.Link" />
+        <PropertyColumn Title="Password" Property="x => x.Password" />
+        <PropertyColumn Title="Fee" Property="x => x.Fee" />
+        <BoolColumn Title="Is Open" Property="x => x.IsOpen" />
+        <DatePickerColumn Title="Registration Close" Property="x => x.RegistrationCloseDate" />
+        <TemplateColumn Title="Registrations" Editable="false">
+            <CellTemplate>
+                <MudChip Href='@($"/bracket-challenges/{context.Item.Id}/registrations")' Variant="Variant.Text" Color="Color.Info" Size="Size.Small" Label="true">
+                    @context.Item.Registrations.Count
+                </MudChip>
+            </CellTemplate>
+        </TemplateColumn>
+        <ImageColumn T="Core.BracketChallenge.Event" Title="Logo" 
+                     Property="x => x.Logo" OnImageUploaded="UpdateBracketChallengeLogo" />
+        <TemplateColumn Title="TOS">
+            <EditTemplate>
+                <MarkdownEditButton Markdown="@context.Item.TermsOfServiceMarkdownContent" OnSave="@(m => UpdateTOS(context.Item, m))" Title="Terms of Service" />
+            </EditTemplate>
+        </TemplateColumn>
+    </Columns>
+</EntityDataGrid>
+
+
+@code {
+
+    private EntityDataGrid<Core.BracketChallenge.Event> _dataGrid = null!;
+    
+    private readonly Core.BracketChallenge.EventComparer _comparer = new();
+    
+    private async Task<Core.BracketChallenge.Event> NewItemFunc()
+    {
+        return new Core.BracketChallenge.Event
+        {
+            
+        };
+    }
+    
+    private async Task UpdateBracketChallengeLogo(ImageUploadResult<Core.BracketChallenge.Event> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey)) 
+            return;
+        await BracketChallengeService.UpdateLogoAsync(result.Item.Id, result.NewKey);
+    }
+
+    private async Task UpdateTOS(Core.BracketChallenge.Event item, string? markdown)
+    {
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        var bracketChallenge = await dbContext.BracketChallenges
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == item.Id);
+        if (bracketChallenge is null)
+            return;
+
+        bracketChallenge.TermsOfServiceMarkdownContent = markdown;
+        dbContext.Update(bracketChallenge);
+        await dbContext.SaveChangesAsync();
+        await _dataGrid.ReloadAsync();
+    }
+
+}

@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260415161016_EnhanceBracketChallenge")]
+    partial class EnhanceBracketChallenge
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,10 +183,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    b.Property<bool>("AgreedToTermsOfService")
-                        .HasColumnType("boolean")
-                        .HasColumnName("agreed_terms_of_service");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
