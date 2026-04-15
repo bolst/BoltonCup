@@ -88,6 +88,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.PaymentId).HasColumnName("payment_id");
+            entity.Property(e => e.AgreedToTermsOfService).HasColumnName("agreed_terms_of_service");
         });
 
         modelBuilder.Entity<Game>(entity =>

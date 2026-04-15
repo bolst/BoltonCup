@@ -7,6 +7,7 @@ public class Registration : EntityBase
     public required string Name { get; set; }
     public required string Email { get; set; }
     public string? PaymentId { get; set; }
+    public bool AgreedToTermsOfService { get; set; }
 
     public Event BracketChallenge { get; set; } = null!;
 }
