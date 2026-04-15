@@ -11,7 +11,7 @@ public interface IBracketChallengeMapper
     CreateBracketChallengePaymentIntentCommand ToCommand(int bracketChallengeId, CreateBracketChallengePaymentIntentRequest request);
 }
 
-public class BracketChallengeMapper : IBracketChallengeMapper
+public class BracketChallengeMapper(IAssetUrlResolver _urlResolver) : IBracketChallengeMapper
 {
     public GetBracketChallengesQuery ToQuery(GetBracketChallengesRequest request)
     {
@@ -31,7 +31,8 @@ public class BracketChallengeMapper : IBracketChallengeMapper
             Title: challenge.Title,
             Link: challenge.Link,
             Fee: challenge.Fee,
-            IsOpen: challenge.IsOpen
+            IsOpen: challenge.IsOpen,
+            Logo: _urlResolver.GetFullUrl(challenge.Logo)
         ));
     }
     

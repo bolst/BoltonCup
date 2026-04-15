@@ -5112,6 +5112,10 @@
           },
           "isOpen": {
             "type": "boolean"
+          },
+          "logo": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

@@ -5,5 +5,6 @@ public record BracketChallengeDto(
     string? Title,
     string? Link,
     decimal? Fee,
-    bool IsOpen
+    bool IsOpen,
+    string? Logo
 );

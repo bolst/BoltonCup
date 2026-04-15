@@ -8,6 +8,7 @@ public class Event : EntityBase
     public string? Password { get; set; }
     public decimal? Fee { get; set; }
     public bool IsOpen { get; set; }
+    public string? Logo { get; set; }
 
     public ICollection<Registration> Registrations { get; set; } = [];
 }
