@@ -86,6 +86,12 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
             LastName = player.Account.LastName,
             Birthday = player.Account.Birthday,
             ProfilePicture = _urlResolver.GetFullUrl(player.Account.Avatar),
+            CaptaincyTag = player.Captaincy switch
+            {
+                Captaincy.Captain => 'C',
+                Captaincy.Alternate => 'A',
+                _ => null
+            }
         };
     }
 

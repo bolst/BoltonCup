@@ -6170,6 +6170,10 @@
             "type": "string",
             "nullable": true
           },
+          "captaincyTag": {
+            "type": "string",
+            "nullable": true
+          },
           "isGoalie": {
             "type": "boolean",
             "readOnly": true
