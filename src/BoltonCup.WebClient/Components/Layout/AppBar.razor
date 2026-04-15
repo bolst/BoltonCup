@@ -10,13 +10,11 @@
         }
         @if (_moreNavLinks.Any())
         {
-            <MudMenu Label="More" Variant="Variant.Text" Color="Color.Inherit" Size="Size.Large" EndIcon="@Icons.Material.Rounded.KeyboardArrowDown">
-                <MudList T="string">
-                    @foreach (var navLink in _moreNavLinks)
-                    {
-                        <MudListItem Text="@navLink.Title" Icon="@navLink.Icon" Href="@navLink.Href" />
-                    }
-                </MudList>
+            <MudMenu Label="More" Variant="Variant.Text" Color="Color.Inherit" Size="Size.Large" EndIcon="@Icons.Material.Rounded.KeyboardArrowDown" >
+                @foreach (var navLink in _moreNavLinks)
+                {
+                    <MudMenuItem Label="@navLink.Title" Icon="@navLink.Icon" Href="@navLink.Href" />
+                }
             </MudMenu>
         }
         <MudSpacer />
