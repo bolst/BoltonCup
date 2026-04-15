@@ -1,0 +1,55 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam T where T : class
+@typeparam TEnum
+@inherits InputColumnBase<T, TEnum>
+
+@code {
+
+    private IEnumerable<TEnum> _enumValues = [];
+    private bool _isNullable;
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        var type = typeof(TEnum);
+        
+        var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
+        _isNullable = Nullable.GetUnderlyingType(type) != null;
+
+        if (underlyingType.IsEnum)
+        {
+            _enumValues = Enum.GetValues(underlyingType)
+                .Cast<object>()
+                .Select(e => (TEnum)e)
+                .ToList();
+        }
+        else
+        {
+            throw new InvalidOperationException($"The type {type.Name} provided to EnumColumn is not an Enum.");
+        }
+    }
+
+    protected override RenderFragment EntityEditTemplate(CellContext<T> context)
+    {
+        var property = PropertyFunc(context.Item);
+        if (property is not null and not TEnum)
+        {
+            return @<div></div>;
+        }
+
+        var item = property == null ? default : (TEnum)property;
+        return @<MudSelect T="TEnum" 
+                           Value="@item" 
+                           ValueChanged="v => SetProperty(context.Item, v)" 
+                           Clearable="@_isNullable"
+                           Underline="false"
+                           Margin="Margin.Dense" 
+                           Dense>
+                   @foreach (var enumValue in _enumValues)
+                   {
+                       <MudSelectItem T="TEnum" Value="@enumValue">@enumValue?.ToString()</MudSelectItem>
+                   }
+               </MudSelect>;
+    }
+}
