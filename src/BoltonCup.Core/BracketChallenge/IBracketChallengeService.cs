@@ -4,7 +4,8 @@ namespace BoltonCup.Core.BracketChallenge;
 
 public interface IBracketChallengeService
 {
-    Task<IPagedList<Event>> GetBracketChallengesAsync(GetBracketChallengesQuery query, CancellationToken cancellationToken = default);
+    Task<IPagedList<Event>> GetAsync(GetBracketChallengesQuery query, CancellationToken cancellationToken = default);
+    Task<Event?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task UpdateLogoAsync(int eventId, string tempKey, CancellationToken cancellationToken = default);
     Task<BracketChallengePaymentIntent> CreatePaymentIntentAsync(CreateBracketChallengePaymentIntentCommand command, CancellationToken cancellationToken = default);
     Task ProcessPaymentIntentAsync(ProcessBracketChallengePaymentIntentCommand command, CancellationToken cancellationToken = default);

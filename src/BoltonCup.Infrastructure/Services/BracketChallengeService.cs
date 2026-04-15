@@ -17,13 +17,20 @@ public class BracketChallengeService(
 ) : IBracketChallengeService
 {
 
-    public async Task<IPagedList<Core.BracketChallenge.Event>> GetBracketChallengesAsync(GetBracketChallengesQuery query, 
+    public async Task<IPagedList<Core.BracketChallenge.Event>> GetAsync(GetBracketChallengesQuery query, 
         CancellationToken cancellationToken = default)
     {
         return await _dbContext.BracketChallenges
             .AsNoTracking()
             .OrderByDescending(b => b.Title)
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
+    }
+
+    public async Task<Core.BracketChallenge.Event?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.BracketChallenges
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken: cancellationToken);
     }
 
     public Task UpdateLogoAsync(int eventId, string tempKey, CancellationToken cancellationToken = default)

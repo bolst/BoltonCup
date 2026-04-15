@@ -7,6 +7,7 @@ public interface IBracketChallengeMapper
 {
     GetBracketChallengesQuery ToQuery(GetBracketChallengesRequest request);
     IPagedList<BracketChallengeDto> ToDtoList(IPagedList<Core.BracketChallenge.Event> bracketChallenges);
+    BracketChallengeSingleDto? ToDto(Core.BracketChallenge.Event? bracketChallenge);
     BracketChallengePaymentIntentDto ToDto(BracketChallengePaymentIntent paymentIntent);
     CreateBracketChallengePaymentIntentCommand ToCommand(int bracketChallengeId, CreateBracketChallengePaymentIntentRequest request);
 }
@@ -26,14 +27,33 @@ public class BracketChallengeMapper(IAssetUrlResolver _urlResolver) : IBracketCh
 
     public IPagedList<BracketChallengeDto> ToDtoList(IPagedList<Core.BracketChallenge.Event> bracketChallenges)
     {
-        return bracketChallenges.ProjectTo(challenge => new BracketChallengeDto(
-            Id: challenge.Id,
-            Title: challenge.Title,
-            Link: challenge.Link,
-            Fee: challenge.Fee,
-            IsOpen: challenge.IsOpen,
-            Logo: _urlResolver.GetFullUrl(challenge.Logo)
-        ));
+        return bracketChallenges.ProjectTo(challenge => new BracketChallengeDto
+        {
+            Id = challenge.Id,
+            Title = challenge.Title,
+            Link = challenge.Link,
+            Fee = challenge.Fee,
+            IsOpen = challenge.IsOpen,
+            Logo = _urlResolver.GetFullUrl(challenge.Logo),
+            CloseDate = challenge.RegistrationCloseDate
+        });
+    }
+
+    public BracketChallengeSingleDto? ToDto(Core.BracketChallenge.Event? challenge)
+    {
+        if (challenge is null)
+            return null;
+        return new BracketChallengeSingleDto
+        {
+            Id = challenge.Id,
+            Title = challenge.Title,
+            Link = challenge.Link,
+            Fee = challenge.Fee,
+            IsOpen = challenge.IsOpen,
+            Logo = _urlResolver.GetFullUrl(challenge.Logo),
+            CloseDate = challenge.RegistrationCloseDate,
+            TOSMarkdown = challenge.TermsOfServiceMarkdownContent
+        };
     }
     
     public BracketChallengePaymentIntentDto ToDto(BracketChallengePaymentIntent paymentIntent)
