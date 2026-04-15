@@ -118,7 +118,7 @@ public class BracketChallengeService(
         {
             EventId = command.EventId,
             Name = command.Name,
-            Email = command.Email,
+            Email = command.Email.ToLower(),
             PaymentId = command.PaymentId,
         });
         await _dbContext.SaveChangesAsync(cancellationToken);
