@@ -9,6 +9,8 @@ public class Event : EntityBase
     public decimal? Fee { get; set; }
     public bool IsOpen { get; set; }
     public string? Logo { get; set; }
+    public DateTime? RegistrationCloseDate { get; set; }
+    public string? TermsOfServiceMarkdownContent { get; set; }
 
     public ICollection<Registration> Registrations { get; set; } = [];
 }

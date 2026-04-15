@@ -11,6 +11,8 @@ namespace BoltonCup.Infrastructure.Services;
 
 public class BracketChallengeService(
     BoltonCupDbContext _dbContext,
+    IStorageService _storageService,
+    IAssetKeyGenerator _assetKeyGenerator,
     ILogger<BracketChallengeService> _logger
 ) : IBracketChallengeService
 {
@@ -22,6 +24,19 @@ public class BracketChallengeService(
             .AsNoTracking()
             .OrderByDescending(b => b.Title)
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
+    }
+
+    public Task UpdateLogoAsync(int eventId, string tempKey, CancellationToken cancellationToken = default)
+    {
+        return _storageService.UpdateAssetAsync<Core.BracketChallenge.Event>(
+            _dbContext,
+            _assetKeyGenerator,
+            e => e.Id == eventId,
+            e => e.Logo,
+            tempKey,
+            eventId.ToString(),
+            cancellationToken
+        );
     }
     
     public async Task<BracketChallengePaymentIntent> CreatePaymentIntentAsync(

@@ -66,6 +66,9 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Password).HasColumnName("password");
             entity.Property(e => e.Fee).HasColumnName("fee");
             entity.Property(e => e.IsOpen).HasColumnName("is_open");
+            entity.Property(e => e.Logo).HasColumnName("logo");
+            entity.Property(e => e.RegistrationCloseDate).HasColumnName("registration_close_date");
+            entity.Property(e => e.TermsOfServiceMarkdownContent).HasColumnName("terms_of_service_markdown_content");
         });
 
         modelBuilder.Entity<Core.BracketChallenge.Registration>(entity =>
