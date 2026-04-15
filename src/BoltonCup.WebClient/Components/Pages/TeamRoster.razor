@@ -42,6 +42,13 @@ else
                             <MudImage Src="@context.ProfilePicture" Alt="@context.FullName"/>
                         </MudAvatar>
                         <PlayerLink Player="context" />
+                        @if (!string.IsNullOrEmpty(context.CaptaincyTag))
+                        {
+                            var color = context.CaptaincyTag == "C" ? Color.Primary : Color.Secondary;
+                            <MudChip T="string" Color="@color" Variant="Variant.Text" Size="Size.Small" Label="true">
+                                @context.CaptaincyTag
+                            </MudChip>
+                        }
                     </div>
                 </MudTd>
                 <MudTd DataLabel="#">@context.JerseyNumber</MudTd>
