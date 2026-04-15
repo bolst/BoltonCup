@@ -13,6 +13,7 @@ public class BracketChallengeService(
     BoltonCupDbContext _dbContext,
     IStorageService _storageService,
     IAssetKeyGenerator _assetKeyGenerator,
+    IEmailer _emailer,
     ILogger<BracketChallengeService> _logger
 ) : IBracketChallengeService
 {
@@ -115,6 +116,10 @@ public class BracketChallengeService(
 
     public async Task ProcessPaymentIntentAsync(ProcessBracketChallengePaymentIntentCommand command, CancellationToken cancellationToken = default)
     {
+        var bracketChallenge = await _dbContext.BracketChallenges
+            .FirstOrDefaultAsync(e => e.Id == command.EventId, cancellationToken: cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(Core.BracketChallenge.Event), command.EventId);
+        
         _dbContext.BracketChallengeRegistrations.Add(new Core.BracketChallenge.Registration
         {
             EventId = command.EventId,
@@ -124,5 +129,6 @@ public class BracketChallengeService(
             AgreedToTermsOfService = command.AgreedToTOS
         });
         await _dbContext.SaveChangesAsync(cancellationToken);
+        await _emailer.SendBracketChallengeCredentialsAsync(bracketChallenge, command.Email);
     }
 }
