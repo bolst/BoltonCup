@@ -1,3 +1,4 @@
+using BoltonCup.Core;
 using BoltonCup.Core.BracketChallenge;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
@@ -10,6 +11,16 @@ public class BracketChallengesController(
     IBracketChallengeMapper _mapper
 ) : BoltonCupControllerBase
 {
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<ActionResult<IPagedList<BracketChallengeDto>>> GetBracketChallenges(
+        [FromQuery] GetBracketChallengesRequest request)
+    {
+        var query = _mapper.ToQuery(request);
+        var bracketChallenges = await _bracketChallengeService.GetBracketChallengesAsync(query);
+        return Ok(_mapper.ToDtoList(bracketChallenges));
+    }
+    
     [AllowAnonymous]
     [HttpPost("{id:int}")]
     public async Task<ActionResult<BracketChallengePaymentIntentDto>> CreateBracketChallengePaymentIntent(int id, [FromBody] CreateBracketChallengePaymentIntentRequest request)

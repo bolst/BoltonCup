@@ -2,10 +2,9 @@ using BoltonCup.Core;
 using BoltonCup.Core.BracketChallenge;
 using BoltonCup.Core.Exceptions;
 using BoltonCup.Infrastructure.Data;
-using BoltonCup.Infrastructure.Settings;
+using BoltonCup.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Stripe;
 
 namespace BoltonCup.Infrastructure.Services;
@@ -15,6 +14,15 @@ public class BracketChallengeService(
     ILogger<BracketChallengeService> _logger
 ) : IBracketChallengeService
 {
+
+    public async Task<IPagedList<Core.BracketChallenge.Event>> GetBracketChallengesAsync(GetBracketChallengesQuery query, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.BracketChallenges
+            .AsNoTracking()
+            .OrderByDescending(b => b.Title)
+            .ToPagedListAsync(query, cancellationToken: cancellationToken);
+    }
     
     public async Task<BracketChallengePaymentIntent> CreatePaymentIntentAsync(
         CreateBracketChallengePaymentIntentCommand command, CancellationToken cancellationToken = default)
