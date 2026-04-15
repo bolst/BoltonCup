@@ -8,6 +8,17 @@
         {
             <MudButton Href="@navLink.Href" Variant="Variant.Text" Color="Color.Inherit" Size="Size.Large">@navLink.Title</MudButton>
         }
+        @if (_moreNavLinks.Any())
+        {
+            <MudMenu Label="More" Variant="Variant.Text" Color="Color.Inherit" Size="Size.Large" EndIcon="@Icons.Material.Rounded.KeyboardArrowDown">
+                <MudList T="string">
+                    @foreach (var navLink in _moreNavLinks)
+                    {
+                        <MudListItem Text="@navLink.Title" Icon="@navLink.Icon" Href="@navLink.Href" />
+                    }
+                </MudList>
+            </MudMenu>
+        }
         <MudSpacer />
         <UserMenu />
     </MudHidden>
@@ -25,11 +36,20 @@
             <MudNavMenu Class="mud-width-full" Color="Color.Primary" Margin="Margin.Normal" Rounded Bordered>
                 @foreach (var navLink in _navLinks)
                 {
-                    <MudNavLink Class="px-2" Href="@navLink.Href" Icon="@navLink.Icon" Match="navLink.Match">@navLink.Title</MudNavLink>
+                    @RenderNavLink(navLink)
+                }
+                @if (_moreNavLinks.Any())
+                {
+                    <MudNavGroup Title="More" Expanded>
+                        @foreach (var navLink in _moreNavLinks)
+                        {
+                            @RenderNavLink(navLink)
+                        }
+                    </MudNavGroup>
                 }
             </MudNavMenu>
             <MudSpacer />
-            <UserMenu EndIcon="@Icons.Material.Rounded.KeyboardArrowUp" OnItemClick="CloseDrawer" />
+            <UserMenu EndIcon="@Icons.Material.Rounded.KeyboardArrowUp" OnItemClick="CloseDrawer" Color="Color.Primary" Variant="Variant.Filled" />
         </MudDrawer>
     </MudHidden>
 </MudAppBar>
@@ -45,6 +65,11 @@
         new("Schedule", "/schedule", Icons.Material.Rounded.CalendarMonth),
         new("Stats", "/stats", Icons.Material.Rounded.QueryStats)
     ];
+
+    private readonly List<NavLinkItem> _moreNavLinks =
+    [
+        new("Bracket Challenge", "/bracket-challenges", Icons.Material.Rounded.AccountTree)
+    ];
     
     private bool _drawerOpen;
 
@@ -52,4 +77,8 @@
     private void CloseDrawer() => _drawerOpen = false;
 
     public record NavLinkItem(string Title, string Href, string Icon, NavLinkMatch Match = NavLinkMatch.Prefix);
+
+    private RenderFragment RenderNavLink(NavLinkItem navLink)
+        => @<MudNavLink Class="px-2" Href="@navLink.Href" Icon="@navLink.Icon" Match="navLink.Match">@navLink.Title</MudNavLink>;
+
 }

@@ -6,11 +6,12 @@
 <AuthorizeView>
     <Authorized>
         <MudMenu Label="@context.User.Identity?.Name"
-                 Variant="Variant.Text" 
-                 Color="Color.Inherit" 
+                 Variant="@Variant" 
+                 Color="@Color"
                  EndIcon="@EndIcon"
+                 RelativeWidth="DropdownWidth.Adaptive"
                  FullWidth>
-            <MudMenuItem Href="@($"{Config.Value.WebBaseUrl}profile")" Icon="@Icons.Material.Rounded.AccountCircle" IconColor="Color.Primary" OnClick="@OnItemClick">My Profile</MudMenuItem>
+            <MudMenuItem Href="@($"{Config.Value.WebBaseUrl}profile")" Icon="@Icons.Material.Rounded.AccountCircle" IconColor="@IconColor" OnClick="@OnItemClick">My Profile</MudMenuItem>
             @if (LogOutTemplate is null)
             {
                 <MudMenuItem OnClick="LogOut" Icon="@Icons.Material.Rounded.Logout" IconColor="Color.Error">Log Out</MudMenuItem>
@@ -22,7 +23,7 @@
         </MudMenu>
     </Authorized>
     <NotAuthorized>
-        <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="GoToLogin">Log In</MudButton>
+        <MudButton Variant="@Variant" Color="@Color" OnClick="GoToLogin">Log In</MudButton>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -36,6 +37,15 @@
     
     [Parameter]
     public RenderFragment<AuthenticationState>? LogOutTemplate { get; set; }
+
+    [Parameter]
+    public Color Color { get; set; } = Color.Inherit;
+
+    [Parameter]
+    public Color IconColor { get; set; } = Color.Primary;
+
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Text;
 
     private void GoToLogin()
     {
