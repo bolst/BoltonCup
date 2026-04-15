@@ -1,10 +1,193 @@
 @page "/bracket-challenges/{BracketChallengeId:int}/register"
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
+@inject IBoltonCupApi BoltonCupApi
 
+<PageTitle>Bracket Challenge Registration | Bolton Cup</PageTitle>
 
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
+    @if (_bracketChallenge is not null)
+    {
+        <div class="mb-2 ml-2 d-flex flex-row align-center gap-3">
+            <MudText Typo="Typo.h6"><b>Register for @_bracketChallenge.Title</b></MudText>
+        </div>
+            
+        <MudDivider Class="my-2" />
+            
+        if (_bracketChallenge.IsOpen)
+        {
+            <MudStepper @bind-ActiveIndex="@_currentStep" StepClass="py-2" NavClass="justify-center" CenterLabels NonLinear>
+                <ChildContent>
+                    <MudStep Title="Your Info" Disabled="@IsComplete" Completed="_currentStep > 0">
+                        <BoltonCupEditForm T="BracketChallengeUserInfoModel" Model="@_userInfoModel" OnValidSubmit="@SaveUserInfoAndContinue">
+                            <ActionsContent>
+                                <MudLink OnClick="@ShowTOSDrawer" Color="Color.Info">Terms of service</MudLink>
+                                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth>Save & Continue</MudButton>
+                            </ActionsContent>
+                        </BoltonCupEditForm>
+                    </MudStep>
+                    <MudStep Title="Checkout" Disabled="_currentStep < 1 || IsComplete" Completed="_currentStep > 1">
+                        @if (_paymentIntent is not null)
+                        {
+                            <StripeCheckoutForm
+                                ClientSecret="@_paymentIntent.ClientSecret"
+                                Amount="@_paymentIntent.TotalAmount"
+                                Currency="@_paymentIntent.Currency"
+                                Breakdown="@_paymentIntent.Breakdown"
+                                OnValidSubmit="@OnValidPayment"
+                                />
+                        }
+                    </MudStep>
+                    <MudStep Title="Complete" Disabled="!IsComplete" Completed="IsComplete">
+                        <MudAlert Severity="Severity.Success" NoIcon>
+                            <div class="d-flex flex-row align-center gap-3">
+                                <MudIcon Icon="@Icons.Material.Rounded.CheckCircleOutline" Size="Size.Large" Color="Color.Success"/>
+                                <div>
+                                    @if (_isAlreadyRegistered)
+                                    {
+                                        <MudText>That email is already registered for this bracket challenge. A link and password has been sent to your email along with a receipt.</MudText>                                        
+                                    }
+                                    else
+                                    {
+                                        <MudText Typo="Typo.h6">Payment Successful!</MudText>
+                                        <MudText>You are officially registered! The bracket challenge link and password has been sent to your email along with a receipt.</MudText>
+                                    }
+                                    <MudText>If you have any problems/questions you can <MudLink Href="/contact">contact us here</MudLink>.</MudText>
+                                </div>
+                            </div>
+                        </MudAlert>
+                    </MudStep>
+                </ChildContent>
+                <ConnectorTemplate>
+                    @* empty: renders better on mobile *@
+                </ConnectorTemplate>
+                <ActionContent>
+                    @* empty: we will control navigation manually *@
+                </ActionContent>
+            </MudStepper>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Error">Sorry! @_bracketChallenge.Title is not open for registration.</MudAlert>
+        }
+    }
+</MudContainer>
+
+<MudDrawer @bind-Open="_tosDrawerOpen" Anchor="Anchor.Bottom" Elevation="1" Variant="DrawerVariant.Temporary" Width="100%" Height="100%">
+    <MudPaper Class="d-flex flex-row align-center px-2" Elevation="0" Width="100%" Height="64px" Square>
+        <BoltonCupLogo Height="64" />
+        <MudSpacer />
+        <MudIconButton OnClick="@HideTOSDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit" />
+    </MudPaper>
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        @if (_bracketChallenge?.TosMarkdown is not null)
+        {
+            <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-8"><b>Terms of Service</b></MudText>
+            <MarkdownView Value="@_bracketChallenge?.TosMarkdown" />
+        }
+    </MudContainer>
+</MudDrawer>
 
 @code {
 
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    
     [Parameter]
     public required int BracketChallengeId { get; set; }
 
+    private Sdk.BracketChallengeSingleDto? _bracketChallenge;
+    
+    private readonly BracketChallengeUserInfoModel _userInfoModel = new();
+    private Sdk.BracketChallengePaymentIntentDto? _paymentIntent;
+    
+    private bool _tosDrawerOpen;
+
+    private int _currentStep;
+    private bool IsComplete => _currentStep == 2;
+
+    private bool _isAlreadyRegistered;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_bracketChallenge?.Id != BracketChallengeId)
+        {
+            _bracketChallenge = await BoltonCupApi.GetBracketChallengeByIdAsync(BracketChallengeId);
+
+            if (_currentStep != 0 || !string.IsNullOrEmpty(_userInfoModel.Email))
+                return;
+            
+            if (AuthenticationState is not null)
+            {
+                var authState = await AuthenticationState;
+                _userInfoModel.Email = authState.User.FindFirst(ClaimTypes.Email)?.Value;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+    
+    private void ShowTOSDrawer()
+    {
+        _tosDrawerOpen = true;
+    }
+
+    private void HideTOSDrawer()
+    {
+        _tosDrawerOpen = false;
+    }
+
+    private async Task SaveUserInfoAndContinue()
+    {
+        if (_currentStep != 0)
+            return;
+
+        _isAlreadyRegistered = false;
+        
+        try
+        {
+            _paymentIntent = await BoltonCupApi.CreateBracketChallengePaymentIntentAsync(
+                id: BracketChallengeId,
+                body: new Sdk.CreateBracketChallengePaymentIntentRequest
+                {
+                    Name = _userInfoModel.Name,
+                    Email = _userInfoModel.Email,
+                    AgreedToTOS = _userInfoModel.HasAgreedToTermsOfService
+                }
+            );
+
+            _currentStep = 1;
+        }
+        catch (Sdk.ApiException<Sdk.BoltonCupProblemDetails> e)
+            when (e.Result.Type == ErrorTypes.BracketChallenges.EmailAlreadyRegistered)
+        {
+            _isAlreadyRegistered = true;
+            _currentStep = 2;
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task OnValidPayment()
+    {
+        _currentStep = 2;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private class BracketChallengeUserInfoModel
+    {
+        [Display(Name = "Name")]
+        [Required]
+        public string? Name { get; set; } = string.Empty;
+
+        [Display(Name = "Email")]
+        [DataType(DataType.EmailAddress)]
+        [Required]
+        public string? Email { get; set; } = string.Empty;
+        
+        [Display(Name = "I have read, understand and agree to the terms of service.")]
+        [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree in order to register.")]
+        public bool HasAgreedToTermsOfService { get; set; }
+    }
 }
