@@ -86,6 +86,7 @@ public class BracketChallengeService(
                 { "EventId", command.BracketChallengeId.ToString() },
                 { "Name", command.Name },
                 { "Email", command.Email },
+                { "AgreedToTOS", "true" }
             }
         }, cancellationToken: cancellationToken);
         
@@ -120,6 +121,7 @@ public class BracketChallengeService(
             Name = command.Name,
             Email = command.Email.ToLower(),
             PaymentId = command.PaymentId,
+            AgreedToTermsOfService = command.AgreedToTOS
         });
         await _dbContext.SaveChangesAsync(cancellationToken);
     }

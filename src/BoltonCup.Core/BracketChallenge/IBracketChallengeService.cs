@@ -23,6 +23,6 @@ public sealed record BracketChallengePaymentIntent(
     IReadOnlyList<PaymentBreakdown> AmountBreakdown
 );
 
-public sealed record CreateBracketChallengePaymentIntentCommand(string Name, string Email, int BracketChallengeId);
+public sealed record CreateBracketChallengePaymentIntentCommand(string Name, string Email, bool AgreedToTOS, int BracketChallengeId);
 
-public sealed record ProcessBracketChallengePaymentIntentCommand(int EventId, string Name, string Email, string PaymentId);
+public sealed record ProcessBracketChallengePaymentIntentCommand(int EventId, string Name, string Email, string PaymentId, bool AgreedToTOS);

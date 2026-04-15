@@ -5416,6 +5416,9 @@
           "email": {
             "type": "string",
             "nullable": true
+          },
+          "agreedToTOS": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

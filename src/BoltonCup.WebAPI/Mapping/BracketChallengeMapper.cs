@@ -71,6 +71,7 @@ public class BracketChallengeMapper(IAssetUrlResolver _urlResolver) : IBracketCh
         return new CreateBracketChallengePaymentIntentCommand(
             Name: request.Name,
             Email: request.Email,
+            AgreedToTOS: request.AgreedToTOS,
             BracketChallengeId: bracketChallengeId
         );
     }

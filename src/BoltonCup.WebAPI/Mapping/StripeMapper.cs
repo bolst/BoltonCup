@@ -40,13 +40,15 @@ public class StripeMapper() : IStripeMapper
         if (paymentIntent.Metadata.TryGetValue("EventId", out var eventIdStr)
             && paymentIntent.Metadata.TryGetValue("Name", out var name)
             && paymentIntent.Metadata.TryGetValue("Email", out var email)
+            && paymentIntent.Metadata.TryGetValue("AgreedToTOS", out var agreedToTOSStr)
             && int.TryParse(eventIdStr, out var eventId))
         {
             command = new ProcessBracketChallengePaymentIntentCommand(
                 EventId: eventId,
                 Name: name, 
                 Email: email, 
-                PaymentId: paymentIntent.Id
+                PaymentId: paymentIntent.Id,
+                AgreedToTOS: agreedToTOSStr == "true"
             );
             return true;
         }
