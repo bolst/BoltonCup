@@ -6228,6 +6228,11 @@
             "type": "string",
             "nullable": true,
             "readOnly": true
+          },
+          "jerseyNumberLabel": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false
