@@ -2,14 +2,11 @@ namespace BoltonCup.Common;
 
 public static class DateTimeExtensions
 {
-    public static string ToEstString(this DateTime? dateTime, string format = "g")
+    public static string ToEstString(this DateTime dateTime, string format = "g")
     {
-        if (dateTime == null)
-            return string.Empty;
-        
-        var utcDate = dateTime.Value.Kind == DateTimeKind.Utc
-            ? dateTime.Value
-            : dateTime.Value.ToUniversalTime();
+        var utcDate = dateTime.Kind == DateTimeKind.Utc
+            ? dateTime
+            : dateTime.ToUniversalTime();
 
         TimeZoneInfo estZone;
         try
@@ -23,5 +20,12 @@ public static class DateTimeExtensions
 
         var estTime = TimeZoneInfo.ConvertTimeFromUtc(utcDate, estZone);
         return estTime.ToString(format);
+    }
+
+    public static string ToEstString(this DateTime? dateTime, string format = "g")
+    {
+        return dateTime == null 
+            ? string.Empty 
+            : dateTime.Value.ToEstString(format);
     }
 }

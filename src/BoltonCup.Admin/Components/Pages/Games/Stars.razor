@@ -1,4 +1,5 @@
 @page "/games/stars"
+@using BoltonCup.Common
 
 <EntityDataGrid
     T="GameStar"
@@ -26,19 +27,20 @@
             <ItemTemplate>
                 <MudText>@context.HomeTeam?.NameShort vs. @context.AwayTeam?.NameShort</MudText>
                 <MudChip T="string" Variant="Variant.Text" Color="Color.Info" Size="Size.Small" Label="true">
-                    @context.GameTime.ToString("g")
+                    @context.GameTime.ToEstString("g")
                 </MudChip>
                 <MudText Typo="Typo.caption">@context.Tournament.Name</MudText>
                 <MudDivider Class="mt-2" />
             </ItemTemplate>
         </ForeignColumn>
-        <PropertyColumn Title="Game date" Property="x => x.Game.GameTime" Format="g" Editable="false" InitialDirection="SortDirection.Ascending" />
+        <PropertyColumn Title="Game date" Property="x => x.Game.GameTime" Format="g" Editable="false" InitialDirection="SortDirection.Ascending">
+            <CellTemplate>
+                <span>@context.Item.Game?.GameTime.ToEstString("g")</span>
+            </CellTemplate>
+        </PropertyColumn>
         <TemplateColumn Title="Tournament" Editable="false">
             <CellTemplate>
-                @if (context.Item.Game?.Tournament is Tournament tournament)
-                {
-                    <span>@tournament.Name</span>
-                }
+                <span>@context.Item.Game?.Tournament?.Name</span>
             </CellTemplate>
         </TemplateColumn>
     </Columns>
