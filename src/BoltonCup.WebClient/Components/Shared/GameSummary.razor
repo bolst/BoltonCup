@@ -1,19 +1,40 @@
 @namespace BoltonCup.WebClient.Components.Shared
 
+
+<div>
+    @if (Game is not null && Game.Stars.Any())
+    {
+        <div class="d-flex flex-row align-center px-1 py-2 mud-width-full">
+            <MudText Typo="Typo.h6"><b>Three Stars of the Game</b></MudText>
+        </div>
+
+        <MudGrid>
+            @foreach (var star in Game.Stars.Where(x => x.Player is not null && x.StarRank is >= 1 and <= 3).OrderBy(x => x.StarRank))
+            {
+                <MudItem xs="12" sm="4">
+                    <MudStack AlignItems="AlignItems.Center" Row>
+                        <MudBadge Content="@star.StarRank.ToString()" BadgeClass="mr-n2 mt-n2" Origin="Origin.BottomLeft" Color="Color.Primary" Overlap="true" Bordered="true">
+                            <MudAvatar Style="width: 64px; height: 64px">
+                                <MudImage Src="@star.Player.ProfilePicture" Alt="@star.Player.FullName"/>
+                            </MudAvatar>
+                        </MudBadge>
+                        <div class="d-flex flex-column">
+                            <PlayerLink Player="@star.Player" ToStringFunc="@(x => x!.FirstName[..1] + ". " + x.LastName)"/>
+                            <MudText Typo="Typo.caption">@star.Player.JerseyNumberLabel | @star.Player.Position</MudText>
+                            <MudText Typo="Typo.caption">G: 2 | A: 1 | P: 3</MudText>
+                        </div>
+                    </MudStack>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+</div>
+
+
 @code {
 
-    [Parameter, EditorRequired]
-    public required int GameId { get; set; }
+    [Parameter]
+    [EditorRequired]
+    public Sdk.GameSingleDto? Game { get; set; }
 
-    private int? _gameId { get; set; }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (_gameId == GameId)
-            return;
-        _gameId = GameId;
-        
-        // TODO:
-    }
-    
 }

@@ -18,9 +18,12 @@
         }
         <MudGrid Class="mt-2">
             <MudItem xs="12" md="8">
-                <MudTabs ActivePanelIndex="1" Style="max-width: 100%" Elevation="0" KeepPanelsAlive>
-                    <MudTabPanel Text="Summary" Visible="false">
-                        <GameSummary GameId="GameId"/>
+                <MudTabs Style="max-width: 100%" Elevation="0" KeepPanelsAlive>
+                    <MudTabPanel Text="Summary">
+                        @if (_game is not null)
+                        {
+                            <GameSummary Game="_game"/>
+                        }
                     </MudTabPanel>
                     <MudTabPanel Text="Box Score">
                         @if (_loading)
