@@ -9,7 +9,8 @@ public sealed class ChangeTracker<T>
     public HashSet<T> EditItems { get; private set; }
     public HashSet<T> DeleteItems { get; private set; }
     public HashSet<T> NewItems { get; private set; }
-    public bool IsDirty { get; private set; }
+
+    public bool IsDirty => EditItems.Count > 0 || DeleteItems.Count > 0 || NewItems.Count > 0;
 
     public ChangeTracker(IEqualityComparer<T>? comparer = null)
     {
@@ -24,14 +25,17 @@ public sealed class ChangeTracker<T>
         if (DeleteItems.Contains(item) || NewItems.Contains(item))
             return;
         EditItems.Add(item);
-        IsDirty = true;
     }
 
     public void TrackDelete(T item)
     {
         EditItems.Remove(item);
-        DeleteItems.Add(item);
-        IsDirty = true;
+        
+        // db doesnt have this yet
+        if (!NewItems.Remove(item))
+        {
+            DeleteItems.Add(item);
+        }
     }
     
     public void TrackDeletes(IEnumerable<T> items)
@@ -39,22 +43,44 @@ public sealed class ChangeTracker<T>
         var enumerable = items.ToHashSet();
         EditItems.ExceptWith(enumerable);
         DeleteItems.UnionWith(enumerable);
-        IsDirty = true;
     }
 
     public void TrackNew(T item)
     {
         EditItems.Remove(item);
         NewItems.Add(item);
-        IsDirty = true;
     }
 
     public async Task SaveChangesAsync(DbContext dbContext)
     {
         var dbSet = dbContext.Set<T>();
-        dbSet.UpdateRange(EditItems);
-        dbSet.RemoveRange(DeleteItems);
-        dbSet.AddRange(NewItems);
+        
+        // new items
+        foreach (var newItem in NewItems)
+        {
+            dbContext.ChangeTracker.TrackGraph(newItem, node =>
+            {
+                // if entity already has an ID, we assume it exists
+                node.Entry.State = node.Entry.IsKeySet ? EntityState.Unchanged : EntityState.Added;
+            });
+        }
+        
+        // edit items
+        foreach (var editItem in EditItems)
+        {
+            dbContext.ChangeTracker.TrackGraph(editItem, node =>
+            {
+                if (node.Entry.Entity == editItem)
+                    node.Entry.State = EntityState.Modified;
+                else
+                    node.Entry.State = node.Entry.IsKeySet ? EntityState.Unchanged : EntityState.Added;
+            });
+        }
+        
+        // delete items
+        if (DeleteItems.Count > 0)
+            dbSet.RemoveRange(DeleteItems);
+        
         await dbContext.SaveChangesAsync();
         Clear();
     }
@@ -64,6 +90,5 @@ public sealed class ChangeTracker<T>
         EditItems.Clear();
         DeleteItems.Clear();
         NewItems.Clear();
-        IsDirty = false;
     }
 }
