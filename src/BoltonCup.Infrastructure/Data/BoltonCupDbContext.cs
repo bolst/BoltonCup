@@ -19,6 +19,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<Core.BracketChallenge.Event> BracketChallenges { get; set; }
     public DbSet<Core.BracketChallenge.Registration> BracketChallengeRegistrations { get; set; }
     public DbSet<Game> Games { get; set; }
+    public DbSet<GameStar> GameStars { get; set; }
     public DbSet<Goal> Goals { get; set; }
     public DbSet<GoalieGameLog> GoalieGameLogs { get; set; }
     public DbSet<GoalieStat> GoalieStats { get; set; }
@@ -116,6 +117,31 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.GameType).HasColumnName("game_type");
             entity.Property(e => e.Venue).HasColumnName("venue");
             entity.Property(e => e.Rink).HasColumnName("rink");
+        });
+
+        modelBuilder.Entity<GameStar>(entity =>
+        {
+            entity
+                .ToTable("game_stars")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Game)
+                .WithMany(g => g.Stars)
+                .HasForeignKey(e => e.GameId);
+            entity
+                .HasOne(e => e.Player)
+                .WithMany(p => p.Stars)
+                .HasForeignKey(e => e.PlayerId);
+            entity
+                .HasIndex(e => new { e.PlayerId, e.GameId })
+                .IsUnique();
+            entity
+                .HasIndex(e => new { e.StarRank, e.GameId })
+                .IsUnique();
+            entity.HasIndex(e => e.GameId);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.PlayerId).HasColumnName("player_id");
         });
 
         modelBuilder.Entity<Goal>(entity =>

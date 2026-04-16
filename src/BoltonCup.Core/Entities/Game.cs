@@ -18,6 +18,7 @@ public class Game : EntityBase
     public ICollection<Penalty> Penalties { get; set; } = [];
     public ICollection<SkaterGameLog> SkaterGameLogs { get; set; } = [];
     public ICollection<GoalieGameLog> GoalieGameLogs { get; set; } = [];
+    public ICollection<GameStar> Stars { get; set; } = [];
 }
 
 public class GameComparer : IEqualityComparer<Game>
