@@ -1,0 +1,105 @@
+@page "/games/{GameId:int}/goals"
+@using System.Linq.Expressions
+
+<EntityDataGrid 
+    @ref="_dataGrid" 
+    T="Goal"
+    Include="@_includes"
+    SearchBy="x => x.Scorer.Account.FirstName + ' ' + x.Scorer.Account.LastName"
+    Filter="@_filter"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Property="x => x.Game" Editable="false">
+            <CellTemplate>
+                <span>@context.Item.Game.HomeTeam?.NameShort vs. @context.Item.Game.AwayTeam?.NameShort</span>
+            </CellTemplate>
+            <FooterTemplate>
+                @{
+                    var homeGoals = context.Items.Count(x => x.TeamId == x.Game.HomeTeamId);
+                    var awayGoals = context.Items.Count(x => x.TeamId == x.Game.AwayTeamId);
+                }
+                <MudChip Variant="Variant.Filled" Color="Color.Surface" Label="true">
+                    @context.Items.FirstOrDefault()?.Game.HomeTeam?.NameShort @homeGoals | @context.Items.FirstOrDefault()?.Game.AwayTeam?.NameShort @awayGoals
+                </MudChip>
+            </FooterTemplate>
+        </PropertyColumn>
+        <ForeignColumn Title="Team" Property="x => x.Team" PropertySetter="(gs, team) => gs.Team = team"
+                       Filter="@(x => (y => y.Id == x.Game.HomeTeamId || y.Id == x.Game.AwayTeamId))"
+                       SearchBy="x => x.Name"
+                       EqualityComparer="new TeamComparer()" 
+                       ImageSrcFunc="x => x.Logo" 
+                       Required />
+        <ForeignColumn Title="Scorer" Property="x => x.Scorer" PropertySetter="(gs, sp) => gs.Scorer = sp"
+                       EqualityComparer="new PlayerComparer()" Include="x => x.Include(p => p.Account)"
+                       Filter="@(x => (y => y.TeamId == x.TeamId))"
+                       SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName" 
+                       Required/>
+        <ForeignColumn Title="Primary Assist" Property="x => x.Assist1Player" PropertySetter="(gs, ap) => gs.Assist1Player = ap"
+                       EqualityComparer="new PlayerComparer()" Include="x => x.Include(p => p.Account)"
+                       Filter="@(x => (y => y.TeamId == x.TeamId))"
+                       SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"/>
+        <ForeignColumn Title="Secondary Assist" Property="x => x.Assist2Player" PropertySetter="(gs, ap) => gs.Assist2Player = ap"
+                       EqualityComparer="new PlayerComparer()" Include="x => x.Include(p => p.Account)"
+                       Filter="@(x => (y => y.TeamId == x.TeamId))"
+                       SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"/>
+        <PropertyColumn Title="Period" Property="x => x.Period" />
+        <PropertyColumn Title="Time" Property="x => x.PeriodTimeRemaining" Required>
+            <EditTemplate>
+                <MudTimePicker 
+                    Time="@context.Item.PeriodTimeRemaining" 
+                    TimeChanged="@(async t => { context.Item.PeriodTimeRemaining = t.GetValueOrDefault(); await _dataGrid.NotifyItemChangedAsync(context.Item); })"
+                    TimeFormat="mm:ss" Editable="true" Mask="@_timeMask" AdornmentIcon="@string.Empty"
+                    Underline="false" Margin="Margin.Dense" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Notes" Property="x => x.Notes" Required="false" />
+    </Columns>
+</EntityDataGrid>
+
+
+@code {
+
+    [Parameter]
+    public int GameId { get; set; }
+
+    private int? _gameId;
+
+    private static IMask _timeMask = new Utilities.TimeSpanMask("mm:ss");
+
+    private EntityDataGrid<Goal> _dataGrid = null!;
+    private static readonly GoalComparer _comparer = new();
+
+    private Expression<Func<Goal, bool>>? _filter;
+
+    private static readonly Func<IQueryable<Goal>, IQueryable<Goal>> _includes = 
+        x => x
+            .Include(g => g.Scorer).ThenInclude(p => p.Account)
+            .Include(g => g.Assist1Player).ThenInclude(p => p.Account)
+            .Include(g => g.Assist2Player).ThenInclude(p => p.Account)
+            .Include(g => g.Game).ThenInclude(g => g.HomeTeam)
+            .Include(g => g.Game).ThenInclude(g => g.AwayTeam)
+            .Include(g => g.Game).ThenInclude(g => g.Tournament);
+
+    
+    protected override Task OnParametersSetAsync()
+    {
+        if (_gameId == GameId)
+            return Task.CompletedTask;
+        _gameId = GameId;
+        
+        _filter = x => x.GameId == _gameId;
+        return _dataGrid is not null
+            ? _dataGrid.ReloadAsync()
+            : Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        await _dataGrid.ExtendSortAsync("Period", SortDirection.Ascending, x => x.Period);
+        await _dataGrid.ExtendSortAsync("PeriodTimeRemaining", SortDirection.Ascending, x => x.PeriodTimeRemaining);
+    }
+
+}
