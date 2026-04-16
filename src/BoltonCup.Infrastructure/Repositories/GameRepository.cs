@@ -42,6 +42,12 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
             .Include(p => p.Penalties)
                 .ThenInclude(x => x.Player)
                 .ThenInclude(x => x.Account)
+            .Include(p => p.Stars)
+                .ThenInclude(s => s.Player)
+                .ThenInclude(p => p.Account)
+            .Include(p => p.Highlights.Take(3))
+                .ThenInclude(h => h.Player)
+                .ThenInclude(p => p.Account)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 

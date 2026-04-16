@@ -1,0 +1,70 @@
+@page "/games/highlights"
+@using BoltonCup.Common
+
+<EntityDataGrid
+    T="GameHighlight"
+    NewItemFunc="NewItemFunc"
+    Include="@_includes"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Video ID" Property="x => x.VideoId" Required />
+        <ForeignColumn Title="Game" Property="x => x.Game" PropertySetter="(gs, game) => gs.Game = game"
+                       Include="x => x.Include(g => g.HomeTeam).Include(g => g.AwayTeam).Include(g => g.Tournament)"
+                       Filter="@(star =>
+                               {
+                                   var tournamentId = star.Game?.TournamentId;
+                                   return y => tournamentId == null || y.TournamentId == tournamentId;
+                               })"
+                       SearchBy="@(x => (x.HomeTeam != null ? x.HomeTeam.Name : " ") + ' ' + (x.AwayTeam != null ? x.AwayTeam.Name : " "))"
+                       EqualityComparer="new GameComparer()">
+            <ItemTemplate>
+                <MudText>@context.HomeTeam?.NameShort vs. @context.AwayTeam?.NameShort</MudText>
+                <MudChip T="string" Variant="Variant.Text" Color="Color.Info" Size="Size.Small" Label="true">
+                    @context.GameTime.ToEstString("g")
+                </MudChip>
+                <MudText Typo="Typo.caption">@context.Tournament.Name</MudText>
+                <MudDivider Class="mt-2"/>
+            </ItemTemplate>
+        </ForeignColumn>
+        <ForeignColumn Title="Player" Property="x => x.Player" PropertySetter="(gs, player) => gs.Player = player"
+                       EqualityComparer="new PlayerComparer()" Include="x => x.Include(p => p.Account)"
+                       Filter="@(x =>
+                               {
+                                   var tournamentId = x.Game?.TournamentId;
+                                   return y => tournamentId == null || y.TournamentId == tournamentId;
+                               })"
+                       SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"/>
+        <PropertyColumn Title="Title" Property="x => x.Title" />
+        <PropertyColumn Title="Description" Property="x => x.Description" />
+        <PropertyColumn Title="Game date" Property="x => x.Game.GameTime" Format="g" Editable="false" InitialDirection="SortDirection.Ascending">
+            <CellTemplate>
+                <span>@context.Item.Game?.GameTime.ToEstString("g")</span>
+            </CellTemplate>
+        </PropertyColumn>
+        <TemplateColumn Title="Tournament" Editable="false">
+            <CellTemplate>
+                <span>@context.Item.Game?.Tournament?.Name</span>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</EntityDataGrid>
+
+@code {
+    
+    private static readonly GameHighlightComparer _comparer = new();
+    
+    private async Task<GameHighlight?> NewItemFunc()
+    {
+        return new GameHighlight
+        {
+        };
+    }
+
+    private static readonly Func<IQueryable<GameHighlight>, IQueryable<GameHighlight>> _includes = 
+        x => x
+            .Include(g => g.Player).ThenInclude(p => p.Account)
+            .Include(g => g.Game).ThenInclude(g => g.HomeTeam)
+            .Include(g => g.Game).ThenInclude(g => g.AwayTeam)
+            .Include(g => g.Game).ThenInclude(g => g.Tournament);
+    
+}

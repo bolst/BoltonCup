@@ -5545,6 +5545,27 @@
         },
         "additionalProperties": false
       },
+      "GameHighlightDto": {
+        "type": "object",
+        "properties": {
+          "videoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "player": {
+            "$ref": "#/components/schemas/PlayerBriefDto"
+          }
+        },
+        "additionalProperties": false
+      },
       "GameOfTeamDto": {
         "required": [
           "gameTime",
@@ -5610,8 +5631,10 @@
         "required": [
           "gameTime",
           "goals",
+          "highlights",
           "id",
           "penalties",
+          "stars",
           "tournament"
         ],
         "type": "object",
@@ -5656,6 +5679,40 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PenaltyBriefDto"
+            },
+            "nullable": true
+          },
+          "stars": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameStarDto"
+            },
+            "nullable": true
+          },
+          "highlights": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameHighlightDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GameStarDto": {
+        "type": "object",
+        "properties": {
+          "starRank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player": {
+            "$ref": "#/components/schemas/PlayerBriefDto"
+          },
+          "stats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatItem"
             },
             "nullable": true
           }
@@ -6175,6 +6232,11 @@
             "readOnly": true
           },
           "fullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "jerseyNumberLabel": {
             "type": "string",
             "nullable": true,
             "readOnly": true
@@ -6736,6 +6798,20 @@
             "type": "integer",
             "format": "int32",
             "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "StatItem": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

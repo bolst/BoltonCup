@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260416005551_AddGameStars")]
+    partial class AddGameStars
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -295,66 +298,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.ToTable("games", "core");
                 });
 
-            modelBuilder.Entity("BoltonCup.Core.GameHighlight", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<int>("GameId")
-                        .HasColumnType("integer")
-                        .HasColumnName("game_id");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_modified");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("last_modified_by");
-
-                    b.Property<int?>("PlayerId")
-                        .HasColumnType("integer")
-                        .HasColumnName("player_id");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text")
-                        .HasColumnName("title");
-
-                    b.Property<string>("VideoId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("video_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GameId");
-
-                    b.HasIndex("PlayerId");
-
-                    b.HasIndex("VideoId")
-                        .IsUnique();
-
-                    b.ToTable("game_highlights", "core");
-                });
-
             modelBuilder.Entity("BoltonCup.Core.GameStar", b =>
                 {
                     b.Property<int>("Id")
@@ -364,27 +307,9 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
                     b.Property<int>("GameId")
                         .HasColumnType("integer")
                         .HasColumnName("game_id");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_modified");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("last_modified_by");
 
                     b.Property<int>("PlayerId")
                         .HasColumnType("integer")
@@ -1415,23 +1340,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Navigation("Tournament");
                 });
 
-            modelBuilder.Entity("BoltonCup.Core.GameHighlight", b =>
-                {
-                    b.HasOne("BoltonCup.Core.Game", "Game")
-                        .WithMany("Highlights")
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BoltonCup.Core.Player", "Player")
-                        .WithMany("GameHighlights")
-                        .HasForeignKey("PlayerId");
-
-                    b.Navigation("Game");
-
-                    b.Navigation("Player");
-                });
-
             modelBuilder.Entity("BoltonCup.Core.GameStar", b =>
                 {
                     b.HasOne("BoltonCup.Core.Game", "Game")
@@ -1684,8 +1592,6 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     b.Navigation("Goals");
 
-                    b.Navigation("Highlights");
-
                     b.Navigation("Penalties");
 
                     b.Navigation("SkaterGameLogs");
@@ -1695,8 +1601,6 @@ namespace BoltonCup.Infrastructure.Migrations
 
             modelBuilder.Entity("BoltonCup.Core.Player", b =>
                 {
-                    b.Navigation("GameHighlights");
-
                     b.Navigation("GoalieGameLogs");
 
                     b.Navigation("Goals");

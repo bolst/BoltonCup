@@ -1,5 +1,6 @@
 ﻿@page "/registrations"
 @using System.Text.Json
+@using BoltonCup.Common
 @inject IDialogService DialogService
 
 <EntityDataGrid
@@ -50,7 +51,11 @@
             </CellTemplate>
         </TemplateColumn>
         <ForeignColumn Title="Tournament" Property="x => x.Tournament" Editable="false"/>
-        <PropertyColumn Title="Created at" Property="x => x.CreatedAt" Editable="false" Format="g" InitialDirection="SortDirection.Descending"/>
+        <PropertyColumn Title="Created at" Property="x => x.CreatedAt" Editable="false" Format="g" InitialDirection="SortDirection.Descending">
+            <CellTemplate>
+                <span>@context.Item.CreatedAt.ToEstString("g")</span>
+            </CellTemplate>
+        </PropertyColumn>
     </Columns>
 </EntityDataGrid>
 
