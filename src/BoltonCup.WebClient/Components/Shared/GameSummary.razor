@@ -31,6 +31,63 @@
                 }
             </MudGrid>
         }
+        
+        if (Game.Goals.Any())
+        {
+            <div class="d-flex flex-row align-center px-1 pt-4 mud-width-full">
+                <MudText Typo="Typo.h6"><b>Scoring</b></MudText>
+            </div>
+
+            foreach (var periodGoals in Game.Goals.GroupBy(g => g.PeriodLabel))
+            {
+                <MudText Class="my-1" Typo="Typo.subtitle1"><b>@periodGoals.Key</b></MudText>
+
+                <MudStack Spacing="1" Class="mud-width-full mb-2">
+                    @foreach (var goal in periodGoals)
+                    {
+                        var assists = "Unassisted";
+                        if (goal.PrimaryAssist is not null)
+                        {
+                            assists = goal.PrimaryAssist.FirstName[..1] + ". " + goal.PrimaryAssist.LastName;
+                            if (goal.SecondaryAssist is not null)
+                            {
+                                assists += ", " + goal.SecondaryAssist.FirstName[..1] + ". " + goal.SecondaryAssist.LastName;
+                            }
+                        }
+                        <MudPaper Class="d-flex flex-row align-center justify-space-between flex-wrap gap-3 px-4 py-2" Width="100%" MinHeight="120px" Elevation="0" Outlined Square>
+                            <MudGrid>
+                                <MudItem xs="8" Class="d-flex flex-row align-center gap-3">
+                                    <MudAvatar Style="width: 64px; height: 64px">
+                                        <MudImage Src="@goal.Scorer.ProfilePicture" Alt="@goal.Scorer.FullName"/>
+                                    </MudAvatar>
+                                    <div class="d-flex flex-column align-start justify-space-between">
+                                        <PlayerLink Player="@goal.Scorer" Typo="Typo.body1"/>
+                                        <div class="d-flex flex-row align-center gap-1">
+                                            <MudImage Src="@(goal.TeamId == Game.HomeTeam.Id ? Game.HomeTeam.Logo : Game.AwayTeam.Logo)" Height="24"/>
+                                            <MudText Typo="Typo.body2">@assists</MudText>
+                                        </div>
+                                    </div>
+                                </MudItem>
+                                <MudItem xs="1" sm="2"></MudItem>
+                                <MudItem xs="3" sm="2">
+                                    <MudGrid>
+                                        @* <MudItem xs="4"></MudItem> *@
+                                        @* <MudItem xs="4"></MudItem> *@
+                                        <MudItem xs="12">
+                                            <div class="d-flex flex-column align-center gap-1 gray lighten-3 pa-2">
+                                                <MudText Typo="Typo.subtitle2">@goal.TimeString</MudText>
+                                                <MudText Typo="Typo.caption">Time</MudText>
+                                            </div>
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudItem>
+                            </MudGrid>
+                            
+                        </MudPaper>
+                    }
+                </MudStack>
+            }
+        }
 
         if (Game.Highlights.Any())
         {
@@ -50,6 +107,47 @@
                 }
             </MudGrid>
         }
+
+        if (Game.Penalties.Any())
+        {
+            <div class="d-flex flex-row align-center px-1 pt-4 mud-width-full">
+                <MudText Typo="Typo.h6"><b>Penalties</b></MudText>
+            </div>
+            
+            <MudSimpleTable Elevation="0" Striped Square>
+                @foreach (var periodPenalties in Game.Penalties.GroupBy(p => p.PeriodLabel))
+                {
+                    <colgroup>
+                        <col span="2" style="width: 75px" />
+                        <col class="border-l mud-border-lines-default" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th colspan="3">
+                            <MudText Typo="Typo.subtitle1"><b>@periodPenalties.Key</b></MudText>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Team</th>
+                        <th>Time</th>
+                        <th>Penalty</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var penalty in periodPenalties)
+                        {
+                            <tr>
+                                <td>
+                                    <MudImage Src="@(penalty.TeamId == Game.HomeTeam.Id ? Game.HomeTeam.Logo : Game.AwayTeam.Logo)" Height="24" />
+                                </td>
+                                <td>@penalty.TimeString</td>
+                                <td>@penalty.Player.FullName (@penalty.Player.JerseyNumberLabel) @penalty.DurationMins minutes for @penalty.Infraction</td>
+                            </tr>
+                        }
+                    </tbody>
+                }
+            </MudSimpleTable>
+        }
     }
 </div>
 
@@ -59,5 +157,12 @@
     [Parameter]
     [EditorRequired]
     public Sdk.GameSingleDto? Game { get; set; }
-
+    
+    private static readonly TableGroupDefinition<Sdk.PenaltyBriefDto> _penaltiesGroupDefinition = new()
+    {
+        GroupName = "Period",
+        Indentation = false,
+        Expandable = false,
+        Selector = e => e.PeriodLabel,
+    };
 }

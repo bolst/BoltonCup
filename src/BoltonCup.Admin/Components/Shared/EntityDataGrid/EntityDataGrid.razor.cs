@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.State;
 using MudBlazor.Utilities;
+using System.Linq.Dynamic.Core;
 
 namespace BoltonCup.Admin.Components.Shared;
 
@@ -137,8 +138,6 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         
         try
         {
-            var sortDefinition = state.SortDefinitions.FirstOrDefault();
-            
             await using var dbContext = await CreateDbContext(cancellationToken);
             var dbSet = dbContext
                 .Set<T>()
@@ -157,15 +156,17 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
             if (SearchBy is not null)
                 dbSet = dbSet.WhereContains(SearchBy, _search);
 
+            var sortExpression = string.Join(", ", state.SortDefinitions.Select(d => $"{d.SortBy} {(d.Descending ? "desc" : "asc")}"));
+            if (!string.IsNullOrEmpty(sortExpression))
+                dbSet = dbSet.OrderBy(sortExpression);
+            
             var query = new QueryBase
             {
                 Page = state.Page + 1,
                 Size = state.PageSize,
-                SortBy = sortDefinition?.SortBy,
-                Descending = sortDefinition?.Descending ?? false,
             };
+            
             var data = await dbSet
-                .ApplySorting(query, x => x.Order())
                 .ToPagedListAsync(query, cancellationToken);
             
             var items = _changeTracker.NewItems.Concat(data.Items);
@@ -261,6 +262,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     
     public Task ReloadAsync()
         => _dataGrid.ReloadServerData();
+
+    public Task ExtendSortAsync(string field, SortDirection direction, Func<T, object?> sortFunc)
+        => _dataGrid.ExtendSortAsync(field, direction, sortFunc);
     
     private string RowStyleFunc(T item, int row)
     {

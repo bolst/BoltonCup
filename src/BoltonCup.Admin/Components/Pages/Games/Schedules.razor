@@ -3,6 +3,7 @@
 <EntityDataGrid
     T="Game"
     NewItemFunc="NewItemFunc"
+    Include="x => x.Include(p => p.Goals).Include(p => p.Penalties)"
     Comparer="_comparer">
     <Columns>
         <ForeignColumn Title="Home" Property="x => x.HomeTeam" PropertySetter="(game, team) => game.HomeTeam = team" 
@@ -10,6 +11,24 @@
         <ForeignColumn Title="Away" Property="x => x.AwayTeam" PropertySetter="(game, team) => game.AwayTeam = team" 
                        EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" />
         <DatePickerColumn Title="Date" Property="x => x.GameTime"/>
+        <TemplateColumn Title="Score" Editable="false">
+            <CellTemplate>
+                @{
+                    var homeGoals = context.Item.Goals.Count(x => x.TeamId == context.Item.HomeTeamId);
+                    var awayGoals = context.Item.Goals.Count(x => x.TeamId == context.Item.AwayTeamId);
+                }
+                <MudChip T="string" Href='@($"/games/{context.Item.Id}/goals")' Text="@($"{homeGoals} - {awayGoals}")" Color="Color.Info" Variant="Variant.Text" Size="Size.Small" Label="true"/>
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="PIM" Editable="false">
+            <CellTemplate>
+                @{
+                    var homePIMs = context.Item.Penalties.Where(x => x.TeamId == context.Item.HomeTeamId).Sum(x => x.DurationMinutes);
+                    var awayPIMs = context.Item.Penalties.Where(x => x.TeamId == context.Item.AwayTeamId).Sum(x => x.DurationMinutes);
+                }
+                <MudChip T="string" Href='@($"/games/{context.Item.Id}/penalties")' Text="@($"{homePIMs} - {awayPIMs}")" Color="Color.Info" Variant="Variant.Text" Size="Size.Small" Label="true"/>
+            </CellTemplate>
+        </TemplateColumn>
         <PropertyColumn Title="Type" Property="x => x.GameType"/>
         <PropertyColumn Title="Venue" Property="x => x.Venue"/>
         <PropertyColumn Title="Rink" Property="x => x.Rink"/>

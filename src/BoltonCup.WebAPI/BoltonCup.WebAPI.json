@@ -5722,7 +5722,6 @@
       "GoalBriefDto": {
         "required": [
           "period",
-          "periodLabel",
           "primaryAssist",
           "scorer",
           "secondaryAssist",
@@ -5739,10 +5738,6 @@
             "type": "integer",
             "format": "int32"
           },
-          "periodLabel": {
-            "type": "string",
-            "nullable": true
-          },
           "teamId": {
             "type": "integer",
             "format": "int32"
@@ -5755,6 +5750,21 @@
           },
           "secondaryAssist": {
             "$ref": "#/components/schemas/PlayerBriefDto"
+          },
+          "periodLabel": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "periodAbbreviation": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "timeString": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -6154,7 +6164,6 @@
           "durationMins",
           "infraction",
           "period",
-          "periodLabel",
           "player",
           "teamId",
           "timeRemaining"
@@ -6168,10 +6177,6 @@
           "period": {
             "type": "integer",
             "format": "int32"
-          },
-          "periodLabel": {
-            "type": "string",
-            "nullable": true
           },
           "teamId": {
             "type": "integer",
@@ -6187,6 +6192,21 @@
           "durationMins": {
             "type": "integer",
             "format": "int32"
+          },
+          "periodLabel": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "periodAbbreviation": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "timeString": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false

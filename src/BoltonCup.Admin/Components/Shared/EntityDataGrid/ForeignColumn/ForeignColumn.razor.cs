@@ -19,7 +19,6 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     private Func<T, TEntity?>? _compiledExpression;
     private List<TEntity> _options = [];
     private bool _pendingRegistration = true;
-    private IEnumerable<TEntity>? _cachedDefaultOptions;
 
     [CascadingParameter]
     public EntityDataGrid<T> ParentGrid { get; set; } = null!;
@@ -145,10 +144,9 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
         
             if (string.IsNullOrEmpty(search))
             {
-                _cachedDefaultOptions ??= await dbSet
+                return await dbSet
                     .Order()
                     .ToListAsync(cancellationToken: token);
-                return _cachedDefaultOptions;
             }
         
             if (SearchBy is not null)
