@@ -1,0 +1,75 @@
+@page "/games/logs/goalie"
+@using BoltonCup.Common
+
+<EntityDataGrid
+    @ref="@_dataGrid"
+    T="GoalieGameLog"
+    SearchBy="x => x.Player.Account.FirstName + ' ' + x.Player.Account.LastName"
+    Include="@_includes"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Player" Property="x => x.Player.Account.FirstName" Editable="false">
+            <CellTemplate>
+                <span>@context.Item.Player.Account.FirstName @context.Item.Player.Account.LastName</span>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Team" Property="x => x.Team.NameShort" Editable="false">
+            <CellTemplate>
+                <div class="d-flex flex-row align-center gap-1">
+                    <BoltonCupImage Src="@context.Item.Team.Logo" Height="24" />
+                    <span>@context.Item.Team.NameShort</span>
+                </div>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="vs." Property="x => x.OpponentTeam.NameShort" Editable="false">
+            <CellTemplate>
+                <div class="d-flex flex-row align-center gap-1">
+                    <BoltonCupImage Src="@context.Item.OpponentTeam.Logo" Height="24" />
+                    <span>@context.Item.OpponentTeam.NameShort</span>
+                </div>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Shots" Property="x => x.ShotsAgainst" />
+        <PropertyColumn Title="Saves" Property="x => x.Saves" />
+        <PropertyColumn Title="GA" Property="x => x.GoalsAgainst" Editable="false" />
+        <BoolColumn Title="Shutout" Property="x => x.Shutout" Editable="false" />
+        <BoolColumn Title="Win" Property="x => x.Win" Editable="false" />
+        <PropertyColumn Title="Assists" Property="x => x.Assists" Editable="false" />
+        <PropertyColumn Title="PIM" Property="x => x.PenaltyMinutes" Editable="false" />
+        <PropertyColumn Title="Game date" Property="x => x.Game.GameTime" Format="g" Editable="false">
+            <CellTemplate>
+                <span>@context.Item.Game?.GameTime.ToEstString("g")</span>
+            </CellTemplate>
+        </PropertyColumn>
+        <TemplateColumn Title="Tournament" Editable="false">
+            <CellTemplate>
+                <span>@context.Item.Game?.Tournament?.Name</span>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</EntityDataGrid>
+
+@code {
+
+    private EntityDataGrid<GoalieGameLog> _dataGrid = null!;
+    
+    private readonly GameLogComparer _comparer = new();
+    
+    private static readonly Func<IQueryable<GoalieGameLog>, IQueryable<GoalieGameLog>> _includes = 
+        x => x
+            .Include(g => g.Team)
+            .Include(g => g.OpponentTeam)
+            .Include(g => g.Player).ThenInclude(p => p.Account)
+            .Include(g => g.Game).ThenInclude(g => g.Tournament);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        await _dataGrid.ExtendSortAsync("Game.Tournament.Name", SortDirection.Ascending, x => x.Game.Tournament.Name);
+        await _dataGrid.ExtendSortAsync("Player.Account.FirstName", SortDirection.Ascending, x => x.Player.Account.FirstName);
+        await _dataGrid.ExtendSortAsync("Game.GameTime", SortDirection.Ascending, x => x.Game.GameTime);
+    }
+    
+}
