@@ -9,4 +9,6 @@ public sealed record GoalBriefDto
     public required PlayerBriefDto Scorer  { get; set; }
     public required PlayerBriefDto? PrimaryAssist { get; set; }
     public required PlayerBriefDto? SecondaryAssist { get; set; }
+    
+    public string TimeString => TimeRemaining.ToString(@"mm\:ss");
 }
