@@ -4,6 +4,9 @@
 @inherits Column<T>
 
 @code {
+    
+    [Parameter]
+    public RenderFragment<TEntity>? ItemTemplate { get; set; }
 
     private RenderFragment RenderSearch(CellContext<T> context, TEntity? entity)
     {
@@ -12,14 +15,15 @@
                     Value="@entity"
                     ValueChanged="@(val => OnValueChangedAsync(context.Item, val))"
                     SearchFunc="@((s, ct) => SearchOptionsAsync(s, context, ct))"
+                    ItemTemplate="@ItemTemplate"
                     Margin="Margin.Dense"
                     Clearable="!Required"
                     Required="Required"
                     ReadOnly="!Editable"
                     IconSize="Size.Small"
                     Strict="false"
-                    Dense
-                    />;
+                    ShowProgressIndicator
+                    Dense />;
     }
 
     protected virtual RenderFragment EntityEditTemplate(CellContext<T> context)

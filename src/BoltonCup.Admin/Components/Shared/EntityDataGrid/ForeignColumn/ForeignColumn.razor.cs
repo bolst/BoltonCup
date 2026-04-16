@@ -3,6 +3,7 @@ using System.Reflection;
 using BoltonCup.Admin.Extensions;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Data;
+using BoltonCup.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
@@ -152,10 +153,15 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
         
             if (SearchBy is not null)
                 dbSet = dbSet.WhereContains(SearchBy, search);
-        
-            return await dbSet
+
+            var query = new Core.Queries.Base.QueryBase { Size = 10 };
+            var result = await dbSet
                 .Order()
-                .ToListAsync(token);
+                .ToPagedListAsync(
+                    query: query,
+                    cancellationToken: token
+                );
+            return result.Items;
         }
         catch (Exception e)
         {
