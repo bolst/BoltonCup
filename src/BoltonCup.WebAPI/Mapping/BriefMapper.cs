@@ -40,7 +40,6 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
         {
             TimeRemaining = goal.PeriodTimeRemaining,
             Period = goal.Period,
-            PeriodLabel = goal.PeriodLabel,
             TeamId = goal.TeamId,
             Scorer = ToPlayerBriefDto(goal.Scorer),
             PrimaryAssist = goal.Assist1Player == null ? null : ToPlayerBriefDto(goal.Assist1Player),
@@ -65,7 +64,6 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
         {
             TimeRemaining = penalty.PeriodTimeRemaining,
             Period = penalty.Period,
-            PeriodLabel = penalty.PeriodLabel,
             TeamId = penalty.TeamId,
             Player = ToPlayerBriefDto(penalty.Player),
             Infraction = penalty.InfractionName,
