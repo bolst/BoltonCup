@@ -1,0 +1,35 @@
+@page "/games/stars"
+
+<EntityDataGrid
+    T="GameStar"
+    NewItemFunc="NewItemFunc"
+    Include="@_includes"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Rank" Property="x => x.StarRank" Required />
+        <ForeignColumn Title="Player" Property="x => x.Player" PropertySetter="(gs, player) => gs.Player = player"
+                       EqualityComparer="new PlayerComparer()" Include="x => x.Include(p => p.Account)" />
+        <ForeignColumn Title="Game" Property="x => x.Game" PropertySetter="(gs, game) => gs.Game = game"
+                       Include="x => x.Include(g => g.HomeTeam).Include(g => g.AwayTeam)"
+                       EqualityComparer="new GameComparer()"/>
+    </Columns>
+</EntityDataGrid>
+
+@code {
+    
+    private readonly GameStarComparer _comparer = new();
+    
+    private async Task<GameStar?> NewItemFunc()
+    {
+        return new GameStar
+        {
+        };
+    }
+
+    private static readonly Func<IQueryable<GameStar>, IQueryable<GameStar>> _includes = 
+        x => x
+            .Include(g => g.Player).ThenInclude(p => p.Account)
+            .Include(g => g.Game).ThenInclude(g => g.HomeTeam)
+            .Include(g => g.Game).ThenInclude(g => g.AwayTeam);
+
+}

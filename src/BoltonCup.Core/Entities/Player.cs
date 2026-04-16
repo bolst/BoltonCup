@@ -26,6 +26,13 @@ public class Player : EntityBase
     public ICollection<SkaterGameLog> SkaterGameLogs { get; set; } = [];
     public ICollection<GoalieGameLog> GoalieGameLogs { get; set; } = [];
     public ICollection<GameStar> Stars { get; set; } = [];
+
+    public override string ToString()
+    {
+        return Account != null 
+            ? Account.ToString() 
+            : $"Player {Id}";
+    }
 }
 
 public class PlayerComparer : IEqualityComparer<Player>

@@ -19,6 +19,13 @@ public class Game : EntityBase
     public ICollection<SkaterGameLog> SkaterGameLogs { get; set; } = [];
     public ICollection<GoalieGameLog> GoalieGameLogs { get; set; } = [];
     public ICollection<GameStar> Stars { get; set; } = [];
+
+    public override string ToString()
+    {
+        if (HomeTeam is null || AwayTeam is null)
+            return $"Game {Id} (T{TournamentId})";
+        return $"{HomeTeam.Name} vs. {AwayTeam.Name}";
+    }
 }
 
 public class GameComparer : IEqualityComparer<Game>

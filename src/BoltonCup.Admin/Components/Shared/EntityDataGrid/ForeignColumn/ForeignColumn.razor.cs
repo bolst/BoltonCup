@@ -39,6 +39,9 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     [Parameter]
     public Expression<Func<TEntity, bool>>? Filter { get; set; }
     
+    [Parameter]
+    public Func<IQueryable<TEntity>, IQueryable<TEntity>>? Include { get; set; }
+    
     protected override async Task OnInitializedAsync()
     {
         EditTemplate = EntityEditTemplate;
@@ -125,12 +128,15 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
         // Grabs all records of the target foreign entity type
         
         var dbSet = dbContext.Set<TEntity>().AsNoTracking();
+
+        if (Include is not null)
+            dbSet = Include(dbSet);
+        
         if (Filter is not null)
-        {
             dbSet = dbSet.Where(Filter);
-        }
         
         _options = await dbSet
+            .Order()
             .ToListAsync();
     }
 
