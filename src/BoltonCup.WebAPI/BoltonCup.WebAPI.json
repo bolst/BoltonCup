@@ -5545,6 +5545,27 @@
         },
         "additionalProperties": false
       },
+      "GameHighlightDto": {
+        "type": "object",
+        "properties": {
+          "videoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "player": {
+            "$ref": "#/components/schemas/PlayerBriefDto"
+          }
+        },
+        "additionalProperties": false
+      },
       "GameOfTeamDto": {
         "required": [
           "gameTime",
@@ -5610,6 +5631,7 @@
         "required": [
           "gameTime",
           "goals",
+          "highlights",
           "id",
           "penalties",
           "stars",
@@ -5664,6 +5686,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/GameStarDto"
+            },
+            "nullable": true
+          },
+          "highlights": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameHighlightDto"
             },
             "nullable": true
           }

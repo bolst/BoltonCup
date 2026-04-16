@@ -12,6 +12,7 @@ public interface IGameMapper
 public class GameMapper(
     IAssetUrlResolver _urlResolver, 
     IBriefMapper _briefMapper, 
+    IGameHighlightMapper _gameHighlightMapper,
     IGameStarMapper _gameStarMapper
 ) : IGameMapper
 {
@@ -71,7 +72,10 @@ public class GameMapper(
                 Stars = game.Stars
                     .Select(_gameStarMapper.ToDto)
                     .OrderBy(gs => gs.StarRank)
-                    .ToList()
+                    .ToList(),
+                Highlights = game.Highlights
+                    .Select(_gameHighlightMapper.ToDto)
+                    .ToList(),
             };
     }
 }

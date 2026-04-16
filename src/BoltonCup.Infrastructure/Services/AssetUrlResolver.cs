@@ -13,6 +13,13 @@ public class AssetUrlResolver(string baseUrl) : IAssetUrlResolver
         return $"{_baseUrl}{s3Key}";
     }
 
+    public string? GetVideoUrl(string? videoId)
+    {
+        if (string.IsNullOrEmpty(videoId))
+            return null;
+        return $"https://www.youtube.com/embed/{videoId}";
+    }
+
 
     public static class StaticKeys
     {
