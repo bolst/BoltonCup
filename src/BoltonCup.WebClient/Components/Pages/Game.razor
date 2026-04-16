@@ -16,7 +16,7 @@
         {
             <GameResultBanner Game="_game"/>
         }
-        <MudGrid Class="mt-2">
+        <MudGrid Class="mt-2" Spacing="3">
             <MudItem xs="12" md="8">
                 <MudTabs Style="max-width: 100%" Elevation="0" KeepPanelsAlive>
                     <MudTabPanel Text="Summary">
@@ -46,7 +46,9 @@
                     }
                     else if (_game is not null)
                     {
-                        <MudSimpleTable Elevation="0" Dense Striped Square>
+                        var hasOT = _game.Goals.Any(t => t.Period == 4);
+                        var hasSO = _game.Goals.Any(t => t.Period == 5);
+                        <MudSimpleTable Class="line-score-table" Elevation="0" Dense Striped Square>
                             <thead>
                             <tr>
                                 <th></th>
@@ -54,24 +56,48 @@
                                 <th>1st</th>
                                 <th>2nd</th>
                                 <th>3rd</th>
+                                @if (hasOT)
+                                {
+                                    <th>OT</th>
+                                }
+                                @if (hasSO)
+                                {
+                                    <th>SO</th>
+                                }
                                 <th><b>T</b></th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr>
-                                <td><MudImage Src="@_game.AwayTeam.Logo" Alt="@_game.AwayTeam.Abbreviation" Height="32"/></td>
+                                <td><MudImage Src="@_game.AwayTeam.Logo" Alt="@_game.AwayTeam.Abbreviation" Height="24"/></td>
                                 <td><MudText Typo="Typo.body2"><b>@_game.AwayTeam.Abbreviation</b></MudText></td>
                                 <td>@_awayGoals.Count(x => x.Period == 1)</td>
                                 <td>@_awayGoals.Count(x => x.Period == 2)</td>
                                 <td>@_awayGoals.Count(x => x.Period == 3)</td>
+                                @if (hasOT)
+                                {
+                                    <td>@_awayGoals.Count(x => x.Period == 4)</td>
+                                }
+                                @if (hasSO)
+                                {
+                                    <td>@_awayGoals.Count(x => x.Period == 5)</td>
+                                }
                                 <td><b>@_awayGoals.Count()</b></td>
                             </tr>
                             <tr>
-                                <td><MudImage Src="@_game.HomeTeam.Logo" Alt="@_game.HomeTeam.Abbreviation" Height="32"/></td>
+                                <td><MudImage Src="@_game.HomeTeam.Logo" Alt="@_game.HomeTeam.Abbreviation" Height="24"/></td>
                                 <td><MudText Typo="Typo.body2"><b>@_game.HomeTeam.Abbreviation</b></MudText></td>
                                 <td>@_homeGoals.Count(x => x.Period == 1)</td>
                                 <td>@_homeGoals.Count(x => x.Period == 2)</td>
                                 <td>@_homeGoals.Count(x => x.Period == 3)</td>
+                                @if (hasOT)
+                                {
+                                    <td>@_homeGoals.Count(x => x.Period == 4)</td>
+                                }
+                                @if (hasSO)
+                                {
+                                    <td>@_homeGoals.Count(x => x.Period == 5)</td>
+                                }
                                 <td><b>@_homeGoals.Count()</b></td>
                             </tr>
                             </tbody>
@@ -82,6 +108,12 @@
         </MudGrid>
     </MudContainer>
 </BackgroundContainer>
+
+<style>
+    .line-score-table * tr td, .line-score-table * tr th {
+        padding: 6px 6px !important;
+    }
+</style>
 
 @code {
 
