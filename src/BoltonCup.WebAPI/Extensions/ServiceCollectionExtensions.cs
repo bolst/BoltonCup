@@ -127,7 +127,6 @@ public static class ServiceCollectionExtensions
             .AddTransient<IBracketChallengeMapper, BracketChallengeMapper>()
             .AddTransient<IGameMapper, GameMapper>()
             .AddTransient<IGameHighlightMapper, GameHighlightMapper>()
-            .AddTransient<IGameStarMapper, GameStarMapper>()
             .AddTransient<IGoalieGameLogMapper, GoalieGameLogMapper>()
             .AddTransient<IGoalieStatMapper, GoalieStatMapper>()
             .AddTransient<IInfoGuideMapper, InfoGuideMapper>()

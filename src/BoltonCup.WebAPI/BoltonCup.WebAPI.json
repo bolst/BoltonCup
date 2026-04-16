@@ -5708,6 +5708,13 @@
           },
           "player": {
             "$ref": "#/components/schemas/PlayerBriefDto"
+          },
+          "stats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatItem"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6791,6 +6798,20 @@
             "type": "integer",
             "format": "int32",
             "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "StatItem": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
