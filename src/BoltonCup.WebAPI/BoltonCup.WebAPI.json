@@ -6192,6 +6192,11 @@
           "durationMins": {
             "type": "integer",
             "format": "int32"
+          },
+          "timeString": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false

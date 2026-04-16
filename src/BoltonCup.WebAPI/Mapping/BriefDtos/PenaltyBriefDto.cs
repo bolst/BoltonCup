@@ -9,4 +9,6 @@ public sealed record PenaltyBriefDto
     public required PlayerBriefDto Player  { get; set; }
     public required string Infraction { get; set; }
     public required int DurationMins { get; set; }
+    
+    public string TimeString => TimeRemaining.ToString(@"mm\:ss");
 }
