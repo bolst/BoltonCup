@@ -9,7 +9,11 @@ public interface IGameMapper
     GameSingleDto? ToDto(Game? game);
 }
 
-public class GameMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMapper) : IGameMapper
+public class GameMapper(
+    IAssetUrlResolver _urlResolver, 
+    IBriefMapper _briefMapper, 
+    IGameStarMapper _gameStarMapper
+) : IGameMapper
 {
     public GetGamesQuery ToQuery(GetGamesRequest request)
     {
@@ -64,6 +68,10 @@ public class GameMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMappe
                     .OrderBy(penalty => penalty.Period)
                     .ThenByDescending(penalty => penalty.TimeRemaining)
                     .ToList(),
+                Stars = game.Stars
+                    .Select(_gameStarMapper.ToDto)
+                    .OrderBy(gs => gs.StarRank)
+                    .ToList()
             };
     }
 }

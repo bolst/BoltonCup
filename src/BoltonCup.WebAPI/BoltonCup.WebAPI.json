@@ -5612,6 +5612,7 @@
           "goals",
           "id",
           "penalties",
+          "stars",
           "tournament"
         ],
         "type": "object",
@@ -5658,6 +5659,26 @@
               "$ref": "#/components/schemas/PenaltyBriefDto"
             },
             "nullable": true
+          },
+          "stars": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameStarDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GameStarDto": {
+        "type": "object",
+        "properties": {
+          "starRank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player": {
+            "$ref": "#/components/schemas/PlayerBriefDto"
           }
         },
         "additionalProperties": false
