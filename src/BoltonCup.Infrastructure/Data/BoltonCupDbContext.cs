@@ -369,6 +369,11 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.AgreedToCodeOfConduct).HasColumnName("agreed_code_of_conduct");
             entity.Property(e => e.AgreedToConcussionWaiver).HasColumnName("agreed_concussion_waiver");
             entity.Property(e => e.AgreedToCommunicationConsent).HasColumnName("agreed_communication_consent");
+            entity.Property(e => e.Captaincy).HasColumnName("captaincy")
+                .HasConversion(
+                    e => e.ToString()!.ToLower(),
+                    s => (Captaincy)Enum.Parse(typeof(Captaincy), s, true)
+                );
         });
 
         modelBuilder.Entity<SkaterGameLog>(entity =>

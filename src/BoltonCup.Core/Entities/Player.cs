@@ -15,6 +15,7 @@ public class Player : EntityBase
     public bool AgreedToCodeOfConduct { get; set; }
     public bool AgreedToConcussionWaiver { get; set; }
     public bool AgreedToCommunicationConsent { get; set; }
+    public Captaincy? Captaincy { get; set; }
 
     public Account Account { get; set; } = null!;
     public Tournament Tournament { get; set; } = null!;

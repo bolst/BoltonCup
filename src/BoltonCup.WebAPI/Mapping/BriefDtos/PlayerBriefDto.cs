@@ -10,6 +10,7 @@ public record PlayerBriefDto
     public string LastName { get; set; }
     public DateTime Birthday { get; set; }
     public string? ProfilePicture { get; set; }
+    public char? CaptaincyTag { get; set; }
     public bool IsGoalie => Position == BoltonCup.Core.Values.Position.Goalie;
     public string FullName => FirstName + " " + LastName;
     public string JerseyNumberLabel => JerseyNumber.HasValue ? $"#{JerseyNumber.Value}" : string.Empty;
