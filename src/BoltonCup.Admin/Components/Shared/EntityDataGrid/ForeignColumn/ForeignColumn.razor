@@ -5,6 +5,23 @@
 
 @code {
 
+    private RenderFragment RenderSearch(CellContext<T> context, TEntity? entity)
+    {
+        return @<MudAutocomplete
+                    T="TEntity"
+                    Value="@entity"
+                    ValueChanged="@(val => OnValueChangedAsync(context.Item, val))"
+                    SearchFunc="@((s, ct) => SearchOptionsAsync(s, context, ct))"
+                    Margin="Margin.Dense"
+                    Clearable="!Required"
+                    Required="Required"
+                    ReadOnly="!Editable"
+                    IconSize="Size.Small"
+                    Strict="false"
+                    Dense
+                    />;
+    }
+
     protected virtual RenderFragment EntityEditTemplate(CellContext<T> context)
     {
         var item = PropertyFunc(context.Item);
@@ -15,40 +32,48 @@
         var entity = (TEntity?)item;
         
         return @<div>
-                   <MudSelect T="TEntity?"
-                              Value="entity"
-                              ValueChanged="@(val => OnValueChangedAsync(context.Item, val))"
-                              Comparer="EqualityComparer"
-                              Margin="Margin.Dense"
-                              Clearable="!Required"
-                              Required="Required"
-                              ReadOnly="!Editable"
-                              Dense>
-                       @if (entity is not null)
-                       {
-                           <MudSelectItem Value="entity">
-                               <div class="d-flex flex-row align-center gap-1">
-                                   @if (ImageSrcFunc is not null)
-                                   {
-                                       <BoltonCupImage Src="@ImageSrcFunc(entity)" Height="24" Editable="false" />
-                                   }
-                                   <span>@entity.ToString()</span>
-                               </div>
-                           </MudSelectItem>
-                       }
-                       @foreach (var option in _options.Where(x => !EqualityComparer?.Equals(x, entity) ?? false))
-                       {
-                           <MudSelectItem Value="@option">
-                               <div class="d-flex flex-row align-center gap-1">
-                                   @if (ImageSrcFunc is not null)
-                                   {
-                                       <BoltonCupImage Src="@ImageSrcFunc(option)" Height="24" Editable="false" />
-                                   }
-                                   <span>@option.ToString()</span>
-                               </div>
-                           </MudSelectItem>
-                       }
-                   </MudSelect>
-        </div>;
+                   @if (SearchBy is not null)
+                   {
+                       @RenderSearch(context, entity)
+                   }
+                   else
+                   {
+                       <MudSelect T="TEntity?"
+                                  Value="entity"
+                                  ValueChanged="@(val => OnValueChangedAsync(context.Item, val))"
+                                  OpenChanged="@(_ => LoadOptionsAsync(context))"
+                                  Comparer="EqualityComparer"
+                                  Margin="Margin.Dense"
+                                  Clearable="!Required"
+                                  Required="Required"
+                                  ReadOnly="!Editable"
+                                  Dense>
+                           @if (entity is not null)
+                           {
+                               <MudSelectItem Value="entity">
+                                   <div class="d-flex flex-row align-center gap-1">
+                                       @if (ImageSrcFunc is not null)
+                                       {
+                                           <BoltonCupImage Src="@ImageSrcFunc(entity)" Height="24" Editable="false"/>
+                                       }
+                                       <span>@entity.ToString()</span>
+                                   </div>
+                               </MudSelectItem>
+                           }
+                           @foreach (var option in _options.Where(x => !EqualityComparer?.Equals(x, entity) ?? false))
+                           {
+                               <MudSelectItem Value="@option">
+                                   <div class="d-flex flex-row align-center gap-1">
+                                       @if (ImageSrcFunc is not null)
+                                       {
+                                           <BoltonCupImage Src="@ImageSrcFunc(option)" Height="24" Editable="false"/>
+                                       }
+                                       <span>@option.ToString()</span>
+                                   </div>
+                               </MudSelectItem>
+                           }
+                       </MudSelect>
+                    }
+                 </div>;
     }
 }

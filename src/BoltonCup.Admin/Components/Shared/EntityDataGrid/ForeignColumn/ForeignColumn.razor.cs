@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using BoltonCup.Admin.Extensions;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.AspNetCore.Components;
@@ -17,6 +18,7 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     private Func<T, TEntity?>? _compiledExpression;
     private List<TEntity> _options = [];
     private bool _pendingRegistration = true;
+    private IEnumerable<TEntity>? _cachedDefaultOptions;
 
     [CascadingParameter]
     public EntityDataGrid<T> ParentGrid { get; set; } = null!;
@@ -37,12 +39,15 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     public Func<TEntity, string?>? ImageSrcFunc { get; set; }
     
     [Parameter]
-    public Expression<Func<TEntity, bool>>? Filter { get; set; }
+    public Func<T, Expression<Func<TEntity, bool>>>? Filter { get; set; }
     
     [Parameter]
     public Func<IQueryable<TEntity>, IQueryable<TEntity>>? Include { get; set; }
     
-    protected override async Task OnInitializedAsync()
+    [Parameter]
+    public Expression<Func<TEntity, string?>>? SearchBy { get; set; }
+    
+    protected override Task OnInitializedAsync()
     {
         EditTemplate = EntityEditTemplate;
         if (Property.Body is MemberExpression memberExpr)
@@ -52,7 +57,7 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
             _entityName = memberExpr.Member.Name;
         }
 
-        await LoadOptionsAsync();
+        return Task.CompletedTask;
     }
 
     protected override void OnParametersSet()
@@ -121,8 +126,45 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
         return propertyInfo.GetValue(subObject) 
                ?? throw new NullReferenceException($"Unable to get property value, value of '{propertyInfo.Name}' is null in '{Property}'");
     }
+    
+    
+    private async Task<IEnumerable<TEntity>> SearchOptionsAsync(string? search, CellContext<T> context, CancellationToken token)
+    {
+        try
+        {
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync(token);
 
-    private async Task LoadOptionsAsync()
+            var dbSet = dbContext.Set<TEntity>().AsNoTracking();
+
+            if (Include is not null)
+                dbSet = Include(dbSet);
+        
+            if (Filter is not null)
+                dbSet = dbSet.Where(Filter(context.Item));
+        
+            if (string.IsNullOrEmpty(search))
+            {
+                _cachedDefaultOptions ??= await dbSet
+                    .Order()
+                    .ToListAsync(cancellationToken: token);
+                return _cachedDefaultOptions;
+            }
+        
+            if (SearchBy is not null)
+                dbSet = dbSet.WhereContains(SearchBy, search);
+        
+            return await dbSet
+                .Order()
+                .ToListAsync(token);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    private async Task LoadOptionsAsync(CellContext<T> context)
     {
         await using var dbContext = await DbContextFactory.CreateDbContextAsync();
         // Grabs all records of the target foreign entity type
@@ -133,7 +175,7 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
             dbSet = Include(dbSet);
         
         if (Filter is not null)
-            dbSet = dbSet.Where(Filter);
+            dbSet = dbSet.Where(Filter(context.Item));
         
         _options = await dbSet
             .Order()
