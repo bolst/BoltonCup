@@ -24,7 +24,7 @@ public class Game : EntityBase
     {
         if (HomeTeam is null || AwayTeam is null)
             return $"Game {Id} (T{TournamentId})";
-        return $"{HomeTeam.Name} vs. {AwayTeam.Name}";
+        return $"{HomeTeam.NameShort} vs. {AwayTeam.NameShort}";
     }
 }
 
