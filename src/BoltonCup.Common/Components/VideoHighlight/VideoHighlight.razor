@@ -1,0 +1,36 @@
+@using BoltonCup.Sdk
+@using MudBlazor.Utilities
+@namespace BoltonCup.Common.Components
+@inject IDialogService DialogService
+
+
+<div class="d-flex flex-column gap-1" style="@Stylename">
+    <div class="d-flex relative cursor-pointer" @onclick="OpenDialog">
+        <MudImage Src="@Highlight.ThumbnailUrl" Alt="@Highlight.Title" Style="max-width: 100%" Fluid/>
+        <MudIcon Icon="@Icons.Material.Rounded.PlayCircleOutline" Size="Size.Large" Class="absolute" Style="bottom: 8px; left: 8px; fill: #FFFFFF;" />
+    </div>
+    <MudText Typo="Typo.body1"><b>@Highlight.Title</b></MudText>
+</div>
+
+@code {
+        
+    [Parameter]
+    [EditorRequired]
+    public required GameHighlightDto Highlight { get; set; }
+
+    [Parameter]
+    public string MaxWidth { get; set; } = "250px";
+
+    private string Stylename => new StyleBuilder()
+        .AddStyle("max-width", MaxWidth)
+        .Build();
+
+    
+    private Task OpenDialog()
+    {
+        return DialogService.ShowAsync<VideoHighlightDialog>(Highlight.Title, new DialogParameters<VideoHighlightDialog>
+        {
+            { x => x.Highlight, Highlight }
+        });
+    }
+}
