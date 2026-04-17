@@ -1,0 +1,44 @@
+@using BoltonCup.Sdk
+@namespace BoltonCup.Common.Components
+
+<MudDialog ContentClass="pa-4">
+    <DialogContent>
+        <div class="mud-width-full">
+            <BoltonCupLogo Height="48" />
+        </div>
+        <div class="mud-width-full d-flex flex-column gap-1">
+            <div class="mud-width-full">
+                <iframe style="width: 100%; aspect-ratio: 16 / 9"
+                        src="@($"{Highlight.VideoUrl}?vq=hd1080&autoplay=1")" title="@Highlight.Title" 
+                        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <MudText Typo="Typo.h6">@Highlight.Title</MudText>
+                <MudText Typo="Typo.subtitle1">@Highlight.Description</MudText>
+            </div>
+        </div>
+    </DialogContent>
+</MudDialog>
+
+
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter]
+    [EditorRequired]
+    public required GameHighlightDto Highlight { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        return Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            NoHeader = true,
+            BackdropClick = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+        });
+    }
+
+}

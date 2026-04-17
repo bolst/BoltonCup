@@ -13,11 +13,14 @@ public class AssetUrlResolver(string baseUrl) : IAssetUrlResolver
         return $"{_baseUrl}{s3Key}";
     }
 
-    public string? GetVideoUrl(string? videoId)
+    public HighlightUrls? GetHighlightUrls(string? videoId)
     {
         if (string.IsNullOrEmpty(videoId))
             return null;
-        return $"https://www.youtube.com/embed/{videoId}";
+        return new HighlightUrls(
+            VideoUrl: $"https://www.youtube.com/embed/{videoId}",
+            ThumbnailUrl: $"https://img.youtube.com/vi/{videoId}/hqdefault.jpg"
+        );
     }
 
 
