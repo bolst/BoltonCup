@@ -9,7 +9,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
 {
-    public async Task<IPagedList<Player>> GetAllAsync(GetPlayersQuery query)
+    public async Task<IPagedList<Player>> GetAllAsync(GetPlayersQuery query, CancellationToken cancellationToken = default)
     {
         return await _context.Players
             .AsNoTracking()
@@ -19,10 +19,10 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ApplySorting(query, x => x.OrderBy(p => p.Id))
-            .ToPagedListAsync(query);
+            .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }
 
-    public async Task<Player?> GetByIdAsync(int id)
+    public async Task<Player?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         var account = await _context.Accounts
             .AsNoTracking()
@@ -81,31 +81,7 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
                 .ThenInclude(p => p.Team)
                 .ThenInclude(t => t.AwayGames)
                 .ThenInclude(g => g.HomeTeam)
-            .FirstOrDefaultAsync(a => a.Players.Any(p => p.Id == id));
+            .FirstOrDefaultAsync(a => a.Players.Any(p => p.Id == id), cancellationToken: cancellationToken);
         return account?.Players.FirstOrDefault(p => p.Id == id);
-    }
-
-    public async Task<bool> AddAsync(Player entity)
-    {
-        await _context.Players.AddAsync(entity);
-        var result = await _context.SaveChangesAsync();
-        return result > 0;
-    }
-
-    public async Task<bool> UpdateAsync(Player entity)
-    {
-        _context.Players.Update(entity);
-        var result = await _context.SaveChangesAsync();
-        return result > 0;
-    }
-
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var entity = await _context.Players.FindAsync(id);
-        if (entity == null) return false;
-
-        _context.Players.Remove(entity);
-        var result = await _context.SaveChangesAsync();
-        return result > 0;
     }
 }
