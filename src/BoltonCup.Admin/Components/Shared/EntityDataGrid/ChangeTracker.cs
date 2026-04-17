@@ -1,5 +1,6 @@
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace BoltonCup.Admin.Components.Shared;
 
@@ -54,32 +55,76 @@ public sealed class ChangeTracker<T>
     public async Task SaveChangesAsync(DbContext dbContext)
     {
         var dbSet = dbContext.Set<T>();
-        
-        // new items
-        foreach (var newItem in NewItems)
+
+        void TrackNode(EntityEntryGraphNode node)
         {
-            dbContext.ChangeTracker.TrackGraph(newItem, node =>
+            var entry = node.Entry;
+            
+            // check if is root item
+            if (NewItems.Contains(entry.Entity))
             {
-                // if entity already has an ID, we assume it exists
-                node.Entry.State = node.Entry.IsKeySet ? EntityState.Unchanged : EntityState.Added;
-            });
+                entry.State = EntityState.Added;
+                return;
+            }
+            if (EditItems.Contains(entry.Entity))
+            {
+                entry.State = EntityState.Modified;
+                return;
+            }
+            
+            // check for new foreign entity
+            if (!entry.IsKeySet)
+            {
+                entry.State = EntityState.Added;
+                return;
+            }
+            
+            // check for collisions
+            var pk = entry.Metadata.FindPrimaryKey();
+            if (pk is not null)
+            {
+                var keyValues = pk.Properties.Select(p => entry.Property(p.Name).CurrentValue).ToArray();
+                
+                // check if we are already tracking this entity
+                var existingTracked = dbContext.ChangeTracker.Entries()
+                    .FirstOrDefault(e => e.Metadata.ClrType == entry.Metadata.ClrType &&
+                                         e.Metadata.FindPrimaryKey()?.Properties
+                                             .Select(p => e.Property(p.Name).CurrentValue)
+                                             .SequenceEqual(keyValues) == true);
+
+                if (existingTracked is not null)
+                {
+                    // handle collision
+                    if (existingTracked != entry.Entity)
+                    {
+                        if (node.InboundNavigation is { IsCollection: false })
+                        {
+                            var propertyInfo = node.InboundNavigation.PropertyInfo;
+                            if (propertyInfo is { CanWrite: true })
+                            {
+                                propertyInfo.SetValue(node.SourceEntry!.Entity, existingTracked.Entity);
+                            }
+                        }
+                    }
+
+                    return;
+                }
+            }
+
+            entry.State = EntityState.Unchanged;
         }
         
-        // edit items
-        foreach (var editItem in EditItems)
+        // new and edit items
+        foreach (var item in NewItems.Concat(EditItems))
         {
-            dbContext.ChangeTracker.TrackGraph(editItem, node =>
-            {
-                if (node.Entry.Entity == editItem)
-                    node.Entry.State = EntityState.Modified;
-                else
-                    node.Entry.State = node.Entry.IsKeySet ? EntityState.Unchanged : EntityState.Added;
-            });
+            dbContext.ChangeTracker.TrackGraph(item, TrackNode);
         }
         
         // delete items
         if (DeleteItems.Count > 0)
+        {
             dbSet.RemoveRange(DeleteItems);
+        }
         
         await dbContext.SaveChangesAsync();
         Clear();
