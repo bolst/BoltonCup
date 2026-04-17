@@ -1,15 +1,10 @@
 @namespace BoltonCup.WebClient.Components.Shared
 
 
-<div>
+<div class="d-flex flex-column gap-2">
     @if (Game is not null)
     {
-        if (Game.Stars.Any())
-        {
-            <div class="d-flex flex-row align-center px-1 py-2 mud-width-full">
-                <MudText Typo="Typo.h6"><b>Three Stars of the Game</b></MudText>
-            </div>
-
+        <GameSummarySection Title="Three Stars of the Game" Visible="@Game.Stars.Any()">
             <MudGrid>
                 @foreach (var star in Game.Stars.Where(x => x.Player is not null && x.StarRank is >= 1 and <= 3).OrderBy(x => x.StarRank))
                 {
@@ -30,17 +25,12 @@
                     </MudItem>
                 }
             </MudGrid>
-        }
+        </GameSummarySection>
         
-        if (Game.Goals.Any())
-        {
-            <div class="d-flex flex-row align-center px-1 pt-4 mud-width-full">
-                <MudText Typo="Typo.h6"><b>Scoring</b></MudText>
-            </div>
-
-            foreach (var periodGoals in Game.Goals.GroupBy(g => g.PeriodLabel))
+        <GameSummarySection Title="Scoring" Visible="@Game.Goals.Any()">
+            @foreach (var periodGoals in Game.Goals.GroupBy(g => g.PeriodLabel))
             {
-                <MudText Class="my-1" Typo="Typo.subtitle1"><b>@periodGoals.Key</b></MudText>
+                <MudText Typo="Typo.subtitle1"><b>@periodGoals.Key</b></MudText>
 
                 <MudStack Spacing="1" Class="mud-width-full mb-2">
                     @foreach (var goal in periodGoals)
@@ -54,7 +44,7 @@
                                 assists += ", " + goal.SecondaryAssist.FirstName[..1] + ". " + goal.SecondaryAssist.LastName;
                             }
                         }
-                        <MudPaper Class="d-flex flex-row align-center justify-space-between flex-wrap gap-3 px-4 py-2" Width="100%" MinHeight="120px" Elevation="0" Outlined Square>
+                        <MudPaper Class="d-flex flex-row align-center justify-space-between flex-wrap gap-3 px-4" Width="100%" MinHeight="120px" Elevation="0" Outlined Square>
                             <MudGrid>
                                 <MudItem xs="8" Class="d-flex flex-row align-center gap-3">
                                     <MudAvatar Style="width: 64px; height: 64px">
@@ -87,14 +77,9 @@
                     }
                 </MudStack>
             }
-        }
-
-        if (Game.Highlights.Any())
-        {
-            <div class="d-flex flex-row align-center px-1 py-2 mud-width-full">
-                <MudText Typo="Typo.h6"><b>Highlights</b></MudText>
-            </div>
-            
+        </GameSummarySection>
+        
+        <GameSummarySection Title="Highlights" Visible="@Game.Highlights.Any()">
             <MudGrid>
                 @foreach (var highlight in Game.Highlights.Take(3))
                 {
@@ -103,14 +88,9 @@
                     </MudItem>
                 }
             </MudGrid>
-        }
+        </GameSummarySection>
 
-        if (Game.Penalties.Any())
-        {
-            <div class="d-flex flex-row align-center px-1 pt-4 mud-width-full">
-                <MudText Typo="Typo.h6"><b>Penalties</b></MudText>
-            </div>
-            
+        <GameSummarySection Title="Penalties" Visible="@Game.Penalties.Any()">
             <MudSimpleTable Elevation="0" Striped Square>
                 @foreach (var periodPenalties in Game.Penalties.GroupBy(p => p.PeriodLabel))
                 {
@@ -131,20 +111,20 @@
                     </tr>
                     </thead>
                     <tbody>
-                        @foreach (var penalty in periodPenalties)
-                        {
-                            <tr>
-                                <td>
-                                    <MudImage Src="@(penalty.TeamId == Game.HomeTeam.Id ? Game.HomeTeam.Logo : Game.AwayTeam.Logo)" Height="24" />
-                                </td>
-                                <td>@penalty.TimeString</td>
-                                <td>@penalty.Player.FullName (@penalty.Player.JerseyNumberLabel) @penalty.DurationMins minutes for @penalty.Infraction</td>
-                            </tr>
-                        }
+                    @foreach (var penalty in periodPenalties)
+                    {
+                        <tr>
+                            <td>
+                                <MudImage Src="@(penalty.TeamId == Game.HomeTeam.Id ? Game.HomeTeam.Logo : Game.AwayTeam.Logo)" Height="24" />
+                            </td>
+                            <td>@penalty.TimeString</td>
+                            <td>@penalty.Player.FullName (@penalty.Player.JerseyNumberLabel) @penalty.DurationMins minutes for @penalty.Infraction</td>
+                        </tr>
+                    }
                     </tbody>
                 }
             </MudSimpleTable>
-        }
+        </GameSummarySection>
     }
 </div>
 
