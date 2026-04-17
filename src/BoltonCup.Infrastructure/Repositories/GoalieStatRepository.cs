@@ -15,6 +15,7 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
             .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => query.TeamIds!.Contains(p.TeamId), query.TeamIds?.Count > 0)
+            .ConditionalWhere(p => p.GameId == query.GameId, query.GameId.HasValue)
             .OrderBy(x => x.AccountId)
             .ThenByDescending(x => x.GameTime)
             .GroupBy(x => x.AccountId)

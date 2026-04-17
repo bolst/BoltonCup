@@ -17,6 +17,7 @@ public class SkaterStatMapper(IAssetUrlResolver _urlResolver) : ISkaterStatMappe
             TournamentId = request.TournamentId,
             Position = request.Position,
             TeamIds = request.TeamIds,
+            GameId = request.GameId,
             Page = request.Page,
             Size = request.Size,
             SortBy = request.SortBy,
