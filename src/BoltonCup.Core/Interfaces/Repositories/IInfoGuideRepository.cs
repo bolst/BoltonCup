@@ -2,10 +2,7 @@ namespace BoltonCup.Core;
 
 public interface IInfoGuideRepository
 {
-    Task<IPagedList<InfoGuide>> GetAllAsync(GetInfoGuidesQuery query);
-    Task<InfoGuide?> GetByIdAsync(Guid id);
-    Task<InfoGuide?> GetByTournamentIdAsync(int tournamentId);
-    Task<bool> AddAsync(InfoGuide entity);
-    Task<bool> UpdateAsync(InfoGuide entity);
-    Task<bool> DeleteAsync(Guid id);
+    Task<IPagedList<InfoGuide>> GetAllAsync(GetInfoGuidesQuery query, CancellationToken cancellationToken = default);
+    Task<InfoGuide?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<InfoGuide?> GetByTournamentIdAsync(int tournamentId, CancellationToken cancellationToken = default);
 }

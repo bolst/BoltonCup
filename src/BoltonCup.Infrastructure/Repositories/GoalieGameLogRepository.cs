@@ -10,7 +10,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class GoalieGameLogRepository(BoltonCupDbContext _context) : IGoalieGameLogRepository
 {
-    public async Task<IPagedList<GoalieGameLog>> GetAllAsync(GetGoalieGameLogsQuery query)
+    public async Task<IPagedList<GoalieGameLog>> GetAllAsync(GetGoalieGameLogsQuery query, CancellationToken cancellationToken = default)
     {
         return await _context.GoalieGameLogs
             .AsNoTracking()
@@ -23,6 +23,6 @@ public class GoalieGameLogRepository(BoltonCupDbContext _context) : IGoalieGameL
             .ConditionalWhere(g => g.TeamId == query.TeamId, query.TeamId.HasValue)
             .ConditionalWhere(g => g.TeamId == (query.HomeOrAway == HomeOrAway.Home ? g.Game.HomeTeamId : g.Game.AwayTeamId), !string.IsNullOrEmpty(query.HomeOrAway))
             .ApplySorting(query, x => x.OrderBy(p => p.Player.JerseyNumber))
-            .ToPagedListAsync(query);
+            .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }       
 }

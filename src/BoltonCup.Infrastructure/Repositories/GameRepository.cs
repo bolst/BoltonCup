@@ -9,7 +9,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class GameRepository(BoltonCupDbContext _context) : IGameRepository
 {
-    public async Task<IPagedList<Game>> GetAllAsync(GetGamesQuery query)
+    public async Task<IPagedList<Game>> GetAllAsync(GetGamesQuery query, CancellationToken cancellationToken = default)
     {
         return await _context.Games
             .AsNoTracking()
@@ -20,10 +20,10 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
             .ApplySorting(query, x => x.OrderBy(p => p.GameTime))
-            .ToPagedListAsync(query);
+            .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }       
     
-    public async Task<Game?> GetByIdAsync(int id)
+    public async Task<Game?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _context.Games
             .AsNoTracking()
@@ -48,30 +48,6 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
             .Include(p => p.Highlights.Take(3))
                 .ThenInclude(h => h.Player)
                 .ThenInclude(p => p.Account)
-            .FirstOrDefaultAsync(p => p.Id == id);
-    }
-
-    public async Task<bool> AddAsync(Game entity)
-    {
-        await _context.Games.AddAsync(entity);
-        var result = await _context.SaveChangesAsync();
-        return result > 0;
-    }
-
-    public async Task<bool> UpdateAsync(Game entity)
-    {
-        _context.Games.Update(entity);
-        var result = await _context.SaveChangesAsync();
-        return result > 0;
-    }
-
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var entity = await _context.Games.FindAsync(id);
-        if (entity == null) return false;
-
-        _context.Games.Remove(entity);
-        var result = await _context.SaveChangesAsync();
-        return result > 0;
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken: cancellationToken);
     }
 }

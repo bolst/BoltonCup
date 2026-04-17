@@ -2,5 +2,5 @@ namespace BoltonCup.Core;
 
 public interface IGoalieGameLogRepository
 {
-    Task<IPagedList<GoalieGameLog>> GetAllAsync(GetGoalieGameLogsQuery query);
+    Task<IPagedList<GoalieGameLog>> GetAllAsync(GetGoalieGameLogsQuery query, CancellationToken cancellationToken = default);
 }

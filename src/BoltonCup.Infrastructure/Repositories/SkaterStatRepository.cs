@@ -9,7 +9,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepository
 {
-    public async Task<IPagedList<SkaterStat>> GetAllAsync(GetSkaterStatsQuery query)
+    public async Task<IPagedList<SkaterStat>> GetAllAsync(GetSkaterStatsQuery query, CancellationToken cancellationToken = default)
     {
         return await _context.SkaterStats
             .AsNoTracking()
@@ -46,6 +46,6 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
                 .ThenByDescending(p => p.Assists)
                 .ThenBy(p => p.GamesPlayed)
             )
-            .ToPagedListAsync(query);
+            .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }       
 }
