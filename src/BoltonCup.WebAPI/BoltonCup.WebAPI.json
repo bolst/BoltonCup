@@ -5239,6 +5239,10 @@
             "type": "string",
             "nullable": true
           },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
+          },
           "title": {
             "type": "string",
             "nullable": true

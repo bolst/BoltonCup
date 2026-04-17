@@ -3,5 +3,7 @@ namespace BoltonCup.Core;
 public interface IAssetUrlResolver
 {
     string? GetFullUrl(string? s3Key);
-    string? GetVideoUrl(string? videoId);
+    HighlightUrls? GetHighlightUrls(string? videoId);
 }
+
+public record HighlightUrls(string VideoUrl, string ThumbnailUrl);
