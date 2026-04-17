@@ -485,96 +485,16 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.ToTable("goals", "core");
                 });
 
-            modelBuilder.Entity("BoltonCup.Core.GoalieGameLog", b =>
+            modelBuilder.Entity("BoltonCup.Core.GoalieStat", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Assists")
-                        .HasColumnType("integer")
-                        .HasColumnName("assists");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
                     b.Property<int>("GameId")
                         .HasColumnType("integer")
                         .HasColumnName("game_id");
-
-                    b.Property<int>("Goals")
-                        .HasColumnType("integer")
-                        .HasColumnName("goals");
-
-                    b.Property<int>("GoalsAgainst")
-                        .HasColumnType("integer")
-                        .HasColumnName("goals_against");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_modified");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("last_modified_by");
-
-                    b.Property<int>("OpponentTeamId")
-                        .HasColumnType("integer")
-                        .HasColumnName("opponent_team_id");
-
-                    b.Property<double>("PenaltyMinutes")
-                        .HasColumnType("double precision")
-                        .HasColumnName("penalty_minutes");
 
                     b.Property<int>("PlayerId")
                         .HasColumnType("integer")
                         .HasColumnName("player_id");
 
-                    b.Property<int>("Saves")
-                        .HasColumnType("integer")
-                        .HasColumnName("saves");
-
-                    b.Property<int>("ShotsAgainst")
-                        .HasColumnType("integer")
-                        .HasColumnName("shots_against");
-
-                    b.Property<bool>("Shutout")
-                        .HasColumnType("boolean")
-                        .HasColumnName("shutout");
-
-                    b.Property<int>("TeamId")
-                        .HasColumnType("integer")
-                        .HasColumnName("team_id");
-
-                    b.Property<bool>("Win")
-                        .HasColumnType("boolean")
-                        .HasColumnName("win");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GameId");
-
-                    b.HasIndex("OpponentTeamId");
-
-                    b.HasIndex("PlayerId");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("goalie_game_logs", "core");
-                });
-
-            modelBuilder.Entity("BoltonCup.Core.GoalieStat", b =>
-                {
                     b.Property<int>("AccountId")
                         .HasColumnType("integer")
                         .HasColumnName("account_id");
@@ -591,10 +511,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("first_name");
-
-                    b.Property<int>("GameId")
-                        .HasColumnType("integer")
-                        .HasColumnName("game_id");
 
                     b.Property<string>("GameRink")
                         .HasColumnType("text")
@@ -661,10 +577,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("penalty_minutes");
 
-                    b.Property<int>("PlayerId")
-                        .HasColumnType("integer")
-                        .HasColumnName("player_id");
-
                     b.Property<int>("Points")
                         .HasColumnType("integer")
                         .HasColumnName("points");
@@ -729,9 +641,17 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("wins");
 
+                    b.HasKey("GameId", "PlayerId");
+
+                    b.HasIndex("OpponentId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.HasIndex("TeamId");
+
                     b.ToTable((string)null);
 
-                    b.ToView("mv_goalie_game_stats", "core");
+                    b.ToView("mv_goalie_game_logs", "core");
                 });
 
             modelBuilder.Entity("BoltonCup.Core.InfoGuide", b =>
@@ -948,76 +868,16 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.ToTable("players", "core");
                 });
 
-            modelBuilder.Entity("BoltonCup.Core.SkaterGameLog", b =>
+            modelBuilder.Entity("BoltonCup.Core.SkaterStat", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Assists")
-                        .HasColumnType("integer")
-                        .HasColumnName("assists");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
                     b.Property<int>("GameId")
                         .HasColumnType("integer")
                         .HasColumnName("game_id");
-
-                    b.Property<int>("Goals")
-                        .HasColumnType("integer")
-                        .HasColumnName("goals");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_modified");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("last_modified_by");
-
-                    b.Property<int>("OpponentTeamId")
-                        .HasColumnType("integer")
-                        .HasColumnName("opponent_team_id");
-
-                    b.Property<double>("PenaltyMinutes")
-                        .HasColumnType("double precision")
-                        .HasColumnName("penalty_minutes");
 
                     b.Property<int>("PlayerId")
                         .HasColumnType("integer")
                         .HasColumnName("player_id");
 
-                    b.Property<int>("TeamId")
-                        .HasColumnType("integer")
-                        .HasColumnName("team_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GameId");
-
-                    b.HasIndex("OpponentTeamId");
-
-                    b.HasIndex("PlayerId");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("skater_game_logs", "core");
-                });
-
-            modelBuilder.Entity("BoltonCup.Core.SkaterStat", b =>
-                {
                     b.Property<int>("AccountId")
                         .HasColumnType("integer")
                         .HasColumnName("account_id");
@@ -1034,10 +894,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("first_name");
-
-                    b.Property<int>("GameId")
-                        .HasColumnType("integer")
-                        .HasColumnName("game_id");
 
                     b.Property<string>("GameRink")
                         .HasColumnType("text")
@@ -1096,10 +952,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("penalty_minutes");
 
-                    b.Property<int>("PlayerId")
-                        .HasColumnType("integer")
-                        .HasColumnName("player_id");
-
                     b.Property<int>("Points")
                         .HasColumnType("integer")
                         .HasColumnName("points");
@@ -1144,9 +996,17 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("tournament_name");
 
+                    b.HasKey("GameId", "PlayerId");
+
+                    b.HasIndex("OpponentId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.HasIndex("TeamId");
+
                     b.ToTable((string)null);
 
-                    b.ToView("mv_skater_game_stats", "core");
+                    b.ToView("mv_skater_game_logs", "core");
                 });
 
             modelBuilder.Entity("BoltonCup.Core.Team", b =>
@@ -1494,7 +1354,7 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("BoltonCup.Core.GoalieGameLog", b =>
+            modelBuilder.Entity("BoltonCup.Core.GoalieStat", b =>
                 {
                     b.HasOne("BoltonCup.Core.Game", "Game")
                         .WithMany("GoalieGameLogs")
@@ -1502,9 +1362,9 @@ namespace BoltonCup.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BoltonCup.Core.Team", "OpponentTeam")
+                    b.HasOne("BoltonCup.Core.Team", "Opponent")
                         .WithMany()
-                        .HasForeignKey("OpponentTeamId")
+                        .HasForeignKey("OpponentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1522,7 +1382,7 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     b.Navigation("Game");
 
-                    b.Navigation("OpponentTeam");
+                    b.Navigation("Opponent");
 
                     b.Navigation("Player");
 
@@ -1590,7 +1450,7 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Navigation("Tournament");
                 });
 
-            modelBuilder.Entity("BoltonCup.Core.SkaterGameLog", b =>
+            modelBuilder.Entity("BoltonCup.Core.SkaterStat", b =>
                 {
                     b.HasOne("BoltonCup.Core.Game", "Game")
                         .WithMany("SkaterGameLogs")
@@ -1598,9 +1458,9 @@ namespace BoltonCup.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BoltonCup.Core.Team", "OpponentTeam")
+                    b.HasOne("BoltonCup.Core.Team", "Opponent")
                         .WithMany()
-                        .HasForeignKey("OpponentTeamId")
+                        .HasForeignKey("OpponentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1618,7 +1478,7 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     b.Navigation("Game");
 
-                    b.Navigation("OpponentTeam");
+                    b.Navigation("Opponent");
 
                     b.Navigation("Player");
 

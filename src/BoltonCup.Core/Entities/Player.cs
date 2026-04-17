@@ -24,8 +24,8 @@ public class Player : EntityBase
     public ICollection <Goal> PrimaryAssists { get; set; } = [];
     public ICollection <Goal> SecondaryAssists { get; set; } = [];
     public ICollection<Penalty> Penalties { get; set; } = [];
-    public ICollection<SkaterGameLog> SkaterGameLogs { get; set; } = [];
-    public ICollection<GoalieGameLog> GoalieGameLogs { get; set; } = [];
+    public ICollection<SkaterStat> SkaterGameLogs { get; set; } = [];
+    public ICollection<GoalieStat> GoalieGameLogs { get; set; } = [];
     public ICollection<GameHighlight> GameHighlights { get; set; } = [];
     public ICollection<GameStar> Stars { get; set; } = [];
 

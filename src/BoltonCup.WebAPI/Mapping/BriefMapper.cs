@@ -145,8 +145,8 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
                 Goals = g.Sum(x => x.Goals.Count),
                 Assists = g.Sum(x => x.PrimaryAssists.Count + x.SecondaryAssists.Count),
                 PenaltyMinutes = g.Sum(x => x.Penalties.Sum(p => p.DurationMinutes)),
-                Wins = g.Sum(x => x.GoalieGameLogs.Count(gl => gl.Win)),
-                Shutouts = g.Sum(x => x.GoalieGameLogs.Count(gl => gl.Shutout)),
+                Wins = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Wins)),
+                Shutouts = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Shutouts)),
                 GoalsAgainstAverage = g
                     .SelectMany(x => x.GoalieGameLogs)
                     .Select(x => x.GoalsAgainst)
