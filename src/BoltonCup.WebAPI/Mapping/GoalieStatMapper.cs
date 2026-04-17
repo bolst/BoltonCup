@@ -16,6 +16,7 @@ public class GoalieStatMapper(IAssetUrlResolver _urlResolver) : IGoalieStatMappe
         {
             TournamentId = request.TournamentId,
             TeamIds = request.TeamIds,
+            GameId = request.GameId,
             Page = request.Page,
             Size = request.Size,
             SortBy = request.SortBy,

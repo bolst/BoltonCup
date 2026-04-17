@@ -34,8 +34,9 @@ else
                 @foreach (var forward in _forwardLogs)
                 {
                     <tr>
-                        <td>@forward.Player.JerseyNumber</td>
-                        <td><PlayerLink Player="forward.Player" ToStringFunc="GetFormattedPlayerName" /></td>
+                        <td>@forward.JerseyNumber</td>
+                        <td><PlayerLink PlayerId="@forward.PlayerId" Label="@GetFormattedPlayerName(forward.FirstName, forward.LastName)" /></td>
+
                         <td>@forward.Goals</td>
                         <td>@forward.Assists</td>
                         <td>@forward.Points</td>
@@ -57,8 +58,8 @@ else
                 @foreach (var defense in _defenseLogs)
                 {
                     <tr>
-                        <td>@defense.Player.JerseyNumber</td>
-                        <td><PlayerLink Player="defense.Player" ToStringFunc="GetFormattedPlayerName" /></td>
+                        <td>@defense.JerseyNumber</td>
+                        <td><PlayerLink PlayerId="@defense.PlayerId" Label="@GetFormattedPlayerName(defense.FirstName, defense.LastName)" /></td>
 
                         <td>@defense.Goals</td>
                         <td>@defense.Assists</td>
@@ -81,11 +82,11 @@ else
                 @foreach (var goalie in _goalieLogs)
                 {
                     <tr>
-                        <td>@goalie.Player.JerseyNumber</td>
-                        <td><PlayerLink Player="goalie.Player" ToStringFunc="GetFormattedPlayerName" /></td>
+                        <td>@goalie.JerseyNumber</td>
+                        <td><PlayerLink PlayerId="@goalie.PlayerId" Label="@GetFormattedPlayerName(goalie.FirstName, goalie.LastName)" /></td>
                         <td>@goalie.GoalsAgainst</td>
                         <td>
-                            @if (goalie.Win)
+                            @if (goalie.Wins > 0)
                             {
                                 <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
                             }
@@ -95,7 +96,7 @@ else
                             }
                         </td>
                         <td>
-                            @if (goalie.Shutout)
+                            @if (goalie.Shutouts > 0)
                             {
                                 <MudIcon Icon="@Icons.Material.Rounded.CheckBox" Color="Color.Success" Size="Size.Small"/>
                             }
@@ -123,13 +124,13 @@ else
 
     private bool _loading;
 
-    private Sdk.SkaterGameLogDtoIPagedList? _skaterLog;
-    private Sdk.GoalieGameLogDtoIPagedList? _goalieLog;
+    private Sdk.SkaterStatDtoIPagedList? _skaterLog;
+    private Sdk.GoalieStatDtoIPagedList? _goalieLog;
     
     private Sdk.TeamInGameDto? _selectedTeam;
-    private List<Sdk.SkaterGameLogDto> _forwardLogs = [];
-    private List<Sdk.SkaterGameLogDto> _defenseLogs = [];
-    private List<Sdk.GoalieGameLogDto> _goalieLogs = [];
+    private List<Sdk.SkaterStatDto> _forwardLogs = [];
+    private List<Sdk.SkaterStatDto> _defenseLogs = [];
+    private List<Sdk.GoalieStatDto> _goalieLogs = [];
 
     protected override async Task OnParametersSetAsync()
     {
@@ -147,12 +148,12 @@ else
 
     private async Task GetAndSetSkaterLogsAsync()
     {
-        _skaterLog = await BoltonCupApi.GetSkaterGameLogsAsync(Game.Id);
+        _skaterLog = await BoltonCupApi.GetSkaterStatsAsync(gameId: Game.Id);
     }
     
     private async Task GetAndSetGoalieLogsAsync()
     {
-        _goalieLog = await BoltonCupApi.GetGoalieGameLogsAsync(Game.Id);
+        _goalieLog = await BoltonCupApi.GetGoalieStatsAsync(gameId: Game.Id);
     }
 
     private void SetSelectedTeam(Sdk.TeamInGameDto? team)
@@ -167,21 +168,20 @@ else
         }
 
         _forwardLogs = (_skaterLog?.Items ?? [])
-            .Where(p => p.Player.Position == "forward" && p.Team.Id == _selectedTeam.Id)
+            .Where(p => p.Position == "forward" && p.TeamId == _selectedTeam.Id)
             .ToList();
         _defenseLogs = (_skaterLog?.Items ?? [])
-            .Where(p => p.Player.Position == "defense" && p.Team.Id == _selectedTeam.Id)
+            .Where(p => p.Position == "defense" && p.TeamId == _selectedTeam.Id)
             .ToList();
         _goalieLogs = (_goalieLog?.Items ?? [])
-            .Where(p => p.Team.Id == _selectedTeam.Id)
+            .Where(p => p.TeamId == _selectedTeam.Id)
             .ToList();
     }
 
-    private string GetFormattedPlayerName(Sdk.PlayerBriefDto player)
+    private string GetFormattedPlayerName(string firstName, string lastName)
     {
-        var first = player.FirstName.FirstOrDefault();
-        var last = player.LastName;
-        return $"{first}. {last}";
+        var first = firstName.FirstOrDefault();
+        return $"{first}. {lastName}";
     }
     
 }

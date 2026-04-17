@@ -24,6 +24,8 @@
     <ItemGroup>
       <_ContentIncludedByDefault Remove="Components\Shared\EntityDataGrid\EntityColumns\TeamColumn.razor" />
       <_ContentIncludedByDefault Remove="Components\Shared\EntityDataGrid\EntityColumns\TournamentColumn.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Games\Logs\GoalieLogs.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Games\Logs\SkaterLogs.razor" />
     </ItemGroup>
 
     <ItemGroup>

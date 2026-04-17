@@ -40,4 +40,9 @@ public class GoalieStat
     public int TournamentId { get; init; }
     public string? TournamentName { get; init; }
     public bool TournamentActive { get; init; }
+
+    public Player Player { get; set; } = null!;
+    public Team Team { get; set; } = null!;
+    public Team Opponent { get; set; } = null!;
+    public Game Game { get; set; } = null!;
 }
