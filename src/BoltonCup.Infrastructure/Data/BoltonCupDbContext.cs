@@ -22,12 +22,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<GameHighlight> GameHighlights { get; set; }
     public DbSet<GameStar> GameStars { get; set; }
     public DbSet<Goal> Goals { get; set; }
-    public DbSet<GoalieGameLog> GoalieGameLogs { get; set; }
     public DbSet<GoalieStat> GoalieStats { get; set; }
     public DbSet<InfoGuide> InfoGuides { get; set; }
     public DbSet<Penalty> Penalties { get; set; }
     public DbSet<Player> Players { get; set; }
-    public DbSet<SkaterGameLog> SkaterGameLogs { get; set; }
     public DbSet<SkaterStat> SkaterStats { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
@@ -208,11 +206,11 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Notes).HasColumnName("notes");
         });
         
-        modelBuilder.Entity<GoalieGameLog>(entity =>
+        modelBuilder.Entity<GoalieStat>(entity =>
         {
             entity
-                .ToTable("goalie_game_logs")
-                .HasKey(e => e.Id);
+                .ToView("mv_goalie_game_logs")
+                .HasKey(e => new { e.GameId, e.PlayerId });
             entity
                 .HasOne(e => e.Player)
                 .WithMany(e => e.GoalieGameLogs)
@@ -222,33 +220,13 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany(e => e.GoalieGameLogs)
                 .HasForeignKey(e => e.TeamId);
             entity
-                .HasOne(e => e.OpponentTeam)
+                .HasOne(e => e.Opponent)
                 .WithMany()
-                .HasForeignKey(e => e.OpponentTeamId);
+                .HasForeignKey(e => e.OpponentId);
             entity
                 .HasOne(e => e.Game)
                 .WithMany(e => e.GoalieGameLogs)
                 .HasForeignKey(e => e.GameId);
-            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
-            entity.Property(e => e.PlayerId).HasColumnName("player_id");
-            entity.Property(e => e.TeamId).HasColumnName("team_id");
-            entity.Property(e => e.OpponentTeamId).HasColumnName("opponent_team_id");
-            entity.Property(e => e.GameId).HasColumnName("game_id");
-            entity.Property(e => e.Goals).HasColumnName("goals");
-            entity.Property(e => e.Assists).HasColumnName("assists");
-            entity.Property(e => e.PenaltyMinutes).HasColumnName("penalty_minutes");
-            entity.Property(e => e.GoalsAgainst).HasColumnName("goals_against");
-            entity.Property(e => e.ShotsAgainst).HasColumnName("shots_against");
-            entity.Property(e => e.Saves).HasColumnName("saves");
-            entity.Property(e => e.Shutout).HasColumnName("shutout");
-            entity.Property(e => e.Win).HasColumnName("win");
-        });
-        
-        modelBuilder.Entity<GoalieStat>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("mv_goalie_game_stats");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.GoalsAgainst).HasColumnName("goals_against");
             entity.Property(e => e.ShotsAgainst).HasColumnName("shots_against");
@@ -376,11 +354,11 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 );
         });
 
-        modelBuilder.Entity<SkaterGameLog>(entity =>
+        modelBuilder.Entity<SkaterStat>(entity =>
         {
             entity
-                .ToTable("skater_game_logs")
-                .HasKey(e => e.Id);
+                .ToView("mv_skater_game_logs")
+                .HasKey(e => new { e.GameId, e.PlayerId });
             entity
                 .HasOne(e => e.Player)
                 .WithMany(e => e.SkaterGameLogs)
@@ -390,28 +368,13 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany(e => e.SkaterGameLogs)
                 .HasForeignKey(e => e.TeamId);
             entity
-                .HasOne(e => e.OpponentTeam)
+                .HasOne(e => e.Opponent)
                 .WithMany()
-                .HasForeignKey(e => e.OpponentTeamId);
+                .HasForeignKey(e => e.OpponentId);
             entity
                 .HasOne(e => e.Game)
                 .WithMany(e => e.SkaterGameLogs)
                 .HasForeignKey(e => e.GameId);
-            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
-            entity.Property(e => e.PlayerId).HasColumnName("player_id");
-            entity.Property(e => e.TeamId).HasColumnName("team_id");
-            entity.Property(e => e.OpponentTeamId).HasColumnName("opponent_team_id");
-            entity.Property(e => e.GameId).HasColumnName("game_id");
-            entity.Property(e => e.Goals).HasColumnName("goals");
-            entity.Property(e => e.Assists).HasColumnName("assists");
-            entity.Property(e => e.PenaltyMinutes).HasColumnName("penalty_minutes");
-        });
-
-        modelBuilder.Entity<SkaterStat>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("mv_skater_game_stats");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.GamesPlayed).HasColumnName("games_played");
             entity.Property(e => e.Goals).HasColumnName("goals");
