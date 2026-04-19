@@ -18,6 +18,9 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Core.BracketChallenge.Event> BracketChallenges { get; set; }
     public DbSet<Core.BracketChallenge.Registration> BracketChallengeRegistrations { get; set; }
+    public DbSet<Draft> Drafts { get; set; }
+    public DbSet<DraftOrder> DraftOrders { get; set; }
+    public DbSet<DraftPick> DraftPicks { get; set; }
     public DbSet<Game> Games { get; set; }
     public DbSet<GameHighlight> GameHighlights { get; set; }
     public DbSet<GameStar> GameStars { get; set; }
@@ -89,6 +92,82 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.PaymentId).HasColumnName("payment_id");
             entity.Property(e => e.AgreedToTermsOfService).HasColumnName("agreed_terms_of_service");
+        });
+
+        modelBuilder.Entity<Draft>(entity =>
+        {
+            entity
+                .ToTable("drafts")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Tournament)
+                .WithMany()
+                .HasForeignKey(e => e.TournamentId);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.Type).HasColumnName("draft_type").HasConversion(
+                e => e.ToString()!.ToLower(),
+                s => Enum.Parse<DraftType>(s, true)
+            );
+            entity.Property(e => e.Status).HasColumnName("draft_status").HasConversion(
+                e => e.ToString()!.ToLower(),
+                s => Enum.Parse<DraftStatus>(s, true)
+            );
+        });
+
+        modelBuilder.Entity<DraftOrder>(entity =>
+        {
+            entity
+                .ToTable("draft_orders")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Draft)
+                .WithMany(e => e.DraftOrders)
+                .HasForeignKey(e => e.DraftId);
+            entity
+                .HasOne(e => e.Team)
+                .WithMany()
+                .HasForeignKey(e => e.TeamId);
+            entity
+                .HasIndex(e => new { e.DraftId, e.TeamId })
+                .IsUnique();
+            entity
+                .HasIndex(e => new { e.DraftId, e.Pick })
+                .IsUnique();
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.DraftId).HasColumnName("draft_id");
+            entity.Property(e => e.TeamId).HasColumnName("tournament_id");
+            entity.Property(e => e.Pick).HasColumnName("pick_number");
+        });
+
+        modelBuilder.Entity<DraftPick>(entity =>
+        {
+            entity
+                .ToTable("draft_picks")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Draft)
+                .WithMany(e => e.DraftPicks)
+                .HasForeignKey(e => e.DraftId);
+            entity
+                .HasOne(e => e.Team)
+                .WithMany()
+                .HasForeignKey(e => e.TeamId);
+            entity
+                .HasOne(e => e.Player)
+                .WithMany()
+                .HasForeignKey(e => e.PlayerId);
+            entity
+                .HasIndex(e => new { e.DraftId, e.OverallPick })
+                .IsUnique();
+            entity
+                .HasIndex(e => new { e.DraftId, e.PlayerId })
+                .IsUnique();
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.DraftId).HasColumnName("draft_id");
+            entity.Property(e => e.OverallPick).HasColumnName("overall_pick_number");
+            entity.Property(e => e.TeamId).HasColumnName("team_id");
+            entity.Property(e => e.PlayerId).HasColumnName("player_id");
         });
 
         modelBuilder.Entity<Game>(entity =>
