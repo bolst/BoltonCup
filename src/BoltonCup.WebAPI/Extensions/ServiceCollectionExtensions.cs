@@ -85,9 +85,11 @@ public static class ServiceCollectionExtensions
                         "https://localhost:7244",
                         "https://localhost:7266",
                         "https://localhost:7269",
+                        "https://localhost:7047",
                         "https://boltoncup.ca",
                         "https://www.boltoncup.ca",
-                        "https://auth.boltoncup.ca"
+                        "https://auth.boltoncup.ca",
+                        "https://draft.boltoncup.ca"
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
