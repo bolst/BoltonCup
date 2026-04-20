@@ -1,7 +1,83 @@
 ﻿@page "/"
+@inject IBoltonCupApi BoltonCupApi
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Drafts</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudDataGrid
+    @ref="_dataGrid"
+    T="Sdk.DraftDto"
+    Class="filter-datagrid"
+    ServerData="ServerReload"
+    Breakpoint="Breakpoint.None"
+    RowStyle="height: 50px"
+    RowsPerPage="50"
+    Elevation="0"
+    ShowColumnOptions="false"
+    AllowUnsorted
+    Striped
+    Dense>
+    <ToolBarContent>
+        <div class="d-flex flex-row align-center gap-3 flex-wrap">
+            <FilterToolbarField
+                T="Sdk.TournamentDto?" Label="Tournament"
+                Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="@_dataGrid.ReloadServerData"
+                ToStringFunc="x => x?.Name">
+                <TournamentFilter/>
+            </FilterToolbarField>
+        </div>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Title="Tournament" Property="x => x.Tournament.Name" />
+        <PropertyColumn Title="Status" Property="x => x.Status.ToString()" />
+    </Columns>
+    <NoRecordsContent>
+        <div class="mud-width-full d-flex justify-center align-center" style="height: 300px">
+            <MudText Typo="Typo.body2">No drafts found :(</MudText>
+        </div>
+    </NoRecordsContent>
+</MudDataGrid>
 
-Welcome to your new app.
+
+@code {
+
+    private MudDataGrid<Sdk.DraftDto> _dataGrid = null!;
+
+    private readonly DraftsFilterModel _filter = new();
+
+    private async Task<GridData<Sdk.DraftDto>> ServerReload(GridState<Sdk.DraftDto> state, CancellationToken cancellationToken)
+    {
+        string? sortBy = null;
+        bool? descending = null;
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        if (sortDefinition is not null)
+        {
+            sortBy = sortDefinition.SortBy;
+            descending = sortDefinition.Descending;
+        }
+
+        var data = await BoltonCupApi.GetDraftsAsync(
+            tournamentId: _filter.Tournament?.Id,
+            page: state.Page + 1, 
+            size: state.PageSize,
+            sortBy: sortBy,
+            descending: descending, 
+            cancellationToken: cancellationToken
+        );
+        
+        return new GridData<Sdk.DraftDto> {
+            TotalItems = data.Total,
+            Items = data.Items,
+        };
+    }
+    
+    private Task OnFilterTournamentChange(Sdk.TournamentDto? tournament)
+    {
+        _filter.Tournament = tournament;
+        return _dataGrid.ReloadServerData();
+    }
+    
+    private class DraftsFilterModel
+    {
+        public Sdk.TournamentDto? Tournament { get; set; }
+    }
+}
