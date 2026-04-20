@@ -42,7 +42,6 @@ public class DraftService(
         _dbContext.Drafts.Add(new Draft
         {
             TournamentId = command.TournamentId,
-            Type = command.DraftType,
             Status = DraftStatus.Pending,
         });
         return _dbContext.SaveChangesAsync(cancellationToken);
