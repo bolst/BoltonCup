@@ -28,9 +28,17 @@
             </div>
         </ToolBarContent>
         <Columns>
-            <PropertyColumn Title="Draft" Property="x => x.Title" />
+            <PropertyColumn Title="Draft" Property="x => x.Title">
+                <CellTemplate>
+                    <MudLink Href="@($"/drafts/{context.Item.Id}")" Color="Color.Primary" Typo="Typo.body2"><b>@context.Item.Title</b></MudLink>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Title="Status" Property="x => x.Status">
+                <CellTemplate>
+                    <DraftStatusChip Status="@context.Item.Status" />
+                </CellTemplate>
+            </PropertyColumn>
             <PropertyColumn Title="Tournament" Property="x => x.Tournament.Name"/>
-            <PropertyColumn Title="Status" Property="x => x.Status.ToString()"/>
             <TemplateColumn>
                 <CellTemplate>
                     <MudButtonGroup OverrideStyles="false" Size="Size.Small">
