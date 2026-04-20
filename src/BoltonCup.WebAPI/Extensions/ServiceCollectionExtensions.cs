@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Shared;
@@ -127,6 +128,7 @@ public static class ServiceCollectionExtensions
             .AddTransient<IBriefMapper, BriefMapper>()
             .AddTransient<IAccountMapper, AccountMapper>()
             .AddTransient<IBracketChallengeMapper, BracketChallengeMapper>()
+            .AddTransient<IDraftMapper, DraftMapper>()
             .AddTransient<IGameMapper, GameMapper>()
             .AddTransient<IGameHighlightMapper, GameHighlightMapper>()
             .AddTransient<IGoalieStatMapper, GoalieStatMapper>()
@@ -177,7 +179,11 @@ public static class ServiceCollectionExtensions
             .AddRouting(options => options.LowercaseUrls = true)
             .AddMappers()
             .AddExceptionHandlers()
-            .AddControllers();
+            .AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
         
         return builder.Services;
     }
