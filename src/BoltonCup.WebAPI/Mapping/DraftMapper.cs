@@ -24,6 +24,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         return drafts.ProjectTo(draft => new DraftDto
         {
             Id = draft.Id,
+            Title = draft.Title,
             Type = draft.Type,
             Status = draft.Status,
             Tournament = _briefMapper.ToTournamentBriefDto(draft.Tournament),
@@ -48,6 +49,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         return new DraftSingleDto
         {
             Id = draft.Id,
+            Title = draft.Title,
             Type = draft.Type,
             Status = draft.Status,
             Tournament = _briefMapper.ToTournamentBriefDto(draft.Tournament),
