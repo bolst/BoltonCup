@@ -7,6 +7,7 @@ public class DraftPick : EntityBase
     public int OverallPick { get; set; }
     public int TeamId { get; set; }
     public int? PlayerId { get; set; }
+    public byte[] Version { get; set; }
 
     public Draft Draft { get; set; } = null!;
     public Team Team { get; set; } = null!;
