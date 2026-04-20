@@ -30,11 +30,11 @@ public class DraftsController(
 
     [Authorize(Roles = Admin)]
     [HttpPost]
-    public async Task<IActionResult> CreateDraft([FromBody] CreateDraftRequest request)
+    public async Task<ActionResult<int>> CreateDraft([FromBody] CreateDraftRequest request)
     {
         var command = _mapper.ToCommand(request);
-        await _draftService.CreateAsync(command);
-        return Ok();
+        var newDraftId = await _draftService.CreateAsync(command);
+        return Ok(newDraftId);
     }
 
     [Authorize(Roles = Admin)]

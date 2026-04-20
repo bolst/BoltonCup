@@ -37,15 +37,17 @@ public class DraftService(
             .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
     }
 
-    public Task CreateAsync(CreateDraftCommand command, CancellationToken cancellationToken = default)
+    public async Task<int> CreateAsync(CreateDraftCommand command, CancellationToken cancellationToken = default)
     {
-        _dbContext.Drafts.Add(new Draft
+        var newDraft = new Draft
         {
             TournamentId = command.TournamentId,
             Title = command.Title,
             Status = DraftStatus.Pending,
-        });
-        return _dbContext.SaveChangesAsync(cancellationToken);
+        };
+        _dbContext.Drafts.Add(newDraft);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return newDraft.Id;
     }
 
     public async Task UpdateAsync(UpdateDraftCommand command, CancellationToken cancellationToken = default)
