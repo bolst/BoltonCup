@@ -6065,6 +6065,23 @@
         },
         "additionalProperties": false
       },
+      "DraftPickOrderDto": {
+        "required": [
+          "pick",
+          "team"
+        ],
+        "type": "object",
+        "properties": {
+          "pick": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "team": {
+            "$ref": "#/components/schemas/TeamBriefDto"
+          }
+        },
+        "additionalProperties": false
+      },
       "DraftPickSingleDto": {
         "required": [
           "draftId",
@@ -6111,6 +6128,7 @@
       "DraftSingleDto": {
         "required": [
           "id",
+          "pickOrder",
           "status",
           "title",
           "tournament",
@@ -6134,6 +6152,13 @@
           },
           "tournament": {
             "$ref": "#/components/schemas/TournamentBriefDto"
+          },
+          "pickOrder": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DraftPickOrderDto"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
