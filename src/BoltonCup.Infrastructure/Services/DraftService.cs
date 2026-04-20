@@ -60,14 +60,11 @@ public class DraftService(
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+    public Task DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        var draft = await _dbContext.Drafts
-            .SingleOrDefaultAsync(e => e.Id == id, cancellationToken)
-            ?? throw new EntityNotFoundException(nameof(Draft), id);
-        
-        _dbContext.Drafts.Remove(draft);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        return _dbContext.Drafts
+            .Where(d => d.Id == id)
+            .ExecuteDeleteAsync(cancellationToken);
     }
     
     
