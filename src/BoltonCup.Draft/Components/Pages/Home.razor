@@ -3,39 +3,53 @@
 
 <PageTitle>Drafts</PageTitle>
 
-<MudDataGrid
-    @ref="_dataGrid"
-    T="Sdk.DraftDto"
-    Class="filter-datagrid"
-    ServerData="ServerReload"
-    Breakpoint="Breakpoint.None"
-    RowStyle="height: 50px"
-    RowsPerPage="50"
-    Elevation="0"
-    ShowColumnOptions="false"
-    AllowUnsorted
-    Striped
-    Dense>
-    <ToolBarContent>
-        <div class="d-flex flex-row align-center gap-3 flex-wrap">
-            <FilterToolbarField
-                T="Sdk.TournamentDto?" Label="Tournament"
-                Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="@_dataGrid.ReloadServerData"
-                ToStringFunc="x => x?.Name">
-                <TournamentFilter/>
-            </FilterToolbarField>
-        </div>
-    </ToolBarContent>
-    <Columns>
-        <PropertyColumn Title="Tournament" Property="x => x.Tournament.Name" />
-        <PropertyColumn Title="Status" Property="x => x.Status.ToString()" />
-    </Columns>
-    <NoRecordsContent>
-        <div class="mud-width-full d-flex justify-center align-center" style="height: 300px">
-            <MudText Typo="Typo.body2">No drafts found :(</MudText>
-        </div>
-    </NoRecordsContent>
-</MudDataGrid>
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudDataGrid
+        @ref="_dataGrid"
+        T="Sdk.DraftDto"
+        Class="filter-datagrid"
+        ServerData="ServerReload"
+        Breakpoint="Breakpoint.None"
+        RowStyle="height: 50px"
+        RowsPerPage="50"
+        Elevation="0"
+        ShowColumnOptions="false"
+        AllowUnsorted
+        Striped
+        Dense>
+        <ToolBarContent>
+            <div class="d-flex flex-row align-center gap-3 flex-wrap">
+                <FilterToolbarField
+                    T="Sdk.TournamentDto?" Label="Tournament"
+                    Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="@_dataGrid.ReloadServerData"
+                    ToStringFunc="x => x?.Name">
+                    <TournamentFilter/>
+                </FilterToolbarField>
+            </div>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Title="Draft" Property="x => x.Title" />
+            <PropertyColumn Title="Tournament" Property="x => x.Tournament.Name"/>
+            <PropertyColumn Title="Status" Property="x => x.Status.ToString()"/>
+            <TemplateColumn>
+                <CellTemplate>
+                    <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                        <MudIconButton Href="@($"/drafts/{context.Item.Id}")" Icon="@Icons.Material.Rounded.RemoveRedEye" Color="Color.Info"/>
+
+                        <AuthorizeView Roles="Admin" Context="_">
+                            <MudIconButton Href="@($"/drafts/{context.Item.Id}/config")" Icon="@Icons.Material.Rounded.Settings" Color="Color.Default"/>
+                        </AuthorizeView>
+                    </MudButtonGroup>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <NoRecordsContent>
+            <div class="mud-width-full d-flex justify-center align-center" style="height: 300px">
+                <MudText Typo="Typo.body2">No drafts found :(</MudText>
+            </div>
+        </NoRecordsContent>
+    </MudDataGrid>
+</MudContainer>
 
 
 @code {
