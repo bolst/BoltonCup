@@ -10,15 +10,13 @@ namespace BoltonCup.Infrastructure.Services;
 
 public class DraftService(
     BoltonCupDbContext _dbContext,
-    IStorageService _storageService,
-    IAssetKeyGenerator _assetKeyGenerator,
     ILogger<DraftService> _logger
 ) : IDraftService
 {
     public async Task<IPagedList<Draft>> GetAsync(GetDraftsQuery query, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Drafts
-            .Include(d => d.TournamentId)
+            .Include(d => d.Tournament)
             .ConditionalWhere(d => d.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(d => d.Status == query.Status, query.Status.HasValue)
             .OrderByDescending(d => d.CreatedAt)
@@ -28,7 +26,7 @@ public class DraftService(
     public async Task<Draft?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Drafts
-            .Include(d => d.TournamentId)
+            .Include(d => d.Tournament)
             .Include(d => d.DraftOrders)
                 .ThenInclude(d => d.Team)
             .Include(d => d.DraftPicks)
@@ -39,21 +37,15 @@ public class DraftService(
             .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
     }
 
-    public async Task CreateAsync(CreateDraftCommand command, CancellationToken cancellationToken = default)
+    public Task CreateAsync(CreateDraftCommand command, CancellationToken cancellationToken = default)
     {
-        _ = await _dbContext.Tournaments
-                .SingleOrDefaultAsync(e => e.Id == command.TournamentId, cancellationToken: cancellationToken) 
-            ?? throw new EntityNotFoundException(nameof(Tournament), command.TournamentId);
-
-        var draft = new Draft
+        _dbContext.Drafts.Add(new Draft
         {
             TournamentId = command.TournamentId,
             Type = command.DraftType,
             Status = DraftStatus.Pending,
-        };
-        
-        _dbContext.Drafts.Add(draft);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        });
+        return _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task UpdateAsync(UpdateDraftCommand command, CancellationToken cancellationToken = default)
@@ -61,11 +53,12 @@ public class DraftService(
         var draft = await _dbContext.Drafts
             .SingleOrDefaultAsync(e => e.Id == command.DraftId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Draft), command.DraftId);
+
+        if (draft.Status != DraftStatus.Pending)
+            throw new InvalidOperationException("Draft cannot be changed once started.");
         
-        draft.Status = command.DraftStatus;
         draft.Type = command.DraftType;
-        
-        throw new NotImplementedException();
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
@@ -77,39 +70,136 @@ public class DraftService(
         _dbContext.Drafts.Remove(draft);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
+    
+    
+    public async Task<DraftPick?> GetCurrentPickAsync(int draftId, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts.SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+        if (draft.Status != DraftStatus.InProgress)
+            throw new InvalidOperationException("Draft is not in progress.");
+
+        return await _dbContext.DraftPicks
+            .Where(dp => dp.DraftId == draft.Id)
+            .Where(dp => dp.PlayerId == null)
+            .OrderBy(dp => dp.OverallPick)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+    }
 
     public async Task DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default)
     {
         var draft = await _dbContext.Drafts
-                        .AsNoTracking()
+                        .Include(d => d.DraftPicks)
                         .SingleOrDefaultAsync(e => e.Id == command.DraftId, cancellationToken)
                     ?? throw new EntityNotFoundException(nameof(Draft), command.DraftId);
         
-        // make sure team exists and is in draft
-        var team = await _dbContext.Teams
-                       .AsNoTracking()
-                        .SingleOrDefaultAsync(e => e.Id == command.TeamId, cancellationToken)
-                    ?? throw new EntityNotFoundException(nameof(Team), command.TeamId);
-        if (team.TournamentId != draft.TournamentId)
-            throw new InvalidOperationException($"Team {command.TeamId} does not belong to {draft.TournamentId}");
+        if (draft.Status != DraftStatus.InProgress)
+            throw new InvalidOperationException("Draft is not in progress.");
         
-        // make sure player exists and is in draft
-        var player = await _dbContext.Players
-                         .AsNoTracking()
-                        .SingleOrDefaultAsync(e => e.Id == command.PlayerId, cancellationToken)
-                    ?? throw new EntityNotFoundException(nameof(Player), command.PlayerId);
-        if (player.TournamentId != draft.TournamentId)
-            throw new InvalidOperationException($"Player {command.PlayerId} does not belong to {draft.TournamentId}");
-
+        // make sure player is in draft's tournament
+        var isValidPlayer = await _dbContext.Players
+            .Where(p => p.TournamentId == draft.TournamentId)
+            .AnyAsync(p => p.Id == command.PlayerId, cancellationToken);
+        if (!isValidPlayer) 
+            throw new EntityNotFoundException(nameof(Player), command.PlayerId);
+        // make sure player is not already drafted
+        if (draft.DraftPicks.Any(dp => dp.PlayerId == command.PlayerId))
+            throw new InvalidOperationException($"Player {command.PlayerId} is already drafted");
         // make sure pick exists and matches command
-        var pick = await _dbContext.DraftPicks
-                       .FirstOrDefaultAsync(dp => dp.DraftId == command.DraftId && dp.PlayerId == null, cancellationToken: cancellationToken)
+        var pick = draft.DraftPicks
+                       .Where(dp => dp.OverallPick == command.OverallPick)
+                       .Where(dp => dp.TeamId == command.TeamId) 
+                       .FirstOrDefault(dp => dp.PlayerId == null)
                    ?? throw new InvalidOperationException($"No available draft picks for Draft {command.DraftId}");
-        if (pick.TeamId != command.TeamId)
-            throw new InvalidOperationException($"The current pick does not belong to Team {command.TeamId}");
         
         // draft player
         pick.PlayerId = command.PlayerId;
+
+        try
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new InvalidOperationException("Draft pick version expired");
+        }
+    }
+
+
+    public async Task StartDraftAsync(int draftId, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts
+            .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+            ??  throw new EntityNotFoundException(nameof(Draft), draftId);
+        
+        if (draft.Status != DraftStatus.Pending)
+            throw new InvalidOperationException("Draft has already started.");
+
+        await RegenerateDraftPicksAsync(draft, cancellationToken);
+        
+        draft.Status = DraftStatus.InProgress;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+
+    public async Task EndDraftAsync(int draftId, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts
+                        .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                    ??  throw new EntityNotFoundException(nameof(Draft), draftId);
+        
+        if (draft.Status != DraftStatus.InProgress)
+            throw new InvalidOperationException("Draft has not started yet or is already completed.");
+        
+        draft.Status = DraftStatus.Completed;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+    
+    
+    
+    
+    private async Task RegenerateDraftPicksAsync(Draft draft, CancellationToken cancellationToken)
+    {
+        // delete old picks
+        await _dbContext.DraftPicks
+            .Where(d => d.DraftId == draft.Id)
+            .ExecuteDeleteAsync(cancellationToken);
+        
+        var draftOrders = await _dbContext.DraftOrders
+            .Where(d => d.DraftId == draft.Id)
+            .OrderBy(d => d.Pick)
+            .ToDictionaryAsync(d => d.Pick, cancellationToken);
+        var teamCount = draftOrders.Count;
+        if (teamCount == 0)
+            throw new InvalidOperationException($"Draft {draft.Id} has no teams/orders");
+        
+        var totalPlayerCount = await _dbContext.Players
+            .Where(p => p.TeamId == null)
+            .Where(p => p.TournamentId == draft.TournamentId)
+            .CountAsync(cancellationToken);
+        
+        for (int i = 0; i < totalPlayerCount; i++)
+        {
+            var round = i / teamCount + 1;
+            var standardRoundPick = i % teamCount + 1;
+            var roundPick = standardRoundPick;
+            
+            // if draft is snake, we reverse the order in even rounds
+            if (draft.Type == DraftType.Snake && round % 2 == 0)
+                roundPick = teamCount - standardRoundPick + 1;
+
+            if (draftOrders.GetValueOrDefault(roundPick)?.TeamId is not { } teamId) 
+                throw new InvalidOperationException($"Cannot generate picks: Draft {draft.Id} has an invalid ordering.");
+            
+            _dbContext.DraftPicks.Add(new DraftPick
+            {
+                DraftId = draft.Id,
+                OverallPick = i + 1,
+                TeamId = teamId,
+                PlayerId = null
+            });
+        }
+
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

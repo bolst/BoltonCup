@@ -2,6 +2,5 @@ namespace BoltonCup.Core.Commands;
 
 public sealed record UpdateDraftCommand(
     int DraftId,
-    DraftType DraftType,
-    DraftStatus DraftStatus
+    DraftType DraftType
 );

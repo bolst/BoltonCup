@@ -42,6 +42,7 @@ public static class ServiceCollectionExtensions
             .AddDbContextFactory<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
             .AddDbContextFactory<AuthDbContext>(options => options.UseNpgsql(connectionString))
             .AddTransient<IAccountRepository, AccountRepository>()
+            .AddTransient<IDraftService, DraftService>()
             .AddTransient<IGameRepository, GameRepository>()
             .AddTransient<IGoalieStatRepository, GoalieStatRepository>()
             .AddTransient<IInfoGuideRepository, InfoGuideRepository>()
