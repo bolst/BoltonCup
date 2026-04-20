@@ -3,6 +3,7 @@
 @implements IDisposable
 @inject IBoltonCupApi BoltonCupApi
 @inject ISnackbar Snackbar
+@inject NavigationManager Navigation
 @attribute [Authorize(Roles = "Admin")]
 
 <MudContainer Class="py-1" MaxWidth="MaxWidth.ExtraExtraLarge" Gutters="false">
@@ -56,7 +57,16 @@
                 
                 <MudItem xs="4">
                     <MudPaper Class="pa-4">
-                        
+                        @foreach (var pickOrder in _draft.PickOrder)
+                        {
+                            <MudText>@pickOrder.Team.Name | @pickOrder.Pick</MudText>
+                        }
+                    </MudPaper>
+                </MudItem>
+                
+                <MudItem xs="4">
+                    <MudPaper Class="pa-4">
+                        <MudButton OnClick="@DeleteDraftAsync" Variant="Variant.Filled" Color="Color.Error">Delete Draft</MudButton>
                     </MudPaper>
                 </MudItem>
                 
@@ -128,6 +138,12 @@
             _messageStore?.AddApiErrorResponse(_updateDraftRequest, e.Result);
             _editContext?.NotifyValidationStateChanged();
         }
+    }
+
+    private async Task DeleteDraftAsync()
+    {
+        await BoltonCupApi.DeleteDraftAsync(DraftId);
+        Navigation.NavigateTo("/");
     }
 
     private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)

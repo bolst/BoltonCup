@@ -39,6 +39,10 @@ public class DraftService(
 
     public async Task<int> CreateAsync(CreateDraftCommand command, CancellationToken cancellationToken = default)
     {
+        if (await _dbContext.Tournaments.AllAsync(t => t.Id != command.TournamentId, cancellationToken))
+            throw new EntityNotFoundException(nameof(Tournament), command.TournamentId);
+        
+        // create draft
         var newDraft = new Draft
         {
             TournamentId = command.TournamentId,
@@ -46,7 +50,29 @@ public class DraftService(
             Status = DraftStatus.Pending,
         };
         _dbContext.Drafts.Add(newDraft);
+        
         await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        // create default orderings
+        var orderings = await _dbContext.Teams
+            .Where(t => t.TournamentId == command.TournamentId)
+            .Select(team => new DraftOrder
+            {
+                DraftId = newDraft.Id,
+                TeamId = team.Id,
+                Pick = 0,
+            })
+            .ToListAsync(cancellationToken);
+
+        orderings = orderings.Select((order, index) =>
+        {
+            order.Pick = index + 1;
+            return order;
+        }).ToList();
+        
+        _dbContext.DraftOrders.AddRange(orderings);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
         return newDraft.Id;
     }
 
