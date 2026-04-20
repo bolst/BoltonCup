@@ -12,6 +12,4 @@ public interface IDraftService
     
     Task<DraftPick?> GetCurrentPickAsync(int draftId, CancellationToken cancellationToken = default);
     Task DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default);
-    Task StartDraftAsync(int draftId, CancellationToken cancellationToken = default);
-    Task EndDraftAsync(int draftId, CancellationToken cancellationToken = default);
 }

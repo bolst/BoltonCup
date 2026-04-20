@@ -87,7 +87,8 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
     {
         return new UpdateDraftCommand(
             DraftId: id,
-            DraftType: request.DraftType
+            DraftType: request.DraftType,
+            DraftStatus: request.DraftStatus
         );
     }
     

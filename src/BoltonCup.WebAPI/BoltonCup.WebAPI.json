@@ -7848,12 +7848,11 @@
       "UpdateDraftRequest": {
         "type": "object",
         "properties": {
-          "tournamentId": {
-            "type": "integer",
-            "format": "int32"
-          },
           "draftType": {
             "$ref": "#/components/schemas/DraftType"
+          },
+          "draftStatus": {
+            "$ref": "#/components/schemas/DraftStatus"
           }
         },
         "additionalProperties": false
