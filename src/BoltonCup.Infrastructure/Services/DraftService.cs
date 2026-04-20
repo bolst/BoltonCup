@@ -42,6 +42,7 @@ public class DraftService(
         _dbContext.Drafts.Add(new Draft
         {
             TournamentId = command.TournamentId,
+            Title = command.Title,
             Status = DraftStatus.Pending,
         });
         return _dbContext.SaveChangesAsync(cancellationToken);
@@ -53,7 +54,6 @@ public class DraftService(
             .SingleOrDefaultAsync(e => e.Id == command.DraftId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Draft), command.DraftId);
 
-
         var regeneratePicks = await EnsureDraftStatusIsValidAsync(draft, command.DraftStatus, cancellationToken);
         draft.Status = command.DraftStatus;
         
@@ -61,6 +61,11 @@ public class DraftService(
         if (command.DraftType != draft.Type && draft.Status != DraftStatus.Pending)
             throw new InvalidOperationException("Draft type cannot change once the draft has started.");
         draft.Type = command.DraftType;
+        
+        // draft title can only be changed in the pending state
+        if (command.Title != draft.Title && draft.Status != DraftStatus.Pending)
+            throw new InvalidOperationException("Draft name cannot change once the draft has started.");
+        draft.Title = command.Title;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         

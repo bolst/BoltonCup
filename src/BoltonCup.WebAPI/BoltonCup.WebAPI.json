@@ -5935,6 +5935,10 @@
           "tournamentId": {
             "type": "integer",
             "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -7853,6 +7857,10 @@
           },
           "draftStatus": {
             "$ref": "#/components/schemas/DraftStatus"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

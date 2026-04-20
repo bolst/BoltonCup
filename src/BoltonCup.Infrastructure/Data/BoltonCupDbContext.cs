@@ -105,6 +105,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasForeignKey(e => e.TournamentId);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.Title).HasColumnName("draft_title");
+            entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.Type).HasColumnName("draft_type").HasConversion(
                 e => e.ToString()!.ToLower(),
                 s => Enum.Parse<DraftType>(s, true)
