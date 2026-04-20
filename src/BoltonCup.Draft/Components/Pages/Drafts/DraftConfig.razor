@@ -1,5 +1,69 @@
 @page "/drafts/{DraftId:int}/config"
+@using BoltonCup.Common
+@implements IDisposable
+@inject IBoltonCupApi BoltonCupApi
+@inject ISnackbar Snackbar
+@attribute [Authorize(Roles = "Admin")]
 
+<MudContainer Class="py-1" MaxWidth="MaxWidth.ExtraExtraLarge" Gutters="false">
+    @if (_loading)
+    {
+        @:loading...
+    }
+    else
+    {
+        if (_draft is null)
+        {
+            <MudAlert Severity="Severity.Error">No draft found.</MudAlert>
+        }
+        else
+        {
+            <PageTitle>Config | @_draft.Title</PageTitle>
+            
+            <MudGrid>
+                <MudItem xs="4">
+                    <MudPaper Class="pa-4" Elevation="0" Outlined Square>
+                        <EditForm EditContext="@_editContext" OnValidSubmit="@UpdateDraftAsync">
+                            <DataAnnotationsValidator/>
+
+                            <MudStack Spacing="6">
+                                <MudTextField
+                                    @bind-Value="@_updateDraftRequest.Title"
+                                    For="@(() => _updateDraftRequest.Title)"
+                                    Variant="Variant.Text"
+                                    Label="Name"
+                                    Margin="Margin.Dense"
+                                    Required/>
+
+                                <MudSelect
+                                    @bind-Value="@_updateDraftRequest.DraftType"
+                                    For="@(() => _updateDraftRequest.DraftType)"
+                                    Variant="Variant.Outlined"
+                                    Label="Draft Type"
+                                    Margin="Margin.Dense"
+                                    Strict
+                                    Dense
+                                    Required>
+                                    <MudSelectItem T="Sdk.DraftType" Value="@Sdk.DraftType.Standard">Standard</MudSelectItem>
+                                    <MudSelectItem T="Sdk.DraftType" Value="@Sdk.DraftType.Snake">Snake</MudSelectItem>
+                                </MudSelect>
+
+                                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_isDirty)">Save</MudButton>
+                            </MudStack>
+                        </EditForm>
+                    </MudPaper>
+                </MudItem>
+                
+                <MudItem xs="4">
+                    <MudPaper Class="pa-4">
+                        
+                    </MudPaper>
+                </MudItem>
+                
+            </MudGrid>
+        }
+    }
+</MudContainer>
 
 @code {
     
@@ -7,4 +71,85 @@
     [EditorRequired]
     public required int DraftId { get; set; }
 
+    private int? _draftId;
+
+    private bool _loading = true;
+
+    private Sdk.DraftSingleDto? _draft;
+
+    private readonly Sdk.UpdateDraftRequest _updateDraftRequest = new();
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+    private bool _isDirty;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_updateDraftRequest);
+        _messageStore = new ValidationMessageStore(_editContext);
+        _editContext.OnValidationRequested += HandleValidationRequested;
+        _editContext.OnFieldChanged += HandleFieldChanged;
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_draftId == DraftId)
+            return;
+        _draftId = DraftId;
+
+        await Task.WhenAll(
+            LoadDraftDataAsync()
+        );
+    }
+
+    private async Task LoadDraftDataAsync()
+    {
+        _loading = true;
+        
+        _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
+        _updateDraftRequest.Title = _draft.Title;
+        _updateDraftRequest.DraftStatus = _draft.Status;
+        _updateDraftRequest.DraftType = _draft.Type;
+
+        _isDirty = false;
+        _loading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task UpdateDraftAsync()
+    {
+        try
+        {
+            await BoltonCupApi.UpdateDraftAsync(DraftId, _updateDraftRequest);
+            Snackbar.Add("Saved changes", Severity.Success);
+            await LoadDraftDataAsync();
+        }
+        catch (Sdk.ApiException<Sdk.BoltonCupValidationProblemDetails> e)
+        {
+            _messageStore?.AddApiErrorResponse(_updateDraftRequest, e.Result);
+            _editContext?.NotifyValidationStateChanged();
+        }
+    }
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        _messageStore?.Clear();
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs args)
+    {
+        if (!_isDirty)
+        {
+            _isDirty = true;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_editContext is not null)
+        {
+            _editContext.OnValidationRequested -= HandleValidationRequested;
+            _editContext.OnFieldChanged -= HandleFieldChanged;
+        }
+    }
 }
