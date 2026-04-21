@@ -4,10 +4,26 @@
 
 @code {
 
-    private void SetDateTime(T item, DateTime? dateTime)
+    private void SetDateTime(T item, DateTime? oldDateTime, DateTime? newDateTime)
     {
-        dateTime = dateTime?.ToUniversalTime();
-        SetProperty(item, dateTime);
+        newDateTime = newDateTime?.ToUniversalTime();
+        if (newDateTime is not null)
+        {
+            oldDateTime ??= newDateTime;
+            
+            newDateTime = new DateTime(
+                newDateTime.Value.Year,
+                newDateTime.Value.Month,
+                newDateTime.Value.Day,
+                oldDateTime.Value.Hour,
+                oldDateTime.Value.Minute,
+                oldDateTime.Value.Second,
+                oldDateTime.Value.Millisecond,
+                oldDateTime.Value.Kind
+            );
+        }
+        
+        SetProperty(item, newDateTime);
     }
     
     protected override RenderFragment EntityEditTemplate(CellContext<T> context)
@@ -19,7 +35,7 @@
         }
 
         var item = property as DateTime?;
-        return @<MudDatePicker Date="item" DateChanged="d => SetDateTime(context.Item, d)"
+        return @<MudDatePicker Date="item" DateChanged="d => SetDateTime(context.Item, item, d)"
                                IconSize="Size.Small" Margin="Margin.Dense" Underline="false" Rounded Editable />;
     }
 }
