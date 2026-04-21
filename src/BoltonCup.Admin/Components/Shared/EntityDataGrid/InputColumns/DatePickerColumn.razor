@@ -1,29 +1,34 @@
 @namespace BoltonCup.Admin.Components.Shared
 @typeparam T where T : class
+@using BoltonCup.Common
 @inherits InputColumnBase<T, DateTime?>
 
 @code {
 
+    [Parameter]
+    public bool DisplayEastern { get; set; } = true;
+
     private void SetDateTime(T item, DateTime? oldDateTime, DateTime? newDateTime)
     {
-        newDateTime = newDateTime?.ToUniversalTime();
-        if (newDateTime is not null)
+        // If the user clears the date, just pass null
+        if (newDateTime is null)
         {
-            oldDateTime ??= newDateTime;
-            
-            newDateTime = new DateTime(
-                newDateTime.Value.Year,
-                newDateTime.Value.Month,
-                newDateTime.Value.Day,
-                oldDateTime.Value.Hour,
-                oldDateTime.Value.Minute,
-                oldDateTime.Value.Second,
-                oldDateTime.Value.Millisecond,
-                oldDateTime.Value.Kind
-            );
+            SetProperty(item, null);
+            return;
         }
+
+        // Grab the time from the old date (default to midnight if there wasn't one)
+        var timeOfDay = oldDateTime?.TimeOfDay ?? TimeSpan.Zero;
         
-        SetProperty(item, newDateTime);
+        // Combine the newly selected date with the old time
+        var combinedDateTime = newDateTime.Value.Date + timeOfDay;
+
+        // Ensure it gets converted back to UTC properly before saving
+        var finalDateTime = DisplayEastern 
+            ? combinedDateTime.ConvertEstToUtc() // Use your existing EST to UTC converter
+            : DateTime.SpecifyKind(combinedDateTime, DateTimeKind.Utc);
+        
+        SetProperty(item, finalDateTime);
     }
     
     protected override RenderFragment EntityEditTemplate(CellContext<T> context)
@@ -35,6 +40,9 @@
         }
 
         var item = property as DateTime?;
+        if (DisplayEastern)
+            item = item?.ToEst();
+
         return @<MudDatePicker Date="item" DateChanged="d => SetDateTime(context.Item, item, d)"
                                IconSize="Size.Small" Margin="Margin.Dense" Underline="false" Rounded Editable />;
     }

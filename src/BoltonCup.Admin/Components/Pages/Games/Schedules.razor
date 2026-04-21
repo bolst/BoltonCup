@@ -10,7 +10,7 @@
                        EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" />
         <ForeignColumn Title="Away" Property="x => x.AwayTeam" PropertySetter="(game, team) => game.AwayTeam = team" 
                        EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" />
-        <DatePickerColumn Title="Date" Property="x => x.GameTime"/>
+        <DateTimePickerColumn Title="Date" Property="x => x.GameTime" />
         <TemplateColumn Title="Score" Editable="false">
             <CellTemplate>
                 @{
