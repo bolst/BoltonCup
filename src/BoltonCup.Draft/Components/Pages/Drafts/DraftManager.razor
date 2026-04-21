@@ -1,0 +1,25 @@
+@page "/drafts/{DraftId:int}/manager"
+@attribute [Authorize(Roles = "Admin")]
+@inject IBoltonCupApi BoltonCupApi
+
+
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required int DraftId { get; set; }
+
+    private int? _draftId;
+
+    private Sdk.DraftSingleDto? _draft;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_draftId == DraftId)
+            return;
+        _draftId = DraftId;
+
+        _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
+    }
+}
