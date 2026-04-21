@@ -2,14 +2,17 @@
 
 <EntityDataGrid
     T="Game"
+    @ref="@_dataGrid"
     NewItemFunc="NewItemFunc"
     Include="x => x.Include(p => p.Goals).Include(p => p.Penalties)"
     Comparer="_comparer">
     <Columns>
         <ForeignColumn Title="Home" Property="x => x.HomeTeam" PropertySetter="(game, team) => game.HomeTeam = team" 
-                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" />
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo"
+                       Filter="@(x => (y => y.TournamentId == x.TournamentId))"/>
         <ForeignColumn Title="Away" Property="x => x.AwayTeam" PropertySetter="(game, team) => game.AwayTeam = team" 
-                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" />
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo"
+                       Filter="@(x => (y => y.TournamentId == x.TournamentId))"/>
         <DateTimePickerColumn Title="Date" Property="x => x.GameTime" />
         <TemplateColumn Title="Score" Editable="false">
             <CellTemplate>
@@ -38,7 +41,8 @@
 </EntityDataGrid>
 
 @code {
-    
+
+    private EntityDataGrid<Game> _dataGrid = null!;
     private readonly GameComparer _comparer = new();
     
     private async Task<Game?> NewItemFunc()
@@ -50,4 +54,12 @@
         };
     }
     
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        await _dataGrid.ExtendSortAsync("Tournament", SortDirection.Descending, x => x.Tournament);
+        await _dataGrid.ExtendSortAsync("GameTime", SortDirection.Ascending, x => x.GameTime);
+    }
 }
