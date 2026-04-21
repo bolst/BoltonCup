@@ -169,6 +169,12 @@ public static class ServiceCollectionExtensions
             .AddExceptionHandler<UnhandledExceptionHandler>();
     }
 
+    private static IServiceCollection AddSignalRServices(this IServiceCollection services)
+    {
+        services.AddSignalR();
+        return services;
+    }
+
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
     {
         builder
@@ -179,6 +185,7 @@ public static class ServiceCollectionExtensions
             .AddRouting(options => options.LowercaseUrls = true)
             .AddMappers()
             .AddExceptionHandlers()
+            .AddSignalRServices()
             .AddControllers()
             .AddJsonOptions(options =>
             {
