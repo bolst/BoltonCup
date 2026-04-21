@@ -1,12 +1,14 @@
 @page "/drafts/{DraftId:int}/config"
 @using BoltonCup.Common
+@using BoltonCup.Sdk
 @implements IDisposable
 @inject IBoltonCupApi BoltonCupApi
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
+@inject IDialogService DialogService
 @attribute [Authorize(Roles = "Admin")]
 
-<MudContainer Class="py-1" MaxWidth="MaxWidth.ExtraExtraLarge" Gutters="false">
+<MudContainer Class="py-1" MaxWidth="MaxWidth.Large" Gutters="false">
     @if (_loading)
     {
         @:loading...
@@ -22,7 +24,7 @@
             <PageTitle>Config | @_draft.Title</PageTitle>
             
             <MudGrid>
-                <MudItem xs="4">
+                <MudItem xs="12" md="6" lg="4">
                     <MudPaper Class="pa-4 mb-2" Elevation="0" Outlined Square>
                         <EditForm EditContext="@_editContext" OnValidSubmit="@UpdateDraftAsync">
                             <DataAnnotationsValidator/>
@@ -31,6 +33,7 @@
                                 <MudTextField
                                     @bind-Value="@_updateDraftRequest.Title"
                                     For="@(() => _updateDraftRequest.Title)"
+                                    Disabled="@Disabled"
                                     Variant="Variant.Text"
                                     Label="Name"
                                     Margin="Margin.Dense"
@@ -42,6 +45,7 @@
                                     Variant="Variant.Outlined"
                                     Label="Draft Type"
                                     Margin="Margin.Dense"
+                                    Disabled="@Disabled"
                                     Strict
                                     Dense
                                     Required>
@@ -49,7 +53,7 @@
                                     <MudSelectItem T="Sdk.DraftType" Value="@Sdk.DraftType.Snake">Snake</MudSelectItem>
                                 </MudSelect>
 
-                                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_isDirty)">Save</MudButton>
+                                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_isDirty || Disabled)">Save</MudButton>
                             </MudStack>
                         </EditForm>
                     </MudPaper>
@@ -68,15 +72,15 @@
                             <TemplateColumn>
                                 <CellTemplate>
                                     <MudButtonGroup OverrideStyles="false" Size="Size.Small">
-                                        <MudIconButton OnClick="@(_ => ShiftTeamOrderUp(context.Item))" Icon="@Icons.Material.Rounded.KeyboardArrowUp" Disabled="@(context.Item.Pick == 1)"/>
-                                        <MudIconButton OnClick="@(_ => ShiftTeamOrderDown(context.Item))" Icon="@Icons.Material.Rounded.KeyboardArrowDown" Disabled="@(context.Item.Pick == _draft.PickOrder.Count)"/>
+                                        <MudIconButton OnClick="@(_ => ShiftTeamOrderUp(context.Item))" Icon="@Icons.Material.Rounded.KeyboardArrowUp" Disabled="@(context.Item.Pick == 1 || Disabled)"/>
+                                        <MudIconButton OnClick="@(_ => ShiftTeamOrderDown(context.Item))" Icon="@Icons.Material.Rounded.KeyboardArrowDown" Disabled="@(context.Item.Pick == _draft.PickOrder.Count || Disabled)"/>
                                     </MudButtonGroup>
                                 </CellTemplate>
                             </TemplateColumn>
                         </Columns>
                         <PagerContent>
                             <div class="mud-width-full pa-4">
-                                <MudButton OnClick="@UpdateDraftOrderingAsync" Color="Color.Primary" Variant="Variant.Filled" Disabled="@(!_isOrderingDirty)" FullWidth>
+                                <MudButton OnClick="@UpdateDraftOrderingAsync" Color="Color.Primary" Variant="Variant.Filled" Disabled="@(!_isOrderingDirty || Disabled)" FullWidth>
                                     Save
                                 </MudButton>
                             </div>
@@ -84,7 +88,7 @@
                     </MudDataGrid>
                 </MudItem>
                 
-                <MudItem xs="4">
+                <MudItem xs="12" md="6" lg="4">
                     <MudDataGrid Items="@_players" Height="400px" Filterable="false" ShowColumnOptions="false" Elevation="0" FixedHeader FixedFooter Outlined Square Dense>
                         <Columns>
                             <PropertyColumn Title="Player" Property="x => x.FullName">
@@ -106,9 +110,24 @@
                     </MudDataGrid>
                 </MudItem>
                 
-                <MudItem xs="4">
-                    <MudPaper Class="pa-4" Elevation="0" Outlined Square>
-                        <MudButton OnClick="@DeleteDraftAsync" Variant="Variant.Filled" Color="Color.Error">Delete Draft</MudButton>
+                <MudItem xs="12" md="4">
+                    <MudPaper Class="pa-4 d-flex flex-column gap-3" Elevation="0" Outlined Square>
+                        <MudButton OnClick="@StartDraftAsync" Variant="Variant.Text" Color="Color.Primary" Disabled="@Disabled" FullWidth>
+                            @switch (_draft.Status)
+                            {
+                                case DraftStatus.Pending:
+                                    @:Start Draft
+                                    break;
+                                case DraftStatus.InProgress:
+                                    @:Draft in progress
+                                    break;
+                                case DraftStatus.Completed:
+                                default:
+                                    @:Draft complete
+                                    break;
+                            }
+                        </MudButton>
+                        <MudButton OnClick="@DeleteDraftAsync" Variant="Variant.Text" Color="Color.Error" FullWidth>Delete Draft</MudButton>
                     </MudPaper>
                 </MudItem>
                 
@@ -140,6 +159,8 @@
     private ValidationMessageStore? _messageStore;
     private bool _isDirty;
     private bool _isOrderingDirty;
+
+    private bool Disabled => _draft is null || _draft.Status != DraftStatus.Pending;
 
     protected override void OnInitialized()
     {
@@ -234,8 +255,32 @@
         }
     }
 
+    private async Task StartDraftAsync()
+    {
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Start Draft?",
+            "You will no longer be able to edit the draft settings.",
+            yesText: "Start Draft",
+            noText: "Cancel"
+        );
+        if (confirm != true)
+            return;
+        
+        _updateDraftRequest.DraftStatus = DraftStatus.InProgress;
+        await BoltonCupApi.UpdateDraftAsync(DraftId, _updateDraftRequest);
+        Navigation.NavigateTo($"/drafts/{DraftId}/manager");
+    }
+
     private async Task DeleteDraftAsync()
     {
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Delete draft?",
+            "It will be lost forever.",
+            yesText: "Delete",
+            noText: "Cancel"
+        );
+        if (confirm != true)
+            return;
         await BoltonCupApi.DeleteDraftAsync(DraftId);
         Navigation.NavigateTo("/");
     }

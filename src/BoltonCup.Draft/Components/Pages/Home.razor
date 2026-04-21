@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using BoltonCup.Sdk
 @inject IBoltonCupApi BoltonCupApi
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
@@ -56,7 +57,11 @@
                 <CellTemplate>
                     <MudButtonGroup OverrideStyles="false" Size="Size.Small">
                         <MudIconButton Href="@($"/drafts/{context.Item.Id}")" Icon="@Icons.Material.Rounded.RemoveRedEye" Color="Color.Info"/>
-
+                        
+                        <AuthorizeView Roles="Admin" Context="_">
+                            <MudIconButton Href="@($"/drafts/{context.Item.Id}/manager")" Icon="@Icons.Material.Rounded.ListAlt" Color="Color.Secondary" Disabled="@(context.Item.Status == DraftStatus.Pending)" />
+                        </AuthorizeView>
+                        
                         <AuthorizeView Roles="Admin" Context="_">
                             <MudIconButton Href="@($"/drafts/{context.Item.Id}/config")" Icon="@Icons.Material.Rounded.Settings" Color="Color.Default"/>
                         </AuthorizeView>
