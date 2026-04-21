@@ -2,6 +2,85 @@
 @attribute [Authorize(Roles = "Admin")]
 @inject IBoltonCupApi BoltonCupApi
 
+<MudDrawer 
+    Open="@_drawerOpen" OpenChanged="@SetDrawerOpen" Elevation="1"
+    Anchor="Anchor.Right" Variant="DrawerVariant.Mini" Breakpoint="Breakpoint.None"
+    Width="350px" Height="calc(100vh - 64px)" Fixed="false" OpenMiniOnHover="false">
+    @if (_selectedPlayer is not null)
+    {
+        <MudDrawerHeader>
+            <MudStack Class="mud-width-full" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Row>
+                <MudText Typo="Typo.h6">@_selectedPlayer.FullName</MudText>
+                <MudIconButton OnClick="@(() => SetDrawerOpen(false))" Icon="@Icons.Material.Rounded.Close" Class="rounded" Size="Size.Small" />
+            </MudStack>
+        </MudDrawerHeader>
+        
+        <MudStack Class="pa-1 mud-height-full">
+            <MudImage Src="@_selectedPlayer.ProfilePicture" Width="200" />
+            
+            <MudSpacer />
+            
+            <MudButton OnClick="@DraftSelectedPlayer" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" FullWidth>Draft @_selectedPlayer.FullName</MudButton>
+        </MudStack>
+    }
+</MudDrawer>
+
+@if (_draft is not null)
+{
+    <MudDataGrid
+        @ref="_dataGrid"
+        T="Sdk.PlayerDto"
+        Class="filter-datagrid"
+        ServerData="@PlayerServerFunc"
+        RowClick="@(x => OpenPlayerDrawer(x.Item))"
+        Breakpoint="Breakpoint.None"
+        RowClass="cursor-pointer"
+        RowStyle="height: 50px"
+        RowsPerPage="50"
+        Elevation="0"
+        ShowColumnOptions="false"
+        Height="75vh"
+        Hover
+        FixedHeader
+        FixedFooter
+        AllowUnsorted
+        Striped
+        Dense>
+        <ToolBarContent>
+            <div class="d-flex flex-row align-center gap-3 flex-wrap">
+                <FilterToolbarField
+                    T="string?" Label="Position"
+                    @bind-Value="@_filter.Position" OnApplyClicked="@_dataGrid.ReloadServerData">
+                    <PositionFilter/>
+                </FilterToolbarField>
+            </div>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Title="Player" Property="x => x.FullName">
+                <FooterTemplate>
+                    <MudChip T="string" Color="Color.Primary" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.Position == Core.Values.Position.Forward) forwards</MudChip>
+                </FooterTemplate>
+            </PropertyColumn>
+            <PropertyColumn Title="Position" Property="x => x.Position">
+                <FooterTemplate>
+                    <MudChip T="string" Color="Color.Secondary" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.Position == Core.Values.Position.Defense) defensemen</MudChip>
+                </FooterTemplate>
+            </PropertyColumn>
+            <PropertyColumn Title="Year" Property="x => x.Birthday" Format="yyyy">
+                <FooterTemplate>
+                    <MudChip T="string" Color="Color.Dark" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.IsGoalie) goalies</MudChip>
+                </FooterTemplate>
+            </PropertyColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="Sdk.PlayerDto" PageSizeSelector="false"/>
+        </PagerContent>
+    </MudDataGrid>
+}
+else
+{
+    <MudAlert Severity="Severity.Error">No draft found.</MudAlert>
+}
 
 
 @code {
@@ -14,6 +93,12 @@
 
     private Sdk.DraftSingleDto? _draft;
 
+    private bool _drawerOpen;
+    private Sdk.PlayerDto? _selectedPlayer;
+
+    private readonly DraftManagerFilterModel _filter = new();
+    private MudDataGrid<Sdk.PlayerDto> _dataGrid = null!;
+
     protected override async Task OnParametersSetAsync()
     {
         if (_draftId == DraftId)
@@ -21,5 +106,76 @@
         _draftId = DraftId;
 
         _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
+    }
+
+    private async Task<GridData<Sdk.PlayerDto>> PlayerServerFunc(GridState<Sdk.PlayerDto> state, CancellationToken cancellationToken)
+    {
+        if (_draft is null)
+        {
+            return new GridData<Sdk.PlayerDto>
+            {
+                TotalItems = 0,
+                Items = []
+            };
+        }
+        
+        string? sortBy = null;
+        bool? descending = null;
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        if (sortDefinition is not null)
+        {
+            sortBy = sortDefinition.SortBy;
+            descending = sortDefinition.Descending;
+        }
+
+        var data = await BoltonCupApi.GetPlayersAsync(
+            tournamentId: _draft.Tournament.Id,
+            page: state.Page + 1, 
+            size: state.PageSize,
+            sortBy: sortBy,
+            descending: descending, 
+            cancellationToken: cancellationToken
+        );
+        
+        return new GridData<Sdk.PlayerDto>
+        {
+            TotalItems = data.Total,
+            Items = data.Items,
+        };
+    }
+
+    private Task SetDrawerOpen(bool open)
+    {
+        if (open && _selectedPlayer is null)
+            return Task.CompletedTask;
+        if (!open)
+            _selectedPlayer = null;
+        
+        _drawerOpen = open;
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private void OpenPlayerDrawer(Sdk.PlayerDto player)
+    {
+        _selectedPlayer = player;
+        _drawerOpen = true;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task DraftSelectedPlayer()
+    {
+        if (_selectedPlayer is null)
+            return;
+        // await BoltonCupApi.DraftPlayerAsync(DraftId, new Sdk.DraftPlayerRequest
+        // {
+        //     PlayerId = _selectedPlayer.Id,
+        //     TeamId = _currentPick.Team.Id,
+        //     OverallPick = _currentPick.OverallPick
+        // });
+    }
+    
+    private class DraftManagerFilterModel
+    {
+        public string? Position { get; set; }
     }
 }
