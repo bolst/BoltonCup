@@ -1,5 +1,8 @@
 ﻿@page "/"
 @inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+
 
 <PageTitle>Drafts</PageTitle>
 
@@ -26,6 +29,16 @@
                     <TournamentFilter/>
                 </FilterToolbarField>
             </div>
+            
+            <MudSpacer />
+            
+            <AuthorizeView Roles="Admin">
+                <MudButton
+                    OnClick="@CreateNewDraftAsync" Variant="Variant.Filled" Class="mr-1"
+                    Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add">
+                    New Draft
+                </MudButton>
+            </AuthorizeView>
         </ToolBarContent>
         <Columns>
             <PropertyColumn Title="Draft" Property="x => x.Title">
@@ -96,6 +109,16 @@
     {
         _filter.Tournament = tournament;
         return _dataGrid.ReloadServerData();
+    }
+    
+    private async Task CreateNewDraftAsync()
+    {
+        var dialog = await DialogService.ShowAsync<NewDraftDialog>();
+        var result = await dialog.Result;
+        if (result?.Data is int newDraftId)
+        {
+            Navigation.NavigateTo($"/drafts/{newDraftId}/config");
+        }
     }
     
     private class DraftsFilterModel
