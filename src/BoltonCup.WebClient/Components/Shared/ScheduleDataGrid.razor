@@ -105,11 +105,8 @@
             size: state.PageSize,
             cancellationToken: cancellationToken
         );
-        var result = data.Items
-            .OrderByDescending(x => x.Tournament.StartDate)
-            .ThenBy(x => x.GameTime);
         return new TableData<Sdk.GameDto> {
-            Items = result,
+            Items = data.Items,
             TotalItems = data.Total,
         };
     }
