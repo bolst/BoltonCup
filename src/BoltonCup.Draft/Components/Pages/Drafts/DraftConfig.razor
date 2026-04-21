@@ -56,12 +56,34 @@
                 </MudItem>
                 
                 <MudItem xs="4">
-                    <MudPaper Class="pa-4">
-                        @foreach (var pickOrder in _draft.PickOrder)
-                        {
-                            <MudText>@pickOrder.Team.Name | @pickOrder.Pick</MudText>
-                        }
-                    </MudPaper>
+                    <MudDataGrid Items="@_draft.PickOrder" SortMode="SortMode.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Outlined Square Dense>
+                        <Columns>
+                            <PropertyColumn Title="Pick" Property="x => x.Pick" InitialDirection="SortDirection.Ascending" Sortable="false" CellStyle="text-align: right" />
+                            <PropertyColumn Title="Team" Property="x => x.Team.Name">
+                                <CellTemplate>
+                                    <div class="d-flex flex-row align-center gap-1">
+                                        <MudImage Src="@context.Item.Team.Logo" Height="24" />
+                                        <MudText Typo="Typo.body2">@context.Item.Team.Name</MudText>
+                                    </div>
+                                </CellTemplate>
+                            </PropertyColumn>
+                            <TemplateColumn>
+                                <CellTemplate>
+                                    <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                                        <MudIconButton OnClick="@(_ => ShiftTeamOrderUp(context.Item))" Icon="@Icons.Material.Rounded.KeyboardArrowUp" Disabled="@(context.Item.Pick == 1)"/>
+                                        <MudIconButton OnClick="@(_ => ShiftTeamOrderDown(context.Item))" Icon="@Icons.Material.Rounded.KeyboardArrowDown" Disabled="@(context.Item.Pick == _draft.PickOrder.Count)"/>
+                                    </MudButtonGroup>
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                        <PagerContent>
+                            <div class="mud-width-full pa-4">
+                                <MudButton OnClick="@UpdateDraftOrderingAsync" Color="Color.Primary" Variant="Variant.Filled" Disabled="@(!_isOrderingDirty)" FullWidth>
+                                    Save
+                                </MudButton>
+                            </div>
+                        </PagerContent>
+                    </MudDataGrid>
                 </MudItem>
                 
                 <MudItem xs="4">
@@ -91,6 +113,7 @@
     private EditContext? _editContext;
     private ValidationMessageStore? _messageStore;
     private bool _isDirty;
+    private bool _isOrderingDirty;
 
     protected override void OnInitialized()
     {
@@ -121,6 +144,7 @@
         _updateDraftRequest.DraftType = _draft.Type;
 
         _isDirty = false;
+        _isOrderingDirty = false;
         _loading = false;
         await InvokeAsync(StateHasChanged);
     }
@@ -140,10 +164,66 @@
         }
     }
 
+    private async Task UpdateDraftOrderingAsync()
+    {
+        if (_draft is null)
+            return;
+        
+        try
+        {
+            await BoltonCupApi.UpdateDraftOrderAsync(DraftId, new Sdk.UpdateDraftOrderingRequest
+            {
+                Ordering = _draft.PickOrder
+                    .Select(x => new Sdk.DraftOrderingRequestEntry
+                    {
+                        TeamId = x.Team.Id,
+                        Pick = x.Pick
+                    })
+                    .ToList()
+            });
+            Snackbar.Add("Saved changes", Severity.Success);
+            await LoadDraftDataAsync();
+        }
+        catch (Sdk.ApiException e)
+        {
+            Snackbar.Add($"Unable to save changes: {e.Message}", Severity.Error);
+        }
+    }
+
     private async Task DeleteDraftAsync()
     {
         await BoltonCupApi.DeleteDraftAsync(DraftId);
         Navigation.NavigateTo("/");
+    }
+
+    private Task ShiftTeamOrderUp(Sdk.DraftPickOrderDto draftPick)
+    {
+        if (draftPick.Pick == 1)
+            return Task.CompletedTask;
+
+        _isOrderingDirty = true;
+        
+        var swapPick = _draft?.PickOrder.FirstOrDefault(p => p.Pick == draftPick.Pick - 1);
+        if (swapPick is not null)
+            swapPick.Pick = draftPick.Pick;
+        draftPick.Pick -= 1;
+        
+        return InvokeAsync(StateHasChanged);   
+    }
+
+    private Task ShiftTeamOrderDown(Sdk.DraftPickOrderDto draftPick)
+    {
+        if (draftPick.Pick == _draft?.PickOrder.Count)
+            return Task.CompletedTask;
+        
+        _isOrderingDirty = true;
+        
+        var swapPick = _draft?.PickOrder.FirstOrDefault(p => p.Pick == draftPick.Pick + 1);
+        if (swapPick is not null)
+            swapPick.Pick = draftPick.Pick;
+        draftPick.Pick += 1;
+        
+        return InvokeAsync(StateHasChanged);   
     }
 
     private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)

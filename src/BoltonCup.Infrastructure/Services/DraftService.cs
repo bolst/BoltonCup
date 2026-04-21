@@ -109,6 +109,35 @@ public class DraftService(
             .Where(d => d.Id == id)
             .ExecuteDeleteAsync(cancellationToken);
     }
+
+
+    public async Task UpdateOrderingAsync(UpdateDraftOrderingCommand command, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts 
+                        .Include(d => d.DraftOrders) 
+                        .FirstOrDefaultAsync(d => d.Id == command.DraftId, cancellationToken) 
+                    ?? throw new EntityNotFoundException(nameof(Draft), command.DraftId);
+
+        if (draft.Status != DraftStatus.Pending)
+            throw new InvalidOperationException("Cannot update draft ordering once draft starts.");
+
+        if (!command.Ordering.All(x => draft.DraftOrders.Any(d => d.TeamId == x.TeamId)))
+            throw new InvalidOperationException($"Invalid teams for Draft {draft.Id}.");
+        
+        if (command.Ordering.Any(x => x.Pick < 1 || x.Pick > command.Ordering.Count))
+            throw new InvalidOperationException($"Invalid picks.");
+        
+        draft.DraftOrders = command.Ordering
+            .Select(d => new DraftOrder
+            {
+                DraftId = command.DraftId,
+                TeamId = d.TeamId,
+                Pick = d.Pick,
+            })
+            .ToList();
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
     
     
     public async Task<DraftPick?> GetCurrentPickAsync(int draftId, CancellationToken cancellationToken = default)

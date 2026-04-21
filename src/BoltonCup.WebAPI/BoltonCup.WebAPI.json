@@ -2820,6 +2820,127 @@
         ]
       }
     },
+    "/api/drafts/{id}/order": {
+      "put": {
+        "tags": [
+          "Drafts"
+        ],
+        "operationId": "UpdateDraftOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/drafts/{id}/currentpick": {
       "get": {
         "tags": [
@@ -6065,6 +6186,20 @@
         },
         "additionalProperties": false
       },
+      "DraftOrderingRequestEntry": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pick": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "DraftPickOrderDto": {
         "required": [
           "pick",
@@ -7384,8 +7519,7 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "format": "int32"
           },
           "name": {
             "type": "string",
@@ -7522,8 +7656,7 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "format": "int32"
           },
           "name": {
             "type": "string",
@@ -7899,6 +8032,22 @@
           "weight": {
             "type": "integer",
             "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateDraftOrderingRequest": {
+        "required": [
+          "ordering"
+        ],
+        "type": "object",
+        "properties": {
+          "ordering": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DraftOrderingRequestEntry"
+            },
             "nullable": true
           }
         },

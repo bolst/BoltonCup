@@ -14,6 +14,7 @@ public interface IDraftMapper
     GetDraftsQuery ToQuery(GetDraftsRequest request);
     CreateDraftCommand ToCommand(CreateDraftRequest request);
     UpdateDraftCommand ToCommand(int id, UpdateDraftRequest request);
+    UpdateDraftOrderingCommand ToCommand(int id, UpdateDraftOrderingRequest request);
     DraftPlayerCommand ToCommand(int id, DraftPlayerRequest request);
 }
 
@@ -98,6 +99,14 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
             DraftType: request.DraftType,
             DraftStatus: request.DraftStatus,
             Title: request.Title
+        );
+    }
+
+    public UpdateDraftOrderingCommand ToCommand(int id, UpdateDraftOrderingRequest request)
+    {
+        return new UpdateDraftOrderingCommand(
+            DraftId: id,
+            Ordering: request.Ordering.Select(x => new DraftOrderCommandEntry(x.TeamId, x.Pick)).ToList()
         );
     }
     

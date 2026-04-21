@@ -53,6 +53,15 @@ public class DraftsController(
         await _draftService.DeleteAsync(id);
         return Ok();
     }
+
+    [Authorize(Roles = Admin)]
+    [HttpPut("{id:int}/order")]
+    public async Task<IActionResult> UpdateDraftOrder(int id, [FromBody] UpdateDraftOrderingRequest request)
+    {
+        var command = _mapper.ToCommand(id, request);
+        await _draftService.UpdateOrderingAsync(command);
+        return Ok();
+    }
     
     [AllowAnonymous]
     [HttpGet("{id:int}/currentPick")]
