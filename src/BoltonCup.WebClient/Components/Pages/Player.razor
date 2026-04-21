@@ -77,7 +77,7 @@ else
                 <MudDataGrid Items="_last5Games" Breakpoint="Breakpoint.None" SortMode="SortMode.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Dense Striped Square>
                     <Columns>
                         <PropertyColumn Property="x => x.Game.GameTime.Date" Title="Date" Format="d" CellStyle="width: 50px" />
-                        <PropertyColumn Property="x => x.Game.Opponent.Name" Title="Opp" CellTemplate="OpponentCellTemplate" CellStyle="width: 120px" />
+                        <PropertyColumn Property="x => x.Game.Opponent == null ? null : x.Game.Opponent.Name" Title="Opp" CellTemplate="OpponentCellTemplate" CellStyle="width: 120px" />
                         @if (_player.IsGoalie)
                         {
                             <PropertyColumn Property="@(x => x.Game.GoalsFor > x.Game.GoalsAgainst ? 'W' : 'L')" Title="DEC" CellStyle="width: 50px"/>
@@ -103,7 +103,7 @@ else
                                 </ToolBarContent>
                                 <Columns>
                                     <PropertyColumn Property="x => x.Tournament.Name" Title="Tournament" CellStyle="width: 100px" />
-                                    <PropertyColumn Property="x => x.Team.Name" Title="Team" />
+                                    <PropertyColumn Property="x => x.Team == null ? null : x.Team.Name" Title="Team" />
                                     <PropertyColumn Property="x => x.GamesPlayed" Title="GP" CellStyle="width: 50px" />
                                     
                                     <PropertyColumn Property="x => x.Wins" Title="W" CellStyle="width: 50px" Hidden="!_player.IsGoalie" />
@@ -126,11 +126,11 @@ else
                                 <Columns>
                                     <PropertyColumn Property="x => x.Tournament.Name" Title="Tournament" CellStyle="width: 100px" />
                                     <PropertyColumn Property="x => x.Game.GameTime" Title="Date" Format="d" CellStyle="width: 100px" InitialDirection="SortDirection.Descending" />
-                                    <PropertyColumn Property="x => x.Team.Abbreviation" Title="Team" CellStyle="width: 100px" Sortable="false">
+                                    <PropertyColumn Property="x => x.Team == null ? null : x.Team.Abbreviation" Title="Team" CellStyle="width: 100px" Sortable="false">
                                         <CellTemplate>
                                             <div class="d-flex flex-row align-center gap-1">
-                                                <MudText Typo="Typo.body2">@context.Item.Team.Abbreviation</MudText>
-                                                <MudImage Src="@context.Item.Team.Logo" Alt="@context.Item.Team.Abbreviation" Height="32"/>
+                                                <MudText Typo="Typo.body2">@context.Item.Team?.Abbreviation</MudText>
+                                                <MudImage Src="@context.Item.Team?.Logo" Alt="@context.Item.Team?.Abbreviation" Height="32"/>
                                             </div>
                                         </CellTemplate>
                                     </PropertyColumn>
@@ -196,7 +196,7 @@ else
     private RenderFragment<CellContext<Sdk.PlayerGameByGame>> OpponentCellTemplate => context =>
     {
         var prefix = context.Item.Game.IsHome ? "vs" : "@";
-        return @<MudLink Href="@($"/games/{context.Item.Game.Id}")" Color="Color.Info" Underline="Underline.Always">@prefix @context.Item.Game.Opponent.Abbreviation</MudLink>;
+        return @<MudLink Href="@($"/games/{context.Item.Game.Id}")" Color="Color.Info" Underline="Underline.Always">@prefix @context.Item.Game.Opponent?.Abbreviation</MudLink>;
     };
 
 }

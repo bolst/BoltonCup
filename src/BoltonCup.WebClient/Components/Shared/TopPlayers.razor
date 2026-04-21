@@ -3,8 +3,6 @@
 @namespace BoltonCup.WebClient.Components.Shared
 @typeparam T
 @inject IBoltonCupApi BoltonCupApi
-@inject NavigationManager Navigation
-
 
 
 @if (_skaterCategoryFunc is not null)
@@ -23,7 +21,7 @@
                             <MudText Typo="Typo.subtitle2" Color="Color.Primary">@_selectedSkater.FullName</MudText>
                             <div class="d-flex flex-row align-center gap-1">
                                 <MudImage Src="@_selectedSkater.TeamLogoUrl" Alt="@_selectedSkater.TeamName" Width="20" Height="20"/>
-                                <MudText Typo="Typo.caption">@_selectedSkater.Position.ToUpper().First()</MudText>
+                                <MudText Typo="Typo.caption">@_selectedSkater.Position?.ToUpper().First()</MudText>
                                 <MudText Typo="Typo.caption">@($"#{_selectedSkater.JerseyNumber.ToString() ?? string.Empty}")</MudText>
                             </div>
                         </div>
@@ -62,7 +60,7 @@ else if (_goalieCategoryFunc is not null)
                             <MudText Typo="Typo.subtitle2" Color="Color.Primary">@_selectedGoalie.FullName</MudText>
                             <div class="d-flex flex-row align-center gap-1">
                                 <MudImage Src="@_selectedGoalie.TeamLogoUrl" Alt="@_selectedGoalie.TeamName" Width="20" Height="20" />
-                                <MudText Typo="Typo.caption">@_selectedGoalie.Position.ToUpper().First()</MudText>
+                                <MudText Typo="Typo.caption">@_selectedGoalie.Position?.ToUpper().First()</MudText>
                                 <MudText Typo="Typo.caption">@($"#{_selectedGoalie.JerseyNumber.ToString() ?? string.Empty}")</MudText>
                             </div>
                         </div>
@@ -176,19 +174,6 @@ else if (_goalieCategoryFunc is not null)
         await InvokeAsync(StateHasChanged);
     }
 
-    private void NavToSelectedSkater()
-    {
-        if (_selectedSkater is not null)
-            Navigation.NavigateTo($"/player/{_selectedSkater.PlayerId}");
-    }
-    
-    private void NavToSelectedGoalie()
-    {
-        if (_selectedGoalie is not null)
-            Navigation.NavigateTo($"/player/{_selectedGoalie.PlayerId}");
-    }
-
-    
     private static string GetExpressionPropertyName<TSource>(Expression<Func<TSource, T>> expression)
     {
         if (expression == null)

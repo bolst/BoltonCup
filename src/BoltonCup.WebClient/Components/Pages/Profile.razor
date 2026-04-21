@@ -53,7 +53,7 @@
             Snackbar.Add("Your banner has been updated.", Severity.Success);
             await InvokeAsync(StateHasChanged);
         }
-        catch(Exception ex)
+        catch(Exception)
         {
             Snackbar.Add("Your image was uploaded but for some reason we could not assign it to you...", Severity.Error);
         }
@@ -70,7 +70,7 @@
             Snackbar.Add("Your avatar has been updated.", Severity.Success);
             await InvokeAsync(StateHasChanged);
         }
-        catch(Exception ex)
+        catch(Exception _)
         {
             Snackbar.Add("Your image was uploaded but for some reason we could not assign it to you...", Severity.Error);
         }

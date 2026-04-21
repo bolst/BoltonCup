@@ -75,6 +75,12 @@ public class TournamentRegistrationService(
 
     private static bool TryParseDto(TournamentRegistrationDto dto, [NotNullWhen(true)] out TournamentRegistrationModel? model)
     {
+        if (string.IsNullOrEmpty(dto?.Payload))
+        {
+            model = null;
+            return false;
+        }
+        
         try
         {
             model = JsonSerializer.Deserialize<TournamentRegistrationModel>(dto.Payload, _serializerOptions);
@@ -93,10 +99,10 @@ public class TournamentRegistrationService(
         {
             UserInfo = new UserInfoModel
             {
-                FirstName = me.FirstName,
-                LastName = me.LastName,
-                Email = me.Email,
-                Phone = me.Phone,
+                FirstName = me.FirstName ?? "",
+                LastName = me.LastName ?? "",
+                Email = me.Email ?? "",
+                Phone = me.Phone ?? "",
                 HighestLevel = me.HighestLevel,
             },
             Documents = new DocumentModel()

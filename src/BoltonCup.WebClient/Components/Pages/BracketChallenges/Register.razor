@@ -120,7 +120,7 @@
             if (AuthenticationState is not null)
             {
                 var authState = await AuthenticationState;
-                _userInfoModel.Email = authState.User.FindFirst(ClaimTypes.Email)?.Value;
+                _userInfoModel.Email = authState.User.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
                 await InvokeAsync(StateHasChanged);
             }
         }
@@ -179,12 +179,12 @@
     {
         [Display(Name = "Name")]
         [Required]
-        public string? Name { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
         [Display(Name = "Email")]
         [DataType(DataType.EmailAddress)]
         [Required]
-        public string? Email { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         
         [Display(Name = "I have read, understand and agree to the terms of service.")]
         [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree in order to register.")]

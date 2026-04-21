@@ -68,7 +68,7 @@
                     
 
                     <div class="mud-width-full d-flex justify-end">
-                        <MudButton OnClick="ProcessPaymentAsync" Color="Color.Primary" Variant="Variant.Filled" Disabled="_isProcessing">
+                        <MudButton OnClick="@ProcessPaymentAsync" Color="Color.Primary" Variant="Variant.Filled" Disabled="_isProcessing">
                             @if (_isProcessing)
                             {
                                 @:Processing...
@@ -145,7 +145,7 @@
         {
             _errorMessage = "You are already registered for this tournament!";
         }
-        catch (Exception e)
+        catch (Exception _)
         {
             _errorMessage = "Sorry, there was a problem while setting up payment...";
         }
@@ -203,6 +203,6 @@
     public class StripePaymentResult
     {
         public bool Success { get; set; }
-        public string Error { get; set; }
+        public string? Error { get; set; }
     }
 }

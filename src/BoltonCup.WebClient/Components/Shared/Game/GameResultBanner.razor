@@ -21,27 +21,41 @@
 
     private string _classname => $"d-flex flex-row align-center justify-space-evenly gap-3 {Class}";
 
-    private Sdk.TeamInGameDto WinningTeam => Game.HomeTeam.Goals > Game.AwayTeam.Goals ? Game.HomeTeam : Game.AwayTeam;
-    private RenderFragment TeamGoalText(Sdk.TeamInGameDto team) => team.Id == WinningTeam.Id 
-        ? @<MudText Typo="Typo.h4"><b>@team.Goals</b></MudText> 
-        : @<MudText Typo="Typo.h4">@team.Goals</MudText>;
+    private Sdk.TeamInGameDto? GetWinningTeam()
+    {
+        if (Game.HomeTeam is null || Game.AwayTeam is null)
+            return null;
+        return Game.HomeTeam.Goals > Game.AwayTeam.Goals 
+            ? Game.HomeTeam 
+            : Game.AwayTeam;
+    }
 
-    private RenderFragment TeamTemplate(Sdk.TeamInGameDto team, bool reverse)
+    private RenderFragment TeamGoalText(Sdk.TeamInGameDto? team)
+    {
+        if (team is null)
+            return @<MudText Typo="Typo.h4">-</MudText>;
+        
+        return team.Id == GetWinningTeam()?.Id 
+            ? @<MudText Typo="Typo.h4"><b>@team.Goals</b></MudText> 
+            : @<MudText Typo="Typo.h4">@team.Goals</MudText>;
+    }
+
+    private RenderFragment TeamTemplate(Sdk.TeamInGameDto? team, bool reverse)
     {
         var flexDirection = reverse ? "flex-row-reverse" : "flex-row";
         return @<div class="d-flex @flexDirection align-center justify-center flex-wrap gap-1">
                     <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-                        <MudImage Src="@team.Logo" Height="72"/>
+                        <MudImage Src="@team?.Logo" Height="72"/>
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
-                        <MudImage Src="@team.Logo" Height="48" />
+                        <MudImage Src="@team?.Logo" Height="48" />
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-                        <MudText Align="Align.Center"><b>@team.Name</b></MudText>
+                        <MudText Align="Align.Center"><b>@team?.Name</b></MudText>
                     </MudHidden>
                     <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
                         <MudFlexBreak />
-                        <MudText Align="Align.Center"><b>@team.Abbreviation</b></MudText>
+                        <MudText Align="Align.Center"><b>@team?.Abbreviation</b></MudText>
                     </MudHidden>
             </div>;
     }

@@ -1,3 +1,4 @@
+@using BoltonCup.Sdk
 @inject IBoltonCupApi BoltonCupApi
 
 <MudTable
@@ -81,8 +82,8 @@
         GroupName = "Tournament",
         Indentation = true,
         Expandable = false,
-        Selector = e => e.Tournament.Name,
-        InnerGroup = new()
+        Selector = e => e.Tournament.Name ?? string.Empty,
+        InnerGroup = new TableGroupDefinition<GameDto>
         {
             GroupName = "Date",
             Indentation = false,
@@ -90,11 +91,6 @@
             Selector = e => e.GameTime.ToLocalTime().Date.ToLongDateString(),
         }
     };
-
-    private (Sdk.TeamInGameDto winner, Sdk.TeamInGameDto loser) GetTeamsByWin(Sdk.GameDto game)
-        => game.HomeTeam.Goals >= game.AwayTeam.Goals
-            ? (game.HomeTeam, game.AwayTeam)
-            : (game.AwayTeam, game.HomeTeam);
 
     private async Task<TableData<Sdk.GameDto>> ServerReload(TableState state, CancellationToken cancellationToken)
     {
@@ -121,26 +117,30 @@
     private RenderFragment MatchupCell(Sdk.GameDto context)
         => @<div class="mud-width-full d-flex flex-row align-center justify-center gap-4">
             <div class="d-flex flex-row align-center justify-end gap-2" style="width: 100px">
-                <MudText Typo="Typo.body2"><b>@context.AwayTeam.NameShort</b></MudText>
-                <MudImage Src="@context.AwayTeam.Logo" Height="48" Alt="@context.AwayTeam.Abbreviation"/>
+                <MudText Typo="Typo.body2"><b>@context.AwayTeam?.NameShort</b></MudText>
+                <MudImage Src="@context.AwayTeam?.Logo" Height="48" Alt="@context.AwayTeam?.Abbreviation"/>
             </div>
             @@
             <div class="d-flex flex-row-reverse align-center justify-end gap-2" style="width: 100px">
-                <MudText Typo="Typo.body2"><b>@context.HomeTeam.NameShort</b></MudText>
-                <MudImage Src="@context.HomeTeam.Logo" Height="48" Alt="@context.HomeTeam.Abbreviation"/>
+                <MudText Typo="Typo.body2"><b>@context.HomeTeam?.NameShort</b></MudText>
+                <MudImage Src="@context.HomeTeam?.Logo" Height="48" Alt="@context.HomeTeam?.Abbreviation"/>
             </div>
         </div>;
     
     private RenderFragment GameScoreText(Sdk.GameDto context) => builder =>
     {
-        var teams = GetTeamsByWin(context);
+        if (context.HomeTeam is null || context.AwayTeam is null)
+            return;
+        var (winner, loser) = context.HomeTeam.Goals >= context.AwayTeam.Goals
+            ? (context.HomeTeam, context.AwayTeam)
+            : (context.AwayTeam, context.HomeTeam);
         builder.OpenElement(0, "div");
         builder.AddAttribute(1, "class", "d-flex flex-row align-center justify-center gap-1");
         builder.OpenElement(2, "b");
-        builder.AddContent(3, $"{teams.winner.Abbreviation} {teams.winner.Goals}");
+        builder.AddContent(3, $"{winner.Abbreviation} {winner.Goals}");
         builder.CloseElement();
         builder.AddContent(4, ", ");
-        builder.AddContent(5, $"{teams.loser.Abbreviation} {teams.loser.Goals}");
+        builder.AddContent(5, $"{loser.Abbreviation} {loser.Goals}");
         builder.CloseElement();
     };
     
