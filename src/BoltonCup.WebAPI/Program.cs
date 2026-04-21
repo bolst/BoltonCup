@@ -2,7 +2,7 @@ using BoltonCup.Infrastructure;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Shared;
 using BoltonCup.WebAPI;
-using BoltonCup.WebAPI.Authentication;
+using BoltonCup.WebAPI.Auth;
 using BoltonCup.WebAPI.Controllers;
 using BoltonCup.WebAPI.Hubs;
 using BoltonCup.WebAPI.Swagger;

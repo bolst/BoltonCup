@@ -1,4 +1,4 @@
-using BoltonCup.WebAPI.Authentication;
+using BoltonCup.WebAPI.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;

@@ -1,4 +1,4 @@
-namespace BoltonCup.WebAPI.Authentication;
+namespace BoltonCup.WebAPI.Auth;
 
 public static class ApiKeyConstants
 {

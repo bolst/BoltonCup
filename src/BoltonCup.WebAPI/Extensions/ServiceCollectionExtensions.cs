@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Shared;
-using BoltonCup.WebAPI.Authentication;
+using BoltonCup.WebAPI.Auth;
 using BoltonCup.WebAPI.Errors;
 using BoltonCup.WebAPI.Extensions;
 using BoltonCup.WebAPI.Mapping;
