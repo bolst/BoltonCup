@@ -72,6 +72,12 @@ public static class ServiceCollectionExtensions
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim(BoltonCupClaimTypes.AccountId);
                 });
+                
+                options.AddPolicy(BoltonCupPolicy.CanAccessDraft, policy =>
+                    policy.Requirements.Add(new AccessDraftRequirement()));
+                
+                options.AddPolicy(BoltonCupPolicy.CanManageTeam, policy =>
+                    policy.Requirements.Add(new ManageTeamRequirement()));
             });
     }
     
