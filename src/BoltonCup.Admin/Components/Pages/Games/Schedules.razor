@@ -17,7 +17,7 @@
         <EnumColumn Title="Type" Property="x => x.GameType"/>
         <PropertyColumn Title="Venue" Property="x => x.Venue"/>
         <PropertyColumn Title="Rink" Property="x => x.Rink"/>
-        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament" 
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament!"
                        EqualityComparer="new TournamentComparer()" ImageSrcFunc="t => t.Logo" />
     </Columns>
     <ChildRowContent>
@@ -53,7 +53,7 @@
         if (!firstRender)
             return;
 
-        await _dataGrid.ExtendSortAsync("Tournament", SortDirection.Descending, x => x.Tournament);
+        await _dataGrid.ExtendSortAsync("Tournament.StartDate", SortDirection.Descending, x => x.Tournament.StartDate);
         await _dataGrid.ExtendSortAsync("GameTime", SortDirection.Ascending, x => x.GameTime);
     }
 }
