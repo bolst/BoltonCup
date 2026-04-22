@@ -2362,7 +2362,11 @@
             "name": "Status",
             "in": "query",
             "schema": {
-              "$ref": "#/components/schemas/DraftStatus"
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DraftStatus"
+                }
+              ]
             }
           },
           {
@@ -2502,17 +2506,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateDraftRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateDraftRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateDraftRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateDraftRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateDraftRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateDraftRequest"
+                  }
+                ]
               }
             }
           }
@@ -2752,17 +2768,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateDraftRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDraftRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateDraftRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDraftRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateDraftRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDraftRequest"
+                  }
+                ]
               }
             }
           }
@@ -2973,17 +3001,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
+                  }
+                ]
               }
             }
           }
@@ -3203,17 +3243,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DraftPlayerRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DraftPlayerRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/DraftPlayerRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DraftPlayerRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/DraftPlayerRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DraftPlayerRequest"
+                  }
+                ]
               }
             }
           }
@@ -6233,8 +6285,7 @@
             "format": "int32"
           },
           "title": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -6296,13 +6347,25 @@
             "nullable": true
           },
           "type": {
-            "$ref": "#/components/schemas/DraftType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftType"
+              }
+            ]
           },
           "status": {
-            "$ref": "#/components/schemas/DraftStatus"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftStatus"
+              }
+            ]
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -6315,7 +6378,6 @@
             "items": {
               "$ref": "#/components/schemas/DraftDto"
             },
-            "nullable": true,
             "readOnly": true
           },
           "total": {
@@ -6362,7 +6424,11 @@
             "format": "int32"
           },
           "team": {
-            "$ref": "#/components/schemas/TeamBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -6384,10 +6450,19 @@
             "format": "int32"
           },
           "team": {
-            "$ref": "#/components/schemas/TeamBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ]
           },
           "player": {
-            "$ref": "#/components/schemas/PlayerBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6430,20 +6505,31 @@
             "nullable": true
           },
           "type": {
-            "$ref": "#/components/schemas/DraftType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftType"
+              }
+            ]
           },
           "status": {
-            "$ref": "#/components/schemas/DraftStatus"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftStatus"
+              }
+            ]
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ]
           },
           "pickOrder": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DraftPickOrderDto"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -6766,15 +6852,14 @@
       },
       "GameType": {
         "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5
+          "RoundRobin",
+          "QuarterFinals",
+          "SemiFinals",
+          "FifthPlaceFinals",
+          "ThirdPlaceFinals",
+          "Finals"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "GoalBriefDto": {
         "required": [
@@ -8286,8 +8371,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DraftOrderingRequestEntry"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -8296,14 +8380,21 @@
         "type": "object",
         "properties": {
           "draftType": {
-            "$ref": "#/components/schemas/DraftType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftType"
+              }
+            ]
           },
           "draftStatus": {
-            "$ref": "#/components/schemas/DraftStatus"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftStatus"
+              }
+            ]
           },
           "title": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
