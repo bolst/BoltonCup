@@ -32,8 +32,13 @@
     private readonly AccountComparer _comparer = new();
 
 
-    private async Task OnSave(ChangeTracker<Account> changes)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!firstRender)
+            return;
+
+        await _dataGrid.ExtendSortAsync("LastName", SortDirection.Ascending, x => x.LastName);
+        await _dataGrid.ExtendSortAsync("FirstName", SortDirection.Ascending, x => x.FirstName);
     }
 
     private async Task UpdateAvatar(ImageUploadResult<Account> result)
