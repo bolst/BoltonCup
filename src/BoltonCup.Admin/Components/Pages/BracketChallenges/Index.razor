@@ -17,13 +17,6 @@
         <PropertyColumn Title="Fee" Property="x => x.Fee" />
         <BoolColumn Title="Is Open" Property="x => x.IsOpen" />
         <DatePickerColumn Title="Registration Close" Property="x => x.RegistrationCloseDate" />
-        <TemplateColumn Title="Registrations" Editable="false">
-            <CellTemplate>
-                <MudChip Href='@($"/bracket-challenges/{context.Item.Id}/registrations")' Variant="Variant.Text" Color="Color.Info" Size="Size.Small" Label="true">
-                    @context.Item.Registrations.Count
-                </MudChip>
-            </CellTemplate>
-        </TemplateColumn>
         <ImageColumn T="Core.BracketChallenge.Event" Title="Logo" 
                      Property="x => x.Logo" OnImageUploaded="UpdateBracketChallengeLogo" />
         <TemplateColumn Title="TOS">
@@ -32,6 +25,13 @@
             </EditTemplate>
         </TemplateColumn>
     </Columns>
+    <ChildRowContent>
+        <div class="pa-2 d-flex flex-row align-center gap-1">
+            <MudChip Href='@($"/bracket-challenges/{context.Item.Id}/registrations")' Variant="Variant.Text" Color="Color.Info" Label="true">
+                @context.Item.Registrations.Count registrations
+            </MudChip>
+        </div>
+    </ChildRowContent>
 </EntityDataGrid>
 
 

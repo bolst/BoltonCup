@@ -12,7 +12,7 @@
         RowStyleFunc="RowStyleFunc"
         SelectedItems="@_selectedItemsState.Value"
         SelectedItemsChanged="@SetSelectedItemsAsync"
-        ChildRowRenderer="@ChildRowRenderer"
+        ChildRowContent="@ChildRowContent"
         EditMode="DataGridEditMode.Cell"
         SortMode="SortMode.Multiple"
         Breakpoint="Breakpoint.None"
@@ -61,9 +61,9 @@
             </MudButtonGroup>
         </ToolBarContent>
         <Columns>
-            @if (ChildRowRenderer is not null)
+            @if (ChildRowContent is not null)
             {
-                <HierarchyColumn T="T" />
+                <HierarchyColumn T="T" EnableHeaderToggle />
             }
             @if (Selectable)
             {
