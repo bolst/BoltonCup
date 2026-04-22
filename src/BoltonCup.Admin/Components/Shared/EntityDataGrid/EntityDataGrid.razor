@@ -12,6 +12,7 @@
         RowStyleFunc="RowStyleFunc"
         SelectedItems="@_selectedItemsState.Value"
         SelectedItemsChanged="@SetSelectedItemsAsync"
+        ChildRowRenderer="@ChildRowRenderer"
         EditMode="DataGridEditMode.Cell"
         SortMode="SortMode.Multiple"
         Breakpoint="Breakpoint.None"
@@ -60,6 +61,10 @@
             </MudButtonGroup>
         </ToolBarContent>
         <Columns>
+            @if (ChildRowRenderer is not null)
+            {
+                <HierarchyColumn T="T" />
+            }
             @if (Selectable)
             {
                 <SelectColumn T="T" ShowInHeader/>

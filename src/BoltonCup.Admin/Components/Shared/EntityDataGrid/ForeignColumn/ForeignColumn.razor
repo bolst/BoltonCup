@@ -11,7 +11,7 @@
     private RenderFragment RenderSearch(CellContext<T> context, TEntity? entity)
     {
         return @<MudAutocomplete
-                    T="TEntity"
+                    T="TEntity?"
                     Value="@entity"
                     ValueChanged="@(val => OnValueChangedAsync(context.Item, val))"
                     SearchFunc="@((s, ct) => SearchOptionsAsync(s, context, ct))"

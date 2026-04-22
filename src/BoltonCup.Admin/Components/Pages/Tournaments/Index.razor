@@ -39,6 +39,8 @@
         <PropertyColumn Title="Goalie Registration Fee" Property="x => x.GoalieRegistrationFee" />
         <ForeignColumn Title="Winner" Property="x => x.WinningTeam"
                        EqualityComparer="new TeamComparer()" ImageSrcFunc="t => t.Logo" />
+        <ForeignColumn Title="Gallery" Property="x => x.Gallery" PropertySetter="(t, g) => { t.Gallery = g; t.GalleryId = g?.Id; }"
+                       EqualityComparer="new GalleryComparer()" Required="false" />
     </Columns>
 </EntityDataGrid>
 
