@@ -17,6 +17,7 @@ public class Tournament : EntityBase
     public int? GoalieLimit { get; set; }
     public decimal? SkaterRegistrationFee { get; set; }
     public decimal? GoalieRegistrationFee { get; set; }
+    public int? GalleryId { get; set; }
 
     public ICollection<Player> Players { get; set; } = [];
     public ICollection<Team> Teams { get; set; } = [];
@@ -24,6 +25,7 @@ public class Tournament : EntityBase
     public ICollection<TournamentRegistration> Registrations { get; set; } = [];
     public Team? WinningTeam { get; set; }
     public InfoGuide? InfoGuide { get; set; }
+    public Gallery? Gallery { get; set; }
 
     public override string ToString() => Name;
 }
