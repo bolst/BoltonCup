@@ -28,6 +28,11 @@
                 </MudChip>
             </CellTemplate>
         </TemplateColumn>
+        <TemplateColumn Title="Draft Rankings" Editable="false">
+            <CellTemplate>
+                <MudIconButton Href='@($"/tournaments/{context.Item.Id}/draft-rankings")' Icon="@Icons.Material.Rounded.Link" Variant="Variant.Text" Color="Color.Info" Size="Size.Small" />
+            </CellTemplate>
+        </TemplateColumn>
         <PropertyColumn Title="Skater Limit" Property="x => x.SkaterLimit" />
         <PropertyColumn Title="Goalie Limit" Property="x => x.GoalieLimit" />
         <PropertyColumn Title="Skater Registration Fee" Property="x => x.SkaterRegistrationFee" />
