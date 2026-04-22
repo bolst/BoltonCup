@@ -23,6 +23,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<Draft> Drafts { get; set; }
     public DbSet<DraftOrder> DraftOrders { get; set; }
     public DbSet<DraftPick> DraftPicks { get; set; }
+    public DbSet<Gallery> Galleries { get; set; }
     public DbSet<Game> Games { get; set; }
     public DbSet<GameHighlight> GameHighlights { get; set; }
     public DbSet<GameStar> GameStars { get; set; }
@@ -175,6 +176,20 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.Version).HasColumnName("row_version").IsRowVersion();
+        });
+
+        modelBuilder.Entity<Gallery>(entity =>
+        {
+            entity
+                .ToTable("galleries")
+                .HasKey(e => e.Id);
+            entity
+                .HasIndex(e => e.Title)
+                .IsUnique();
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.Title).HasColumnName("title").HasMaxLength(80);
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.Source).HasColumnName("source");
         });
 
         modelBuilder.Entity<Game>(entity =>
@@ -529,6 +544,11 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.WinningTeam)
                 .WithMany()
                 .HasForeignKey(e => e.WinningTeamId);
+            entity
+                .HasOne(e => e.Gallery)
+                .WithMany(t => t.Tournaments)
+                .HasForeignKey(e => e.GalleryId)
+                .OnDelete(DeleteBehavior.SetNull);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Logo).HasColumnName("logo_key");
@@ -544,6 +564,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.GoalieLimit).HasColumnName("goalie_limit");
             entity.Property(e => e.SkaterRegistrationFee).HasColumnName("skater_registration_fee");
             entity.Property(e => e.GoalieRegistrationFee).HasColumnName("goalie_registration_fee");
+            entity.Property(e => e.GalleryId).HasColumnName("gallery_id");
         });
 
         modelBuilder.Entity<TournamentRegistration>(entity =>

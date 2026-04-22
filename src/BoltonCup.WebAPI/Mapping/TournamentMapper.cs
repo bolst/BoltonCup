@@ -38,6 +38,7 @@ public class TournamentMapper(IAssetUrlResolver _urlResolver, IBriefMapper _brie
             IsPaymentOpen = tournament.IsPaymentOpen,
             SkaterLimit = tournament.SkaterLimit,
             GoalieLimit = tournament.GoalieLimit,
+            Gallery = tournament.Gallery is null ? null : _briefMapper.ToGalleryBriefDto(tournament.Gallery)
         });
     }    
     
@@ -60,6 +61,7 @@ public class TournamentMapper(IAssetUrlResolver _urlResolver, IBriefMapper _brie
                 SkaterLimit = tournament.SkaterLimit,
                 GoalieLimit = tournament.GoalieLimit,
                 InfoGuide = tournament.InfoGuide is null ? null : _briefMapper.ToInfoGuideBriefDto(tournament.InfoGuide),
+                Gallery = tournament.Gallery is null ? null : _briefMapper.ToGalleryBriefDto(tournament.Gallery)
             };
     }
 }

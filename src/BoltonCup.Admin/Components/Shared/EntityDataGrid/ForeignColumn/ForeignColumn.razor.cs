@@ -128,7 +128,7 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     }
     
     
-    private async Task<IEnumerable<TEntity>> SearchOptionsAsync(string? search, CellContext<T> context, CancellationToken token)
+    private async Task<IEnumerable<TEntity?>> SearchOptionsAsync(string? search, CellContext<T> context, CancellationToken token)
     {
         try
         {

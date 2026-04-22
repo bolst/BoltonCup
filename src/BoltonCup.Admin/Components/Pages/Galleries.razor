@@ -1,0 +1,28 @@
+@page "/galleries"
+
+<EntityDataGrid
+    T="Gallery"
+    NewItemFunc="NewItemFunc"
+    SearchBy="x => x.Title"
+    Comparer="_comparer"
+    ColumnResizeMode="ResizeMode.Column">
+    <Columns>
+        <PropertyColumn Title="Id" Property="x => x.Id" Editable="false" />
+        <PropertyColumn Title="Title" Property="x => x.Title" Editable="true" Required="false" />
+        <PropertyColumn Title="Description" Property="x => x.Description" Editable="true" Required="false" />
+        <LinkColumn Title="Source Link" Property="x => x.Source" Editable="true" Required="false" />
+    </Columns>
+</EntityDataGrid>
+
+@code {
+
+    private static readonly GalleryComparer _comparer = new();
+
+    private async Task<Gallery?> NewItemFunc()
+    {
+        return new Gallery
+        {
+        };
+    }
+
+}

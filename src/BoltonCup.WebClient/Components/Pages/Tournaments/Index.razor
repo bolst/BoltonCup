@@ -14,7 +14,7 @@
         {
             var registerText = tournament.IsRegistrationOpen ? "Register" : "Closed";
             <MudItem xs="12">
-                <MudPaper Class="d-flex flex-row align-center gap-3 px-1 py-8" Width="100%" Height="160px" Elevation="0" Outlined>
+                <MudPaper Class="d-flex flex-row align-center gap-3 px-1 py-8" Width="100%" MinHeight="160px" Elevation="0" Outlined>
                     <div class="d-flex align-center justify-center mud-full-height" style="width: 120px">
                         <MudImage Src="@tournament.Logo" Alt="@tournament.Name" Height="80"/>
                     </div>
@@ -22,13 +22,23 @@
                         <MudText Typo="Typo.h6"><b>@tournament.Name</b></MudText>
                         <DateRangeChip Start="tournament.StartDate" End="tournament.EndDate"/>
                         <div class="d-flex flex-row align-center gap-3 flex-wrap">
-                            <MudButton 
-                                Color="Color.Primary"
-                                Href="@($"/tournaments/{tournament.Id}/information")">Information</MudButton>
                             <MudButton
                                 Color="Color.Secondary"
                                 Href="@($"/tournaments/{tournament.Id}/register")"
                                 Disabled="!tournament.IsRegistrationOpen">@registerText</MudButton>
+                            <MudButton 
+                                Color="Color.Primary"
+                                Href="@($"/tournaments/{tournament.Id}/information")">Information</MudButton>
+                            
+                            @if (tournament.Gallery is not null)
+                            {
+                                <MudButton
+                                    Color="Color.Primary"
+                                    Href="@tournament.Gallery.Url"
+                                    Target="_blank"
+                                    EndIcon="@Icons.Material.Rounded.ArrowOutward"
+                                    Disabled="@(string.IsNullOrEmpty(tournament.Gallery.Url))">Gallery</MudButton>
+                            }
                         </div>
                     </div>
                 </MudPaper>

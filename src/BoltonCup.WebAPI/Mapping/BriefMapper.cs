@@ -4,6 +4,7 @@ namespace BoltonCup.WebAPI.Mapping;
 
 public interface IBriefMapper
 {
+    GalleryBriefDto ToGalleryBriefDto(Gallery gallery);
     GameBriefDto ToGameBriefDto(Game game);
     GoalBriefDto ToGoalBriefDto(Goal goal);
     InfoGuideBriefDto ToInfoGuideBriefDto(InfoGuide infoGuide);
@@ -19,6 +20,17 @@ public interface IBriefMapper
 public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
 {
 
+    public GalleryBriefDto ToGalleryBriefDto(Gallery gallery)
+    {
+        return new GalleryBriefDto
+        {
+            Id = gallery.Id,
+            Title = gallery.Title,
+            Description = gallery.Description,
+            Url = gallery.Source,
+        };
+    }
+    
     public GameBriefDto ToGameBriefDto(Game game)
     {
         return new GameBriefDto
