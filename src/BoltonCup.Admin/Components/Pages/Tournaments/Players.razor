@@ -10,7 +10,9 @@
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Id" Property="x => x.Id" Editable="false"/>
-        <ForeignColumn Title="Player" Property="x => x.Account" Editable="false" />
+        <ForeignColumn Title="Player" Property="x => x.Account" PropertySetter="(p, account) => p.Account = account!" 
+                       SearchBy="x => x.FirstName + ' ' + x.LastName" Editable="true" Required />
+        <PropertyColumn Title="Account" Property="x => x.AccountId" Editable="false" />
         <PropertyColumn Title="Position" Property="x => x.Position" Required />
         <BoolColumn Title="Can play F/D" Property="x => x.CanPlayEitherPosition" />
         <PropertyColumn Title="Jersey Size" Property="x => x.JerseySize" />

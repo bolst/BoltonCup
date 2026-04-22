@@ -1,0 +1,121 @@
+@namespace BoltonCup.Draft.Components.Shared
+@using System.ComponentModel.DataAnnotations
+@using BoltonCup.Common
+@implements IDisposable
+@inject IBoltonCupApi BoltonCupApi
+
+<MudDialog>
+    <DialogContent>
+        <div class="mud-width-full my-2">
+            <MudText Typo="Typo.h6">Create a new draft</MudText>
+        </div>
+        
+        @if (_editContext is not null)
+        {
+            <EditForm EditContext="_editContext" OnValidSubmit="@CreateDraftAsync" class="mud-width-full">
+                <DataAnnotationsValidator/>
+                <MudStack Spacing="6">
+                    <MudTextField
+                        @bind-Value="@_model.Title"
+                        For="@(() => _model.Title)"
+                        Label="Title"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense"
+                        Required/>
+
+                    <MudSelect
+                        @bind-Value="@_model.Tournament"
+                        For="@(() => _model.Tournament)"
+                        Label="Tournament"
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense"
+                        Dense
+                        Required>
+                        @foreach (var tournament in _tournamentOptions)
+                        {
+                            <MudSelectItem Value="@tournament">@tournament.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <div class="d-flex flex-row align-center justify-end gap-1">
+                        <MudButton OnClick="@Dialog.Cancel">Cancel</MudButton>
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Create Draft</MudButton>
+                    </div>
+                </MudStack>
+            </EditForm>
+        }
+    </DialogContent>
+</MudDialog>
+
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+    private readonly CreateDraftFormModel _model = new();
+    
+    private ICollection<Sdk.TournamentDto> _tournamentOptions = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            CloseOnEscapeKey = false,
+            BackdropClick = false,
+            NoHeader = true
+        });
+        
+        var response = await BoltonCupApi.GetTournamentsAsync();
+        _tournamentOptions = response.Items;
+        
+        _editContext = new EditContext(_model);
+        _messageStore = new ValidationMessageStore(_editContext);
+        _editContext.OnValidationRequested += HandleValidationRequested;
+    }
+    
+    private async Task CreateDraftAsync()
+    {
+        try
+        {
+            var draftId = await BoltonCupApi.CreateDraftAsync(new Sdk.CreateDraftRequest
+            {
+                Title = _model.Title,
+                TournamentId = _model.Tournament!.Id
+            });
+            Dialog.Close(DialogResult.Ok(draftId));
+        }
+        catch (Sdk.ApiException<Sdk.BoltonCupValidationProblemDetails> e)
+        {
+            _messageStore?.AddApiErrorResponse(_model, e.Result);
+            _editContext?.NotifyValidationStateChanged();
+        }
+    }
+    
+    
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        // _messageStore?.Clear();
+    }
+
+    public void Dispose()
+    {
+        if (_editContext is not null)
+        {
+            _editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+    }
+
+
+    private sealed class CreateDraftFormModel
+    {
+        [Required(ErrorMessage = "Please name the draft.")]
+        public string? Title { get; set; }
+        
+        [Required(ErrorMessage = "Please select a tournament.")]
+        public Sdk.TournamentDto? Tournament { get; set; }
+    }
+    
+}

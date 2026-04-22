@@ -1,7 +1,8 @@
+using System.Text.Json.Serialization;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Shared;
-using BoltonCup.WebAPI.Authentication;
+using BoltonCup.WebAPI.Auth;
 using BoltonCup.WebAPI.Errors;
 using BoltonCup.WebAPI.Extensions;
 using BoltonCup.WebAPI.Mapping;
@@ -71,6 +72,12 @@ public static class ServiceCollectionExtensions
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim(BoltonCupClaimTypes.AccountId);
                 });
+                
+                options.AddPolicy(BoltonCupPolicy.CanAccessDraft, policy =>
+                    policy.Requirements.Add(new AccessDraftRequirement()));
+                
+                options.AddPolicy(BoltonCupPolicy.CanManageTeam, policy =>
+                    policy.Requirements.Add(new ManageTeamRequirement()));
             });
     }
     
@@ -85,9 +92,11 @@ public static class ServiceCollectionExtensions
                         "https://localhost:7244",
                         "https://localhost:7266",
                         "https://localhost:7269",
+                        "https://localhost:7047",
                         "https://boltoncup.ca",
                         "https://www.boltoncup.ca",
-                        "https://auth.boltoncup.ca"
+                        "https://auth.boltoncup.ca",
+                        "https://draft.boltoncup.ca"
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
@@ -125,6 +134,7 @@ public static class ServiceCollectionExtensions
             .AddTransient<IBriefMapper, BriefMapper>()
             .AddTransient<IAccountMapper, AccountMapper>()
             .AddTransient<IBracketChallengeMapper, BracketChallengeMapper>()
+            .AddTransient<IDraftMapper, DraftMapper>()
             .AddTransient<IGameMapper, GameMapper>()
             .AddTransient<IGameHighlightMapper, GameHighlightMapper>()
             .AddTransient<IGoalieStatMapper, GoalieStatMapper>()
@@ -165,6 +175,12 @@ public static class ServiceCollectionExtensions
             .AddExceptionHandler<UnhandledExceptionHandler>();
     }
 
+    private static IServiceCollection AddSignalRServices(this IServiceCollection services)
+    {
+        services.AddSignalR();
+        return services;
+    }
+
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
     {
         builder
@@ -175,7 +191,12 @@ public static class ServiceCollectionExtensions
             .AddRouting(options => options.LowercaseUrls = true)
             .AddMappers()
             .AddExceptionHandlers()
-            .AddControllers();
+            .AddSignalRServices()
+            .AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
         
         return builder.Services;
     }

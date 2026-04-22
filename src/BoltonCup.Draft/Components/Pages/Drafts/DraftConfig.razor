@@ -1,0 +1,340 @@
+@page "/drafts/{DraftId:int}/config"
+@using BoltonCup.Common
+@using BoltonCup.Sdk
+@implements IDisposable
+@inject IBoltonCupApi BoltonCupApi
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+@attribute [Authorize(Roles = "Admin")]
+
+<MudContainer Class="py-1" MaxWidth="MaxWidth.Large" Gutters="false">
+    @if (_loading)
+    {
+        @:loading...
+    }
+    else
+    {
+        if (_draft is null)
+        {
+            <MudAlert Severity="Severity.Error">No draft found.</MudAlert>
+        }
+        else
+        {
+            <PageTitle>Config | @_draft.Title</PageTitle>
+            
+            <MudGrid>
+                <MudItem xs="12" md="6" lg="4">
+                    <MudPaper Class="pa-4 mb-2" Elevation="0" Outlined Square>
+                        <EditForm EditContext="@_editContext" OnValidSubmit="@UpdateDraftAsync">
+                            <DataAnnotationsValidator/>
+
+                            <MudStack Spacing="6">
+                                <MudTextField
+                                    @bind-Value="@_updateDraftRequest.Title"
+                                    For="@(() => _updateDraftRequest.Title)"
+                                    Disabled="@Disabled"
+                                    Variant="Variant.Text"
+                                    Label="Name"
+                                    Margin="Margin.Dense"
+                                    Required/>
+
+                                <MudSelect
+                                    @bind-Value="@_updateDraftRequest.DraftType"
+                                    For="@(() => _updateDraftRequest.DraftType)"
+                                    Variant="Variant.Outlined"
+                                    Label="Draft Type"
+                                    Margin="Margin.Dense"
+                                    Disabled="@Disabled"
+                                    Strict
+                                    Dense
+                                    Required>
+                                    <MudSelectItem T="Sdk.DraftType" Value="@Sdk.DraftType.Standard">Standard</MudSelectItem>
+                                    <MudSelectItem T="Sdk.DraftType" Value="@Sdk.DraftType.Snake">Snake</MudSelectItem>
+                                </MudSelect>
+
+                                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_isDirty || Disabled)">Save</MudButton>
+                            </MudStack>
+                        </EditForm>
+                    </MudPaper>
+                    
+                    <MudDataGrid Items="@_draft.PickOrder" SortMode="SortMode.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Outlined Square Dense>
+                        <Columns>
+                            <PropertyColumn Title="Pick" Property="x => x.Pick" InitialDirection="SortDirection.Ascending" Sortable="false" CellStyle="text-align: right" />
+                            <PropertyColumn Title="Team" Property="x => x.Team.Name">
+                                <CellTemplate>
+                                    <div class="d-flex flex-row align-center gap-1">
+                                        <MudImage Src="@context.Item.Team.Logo" Height="24" />
+                                        <MudText Typo="Typo.body2">@context.Item.Team.Name</MudText>
+                                    </div>
+                                </CellTemplate>
+                            </PropertyColumn>
+                            <TemplateColumn>
+                                <CellTemplate>
+                                    <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                                        <MudIconButton OnClick="@(_ => ShiftTeamOrderUp(context.Item))" Icon="@Icons.Material.Rounded.KeyboardArrowUp" Disabled="@(context.Item.Pick == 1 || Disabled)"/>
+                                        <MudIconButton OnClick="@(_ => ShiftTeamOrderDown(context.Item))" Icon="@Icons.Material.Rounded.KeyboardArrowDown" Disabled="@(context.Item.Pick == _draft.PickOrder.Count || Disabled)"/>
+                                    </MudButtonGroup>
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                        <PagerContent>
+                            <div class="mud-width-full pa-4">
+                                <MudButton OnClick="@UpdateDraftOrderingAsync" Color="Color.Primary" Variant="Variant.Filled" Disabled="@(!_isOrderingDirty || Disabled)" FullWidth>
+                                    Save
+                                </MudButton>
+                            </div>
+                        </PagerContent>
+                    </MudDataGrid>
+                </MudItem>
+                
+                <MudItem xs="12" md="6" lg="4">
+                    <MudDataGrid Items="@_players" Height="400px" Filterable="false" ShowColumnOptions="false" Elevation="0" FixedHeader FixedFooter Outlined Square Dense>
+                        <Columns>
+                            <PropertyColumn Title="Player" Property="x => x.FullName">
+                                <FooterTemplate>
+                                    <MudChip T="string" Color="Color.Primary" Size="Size.Small" Variant="Variant.Text" Label="true">@_forwardCount forwards</MudChip>
+                                </FooterTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Title="Position" Property="x => x.Position">
+                                <FooterTemplate>
+                                    <MudChip T="string" Color="Color.Secondary" Size="Size.Small" Variant="Variant.Text" Label="true">@_defenseCount defensemen</MudChip>
+                                </FooterTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Title="Year" Property="x => x.Birthday" Format="yyyy">
+                                <FooterTemplate>
+                                    <MudChip T="string" Color="Color.Dark" Size="Size.Small" Variant="Variant.Text" Label="true">@_goalieCount goalies</MudChip>
+                                </FooterTemplate>
+                            </PropertyColumn>
+                        </Columns>
+                    </MudDataGrid>
+                </MudItem>
+                
+                <MudItem xs="12" md="4">
+                    <MudPaper Class="pa-4 d-flex flex-column gap-3" Elevation="0" Outlined Square>
+                        <MudButton OnClick="@StartDraftAsync" Variant="Variant.Text" Color="Color.Primary" Disabled="@Disabled" FullWidth>
+                            @switch (_draft.Status)
+                            {
+                                case DraftStatus.Pending:
+                                    @:Start Draft
+                                    break;
+                                case DraftStatus.InProgress:
+                                    @:Draft in progress
+                                    break;
+                                case DraftStatus.Completed:
+                                default:
+                                    @:Draft complete
+                                    break;
+                            }
+                        </MudButton>
+                        <MudButton OnClick="@DeleteDraftAsync" Variant="Variant.Text" Color="Color.Error" FullWidth>Delete Draft</MudButton>
+                    </MudPaper>
+                </MudItem>
+                
+                
+            </MudGrid>
+        }
+    }
+</MudContainer>
+
+@code {
+    
+    [Parameter]
+    [EditorRequired]
+    public required int DraftId { get; set; }
+
+    private int? _draftId;
+
+    private bool _loading = true;
+
+    private Sdk.DraftSingleDto? _draft;
+
+    private List<Sdk.PlayerDto> _players = [];
+    private int _forwardCount;
+    private int _defenseCount;
+    private int _goalieCount;
+    
+    private readonly Sdk.UpdateDraftRequest _updateDraftRequest = new();
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+    private bool _isDirty;
+    private bool _isOrderingDirty;
+
+    private bool Disabled => _draft is null || _draft.Status != DraftStatus.Pending;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_updateDraftRequest);
+        _messageStore = new ValidationMessageStore(_editContext);
+        _editContext.OnValidationRequested += HandleValidationRequested;
+        _editContext.OnFieldChanged += HandleFieldChanged;
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_draftId == DraftId)
+            return;
+        _draftId = DraftId;
+
+        await LoadDraftDataAsync();
+        await LoadDraftPlayersAsync();
+    }
+
+    private async Task LoadDraftDataAsync()
+    {
+        _loading = true;
+        
+        _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
+        _updateDraftRequest.Title = _draft.Title;
+        _updateDraftRequest.DraftStatus = _draft.Status;
+        _updateDraftRequest.DraftType = _draft.Type;
+
+        _isDirty = false;
+        _isOrderingDirty = false;
+        _loading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LoadDraftPlayersAsync()
+    {
+        if (_draft is null)
+            return;
+        var response = await BoltonCupApi.GetPlayersAsync(tournamentId: _draft.Tournament.Id, size: 100);
+        _players = response.Items
+            .OrderBy(x => x.Position switch
+            {
+                Core.Values.Position.Forward => 0,
+                Core.Values.Position.Defense => 1,
+                _ => 2
+            })
+            .ThenBy(x => x.FirstName)
+            .ToList();
+        _forwardCount = _players.Count(p => p.Position == Core.Values.Position.Forward);
+        _defenseCount = _players.Count(p => p.Position == Core.Values.Position.Defense);
+        _goalieCount = _players.Count(p => p.IsGoalie);
+    }
+
+    private async Task UpdateDraftAsync()
+    {
+        try
+        {
+            await BoltonCupApi.UpdateDraftAsync(DraftId, _updateDraftRequest);
+            Snackbar.Add("Saved changes", Severity.Success);
+            await LoadDraftDataAsync();
+        }
+        catch (Sdk.ApiException<Sdk.BoltonCupValidationProblemDetails> e)
+        {
+            _messageStore?.AddApiErrorResponse(_updateDraftRequest, e.Result);
+            _editContext?.NotifyValidationStateChanged();
+        }
+    }
+
+    private async Task UpdateDraftOrderingAsync()
+    {
+        if (_draft is null)
+            return;
+        
+        try
+        {
+            await BoltonCupApi.UpdateDraftOrderAsync(DraftId, new Sdk.UpdateDraftOrderingRequest
+            {
+                Ordering = _draft.PickOrder
+                    .Select(x => new Sdk.DraftOrderingRequestEntry
+                    {
+                        TeamId = x.Team.Id,
+                        Pick = x.Pick
+                    })
+                    .ToList()
+            });
+            Snackbar.Add("Saved changes", Severity.Success);
+            await LoadDraftDataAsync();
+        }
+        catch (Sdk.ApiException e)
+        {
+            Snackbar.Add($"Unable to save changes: {e.Message}", Severity.Error);
+        }
+    }
+
+    private async Task StartDraftAsync()
+    {
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Start Draft?",
+            "You will no longer be able to edit the draft settings.",
+            yesText: "Start Draft",
+            noText: "Cancel"
+        );
+        if (confirm != true)
+            return;
+        
+        _updateDraftRequest.DraftStatus = DraftStatus.InProgress;
+        await BoltonCupApi.UpdateDraftAsync(DraftId, _updateDraftRequest);
+        Navigation.NavigateTo($"/drafts/{DraftId}/manager");
+    }
+
+    private async Task DeleteDraftAsync()
+    {
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Delete draft?",
+            "It will be lost forever.",
+            yesText: "Delete",
+            noText: "Cancel"
+        );
+        if (confirm != true)
+            return;
+        await BoltonCupApi.DeleteDraftAsync(DraftId);
+        Navigation.NavigateTo("/");
+    }
+
+    private Task ShiftTeamOrderUp(Sdk.DraftPickOrderDto draftPick)
+    {
+        if (draftPick.Pick == 1)
+            return Task.CompletedTask;
+
+        _isOrderingDirty = true;
+        
+        var swapPick = _draft?.PickOrder.FirstOrDefault(p => p.Pick == draftPick.Pick - 1);
+        if (swapPick is not null)
+            swapPick.Pick = draftPick.Pick;
+        draftPick.Pick -= 1;
+        
+        return InvokeAsync(StateHasChanged);   
+    }
+
+    private Task ShiftTeamOrderDown(Sdk.DraftPickOrderDto draftPick)
+    {
+        if (draftPick.Pick == _draft?.PickOrder.Count)
+            return Task.CompletedTask;
+        
+        _isOrderingDirty = true;
+        
+        var swapPick = _draft?.PickOrder.FirstOrDefault(p => p.Pick == draftPick.Pick + 1);
+        if (swapPick is not null)
+            swapPick.Pick = draftPick.Pick;
+        draftPick.Pick += 1;
+        
+        return InvokeAsync(StateHasChanged);   
+    }
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        _messageStore?.Clear();
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs args)
+    {
+        if (!_isDirty)
+        {
+            _isDirty = true;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_editContext is not null)
+        {
+            _editContext.OnValidationRequested -= HandleValidationRequested;
+            _editContext.OnFieldChanged -= HandleFieldChanged;
+        }
+    }
+}

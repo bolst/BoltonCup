@@ -2,7 +2,7 @@ namespace BoltonCup.WebAPI.Mapping;
 
 public record TeamBriefDto
 {
-    public int? Id { get; set; }
+    public int Id { get; set; }
     public string? Name { get; set; }
     public string? NameShort { get; set; }
     public string? Abbreviation { get; set; }

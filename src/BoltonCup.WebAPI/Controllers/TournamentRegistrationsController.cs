@@ -1,6 +1,6 @@
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Extensions;
-using static BoltonCup.WebAPI.Authentication.BoltonCupPolicy;
+using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

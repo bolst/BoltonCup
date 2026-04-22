@@ -1,0 +1,51 @@
+@namespace BoltonCup.Draft.Components.Shared
+
+<MudChip
+    T="string"
+    Color="@_color"
+    Size="@Size"
+    Variant="Variant.Text"
+    Label="true">
+    @_label
+</MudChip>
+
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required Sdk.DraftStatus Status { get; set; }
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+    private Sdk.DraftStatus? _status;
+
+    private Color _color = Color.Default;
+    private string _label = "Status";
+
+    protected override void OnParametersSet()
+    {
+        if (_status == Status)
+            return;
+
+        _status = Status;
+
+        switch (Status)
+        {
+            case Sdk.DraftStatus.Pending:
+                _color = Color.Primary;
+                _label = "Pending";
+                break;
+            case Sdk.DraftStatus.InProgress:
+                _color = Color.Info;
+                _label = "In progress";
+                break;
+            case Sdk.DraftStatus.Completed:
+                _color = Color.Success;
+                _label = "Completed";
+                break;
+        }
+    }
+
+}

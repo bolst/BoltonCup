@@ -1,0 +1,38 @@
+﻿@inherits LayoutComponentBase
+@inject Common.Theme.BoltonCupTheme Theme
+
+<MudThemeProvider Theme="GetTheme()" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="0" Dense>
+        <a href="/" style="height: 100%">
+            <BoltonCupLogo Height="48" />
+        </a>
+        
+        <MudSpacer />
+        <UserMenu Mini />
+    </MudAppBar>
+    <MudMainContent Style="min-height: 100vh">
+        <BoltonCupErrorBoundary>
+            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
+                @Body
+            </MudContainer>
+        </BoltonCupErrorBoundary>
+    </MudMainContent>
+</MudLayout>
+
+
+@code {
+
+    private MudTheme GetTheme()
+    {
+        var theme = Theme.MudTheme;
+        theme.PaletteLight.AppbarBackground = theme.PaletteLight.Tertiary;
+        theme.PaletteLight.AppbarText = theme.PaletteLight.Primary;
+        return theme;
+    }
+
+}

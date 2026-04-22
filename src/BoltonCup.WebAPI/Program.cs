@@ -1,8 +1,10 @@
 using BoltonCup.Infrastructure;
 using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Shared;
 using BoltonCup.WebAPI;
-using BoltonCup.WebAPI.Authentication;
+using BoltonCup.WebAPI.Auth;
 using BoltonCup.WebAPI.Controllers;
+using BoltonCup.WebAPI.Hubs;
 using BoltonCup.WebAPI.Swagger;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.OpenApi;
@@ -123,6 +125,8 @@ app.MapGet("/", async context =>
     context.Response.Redirect("/docs");
     await Task.CompletedTask;
 });
+
+app.MapHub<DraftLobbyHub>(Hubs.DraftLobby);
 
 // Sentry
 app.UseSentryTracing();

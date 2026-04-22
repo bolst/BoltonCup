@@ -6,11 +6,16 @@
 <AuthorizeView>
     <Authorized>
         <MudMenu Label="@context.User.Identity?.Name"
-                 Variant="@Variant" 
+                 Variant="@Variant"
                  Color="@Color"
                  EndIcon="@EndIcon"
+                 Icon="@(Mini ? Icons.Material.Rounded.AccountCircle : null)"
                  RelativeWidth="DropdownWidth.Adaptive"
                  FullWidth>
+            @if (Mini)
+            {
+                <span class="pa-2">@context.User.Identity?.Name</span>
+            }
             <MudMenuItem Href="@($"{Config.Value.WebBaseUrl}profile")" Icon="@Icons.Material.Rounded.AccountCircle" IconColor="@IconColor" OnClick="@OnItemClick">My Profile</MudMenuItem>
             @if (LogOutTemplate is null)
             {
@@ -23,7 +28,7 @@
         </MudMenu>
     </Authorized>
     <NotAuthorized>
-        <MudButton Variant="@Variant" Color="@Color" OnClick="GoToLogin">Log In</MudButton>
+        <MudButton Variant="@Variant" Color="@Color" OnClick="@GoToLogin">Log In</MudButton>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -46,6 +51,9 @@
 
     [Parameter]
     public Variant Variant { get; set; } = Variant.Text;
+    
+    [Parameter]
+    public bool Mini { get; set; }
 
     private void GoToLogin()
     {

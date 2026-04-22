@@ -1,0 +1,133 @@
+﻿@page "/"
+@using BoltonCup.Sdk
+@inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+
+
+<PageTitle>Drafts</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudDataGrid
+        @ref="_dataGrid"
+        T="Sdk.DraftDto"
+        Class="filter-datagrid"
+        ServerData="ServerReload"
+        Breakpoint="Breakpoint.None"
+        RowStyle="height: 50px"
+        RowsPerPage="50"
+        Elevation="0"
+        ShowColumnOptions="false"
+        AllowUnsorted
+        Striped
+        Dense>
+        <ToolBarContent>
+            <div class="d-flex flex-row align-center gap-3 flex-wrap">
+                <FilterToolbarField
+                    T="Sdk.TournamentDto?" Label="Tournament"
+                    Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="@_dataGrid.ReloadServerData"
+                    ToStringFunc="x => x?.Name">
+                    <TournamentFilter/>
+                </FilterToolbarField>
+            </div>
+            
+            <MudSpacer />
+            
+            <AuthorizeView Roles="Admin">
+                <MudButton
+                    OnClick="@CreateNewDraftAsync" Variant="Variant.Filled" Class="mr-1"
+                    Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add">
+                    New Draft
+                </MudButton>
+            </AuthorizeView>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Title="Draft" Property="x => x.Title">
+                <CellTemplate>
+                    <MudLink Href="@($"/drafts/{context.Item.Id}")" Color="Color.Primary" Typo="Typo.body2"><b>@context.Item.Title</b></MudLink>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Title="Status" Property="x => x.Status">
+                <CellTemplate>
+                    <DraftStatusChip Status="@context.Item.Status" />
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Title="Tournament" Property="x => x.Tournament.Name"/>
+            <TemplateColumn>
+                <CellTemplate>
+                    <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                        <MudIconButton Href="@($"/drafts/{context.Item.Id}")" Icon="@Icons.Material.Rounded.RemoveRedEye" Color="Color.Info"/>
+                        
+                        <AuthorizeView Roles="Admin" Context="_">
+                            <MudIconButton Href="@($"/drafts/{context.Item.Id}/manager")" Icon="@Icons.Material.Rounded.ListAlt" Color="Color.Secondary" Disabled="@(context.Item.Status == DraftStatus.Pending)" />
+                        </AuthorizeView>
+                        
+                        <AuthorizeView Roles="Admin" Context="_">
+                            <MudIconButton Href="@($"/drafts/{context.Item.Id}/config")" Icon="@Icons.Material.Rounded.Settings" Color="Color.Default"/>
+                        </AuthorizeView>
+                    </MudButtonGroup>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <NoRecordsContent>
+            <div class="mud-width-full d-flex justify-center align-center" style="height: 300px">
+                <MudText Typo="Typo.body2">No drafts found :(</MudText>
+            </div>
+        </NoRecordsContent>
+    </MudDataGrid>
+</MudContainer>
+
+
+@code {
+
+    private MudDataGrid<Sdk.DraftDto> _dataGrid = null!;
+
+    private readonly DraftsFilterModel _filter = new();
+
+    private async Task<GridData<Sdk.DraftDto>> ServerReload(GridState<Sdk.DraftDto> state, CancellationToken cancellationToken)
+    {
+        string? sortBy = null;
+        bool? descending = null;
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        if (sortDefinition is not null)
+        {
+            sortBy = sortDefinition.SortBy;
+            descending = sortDefinition.Descending;
+        }
+
+        var data = await BoltonCupApi.GetDraftsAsync(
+            tournamentId: _filter.Tournament?.Id,
+            page: state.Page + 1, 
+            size: state.PageSize,
+            sortBy: sortBy,
+            descending: descending, 
+            cancellationToken: cancellationToken
+        );
+        
+        return new GridData<Sdk.DraftDto> {
+            TotalItems = data.Total,
+            Items = data.Items,
+        };
+    }
+    
+    private Task OnFilterTournamentChange(Sdk.TournamentDto? tournament)
+    {
+        _filter.Tournament = tournament;
+        return _dataGrid.ReloadServerData();
+    }
+    
+    private async Task CreateNewDraftAsync()
+    {
+        var dialog = await DialogService.ShowAsync<NewDraftDialog>();
+        var result = await dialog.Result;
+        if (result?.Data is int newDraftId)
+        {
+            Navigation.NavigateTo($"/drafts/{newDraftId}/config");
+        }
+    }
+    
+    private class DraftsFilterModel
+    {
+        public Sdk.TournamentDto? Tournament { get; set; }
+    }
+}

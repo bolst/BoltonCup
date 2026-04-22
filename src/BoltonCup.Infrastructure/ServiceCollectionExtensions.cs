@@ -42,6 +42,7 @@ public static class ServiceCollectionExtensions
             .AddDbContextFactory<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
             .AddDbContextFactory<AuthDbContext>(options => options.UseNpgsql(connectionString))
             .AddTransient<IAccountRepository, AccountRepository>()
+            .AddTransient<IDraftService, DraftService>()
             .AddTransient<IGameRepository, GameRepository>()
             .AddTransient<IGoalieStatRepository, GoalieStatRepository>()
             .AddTransient<IInfoGuideRepository, InfoGuideRepository>()
@@ -54,7 +55,8 @@ public static class ServiceCollectionExtensions
             .AddTransient<ITournamentService, TournamentService>()
             .AddTransient<ITournamentRegistrationService, TournamentRegistrationService>()
             .AddTransient<IUserService, UserService>()
-            .AddTransient<Core.BracketChallenge.IBracketChallengeService, BracketChallengeService>();
+            .AddTransient<Core.BracketChallenge.IBracketChallengeService, BracketChallengeService>()
+            .AddTransient<IPlayerDraftRankingService, PlayerDraftRankingService>();
         return builder;
     }
 
