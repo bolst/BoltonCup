@@ -19,7 +19,7 @@
             <EditTemplate>
                 <HighestLevelSelect 
                     Value="@context.Item.HighestLevel"
-                    ValueChanged="v => { context.Item.HighestLevel = v; _dataGrid.NotifyItemChangedAsync(context.Item); }"/>
+                    ValueChanged="async v => { context.Item.HighestLevel = v; await _dataGrid.NotifyItemChangedAsync(context.Item); }"/>
             </EditTemplate>
         </PropertyColumn>
         <PropertyColumn Title="Beer" Property="x => x.PreferredBeer" />
