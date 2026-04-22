@@ -55,7 +55,8 @@ public static class ServiceCollectionExtensions
             .AddTransient<ITournamentService, TournamentService>()
             .AddTransient<ITournamentRegistrationService, TournamentRegistrationService>()
             .AddTransient<IUserService, UserService>()
-            .AddTransient<Core.BracketChallenge.IBracketChallengeService, BracketChallengeService>();
+            .AddTransient<Core.BracketChallenge.IBracketChallengeService, BracketChallengeService>()
+            .AddTransient<IPlayerDraftRankingService, PlayerDraftRankingService>();
         return builder;
     }
 
