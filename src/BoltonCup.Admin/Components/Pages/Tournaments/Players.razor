@@ -20,7 +20,7 @@
         <PropertyColumn Title="#" Property="x => x.JerseyNumber" Required="false" />
         <EnumColumn Title="Captaincy" Property="x => x.Captaincy" Required="false" />
         <ForeignColumn Title="Team" Property="x => x.Team" PropertySetter="(game, team) => game.Team = team" 
-                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" Filter="x => y => x.TournamentId == TournamentId" />
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" Filter="x => team => team.TournamentId == TournamentId"/>
         <ForeignColumn Title="Tournament" Property="x => x.Tournament" Editable="false" ImageSrcFunc="x => x.Logo" />
     </Columns>
 </EntityDataGrid>
