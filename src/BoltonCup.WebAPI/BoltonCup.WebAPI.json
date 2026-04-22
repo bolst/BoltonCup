@@ -6558,6 +6558,28 @@
         },
         "additionalProperties": false
       },
+      "GalleryBriefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "GameDto": {
         "required": [
           "gameTime",
@@ -8191,6 +8213,14 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "gallery": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GalleryBriefDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -8315,6 +8345,14 @@
           "goalieLimit": {
             "type": "integer",
             "format": "int32",
+            "nullable": true
+          },
+          "gallery": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GalleryBriefDto"
+              }
+            ],
             "nullable": true
           },
           "infoGuide": {

@@ -13,5 +13,6 @@ public record TournamentDto
     public required bool IsPaymentOpen { get; set; }
     public int? SkaterLimit { get; set; }
     public int? GoalieLimit { get; set; }
+    public GalleryBriefDto? Gallery { get; set; }
 }
 

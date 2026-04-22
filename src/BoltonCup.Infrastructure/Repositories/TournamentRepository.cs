@@ -14,6 +14,7 @@ public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepos
             .ConditionalWhere(e => e.IsRegistrationOpen == query.RegistrationOpen!.Value, query.RegistrationOpen.HasValue)
             .Include(e => e.Games)
             .Include(e => e.Teams)
+            .Include(e => e.Gallery)
             .ApplySorting(query, x => x.OrderBy(t => t.StartDate))
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }
@@ -25,6 +26,7 @@ public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepos
             .Include(e => e.InfoGuide)
             .Include(e => e.Games)
             .Include(e => e.Teams)
+            .Include(e => e.Gallery)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken: cancellationToken);
     }
 }
