@@ -14,6 +14,11 @@
                        EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo"
                        Filter="@(x => (y => y.TournamentId == x.TournamentId))"/>
         <DateTimePickerColumn Title="Date" Property="x => x.GameTime" />
+        <EnumColumn Title="Type" Property="x => x.GameType"/>
+        <PropertyColumn Title="Venue" Property="x => x.Venue"/>
+        <PropertyColumn Title="Rink" Property="x => x.Rink"/>
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament" 
+                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="t => t.Logo" />
         <TemplateColumn Title="Score" Editable="false">
             <CellTemplate>
                 @{
@@ -32,11 +37,6 @@
                 <MudChip T="string" Href='@($"/games/{context.Item.Id}/penalties")' Text="@($"{homePIMs} - {awayPIMs}")" Color="Color.Info" Variant="Variant.Text" Size="Size.Small" Label="true"/>
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Title="Type" Property="x => x.GameType"/>
-        <PropertyColumn Title="Venue" Property="x => x.Venue"/>
-        <PropertyColumn Title="Rink" Property="x => x.Rink"/>
-        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament" 
-                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="t => t.Logo" />
     </Columns>
 </EntityDataGrid>
 

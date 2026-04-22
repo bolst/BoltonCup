@@ -1,8 +1,15 @@
+using System.Runtime.Serialization;
+
 namespace BoltonCup.Core;
 
 public enum Captaincy
 {
+    [EnumMember(Value = "")]
+    None,
+    
+    [EnumMember(Value = "captain")]
     Captain,
     
-    Alternate
+    [EnumMember(Value = "alternate")]
+    Alternate,
 }

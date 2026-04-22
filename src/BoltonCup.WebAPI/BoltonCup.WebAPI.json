@@ -5336,7 +5336,11 @@
             ]
           },
           "gameType": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameType"
+              }
+            ],
             "nullable": true
           },
           "venue": {
@@ -5454,7 +5458,11 @@
             "format": "date-time"
           },
           "gameType": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameType"
+              }
+            ],
             "nullable": true
           },
           "venue": {
@@ -5515,7 +5523,11 @@
             ]
           },
           "gameType": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameType"
+              }
+            ],
             "nullable": true
           },
           "venue": {
@@ -5591,6 +5603,18 @@
           }
         },
         "additionalProperties": false
+      },
+      "GameType": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "GoalBriefDto": {
         "required": [

@@ -1,11 +1,13 @@
 @namespace BoltonCup.Admin.Components.Shared
 @typeparam T where T : class
-@typeparam TEnum
+@typeparam TEnum where TEnum : Enum
 @inherits InputColumnBase<T, TEnum>
 
 @code {
 
     private IEnumerable<TEnum> _enumValues = [];
+    private readonly Dictionary<string, string?> _enumNames = [];
+
     private bool _isNullable;
     
     protected override void OnInitialized()
@@ -48,7 +50,14 @@
                            Dense>
                    @foreach (var enumValue in _enumValues)
                    {
-                       <MudSelectItem T="TEnum" Value="@enumValue">@enumValue?.ToString()</MudSelectItem>
+                       var enumString = enumValue.ToString();
+                       if (string.IsNullOrEmpty(enumString))
+                           continue;
+                       if (!_enumNames.ContainsKey(enumString))
+                       {
+                           _enumNames.Add(enumString, EnumMemberConverter<TEnum>.GetEnumMemberValue(enumValue));
+                       }
+                       <MudSelectItem T="TEnum" Value="@enumValue">@_enumNames[enumString]</MudSelectItem>;
                    }
                </MudSelect>;
     }
