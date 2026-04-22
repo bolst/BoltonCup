@@ -16,9 +16,9 @@
                 <MudText>No info guide exists!</MudText>
                 <MudButton OnClick="CreateInfoGuide" Variant="Variant.Filled" EndIcon="@Icons.Material.Rounded.Add" Color="Color.Primary">Create New</MudButton>
                 <MudMenu Label="Copy existing" Variant="Variant.Filled" EndIcon="@Icons.Material.Rounded.KeyboardArrowDown" Color="Color.Primary">
-                    @foreach(var copyInfoGuide in _copyInfoGuides)
+                    @foreach(var copyInfoGuide in _copyInfoGuides ?? [])
                     {
-                        <MudMenuItem OnClick="() => CreateInfoGuideFromExisting(copyInfoGuide)">@copyInfoGuide.Tournament?.Name</MudMenuItem>
+                        <MudMenuItem OnClick="@(() => CreateInfoGuideFromExisting(copyInfoGuide))">@copyInfoGuide.Tournament?.Name</MudMenuItem>
                     }
                 </MudMenu>
             </div>

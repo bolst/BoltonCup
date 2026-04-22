@@ -11,8 +11,8 @@
     @foreach (var group in _teamsByTournament)
     {
         var tournament = group.First().Tournament;
-        var tournamentName = tournament.Name ?? "Unnamed Tournament";
-        var dateRange = new DateRange(tournament.StartDate, tournament.EndDate);
+        var tournamentName = tournament?.Name ?? "Unnamed Tournament";
+        var dateRange = new DateRange(tournament?.StartDate, tournament?.EndDate);
         <div class="mud-width-full d-flex flex-row gap-3 align-center mt-6 mb-1 ml-2">
             <MudText Typo="Typo.h5"><b>@tournamentName</b></MudText>
             @DateRangeChip(dateRange)
@@ -42,15 +42,15 @@
 
 @code {
 
-    private IEnumerable<IGrouping<int, Sdk.TeamDto>> _teamsByTournament = [];
+    private IEnumerable<IGrouping<int?, Sdk.TeamDto>> _teamsByTournament = [];
 
     protected override async Task OnParametersSetAsync()
     {
         var teams = await BoltonCupApi.GetTeamsAsync();
         _teamsByTournament = teams.Items
-            .OrderByDescending(t => t.Tournament.Id)
+            .OrderByDescending(t => t.Tournament?.Id)
             .ThenBy(t => t.Name)
-            .GroupBy(t => t.Tournament.Id);
+            .GroupBy(t => t.Tournament?.Id);
     }
 
     

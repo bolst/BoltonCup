@@ -1,0 +1,65 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam T where T : class
+@using BoltonCup.Common
+@inherits InputColumnBase<T, DateTime?>
+
+@code {
+
+    [Parameter]
+    public bool DisplayEastern { get; set; } = true;
+
+    private void SetDate(T item, DateTime? oldDateTime, DateTime? newDateTime)
+    {
+        if (newDateTime is null)
+        {
+            SetProperty(item, null);
+            return;
+        }
+        
+        // Preserve the existing time, or default to midnight if there wasn't one
+        var timeOfDay = oldDateTime?.TimeOfDay ?? TimeSpan.Zero;
+        var combinedDateTime = newDateTime.Value.Date + timeOfDay;
+
+        var finalDateTime = DisplayEastern 
+            ? combinedDateTime.ConvertEstToUtc() 
+            : DateTime.SpecifyKind(combinedDateTime, DateTimeKind.Utc);
+        
+        SetProperty(item, finalDateTime);
+    }
+    
+    private void SetTime(T item, DateTime? oldDateTime, TimeSpan? newTime)
+    {
+        if (oldDateTime is null || newTime is null)
+            return;
+        
+        var combinedDateTime = oldDateTime.Value.Date + newTime.Value;
+    
+        var finalDateTime = DisplayEastern 
+            ? combinedDateTime.ConvertEstToUtc() 
+            : DateTime.SpecifyKind(combinedDateTime, DateTimeKind.Utc);
+    
+        SetProperty(item, finalDateTime);
+    }
+    
+    protected override RenderFragment EntityEditTemplate(CellContext<T> context)
+    {
+        var property = PropertyFunc(context.Item);
+        if (property is not DateTime and not null)
+        {
+            return @<div></div>;
+        }
+
+        var date = property as DateTime?;
+        if (DisplayEastern)
+            date = date?.ToEst();
+        var time = date?.TimeOfDay;
+
+        return @<div class="d-flex flex-row align-center gap-1">
+                   <MudDatePicker Date="@date?.Date" DateChanged="d => SetDate(context.Item, date, d)"
+                                  IconSize="Size.Small" Margin="Margin.Dense" Underline="false" Rounded Editable/>
+                   <MudTimePicker Time="@time" TimeChanged="@(t => SetTime(context.Item, date, t))"
+                                  IconSize="Size.Small" Margin="Margin.Dense" Underline="false" Rounded Editable
+                                  AmPm TimeFormat="h:mm tt" AutoClose />
+               </div>;
+    }
+}

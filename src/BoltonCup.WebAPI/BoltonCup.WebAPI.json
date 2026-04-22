@@ -16,17 +16,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CompleteUserAccountRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompleteUserAccountRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/CompleteUserAccountRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompleteUserAccountRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/CompleteUserAccountRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompleteUserAccountRequest"
+                  }
+                ]
               }
             }
           }
@@ -233,17 +245,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateAccountRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateAccountRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateAccountRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateAccountRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateAccountRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateAccountRequest"
+                  }
+                ]
               }
             }
           }
@@ -913,17 +937,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LoginRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LoginRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LoginRequest"
+                  }
+                ]
               }
             }
           }
@@ -1015,17 +1051,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RegisterRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RegisterRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RegisterRequest"
+                  }
+                ]
               }
             }
           }
@@ -1117,17 +1165,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResendConfirmationEmailRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ResendConfirmationEmailRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResendConfirmationEmailRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ResendConfirmationEmailRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ResendConfirmationEmailRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ResendConfirmationEmailRequest"
+                  }
+                ]
               }
             }
           }
@@ -1219,17 +1279,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
+                  }
+                ]
               }
             }
           }
@@ -1321,17 +1393,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ForgotPasswordRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ForgotPasswordRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ForgotPasswordRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ForgotPasswordRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ForgotPasswordRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ForgotPasswordRequest"
+                  }
+                ]
               }
             }
           }
@@ -1423,17 +1507,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetPasswordRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ResetPasswordRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetPasswordRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ResetPasswordRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetPasswordRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ResetPasswordRequest"
+                  }
+                ]
               }
             }
           }
@@ -1525,17 +1621,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ConfirmEmailRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ConfirmEmailRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ConfirmEmailRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ConfirmEmailRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ConfirmEmailRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ConfirmEmailRequest"
+                  }
+                ]
               }
             }
           }
@@ -1727,17 +1835,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CheckUserRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CheckUserRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/CheckUserRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CheckUserRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/CheckUserRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CheckUserRequest"
+                  }
+                ]
               }
             }
           }
@@ -2102,17 +2222,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateBracketChallengePaymentIntentRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateBracketChallengePaymentIntentRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateBracketChallengePaymentIntentRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateBracketChallengePaymentIntentRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateBracketChallengePaymentIntentRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateBracketChallengePaymentIntentRequest"
+                  }
+                ]
               }
             }
           }
@@ -4895,17 +5027,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
+                  }
+                ]
               }
             }
           }
@@ -5150,17 +5294,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TournamentRegistrationDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/TournamentRegistrationDto"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/TournamentRegistrationDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/TournamentRegistrationDto"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/TournamentRegistrationDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/TournamentRegistrationDto"
+                  }
+                ]
               }
             }
           }
@@ -5774,10 +5930,19 @@
         "type": "object",
         "properties": {
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ]
           },
           "team": {
-            "$ref": "#/components/schemas/TeamBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5840,8 +6005,7 @@
               "items": {
                 "type": "string"
               }
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": { }
@@ -5889,7 +6053,6 @@
             "items": {
               "$ref": "#/components/schemas/BracketChallengeDto"
             },
-            "nullable": true,
             "readOnly": true
           },
           "total": {
@@ -5914,23 +6077,20 @@
         "type": "object",
         "properties": {
           "clientSecret": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "totalAmount": {
             "type": "number",
             "format": "double"
           },
           "currency": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "breakdown": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PaymentBreakdown"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5978,8 +6138,7 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -6043,12 +6202,10 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "code": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -6057,12 +6214,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "agreedToTOS": {
             "type": "boolean"
@@ -6088,8 +6243,7 @@
         "type": "object",
         "properties": {
           "position": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -6098,23 +6252,19 @@
         "type": "object",
         "properties": {
           "userId": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "roles": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "isAuthenticated": {
             "type": "boolean"
@@ -6317,8 +6467,7 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -6340,10 +6489,18 @@
             "format": "date-time"
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ]
           },
           "gameType": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameType"
+              }
+            ],
             "nullable": true
           },
           "venue": {
@@ -6355,10 +6512,20 @@
             "nullable": true
           },
           "homeTeam": {
-            "$ref": "#/components/schemas/TeamInGameDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamInGameDto"
+              }
+            ],
+            "nullable": true
           },
           "awayTeam": {
-            "$ref": "#/components/schemas/TeamInGameDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamInGameDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6371,7 +6538,6 @@
             "items": {
               "$ref": "#/components/schemas/GameDto"
             },
-            "nullable": true,
             "readOnly": true
           },
           "total": {
@@ -6396,8 +6562,10 @@
         "type": "object",
         "properties": {
           "videoUrl": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
+          },
+          "thumbnailUrl": {
+            "type": "string"
           },
           "title": {
             "type": "string",
@@ -6408,7 +6576,12 @@
             "nullable": true
           },
           "player": {
-            "$ref": "#/components/schemas/PlayerBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6438,15 +6611,18 @@
             "format": "int32"
           },
           "tournamentName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "gameTime": {
             "type": "string",
             "format": "date-time"
           },
           "gameType": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameType"
+              }
+            ],
             "nullable": true
           },
           "venue": {
@@ -6469,7 +6645,12 @@
             "format": "int32"
           },
           "opponent": {
-            "$ref": "#/components/schemas/TeamBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6495,10 +6676,18 @@
             "format": "date-time"
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ]
           },
           "gameType": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameType"
+              }
+            ],
             "nullable": true
           },
           "venue": {
@@ -6510,38 +6699,44 @@
             "nullable": true
           },
           "homeTeam": {
-            "$ref": "#/components/schemas/TeamInGameDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamInGameDto"
+              }
+            ],
+            "nullable": true
           },
           "awayTeam": {
-            "$ref": "#/components/schemas/TeamInGameDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamInGameDto"
+              }
+            ],
+            "nullable": true
           },
           "goals": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/GoalBriefDto"
-            },
-            "nullable": true
+            }
           },
           "penalties": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PenaltyBriefDto"
-            },
-            "nullable": true
+            }
           },
           "stars": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/GameStarDto"
-            },
-            "nullable": true
+            }
           },
           "highlights": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/GameHighlightDto"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -6554,17 +6749,32 @@
             "format": "int32"
           },
           "player": {
-            "$ref": "#/components/schemas/PlayerBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ]
           },
           "stats": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/StatItem"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
+      },
+      "GameType": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "GoalBriefDto": {
         "required": [
@@ -6590,13 +6800,27 @@
             "format": "int32"
           },
           "scorer": {
-            "$ref": "#/components/schemas/PlayerBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ]
           },
           "primaryAssist": {
-            "$ref": "#/components/schemas/PlayerBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ],
+            "nullable": true
           },
           "secondaryAssist": {
-            "$ref": "#/components/schemas/PlayerBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ],
+            "nullable": true
           },
           "periodLabel": {
             "type": "string",
@@ -6610,7 +6834,6 @@
           },
           "timeString": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -6649,12 +6872,10 @@
             "format": "int32"
           },
           "firstName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "lastName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "position": {
             "type": "string",
@@ -6736,7 +6957,6 @@
           },
           "fullName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -6750,7 +6970,6 @@
             "items": {
               "$ref": "#/components/schemas/GoalieStatDto"
             },
-            "nullable": true,
             "readOnly": true
           },
           "total": {
@@ -6805,7 +7024,12 @@
             "nullable": true
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6818,7 +7042,6 @@
             "items": {
               "$ref": "#/components/schemas/InfoGuideDto"
             },
-            "nullable": true,
             "readOnly": true
           },
           "total": {
@@ -6859,7 +7082,12 @@
             "nullable": true
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ],
+            "nullable": true
           },
           "markdownContent": {
             "type": "string",
@@ -6872,12 +7100,10 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "password": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "persist": {
             "type": "boolean"
@@ -6893,8 +7119,7 @@
             "format": "double"
           },
           "title": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -6927,11 +7152,14 @@
             "format": "int32"
           },
           "player": {
-            "$ref": "#/components/schemas/PlayerBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ]
           },
           "infraction": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "durationMins": {
             "type": "integer",
@@ -6949,7 +7177,6 @@
           },
           "timeString": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -6976,12 +7203,10 @@
             "nullable": true
           },
           "firstName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "lastName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "birthday": {
             "type": "string",
@@ -7001,12 +7226,10 @@
           },
           "fullName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "jerseyNumberLabel": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -7063,19 +7286,26 @@
             "nullable": true
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ]
           },
           "team": {
-            "$ref": "#/components/schemas/TeamBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ],
+            "nullable": true
           },
           "fullName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "jerseyNumberLabel": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "isGoalie": {
@@ -7093,7 +7323,6 @@
             "items": {
               "$ref": "#/components/schemas/PlayerDto"
             },
-            "nullable": true,
             "readOnly": true
           },
           "total": {
@@ -7157,13 +7386,26 @@
             "format": "int32"
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ]
           },
           "game": {
-            "$ref": "#/components/schemas/GameOfTeamDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameOfTeamDto"
+              }
+            ]
           },
           "team": {
-            "$ref": "#/components/schemas/TeamBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -7219,19 +7461,26 @@
             "nullable": true
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ]
           },
           "team": {
-            "$ref": "#/components/schemas/TeamBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ],
+            "nullable": true
           },
           "fullName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "jerseyNumberLabel": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "isGoalie": {
@@ -7251,15 +7500,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlayerGameByGame"
-            },
-            "nullable": true
+            }
           },
           "tournamentStats": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlayerTournamentStats"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -7313,10 +7560,19 @@
             "nullable": true
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ]
           },
           "team": {
-            "$ref": "#/components/schemas/TeamBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -7329,12 +7585,10 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "password": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -7346,8 +7600,7 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -7361,16 +7614,13 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "resetCode": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "newPassword": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -7402,12 +7652,10 @@
             "format": "int32"
           },
           "firstName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "lastName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "position": {
             "type": "string",
@@ -7465,7 +7713,6 @@
           },
           "fullName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -7479,7 +7726,6 @@
             "items": {
               "$ref": "#/components/schemas/SkaterStatDto"
             },
-            "nullable": true,
             "readOnly": true
           },
           "total": {
@@ -7504,12 +7750,10 @@
         "type": "object",
         "properties": {
           "tag": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "value": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -7560,19 +7804,21 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "nameShort": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "abbreviation": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ],
+            "nullable": true
           },
           "logoUrl": {
             "type": "string",
@@ -7583,12 +7829,10 @@
             "nullable": true
           },
           "primaryColorHex": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "secondaryColorHex": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "tertiaryColorHex": {
             "type": "string",
@@ -7630,7 +7874,6 @@
             "items": {
               "$ref": "#/components/schemas/TeamDto"
             },
-            "nullable": true,
             "readOnly": true
           },
           "total": {
@@ -7702,19 +7945,21 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "nameShort": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "abbreviation": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "tournament": {
-            "$ref": "#/components/schemas/TournamentBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ],
+            "nullable": true
           },
           "logoUrl": {
             "type": "string",
@@ -7725,12 +7970,10 @@
             "nullable": true
           },
           "primaryColorHex": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "secondaryColorHex": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "tertiaryColorHex": {
             "type": "string",
@@ -7765,8 +8008,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlayerBriefDto"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -7825,8 +8067,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "logo": {
             "type": "string",
@@ -7877,7 +8118,6 @@
             "items": {
               "$ref": "#/components/schemas/TournamentDto"
             },
-            "nullable": true,
             "readOnly": true
           },
           "total": {
@@ -7902,23 +8142,20 @@
         "type": "object",
         "properties": {
           "clientSecret": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "totalAmount": {
             "type": "number",
             "format": "double"
           },
           "currency": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "breakdown": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PaymentBreakdown"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -7955,8 +8192,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "logo": {
             "type": "string",
@@ -7997,7 +8233,12 @@
             "nullable": true
           },
           "infoGuide": {
-            "$ref": "#/components/schemas/InfoGuideBriefDto"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InfoGuideBriefDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -8006,12 +8247,10 @@
         "type": "object",
         "properties": {
           "firstName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "lastName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "birthday": {
             "type": "string",
@@ -8073,12 +8312,10 @@
         "type": "object",
         "properties": {
           "uploadUrl": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "tempKey": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -8087,12 +8324,10 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "code": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false

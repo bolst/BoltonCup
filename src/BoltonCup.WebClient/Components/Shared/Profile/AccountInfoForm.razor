@@ -131,8 +131,8 @@
         if (_accountInfo is null)
             return;
         _updateRequest ??= new UpdateAccountRequest();
-        _updateRequest.FirstName = _accountInfo.FirstName;
-        _updateRequest.LastName = _accountInfo.LastName;
+        _updateRequest.FirstName = _accountInfo.FirstName ?? string.Empty;
+        _updateRequest.LastName = _accountInfo.LastName ?? string.Empty;
         _updateRequest.Birthday = _accountInfo.Birthday;
         _updateRequest.HighestLevel = _accountInfo.HighestLevel;
         _updateRequest.PreferredBeer = _accountInfo.PreferredBeer;

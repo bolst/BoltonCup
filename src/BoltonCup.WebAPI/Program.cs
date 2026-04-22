@@ -37,6 +37,9 @@ builder.Services.AddResponseCaching();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    options.SupportNonNullableReferenceTypes();
+    options.UseAllOfToExtendReferenceSchemas();
+    
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "Bolton Cup",

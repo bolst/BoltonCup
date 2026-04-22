@@ -15,8 +15,15 @@ else
                 <MudText Typo="Typo.h6"><b>Game Sheet</b></MudText>
                 <MudSpacer />
                 <MudToggleGroup T="Sdk.TeamInGameDto" Value="_selectedTeam" ValueChanged="SetSelectedTeam" Size="Size.Small">
-                    <MudToggleItem Value="_game.AwayTeam" Text="@_game.AwayTeam.NameShort" />
-                    <MudToggleItem Value="_game.HomeTeam" Text="@_game.HomeTeam.NameShort" />
+                    @if (_game.AwayTeam is not null)
+                    {
+                        <MudToggleItem Value="_game.AwayTeam" Text="@_game.AwayTeam.NameShort"/>
+                    }
+                    
+                    @if (_game.HomeTeam is not null)
+                    {
+                        <MudToggleItem Value="_game.HomeTeam" Text="@_game.HomeTeam.NameShort"/>
+                    }
                 </MudToggleGroup>
             </div>
             <MudSimpleTable Elevation="0" Striped Square>

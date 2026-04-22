@@ -2,9 +2,11 @@
 @using BoltonCup.Common
 
 <EntityDataGrid
+    @ref="@_dataGrid"
     T="GameStar"
     NewItemFunc="NewItemFunc"
     Include="@_includes"
+    SearchBy="x => x.Player.Account.FirstName + ' ' + x.Player.Account.LastName"
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Rank" Property="x => x.StarRank" Required />
@@ -33,7 +35,7 @@
                 <MudDivider Class="mt-2" />
             </ItemTemplate>
         </ForeignColumn>
-        <PropertyColumn Title="Game date" Property="x => x.Game.GameTime" Format="g" Editable="false" InitialDirection="SortDirection.Ascending">
+        <PropertyColumn Title="Game date" Property="x => x.Game.GameTime" Format="g" Editable="false">
             <CellTemplate>
                 <span>@context.Item.Game?.GameTime.ToEstString("g")</span>
             </CellTemplate>
@@ -47,7 +49,8 @@
 </EntityDataGrid>
 
 @code {
-    
+
+    private EntityDataGrid<GameStar> _dataGrid = null!;
     private readonly GameStarComparer _comparer = new();
     
     private async Task<GameStar?> NewItemFunc()
@@ -64,4 +67,13 @@
             .Include(g => g.Game).ThenInclude(g => g.AwayTeam)
             .Include(g => g.Game).ThenInclude(g => g.Tournament);
     
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        await _dataGrid.ExtendSortAsync("Game.GameTime", SortDirection.Descending, x => x.Game.GameTime);
+        await _dataGrid.ExtendSortAsync("StarRank", SortDirection.Ascending, x => x.StarRank);
+    }
 }

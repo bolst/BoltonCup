@@ -33,7 +33,7 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     public Action<T, TEntity?>? PropertySetter { get; set; }
     
     [Parameter]
-    public new IEqualityComparer<TEntity?>? EqualityComparer { get; set; }
+    public IEqualityComparer<TEntity?>? EqualityComparer { get; set; }
     
     [Parameter]
     public Func<TEntity, string?>? ImageSrcFunc { get; set; }

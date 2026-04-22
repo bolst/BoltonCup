@@ -2,15 +2,23 @@
 
 <EntityDataGrid
     T="Game"
+    @ref="@_dataGrid"
     NewItemFunc="NewItemFunc"
     Include="x => x.Include(p => p.Goals).Include(p => p.Penalties)"
     Comparer="_comparer">
     <Columns>
         <ForeignColumn Title="Home" Property="x => x.HomeTeam" PropertySetter="(game, team) => game.HomeTeam = team" 
-                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" />
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo"
+                       Filter="@(x => (y => y.TournamentId == x.TournamentId))"/>
         <ForeignColumn Title="Away" Property="x => x.AwayTeam" PropertySetter="(game, team) => game.AwayTeam = team" 
-                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo" />
-        <DatePickerColumn Title="Date" Property="x => x.GameTime"/>
+                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo"
+                       Filter="@(x => (y => y.TournamentId == x.TournamentId))"/>
+        <DateTimePickerColumn Title="Date" Property="x => x.GameTime" />
+        <EnumColumn Title="Type" Property="x => x.GameType"/>
+        <PropertyColumn Title="Venue" Property="x => x.Venue"/>
+        <PropertyColumn Title="Rink" Property="x => x.Rink"/>
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament" 
+                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="t => t.Logo" />
         <TemplateColumn Title="Score" Editable="false">
             <CellTemplate>
                 @{
@@ -29,16 +37,12 @@
                 <MudChip T="string" Href='@($"/games/{context.Item.Id}/penalties")' Text="@($"{homePIMs} - {awayPIMs}")" Color="Color.Info" Variant="Variant.Text" Size="Size.Small" Label="true"/>
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Title="Type" Property="x => x.GameType"/>
-        <PropertyColumn Title="Venue" Property="x => x.Venue"/>
-        <PropertyColumn Title="Rink" Property="x => x.Rink"/>
-        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament" 
-                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="t => t.Logo" />
     </Columns>
 </EntityDataGrid>
 
 @code {
-    
+
+    private EntityDataGrid<Game> _dataGrid = null!;
     private readonly GameComparer _comparer = new();
     
     private async Task<Game?> NewItemFunc()
@@ -50,4 +54,12 @@
         };
     }
     
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        await _dataGrid.ExtendSortAsync("Tournament", SortDirection.Descending, x => x.Tournament);
+        await _dataGrid.ExtendSortAsync("GameTime", SortDirection.Ascending, x => x.GameTime);
+    }
 }

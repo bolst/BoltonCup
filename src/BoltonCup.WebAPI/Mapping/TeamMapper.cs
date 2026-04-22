@@ -40,9 +40,9 @@ public class TeamMapper(IBriefMapper _briefMapper, IAssetUrlResolver _urlResolve
             GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSong),
             PenaltySongUrl = _urlResolver.GetFullUrl(team.PenaltySong),
             GmAccountId = team.GmAccountId,
-            GmFirstName = team.GeneralManager!.FirstName,
-            GmLastName = team.GeneralManager.LastName,
-            GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager.Avatar),
+            GmFirstName = team.GeneralManager?.FirstName,
+            GmLastName = team.GeneralManager?.LastName,
+            GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager?.Avatar),
         });
     }    
     
@@ -66,9 +66,9 @@ public class TeamMapper(IBriefMapper _briefMapper, IAssetUrlResolver _urlResolve
                 GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSong),
                 PenaltySongUrl = _urlResolver.GetFullUrl(team.PenaltySong),
                 GmAccountId = team.GmAccountId,
-                GmFirstName = team.GeneralManager!.FirstName,
-                GmLastName = team.GeneralManager.LastName,
-                GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager.Avatar),
+                GmFirstName = team.GeneralManager?.FirstName,
+                GmLastName = team.GeneralManager?.LastName,
+                GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager?.Avatar),
                 Players = team.Players
                     .Select(_briefMapper.ToPlayerBriefDto)
                     .ToList(),

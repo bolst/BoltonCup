@@ -14,8 +14,10 @@ public class GameHighlightMapper(
 {
     public GameHighlightDto ToDto(GameHighlight highlight)
     {
+        var highlightUrls = _urlResolver.GetHighlightUrls(highlight.VideoId);
         return new GameHighlightDto(
-            VideoUrl: _urlResolver.GetVideoUrl(highlight.VideoId) ?? string.Empty,
+            VideoUrl: highlightUrls?.VideoUrl ?? string.Empty,
+            ThumbnailUrl: highlightUrls?.ThumbnailUrl ?? string.Empty,
             Title: highlight.Title,
             Description: highlight.Description,
             Player: highlight.Player is null ? null : _briefMapper.ToPlayerBriefDto(highlight.Player)

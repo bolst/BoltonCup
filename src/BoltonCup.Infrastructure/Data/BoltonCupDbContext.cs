@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Runtime.Serialization;
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -195,7 +197,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.GameTime).HasColumnName("game_time");
             entity.Property(e => e.HomeTeamId).HasColumnName("home_team_id");
             entity.Property(e => e.AwayTeamId).HasColumnName("away_team_id");
-            entity.Property(e => e.GameType).HasColumnName("game_type");
+            entity.Property(e => e.GameType).HasColumnName("game_type").HasConversion(new EnumMemberConverter<GameType>());
             entity.Property(e => e.Venue).HasColumnName("venue");
             entity.Property(e => e.Rink).HasColumnName("rink");
         });
@@ -430,10 +432,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.AgreedToConcussionWaiver).HasColumnName("agreed_concussion_waiver");
             entity.Property(e => e.AgreedToCommunicationConsent).HasColumnName("agreed_communication_consent");
             entity.Property(e => e.Captaincy).HasColumnName("captaincy")
-                .HasConversion(
-                    e => e.ToString()!.ToLower(),
-                    s => (Captaincy)Enum.Parse(typeof(Captaincy), s, true)
-                );
+                .HasConversion(new EnumMemberConverter<Captaincy>())
+                .HasDefaultValue(Captaincy.None);
         });
 
         modelBuilder.Entity<SkaterStat>(entity =>
@@ -604,3 +604,33 @@ public class NullableDateTimeWithKindConverter() : ValueConverter<DateTime?, Dat
     v => v.HasValue ? (v.Value.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)) : v,
     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v
 );
+
+public class EnumMemberConverter<TEnum>()
+    : ValueConverter<TEnum, string>(
+        s => GetEnumMemberValue(s),
+        s => GetEnumFromValue(s)
+) where TEnum : Enum
+{
+    public static string GetEnumMemberValue(TEnum value)
+    {
+        return typeof(TEnum)
+            .GetField(value.ToString())?
+            .GetCustomAttribute<EnumMemberAttribute>()?.Value 
+               ?? value.ToString();
+    }
+
+    public static TEnum GetEnumFromValue(string value)
+    {
+        foreach (var field in typeof(TEnum).GetFields())
+        {
+            var attribute = field.GetCustomAttribute<EnumMemberAttribute>();
+            if (attribute?.Value == value || field.Name == value)
+            {
+                return (TEnum?)field.GetValue(null)
+                    ?? throw new ArgumentException($"Unknown value: {value}");
+            }
+        }
+        
+        throw new ArgumentException($"Unknown value: {value}");
+    }
+}

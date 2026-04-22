@@ -1,7 +1,7 @@
 @page "/games/{GameId:int}"
 @inject IBoltonCupApi BoltonCupApi
 
-@if (_game is not null)
+@if (_game is { AwayTeam: not null, HomeTeam: not null })
 {
     <PageTitle>@_game.AwayTeam.NameShort @@ @_game.HomeTeam.NameShort | Bolton Cup</PageTitle>
 }
@@ -44,7 +44,7 @@
                     {
                         <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="250px" Width="100%" />
                     }
-                    else if (_game is not null)
+                    else if (_game is { HomeTeam: not null, AwayTeam: not null })
                     {
                         var hasOT = _game.Goals.Any(t => t.Period == 4);
                         var hasSO = _game.Goals.Any(t => t.Period == 5);
@@ -125,8 +125,8 @@
     private bool _loading;
 
     private Sdk.GameSingleDto? _game;
-    private IEnumerable<Sdk.GoalBriefDto> _awayGoals => _game?.Goals.Where(g => g.TeamId == _game.AwayTeam.Id) ?? [];
-    private IEnumerable<Sdk.GoalBriefDto> _homeGoals => _game?.Goals.Where(g => g.TeamId == _game.HomeTeam.Id) ?? [];
+    private IEnumerable<Sdk.GoalBriefDto> _awayGoals => _game?.Goals.Where(g => g.TeamId == _game.AwayTeam?.Id) ?? [];
+    private IEnumerable<Sdk.GoalBriefDto> _homeGoals => _game?.Goals.Where(g => g.TeamId == _game.HomeTeam?.Id) ?? [];
 
     protected override async Task OnParametersSetAsync()
     {

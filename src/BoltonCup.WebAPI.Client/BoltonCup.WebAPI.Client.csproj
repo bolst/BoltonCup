@@ -20,6 +20,6 @@
                 Namespace="BoltonCup.Sdk"
                 SourceGenerator="NSwagCSharp"
                 Link="OpenAPIs\boltoncup.json"
-                Options="/GenerateOptionalParameters:true /GenerateClientInterfaces:true /DateTimeType:System.DateTime /JsonLibrary:SystemTextJson" />
+                Options="/GenerateOptionalParameters:true /GenerateNullableReferenceTypes:true /GenerateClientInterfaces:true /DateTimeType:System.DateTime /JsonLibrary:SystemTextJson" />
     </ItemGroup>
 </Project>

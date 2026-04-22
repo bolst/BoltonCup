@@ -10,11 +10,6 @@
         <PropertyColumn Title="Video ID" Property="x => x.VideoId" Required />
         <ForeignColumn Title="Game" Property="x => x.Game" PropertySetter="(gs, game) => gs.Game = game"
                        Include="x => x.Include(g => g.HomeTeam).Include(g => g.AwayTeam).Include(g => g.Tournament)"
-                       Filter="@(star =>
-                               {
-                                   var tournamentId = star.Game?.TournamentId;
-                                   return y => tournamentId == null || y.TournamentId == tournamentId;
-                               })"
                        SearchBy="@(x => (x.HomeTeam != null ? x.HomeTeam.Name : " ") + ' ' + (x.AwayTeam != null ? x.AwayTeam.Name : " "))"
                        EqualityComparer="new GameComparer()">
             <ItemTemplate>
@@ -28,22 +23,18 @@
         </ForeignColumn>
         <ForeignColumn Title="Player" Property="x => x.Player" PropertySetter="(gs, player) => gs.Player = player"
                        EqualityComparer="new PlayerComparer()" Include="x => x.Include(p => p.Account)"
-                       Filter="@(x =>
-                               {
-                                   var tournamentId = x.Game?.TournamentId;
-                                   return y => tournamentId == null || y.TournamentId == tournamentId;
-                               })"
+                       Filter="@(x => y => y.TournamentId == x.Game.TournamentId)"
                        SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"/>
         <PropertyColumn Title="Title" Property="x => x.Title" />
-        <PropertyColumn Title="Description" Property="x => x.Description" />
+        <PropertyColumn Title="Description" Property="x => x.Description" Required="false" />
         <PropertyColumn Title="Game date" Property="x => x.Game.GameTime" Format="g" Editable="false" InitialDirection="SortDirection.Ascending">
             <CellTemplate>
-                <span>@context.Item.Game?.GameTime.ToEstString("g")</span>
+                <span>@context.Item.Game.GameTime.ToEstString("g")</span>
             </CellTemplate>
         </PropertyColumn>
         <TemplateColumn Title="Tournament" Editable="false">
             <CellTemplate>
-                <span>@context.Item.Game?.Tournament?.Name</span>
+                <span>@context.Item.Game.Tournament.Name</span>
             </CellTemplate>
         </TemplateColumn>
     </Columns>
