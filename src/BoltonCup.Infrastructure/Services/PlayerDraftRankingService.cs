@@ -21,7 +21,7 @@ public class PlayerDraftRankingService(BoltonCupDbContext _dbContext) : IPlayerD
                 .ThenInclude(account => account.Players)
                 .ThenInclude(player => player.GoalieGameLogs)
             .Where(p => p.TournamentId == tournamentId)
-            .Where(p => _dbContext.PlayerDraftRankings.Any(pdr => pdr.PlayerId == p.Id && pdr.OverrideRanking == false))
+            .Where(p => _dbContext.PlayerDraftRankings.All(pdr => pdr.PlayerId != p.Id))
             .ToListAsync(cancellationToken: cancellationToken);
 
         var rankings = players

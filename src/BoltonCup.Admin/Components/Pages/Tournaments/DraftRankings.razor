@@ -1,35 +1,37 @@
 @page "/tournaments/{TournamentId:int}/draft-rankings"
 @using System.Linq.Expressions
 @using BoltonCup.Infrastructure.ViewModels
+@inject Infrastructure.Services.IPlayerDraftRankingService PlayerDraftRankingService
 
 <EntityDataGrid
     @ref="_dataGrid"
     T="PlayerDraftRanking"
     SearchBy="x => x.Player.Account.FirstName + ' ' + x.Player.Account.LastName"
+    Include="x => x.Include(y => y.Player).ThenInclude(y => y.Account)"
     Filter="@_filter"
     Comparer="_comparer">
     <ActionMenu>
         <MudMenuItem OnClick="@GenerateNewRankings" Label="Generate New Rankings" Icon="@Icons.Material.Rounded.Refresh" />
     </ActionMenu>
     <Columns>
-        <PropertyColumn Title="Player" Property="x => x.Player.Account.FirstName + ' ' + x.Player.Account.LastName" Editable="false"/>
+        <PropertyColumn Title="Player" Property="x => x.Player.Account.FirstName + ' ' + x.Player.Account.LastName" Editable="false" StickyLeft />
         <PropertyColumn Title="Position" Property="x => x.Player.Position" Editable="false">
             <CellTemplate>
                 <span>
-                    @context.Item.Player.Position
-                    
+                    <PositionChip Position="@context.Item.Player.Position" Size="Size.Small" Variant="Variant.Filled" />
+
                     @if (context.Item.Player.CanPlayEitherPosition)
                     {
                         var otherPosition = context.Item.Player.Position == Core.Values.Position.Forward ? "D" : "F";
-                        @: (can play @otherPosition)
+                        <MudText Typo="Typo.caption">(can play @otherPosition)</MudText>
                     }
                 </span>
             </CellTemplate>
         </PropertyColumn>
-        <PropertyColumn Title="Ranking" Property="x => x.DraftRanking" Editable="true" />
-        <PropertyColumn Title="PPG" Property="x => x.PointsPerGame" Editable="false" />
-        <PropertyColumn Title="Points" Property="x => x.TotalPoints" Editable="false" />
-        <PropertyColumn Title="Games Played" Property="x => x.GamesPlayed" Editable="false" />
+        <PropertyColumn Title="Ranking" Property="x => x.DraftRanking" Editable="true" Format="F3" InitialDirection="SortDirection.Descending" />
+        <PropertyColumn Title="PPG" Property="x => x.PointsPerGame" Editable="false" Format="F3" />
+        <PropertyColumn Title="P" Property="x => x.TotalPoints" Editable="false" />
+        <PropertyColumn Title="GP" Property="x => x.GamesPlayed" Editable="false" />
         <PropertyColumn Title="Friends" Property="x => x.Player.Friends" Editable="false" />
     </Columns>
 </EntityDataGrid>
@@ -69,7 +71,9 @@
     {
         _isLoading = true;
 
+        await PlayerDraftRankingService.RefreshDataAsync(TournamentId);
+
         _isLoading = false;
-        await InvokeAsync(StateHasChanged);
+        await (_dataGrid?.ReloadAsync() ?? InvokeAsync(StateHasChanged));
     }
 }

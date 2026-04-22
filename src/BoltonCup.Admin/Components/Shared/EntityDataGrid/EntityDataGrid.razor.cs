@@ -147,7 +147,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
                 dbSet = Include(dbSet);
             
             dbSet = _includeQueries.Aggregate(dbSet,
-                (current, query) => query(current)
+                (current, query) => query(current).AsNoTracking()
             );
 
             if (Filter is not null)

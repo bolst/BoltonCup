@@ -1,0 +1,55 @@
+@namespace BoltonCup.Common.Components
+
+@if (_positionStyle is not null)
+{
+    <MudChip
+        T="string"
+        Color="@_positionStyle.Color"
+        Size="@Size"
+        Variant="@Variant"
+        Label="true">
+        @_positionStyle.Position
+    </MudChip>
+}
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public string Position { get; set; }
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Text;
+
+    private PositionStyle? _positionStyle;
+
+    protected override void OnParametersSet()
+    {
+        if (_positionStyle?.Position == Position)
+            return;
+        _positionStyle = new PositionStyle(Position);
+    }
+
+    public class PositionStyle
+    {
+        public string Position { get; }
+        public Color Color { get; }
+        
+        public PositionStyle(string position)
+        {
+            Position = position;
+
+            Color = position switch
+            {
+                Core.Values.Position.Forward => Color.Primary,
+                Core.Values.Position.Defense => Color.Secondary,
+                Core.Values.Position.Goalie => Color.Dark,
+                _ => Color
+            };
+        }
+    }
+
+}
