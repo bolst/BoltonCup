@@ -137,6 +137,7 @@ public class DraftService(
                 .ThenInclude(p => p.Account)
             .Include(d => d.Tournament)
             .Where(d => d.DraftId == draftId)
+            .ApplySorting(query, x => x.OrderByDescending(y => y.DraftRanking))
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }
     

@@ -10,17 +10,17 @@
     {
         <MudDrawerHeader>
             <MudStack Class="mud-width-full" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Row>
-                <MudText Typo="Typo.h6">@_selectedPlayer.FullName</MudText>
+                <MudText Typo="Typo.h6">@_selectedPlayer.Player.FullName</MudText>
                 <MudIconButton OnClick="@(() => SetDrawerOpen(false))" Icon="@Icons.Material.Rounded.Close" Class="rounded" Size="Size.Small" />
             </MudStack>
         </MudDrawerHeader>
         
         <MudStack Class="pa-1 mud-height-full">
-            <MudImage Src="@_selectedPlayer.ProfilePicture" Width="150" />
+            <MudImage Src="@_selectedPlayer.Player.ProfilePicture" Width="150" />
             
             <MudSpacer />
             
-            <MudButton OnClick="@DraftSelectedPlayer" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" FullWidth>Draft @_selectedPlayer.FullName</MudButton>
+            <MudButton OnClick="@DraftSelectedPlayer" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" FullWidth>Draft @_selectedPlayer.Player.FullName</MudButton>
         </MudStack>
     }
 </MudDrawer>
@@ -29,7 +29,7 @@
 {
     <MudDataGrid
         @ref="_dataGrid"
-        T="Sdk.PlayerDto"
+        T="Sdk.DraftRankingDto"
         Class="filter-datagrid"
         ServerData="@PlayerServerFunc"
         RowClick="@(x => OpenPlayerDrawer(x.Item))"
@@ -56,24 +56,30 @@
             </div>
         </ToolBarContent>
         <Columns>
-            <PropertyColumn Title="Player" Property="x => x.FullName">
+            <PropertyColumn Title="Player" Property="x => x.Player.FullName">
+                <CellTemplate>
+                    <MudText Typo="Typo.body2"><b>@context.Item.Player.FullName</b></MudText>
+                </CellTemplate>
                 <FooterTemplate>
-                    <MudChip T="string" Color="Color.Primary" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.Position == Core.Values.Position.Forward) forwards</MudChip>
+                    <MudChip T="string" Color="Color.Primary" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.Player.Position == Core.Values.Position.Forward) forwards</MudChip>
                 </FooterTemplate>
             </PropertyColumn>
-            <PropertyColumn Title="Position" Property="x => x.Position">
+            <PropertyColumn Title="Position" Property="x => x.Player.Position">
                 <FooterTemplate>
-                    <MudChip T="string" Color="Color.Secondary" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.Position == Core.Values.Position.Defense) defensemen</MudChip>
+                    <MudChip T="string" Color="Color.Secondary" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.Player.Position == Core.Values.Position.Defense) defensemen</MudChip>
                 </FooterTemplate>
             </PropertyColumn>
-            <PropertyColumn Title="Year" Property="x => x.Birthday" Format="yyyy">
+            <PropertyColumn Title="PPG" Property="x => x.DraftRanking" Format="F3" />
+            <PropertyColumn Title="P" Property="x => x.TotalPoints" />
+            <PropertyColumn Title="GP" Property="x => x.GamesPlayed" />
+            <PropertyColumn Title="Year" Property="x => x.Player.Birthday" Format="yyyy">
                 <FooterTemplate>
-                    <MudChip T="string" Color="Color.Dark" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.IsGoalie) goalies</MudChip>
+                    <MudChip T="string" Color="Color.Dark" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.Player.IsGoalie) goalies</MudChip>
                 </FooterTemplate>
             </PropertyColumn>
         </Columns>
         <PagerContent>
-            <MudDataGridPager T="Sdk.PlayerDto" PageSizeSelector="false"/>
+            <MudDataGridPager T="Sdk.DraftRankingDto" PageSizeSelector="false"/>
         </PagerContent>
     </MudDataGrid>
 }
@@ -94,10 +100,12 @@ else
     private Sdk.DraftSingleDto? _draft;
 
     private bool _drawerOpen;
-    private Sdk.PlayerDto? _selectedPlayer;
+    private Sdk.DraftRankingDto? _selectedPlayer;
 
     private readonly DraftManagerFilterModel _filter = new();
-    private MudDataGrid<Sdk.PlayerDto> _dataGrid = null!;
+    private MudDataGrid<Sdk.DraftRankingDto> _dataGrid = null!;
+
+    private bool _sorted;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -108,11 +116,11 @@ else
         _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
     }
 
-    private async Task<GridData<Sdk.PlayerDto>> PlayerServerFunc(GridState<Sdk.PlayerDto> state, CancellationToken cancellationToken)
+    private async Task<GridData<Sdk.DraftRankingDto>> PlayerServerFunc(GridState<Sdk.DraftRankingDto> state, CancellationToken cancellationToken)
     {
         if (_draft is null)
         {
-            return new GridData<Sdk.PlayerDto>
+            return new GridData<Sdk.DraftRankingDto>
             {
                 TotalItems = 0,
                 Items = []
@@ -127,9 +135,15 @@ else
             sortBy = sortDefinition.SortBy;
             descending = sortDefinition.Descending;
         }
+        else
+        {
+            sortBy = "DraftRanking";
+            descending = true;
+        }
+        
 
-        var data = await BoltonCupApi.GetPlayersAsync(
-            tournamentId: _draft.Tournament.Id,
+        var data = await BoltonCupApi.GetDraftRankingsAsync(
+            id: _draft.Id, 
             page: state.Page + 1, 
             size: state.PageSize,
             sortBy: sortBy,
@@ -137,7 +151,7 @@ else
             cancellationToken: cancellationToken
         );
         
-        return new GridData<Sdk.PlayerDto>
+        return new GridData<Sdk.DraftRankingDto>
         {
             TotalItems = data.Total,
             Items = data.Items,
@@ -155,7 +169,7 @@ else
         return InvokeAsync(StateHasChanged);
     }
 
-    private void OpenPlayerDrawer(Sdk.PlayerDto player)
+    private void OpenPlayerDrawer(Sdk.DraftRankingDto player)
     {
         _selectedPlayer = player;
         _drawerOpen = true;
