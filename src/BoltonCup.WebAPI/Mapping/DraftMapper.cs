@@ -9,6 +9,7 @@ public interface IDraftMapper
 {
     IPagedList<DraftDto> ToDtoList(IPagedList<Draft> drafts);
     IPagedList<DraftPickDto> ToDtoList(IPagedList<DraftPick> draftPicks);
+    IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings);
     DraftSingleDto? ToDto(Draft? draft);
     DraftPickSingleDto? ToDto(DraftPick? draftPick);
     GetDraftsQuery ToQuery(GetDraftsRequest request);
@@ -40,6 +41,24 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
             OverallPick = draft.OverallPick,
             Team = _briefMapper.ToTeamBriefDto(draft.Team),
             Player = draft.Player is null ? null : _briefMapper.ToPlayerBriefDto(draft.Player),
+        });
+    }
+
+    public IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings)
+    {
+        return rankings.ProjectTo(draft => new DraftRankingDto
+        {
+            Id = draft.Id,
+            DraftId = draft.DraftId,
+            Player = _briefMapper.ToPlayerBriefDto(draft.Player),
+            Tournament = _briefMapper.ToTournamentBriefDto(draft.Tournament),
+            GamesPlayed = draft.GamesPlayed,
+            TotalPoints = draft.TotalPoints,
+            IsChampion = draft.IsChampion,
+            DraftRanking = draft.DraftRanking,
+            OverrideRanking = draft.OverrideRanking,
+            IsDrafted = draft.IsDrafted,
+            PointsPerGame = draft.PointsPerGame,
         });
     }
     
