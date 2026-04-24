@@ -3254,6 +3254,13 @@
             }
           },
           {
+            "name": "IsDrafted",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "Page",
             "in": "query",
             "schema": {
@@ -6677,6 +6684,19 @@
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
             ]
+          },
+          "team": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ],
+            "nullable": true
+          },
+          "overallPick": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           },
           "gamesPlayed": {
             "type": "integer",

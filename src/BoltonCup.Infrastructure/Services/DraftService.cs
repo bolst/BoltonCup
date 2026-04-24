@@ -138,10 +138,13 @@ public class DraftService(
             .AsNoTracking()
             .Include(d => d.Player)
                 .ThenInclude(p => p.Account)
+            .Include(d => d.DraftPick)
+                .ThenInclude(dp => dp.Team)
             .Include(d => d.Tournament)
             .Where(d => d.DraftId == draftId)
             .ConditionalWhere(d => d.Player.Position == query.Position, !string.IsNullOrEmpty(query.Position))
             .ConditionalWhere(d => d.Player.TeamId == query.TeamId, query.TeamId.HasValue)
+            .ConditionalWhere(d => (d.DraftPickId != null) == query.IsDrafted!.Value, query.IsDrafted.HasValue)
             .ApplySorting(query, x => x.OrderByDescending(y => y.DraftRanking))
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }
@@ -205,7 +208,7 @@ public class DraftService(
         
         // draft player
         pick.PlayerId = command.PlayerId;
-        player.IsDrafted = true;
+        player.DraftPickId = pick.Id;
 
         try
         {

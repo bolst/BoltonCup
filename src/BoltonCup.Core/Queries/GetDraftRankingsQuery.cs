@@ -9,6 +9,8 @@ public sealed record GetDraftRankingsQuery : QueryBase
     public string? Position { get; set; }
     
     public int? TeamId { get; set; }
+    
+    public bool? IsDrafted { get; set; }
 }
 
 

@@ -475,9 +475,14 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Tournament)
                 .WithMany()
                 .HasForeignKey(e => e.TournamentId);
+            entity
+                .HasOne(e => e.DraftPick)
+                .WithMany()
+                .HasForeignKey(e => e.DraftPickId);
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.DraftId).HasColumnName("draft_id");
+            entity.Property(e => e.DraftPickId).HasColumnName("draft_pick_id");
             entity.Property(e => e.GamesPlayed).HasColumnName("games_played");
             entity.Property(e => e.TotalPoints).HasColumnName("total_points");
             entity.Property(e => e.IsChampion).HasColumnName("is_champion");

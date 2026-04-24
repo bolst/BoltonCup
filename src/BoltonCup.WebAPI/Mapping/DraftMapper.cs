@@ -52,6 +52,8 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
             DraftId = draft.DraftId,
             Player = _briefMapper.ToPlayerBriefDto(draft.Player),
             Tournament = _briefMapper.ToTournamentBriefDto(draft.Tournament),
+            Team = draft.DraftPick is null ? null : _briefMapper.ToTeamBriefDto(draft.DraftPick.Team),
+            OverallPick = draft.DraftPick?.OverallPick,
             GamesPlayed = draft.GamesPlayed,
             TotalPoints = draft.TotalPoints,
             IsChampion = draft.IsChampion,

@@ -9,13 +9,15 @@ public sealed class PlayerDraftRanking : EntityBase
     public Tournament Tournament { get; set; } = null!;
     public int DraftId { get; set; }
     public Draft Draft { get; set; } = null!;
+    public int? DraftPickId { get; set; }
+    public DraftPick? DraftPick { get; set; }
     public int GamesPlayed { get; set; }
     public int TotalPoints { get; set; }
     public bool IsChampion { get; set; }
     public double DraftRanking { get; set; }
     public bool OverrideRanking { get; set; }
-    public bool IsDrafted { get; set; }
 
+    public bool IsDrafted => DraftPick is not null;
     public string PlayerName => Player.Account.FirstName + " " + Player.Account.LastName;
     public double PointsPerGame => GamesPlayed == 0 ? 0 : (double)TotalPoints / GamesPlayed;
 
