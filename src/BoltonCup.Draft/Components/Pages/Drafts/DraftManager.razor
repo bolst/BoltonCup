@@ -67,7 +67,7 @@ else
             </MudStack>
         }
     </MudDrawer>
-
+    
     @if (_draft is not null)
     {
         <MudDataGrid
@@ -76,6 +76,7 @@ else
             Class="filter-datagrid"
             ServerData="@PlayerServerFunc"
             RowClick="@(x => OpenPlayerDrawer(x.Item))"
+            SortMode="SortMode.None"
             Breakpoint="Breakpoint.None"
             RowClass="cursor-pointer"
             RowStyle="height: 50px"
@@ -96,7 +97,7 @@ else
                         @bind-Value="@_filter.Position" OnApplyClicked="@_dataGrid.ReloadServerData">
                         <PositionFilter UseGoalie/>
                     </FilterToolbarField>
-                    
+                
                     <MudChipSet T="int?" SelectedValue="@_filter.TeamId" SelectedValueChanged="@SelectedTeamChanged" SelectionMode="SelectionMode.ToggleSelection">
                         @foreach (var pickOrder in _draft.PickOrder)
                         {
@@ -107,7 +108,7 @@ else
                             </MudChip>
                         }
                     </MudChipSet>
-                    
+                
                     <MudToggleGroup 
                         T="bool?" Value="@_filter.IsDrafted" ValueChanged="@IsDraftedChanged"
                         Size="Size.Small" Color="Color.Primary">
@@ -115,17 +116,17 @@ else
                         <MudToggleItem T="bool?" Value="true" Text="Drafted" />
                         <MudToggleItem T="bool?" Value="null" Text="All" />
                     </MudToggleGroup>
-                    
+                
                     <MudSpacer/>
-                    
+                
                     <MudText Typo="Typo.h6"><b>Current Pick:</b></MudText>
                     @if (_currentPick is not null)
                     {
                         <MudImage Src="@_currentPick.Team.Logo" Height="48" />
                     }
-                    
+                
                     <MudDivider FlexItem Vertical />
-                    
+                
                     @if (_currentPick is not null)
                     {
                         <MudText Typo="Typo.body2">Pick @_currentPick.OverallPick</MudText>
