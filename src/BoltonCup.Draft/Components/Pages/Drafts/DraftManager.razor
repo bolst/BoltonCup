@@ -72,12 +72,38 @@
         Striped
         Dense>
         <ToolBarContent>
-            <div class="d-flex flex-row align-center gap-3 flex-wrap">
+            <div class="mud-width-full d-flex flex-row align-center gap-3 flex-wrap">
                 <FilterToolbarField
                     T="string?" Label="Position"
                     @bind-Value="@_filter.Position" OnApplyClicked="@_dataGrid.ReloadServerData">
-                    <PositionFilter/>
+                    <PositionFilter UseGoalie/>
                 </FilterToolbarField>
+                
+                <MudChipSet T="int?" SelectedValue="@_filter.TeamId" SelectedValueChanged="@SelectedTeamChanged" Size="Size.Small" SelectionMode="SelectionMode.ToggleSelection">
+                    @foreach (var team in _teams)
+                    {
+                        <MudChip T="int?"
+                                 Value="@team.Id" Style="@($"background-color: {team.PrimaryColorHex}{(team.Id == _filter.TeamId ? "AA" : "22")}; color: {team.SecondaryColorHex}AA;")"
+                                 Variant="Variant.Text">
+                            <MudImage Src="@team.LogoUrl" Height="24"/>
+                        </MudChip>
+                    }
+                </MudChipSet>
+                
+                <MudSpacer/>
+                
+                <MudText Typo="Typo.h6"><b>Current Pick:</b></MudText>
+                @if (_currentPick is not null)
+                {
+                    <MudImage Src="@_currentPick.Team.Logo" Height="48" />
+                }
+                
+                <MudDivider FlexItem Vertical />
+                
+                @if (_currentPick is not null)
+                {
+                    <MudText Typo="Typo.body2">Pick @_currentPick.OverallPick</MudText>
+                }
             </div>
         </ToolBarContent>
         <Columns>
@@ -126,14 +152,16 @@ else
     private int? _draftId;
 
     private Sdk.DraftSingleDto? _draft;
-
+    private List<Sdk.TeamDto> _teams = [];
+    private Sdk.DraftPickSingleDto? _currentPick;
+    
     private bool _drawerOpen;
     private Sdk.DraftRankingDto? _selectedPlayer;
 
     private readonly DraftManagerFilterModel _filter = new();
     private MudDataGrid<Sdk.DraftRankingDto> _dataGrid = null!;
-
     private bool _sorted;
+    
 
     protected override async Task OnParametersSetAsync()
     {
@@ -142,6 +170,11 @@ else
         _draftId = DraftId;
 
         _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
+        if (_draft is not null)
+        {
+            _teams = (await BoltonCupApi.GetTeamsAsync(tournamentId: _draft.Tournament.Id)).Items.ToList();
+            _currentPick = await BoltonCupApi.GetCurrentDraftPickAsync(DraftId);
+        }
     }
 
     private async Task<GridData<Sdk.DraftRankingDto>> PlayerServerFunc(GridState<Sdk.DraftRankingDto> state, CancellationToken cancellationToken)
@@ -169,9 +202,10 @@ else
             descending = false;
         }
         
-
         var data = await BoltonCupApi.GetDraftRankingsAsync(
             id: _draft.Id,
+            position: _filter.Position,
+            teamId: _filter.TeamId,
             page: state.Page + 1, 
             size: state.PageSize,
             sortBy: sortBy,
@@ -204,6 +238,12 @@ else
         InvokeAsync(StateHasChanged);
     }
 
+    private Task SelectedTeamChanged(int? teamId)
+    {
+        _filter.TeamId = teamId;
+        return _dataGrid.ReloadServerData();
+    }
+
     private async Task DraftSelectedPlayer()
     {
         if (_selectedPlayer is null)
@@ -219,6 +259,7 @@ else
     private class DraftManagerFilterModel
     {
         public string? Position { get; set; }
+        public int? TeamId { get; set; }
     }
 
     public RenderFragment DrawerLabel(string label)

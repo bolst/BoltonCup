@@ -121,6 +121,9 @@ public class DraftService(
             throw new InvalidOperationException("Draft is not in progress.");
 
         return await _dbContext.DraftPicks
+            .Include(dp => dp.Team)
+            .Include(dp => dp.Player)
+                .ThenInclude(p => p.Account)
             .Where(dp => dp.DraftId == draft.Id)
             .Where(dp => dp.PlayerId == null)
             .OrderBy(dp => dp.OverallPick)
@@ -137,6 +140,8 @@ public class DraftService(
                 .ThenInclude(p => p.Account)
             .Include(d => d.Tournament)
             .Where(d => d.DraftId == draftId)
+            .ConditionalWhere(d => d.Player.Position == query.Position, !string.IsNullOrEmpty(query.Position))
+            .ConditionalWhere(d => d.Player.TeamId == query.TeamId, query.TeamId.HasValue)
             .ApplySorting(query, x => x.OrderByDescending(y => y.DraftRanking))
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }
