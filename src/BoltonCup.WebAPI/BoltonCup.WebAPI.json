@@ -8160,6 +8160,16 @@
           "banner": {
             "type": "string",
             "nullable": true
+          },
+          "primaryColorHex": {
+            "type": "string"
+          },
+          "secondaryColorHex": {
+            "type": "string"
+          },
+          "tertiaryColorHex": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -8294,6 +8304,16 @@
             "nullable": true
           },
           "banner": {
+            "type": "string",
+            "nullable": true
+          },
+          "primaryColorHex": {
+            "type": "string"
+          },
+          "secondaryColorHex": {
+            "type": "string"
+          },
+          "tertiaryColorHex": {
             "type": "string",
             "nullable": true
           },

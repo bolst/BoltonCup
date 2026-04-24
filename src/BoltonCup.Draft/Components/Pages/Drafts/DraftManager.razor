@@ -98,12 +98,12 @@ else
                     </FilterToolbarField>
                     
                     <MudChipSet T="int?" SelectedValue="@_filter.TeamId" SelectedValueChanged="@SelectedTeamChanged" SelectionMode="SelectionMode.ToggleSelection">
-                        @foreach (var team in _teams)
+                        @foreach (var pickOrder in _draft.PickOrder)
                         {
                             <MudChip T="int?"
-                                     Value="@team.Id" Style="@($"background-color: {team.PrimaryColorHex}{(team.Id == _filter.TeamId ? "AA" : "11")}; color: {team.SecondaryColorHex}AA;")"
+                                     Value="@pickOrder.Team.Id" Style="@($"background-color: {pickOrder.Team.PrimaryColorHex}{(pickOrder.Team.Id == _filter.TeamId ? "AA" : "11")}; color: {pickOrder.Team.SecondaryColorHex}AA;")"
                                      Variant="Variant.Text">
-                                <MudImage Src="@team.LogoUrl" Height="24"/>
+                                <MudImage Src="@pickOrder.Team.Logo" Height="24"/>
                             </MudChip>
                         }
                     </MudChipSet>
@@ -186,7 +186,6 @@ else
     private bool _loading;
 
     private Sdk.DraftSingleDto? _draft;
-    private List<Sdk.TeamDto> _teams = [];
     private Sdk.DraftPickSingleDto? _currentPick;
     
     private bool _drawerOpen;
@@ -205,11 +204,7 @@ else
         _loading = true;
         
         _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
-        if (_draft is not null)
-        {
-            _teams = (await BoltonCupApi.GetTeamsAsync(tournamentId: _draft.Tournament.Id)).Items.ToList();
-            await LoadCurrentPickAsync();
-        }
+        await LoadCurrentPickAsync();
 
         _loading = false;
         await InvokeAsync(StateHasChanged);
