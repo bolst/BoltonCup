@@ -15,11 +15,36 @@
             </MudStack>
         </MudDrawerHeader>
         
-        <MudStack Class="pa-1 mud-height-full">
-            <MudImage Src="@_selectedPlayer.Player.ProfilePicture" Width="150" />
-            
-            <MudSpacer />
-            
+        <PositionChip Position="@_selectedPlayer.Player.Position" Size="Size.Large" Variant="Variant.Outlined" />
+        
+        <MudStack Class="pa-1 mud-height-full mud-width-full">
+            <div class="mud-width-full d-flex align-center justify-center">
+                <MudImage Src="@_selectedPlayer.Player.ProfilePicture" Width="150"/>
+            </div>
+
+            <MudSimpleTable Elevation="0" Square Striped Dense>
+                <tbody>
+                <tr>
+                    @DrawerLabel("Total Points")
+                    @DrawerValue(_selectedPlayer.TotalPoints)
+                </tr>
+                <tr>
+                    @DrawerLabel("Games Played")
+                    @DrawerValue(_selectedPlayer.GamesPlayed)
+                </tr>
+                <tr>
+                    @DrawerLabel("Points per game")
+                    @DrawerValue(_selectedPlayer.PointsPerGame.ToString("F3"))
+                </tr>
+                <tr>
+                    @DrawerLabel("Rank")
+                    @DrawerValue(_selectedPlayer.DraftRanking.ToString("F0"))
+                </tr>
+                </tbody>
+            </MudSimpleTable>
+
+            <MudSpacer/>
+
             <MudButton OnClick="@DraftSelectedPlayer" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" FullWidth>Draft @_selectedPlayer.Player.FullName</MudButton>
         </MudStack>
     }
@@ -61,20 +86,23 @@
                     <MudText Typo="Typo.body2"><b>@context.Item.Player.FullName</b></MudText>
                 </CellTemplate>
                 <FooterTemplate>
-                    <MudChip T="string" Color="Color.Primary" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.Player.Position == Core.Values.Position.Forward) forwards</MudChip>
+                    <MudChip T="string" Color="Color.Primary" Size="Size.Small" Variant="Variant.Filled" Label="true">@context.Items.Count(x => x.Player.Position == Core.Values.Position.Forward) forwards</MudChip>
                 </FooterTemplate>
             </PropertyColumn>
             <PropertyColumn Title="Position" Property="x => x.Player.Position">
+                <CellTemplate>
+                    <PositionChip Position="@context.Item.Player.Position" Variant="Variant.Text" Size="Size.Small" />
+                </CellTemplate>
                 <FooterTemplate>
-                    <MudChip T="string" Color="Color.Secondary" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.Player.Position == Core.Values.Position.Defense) defensemen</MudChip>
+                    <MudChip T="string" Color="Color.Secondary" Size="Size.Small" Variant="Variant.Filled" Label="true">@context.Items.Count(x => x.Player.Position == Core.Values.Position.Defense) defensemen</MudChip>
                 </FooterTemplate>
             </PropertyColumn>
-            <PropertyColumn Title="PPG" Property="x => x.DraftRanking" Format="F3" />
+            <PropertyColumn Title="PPG" Property="x => x.PointsPerGame" Format="F2" />
             <PropertyColumn Title="P" Property="x => x.TotalPoints" />
             <PropertyColumn Title="GP" Property="x => x.GamesPlayed" />
             <PropertyColumn Title="Year" Property="x => x.Player.Birthday" Format="yyyy">
                 <FooterTemplate>
-                    <MudChip T="string" Color="Color.Dark" Size="Size.Small" Variant="Variant.Text" Label="true">@context.Items.Count(x => x.Player.IsGoalie) goalies</MudChip>
+                    <MudChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Filled" Label="true">@context.Items.Count(x => x.Player.IsGoalie) goalies</MudChip>
                 </FooterTemplate>
             </PropertyColumn>
         </Columns>
@@ -138,12 +166,12 @@ else
         else
         {
             sortBy = "DraftRanking";
-            descending = true;
+            descending = false;
         }
         
 
         var data = await BoltonCupApi.GetDraftRankingsAsync(
-            id: _draft.Id, 
+            id: _draft.Id,
             page: state.Page + 1, 
             size: state.PageSize,
             sortBy: sortBy,
@@ -191,5 +219,15 @@ else
     private class DraftManagerFilterModel
     {
         public string? Position { get; set; }
+    }
+
+    public RenderFragment DrawerLabel(string label)
+    {
+        return @<td><b>@label</b></td>;
+    }
+
+    public RenderFragment DrawerValue(object value)
+    {
+        return @<td>@value</td>;
     }
 }
