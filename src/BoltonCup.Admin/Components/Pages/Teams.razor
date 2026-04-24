@@ -2,6 +2,7 @@
 @inject ITeamService TeamService
 
 <EntityDataGrid
+    @ref="@_dataGrid"
     T="Team"
     NewItemFunc="NewItemFunc"
     SearchBy="x => x.Name"
@@ -21,8 +22,17 @@
 </EntityDataGrid>
 
 @code {
-    
+
+    private EntityDataGrid<Team> _dataGrid = null!;
     private readonly TeamComparer _comparer = new();
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        await _dataGrid.ExtendSortAsync("Tournament.StartDate", SortDirection.Descending, x => x.Tournament.StartDate);
+    }
     
     private async Task<Team?> NewItemFunc()
     {
