@@ -327,9 +327,15 @@ public class DraftService(
                     GamesPlayed = skaterLogs.Count + goalieLogs.Count,
                     TotalPoints = totalPoints,
                     IsChampion = false, // TODO
-                    DraftRanking = skaterLogs.Count == 0 ? 0 : (double)totalPoints / skaterLogs.Count,
+                    DraftRanking = 0,
                     OverrideRanking = false,
                 };
+            })
+            .OrderByDescending(r => r.PointsPerGame)
+            .Select((player, index) =>
+            {
+                player.DraftRanking = index + 1;
+                return player;
             });
 
         _dbContext.PlayerDraftRankings.AddRange(rankings);
