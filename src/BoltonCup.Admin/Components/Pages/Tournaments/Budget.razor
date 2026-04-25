@@ -1,0 +1,20 @@
+@page "/tournaments/{TournamentId:int}/budget"
+
+
+@code {
+
+    [Parameter]
+    public int TournamentId { get; set; }
+
+    private int? _tournamentId;
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (_tournamentId == TournamentId)
+            return Task.CompletedTask;
+        _tournamentId = TournamentId;
+         
+        return Task.CompletedTask;
+    }
+
+}
