@@ -89,7 +89,7 @@
                 </MudItem>
                 
                 <MudItem xs="12" md="6" lg="4">
-                    <MudDataGrid Items="@_players" Height="400px" Filterable="false" ShowColumnOptions="false" Elevation="0" FixedHeader FixedFooter Outlined Square Dense>
+                    <MudDataGrid Items="@_players" Height="400px" Filterable="false" ShowColumnOptions="false" Elevation="0" FixedHeader FixedFooter Outlined Striped Square Dense>
                         <Columns>
                             <PropertyColumn Title="Player" Property="x => x.FullName">
                                 <FooterTemplate>
@@ -185,12 +185,15 @@
         _loading = true;
         
         _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
-        _updateDraftRequest.Title = _draft.Title;
-        _updateDraftRequest.DraftStatus = _draft.Status;
-        _updateDraftRequest.DraftType = _draft.Type;
+        if (_draft is not null)
+        {
+            _updateDraftRequest.Title = _draft.Title ?? "";
+            _updateDraftRequest.DraftStatus = _draft.Status;
+            _updateDraftRequest.DraftType = _draft.Type;
 
-        _isDirty = false;
-        _isOrderingDirty = false;
+            _isDirty = false;
+            _isOrderingDirty = false;
+        }
         _loading = false;
         await InvokeAsync(StateHasChanged);
     }

@@ -37,7 +37,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<Tournament> Tournaments { get; set; }
     public DbSet<TournamentRegistration> TournamentRegistrations { get; set; }
     
-    public DbSet<ViewModels.PlayerDraftRanking> PlayerDraftRankings { get; set; }
+    public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -452,6 +452,43 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasConversion(new EnumMemberConverter<Captaincy>())
                 .HasDefaultValue(Captaincy.None);
         });
+        
+        modelBuilder.Entity<PlayerDraftRanking>(entity =>
+        {
+            entity
+                .ToTable("draft_rankings")
+                .HasKey(e => e.Id);
+            entity
+                .HasIndex(e => new { e.PlayerId, e.TournamentId })
+                .IsUnique();
+            entity
+                .HasIndex(e => e.TournamentId);
+            entity
+                .HasOne(e => e.Player)
+                .WithMany()
+                .HasForeignKey(e => e.PlayerId);
+            entity
+                .HasOne(e => e.Draft)
+                .WithMany()
+                .HasForeignKey(e => e.DraftId);
+            entity
+                .HasOne(e => e.Tournament)
+                .WithMany()
+                .HasForeignKey(e => e.TournamentId);
+            entity
+                .HasOne(e => e.DraftPick)
+                .WithMany()
+                .HasForeignKey(e => e.DraftPickId);
+            entity.Property(e => e.PlayerId).HasColumnName("player_id");
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.DraftId).HasColumnName("draft_id");
+            entity.Property(e => e.DraftPickId).HasColumnName("draft_pick_id");
+            entity.Property(e => e.GamesPlayed).HasColumnName("games_played");
+            entity.Property(e => e.TotalPoints).HasColumnName("total_points");
+            entity.Property(e => e.IsChampion).HasColumnName("is_champion");
+            entity.Property(e => e.DraftRanking).HasColumnName("draft_ranking");
+            entity.Property(e => e.OverrideRanking).HasColumnName("override_ranking");
+        });
 
         modelBuilder.Entity<SkaterStat>(entity =>
         {
@@ -589,33 +626,6 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.CurrentStep).HasColumnName("current_step");
             entity.Property(e => e.Payload).HasColumnName("payload");
             entity.Property(e => e.IsComplete).HasColumnName("is_complete");
-        });
-        
-        
-        // view models
-
-        modelBuilder.Entity<ViewModels.PlayerDraftRanking>(entity =>
-        {
-            entity
-                .ToTable("draft_rankings")
-                .HasKey(e => new { e.PlayerId, e.TournamentId });
-            entity
-                .HasIndex(e => e.TournamentId);
-            entity
-                .HasOne(e => e.Player)
-                .WithMany()
-                .HasForeignKey(e => e.PlayerId);
-            entity
-                .HasOne(e => e.Tournament)
-                .WithMany()
-                .HasForeignKey(e => e.TournamentId);
-            entity.Property(e => e.PlayerId).HasColumnName("player_id");
-            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
-            entity.Property(e => e.GamesPlayed).HasColumnName("games_played");
-            entity.Property(e => e.TotalPoints).HasColumnName("total_points");
-            entity.Property(e => e.IsChampion).HasColumnName("is_champion");
-            entity.Property(e => e.DraftRanking).HasColumnName("draft_ranking");
-            entity.Property(e => e.OverrideRanking).HasColumnName("override_ranking");
         });
         
         

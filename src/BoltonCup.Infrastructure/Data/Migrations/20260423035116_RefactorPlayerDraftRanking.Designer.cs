@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,14 +12,16 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260423035116_RefactorPlayerDraftRanking")]
+    partial class RefactorPlayerDraftRanking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("core")
-                .HasAnnotation("ProductVersion", "10.0.7")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -1115,10 +1118,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("draft_id");
 
-                    b.Property<int?>("DraftPickId")
-                        .HasColumnType("integer")
-                        .HasColumnName("draft_pick_id");
-
                     b.Property<double>("DraftRanking")
                         .HasColumnType("double precision")
                         .HasColumnName("draft_ranking");
@@ -1130,6 +1129,9 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<bool>("IsChampion")
                         .HasColumnType("boolean")
                         .HasColumnName("is_champion");
+
+                    b.Property<bool>("IsDrafted")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone")
@@ -1158,8 +1160,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DraftId");
-
-                    b.HasIndex("DraftPickId");
 
                     b.HasIndex("TournamentId");
 
@@ -1820,10 +1820,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BoltonCup.Core.DraftPick", "DraftPick")
-                        .WithMany()
-                        .HasForeignKey("DraftPickId");
-
                     b.HasOne("BoltonCup.Core.Player", "Player")
                         .WithMany()
                         .HasForeignKey("PlayerId")
@@ -1837,8 +1833,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Draft");
-
-                    b.Navigation("DraftPick");
 
                     b.Navigation("Player");
 
