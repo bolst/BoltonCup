@@ -62,6 +62,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public RenderFragment? ActionMenu { get; set; }
     
     [Parameter]
+    public RenderFragment? ToolbarContent { get; set; }
+    
+    [Parameter]
     public RenderFragment<CellContext<T>>? ChildRowContent { get; set; }
 
     [Parameter]

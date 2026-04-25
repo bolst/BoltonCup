@@ -35,7 +35,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<SkaterStat> SkaterStats { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
-    public DbSet<TournamentBudgetItem> TournamentExpenses { get; set; }
+    public DbSet<TournamentBudgetItem> TournamentBudgetItems { get; set; }
     public DbSet<TournamentRegistration> TournamentRegistrations { get; set; }
     
     public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
