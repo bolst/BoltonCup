@@ -1,0 +1,155 @@
+@page "/tournaments/{TournamentId:int}/budget"
+@using System.Linq.Expressions
+@using BoltonCup.Infrastructure
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+
+<MudGrid Class="pa-1" Spacing="1">
+    <MudItem xs="6" md="3">
+        <DataCard Title="Actual Revenue" Height="100px">
+            <MudText Typo="Typo.h6">@((ActualIncome - _expensesTotal)?.ToString("C"))</MudText>
+        </DataCard>
+    </MudItem>
+    <MudItem xs="6" md="3">
+        <DataCard Title="Projected Revenue" Height="100px">
+            <MudText Typo="Typo.h6">@((ProjectedIncome - _expensesTotal)?.ToString("C"))</MudText>
+        </DataCard>
+    </MudItem>
+</MudGrid>
+
+<EntityDataGrid
+    @ref="_dataGrid"
+    T="TournamentBudgetItem"
+    SearchBy="x => x.Title"
+    Height="calc(100vh - 264px - var(--mud-appbar-height))"
+    Filter="@_filter"
+    ColumnResizeMode="ResizeMode.Column"
+    NewItemFunc="@NewItemFunc"
+    OnServerReload="@OnServerReload"
+    Comparer="_comparer">
+    <ToolbarContent>
+        <MudTooltip Text="@($"Show {(_showIncome ? "expenses" : "income")}")">
+            <MudToggleIconButton
+                Toggled="@_showIncome"
+                ToggledChanged="@ShowIncomeChanged"
+                Icon="@Icons.Material.Rounded.AttachMoney"
+                Color="Color.Error"
+                ToggledColor="Color.Success"/>
+        </MudTooltip>
+    </ToolbarContent>
+    <Columns>
+        <PropertyColumn Title="Title" Property="x => x.Title"/>
+        <PropertyColumn Title="Amount" Property="x => x.Amount" Format="C" InitialDirection="SortDirection.Descending">
+            <FooterTemplate>
+                @if (_showIncome)
+                {
+                    <MudChip
+                        Text="@($"Total: {ActualIncome:C}")"
+                        Variant="Variant.Filled" Color="Color.Success" Label="true"/>
+                }
+                else
+                {
+                    <MudChip
+                        Text="@($"Total: {_expensesTotal:C}")"
+                        Variant="Variant.Filled" Color="Color.Error" Label="true"/>
+                }
+            </FooterTemplate>
+        </PropertyColumn>
+        <EnumColumn Title="Type" Property="x => x.BudgetItemType" />
+    </Columns>
+</EntityDataGrid>
+
+@code {
+
+    [Parameter]
+    public int TournamentId { get; set; }
+
+    private int? _tournamentId;
+    private Tournament? _tournament;
+
+    private decimal _actualPlayerIncome = 0;
+    private decimal _projectedPlayerIncome = 0;
+    
+    private decimal? _incomeTotal;
+    private decimal? _expensesTotal;
+
+    private decimal ActualIncome => _actualPlayerIncome + _incomeTotal ?? 0;
+    private decimal ProjectedIncome => _projectedPlayerIncome + _incomeTotal ?? 0;
+    
+    private EntityDataGrid<TournamentBudgetItem>? _dataGrid;
+    private static readonly TournamentBudgetItemComparer _comparer = new();
+
+    private bool _showIncome;
+    private Expression<Func<TournamentBudgetItem, bool>>? _filter;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_tournamentId == TournamentId)
+            return;
+        _tournamentId = TournamentId;
+        
+        await LoadPlayerIncomeDataAsync();
+
+        _filter = x => x.TournamentId == TournamentId 
+                       && x.BudgetItemType ==  (_showIncome ? BudgetItemType.Income : BudgetItemType.Expense);
+        if (_dataGrid is not null)
+            await _dataGrid.ReloadAsync();
+    }
+
+    private async Task LoadPlayerIncomeDataAsync()
+    {
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        _tournament ??= await dbContext.Tournaments.FindAsync([TournamentId]);
+        if (_tournament is null)
+            return;
+
+        _actualPlayerIncome = 0m;
+        _projectedPlayerIncome = 0m;
+        if (_tournament.SkaterRegistrationFee is {} skaterFee)
+        {
+            var skaterCount = await dbContext.Players
+                .CountAsync(p => p.TournamentId == TournamentId && p.Position != Core.Values.Position.Goalie);
+            var grossSkaterFee = FeeCalculator.GetAdjustedStripeAmount(skaterFee);
+            _actualPlayerIncome += skaterCount * grossSkaterFee;
+            _projectedPlayerIncome += _tournament.SkaterLimit.GetValueOrDefault() * skaterFee;
+        }
+
+        if (_tournament.GoalieRegistrationFee is {} goalieFee)
+        {
+            var goalieCount = await dbContext.Players
+                .CountAsync(p => p.TournamentId == TournamentId && p.Position == Core.Values.Position.Goalie);
+            var grossGoalieFee = FeeCalculator.GetAdjustedStripeAmount(goalieFee);
+            _actualPlayerIncome += goalieCount * grossGoalieFee;
+            _projectedPlayerIncome += _tournament.GoalieLimit.GetValueOrDefault() * goalieFee;
+        }
+    }
+
+    private Task ShowIncomeChanged(bool showIncome)
+    {
+        _showIncome = showIncome;
+        return _dataGrid?.ReloadAsync() ?? Task.CompletedTask;
+    }
+
+    private async Task<TournamentBudgetItem> NewItemFunc()
+    {
+        return new TournamentBudgetItem
+        {
+            TournamentId = TournamentId,
+            BudgetItemType = _showIncome ? BudgetItemType.Income : BudgetItemType.Expense,
+        };
+    }
+
+    private async Task OnServerReload(DbContext dbContext)
+    {
+        if (dbContext is not BoltonCupDbContext bcDbContext)
+            return;
+
+        _expensesTotal = await bcDbContext.TournamentBudgetItems
+            .Where(t => t.TournamentId == TournamentId)
+            .Where(t => t.BudgetItemType == BudgetItemType.Expense)
+            .SumAsync(t => t.Amount);
+        _incomeTotal = await bcDbContext.TournamentBudgetItems
+            .Where(t => t.TournamentId == TournamentId)
+            .Where(t => t.BudgetItemType == BudgetItemType.Income)
+            .SumAsync(t => t.Amount);
+    }
+}

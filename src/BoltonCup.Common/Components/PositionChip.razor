@@ -40,13 +40,13 @@
         
         public PositionStyle(string position)
         {
-            Position = position;
+            Position = position.ToUpper();
 
             Color = position switch
             {
                 Core.Values.Position.Forward => Color.Primary,
                 Core.Values.Position.Defense => Color.Secondary,
-                Core.Values.Position.Goalie => Color.Dark,
+                Core.Values.Position.Goalie => Color.Success,
                 _ => Color
             };
         }

@@ -16,10 +16,17 @@
     {
         <MudSelectItem Value="@option">@option</MudSelectItem>
     }
+    @if (UseGoalie)
+    {
+        <MudSelectItem Value="@Position.Goalie">@Position.Goalie</MudSelectItem>
+    }
 </MudSelect>
 
 @code {
 
+    [Parameter]
+    public bool UseGoalie { get; set; }
+    
     private readonly IReadOnlyList<string> Options = [Position.Forward, Position.Defense];
 
 }

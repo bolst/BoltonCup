@@ -181,6 +181,9 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
             Abbreviation = team.Abbreviation,
             Logo = _urlResolver.GetFullUrl(team.Logo),
             Banner = _urlResolver.GetFullUrl(team.Banner),
+            PrimaryColorHex = team.PrimaryColorHex,
+            SecondaryColorHex = team.SecondaryColorHex,
+            TertiaryColorHex = team.TertiaryColorHex
         };
     }
 

@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260425183026_AddTournamentExpenses")]
+    partial class AddTournamentExpenses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1496,7 +1499,7 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.ToTable("tournaments", "core");
                 });
 
-            modelBuilder.Entity("BoltonCup.Core.TournamentBudgetItem", b =>
+            modelBuilder.Entity("BoltonCup.Core.TournamentExpense", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1507,11 +1510,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric")
                         .HasColumnName("amount");
-
-                    b.Property<string>("BudgetItemType")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("budget_item_type");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -1543,7 +1541,7 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     b.HasIndex("TournamentId");
 
-                    b.ToTable("tournament_budget_items", "core");
+                    b.ToTable("tournament_expenses", "core");
                 });
 
             modelBuilder.Entity("BoltonCup.Core.TournamentRegistration", b =>
@@ -1961,7 +1959,7 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Navigation("WinningTeam");
                 });
 
-            modelBuilder.Entity("BoltonCup.Core.TournamentBudgetItem", b =>
+            modelBuilder.Entity("BoltonCup.Core.TournamentExpense", b =>
                 {
                     b.HasOne("BoltonCup.Core.Tournament", "Tournament")
                         .WithMany("Expenses")

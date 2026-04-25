@@ -8,6 +8,9 @@ public record TeamBriefDto
     public string? Abbreviation { get; set; }
     public string? Logo { get; set; }
     public string? Banner { get; set; }
+    public string PrimaryColorHex { get; set; }
+    public string SecondaryColorHex { get; set; }
+    public string? TertiaryColorHex { get; set; }
 }
 
 public record TeamInGameDto : TeamBriefDto

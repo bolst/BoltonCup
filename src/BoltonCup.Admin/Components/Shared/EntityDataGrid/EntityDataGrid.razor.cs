@@ -62,6 +62,9 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     public RenderFragment? ActionMenu { get; set; }
     
     [Parameter]
+    public RenderFragment? ToolbarContent { get; set; }
+    
+    [Parameter]
     public RenderFragment<CellContext<T>>? ChildRowContent { get; set; }
 
     [Parameter]
@@ -118,6 +121,12 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     [Parameter]
     public bool NoDeleting { get; set; }
 
+    [Parameter]
+    public string? Height { get; set; }
+    
+    [Parameter]
+    public EventCallback<DbContext> OnServerReload { get; set; }
+
     public async Task NotifyItemChangedAsync(T item)
     {
         if (_dataGrid.CommittedItemChanges is not null)
@@ -171,8 +180,10 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
             
             var data = await dbSet
                 .ToPagedListAsync(query, cancellationToken);
-            
             var items = _changeTracker.NewItems.Concat(data.Items);
+            
+            await OnServerReload.InvokeAsync(dbContext);
+            
             return new GridData<T>
             {
                 Items = items,
@@ -282,6 +293,8 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
 
     private string GetHeight()
     {
+        if (!string.IsNullOrEmpty(Height))
+            return Height;
         return HidePagerContent ? _noPagerHeight : _height;
     }
 

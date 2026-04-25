@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260424161150_LinkDraftRankingWithPick")]
+    partial class LinkDraftRankingWithPick
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1496,56 +1499,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.ToTable("tournaments", "core");
                 });
 
-            modelBuilder.Entity("BoltonCup.Core.TournamentBudgetItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("numeric")
-                        .HasColumnName("amount");
-
-                    b.Property<string>("BudgetItemType")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("budget_item_type");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_modified");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("last_modified_by");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text")
-                        .HasColumnName("title");
-
-                    b.Property<int>("TournamentId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tournament_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TournamentId");
-
-                    b.ToTable("tournament_budget_items", "core");
-                });
-
             modelBuilder.Entity("BoltonCup.Core.TournamentRegistration", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1961,17 +1914,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Navigation("WinningTeam");
                 });
 
-            modelBuilder.Entity("BoltonCup.Core.TournamentBudgetItem", b =>
-                {
-                    b.HasOne("BoltonCup.Core.Tournament", "Tournament")
-                        .WithMany("Expenses")
-                        .HasForeignKey("TournamentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tournament");
-                });
-
             modelBuilder.Entity("BoltonCup.Core.TournamentRegistration", b =>
                 {
                     b.HasOne("BoltonCup.Core.Account", "Account")
@@ -2070,8 +2012,6 @@ namespace BoltonCup.Infrastructure.Migrations
 
             modelBuilder.Entity("BoltonCup.Core.Tournament", b =>
                 {
-                    b.Navigation("Expenses");
-
                     b.Navigation("Games");
 
                     b.Navigation("InfoGuide");

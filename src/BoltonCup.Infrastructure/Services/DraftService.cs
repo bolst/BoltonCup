@@ -82,7 +82,7 @@ public class DraftService(
             .SingleOrDefaultAsync(e => e.Id == command.DraftId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Draft), command.DraftId);
 
-        var regeneratePicks = await EnsureDraftStatusIsValidAsync(draft, command.DraftStatus, cancellationToken);
+        await EnsureDraftStatusIsValidAsync(draft, command.DraftStatus, cancellationToken);
         draft.Status = command.DraftStatus;
         
         // draft type can only be changed in the pending state
@@ -97,9 +97,11 @@ public class DraftService(
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         
-        if (regeneratePicks)
+        // if the draft is now in progress, we need to generate the picks
+        if (draft.Status == DraftStatus.InProgress)
         {
-            await RegenerateDraftPicksAsync(draft, cancellationToken);
+            await GenerateDraftPicksAsync(draft, cancellationToken);
+            await GenerateDraftRankingsAsync(draft, cancellationToken);
         }
     }
 
@@ -109,7 +111,44 @@ public class DraftService(
             .Where(d => d.Id == id)
             .ExecuteDeleteAsync(cancellationToken);
     }
+    
+    
+    public async Task<DraftPick?> GetCurrentPickAsync(int draftId, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts.SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+        if (draft.Status != DraftStatus.InProgress)
+            throw new InvalidOperationException("Draft is not in progress.");
 
+        return await _dbContext.DraftPicks
+            .Include(dp => dp.Team)
+            .Include(dp => dp.Player)
+                .ThenInclude(p => p.Account)
+            .Where(dp => dp.DraftId == draft.Id)
+            .Where(dp => dp.PlayerId == null)
+            .OrderBy(dp => dp.OverallPick)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+    }
+
+
+    public async Task<IPagedList<PlayerDraftRanking>> GetDraftRankingsAsync(int draftId, GetDraftRankingsQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.PlayerDraftRankings
+            .AsNoTracking()
+            .Include(d => d.Player)
+                .ThenInclude(p => p.Account)
+            .Include(d => d.DraftPick)
+                .ThenInclude(dp => dp.Team)
+            .Include(d => d.Tournament)
+            .Where(d => d.DraftId == draftId)
+            .ConditionalWhere(d => d.Player.Position == query.Position, !string.IsNullOrEmpty(query.Position))
+            .ConditionalWhere(d => d.DraftPick != null && d.DraftPick.TeamId == query.TeamId, query.TeamId.HasValue)
+            .ConditionalWhere(d => (d.DraftPickId != null) == query.IsDrafted!.Value, query.IsDrafted.HasValue)
+            .ApplySorting(query, x => x.OrderByDescending(y => y.DraftRanking))
+            .ToPagedListAsync(query, cancellationToken: cancellationToken);
+    }
+    
 
     public async Task UpdateOrderingAsync(UpdateDraftOrderingCommand command, CancellationToken cancellationToken = default)
     {
@@ -139,20 +178,6 @@ public class DraftService(
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
     
-    
-    public async Task<DraftPick?> GetCurrentPickAsync(int draftId, CancellationToken cancellationToken = default)
-    {
-        var draft = await _dbContext.Drafts.SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
-                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
-        if (draft.Status != DraftStatus.InProgress)
-            throw new InvalidOperationException("Draft is not in progress.");
-
-        return await _dbContext.DraftPicks
-            .Where(dp => dp.DraftId == draft.Id)
-            .Where(dp => dp.PlayerId == null)
-            .OrderBy(dp => dp.OverallPick)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-    }
 
     public async Task DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default)
     {
@@ -163,25 +188,27 @@ public class DraftService(
         
         if (draft.Status != DraftStatus.InProgress)
             throw new InvalidOperationException("Draft is not in progress.");
-        
-        // make sure player is in draft's tournament
-        var isValidPlayer = await _dbContext.Players
-            .Where(p => p.TournamentId == draft.TournamentId)
-            .AnyAsync(p => p.Id == command.PlayerId, cancellationToken);
-        if (!isValidPlayer) 
-            throw new EntityNotFoundException(nameof(Player), command.PlayerId);
-        // make sure player is not already drafted
-        if (draft.DraftPicks.Any(dp => dp.PlayerId == command.PlayerId))
+
+        var player = await _dbContext.PlayerDraftRankings
+            .Where(p => p.DraftId == command.DraftId)
+            .FirstOrDefaultAsync(p => p.PlayerId == command.PlayerId, cancellationToken: cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(PlayerDraftRanking), command.PlayerId);
+
+        if (player.IsDrafted)
+        {
             throw new InvalidOperationException($"Player {command.PlayerId} is already drafted");
+        }
+        
         // make sure pick exists and matches command
         var pick = draft.DraftPicks
                        .Where(dp => dp.OverallPick == command.OverallPick)
                        .Where(dp => dp.TeamId == command.TeamId) 
                        .FirstOrDefault(dp => dp.PlayerId == null)
-                   ?? throw new InvalidOperationException($"No available draft picks for Draft {command.DraftId}");
+                   ?? throw new InvalidOperationException($"No available draft pick for player {command.PlayerId} in Draft {command.DraftId}");
         
         // draft player
         pick.PlayerId = command.PlayerId;
+        player.DraftPickId = pick.Id;
 
         try
         {
@@ -197,10 +224,10 @@ public class DraftService(
     // status can only evolve as Pending -> InProgress or InProgress -> Completed
     // will throw on validation error
     // returns true if picks need to be regenerated, otherwise false
-    private async Task<bool> EnsureDraftStatusIsValidAsync(Draft draft, DraftStatus newStatus, CancellationToken cancellationToken)
+    private async Task EnsureDraftStatusIsValidAsync(Draft draft, DraftStatus newStatus, CancellationToken cancellationToken)
     {
         if (draft.Status == newStatus)
-            return false;
+            return;
         
         switch (draft.Status)
         {
@@ -209,9 +236,7 @@ public class DraftService(
                 if (newStatus != DraftStatus.InProgress)
                     throw new InvalidOperationException(
                         "Invalid state change (Pending can only evolve to In Progress)");
-                    
-                // if the draft is now in progress, we need to generate the picks
-                return true;
+                break;
             }
             case DraftStatus.InProgress:
             {
@@ -230,12 +255,10 @@ public class DraftService(
             default:
                 throw new InvalidOperationException("Cannot modify the state of an already-completed draft.");
         }
-
-        return false;
     }
     
     
-    private async Task RegenerateDraftPicksAsync(Draft draft, CancellationToken cancellationToken)
+    private async Task GenerateDraftPicksAsync(Draft draft, CancellationToken cancellationToken)
     {
         // delete old picks
         await _dbContext.DraftPicks
@@ -277,6 +300,53 @@ public class DraftService(
             });
         }
 
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+    
+    public async Task GenerateDraftRankingsAsync(Draft draft, CancellationToken cancellationToken = default)
+    {
+        var players = await _dbContext.Players
+            .Include(p => p.Account)
+            .ThenInclude(account => account.Players)
+            .ThenInclude(player => player.SkaterGameLogs)
+            .Include(player => player.Account)
+            .ThenInclude(account => account.Players)
+            .ThenInclude(player => player.GoalieGameLogs)
+            .Where(p => p.TournamentId == draft.TournamentId)
+            .Where(p => _dbContext.PlayerDraftRankings.All(pdr => pdr.PlayerId != p.Id))
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        var rankings = players
+            .Select(player =>
+            {
+                var skaterLogs = player.Account.Players
+                    .SelectMany(p => p.SkaterGameLogs)
+                    .ToList();
+                var goalieLogs = player.Account.Players
+                    .SelectMany(p => p.GoalieGameLogs)
+                    .ToList();
+
+                var totalPoints = skaterLogs.Sum(x => x.Points);
+                return new PlayerDraftRanking
+                {
+                    PlayerId = player.Id,
+                    TournamentId = draft.TournamentId,
+                    DraftId = draft.Id,
+                    GamesPlayed = skaterLogs.Count + goalieLogs.Count,
+                    TotalPoints = totalPoints,
+                    IsChampion = false, // TODO
+                    DraftRanking = 0,
+                    OverrideRanking = false,
+                };
+            })
+            .OrderByDescending(r => r.PointsPerGame)
+            .Select((player, index) =>
+            {
+                player.DraftRanking = index + 1;
+                return player;
+            });
+
+        _dbContext.PlayerDraftRankings.AddRange(rankings);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

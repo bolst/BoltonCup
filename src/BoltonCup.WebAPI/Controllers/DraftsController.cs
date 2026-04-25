@@ -54,15 +54,6 @@ public class DraftsController(
         return Ok();
     }
 
-    [Authorize(Roles = Admin)]
-    [HttpPut("{id:int}/order")]
-    public async Task<IActionResult> UpdateDraftOrder(int id, [FromBody] UpdateDraftOrderingRequest request)
-    {
-        var command = _mapper.ToCommand(id, request);
-        await _draftService.UpdateOrderingAsync(command);
-        return Ok();
-    }
-    
     [AllowAnonymous]
     [HttpGet("{id:int}/currentPick")]
     public async Task<ActionResult<DraftPickSingleDto>> GetCurrentDraftPick(int id)
@@ -70,13 +61,30 @@ public class DraftsController(
         var result = await _draftService.GetCurrentPickAsync(id);
         return OkOrNoContent(_mapper.ToDto(result));
     }
-
+    
     [Authorize(Roles = Admin)]
     [HttpPut("{id:int}/currentPick")]
     public async Task<IActionResult> DraftPlayer(int id, [FromBody] DraftPlayerRequest request)
     {
         var command = _mapper.ToCommand(id, request);
         await _draftService.DraftPlayerAsync(command);
+        return Ok();
+    }
+
+    [Authorize(Roles = Admin)]
+    [HttpGet("{id:int}/ordering")]
+    public async Task<ActionResult<IPagedList<DraftRankingDto>>> GetDraftRankings(int id, [FromQuery] GetDraftRankingsQuery query)
+    {
+        var rankings = await _draftService.GetDraftRankingsAsync(id, query);
+        return Ok(_mapper.ToDtoList(rankings));
+    }
+
+    [Authorize(Roles = Admin)]
+    [HttpPut("{id:int}/order")]
+    public async Task<IActionResult> UpdateDraftOrder(int id, [FromBody] UpdateDraftOrderingRequest request)
+    {
+        var command = _mapper.ToCommand(id, request);
+        await _draftService.UpdateOrderingAsync(command);
         return Ok();
     }
 }
