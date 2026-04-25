@@ -27,6 +27,11 @@ else
                 <div class="mud-width-full d-flex align-center justify-center">
                     <MudImage Src="@_selectedPlayer.Player.ProfilePicture" Width="150"/>
                 </div>
+                
+                @if (!string.IsNullOrEmpty(_selectedPlayer.PlayerPhone))
+                {
+                    <MudButton StartIcon="@Icons.Material.Rounded.Phone" FullWidth>@TryGetPhoneNumberString(_selectedPlayer.PlayerPhone)</MudButton>
+                }
 
                 <MudSimpleTable Elevation="0" Square Striped Dense>
                     <tbody>
@@ -306,6 +311,17 @@ else
         
         await LoadCurrentPickAsync();
         await _dataGrid.ReloadServerData();
+    }
+
+    private static string TryGetPhoneNumberString(string? phoneNumber)
+    {
+        if (string.IsNullOrEmpty(phoneNumber))
+            return string.Empty;
+
+        if (phoneNumber.Trim() is not { Length: 10 } trimmed)
+            return phoneNumber;
+
+        return $"({trimmed[..3]}) {trimmed[3..6]}-{trimmed[6..]}";
     }
     
     private class DraftManagerFilterModel

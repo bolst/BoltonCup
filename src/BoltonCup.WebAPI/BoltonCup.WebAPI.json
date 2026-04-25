@@ -6671,6 +6671,10 @@
             "type": "integer",
             "format": "int32"
           },
+          "playerPhone": {
+            "type": "string",
+            "nullable": true
+          },
           "player": {
             "allOf": [
               {

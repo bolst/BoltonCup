@@ -50,6 +50,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         {
             Id = draft.Id,
             DraftId = draft.DraftId,
+            PlayerPhone = draft.Player.Account.Phone,
             Player = _briefMapper.ToPlayerBriefDto(draft.Player),
             Tournament = _briefMapper.ToTournamentBriefDto(draft.Tournament),
             Team = draft.DraftPick is null ? null : _briefMapper.ToTeamBriefDto(draft.DraftPick.Team),

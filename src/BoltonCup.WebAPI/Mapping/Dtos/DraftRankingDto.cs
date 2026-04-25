@@ -4,6 +4,7 @@ public sealed record DraftRankingDto
 {
     public int Id { get; set; }
     public int DraftId { get; set; }
+    public string? PlayerPhone { get; set; }
     public required PlayerBriefDto Player { get; set; }
     public required TournamentBriefDto Tournament { get; set; }
     public TeamBriefDto? Team { get; set; }
