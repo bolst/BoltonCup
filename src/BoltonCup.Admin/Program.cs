@@ -11,6 +11,10 @@ using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var cultureInfo = new System.Globalization.CultureInfo("en-US");
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 var keyDirectory = builder.Configuration["DataProtection:KeyDirectory"];
 if (!string.IsNullOrEmpty(keyDirectory))
 {
