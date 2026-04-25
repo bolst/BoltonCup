@@ -35,7 +35,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<SkaterStat> SkaterStats { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
-    public DbSet<TournamentExpense> TournamentExpenses { get; set; }
+    public DbSet<TournamentBudgetItem> TournamentExpenses { get; set; }
     public DbSet<TournamentRegistration> TournamentRegistrations { get; set; }
     
     public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
@@ -605,10 +605,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.GalleryId).HasColumnName("gallery_id");
         });
 
-        modelBuilder.Entity<TournamentExpense>(entity =>
+        modelBuilder.Entity<TournamentBudgetItem>(entity =>
         {
             entity
-                .ToTable("tournament_expenses")
+                .ToTable("tournament_budget_items")
                 .HasKey(e => e.Id);
             entity
                 .HasOne(e => e.Tournament)
@@ -618,6 +618,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.Title).HasColumnName("title");
             entity.Property(e => e.Amount).HasColumnName("amount");
+            entity.Property(e => e.BudgetItemType).HasColumnName("budget_item_type").HasConversion(new EnumMemberConverter<BudgetItemType>());
         });
 
         modelBuilder.Entity<TournamentRegistration>(entity =>

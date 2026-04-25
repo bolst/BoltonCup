@@ -26,18 +26,18 @@
     </MudItem>
 </MudGrid>
 
-<EntityDataGrid 
-    @ref="_dataGrid" 
-    T="TournamentExpense"
+<EntityDataGrid
+    @ref="_dataGrid"
+    T="TournamentBudgetItem"
     SearchBy="x => x.Title"
     Height="calc(100vh - 264px - var(--mud-appbar-height))"
     Filter="@_filter"
     ColumnResizeMode="ResizeMode.Column"
-    NewItemFunc="@(() => Task.FromResult(new TournamentExpense { TournamentId = TournamentId })!)"
+    NewItemFunc="@(() => Task.FromResult(new TournamentBudgetItem { TournamentId = TournamentId })!)"
     OnServerReload="@OnServerReload"
     Comparer="_comparer">
     <Columns>
-        <PropertyColumn Title="Title" Property="x => x.Title" />
+        <PropertyColumn Title="Title" Property="x => x.Title"/>
         <PropertyColumn Title="Amount" Property="x => x.Amount" Format="C" InitialDirection="SortDirection.Descending">
             <FooterTemplate>
                 @if (context.Items.Any())
@@ -64,8 +64,8 @@
     private decimal? _actualRevenue;
     private decimal? _projectedRevenue;
     
-    private EntityDataGrid<TournamentExpense>? _dataGrid;
-    private static readonly TournamentExpenseComparer _comparer = new();
+    private EntityDataGrid<TournamentBudgetItem>? _dataGrid;
+    private static readonly TournamentBudgetItemComparer _comparer = new();
 
     private Expression<Func<TournamentExpense, bool>>? _filter;
 
