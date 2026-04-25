@@ -34,6 +34,10 @@
             <MudChip Href='@($"/tournaments/{context.Item.Id}/players")' Variant="Variant.Text" Color="Color.Info" Label="true">
                 Players (@context.Item.Players.Count(p => p.Position != Core.Values.Position.Goalie) skaters, @context.Item.Players.Count(p => p.Position == Core.Values.Position.Goalie) goalies)
             </MudChip>
+            
+            <MudChip Href='@($"/tournaments/{context.Item.Id}/budget")' Variant="Variant.Text" Color="Color.Info" Label="true">
+                Budget
+            </MudChip>
         </div>
     </ChildRowContent>
 </EntityDataGrid>

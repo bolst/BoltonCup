@@ -1,4 +1,26 @@
 @page "/tournaments/{TournamentId:int}/budget"
+@using BoltonCup.Infrastructure
+@using Stripe
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+
+<MudGrid Class="px-1">
+    <MudItem xs="4">
+        <DataCard Title="Actual Income">
+            @if (_actualIncome.HasValue)
+            {
+                @:@_actualIncome.Value.ToString("C")
+            }
+        </DataCard>
+    </MudItem>
+    <MudItem xs="4">
+        <DataCard Title="Projected Income">
+            @if (_projectedIncome.HasValue)
+            {
+                @:@_projectedIncome.Value.ToString("C")
+            }
+        </DataCard>
+    </MudItem>
+</MudGrid>
 
 
 @code {
@@ -7,14 +29,49 @@
     public int TournamentId { get; set; }
 
     private int? _tournamentId;
+    private Tournament? _tournament;
 
-    protected override Task OnParametersSetAsync()
+    private decimal? _actualIncome;
+    private decimal? _projectedIncome;
+
+    protected override async Task OnParametersSetAsync()
     {
         if (_tournamentId == TournamentId)
-            return Task.CompletedTask;
+            return;
         _tournamentId = TournamentId;
-         
-        return Task.CompletedTask;
+        
+        await LoadIncomeDataAsync();
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LoadIncomeDataAsync()
+    {
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        _tournament = await dbContext.Tournaments.FindAsync([TournamentId]);
+        if (_tournament is null)
+            return;
+
+        _actualIncome = 0m;
+        _projectedIncome = 0m;
+        if (_tournament.SkaterRegistrationFee is {} skaterFee)
+        {
+            var skaterCount = await dbContext.Players
+                .CountAsync(p => p.TournamentId == TournamentId && p.Position != Core.Values.Position.Goalie);
+            var grossSkaterFee = FeeCalculator.GetAdjustedStripeAmount(skaterFee);
+            _actualIncome += skaterCount * grossSkaterFee;
+            _projectedIncome += _tournament.SkaterLimit.GetValueOrDefault() * skaterFee;
+        }
+
+        if (_tournament.GoalieRegistrationFee is {} goalieFee)
+        {
+            var goalieCount = await dbContext.Players
+                .CountAsync(p => p.TournamentId == TournamentId && p.Position == Core.Values.Position.Goalie);
+            var grossGoalieFee = FeeCalculator.GetAdjustedStripeAmount(goalieFee);
+            _actualIncome += goalieCount * grossGoalieFee;
+            _projectedIncome += _tournament.GoalieLimit.GetValueOrDefault() * goalieFee;
+        }
+        
     }
 
 }
