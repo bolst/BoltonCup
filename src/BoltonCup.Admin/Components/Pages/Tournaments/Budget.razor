@@ -1,27 +1,55 @@
 @page "/tournaments/{TournamentId:int}/budget"
+@using System.Linq.Expressions
 @using BoltonCup.Infrastructure
-@using Stripe
 @inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
 
-<MudGrid Class="px-1">
-    <MudItem xs="4">
-        <DataCard Title="Actual Income">
-            @if (_actualIncome.HasValue)
-            {
-                @:@_actualIncome.Value.ToString("C")
-            }
+<MudGrid Class="pa-1" Spacing="1">
+    <MudItem xs="12" sm="6" md="3">
+        <DataCard Title="Actual Income" Height="100px">
+            <MudText Typo="Typo.h6">@_actualIncome?.ToString("C")</MudText>
         </DataCard>
     </MudItem>
-    <MudItem xs="4">
-        <DataCard Title="Projected Income">
-            @if (_projectedIncome.HasValue)
-            {
-                @:@_projectedIncome.Value.ToString("C")
-            }
+    <MudItem xs="12" sm="6" md="3">
+        <DataCard Title="Projected Income" Height="100px">
+            <MudText Typo="Typo.h6">@_projectedIncome?.ToString("C")</MudText>
+        </DataCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="3">
+        <DataCard Title="Actual Revenue" Height="100px">
+            <MudText Typo="Typo.h6">@_actualRevenue?.ToString("C")</MudText>
+        </DataCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="3">
+        <DataCard Title="Projected Revenue" Height="100px">
+            <MudText Typo="Typo.h6">@_projectedRevenue?.ToString("C")</MudText>
         </DataCard>
     </MudItem>
 </MudGrid>
 
+<EntityDataGrid 
+    @ref="_dataGrid" 
+    T="TournamentExpense"
+    SearchBy="x => x.Title"
+    Height="calc(100vh - 264px - var(--mud-appbar-height))"
+    Filter="@_filter"
+    ColumnResizeMode="ResizeMode.Column"
+    NewItemFunc="@(() => Task.FromResult(new TournamentExpense { TournamentId = TournamentId })!)"
+    OnServerReload="@OnServerReload"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Title" Property="x => x.Title" />
+        <PropertyColumn Title="Amount" Property="x => x.Amount" Format="C" InitialDirection="SortDirection.Descending">
+            <FooterTemplate>
+                @if (context.Items.Any())
+                {
+                    <MudChip
+                        Text="@($"Total: {context.Items.Sum(x => x.Amount):C}")"
+                        Variant="Variant.Filled" Color="Color.Error" Label="true"/>
+                }
+            </FooterTemplate>
+        </PropertyColumn>
+    </Columns>
+</EntityDataGrid>
 
 @code {
 
@@ -33,6 +61,13 @@
 
     private decimal? _actualIncome;
     private decimal? _projectedIncome;
+    private decimal? _actualRevenue;
+    private decimal? _projectedRevenue;
+    
+    private EntityDataGrid<TournamentExpense>? _dataGrid;
+    private static readonly TournamentExpenseComparer _comparer = new();
+
+    private Expression<Func<TournamentExpense, bool>>? _filter;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -42,13 +77,15 @@
         
         await LoadIncomeDataAsync();
 
-        await InvokeAsync(StateHasChanged);
+        _filter = x => x.TournamentId == TournamentId;
+        if (_dataGrid is not null)
+            await _dataGrid.ReloadAsync();
     }
 
     private async Task LoadIncomeDataAsync()
     {
         await using var dbContext = await DbContextFactory.CreateDbContextAsync();
-        _tournament = await dbContext.Tournaments.FindAsync([TournamentId]);
+        _tournament ??= await dbContext.Tournaments.FindAsync([TournamentId]);
         if (_tournament is null)
             return;
 
@@ -71,7 +108,18 @@
             _actualIncome += goalieCount * grossGoalieFee;
             _projectedIncome += _tournament.GoalieLimit.GetValueOrDefault() * goalieFee;
         }
-        
     }
 
+
+    private async Task OnServerReload(DbContext dbContext)
+    {
+        if (dbContext is not BoltonCupDbContext bcDbContext)
+            return;
+
+        var totalExpenses = await bcDbContext.TournamentExpenses
+            .Where(t => t.TournamentId == TournamentId)
+            .SumAsync(t => t.Amount);
+        _actualRevenue = _actualIncome - totalExpenses;
+        _projectedRevenue = _projectedIncome - totalExpenses;
+    }
 }

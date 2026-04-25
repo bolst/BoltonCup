@@ -1,6 +1,7 @@
+@using MudBlazor.Utilities
 @namespace BoltonCup.Admin.Components.Shared
 
-<MudPaper Class="pa-4 d-flex flex-column align-start justify-space-between" Style="height: 130px">
+<MudPaper Class="pa-4 d-flex flex-column align-start justify-space-between" Style="@Stylename">
     <MudText Typo="Typo.h4">@ChildContent</MudText>
     <MudText>@Title</MudText>
 </MudPaper>
@@ -13,5 +14,12 @@
 
     [Parameter]
     public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Height { get; set; } = "130px";
+
+    private string Stylename => new StyleBuilder()
+        .AddStyle("height", Height)
+        .Build();
 
 }
