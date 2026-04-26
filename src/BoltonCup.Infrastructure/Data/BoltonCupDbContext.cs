@@ -8,11 +8,6 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BoltonCup.Infrastructure.Data;
 
 
-/*
- * dotnet ef migrations add [migration_name] --project ./BoltonCup.Infrastructure --startup-project ./BoltonCup.WebAPI -c BoltonCupDbContext
- * dotnet ef database update --project ./BoltonCup.Infrastructure --startup-project ./BoltonCup.WebAPI -c BoltonCupDbContext
- */
-
 public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options) 
     : DbContext(options)
 {
