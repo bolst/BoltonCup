@@ -3,12 +3,14 @@ using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
+using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
 
 namespace BoltonCup.WebAPI.Controllers;
 
 public class DraftsController(
     IDraftService _draftService,
-    IDraftMapper _mapper
+    IDraftMapper _mapper,
+    IAuthorizationService _authService
 ) : BoltonCupControllerBase
 {
     [AllowAnonymous]
@@ -62,19 +64,25 @@ public class DraftsController(
         return OkOrNoContent(_mapper.ToDto(result));
     }
     
-    [Authorize(Roles = Admin)]
+    [Authorize]
     [HttpPut("{id:int}/currentPick")]
     public async Task<IActionResult> DraftPlayer(int id, [FromBody] DraftPlayerRequest request)
     {
+        if (await _authService.AuthorizeAsync(User, request.TeamId, CanManageTeam) is {Succeeded: false})
+            return Forbid();
+        
         var command = _mapper.ToCommand(id, request);
         await _draftService.DraftPlayerAsync(command);
         return Ok();
     }
 
-    [Authorize(Roles = Admin)]
+    [Authorize]
     [HttpGet("{id:int}/ordering")]
     public async Task<ActionResult<IPagedList<DraftRankingDto>>> GetDraftRankings(int id, [FromQuery] GetDraftRankingsQuery query)
     {
+        if (await _authService.AuthorizeAsync(User, id, CanAccessDraft) is {Succeeded: false})
+            return Forbid();
+
         var rankings = await _draftService.GetDraftRankingsAsync(id, query);
         return Ok(_mapper.ToDtoList(rankings));
     }
