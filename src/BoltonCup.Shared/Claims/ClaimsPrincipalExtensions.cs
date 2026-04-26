@@ -8,7 +8,7 @@ namespace BoltonCup.Shared
     {
         public static int GetAccountId(this ClaimsPrincipal principal)
         {
-            var accountIdString = principal.FindFirst(claim => claim.Type == BoltonCupClaimTypes.AccountId).Value;
+            var accountIdString = principal.FindFirst(claim => claim.Type == BoltonCupClaimTypes.AccountId)?.Value;
             return int.TryParse(accountIdString, out var accountId) 
                 ? accountId 
                 : throw new KeyNotFoundException("Missing account ID claim.");
@@ -16,7 +16,7 @@ namespace BoltonCup.Shared
 
         public static bool TryGetAccountId(this ClaimsPrincipal principal, out int accountId)
         {
-            var accountIdString = principal.FindFirst(claim => claim.Type == BoltonCupClaimTypes.AccountId).Value;
+            var accountIdString = principal.FindFirst(claim => claim.Type == BoltonCupClaimTypes.AccountId)?.Value;
             return int.TryParse(accountIdString, out accountId);
         }
 

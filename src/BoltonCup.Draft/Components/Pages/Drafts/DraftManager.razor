@@ -1,6 +1,7 @@
 @page "/drafts/{DraftId:int}/manager"
 @attribute [Authorize]
 @inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
 
 @if (_loading)
 {
@@ -184,6 +185,9 @@ else
 
 @code {
 
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+    
     [Parameter]
     [EditorRequired]
     public required int DraftId { get; set; }
@@ -208,6 +212,14 @@ else
         _draftId = DraftId;
 
         _loading = true;
+
+        var authState = await AuthStateTask;
+        var user = authState.User;
+        if (!user.IsInRole("Admin") && !user.IsGmForTournament(DraftId))
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
         
         _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
         await LoadCurrentPickAsync();
