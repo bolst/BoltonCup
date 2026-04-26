@@ -210,7 +210,12 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.GameTime).HasColumnName("game_time");
             entity.Property(e => e.HomeTeamId).HasColumnName("home_team_id");
             entity.Property(e => e.AwayTeamId).HasColumnName("away_team_id");
-            entity.Property(e => e.GameType).HasColumnName("game_type").HasConversion(new EnumMemberConverter<GameType>());
+            entity.Property(e => e.GameType).HasColumnName("game_type")
+                .HasConversion(new EnumMemberConverter<GameType>())
+                .HasDefaultValue(GameType.RoundRobin);
+            entity.Property(e => e.GameState).HasColumnName("game_state")
+                .HasConversion(new EnumMemberConverter<GameState>())
+                .HasDefaultValue(GameState.Pending);
             entity.Property(e => e.Venue).HasColumnName("venue");
             entity.Property(e => e.Rink).HasColumnName("rink");
         });
