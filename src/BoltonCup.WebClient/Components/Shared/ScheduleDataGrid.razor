@@ -38,7 +38,21 @@
     </HeaderContent>
     <GroupHeaderTemplate>
         <MudTh colspan="5">
-            <MudText Typo="Typo.h6"><b>@context.Key</b></MudText>
+            @switch (context.Key)
+            {
+                case TournamentGroupKey tournamentGroupKey:
+                    <div class="d-flex flex-row align-center gap-1">
+                        <MudText Typo="Typo.h6"><b>@tournamentGroupKey.TournamentName</b></MudText>
+                        @if (!string.IsNullOrEmpty(tournamentGroupKey.TournamentLogo))
+                        {
+                            <MudImage Src="@tournamentGroupKey.TournamentLogo" Height="48" />
+                        }
+                    </div>
+                    break;
+                case GameDayGroupKey gameDayGroupKey:
+                    <MudText Typo="Typo.h6"><b>@gameDayGroupKey.GameTime</b></MudText>
+                    break;
+            }
         </MudTh>
     </GroupHeaderTemplate>
     <RowTemplate>
@@ -84,13 +98,13 @@
         GroupName = "Tournament",
         Indentation = true,
         Expandable = false,
-        Selector = e => e.Tournament.Name ?? string.Empty,
+        Selector = e => new TournamentGroupKey(e),
         InnerGroup = new TableGroupDefinition<GameDto>
         {
             GroupName = "Date",
             Indentation = false,
             Expandable = false,
-            Selector = e => e.GameTime.ToLocalTime().Date.ToLongDateString(),
+            Selector = e => new GameDayGroupKey(e),
         }
     };
 
@@ -145,6 +159,28 @@
         builder.AddContent(5, $"{loser.Abbreviation} {loser.Goals}");
         builder.CloseElement();
     };
+
+    private record TournamentGroupKey
+    {
+        public string TournamentName { get; init; }
+        public string? TournamentLogo { get; init; }
+        
+        public TournamentGroupKey(GameDto game)
+        {
+            TournamentName = game.Tournament.Name ?? string.Empty;
+            TournamentLogo = game.Tournament.Logo;
+        }
+    }
+
+    private record GameDayGroupKey
+    {
+        public string GameTime { get; init; }
+        
+        public GameDayGroupKey(GameDto game)
+        {
+            GameTime = game.GameTime.ToLocalTime().Date.ToLongDateString();
+        }
+    }
     
     private class ScheduleFilterModel
     {
