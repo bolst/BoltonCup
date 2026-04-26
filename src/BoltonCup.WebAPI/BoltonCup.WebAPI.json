@@ -6855,6 +6855,7 @@
       },
       "GameDto": {
         "required": [
+          "gameState",
           "gameTime",
           "id",
           "tournament"
@@ -6881,8 +6882,14 @@
               {
                 "$ref": "#/components/schemas/GameType"
               }
-            ],
-            "nullable": true
+            ]
+          },
+          "gameState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameState"
+              }
+            ]
           },
           "venue": {
             "type": "string",
@@ -7038,6 +7045,7 @@
       },
       "GameSingleDto": {
         "required": [
+          "gameState",
           "gameTime",
           "goals",
           "highlights",
@@ -7068,8 +7076,14 @@
               {
                 "$ref": "#/components/schemas/GameType"
               }
-            ],
-            "nullable": true
+            ]
+          },
+          "gameState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameState"
+              }
+            ]
           },
           "venue": {
             "type": "string",
@@ -7144,6 +7158,14 @@
           }
         },
         "additionalProperties": false
+      },
+      "GameState": {
+        "enum": [
+          "Pending",
+          "InProgress",
+          "Completed"
+        ],
+        "type": "string"
       },
       "GameType": {
         "enum": [

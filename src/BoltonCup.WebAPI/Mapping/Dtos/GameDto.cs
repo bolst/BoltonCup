@@ -7,7 +7,8 @@ public record GameDto
     public required int Id { get; init; }
     public required DateTime GameTime { get; init; }
     public required TournamentBriefDto Tournament { get; init; }
-    public GameType? GameType { get; init; }
+    public GameType GameType { get; init; }
+    public required GameState GameState { get; init; }
     public string? Venue  { get; init; }
     public string? Rink { get; init; }
     public TeamInGameDto? HomeTeam { get; init; }
