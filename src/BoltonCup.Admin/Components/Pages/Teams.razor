@@ -13,6 +13,9 @@
         <PropertyColumn Title="Abbreviation" Property="x => x.Abbreviation" />
         <ImageColumn T="Team" Title="Logo" Property="x => x.Logo" OnImageUploaded="UpdateTeamLogo" />
         <ImageColumn T="Team" Title="Banner" Property="x => x.Banner" OnImageUploaded="UpdateTeamBanner" />
+        <ForeignColumn Title="GM" Property="x => x.GeneralManager" PropertySetter="(gs, account) => gs.GeneralManager = account"
+                       EqualityComparer="new AccountComparer()" Include="x => x.Include(p => p.Players)"
+                       SearchBy="x => x.FirstName + ' ' + x.LastName"/>
         <ColorPickerColumn Title="Primary" Property="x => x.PrimaryColorHex" />
         <ColorPickerColumn Title="Secondary" Property="x => x.SecondaryColorHex" />
         <ColorPickerColumn Title="Tertiary" Property="x => x.TertiaryColorHex" />
