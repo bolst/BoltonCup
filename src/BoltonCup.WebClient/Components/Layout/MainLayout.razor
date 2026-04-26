@@ -35,7 +35,7 @@
 
         if (user.Identity is { IsAuthenticated: true })
         {
-            if (!user.HasClaim(c => c.Type == "AccountId"))
+            if (!user.HasClaim(c => c.Type == BoltonCupClaimTypes.AccountId))
             {
                 Navigation.NavigateTo($"{BcConfig.Value.AuthBaseUrl}complete-account");
             }

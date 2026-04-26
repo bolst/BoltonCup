@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using BoltonCup.Infrastructure.Data;
+using BoltonCup.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -43,11 +44,4 @@ public class BoltonCupClaimsPrincipalFactory(
 
         return identity;
     }
-}
-
-public static class BoltonCupClaimTypes
-{
-    public const string AccountId = "AccountId";
-    public const string TournamentGm = "TournamentGm";
-    public const string TeamGm = "TeamGm";
 }

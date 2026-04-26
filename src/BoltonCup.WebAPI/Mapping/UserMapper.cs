@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Shared;
 
 namespace BoltonCup.WebAPI.Mapping;
 

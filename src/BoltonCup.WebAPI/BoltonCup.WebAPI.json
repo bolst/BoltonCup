@@ -6495,6 +6495,20 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "teamGmIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "tournamentGmIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         },
         "additionalProperties": false

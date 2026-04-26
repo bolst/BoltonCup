@@ -8,6 +8,7 @@ using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Exceptions;
 using BoltonCup.Infrastructure.Extensions;
 using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
