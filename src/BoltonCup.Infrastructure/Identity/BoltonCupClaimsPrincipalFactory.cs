@@ -1,5 +1,7 @@
 using System.Security.Claims;
+using BoltonCup.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace BoltonCup.Infrastructure.Identity;
@@ -7,7 +9,8 @@ namespace BoltonCup.Infrastructure.Identity;
 public class BoltonCupClaimsPrincipalFactory(
     UserManager<BoltonCupUser> userManager,
     RoleManager<IdentityRole> roleManager,
-    IOptions<IdentityOptions> optionsAccessor)
+    IOptions<IdentityOptions> optionsAccessor,
+    BoltonCupDbContext dbContext)
     : UserClaimsPrincipalFactory<BoltonCupUser, IdentityRole>(userManager, roleManager, optionsAccessor)
 {
     protected override async Task<ClaimsIdentity> GenerateClaimsAsync(BoltonCupUser user)
@@ -18,6 +21,24 @@ public class BoltonCupClaimsPrincipalFactory(
         if (!string.IsNullOrEmpty(accountIdStr))
         {
             identity.AddClaim(new Claim(BoltonCupClaimTypes.AccountId, accountIdStr));
+            
+            // add team GM claim(s)
+            var gmTournaments = await dbContext.Teams
+                .Where(t => t.GmAccountId == user.AccountId)
+                .GroupBy(t => t.TournamentId)
+                .ToListAsync();
+
+            foreach (var tournament in gmTournaments)
+            {
+                if (tournament.Key is { } tournamentId)
+                {
+                    identity.AddClaim(new Claim(BoltonCupClaimTypes.TournamentGm, tournamentId.ToString()));
+                }
+                
+                identity.AddClaims(
+                    tournament.Select(team => new Claim(BoltonCupClaimTypes.TeamGm, team.Id.ToString())).ToArray()
+                );
+            }
         }
 
         return identity;
@@ -27,4 +48,6 @@ public class BoltonCupClaimsPrincipalFactory(
 public static class BoltonCupClaimTypes
 {
     public const string AccountId = "AccountId";
+    public const string TournamentGm = "TournamentGm";
+    public const string TeamGm = "TeamGm";
 }

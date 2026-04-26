@@ -27,5 +27,23 @@ public static class ClaimsPrincipalExtensions
                 return accountId;
             return null;
         }
+
+        public IEnumerable<int> GetTeamGmIds()
+        {
+            return principal
+                .FindAll(claim => claim.Type == BoltonCupClaimTypes.TeamGm)
+                .Select(claim => int.TryParse(claim.Value, out var n) ? n : (int?)null)
+                .Where(n => n.HasValue)
+                .Select(n => n!.Value);
+        }
+
+        public IEnumerable<int> GetTournamentGmIds()
+        {
+            return principal
+                .FindAll(claim => claim.Type == BoltonCupClaimTypes.TournamentGm)
+                .Select(claim => int.TryParse(claim.Value, out var n) ? n : (int?)null)
+                .Where(n => n.HasValue)
+                .Select(n => n!.Value);
+        }
     }
 }

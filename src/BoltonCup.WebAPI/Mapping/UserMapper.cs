@@ -21,7 +21,9 @@ public class UserMapper(IBriefMapper _briefMapper) : IUserMapper
                 Name: claims.FindFirstValue(ClaimTypes.Name) ?? "",
                 Roles: claims.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList(),
                 IsAuthenticated: claims.Identity?.IsAuthenticated ?? false,
-                AccountId: claims.GetAccountIdOrDefault()
+                AccountId: claims.GetAccountIdOrDefault(),
+                TeamGmIds: claims.GetTeamGmIds(),
+                TournamentGmIds: claims.GetTournamentGmIds()
             );
     }
 }
