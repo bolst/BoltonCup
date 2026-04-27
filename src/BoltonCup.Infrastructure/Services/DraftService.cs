@@ -146,7 +146,7 @@ public class DraftService(
             .ConditionalWhere(d => d.Player.Position == query.Position, !string.IsNullOrEmpty(query.Position))
             .ConditionalWhere(d => d.DraftPick != null && d.DraftPick.TeamId == query.TeamId, query.TeamId.HasValue)
             .ConditionalWhere(d => (d.DraftPickId != null) == query.IsDrafted!.Value, query.IsDrafted.HasValue)
-            .ApplySorting(query, x => x.OrderByDescending(y => y.DraftRanking))
+            .ApplySorting(query, x => x.OrderBy(y => y.DraftRanking))
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }
     
