@@ -22,17 +22,6 @@
         Striped
         Dense>
         <ToolBarContent>
-            <div class="d-flex flex-row align-center gap-3 flex-wrap">
-                <FilterToolbarField
-                    T="Sdk.TournamentDto?" Label="Tournament"
-                    Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="@_dataGrid.ReloadServerData"
-                    ToStringFunc="x => x?.Name">
-                    <TournamentFilter/>
-                </FilterToolbarField>
-            </div>
-            
-            <MudSpacer />
-            
             <AuthorizeView Roles="Admin">
                 <MudButton
                     OnClick="@CreateNewDraftAsync" Variant="Variant.Filled" Class="mr-1"
@@ -85,8 +74,6 @@
 
     private MudDataGrid<Sdk.DraftDto> _dataGrid = null!;
 
-    private readonly DraftsFilterModel _filter = new();
-
     private async Task<GridData<Sdk.DraftDto>> ServerReload(GridState<Sdk.DraftDto> state, CancellationToken cancellationToken)
     {
         string? sortBy = null;
@@ -99,7 +86,6 @@
         }
 
         var data = await BoltonCupApi.GetDraftsAsync(
-            tournamentId: _filter.Tournament?.Id,
             page: state.Page + 1, 
             size: state.PageSize,
             sortBy: sortBy,
@@ -113,12 +99,6 @@
         };
     }
     
-    private Task OnFilterTournamentChange(Sdk.TournamentDto? tournament)
-    {
-        _filter.Tournament = tournament;
-        return _dataGrid.ReloadServerData();
-    }
-    
     private async Task CreateNewDraftAsync()
     {
         var dialog = await DialogService.ShowAsync<NewDraftDialog>();
@@ -127,10 +107,5 @@
         {
             Navigation.NavigateTo($"/drafts/{newDraftId}/config");
         }
-    }
-    
-    private class DraftsFilterModel
-    {
-        public Sdk.TournamentDto? Tournament { get; set; }
     }
 }
