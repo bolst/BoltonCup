@@ -12,6 +12,7 @@ public interface IDraftMapper
     IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings);
     DraftSingleDto? ToDto(Draft? draft);
     DraftPickSingleDto? ToDto(DraftPick? draftPick);
+    DraftPickMadeEventDto ToDto(CurrentDraftState draftState);
     GetDraftsQuery ToQuery(GetDraftsRequest request);
     CreateDraftCommand ToCommand(CreateDraftRequest request);
     UpdateDraftCommand ToCommand(int id, UpdateDraftRequest request);
@@ -100,6 +101,16 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
             Team = _briefMapper.ToTeamBriefDto(draftPick.Team),
             Player = draftPick.Player is null ? null : _briefMapper.ToPlayerBriefDto(draftPick.Player),
         };
+    }
+
+    public DraftPickMadeEventDto ToDto(CurrentDraftState draftState)
+    {
+        return new DraftPickMadeEventDto(
+            DraftId: draftState.Draft.Id,
+            CompletedPick: ToDto(draftState.CompletedPick)!,
+            NextPick: ToDto(draftState.NextPick),
+            NewDraftStatus: draftState.Draft.Status
+        );
     }
 
     public GetDraftsQuery ToQuery(GetDraftsRequest request)

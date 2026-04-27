@@ -2,8 +2,10 @@ using BoltonCup.Core;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
 using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
+using static BoltonCup.Shared.HubEvents.Draft;
 
 namespace BoltonCup.WebAPI.Controllers;
 
@@ -66,13 +68,20 @@ public class DraftsController(
     
     [Authorize]
     [HttpPut("{id:int}/currentPick")]
-    public async Task<IActionResult> DraftPlayer(int id, [FromBody] DraftPlayerRequest request)
+    public async Task<IActionResult> DraftPlayer(
+        int id, 
+        [FromBody] DraftPlayerRequest request,
+        [FromServices] IHubContext<Hubs.DraftHub> hubContext
+    )
     {
         if (await _authService.AuthorizeAsync(User, request.TeamId, CanManageTeam) is {Succeeded: false})
             return Forbid();
         
         var command = _mapper.ToCommand(id, request);
-        await _draftService.DraftPlayerAsync(command);
+        var draftState = await _draftService.DraftPlayerAsync(command);
+        var payloadDto = _mapper.ToDto(draftState);
+        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnPickMade, payloadDto);
+        
         return Ok();
     }
 

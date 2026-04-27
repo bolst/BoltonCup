@@ -6631,6 +6631,38 @@
         },
         "additionalProperties": false
       },
+      "DraftPickMadeEventDto": {
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedPick": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftPickSingleDto"
+              }
+            ]
+          },
+          "nextPick": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftPickSingleDto"
+              }
+            ],
+            "nullable": true
+          },
+          "newDraftStatus": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftStatus"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "DraftPickOrderDto": {
         "required": [
           "pick",

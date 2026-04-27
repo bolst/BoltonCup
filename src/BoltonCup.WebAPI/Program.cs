@@ -66,6 +66,7 @@ builder.Services.AddSwaggerGen(options =>
     
     options.OperationFilter<ProblemDetailsOperationFilter>();
     options.OperationFilter<SecurityRequirementsOperationFilter>();
+    options.DocumentFilter<SignalRSchemaFilter>();
     
     // generate operation IDs based on method names
     options.CustomOperationIds(description =>
@@ -126,7 +127,7 @@ app.MapGet("/", async context =>
     await Task.CompletedTask;
 });
 
-app.MapHub<DraftLobbyHub>(Hubs.DraftLobby);
+app.MapHub<DraftHub>(Hubs.Draft);
 
 // Sentry
 app.UseSentryTracing();

@@ -2,10 +2,9 @@ namespace BoltonCup.Shared
 {
     public static class HubEvents
     {
-        public static class DraftLobby
+        public static class Draft
         {
-            public const string UserJoined = "UserJoined";
-            public const string UserLeft = "UserLeft";
+            public const string OnPickMade = "OnPickMade";
         }
     }
 }
