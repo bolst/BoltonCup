@@ -7,7 +7,7 @@
 {
     
 }
-else
+else if (_draft is not null)
 {
     <MudDrawer 
         Open="@_drawerOpen" OpenChanged="@SetDrawerOpen" Elevation="1"
@@ -213,15 +213,17 @@ else
 
         _loading = true;
 
+        _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
+        if (_draft is null)
+            return;
+        
         var authState = await AuthStateTask;
-        var user = authState.User;
-        if (!user.IsInRole("Admin") && !user.IsGmForTournament(DraftId))
+        if (!authState.User.CanAccessDraft(_draft))
         {
             Navigation.NavigateTo("/");
             return;
         }
         
-        _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
         await LoadCurrentPickAsync();
 
         _loading = false;
