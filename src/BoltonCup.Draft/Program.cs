@@ -12,7 +12,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
 builder.Logging.AddBoltonCupSentry(builder.Configuration);
 
-builder.Services.AddTransient<IDraftStateServiceFactory, DraftStateServiceFactory>();
+builder.Services.AddScoped<DraftStateService>();
 
 if (builder.HostEnvironment.IsProduction())
 {

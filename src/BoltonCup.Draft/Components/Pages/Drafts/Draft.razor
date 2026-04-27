@@ -2,19 +2,15 @@
 @using BoltonCup.Draft.Services
 @layout Layout.DraftLayout
 @implements IAsyncDisposable
-@inject IDraftStateServiceFactory DraftStateServiceFactory
+@inject DraftStateService DraftState
 
 @if (_loading)
 {
     
 }
-else if (_draftState is {} draftState)
+else if (DraftState.Draft is not null)
 {
-    <CascadingValue Value="@draftState" IsFixed="true">
-        
-        <DraftDataGrid />
-        
-    </CascadingValue>
+    <DraftDataGrid />
 }
 
 @code {
@@ -26,7 +22,6 @@ else if (_draftState is {} draftState)
     private int? _draftId;
 
     private bool _loading;
-    private DraftStateService? _draftState;
     
     protected override async Task OnParametersSetAsync()
     {
@@ -35,8 +30,8 @@ else if (_draftState is {} draftState)
         _draftId = DraftId;
 
         _loading = true;
-        
-        _draftState = await DraftStateServiceFactory.CreateAsync(DraftId);
+
+        await DraftState.InitializeAsync(DraftId);
 
         _loading = false;
         await InvokeAsync(StateHasChanged);
@@ -45,9 +40,5 @@ else if (_draftState is {} draftState)
 
     public async ValueTask DisposeAsync()
     {
-        if (_draftState is not null)
-        {
-            await _draftState.DisposeAsync();
-        }
     }
 }

@@ -1,22 +1,36 @@
 @using BoltonCup.Draft.Services
 @namespace BoltonCup.Draft.Components
+@implements IDisposable
+@inject DraftStateService DraftState
 
 <MudDataGrid
     T="Sdk.DraftPickDto"
-    Items="@DraftState.Draft.DraftPicks"
+    Items="@DraftState.Draft?.DraftPicks"
     SortMode="SortMode.None"
     Elevation="0"
     Filterable>
     <Columns>
+        <PropertyColumn Property="@(x => x.Player == null ? string.Empty : x.Player.FullName)">
+            <CellTemplate>
+                <MudText Typo="Typo.body2">
+                    @context.Item.OverallPick. @context.Item.Player?.FullName
+                </MudText>
+            </CellTemplate>
+        </PropertyColumn>
     </Columns>
 </MudDataGrid>
 
 
 @code {
 
-    [CascadingParameter]
-    public DraftStateService DraftState { get; set; } = null!;
+    protected override void OnInitialized()
+    {
+        DraftState.OnStateChanged += StateHasChanged;
+    }
 
-    
-    
+
+    public void Dispose()
+    {
+        DraftState.OnStateChanged -= StateHasChanged;
+    }
 }
