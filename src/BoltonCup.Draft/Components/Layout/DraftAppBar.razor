@@ -1,0 +1,48 @@
+
+<MudAppBar Elevation="1" ToolBarClass="d-flex flex-row align-center justify-space-between">
+    <MudButtonGroup OverrideStyles="false">
+        <MudIconButton
+            Href="/" Icon="@Icons.Material.Rounded.KeyboardArrowLeft" Class="rounded"/>
+    </MudButtonGroup>
+
+    <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large">Start Draft</MudButton>
+
+        <MudButtonGroup OverrideStyles="false">
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" OnClick="@OpenSettingsAsync"/>
+        </MudButtonGroup>
+    </MudHidden>
+
+
+    <MudHidden Breakpoint="Breakpoint.MdAndUp">
+        <MudSpacer/>
+        <MudIconButton OnClick="@OpenDrawer" Icon="@Icons.Material.Rounded.Menu" Variant="Variant.Text" Color="Color.Inherit"/>
+        <MudDrawer @bind-Open="_drawerOpen" Anchor="Anchor.End" Elevation="1" Variant="DrawerVariant.Temporary" Width="100%">
+            <MudPaper Class="d-flex flex-row align-center px-2 border-solid border-b" Elevation="0" Width="100%" Height="64px" Square>
+                <a href="/" onclick="location.reload()" style="height: 100%">
+                    <BoltonCupLogo Height="64"/>
+                </a>
+                <MudSpacer/>
+                <MudIconButton OnClick="@CloseDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit"/>
+            </MudPaper>
+
+            <MudNavMenu Class="mud-width-full" Color="Color.Primary" Margin="Margin.Normal" Rounded Bordered>
+
+            </MudNavMenu>
+        </MudDrawer>
+    </MudHidden>
+</MudAppBar>
+
+@code {
+
+    private bool _drawerOpen;
+
+    private void OpenDrawer() => _drawerOpen = true;
+    private void CloseDrawer() => _drawerOpen = false;
+
+    private async Task OpenSettingsAsync()
+    {
+        
+    }
+
+}

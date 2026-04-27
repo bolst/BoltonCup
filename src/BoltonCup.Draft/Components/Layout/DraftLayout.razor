@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+@inject Common.Theme.BoltonCupTheme Theme
+
+<MudThemeProvider Theme="GetTheme()" IsDarkMode />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <DraftAppBar />
+    <MudMainContent Style="min-height: 100vh">
+        <BoltonCupErrorBoundary>
+            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
+                @Body
+            </MudContainer>
+        </BoltonCupErrorBoundary>
+    </MudMainContent>
+</MudLayout>
+
+
+@code {
+
+    private MudTheme GetTheme()
+    {
+        var theme = Theme.MudTheme;
+        return theme;
+    }
+    
+}
