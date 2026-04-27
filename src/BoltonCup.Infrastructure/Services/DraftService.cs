@@ -33,6 +33,7 @@ public class DraftService(
                 .ThenInclude(d => d.Team)
             .Include(d => d.DraftPicks)
                 .ThenInclude(d => d.Player)
+                .ThenInclude(p => p.Account)
             .OrderByDescending(d => d.CreatedAt)
             .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
     }

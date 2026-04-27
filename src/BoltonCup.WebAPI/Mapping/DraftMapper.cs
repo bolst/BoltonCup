@@ -76,11 +76,16 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
             Type = draft.Type,
             Status = draft.Status,
             Tournament = _briefMapper.ToTournamentBriefDto(draft.Tournament),
-            PickOrder = draft.DraftOrders.Select(order => new DraftPickOrderDto
-            {
-                Pick = order.Pick,
-                Team = _briefMapper.ToTeamBriefDto(order.Team)
-            }).OrderBy(d => d.Pick)
+            PickOrder = draft.DraftOrders
+                .Select(order => new DraftPickOrderDto
+                {
+                    Pick = order.Pick,
+                    Team = _briefMapper.ToTeamBriefDto(order.Team)
+                })
+                .OrderBy(d => d.Pick),
+            DraftPicks = draft.DraftPicks
+                .Select(pick => ToDto(pick)!)
+                .OrderBy(pick => pick.OverallPick)
         };
     }
 

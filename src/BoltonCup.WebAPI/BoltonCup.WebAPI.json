@@ -6597,6 +6597,40 @@
         },
         "additionalProperties": false
       },
+      "DraftPickDto": {
+        "required": [
+          "draftId",
+          "overallPick",
+          "team"
+        ],
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overallPick": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "team": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ]
+          },
+          "player": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DraftPickOrderDto": {
         "required": [
           "pick",
@@ -6774,6 +6808,7 @@
       },
       "DraftSingleDto": {
         "required": [
+          "draftPicks",
           "id",
           "pickOrder",
           "status",
@@ -6816,6 +6851,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DraftPickOrderDto"
+            }
+          },
+          "draftPicks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DraftPickDto"
             }
           }
         },
