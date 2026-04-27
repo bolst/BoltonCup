@@ -1,0 +1,22 @@
+@using BoltonCup.Draft.Services
+@namespace BoltonCup.Draft.Components
+
+<MudDataGrid
+    T="Sdk.DraftPickDto"
+    Items="@DraftState.Draft.DraftPicks"
+    SortMode="SortMode.None"
+    Elevation="0"
+    Filterable>
+    <Columns>
+    </Columns>
+</MudDataGrid>
+
+
+@code {
+
+    [CascadingParameter]
+    public DraftStateService DraftState { get; set; } = null!;
+
+    
+    
+}

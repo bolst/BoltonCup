@@ -1,5 +1,21 @@
 @page "/drafts/{DraftId:int}"
+@using BoltonCup.Draft.Services
 @layout Layout.DraftLayout
+@implements IAsyncDisposable
+@inject IDraftStateServiceFactory DraftStateServiceFactory
+
+@if (_loading)
+{
+    
+}
+else if (_draftState is {} draftState)
+{
+    <CascadingValue Value="@draftState" IsFixed="true">
+        
+        <DraftDataGrid />
+        
+    </CascadingValue>
+}
 
 @code {
     
@@ -7,4 +23,31 @@
     [EditorRequired]
     public required int DraftId { get; set; }
 
+    private int? _draftId;
+
+    private bool _loading;
+    private DraftStateService? _draftState;
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        if (DraftId == _draftId)
+            return;
+        _draftId = DraftId;
+
+        _loading = true;
+        
+        _draftState = await DraftStateServiceFactory.CreateAsync(DraftId);
+
+        _loading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_draftState is not null)
+        {
+            await _draftState.DisposeAsync();
+        }
+    }
 }

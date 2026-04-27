@@ -12,7 +12,7 @@ public class DraftStateServiceFactory : IDraftStateServiceFactory
 {
     private readonly IBoltonCupApi _api;
     
-    private DraftStateServiceFactory(IBoltonCupApi api)
+    public DraftStateServiceFactory(IBoltonCupApi api)
     {
         _api = api;
     }

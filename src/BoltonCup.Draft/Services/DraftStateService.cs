@@ -3,10 +3,12 @@ using BoltonCup.Sdk;
 namespace BoltonCup.Draft.Services;
 
 
-public class DraftStateService
+public class DraftStateService : IAsyncDisposable
 {
-    private readonly DraftSingleDto _draft;
     private readonly IBoltonCupApi _api;
+    private readonly DraftSingleDto _draft;
+
+    public DraftSingleDto Draft => _draft;
     
     private DraftStateService(DraftSingleDto draft, IBoltonCupApi api)
     {
@@ -20,5 +22,10 @@ public class DraftStateService
                     ?? throw new InvalidOperationException($"No draft with ID {draftId} exists.");
 
         return new DraftStateService(draft, api);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        
     }
 }
