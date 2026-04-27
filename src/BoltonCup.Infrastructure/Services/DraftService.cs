@@ -184,6 +184,10 @@ public class DraftService(
     {
         var draft = await _dbContext.Drafts
                         .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Player)
+                        .ThenInclude(p => p.Account)
                         .SingleOrDefaultAsync(e => e.Id == command.DraftId, cancellationToken)
                     ?? throw new EntityNotFoundException(nameof(Draft), command.DraftId);
         
