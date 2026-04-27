@@ -118,8 +118,8 @@ public class DraftService(
     {
         var draft = await _dbContext.Drafts.SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
                     ?? throw new EntityNotFoundException(nameof(Draft), draftId);
-        if (draft.Status != DraftStatus.InProgress)
-            throw new InvalidOperationException("Draft is not in progress.");
+        if (draft.Status == DraftStatus.Completed)
+            throw new InvalidOperationException("Draft is completed.");
 
         return await _dbContext.DraftPicks
             .Include(dp => dp.Team)
@@ -180,7 +180,7 @@ public class DraftService(
     }
     
 
-    public async Task DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default)
+    public async Task<CurrentDraftState> DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default)
     {
         var draft = await _dbContext.Drafts
                         .Include(d => d.DraftPicks)
@@ -219,6 +219,25 @@ public class DraftService(
         {
             throw new InvalidOperationException("Draft pick version expired");
         }
+
+        DraftPick? nextPick = null;
+        if (draft.Status != DraftStatus.Completed)
+        {
+            nextPick = await _dbContext.DraftPicks
+                .Include(dp => dp.Team)
+                .Include(dp => dp.Player)
+                .ThenInclude(p => p.Account)
+                .Where(dp => dp.DraftId == draft.Id)
+                .Where(dp => dp.PlayerId == null)
+                .OrderBy(dp => dp.OverallPick)
+                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        }
+        
+        return new CurrentDraftState(
+            Draft: draft,
+            CompletedPick: pick,
+            NextPick: nextPick
+        );
     }
 
 

@@ -13,5 +13,11 @@ public interface IDraftService
     Task<DraftPick?> GetCurrentPickAsync(int draftId, CancellationToken cancellationToken = default);
     Task<IPagedList<PlayerDraftRanking>> GetDraftRankingsAsync(int draftId, GetDraftRankingsQuery query, CancellationToken cancellationToken = default);
     Task UpdateOrderingAsync(UpdateDraftOrderingCommand command, CancellationToken cancellationToken = default);
-    Task DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default);
+    Task<CurrentDraftState> DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default);
 }
+
+public sealed record CurrentDraftState(
+    Draft Draft,
+    DraftPick CompletedPick,
+    DraftPick? NextPick
+);
