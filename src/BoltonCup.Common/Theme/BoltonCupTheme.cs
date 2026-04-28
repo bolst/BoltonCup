@@ -19,6 +19,7 @@ public class BoltonCupTheme
             PrimaryContrastText = "#FFFFFF",
             Secondary = "#F0665E", 
             Tertiary = "#E5D8BC", 
+            TertiaryContrastText = "#16191F",
             Surface = "#0E1116",
             DrawerBackground = "#16191F",
             DrawerText = "#FFFFFF",

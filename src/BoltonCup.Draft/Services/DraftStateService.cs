@@ -65,7 +65,7 @@ public class DraftStateService : IAsyncDisposable
             existingPick.Player = eventDto.CompletedPick.Player;
 
         var draftedPlayer = PlayerRankings
-            .FirstOrDefault(p => p.Player.Id == eventDto.CompletedPick.Player!.Id);
+            .FirstOrDefault(p => p.Player.Id == eventDto.CompletedPick.Player?.Id);
         if (draftedPlayer is not null)
         {
             draftedPlayer.IsDrafted = true;

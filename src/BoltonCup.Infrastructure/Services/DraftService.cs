@@ -237,6 +237,12 @@ public class DraftService(
                 .FirstOrDefaultAsync(cancellationToken: cancellationToken);
         }
         
+        await _dbContext.Entry(pick)
+            .Reference(p => p.Player)
+            .Query()
+            .Include(p => p.Account)
+            .LoadAsync(cancellationToken);
+        
         return new CurrentDraftState(
             Draft: draft,
             CompletedPick: pick,
