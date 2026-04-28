@@ -1,6 +1,8 @@
 @using BoltonCup.Draft.Services
 @implements IDisposable
 @inject DraftStateService DraftState
+@inject NavigationManager Navigation
+@inject IBoltonCupApi BoltonCupApi
 
 <MudAppBar Elevation="1" ToolBarClass="d-flex flex-row align-center justify-space-between">
     <MudButtonGroup OverrideStyles="false">
@@ -26,7 +28,11 @@
         }
 
         <MudButtonGroup OverrideStyles="false">
-            <MudIconButton Icon="@Icons.Material.Filled.Settings" OnClick="@OpenSettingsAsync"/>
+            <MudMenu Icon="@Icons.Material.Filled.Settings">
+                <MudMenuItem 
+                    OnClick="@DeleteDraftAsync"
+                    Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
+            </MudMenu>
         </MudButtonGroup>
     </MudHidden>
 
@@ -44,7 +50,7 @@
             </MudPaper>
 
             <MudNavMenu Class="mud-width-full" Color="Color.Primary" Margin="Margin.Normal" Rounded Bordered>
-
+                
             </MudNavMenu>
         </MudDrawer>
     </MudHidden>
@@ -66,10 +72,14 @@
     {
         
     }
-    
-    private async Task OpenSettingsAsync()
+
+    private async Task DeleteDraftAsync()
     {
-        
+        if (DraftState.Draft is not { } draft)
+            return;
+
+        await BoltonCupApi.DeleteDraftAsync(draft.Id);
+        Navigation.NavigateTo("/", true);
     }
 
     public void Dispose()
