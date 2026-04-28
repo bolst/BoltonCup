@@ -1,7 +1,5 @@
-using System.Security.Claims;
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
-using BoltonCup.Infrastructure.Extensions;
 
 namespace BoltonCup.WebAPI.Mapping;
 
@@ -76,10 +74,10 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
                     Team = _briefMapper.ToTeamBriefDto(order.Team)
                 })
                 .OrderBy(d => d.Pick),
-            DraftPicks = draft.DraftPicks
-                .GroupBy(dto => dto.Team.Id)
-                .Select(group => new TeamDraftPicks(group.Key, group.Select(ToDtoListItem).OrderBy(x => x.OverallPick)))
-                .OrderBy(group => group.TeamId)
+            DraftPicksByRound = draft.DraftPicks
+                .GroupBy(dto => dto.Round)
+                .Select(group => new RoundDraftPicks(group.Key, group.Select(ToDtoListItem).OrderBy(x => x.OverallPick)))
+                .OrderBy(group => group.Round)
         };
     }
 
@@ -91,6 +89,8 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         {
             DraftId = draftPick.DraftId,
             OverallPick = draftPick.OverallPick,
+            Round = draftPick.Round,
+            RoundPick = draftPick.RoundPick,
             Team = _briefMapper.ToTeamBriefDto(draftPick.Team),
             Player = draftPick.Player is null ? null : _briefMapper.ToPlayerBriefDto(draftPick.Player),
         };
@@ -160,6 +160,8 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         {
             DraftId = draftPick.DraftId,
             OverallPick = draftPick.OverallPick,
+            Round = draftPick.Round,
+            RoundPick = draftPick.RoundPick,
             Team = _briefMapper.ToTeamBriefDto(draftPick.Team),
             Player = draftPick.Player is null ? null : _briefMapper.ToPlayerBriefDto(draftPick.Player),
         };

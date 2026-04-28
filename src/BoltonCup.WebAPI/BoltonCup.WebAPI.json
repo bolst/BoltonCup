@@ -6803,6 +6803,8 @@
         "required": [
           "draftId",
           "overallPick",
+          "round",
+          "roundPick",
           "team"
         ],
         "type": "object",
@@ -6812,6 +6814,14 @@
             "format": "int32"
           },
           "overallPick": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "round": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roundPick": {
             "type": "integer",
             "format": "int32"
           },
@@ -6890,6 +6900,8 @@
         "required": [
           "draftId",
           "overallPick",
+          "round",
+          "roundPick",
           "team"
         ],
         "type": "object",
@@ -6899,6 +6911,14 @@
             "format": "int32"
           },
           "overallPick": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "round": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roundPick": {
             "type": "integer",
             "format": "int32"
           },
@@ -7031,7 +7051,7 @@
       },
       "DraftSingleDto": {
         "required": [
-          "draftPicks",
+          "draftPicksByRound",
           "id",
           "pickOrder",
           "status",
@@ -7076,10 +7096,10 @@
               "$ref": "#/components/schemas/DraftPickOrderDto"
             }
           },
-          "draftPicks": {
+          "draftPicksByRound": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TeamDraftPicks"
+              "$ref": "#/components/schemas/RoundDraftPicks"
             }
           }
         },
@@ -8327,6 +8347,22 @@
         },
         "additionalProperties": false
       },
+      "RoundDraftPicks": {
+        "type": "object",
+        "properties": {
+          "round": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "picks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DraftPickDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "SkaterStatDto": {
         "required": [
           "accountId",
@@ -8496,22 +8532,6 @@
           "tertiaryColorHex": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "TeamDraftPicks": {
-        "type": "object",
-        "properties": {
-          "teamId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "picks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DraftPickDto"
-            }
           }
         },
         "additionalProperties": false

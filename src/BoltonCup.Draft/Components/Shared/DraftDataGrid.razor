@@ -6,17 +6,34 @@
 @if (DraftState.Draft is not null)
 {
     <MudTable
-        T="Sdk.TeamDraftPicks"
-        Items="@(DraftState.Draft.DraftPicks)"
-        Elevation="0">
+        T="Sdk.RoundDraftPicks"
+        Items="@(DraftState.Draft.DraftPicksByRound)"
+        Elevation="0"
+        Outlined="false">
         <HeaderContent>
+            @foreach (var pick in DraftState.Draft?.PickOrder ?? [])
+            {
+                <MudTh>
+                    <MudPaper Class="pa-2 d-flex flex-column align-center justify-space-between" Height="64px" Width="158px" Elevation="1">
+                        <MudImage Src="@pick.Team.Logo" Height="32" />
+                        <MudText Typo="Typo.body2">@pick.Team.NameShort</MudText>
+                    </MudPaper>
+                </MudTh>
+            }
         </HeaderContent>
         <RowTemplate>
             @foreach (var pick in context.Picks)
             {
                 <MudTd>
-                    <MudPaper Height="24px" Width="48px" Elevation="1">
-                        @pick.OverallPick @pick.Player?.FullName
+                    <MudPaper Class="pa-2 d-flex flex-column justify-space-between" Height="64px" Width="158px" Elevation="1">
+                        <div class="d-flex flex-row justify-space-between">
+                            <MudText Typo="Typo.body2">@pick.Player?.FullName</MudText>
+                            <MudText Typo="Typo.caption">@pick.Round.@pick.RoundPick</MudText>
+                        </div>
+                        <div class="d-flex flex-row justify-space-between">
+                            <MudText Typo="Typo.body2">@pick.Player?.Position?.ToUpper().FirstOrDefault()</MudText>
+                            <MudImage Src="@pick.Player?.ProfilePicture" Height="24" />
+                        </div>
                     </MudPaper>
                 </MudTd>
             }

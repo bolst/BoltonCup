@@ -75,7 +75,8 @@ public class DraftStateService : IAsyncDisposable
     
     private void HandlePickMade(DraftPickMadeEventDto eventDto)
     {
-        var existingPick = Draft?.DraftPicks
+        var existingPick = Draft?.DraftPicksByRound
+            .Where(dpr => dpr.Round == eventDto.CompletedPick.Round)
             .SelectMany(pick => pick.Picks)
             .FirstOrDefault(p => p.OverallPick == eventDto.CompletedPick.OverallPick);
         if (existingPick is not null)
