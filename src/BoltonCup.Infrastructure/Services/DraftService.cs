@@ -74,6 +74,9 @@ public class DraftService(
         _dbContext.DraftOrders.AddRange(orderings);
         await _dbContext.SaveChangesAsync(cancellationToken);
         
+        await GenerateDraftPicksAsync(newDraft, cancellationToken);
+        await GenerateDraftRankingsAsync(newDraft, cancellationToken);
+        
         return newDraft.Id;
     }
 
@@ -84,22 +87,16 @@ public class DraftService(
             ?? throw new EntityNotFoundException(nameof(Draft), command.DraftId);
 
         await EnsureDraftStatusIsValidAsync(draft, command.DraftStatus, cancellationToken);
+ 
+        var regenerate = draft.Type != command.DraftType;
+        
         draft.Status = command.DraftStatus;
-        
-        // draft type can only be changed in the pending state
-        if (command.DraftType != draft.Type && draft.Status != DraftStatus.Pending)
-            throw new InvalidOperationException("Draft type cannot change once the draft has started.");
         draft.Type = command.DraftType;
-        
-        // draft title can only be changed in the pending state
-        if (command.Title != draft.Title && draft.Status != DraftStatus.Pending)
-            throw new InvalidOperationException("Draft name cannot change once the draft has started.");
         draft.Title = command.Title;
-
+        
         await _dbContext.SaveChangesAsync(cancellationToken);
         
-        // if the draft is now in progress, we need to generate the picks
-        if (draft.Status == DraftStatus.InProgress)
+        if (regenerate)
         {
             await GenerateDraftPicksAsync(draft, cancellationToken);
             await GenerateDraftRankingsAsync(draft, cancellationToken);
