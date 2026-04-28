@@ -49,6 +49,30 @@ public class DraftsController(
         await _draftService.UpdateAsync(command);
         return Ok();
     }
+
+    [Authorize(Roles = Admin)]
+    [HttpPatch("{id:int}/start")]
+    public async Task<IActionResult> StartDraft(int id)
+    {
+        await _draftService.StartAsync(id);
+        return Ok();
+    }
+    
+    [Authorize(Roles = Admin)]
+    [HttpPatch("{id:int}/pause")]
+    public async Task<IActionResult> PauseDraft(int id)
+    {
+        await _draftService.PauseAsync(id);
+        return Ok();
+    }
+    
+    [Authorize(Roles = Admin)]
+    [HttpPatch("{id:int}/end")]
+    public async Task<IActionResult> EndDraft(int id)
+    {
+        await _draftService.EndAsync(id);
+        return Ok();
+    }
     
     [Authorize(Roles = Admin)]
     [HttpDelete("{id:int}")]

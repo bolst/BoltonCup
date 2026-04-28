@@ -8,6 +8,9 @@ public interface IDraftService
     Task<Draft?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<int> CreateAsync(CreateDraftCommand command, CancellationToken cancellationToken = default);
     Task UpdateAsync(UpdateDraftCommand command, CancellationToken cancellationToken = default);
+    Task StartAsync(int draftId, CancellationToken cancellationToken = default);
+    Task PauseAsync(int draftId, CancellationToken cancellationToken = default);
+    Task EndAsync(int draftId, CancellationToken cancellationToken = default);
     Task DeleteAsync(int id, CancellationToken cancellationToken = default);
     
     Task<DraftPick?> GetCurrentPickAsync(int draftId, CancellationToken cancellationToken = default);

@@ -70,7 +70,10 @@
 
     private async Task StartDraftAsync()
     {
-        
+        if (DraftState.Draft?.Id is not { } draftId)
+            return;
+
+        await BoltonCupApi.StartDraftAsync(draftId);
     }
 
     private async Task DeleteDraftAsync()

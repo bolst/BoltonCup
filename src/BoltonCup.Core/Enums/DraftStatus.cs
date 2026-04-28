@@ -4,5 +4,6 @@ public enum DraftStatus
 {
     Pending,
     InProgress,
+    Paused,
     Completed
 }

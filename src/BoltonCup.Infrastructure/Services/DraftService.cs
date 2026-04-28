@@ -42,7 +42,9 @@ public class DraftService(
     {
         if (await _dbContext.Tournaments.AllAsync(t => t.Id != command.TournamentId, cancellationToken))
             throw new EntityNotFoundException(nameof(Tournament), command.TournamentId);
-        
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
         // create draft
         var newDraft = new Draft
         {
@@ -51,9 +53,9 @@ public class DraftService(
             Status = DraftStatus.Pending,
         };
         _dbContext.Drafts.Add(newDraft);
-        
+
         await _dbContext.SaveChangesAsync(cancellationToken);
-        
+
         // create default orderings
         var orderings = await _dbContext.Teams
             .Where(t => t.TournamentId == command.TournamentId)
@@ -70,27 +72,29 @@ public class DraftService(
             order.Pick = index + 1;
             return order;
         }).ToList();
-        
+
         _dbContext.DraftOrders.AddRange(orderings);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        
+
         await GenerateDraftPicksAsync(newDraft, cancellationToken);
         await GenerateDraftRankingsAsync(newDraft, cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
         
         return newDraft.Id;
     }
-
+    
+    
     public async Task UpdateAsync(UpdateDraftCommand command, CancellationToken cancellationToken = default)
     {
         var draft = await _dbContext.Drafts
-            .SingleOrDefaultAsync(e => e.Id == command.DraftId, cancellationToken)
-            ?? throw new EntityNotFoundException(nameof(Draft), command.DraftId);
+                        .SingleOrDefaultAsync(e => e.Id == command.DraftId, cancellationToken)
+                    ?? throw new EntityNotFoundException(nameof(Draft), command.DraftId);
 
-        await EnsureDraftStatusIsValidAsync(draft, command.DraftStatus, cancellationToken);
- 
         var regenerate = draft.Type != command.DraftType;
+        if (regenerate && draft.Status != DraftStatus.Pending)
+            throw new InvalidOperationException("Draft types cannot be changed once draft has started.");
         
-        draft.Status = command.DraftStatus;
         draft.Type = command.DraftType;
         draft.Title = command.Title;
         
@@ -101,6 +105,42 @@ public class DraftService(
             await GenerateDraftPicksAsync(draft, cancellationToken);
             await GenerateDraftRankingsAsync(draft, cancellationToken);
         }
+    }
+
+    public async Task StartAsync(int draftId, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts 
+                        .SingleOrDefaultAsync(e => e.Id == draftId, cancellationToken) 
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+        
+        if (draft.Status == DraftStatus.Completed)
+            throw new InvalidOperationException($"Draft {draft.Id} is completed and cannot be started.");
+
+        draft.Status = DraftStatus.InProgress;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+    
+    public async Task PauseAsync(int draftId, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts 
+                        .SingleOrDefaultAsync(e => e.Id == draftId, cancellationToken) 
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+        
+        if (draft.Status is DraftStatus.Completed or DraftStatus.Pending)
+            throw new InvalidOperationException($"Draft {draft.Id} is completed and cannot be paused.");
+        
+        draft.Status = DraftStatus.Paused;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+    
+    public async Task EndAsync(int draftId, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts 
+                        .SingleOrDefaultAsync(e => e.Id == draftId, cancellationToken) 
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+        
+        draft.Status = DraftStatus.Completed;
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public Task DeleteAsync(int id, CancellationToken cancellationToken = default)
@@ -248,43 +288,6 @@ public class DraftService(
     }
 
 
-    // status can only evolve as Pending -> InProgress or InProgress -> Completed
-    // will throw on validation error
-    // returns true if picks need to be regenerated, otherwise false
-    private async Task EnsureDraftStatusIsValidAsync(Draft draft, DraftStatus newStatus, CancellationToken cancellationToken)
-    {
-        if (draft.Status == newStatus)
-            return;
-        
-        switch (draft.Status)
-        {
-            case DraftStatus.Pending:
-            {
-                if (newStatus != DraftStatus.InProgress)
-                    throw new InvalidOperationException(
-                        "Invalid state change (Pending can only evolve to In Progress)");
-                break;
-            }
-            case DraftStatus.InProgress:
-            {
-                if (newStatus != DraftStatus.Completed)
-                    throw new InvalidOperationException(
-                        "Invalid state change (In Progress can only evolve to Completed");
-
-                var arePlayersUndrafted = await _dbContext.DraftPicks.AnyAsync(
-                    dp => dp.DraftId == draft.Id && dp.PlayerId == null, cancellationToken: cancellationToken);
-                if (arePlayersUndrafted)
-                    throw new InvalidOperationException("Draft still has players who need to be drafted");
-                
-                break;
-            }
-            case DraftStatus.Completed:
-            default:
-                throw new InvalidOperationException("Cannot modify the state of an already-completed draft.");
-        }
-    }
-    
-    
     private async Task GenerateDraftPicksAsync(Draft draft, CancellationToken cancellationToken)
     {
         // delete old picks
