@@ -29,16 +29,21 @@
         }
 
         <MudButtonGroup OverrideStyles="false">
-            <MudMenu Icon="@Icons.Material.Filled.Settings">
-                @if (DraftState.Draft?.Status == DraftStatus.InProgress)
-                {
+            <MudMenu Icon="@Icons.Material.Filled.DisplaySettings">
+                <AuthorizeView Roles="Admin">
                     <MudMenuItem
-                        OnClick="@PauseDraftAsync"
-                        Icon="@Icons.Material.Rounded.PauseCircle">Pause Draft</MudMenuItem>
-                }
-                <MudMenuItem
-                    OnClick="@DeleteDraftAsync"
-                    Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
+                        OnClick="@OpenDraftSettingsAsync"
+                        Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
+                    @if (DraftState.Draft?.Status == DraftStatus.InProgress)
+                    {
+                        <MudMenuItem
+                            OnClick="@PauseDraftAsync"
+                            Icon="@Icons.Material.Rounded.PauseCircle">Pause Draft</MudMenuItem>
+                    }
+                    <MudMenuItem
+                        OnClick="@DeleteDraftAsync"
+                        Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
+                </AuthorizeView>
             </MudMenu>
         </MudButtonGroup>
     </MudHidden>
@@ -75,6 +80,11 @@
         DraftState.OnStateChanged += StateHasChanged;
     }
 
+    private async Task OpenDraftSettingsAsync()
+    {
+        
+    }
+    
     private async Task StartDraftAsync()
     {
         if (DraftState.Draft?.Id is not { } draftId)
