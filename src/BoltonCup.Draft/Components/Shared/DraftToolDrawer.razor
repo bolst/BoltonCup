@@ -1,0 +1,104 @@
+@using BoltonCup.Draft.Services
+@using BoltonCup.Sdk
+@namespace BoltonCup.Draft.Components.Shared
+@implements IDisposable
+@inject DraftStateService DraftState
+@inject IBoltonCupApi BoltonCupApi
+
+<div class="mud-height-full mud-width-full">
+    <MudDataGrid
+        T="DraftRankingDto" Items="@DraftState.PlayerRankings" Height="80vh"
+        QuickFilter="@QuickFilter" RowClassFunc="@RowClassFunc" RowClick="@OnRowClick"
+        ShowColumnOptions="false" Elevation="0" Hover Bordered Dense FixedHeader>
+        <ToolBarContent>
+            <MudCheckBox @bind-Value="@_filterState.ShowDrafted" Size="Size.Small" Label="Show Drafted" Dense/>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Title="Rank" Property="x => x.DraftRanking" CellStyle="width: 50px">
+                <CellTemplate>
+                    <div class="d-flex flex-row align-center gap-1">
+                        @if (!context.Item.IsDrafted)
+                        {
+                            <MudIconButton
+                                OnClick="@(_ => DraftPlayerAsync(context.Item))" Disabled="@(DraftState.Draft?.Status != DraftStatus.InProgress)"
+                                Icon="@Icons.Material.Rounded.Add" Class="rounded" Size="Size.Small"/>
+                        }
+                        <MudSpacer/>
+                        <MudText Typo="Typo.body2">@context.Item.DraftRanking</MudText>
+                    </div>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Title="Player" Property="x => x.Player.FullName">
+                <CellTemplate>
+                    @if (context.Item.IsDrafted)
+                    {
+                        <div class="d-flex flex-row align-center gap-1">
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@context.Item.Player.FullName</MudText>
+                            <MudImage Src="@context.Item.DraftPick?.Team.Logo" Height="24"/>
+                        </div>
+                    }
+                    else
+                    {
+                        <span>@context.Item.Player.FullName</span>
+                    }
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Title="PPG" Property="x => x.PointsPerGame" Format="F2"/>
+            <PropertyColumn Title="P" Property="x => x.TotalPoints"/>
+            <PropertyColumn Title="GP" Property="x => x.GamesPlayed"/>
+        </Columns>
+    </MudDataGrid>
+</div>
+
+
+@code {
+
+    private bool _open = true;
+    private readonly FilterState _filterState = new();
+
+    protected override void OnInitialized()
+    {
+        DraftState.OnStateChanged += StateHasChanged;
+    }
+
+    private bool QuickFilter(Sdk.DraftRankingDto ranking)
+    {
+        if (!_filterState.ShowDrafted)
+            return !ranking.IsDrafted;
+        
+        return true;
+    }
+
+    private string RowClassFunc(Sdk.DraftRankingDto ranking, int rowNumber)
+    {
+        if (ranking.IsDrafted)
+            return "gray darken-3 mud-secondary-text";
+
+        return "cursor-pointer";
+    }
+
+    private async Task OnRowClick(DataGridRowClickEventArgs<Sdk.DraftRankingDto> args)
+    {
+        
+    }
+
+    private async Task DraftPlayerAsync(Sdk.DraftRankingDto ranking)
+    {
+        await BoltonCupApi.DraftPlayerAsync(DraftState.Draft!.Id, new DraftPlayerRequest
+        {
+            PlayerId = ranking.Player.Id,
+            TeamId = DraftState.CurrentPick!.Team.Id,
+            OverallPick = DraftState.CurrentPick!.OverallPick
+        });
+    }
+
+    public void Dispose()
+    {
+        DraftState.OnStateChanged -= StateHasChanged;
+    }
+
+    private class FilterState
+    {
+        public bool ShowDrafted { get; set; }
+    }
+}

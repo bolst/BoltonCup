@@ -10,9 +10,16 @@
 }
 else if (DraftState.Draft is not null)
 {
-    <DraftDataGrid />
-    
-    <DraftToolDrawer />
+    <MudSplitPanel 
+        Class="mud-width-full" Style="height: calc(100vh - 64px)" 
+        FirstPanelInitialSize="300" MinPanelSize="50" Horizontal Transparent>
+        <FirstPanel>
+            <DraftDataGrid/>
+        </FirstPanel>
+        <SecondPanel>
+            <DraftToolDrawer/>
+        </SecondPanel>
+    </MudSplitPanel>
 }
 
 @code {
@@ -38,7 +45,7 @@ else if (DraftState.Draft is not null)
         _loading = false;
         await InvokeAsync(StateHasChanged);
     }
-
+    
 
     public async ValueTask DisposeAsync()
     {

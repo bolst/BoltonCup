@@ -8,8 +8,10 @@
     <MudTable
         T="Sdk.RoundDraftPicks"
         Items="@(DraftState.Draft.DraftPicksByRound)"
-        Elevation="0"
-        Outlined="false">
+        Elevation="0" 
+        CellClass="border-0"
+        Outlined="false"
+        Dense>
         <HeaderContent>
             @foreach (var pick in DraftState.Draft?.PickOrder ?? [])
             {
@@ -25,7 +27,7 @@
             @foreach (var pick in context.Picks)
             {
                 <MudTd>
-                    <MudPaper Class="pa-2 d-flex flex-column justify-space-between" Height="64px" Width="158px" Elevation="1">
+                    <MudPaper Class="mud-theme-dark pa-2 d-flex flex-column justify-space-between" Height="64px" Width="158px" Elevation="1">
                         <div class="d-flex flex-row justify-space-between">
                             <MudText Typo="Typo.body2">@pick.Player?.FullName</MudText>
                             <MudText Typo="Typo.caption">@pick.Round.@pick.RoundPick</MudText>
