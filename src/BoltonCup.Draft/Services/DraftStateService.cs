@@ -60,6 +60,7 @@ public class DraftStateService : IAsyncDisposable
             Draft.Status = eventDto.NewDraftStatus;
 
         var existingPick = Draft?.DraftPicks
+            .SelectMany(pick => pick.Picks)
             .FirstOrDefault(p => p.OverallPick == eventDto.CompletedPick.OverallPick);
         if (existingPick is not null)
             existingPick.Player = eventDto.DraftedPlayer;

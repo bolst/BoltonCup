@@ -3,22 +3,26 @@
 @implements IDisposable
 @inject DraftStateService DraftState
 
-<MudDataGrid
-    T="Sdk.DraftPickDto"
-    Items="@DraftState.Draft?.DraftPicks"
-    SortMode="SortMode.None"
-    Elevation="0"
-    Filterable>
-    <Columns>
-        <PropertyColumn Property="@(x => x.Player == null ? string.Empty : x.Player.FullName)">
-            <CellTemplate>
-                <MudText Typo="Typo.body2">
-                    @context.Item.OverallPick. @context.Item.Player?.FullName
-                </MudText>
-            </CellTemplate>
-        </PropertyColumn>
-    </Columns>
-</MudDataGrid>
+@if (DraftState.Draft is not null)
+{
+    <MudTable
+        T="Sdk.TeamDraftPicks"
+        Items="@(DraftState.Draft.DraftPicks)"
+        Elevation="0">
+        <HeaderContent>
+        </HeaderContent>
+        <RowTemplate>
+            @foreach (var pick in context.Picks)
+            {
+                <MudTd>
+                    <MudPaper Height="24px" Width="48px" Elevation="1">
+                        @pick.OverallPick @pick.Player?.FullName
+                    </MudPaper>
+                </MudTd>
+            }
+        </RowTemplate>
+    </MudTable>
+}
 
 
 @code {

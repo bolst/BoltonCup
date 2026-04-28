@@ -6913,7 +6913,7 @@
           "draftPicks": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DraftPickDto"
+              "$ref": "#/components/schemas/TeamDraftPicks"
             }
           }
         },
@@ -8308,6 +8308,22 @@
           "tertiaryColorHex": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TeamDraftPicks": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "picks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DraftPickDto"
+            }
           }
         },
         "additionalProperties": false

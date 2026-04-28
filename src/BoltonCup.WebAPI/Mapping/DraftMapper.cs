@@ -36,13 +36,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
 
     public IPagedList<DraftPickDto> ToDtoList(IPagedList<DraftPick> draftPicks)
     {
-        return draftPicks.ProjectTo(draft => new DraftPickDto
-        {
-            DraftId = draft.DraftId,
-            OverallPick = draft.OverallPick,
-            Team = _briefMapper.ToTeamBriefDto(draft.Team),
-            Player = draft.Player is null ? null : _briefMapper.ToPlayerBriefDto(draft.Player),
-        });
+        return draftPicks.ProjectTo(ToDtoListItem);
     }
 
     public IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings)
@@ -83,8 +77,9 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
                 })
                 .OrderBy(d => d.Pick),
             DraftPicks = draft.DraftPicks
-                .Select(pick => ToDto(pick)!)
-                .OrderBy(pick => pick.OverallPick)
+                .GroupBy(dto => dto.Team.Id)
+                .Select(group => new TeamDraftPicks(group.Key, group.Select(ToDtoListItem).OrderBy(x => x.OverallPick)))
+                .OrderBy(group => group.TeamId)
         };
     }
 
@@ -155,6 +150,18 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
             TeamId: request.TeamId,
             OverallPick: request.OverallPick
         );
+    }
+
+
+    public DraftPickDto ToDtoListItem(DraftPick draftPick)
+    {
+        return new DraftPickDto
+        {
+            DraftId = draftPick.DraftId,
+            OverallPick = draftPick.OverallPick,
+            Team = _briefMapper.ToTeamBriefDto(draftPick.Team),
+            Player = draftPick.Player is null ? null : _briefMapper.ToPlayerBriefDto(draftPick.Player),
+        };
     }
     
 }
