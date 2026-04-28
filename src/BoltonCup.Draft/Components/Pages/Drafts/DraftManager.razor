@@ -260,7 +260,7 @@ else if (_draft is not null)
             descending = false;
         }
         
-        var data = await BoltonCupApi.GetDraftRankingsAsync(
+        var data = await BoltonCupApi.GetDraftPlayerRankingsAsync(
             id: _draft.Id,
             position: _filter.Position,
             teamId: _filter.TeamId,

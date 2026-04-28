@@ -32,6 +32,8 @@ public class DraftStateService : IAsyncDisposable
             .WithAutomaticReconnect()
             .Build();
 
+        _hubConnection.On<DraftUpdateEventDto>(HubEvents.Draft.OnDraftUpdate, HandleDraftUpdate);
+        _hubConnection.On<DraftStatus>(HubEvents.Draft.OnDraftStatusChange, HandleDraftStatusChange);
         _hubConnection.On<DraftPickMadeEventDto>(HubEvents.Draft.OnPickMade, HandlePickMade);
     }
 
@@ -41,7 +43,7 @@ public class DraftStateService : IAsyncDisposable
         
         Draft = await _api.GetDraftByIdAsync(draftId);
         CurrentPick = await _api.GetCurrentDraftPickAsync(draftId);
-        PlayerRankings = (await _api.GetDraftRankingsAsync(draftId)).Items.ToList();
+        PlayerRankings = (await _api.GetDraftPlayerRankingsAsync(draftId)).Items.ToList();
 
         if (_hubConnection.State == HubConnectionState.Disconnected)
         {
@@ -54,11 +56,25 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
+    private void HandleDraftUpdate(DraftUpdateEventDto eventDto)
+    {
+        Draft = eventDto.Draft;
+        CurrentPick = eventDto.NextPick;
+        NotifyStateChanged();
+    }
+
+    
+    private void HandleDraftStatusChange(DraftStatus newStatus)
+    {
+        if (Draft is null) 
+            return;
+        Draft.Status = newStatus;
+        NotifyStateChanged();
+    }
+
+    
     private void HandlePickMade(DraftPickMadeEventDto eventDto)
     {
-        if (Draft is not null)
-            Draft.Status = eventDto.NewDraftStatus;
-
         var existingPick = Draft?.DraftPicks
             .SelectMany(pick => pick.Picks)
             .FirstOrDefault(p => p.OverallPick == eventDto.CompletedPick.OverallPick);

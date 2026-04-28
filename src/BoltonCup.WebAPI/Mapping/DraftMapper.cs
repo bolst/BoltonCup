@@ -12,11 +12,11 @@ public interface IDraftMapper
     IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings);
     DraftSingleDto? ToDto(Draft? draft);
     DraftPickSingleDto? ToDto(DraftPick? draftPick);
-    DraftPickMadeEventDto ToDto(CurrentDraftState draftState);
+    DraftUpdateEventDto ToDto(CurrentDraftState draftState);
+    DraftPickMadeEventDto ToDto(CurrentDraftStateWithPick draftState);
     GetDraftsQuery ToQuery(GetDraftsRequest request);
     CreateDraftCommand ToCommand(CreateDraftRequest request);
-    UpdateDraftCommand ToCommand(int id, UpdateDraftRequest request);
-    UpdateDraftOrderingCommand ToCommand(int id, UpdateDraftOrderingRequest request);
+    UpdateDraftCommand ToCommand(UpdateDraftRequest request);
     DraftPlayerCommand ToCommand(int id, DraftPlayerRequest request);
 }
 
@@ -96,14 +96,21 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         };
     }
 
-    public DraftPickMadeEventDto ToDto(CurrentDraftState draftState)
+    public DraftUpdateEventDto ToDto(CurrentDraftState draftState)
+    {
+        return new DraftUpdateEventDto(
+            Draft: ToDto(draftState.Draft)!,
+            NextPick: ToDto(draftState.NextPick)
+        );
+    }
+
+    public DraftPickMadeEventDto ToDto(CurrentDraftStateWithPick draftState)
     {
         return new DraftPickMadeEventDto(
             DraftId: draftState.Draft.Id,
             CompletedPick: _briefMapper.ToDraftPickBriefDto(draftState.CompletedPick)!,
             DraftedPlayer: _briefMapper.ToPlayerBriefDto(draftState.CompletedPick!.Player!),
-            NextPick: ToDto(draftState.NextPick),
-            NewDraftStatus: draftState.Draft.Status
+            NextPick: ToDto(draftState.NextPick)
         );
     }
 
@@ -124,23 +131,18 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         );
     }
     
-    public UpdateDraftCommand ToCommand(int id, UpdateDraftRequest request)
+    public UpdateDraftCommand ToCommand(UpdateDraftRequest request)
     {
-        return new UpdateDraftCommand(
-            DraftId: id,
-            DraftType: request.DraftType,
-            Title: request.Title
-        );
+        return new UpdateDraftCommand
+        {
+            Title = request.Title,
+            DraftType = request.DraftType,
+            Ordering = request.Ordering?
+                .Select(x => new DraftOrderCommandEntry(x.TeamId, x.Pick))
+                .ToList(),
+        };
     }
 
-    public UpdateDraftOrderingCommand ToCommand(int id, UpdateDraftOrderingRequest request)
-    {
-        return new UpdateDraftOrderingCommand(
-            DraftId: id,
-            Ordering: request.Ordering.Select(x => new DraftOrderCommandEntry(x.TeamId, x.Pick)).ToList()
-        );
-    }
-    
     public DraftPlayerCommand ToCommand(int id, DraftPlayerRequest request)
     {
         return new DraftPlayerCommand(
