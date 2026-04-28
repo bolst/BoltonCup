@@ -10,6 +10,7 @@ public sealed class SignalRSchemaFilter : IDocumentFilter
 {
     public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
     {
+        context.SchemaGenerator.GenerateSchema(typeof(DraftUpdateEventDto), context.SchemaRepository);
         context.SchemaGenerator.GenerateSchema(typeof(DraftPickMadeEventDto), context.SchemaRepository);
     }
 }

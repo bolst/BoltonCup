@@ -238,7 +238,7 @@
         
         try
         {
-            await BoltonCupApi.UpdateDraftOrderAsync(DraftId, new Sdk.UpdateDraftOrderingRequest
+            await BoltonCupApi.UpdateDraftAsync(DraftId, new UpdateDraftRequest
             {
                 Ordering = _draft.PickOrder
                     .Select(x => new Sdk.DraftOrderingRequestEntry

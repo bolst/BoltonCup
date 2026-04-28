@@ -3528,12 +3528,12 @@
         ]
       }
     },
-    "/api/drafts/{id}/ordering": {
+    "/api/drafts/{id}/players": {
       "get": {
         "tags": [
           "Drafts"
         ],
-        "operationId": "GetDraftRankings",
+        "operationId": "GetDraftPlayerRankings",
         "parameters": [
           {
             "name": "id",
@@ -3617,139 +3617,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
-      }
-    },
-    "/api/drafts/{id}/order": {
-      "put": {
-        "tags": [
-          "Drafts"
-        ],
-        "operationId": "UpdateDraftOrder",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
           },
           "400": {
             "description": "Validation Error",
@@ -6994,13 +6861,6 @@
               }
             ],
             "nullable": true
-          },
-          "newDraftStatus": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DraftStatus"
-              }
-            ]
           }
         },
         "additionalProperties": false
@@ -7240,6 +7100,27 @@
           "Snake"
         ],
         "type": "string"
+      },
+      "DraftUpdateEventDto": {
+        "type": "object",
+        "properties": {
+          "draft": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftSingleDto"
+              }
+            ]
+          },
+          "nextPick": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftPickSingleDto"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "ForgotPasswordRequest": {
         "type": "object",
@@ -9149,33 +9030,27 @@
         },
         "additionalProperties": false
       },
-      "UpdateDraftOrderingRequest": {
-        "required": [
-          "ordering"
-        ],
-        "type": "object",
-        "properties": {
-          "ordering": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DraftOrderingRequestEntry"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "UpdateDraftRequest": {
         "type": "object",
         "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
           "draftType": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/DraftType"
               }
-            ]
+            ],
+            "nullable": true
           },
-          "title": {
-            "type": "string"
+          "ordering": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DraftOrderingRequestEntry"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
