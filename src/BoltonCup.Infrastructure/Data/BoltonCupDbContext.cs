@@ -169,6 +169,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.DraftId).HasColumnName("draft_id");
             entity.Property(e => e.OverallPick).HasColumnName("overall_pick_number");
+            entity.Property(e => e.Round).HasColumnName("round_number");
+            entity.Property(e => e.RoundPick).HasColumnName("round_pick_number");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.Version).HasColumnName("row_version").IsRowVersion();

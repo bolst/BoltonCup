@@ -4,7 +4,8 @@ namespace BoltonCup.WebAPI.Mapping;
 
 public record DraftPickMadeEventDto(
     int DraftId,
-    DraftPickSingleDto CompletedPick,
+    DraftPickBriefDto CompletedPick,
+    PlayerBriefDto DraftedPlayer,
     DraftPickSingleDto? NextPick,
     DraftStatus NewDraftStatus
 );

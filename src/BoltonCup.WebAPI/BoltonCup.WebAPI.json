@@ -6597,6 +6597,35 @@
         },
         "additionalProperties": false
       },
+      "DraftPickBriefDto": {
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overallPick": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "round": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roundPick": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "team": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "DraftPickDto": {
         "required": [
           "draftId",
@@ -6641,7 +6670,14 @@
           "completedPick": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DraftPickSingleDto"
+                "$ref": "#/components/schemas/DraftPickBriefDto"
+              }
+            ]
+          },
+          "draftedPlayer": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
               }
             ]
           },
@@ -6739,7 +6775,7 @@
       "DraftRankingDto": {
         "required": [
           "player",
-          "tournament"
+          "tournamentId"
         ],
         "type": "object",
         "properties": {
@@ -6748,6 +6784,10 @@
             "format": "int32"
           },
           "draftId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tournamentId": {
             "type": "integer",
             "format": "int32"
           },
@@ -6762,24 +6802,12 @@
               }
             ]
           },
-          "tournament": {
+          "draftPick": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/TournamentBriefDto"
-              }
-            ]
-          },
-          "team": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TeamBriefDto"
+                "$ref": "#/components/schemas/DraftPickBriefDto"
               }
             ],
-            "nullable": true
-          },
-          "overallPick": {
-            "type": "integer",
-            "format": "int32",
             "nullable": true
           },
           "gamesPlayed": {
@@ -6789,9 +6817,6 @@
           "totalPoints": {
             "type": "integer",
             "format": "int32"
-          },
-          "isChampion": {
-            "type": "boolean"
           },
           "draftRanking": {
             "type": "number",

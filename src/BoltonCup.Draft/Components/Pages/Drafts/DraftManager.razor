@@ -62,7 +62,7 @@ else if (_draft is not null)
                     {
                         <div class="d-flex flex-row align-center gap-1">
                             <MudText Typo="Typo.button">Drafted</MudText>
-                            <MudImage Src="@_selectedPlayer.Team?.Logo" Height="24" />
+                            <MudImage Src="@_selectedPlayer.DraftPick?.Team.Logo" Height="24" />
                         </div>
                     }
                     else
@@ -144,7 +144,7 @@ else if (_draft is not null)
                     <CellTemplate>
                         <div class="d-flex flex-row align-center gap-1">
                             <MudText Typo="Typo.body2"><b>@context.Item.Player.FullName</b></MudText>
-                            @if (context.Item.Team?.Logo is {} logo)
+                            @if (context.Item.DraftPick?.Team?.Logo is {} logo)
                             {
                                 <MudImage Src="@logo" Height="24" />
                             }

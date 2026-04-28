@@ -325,6 +325,8 @@ public class DraftService(
             {
                 DraftId = draft.Id,
                 OverallPick = i + 1,
+                Round = round,
+                RoundPick = roundPick,
                 TeamId = teamId,
                 PlayerId = null
             });

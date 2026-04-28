@@ -51,14 +51,12 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         {
             Id = draft.Id,
             DraftId = draft.DraftId,
+            TournamentId = draft.TournamentId,
             PlayerPhone = draft.Player.Account.Phone,
             Player = _briefMapper.ToPlayerBriefDto(draft.Player),
-            Tournament = _briefMapper.ToTournamentBriefDto(draft.Tournament),
-            Team = draft.DraftPick is null ? null : _briefMapper.ToTeamBriefDto(draft.DraftPick.Team),
-            OverallPick = draft.DraftPick?.OverallPick,
+            DraftPick = _briefMapper.ToDraftPickBriefDto(draft.DraftPick),
             GamesPlayed = draft.GamesPlayed,
             TotalPoints = draft.TotalPoints,
-            IsChampion = draft.IsChampion,
             DraftRanking = draft.DraftRanking,
             OverrideRanking = draft.OverrideRanking,
             IsDrafted = draft.IsDrafted,
@@ -107,7 +105,8 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
     {
         return new DraftPickMadeEventDto(
             DraftId: draftState.Draft.Id,
-            CompletedPick: ToDto(draftState.CompletedPick)!,
+            CompletedPick: _briefMapper.ToDraftPickBriefDto(draftState.CompletedPick)!,
+            DraftedPlayer: _briefMapper.ToPlayerBriefDto(draftState.CompletedPick!.Player!),
             NextPick: ToDto(draftState.NextPick),
             NewDraftStatus: draftState.Draft.Status
         );
