@@ -64,6 +64,8 @@
 
     private Task OnCellClick(MouseEventArgs args, Sdk.DraftPickDto draftPick)
     {
+        if (draftPick.Player is null)
+            return Task.CompletedTask;
         _contextDraftPick = draftPick;
         return _contextMenu.OpenMenuAsync(args);
     }
@@ -74,9 +76,9 @@
         const string baseClass = "cursor-pointer pa-2 d-flex flex-column justify-space-between ";
         return baseClass + draftPick.Player?.Position switch
         {
-            Core.Values.Position.Forward => "mud-theme-primary",
-            Core.Values.Position.Defense => "mud-theme-secondary",
-            Core.Values.Position.Goalie => "mud-theme-tertiary",
+            Core.Values.Position.Forward => "blue lighten-2 black-text",
+            Core.Values.Position.Defense => "red lighten-2 black-text",
+            Core.Values.Position.Goalie => "yellow lighten-4 black-text",
             _ => "mud-theme-dark"
         };
     }
