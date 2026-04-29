@@ -29,7 +29,7 @@
             @foreach (var pick in context.Picks)
             {
                 <MudTd Style="width: 160px">
-                    <MudPaper Class="@CellClassFunc(pick)" Height="64px" Width="100%" Elevation="1">
+                    <MudPaper Class="@CellClassFunc(pick)" Height="64px" Width="100%" Elevation="1" @onclick="@(x => OnCellClick(x, pick))">
                         <div class="d-flex flex-row justify-space-between">
                             <MudText Typo="Typo.body2">@pick.Player?.FullName</MudText>
                             <MudText Typo="Typo.caption">@pick.Round.@pick.RoundPick</MudText>
@@ -43,20 +43,35 @@
             }
         </RowTemplate>
     </MudTable>
+    
+    <MudMenu @ref="@_contextMenu" id="_contextMenu" Modal="true" PositionAtCursor>
+        <MudMenuItem>
+            context menu item for @_contextDraftPick?.Player?.FullName
+        </MudMenuItem>
+    </MudMenu>
 }
 
 
 @code {
+
+    private Sdk.DraftPickDto? _contextDraftPick;
+    private MudMenu _contextMenu = null!;
 
     protected override void OnInitialized()
     {
         DraftState.OnStateChanged += StateHasChanged;
     }
 
+    private Task OnCellClick(MouseEventArgs args, Sdk.DraftPickDto draftPick)
+    {
+        _contextDraftPick = draftPick;
+        return _contextMenu.OpenMenuAsync(args);
+    }
+
 
     private static string CellClassFunc(Sdk.DraftPickDto draftPick)
     {
-        const string baseClass = "pa-2 d-flex flex-column justify-space-between ";
+        const string baseClass = "cursor-pointer pa-2 d-flex flex-column justify-space-between ";
         return baseClass + draftPick.Player?.Position switch
         {
             Core.Values.Position.Forward => "mud-theme-primary",
