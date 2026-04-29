@@ -76,7 +76,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
                 .OrderBy(d => d.Pick),
             DraftPicksByRound = draft.DraftPicks
                 .GroupBy(dto => dto.Round)
-                .Select(group => new RoundDraftPicks(group.Key, group.Select(ToDtoListItem).OrderBy(x => x.OverallPick)))
+                .Select(group => new RoundDraftPicks(group.Key, group.Select(ToDtoListItem).OrderBy(x => x.RoundPick)))
                 .OrderBy(group => group.Round)
         };
     }
