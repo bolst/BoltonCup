@@ -88,6 +88,7 @@ public class DraftService(
     public async Task<CurrentDraftState> UpdateAsync(int draftId, UpdateDraftCommand command, CancellationToken cancellationToken = default)
     {
         var draft = await _dbContext.Drafts
+                        .Include(draft => draft.Tournament)
                         .Include(draft => draft.DraftOrders)
                         .Include(draft => draft.DraftPicks)
                         .ThenInclude(dp => dp.Team)
@@ -100,7 +101,7 @@ public class DraftService(
         await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
         
         // regenerate if draft type changes or ordering changes
-        var regenerate = command.DraftType.HasValue || command.Ordering is not null;
+        var regenerate = (command.DraftType.HasValue && command.DraftType != draft.Type) || command.Ordering is not null;
         if (regenerate && draft.Status != DraftStatus.Pending)
             throw new InvalidOperationException("Draft type/ordering cannot be changed once draft has started.");
         
@@ -141,6 +142,8 @@ public class DraftService(
             .Where(dp => dp.PlayerId == null)
             .OrderBy(dp => dp.OverallPick)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        
+        await transaction.CommitAsync(cancellationToken);
         
         return new CurrentDraftState(
             Draft: draft,
