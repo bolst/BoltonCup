@@ -1,0 +1,59 @@
+@namespace BoltonCup.Draft.Components.Shared
+@typeparam T
+
+<div class="relative overflow-y-hidden d-flex flex-column gap-3 mud-height-full">
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <MudPaper Class="pa-4 border-b mud-border-lines-default mud-width-full" Square>
+            <MudText Typo="Typo.h6">@Title</MudText>
+        </MudPaper>
+    }
+    <div class="overflow-y-scroll px-4 pb-16">
+        <EditForm id="@FormID" EditContext="@_editContext" OnValidSubmit="@OnValidSubmit">
+            <DataAnnotationsValidator/>
+
+            <MudStack>
+                @ChildContent(context)
+            </MudStack>
+        </EditForm>
+    </div>
+    <MudPaper 
+        Class="absolute d-flex align-center pa-2 border-t mud-border-lines-default" 
+        Style="bottom: 0"
+        Width="100%"
+        Height="54px" 
+        Square>
+        <MudButton ButtonType="ButtonType.Submit" form="@FormID" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_editContext?.IsModified() ?? true)">Save Changes</MudButton>
+    </MudPaper>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public RenderFragment<EditContext> ChildContent { get; set; } = null!;
+    
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public required T Model { get; set; }
+    
+    [Parameter]
+    public EventCallback<EditContext> OnValidSubmit { get; set; }
+
+    private const string FormID = "bc__draft_settings_form";
+
+    private EditContext? _editContext;
+
+    protected override void OnParametersSet()
+    {
+        _editContext ??= new EditContext(Model!);
+    }
+
+    private async Task SaveChangesAsync()
+    {
+        
+    }
+    
+}

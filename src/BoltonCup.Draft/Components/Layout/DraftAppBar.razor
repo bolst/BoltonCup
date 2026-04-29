@@ -2,6 +2,7 @@
 @using BoltonCup.Sdk
 @implements IDisposable
 @inject DraftStateService DraftState
+@inject IDialogService DialogService
 @inject NavigationManager Navigation
 @inject IBoltonCupApi BoltonCupApi
 
@@ -82,7 +83,7 @@
 
     private async Task OpenDraftSettingsAsync()
     {
-        
+        await DialogService.ShowAsync<DraftSettingsDialog>();
     }
     
     private async Task StartDraftAsync()

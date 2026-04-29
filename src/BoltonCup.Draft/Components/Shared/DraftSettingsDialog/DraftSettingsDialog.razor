@@ -1,0 +1,91 @@
+@using System.ComponentModel.DataAnnotations
+@using BoltonCup.Draft.Services
+@namespace BoltonCup.Draft.Components.Shared
+@inject DraftStateService DraftState
+@inject IBoltonCupApi BoltonCupApi
+@inject ISnackbar Snackbar
+
+<MudDialog Style="height: 500px" ContentClass="pa-0">
+    <DialogContent>
+        <MudTabs 
+            Position="Position.Left" 
+            Class="mud-width-full mud-height-full" 
+            TabHeaderClass="pa-2"
+            Border 
+            HideSlider>
+            <MudTabPanel Text="General Settings" PanelClass="mud-width-full">
+                
+                <DraftSettingsForm Model="@_model" OnValidSubmit="@UpdateGeneralSettingsAsync" Title="General Settings">
+                    <MudTextField @bind-Value="@_model.Title" For="@(() => _model.Title)"
+                                  Margin="Margin.Dense" Label="Draft name" FullWidth />
+                        
+                    <MudRadioGroup @bind-Value="@_model.DraftType" For="@(() => _model.DraftType)" Disabled="@(DraftState.Draft?.Status != Sdk.DraftStatus.Pending)">
+                        <MudRadio Value="@Sdk.DraftType.Standard" Color="Color.Primary" Label="Standard" />
+                        <MudRadio Value="@Sdk.DraftType.Snake" Color="Color.Primary" Label="Snake" />
+                    </MudRadioGroup>
+                    
+                </DraftSettingsForm>
+                
+            </MudTabPanel>
+            
+            <MudTabPanel Text="Draft Order">
+                
+            </MudTabPanel>
+        </MudTabs>
+    </DialogContent>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+    
+    private GeneralSettingsFormModel _model = new();
+    
+    protected override Task OnInitializedAsync()
+    {
+        if (DraftState.Draft is null)
+        {
+            Dialog.Close();
+            return Task.CompletedTask;
+        }
+
+        _model.Title = DraftState.Draft.Title;
+        _model.DraftType = DraftState.Draft.Type;
+        
+        return Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            NoHeader = true,
+            BackdropClick = true,
+            CloseOnEscapeKey = true,
+            CloseButton = false,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+        });
+    }
+
+    
+    private async Task UpdateGeneralSettingsAsync()
+    {
+        if (DraftState.Draft is not {} draft)
+            return;
+
+        await BoltonCupApi.UpdateDraftAsync(draft.Id, new Sdk.UpdateDraftRequest
+        {
+            Title = _model.Title,
+            DraftType = _model.DraftType
+        });
+
+        Snackbar.Add("Your changes have been saved.", Severity.Success);
+    }
+
+
+    private class GeneralSettingsFormModel
+    {
+        [Required(ErrorMessage = "Draft name cannot be null.")]
+        public string? Title { get; set; }
+        
+        public Sdk.DraftType DraftType { get; set; }
+    }
+    
+}
