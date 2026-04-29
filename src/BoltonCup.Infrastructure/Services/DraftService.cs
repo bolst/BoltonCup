@@ -306,9 +306,7 @@ public class DraftService(
     private async Task GenerateDraftPicksAsync(Draft draft, CancellationToken cancellationToken)
     {
         // delete old picks
-        await _dbContext.DraftPicks
-            .Where(d => d.DraftId == draft.Id)
-            .ExecuteDeleteAsync(cancellationToken);
+        draft.DraftPicks.Clear();
         
         var draftOrders = await _dbContext.DraftOrders
             .Where(d => d.DraftId == draft.Id)
