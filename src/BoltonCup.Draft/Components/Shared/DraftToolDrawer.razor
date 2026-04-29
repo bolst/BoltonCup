@@ -4,6 +4,7 @@
 @implements IDisposable
 @inject DraftStateService DraftState
 @inject IBoltonCupApi BoltonCupApi
+@inject IDialogService DialogService
 
 <div class="mud-height-full mud-width-full">
     <MudDataGrid
@@ -43,6 +44,11 @@
                     }
                 </CellTemplate>
             </PropertyColumn>
+            <PropertyColumn Title="Pos" Property="x => x.Player.Position">
+                <CellTemplate>
+                    <PositionChip Position="@context.Item.Player.Position" Size="Size.Small"/>
+                </CellTemplate>
+            </PropertyColumn>
             <PropertyColumn Title="PPG" Property="x => x.PointsPerGame" Format="F2"/>
             <PropertyColumn Title="P" Property="x => x.TotalPoints"/>
             <PropertyColumn Title="GP" Property="x => x.GamesPlayed"/>
@@ -77,9 +83,12 @@
         return "cursor-pointer";
     }
 
-    private async Task OnRowClick(DataGridRowClickEventArgs<Sdk.DraftRankingDto> args)
+    private Task OnRowClick(DataGridRowClickEventArgs<DraftRankingDto> args)
     {
-        
+        return DialogService.ShowAsync<PlayerDialog>(new DialogParameters<PlayerDialog>
+        {
+            { x => x.PlayerId, args.Item.Player.Id }
+        });
     }
 
     private async Task DraftPlayerAsync(Sdk.DraftRankingDto ranking)

@@ -1,0 +1,76 @@
+@namespace BoltonCup.Draft.Components.Shared
+@inject IBoltonCupApi BoltonCupApi
+
+
+<MudDialog Style="height: 500px">
+    <DialogContent>
+        @if (_loading)
+        {
+            <MudSkeleton Height="100%" Width="100%" SkeletonType="SkeletonType.Rectangle" />
+        }
+        else if (_player is not null)
+        {
+            <MudStack AlignItems="AlignItems.Center" Spacing="6" Row>
+                <MudImage Src="@_player.ProfilePicture" Height="128" />
+                <div class="d-flex flex-column justify-space-between">
+                    <MudText Typo="Typo.h4"><b>@_player.FullName</b></MudText>
+                    <PositionChip Position="@_player.Position" />
+                    @if (_player.Team is null)
+                    {
+                        <MudText>FREE AGENT</MudText>
+                    }
+                    else
+                    {
+                        <MudImage Src="@_player.Team.Logo" Width="36" />
+                    }
+                </div>
+            </MudStack>
+        }
+    </DialogContent>
+</MudDialog>
+
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter]
+    public required int PlayerId { get; set; }
+
+    private int? _playerId;
+
+    private bool _loading;
+    
+    private Sdk.PlayerSingleDto? _player;
+
+    protected override Task OnInitializedAsync()
+    {
+        return Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            NoHeader = true,
+            BackdropClick = true,
+            CloseOnEscapeKey = true,
+            CloseButton = false,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+        });
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_playerId == PlayerId)
+            return;
+        _playerId = PlayerId;
+
+        _loading = true;
+        
+        _player = await BoltonCupApi.GetPlayerByIdAsync(PlayerId);
+        if (_player is null)
+            Dialog.Close();
+        
+        _loading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

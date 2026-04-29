@@ -11,13 +11,17 @@
 else if (DraftState.Draft is not null)
 {
     <MudSplitPanel 
-        Class="mud-width-full" Style="height: calc(100vh - 64px)" 
+        Class="mud-width-full" Style="height: calc(100vh - 64px)"  
         FirstPanelInitialSize="300" MinPanelSize="50" Horizontal Transparent>
         <FirstPanel>
-            <DraftDataGrid/>
+            <div class="mud-height-full overflow-y-auto overflow-x-hidden">
+                <DraftDataGrid/>
+            </div>
         </FirstPanel>
         <SecondPanel>
-            <DraftToolDrawer/>
+            <div class="mud-height-full overflow-y-auto overflow-x-hidden">
+                <DraftToolDrawer/>
+            </div>
         </SecondPanel>
     </MudSplitPanel>
 }

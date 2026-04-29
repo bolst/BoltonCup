@@ -1,0 +1,5 @@
+.mud-table-dense-cells .mud-table-cell {
+    padding: 1px 1px !important;
+    padding-inline-start: 1px !important;
+    padding-inline-end: 1px !important;
+}
