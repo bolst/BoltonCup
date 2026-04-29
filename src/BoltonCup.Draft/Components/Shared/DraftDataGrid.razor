@@ -31,7 +31,7 @@
                 <MudTd Style="width: 160px">
                     <MudPaper Class="@CellClassFunc(pick)" Height="64px" Width="100%" Elevation="1" @onclick="@(x => OnCellClick(x, pick))">
                         <div class="d-flex flex-row justify-space-between">
-                            <MudText Typo="Typo.body2">@pick.Player?.FullName</MudText>
+                            <MudText Typo="Typo.body2"><b>@pick.Player?.FullName</b></MudText>
                             <MudText Typo="Typo.caption">@pick.Round.@pick.RoundPick</MudText>
                         </div>
                         <div class="d-flex flex-row justify-space-between">

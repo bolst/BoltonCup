@@ -8,7 +8,7 @@
 
 <div class="mud-height-full mud-width-full">
     <MudDataGrid
-        T="DraftRankingDto" Items="@DraftState.PlayerRankings" Height="80vh"
+        T="DraftRankingDto" Items="@DraftState.PlayerRankings" Class="d-flex flex-column mud-height-full pa-1"
         QuickFilter="@QuickFilter" RowClassFunc="@RowClassFunc" RowClick="@OnRowClick"
         ShowColumnOptions="false" Elevation="0" Hover Bordered Dense FixedHeader>
         <ToolBarContent>
