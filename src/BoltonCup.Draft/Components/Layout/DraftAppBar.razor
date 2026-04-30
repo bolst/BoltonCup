@@ -16,7 +16,12 @@
     {
         case DraftStatus.Pending or DraftStatus.Paused:
             <AuthorizeView Roles="Admin">
-                <MudButton OnClick="@StartDraftAsync" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large">Start Draft</MudButton>
+                <Authorized>
+                    <MudButton OnClick="@StartDraftAsync" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large">Start Draft</MudButton>
+                </Authorized>
+                <NotAuthorized>
+                    <MudChip T="string" Icon="@Icons.Material.Rounded.PauseCircleFilled" Text="Paused" Label="true"/>
+                </NotAuthorized>
             </AuthorizeView>
             break;
         case DraftStatus.InProgress when DraftState.CurrentPick is {} currentPick:
