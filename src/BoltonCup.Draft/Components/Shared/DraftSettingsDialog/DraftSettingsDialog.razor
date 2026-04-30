@@ -31,8 +31,30 @@
                 
             </MudTabPanel>
             
-            <MudTabPanel Text="Draft Order">
-                
+            <MudTabPanel Text="Draft Order" PanelClass="mud-width-full">
+                <DraftSettingsForm Model="@_model" OnValidSubmit="@UpdateDraftOrderingAsync" Title="Draft Order" Context="_" DisableIfUnmodified="@(DraftState.Draft?.Status != Sdk.DraftStatus.Pending)">
+                    <MudDataGrid Class="mud-width-full" Items="@_pickOrder" SortMode="SortMode.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Outlined Square Dense>
+                        <Columns>
+                            <PropertyColumn Title="Pick" Property="x => x.Pick" InitialDirection="SortDirection.Ascending" Sortable="false" CellStyle="text-align: right"/>
+                            <PropertyColumn Title="Team" Property="x => x.Team.Name">
+                                <CellTemplate>
+                                    <div class="d-flex flex-row align-center gap-1">
+                                        <MudImage Src="@context.Item.Team.Logo" Height="24"/>
+                                        <MudText Typo="Typo.body2">@context.Item.Team.Name</MudText>
+                                    </div>
+                                </CellTemplate>
+                            </PropertyColumn>
+                            <TemplateColumn>
+                                <CellTemplate>
+                                    <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                                        <MudIconButton OnClick="@(_ => ShiftTeamOrderUp(context.Item))" Icon="@Icons.Material.Rounded.KeyboardArrowUp" Disabled="@(context.Item.Pick == 1 || DraftState.Draft?.Status != Sdk.DraftStatus.Pending)"/>
+                                        <MudIconButton OnClick="@(_ => ShiftTeamOrderDown(context.Item))" Icon="@Icons.Material.Rounded.KeyboardArrowDown" Disabled="@(context.Item.Pick == _pickOrder.Count || DraftState.Draft?.Status != Sdk.DraftStatus.Pending)"/>
+                                    </MudButtonGroup>
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                    </MudDataGrid>
+                </DraftSettingsForm>
             </MudTabPanel>
         </MudTabs>
     </DialogContent>
@@ -44,6 +66,7 @@
     public IMudDialogInstance Dialog { get; set; } = null!;
     
     private readonly GeneralSettingsFormModel _model = new();
+    private List<Sdk.DraftPickOrderDto> _pickOrder = [];
     
     protected override Task OnInitializedAsync()
     {
@@ -55,6 +78,7 @@
 
         _model.Title = DraftState.Draft.Title;
         _model.DraftType = DraftState.Draft.Type;
+        _pickOrder = DraftState.Draft.PickOrder.ToList();
         
         return Dialog.SetOptionsAsync(Dialog.Options with
         {
@@ -81,6 +105,62 @@
 
         editContext.MarkAsUnmodified();
         Snackbar.Add("Your changes have been saved.", Severity.Success);
+    }
+    
+    
+    private async Task UpdateDraftOrderingAsync(EditContext editContext)
+    {
+        if (DraftState.Draft is null)
+            return;
+        
+        try
+        {
+            await BoltonCupApi.UpdateDraftAsync(DraftState.Draft.Id, new Sdk.UpdateDraftRequest
+            {
+                Ordering = _pickOrder
+                    .Select(x => new Sdk.DraftOrderingRequestEntry
+                    {
+                        TeamId = x.Team.Id,
+                        Pick = x.Pick
+                    })
+                    .ToList()
+            });
+            
+            editContext.MarkAsUnmodified();
+            Snackbar.Add("Saved changes", Severity.Success);
+        }
+        catch (Sdk.ApiException e)
+        {
+            Snackbar.Add($"Unable to save changes: {e.Message}", Severity.Error);
+        }
+    }
+
+    
+    
+    private Task ShiftTeamOrderUp(Sdk.DraftPickOrderDto draftPick)
+    {
+        if (draftPick.Pick == 1)
+            return Task.CompletedTask;
+
+        var swapPick = _pickOrder.FirstOrDefault(p => p.Pick == draftPick.Pick - 1);
+        if (swapPick is not null)
+            swapPick.Pick = draftPick.Pick;
+        draftPick.Pick -= 1;
+        
+        return InvokeAsync(StateHasChanged);   
+    }
+
+    private Task ShiftTeamOrderDown(Sdk.DraftPickOrderDto draftPick)
+    {
+        if (draftPick.Pick == _pickOrder.Count)
+            return Task.CompletedTask;
+        
+        var swapPick = _pickOrder.FirstOrDefault(p => p.Pick == draftPick.Pick + 1);
+        if (swapPick is not null)
+            swapPick.Pick = draftPick.Pick;
+        draftPick.Pick += 1;
+        
+        return InvokeAsync(StateHasChanged);   
     }
 
 
