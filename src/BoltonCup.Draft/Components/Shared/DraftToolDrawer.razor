@@ -8,11 +8,18 @@
 
 <div class="mud-height-full mud-width-full">
     <MudDataGrid
-        T="DraftRankingDto" Items="@DraftState.PlayerRankings" Class="d-flex flex-column mud-height-full pa-1"
+        T="DraftRankingDto" Items="@DraftState.PlayerRankings" Class="filter-datagrid d-flex flex-column mud-height-full pa-1"
         QuickFilter="@QuickFilter" RowClassFunc="@RowClassFunc" RowClick="@OnRowClick" Breakpoint="Breakpoint.None"
         ShowColumnOptions="false" Elevation="0" Hover Bordered Dense FixedHeader>
         <ToolBarContent>
-            <MudCheckBox @bind-Value="@_filterState.ShowDrafted" Size="Size.Small" Label="Show Drafted" Dense/>
+            <div class="d-flex flex-row align-center gap-3 flex-wrap">
+                <MudCheckBox @bind-Value="@_filterState.ShowDrafted" Size="Size.Small" Label="Show Drafted" Dense/>
+                <div style="width: 300px">
+                    <MudTextField @bind-Value="@_filterState.Search" Placeholder="Search"
+                                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info"
+                                  IconSize="Size.Medium" Variant="Variant.Text" Margin="Margin.Dense" DebounceInterval="200" FullWidth Clearable Immediate/>
+                </div>
+            </div>
         </ToolBarContent>
         <Columns>
             <PropertyColumn Title="Rank" Property="x => x.DraftRanking" CellStyle="width: 50px">
@@ -69,10 +76,15 @@
 
     private bool QuickFilter(Sdk.DraftRankingDto ranking)
     {
-        if (!_filterState.ShowDrafted)
-            return !ranking.IsDrafted;
+        var result = true;
+
+        if (!string.IsNullOrEmpty(_filterState.Search))
+            result = result && ranking.Player.FullName.Contains(_filterState.Search, StringComparison.OrdinalIgnoreCase);
         
-        return true;
+        if (!_filterState.ShowDrafted)
+            result = result && !ranking.IsDrafted;
+        
+        return result;
     }
 
     private string RowClassFunc(Sdk.DraftRankingDto ranking, int rowNumber)
@@ -111,5 +123,7 @@
     private class FilterState
     {
         public bool ShowDrafted { get; set; }
+
+        public string Search { get; set; } = string.Empty;
     }
 }
