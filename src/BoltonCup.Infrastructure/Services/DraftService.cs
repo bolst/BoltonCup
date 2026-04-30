@@ -357,7 +357,7 @@ public class DraftService(
             .ThenInclude(account => account.Players)
             .ThenInclude(player => player.GoalieGameLogs)
             .Where(p => p.TournamentId == draft.TournamentId)
-            .Where(p => _dbContext.PlayerDraftRankings.All(pdr => pdr.PlayerId != p.Id))
+            .Where(p => !_dbContext.PlayerDraftRankings.Any(pdr => pdr.PlayerId == p.Id && pdr.DraftId == draft.Id))
             .ToListAsync(cancellationToken: cancellationToken);
 
         var rankings = players

@@ -462,10 +462,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .ToTable("draft_rankings")
                 .HasKey(e => e.Id);
             entity
-                .HasIndex(e => new { e.PlayerId, e.TournamentId })
+                .HasIndex(e => new { e.PlayerId, e.DraftId })
                 .IsUnique();
             entity
-                .HasIndex(e => e.TournamentId);
+                .HasIndex(e => e.DraftId);
             entity
                 .HasOne(e => e.Player)
                 .WithMany()
