@@ -66,8 +66,11 @@
 
     private Task OnCellClick(MouseEventArgs args, Sdk.DraftPickDto draftPick)
     {
+        // TODO: improve
         if (draftPick.Player is null)
             return Task.CompletedTask;
+        return Task.CompletedTask;
+        
         _contextDraftPick = draftPick;
         return _contextMenu.OpenMenuAsync(args);
     }
