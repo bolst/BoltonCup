@@ -1,6 +1,8 @@
 @page "/"
+@using BoltonCup.WebClient.Services
 @attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-02-01")]
 @inject IBoltonCupApi BoltonCupApi
+@inject TournamentStateService TournamentState
 
 <PageTitle>Bolton Cup</PageTitle>
 
@@ -61,8 +63,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _tournament ??= await BoltonCupApi.GetActiveTournamentAsync();
-        await InvokeAsync(StateHasChanged);
+        if (_tournament is null)
+        {
+            _tournament = await TournamentState.GetActiveTournamentAsync();
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
 }
