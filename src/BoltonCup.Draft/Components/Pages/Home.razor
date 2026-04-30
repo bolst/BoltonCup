@@ -86,7 +86,7 @@
         var result = await dialog.Result;
         if (result?.Data is int newDraftId)
         {
-            Navigation.NavigateTo($"/drafts/{newDraftId}/config");
+            NavigateToDraft(newDraftId);
         }
     }
 
