@@ -85,6 +85,15 @@
         if (DraftState.Draft is not { } draft)
             return;
 
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Confirm Delete",
+            "You will lose this draft forever.",
+            yesText: "Delete",
+            cancelText: "Cancel"
+        );
+        if (confirm != true)
+            return;
+        
         await BoltonCupApi.DeleteDraftAsync(draft.Id);
         Navigation.NavigateTo("/", true);
     }
