@@ -45,7 +45,7 @@ public class DraftStateService : IAsyncDisposable
         
         Draft = await _api.GetDraftByIdAsync(draftId);
         CurrentPick = await _api.GetCurrentDraftPickAsync(draftId);
-        PlayerRankings = (await _api.GetDraftPlayerRankingsAsync(draftId)).Items.ToList();
+        PlayerRankings = (await _api.GetDraftPlayerRankingsAsync(draftId, size: 200)).Items.ToList();
 
         if (_hubConnection.State == HubConnectionState.Disconnected)
         {

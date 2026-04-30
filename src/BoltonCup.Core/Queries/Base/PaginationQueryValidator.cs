@@ -13,7 +13,7 @@ public abstract class PaginationQueryValidator<T> : AbstractValidator<T>
             .WithMessage("Page must be >= 1");        
         
         RuleFor(x => x.Size)
-            .InclusiveBetween(1, 100)
-            .WithMessage("Size must be an integer in [1,...,100]");
+            .InclusiveBetween(1, 300)
+            .WithMessage("Size must be an integer in [1,...,300]");
     }
 }

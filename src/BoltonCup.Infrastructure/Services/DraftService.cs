@@ -317,7 +317,6 @@ public class DraftService(
             throw new InvalidOperationException($"Draft {draft.Id} has no teams/orders");
         
         var totalPlayerCount = await _dbContext.Players
-            .Where(p => p.TeamId == null)
             .Where(p => p.TournamentId == draft.TournamentId)
             .CountAsync(cancellationToken);
         
