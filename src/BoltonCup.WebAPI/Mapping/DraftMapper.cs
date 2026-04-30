@@ -8,9 +8,9 @@ public interface IDraftMapper
     IPagedList<DraftDto> ToDtoList(IPagedList<Draft> drafts);
     IPagedList<DraftPickDto> ToDtoList(IPagedList<DraftPick> draftPicks);
     IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings);
-    DraftSingleDto? ToDto(Draft? draft);
+    DraftSingleDto? ToDto(Draft? draft, bool isAuthorized);
     DraftPickSingleDto? ToDto(DraftPick? draftPick);
-    DraftUpdateEventDto ToDto(CurrentDraftState draftState);
+    DraftUpdateEventDto ToDto(CurrentDraftState draftState, bool isAuthorized);
     DraftPickMadeEventDto ToDto(CurrentDraftStateWithPick draftState);
     GetDraftsQuery ToQuery(GetDraftsRequest request);
     CreateDraftCommand ToCommand(CreateDraftRequest request);
@@ -56,7 +56,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         });
     }
     
-    public DraftSingleDto? ToDto(Draft? draft)
+    public DraftSingleDto? ToDto(Draft? draft, bool isAuthorized)
     {
         if (draft is null)
             return null;
@@ -77,7 +77,8 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
             DraftPicksByRound = draft.DraftPicks
                 .GroupBy(dto => dto.Round)
                 .Select(group => new RoundDraftPicks(group.Key, group.Select(ToDtoListItem).OrderBy(x => x.RoundPick)))
-                .OrderBy(group => group.Round)
+                .OrderBy(group => group.Round),
+            CanEditDraft = isAuthorized
         };
     }
 
@@ -96,10 +97,10 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         };
     }
 
-    public DraftUpdateEventDto ToDto(CurrentDraftState draftState)
+    public DraftUpdateEventDto ToDto(CurrentDraftState draftState, bool isAuthorized)
     {
         return new DraftUpdateEventDto(
-            Draft: ToDto(draftState.Draft)!,
+            Draft: ToDto(draftState.Draft, isAuthorized)!,
             NextPick: ToDto(draftState.NextPick)
         );
     }

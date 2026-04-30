@@ -29,7 +29,8 @@ public class DraftsController(
     public async Task<ActionResult<DraftSingleDto>> GetDraftById(int id)
     {
         var result = await _draftService.GetByIdAsync(id);
-        return OkOrNoContent(_mapper.ToDto(result));
+        var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
+        return OkOrNoContent(_mapper.ToDto(result, authorized));
     }
 
     [Authorize(Roles = Admin)]
@@ -52,7 +53,8 @@ public class DraftsController(
         var command = _mapper.ToCommand(request);
         var draftState = await _draftService.UpdateAsync(id, command);
         
-        var payloadDto = _mapper.ToDto(draftState);
+        var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
+        var payloadDto = _mapper.ToDto(draftState, authorized);
         await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftUpdate, payloadDto);
         
         return Ok();
@@ -120,13 +122,10 @@ public class DraftsController(
         return Ok();
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("{id:int}/players")]
     public async Task<ActionResult<IPagedList<DraftRankingDto>>> GetDraftPlayerRankings(int id, [FromQuery] GetDraftRankingsQuery query)
     {
-        if (await _authService.AuthorizeAsync(User, id, CanAccessDraft) is {Succeeded: false})
-            return Forbid();
-
         var rankings = await _draftService.GetDraftRankingsAsync(id, query);
         return Ok(_mapper.ToDtoList(rankings));
     }

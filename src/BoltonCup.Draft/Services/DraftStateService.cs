@@ -17,6 +17,8 @@ public class DraftStateService : IAsyncDisposable
     public DraftPickSingleDto? CurrentPick { get; private set; }
     public List<DraftRankingDto> PlayerRankings { get; private set; } = [];
 
+    public bool CanEditDraft => Draft?.CanEditDraft ?? false;
+
     public event Action? OnStateChanged;
 
     public DraftStateService(

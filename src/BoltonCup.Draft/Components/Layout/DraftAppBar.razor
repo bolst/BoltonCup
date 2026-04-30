@@ -28,8 +28,9 @@
     }
 
     <AuthorizeView Roles="Admin">
-        <MudButtonGroup OverrideStyles="false">
-            <MudMenu Icon="@Icons.Material.Filled.DisplaySettings">
+        <Authorized>
+            <MudButtonGroup OverrideStyles="false">
+                <MudMenu Icon="@Icons.Material.Filled.DisplaySettings">
                     <MudMenuItem
                         OnClick="@OpenDraftSettingsAsync"
                         Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
@@ -42,8 +43,12 @@
                     <MudMenuItem
                         OnClick="@DeleteDraftAsync"
                         Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
-            </MudMenu>
-        </MudButtonGroup>
+                </MudMenu>
+            </MudButtonGroup>
+        </Authorized>
+        <NotAuthorized>
+            <div>&nbsp;</div>
+        </NotAuthorized>
     </AuthorizeView>
 </MudAppBar>
 

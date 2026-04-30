@@ -10,20 +10,29 @@
 }
 else if (DraftState.Draft is not null)
 {
-    <MudSplitPanel 
-        Class="mud-width-full" Style="height: calc(100vh - 64px)"  
-        FirstPanelInitialSize="400" MinPanelSize="50" Horizontal Transparent>
-        <FirstPanel>
-            <div class="mud-height-full overflow-y-auto overflow-x-hidden">
-                <DraftDataGrid/>
-            </div>
-        </FirstPanel>
-        <SecondPanel>
-            <div class="mud-height-full overflow-y-auto overflow-x-hidden">
-                <DraftToolDrawer/>
-            </div>
-        </SecondPanel>
-    </MudSplitPanel>
+    if (DraftState.CanEditDraft)
+    {
+        <MudSplitPanel 
+            Class="mud-width-full" Style="height: calc(100vh - 64px)"  
+            FirstPanelInitialSize="400" MinPanelSize="50" Horizontal Transparent>
+            <FirstPanel>
+                <div class="mud-height-full overflow-y-auto overflow-x-hidden">
+                    <DraftDataGrid/>
+                </div>
+            </FirstPanel>
+            <SecondPanel>
+                <div class="mud-height-full overflow-y-auto overflow-x-hidden">
+                    <DraftToolDrawer/>
+                </div>
+            </SecondPanel>
+        </MudSplitPanel>
+    }
+    else
+    {
+        <div class="mud-height-full overflow-y-auto overflow-x-hidden">
+            <DraftDataGrid/>
+        </div>
+    }
 }
 
 @code {
@@ -34,7 +43,7 @@ else if (DraftState.Draft is not null)
 
     private int? _draftId;
 
-    private bool _loading;
+    private bool _loading = true;
     
     protected override async Task OnParametersSetAsync()
     {
@@ -51,7 +60,8 @@ else if (DraftState.Draft is not null)
     }
     
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
+        return DraftState.DisposeAsync();
     }
 }

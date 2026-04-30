@@ -133,7 +133,6 @@
         "tags": [
           "Accounts"
         ],
-        "description": "Gets the currently logged-in user",
         "operationId": "GetMe",
         "responses": {
           "200": {
@@ -479,7 +478,6 @@
         "tags": [
           "Accounts"
         ],
-        "description": "Updates an account's avatar by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateAvatar",
         "parameters": [
           {
@@ -589,7 +587,6 @@
         "tags": [
           "Accounts"
         ],
-        "description": "Updates an account's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateBanner",
         "parameters": [
           {
@@ -699,7 +696,6 @@
         "tags": [
           "Assets"
         ],
-        "description": "Generates a pre-signed URL and temporary key for uploads.",
         "operationId": "GenerateUploadCredentials",
         "parameters": [
           {
@@ -3688,15 +3684,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
+        }
       }
     },
     "/api/games": {
@@ -3704,7 +3692,6 @@
         "tags": [
           "Games"
         ],
-        "description": "Gets a paginated list of games.",
         "operationId": "GetGames",
         "parameters": [
           {
@@ -3857,7 +3844,6 @@
         "tags": [
           "Games"
         ],
-        "description": "Gets a single game by its ID.",
         "operationId": "GetGameById",
         "parameters": [
           {
@@ -3969,7 +3955,6 @@
         "tags": [
           "GoalieStats"
         ],
-        "description": "Gets a paginated list of goalie statistics.",
         "operationId": "GetGoalieStats",
         "parameters": [
           {
@@ -4133,7 +4118,6 @@
         "tags": [
           "InfoGuides"
         ],
-        "description": "Gets a paginated list of info guides.",
         "operationId": "GetInfoGuides",
         "parameters": [
           {
@@ -4270,7 +4254,6 @@
         "tags": [
           "InfoGuides"
         ],
-        "description": "Gets a single info guide by its ID.",
         "operationId": "GetInfoGuideById",
         "parameters": [
           {
@@ -4382,7 +4365,6 @@
         "tags": [
           "InfoGuides"
         ],
-        "description": "Gets an info guide by tournament ID.",
         "operationId": "GetInfoGuideByTournamentId",
         "parameters": [
           {
@@ -4494,7 +4476,6 @@
         "tags": [
           "Players"
         ],
-        "description": "Gets a paginated list of players.",
         "operationId": "GetPlayers",
         "parameters": [
           {
@@ -4647,7 +4628,6 @@
         "tags": [
           "Players"
         ],
-        "description": "Gets a single player by its ID.",
         "operationId": "GetPlayerById",
         "parameters": [
           {
@@ -4759,7 +4739,6 @@
         "tags": [
           "SkaterStats"
         ],
-        "description": "Gets a paginated list of skater statistics.",
         "operationId": "GetSkaterStats",
         "parameters": [
           {
@@ -4930,7 +4909,6 @@
         "tags": [
           "Teams"
         ],
-        "description": "Gets a paginated list of teams.",
         "operationId": "GetTeams",
         "parameters": [
           {
@@ -5075,7 +5053,6 @@
         "tags": [
           "Teams"
         ],
-        "description": "Gets a single team by its ID.",
         "operationId": "GetTeamById",
         "parameters": [
           {
@@ -5187,7 +5164,6 @@
         "tags": [
           "Teams"
         ],
-        "description": "Updates a team's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTeamLogo",
         "parameters": [
           {
@@ -5297,7 +5273,6 @@
         "tags": [
           "Teams"
         ],
-        "description": "Updates a team's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTeamBanner",
         "parameters": [
           {
@@ -5807,7 +5782,6 @@
         "tags": [
           "Tournaments"
         ],
-        "description": "Gets a paginated list of tournaments.",
         "operationId": "GetTournaments",
         "parameters": [
           {
@@ -5951,7 +5925,6 @@
         "tags": [
           "Tournaments"
         ],
-        "description": "Gets a single tournament by its ID.",
         "operationId": "GetTournamentById",
         "parameters": [
           {
@@ -6063,7 +6036,6 @@
         "tags": [
           "Tournaments"
         ],
-        "description": "Updates a tournament's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTournamentLogo",
         "parameters": [
           {
@@ -7101,6 +7073,9 @@
             "items": {
               "$ref": "#/components/schemas/RoundDraftPicks"
             }
+          },
+          "canEditDraft": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
