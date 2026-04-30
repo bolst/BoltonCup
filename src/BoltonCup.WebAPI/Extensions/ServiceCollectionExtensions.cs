@@ -183,11 +183,17 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    private static IServiceCollection AddCacheServices(this IServiceCollection services)
+    {
+        return services.AddMemoryCache();
+    }
+
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
     {
         builder
             .AddAuthServices()
             .AddFluentValidationServices()
+            .AddCacheServices()
             .AddCorsServices()
             .AddRateLimitingServices()
             .AddRouting(options => options.LowercaseUrls = true)

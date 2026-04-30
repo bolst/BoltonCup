@@ -29,4 +29,15 @@ public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepos
             .Include(e => e.Gallery)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken: cancellationToken);
     }
+
+    public async Task<Tournament?> GetActiveAsync(CancellationToken cancellationToken = default)
+    {
+        return await context.Tournaments
+            .AsNoTracking()
+            .Include(e => e.InfoGuide)
+            .Include(e => e.Games)
+            .Include(e => e.Teams)
+            .Include(e => e.Gallery)
+            .FirstOrDefaultAsync(e => e.IsActive, cancellationToken: cancellationToken);
+    }
 }

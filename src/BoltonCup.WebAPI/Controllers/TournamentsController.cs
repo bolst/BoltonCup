@@ -2,12 +2,17 @@ using BoltonCup.Core;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Controllers;
 
-public class TournamentsController(ITournamentRepository _tournaments, ITournamentService _tournamentService, ITournamentMapper _mapper) 
-    : BoltonCupControllerBase
+public class TournamentsController(
+    ITournamentRepository _tournaments, 
+    ITournamentService _tournamentService,
+    ITournamentMapper _mapper,
+    IMemoryCache _cache
+) : BoltonCupControllerBase
 {
     /// <remarks>
     /// Gets a paginated list of tournaments.
@@ -29,6 +34,22 @@ public class TournamentsController(ITournamentRepository _tournaments, ITourname
     public async Task<ActionResult<TournamentSingleDto>> GetTournamentById(int id)
     {
         var tournament = await _tournaments.GetByIdAsync(id);
+        return OkOrNoContent(_mapper.ToDto(tournament));
+    }
+    
+    /// <remarks>
+    /// Gets the active tournament, if one exists. There is either one or none.
+    /// </remarks>
+    [AllowAnonymous]
+    [HttpGet("active")]
+    [ResponseCache(Duration = 300)]
+    public async Task<ActionResult<TournamentSingleDto>> GetActiveTournament()
+    {
+        var tournament = await _cache.GetOrCreateAsync(nameof(GetActiveTournament), async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
+            return await _tournaments.GetActiveAsync();
+        });
         return OkOrNoContent(_mapper.ToDto(tournament));
     }
     
