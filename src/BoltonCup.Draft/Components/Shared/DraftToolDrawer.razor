@@ -9,7 +9,7 @@
 <div class="mud-height-full mud-width-full">
     <MudDataGrid
         T="DraftRankingDto" Items="@DraftState.PlayerRankings" Class="d-flex flex-column mud-height-full pa-1"
-        QuickFilter="@QuickFilter" RowClassFunc="@RowClassFunc" RowClick="@OnRowClick"
+        QuickFilter="@QuickFilter" RowClassFunc="@RowClassFunc" RowClick="@OnRowClick" Breakpoint="Breakpoint.None"
         ShowColumnOptions="false" Elevation="0" Hover Bordered Dense FixedHeader>
         <ToolBarContent>
             <MudCheckBox @bind-Value="@_filterState.ShowDrafted" Size="Size.Small" Label="Show Drafted" Dense/>
