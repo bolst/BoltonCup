@@ -27,24 +27,24 @@
             break;
     }
 
-    <MudButtonGroup OverrideStyles="false">
-        <MudMenu Icon="@Icons.Material.Filled.DisplaySettings">
-            <AuthorizeView Roles="Admin">
-                <MudMenuItem
-                    OnClick="@OpenDraftSettingsAsync"
-                    Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
-                @if (DraftState.Draft?.Status == DraftStatus.InProgress)
-                {
+    <AuthorizeView Roles="Admin">
+        <MudButtonGroup OverrideStyles="false">
+            <MudMenu Icon="@Icons.Material.Filled.DisplaySettings">
                     <MudMenuItem
-                        OnClick="@PauseDraftAsync"
-                        Icon="@Icons.Material.Rounded.PauseCircle">Pause Draft</MudMenuItem>
-                }
-                <MudMenuItem
-                    OnClick="@DeleteDraftAsync"
-                    Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
-            </AuthorizeView>
-        </MudMenu>
-    </MudButtonGroup>
+                        OnClick="@OpenDraftSettingsAsync"
+                        Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
+                    @if (DraftState.Draft?.Status == DraftStatus.InProgress)
+                    {
+                        <MudMenuItem
+                            OnClick="@PauseDraftAsync"
+                            Icon="@Icons.Material.Rounded.PauseCircle">Pause Draft</MudMenuItem>
+                    }
+                    <MudMenuItem
+                        OnClick="@DeleteDraftAsync"
+                        Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
+            </MudMenu>
+        </MudButtonGroup>
+    </AuthorizeView>
 </MudAppBar>
 
 @code {
