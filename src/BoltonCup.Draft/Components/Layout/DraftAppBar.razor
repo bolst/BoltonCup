@@ -12,61 +12,39 @@
             Href="/" Icon="@Icons.Material.Rounded.KeyboardArrowLeft" Class="rounded"/>
     </MudButtonGroup>
 
-    <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+    @switch (DraftState.Draft?.Status)
+    {
+        case DraftStatus.Pending or DraftStatus.Paused:
+            <AuthorizeView Roles="Admin">
+                <MudButton OnClick="@StartDraftAsync" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large">Start Draft</MudButton>
+            </AuthorizeView>
+            break;
+        case DraftStatus.InProgress when DraftState.CurrentPick is {} currentPick:
+            <div class="d-flex flex-row align-center gap-3">
+                <MudText Typo="Typo.h6">Pick @currentPick.OverallPick</MudText>
+                <MudImage Src="@currentPick.Team.Logo" Height="36" />
+            </div>
+            break;
+    }
 
-        @switch (DraftState.Draft?.Status)
-        {
-            case DraftStatus.Pending or DraftStatus.Paused:
-                <AuthorizeView Roles="Admin">
-                    <MudButton OnClick="@StartDraftAsync" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large">Start Draft</MudButton>
-                </AuthorizeView>
-                break;
-            case DraftStatus.InProgress when DraftState.CurrentPick is {} currentPick:
-                <div class="d-flex flex-row align-center gap-3">
-                    <MudText Typo="Typo.h6">Pick @currentPick.OverallPick</MudText>
-                    <MudImage Src="@currentPick.Team.Logo" Height="36" />
-                </div>
-                break;
-        }
-
-        <MudButtonGroup OverrideStyles="false">
-            <MudMenu Icon="@Icons.Material.Filled.DisplaySettings">
-                <AuthorizeView Roles="Admin">
+    <MudButtonGroup OverrideStyles="false">
+        <MudMenu Icon="@Icons.Material.Filled.DisplaySettings">
+            <AuthorizeView Roles="Admin">
+                <MudMenuItem
+                    OnClick="@OpenDraftSettingsAsync"
+                    Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
+                @if (DraftState.Draft?.Status == DraftStatus.InProgress)
+                {
                     <MudMenuItem
-                        OnClick="@OpenDraftSettingsAsync"
-                        Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
-                    @if (DraftState.Draft?.Status == DraftStatus.InProgress)
-                    {
-                        <MudMenuItem
-                            OnClick="@PauseDraftAsync"
-                            Icon="@Icons.Material.Rounded.PauseCircle">Pause Draft</MudMenuItem>
-                    }
-                    <MudMenuItem
-                        OnClick="@DeleteDraftAsync"
-                        Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
-                </AuthorizeView>
-            </MudMenu>
-        </MudButtonGroup>
-    </MudHidden>
-
-
-    <MudHidden Breakpoint="Breakpoint.MdAndUp">
-        <MudSpacer/>
-        <MudIconButton OnClick="@OpenDrawer" Icon="@Icons.Material.Rounded.Menu" Variant="Variant.Text" Color="Color.Inherit"/>
-        <MudDrawer @bind-Open="_drawerOpen" Anchor="Anchor.End" Elevation="1" Variant="DrawerVariant.Temporary" Width="100%">
-            <MudPaper Class="d-flex flex-row align-center px-2 border-solid border-b" Elevation="0" Width="100%" Height="64px" Square>
-                <a href="/" onclick="location.reload()" style="height: 100%">
-                    <BoltonCupLogo Height="64"/>
-                </a>
-                <MudSpacer/>
-                <MudIconButton OnClick="@CloseDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit"/>
-            </MudPaper>
-
-            <MudNavMenu Class="mud-width-full" Color="Color.Primary" Margin="Margin.Normal" Rounded Bordered>
-                
-            </MudNavMenu>
-        </MudDrawer>
-    </MudHidden>
+                        OnClick="@PauseDraftAsync"
+                        Icon="@Icons.Material.Rounded.PauseCircle">Pause Draft</MudMenuItem>
+                }
+                <MudMenuItem
+                    OnClick="@DeleteDraftAsync"
+                    Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
+            </AuthorizeView>
+        </MudMenu>
+    </MudButtonGroup>
 </MudAppBar>
 
 @code {
