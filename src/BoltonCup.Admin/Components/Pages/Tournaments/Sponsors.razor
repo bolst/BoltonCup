@@ -1,0 +1,63 @@
+@page "/tournaments/{TournamentId:int}/sponsors"
+@using System.Linq.Expressions
+@inject IStorageService StorageService
+@inject BoltonCupDbContext DbContext
+@inject IAssetKeyGenerator AssetKeyGenerator
+
+<EntityDataGrid 
+    @ref="_dataGrid" 
+    T="TournamentSponsor"
+    SearchBy="x => x.Name"
+    Filter="@_filter"
+    NewItemFunc="@(() => Task.FromResult(new TournamentSponsor { TournamentId = TournamentId })!)"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Sponsor" Property="x => x.Name" Editable="true"/>
+        <ImageColumn T="TournamentSponsor" Title="Logo" Property="x => x.Logo" OnImageUploaded="@UpdateLogo" />
+        <LinkColumn Title="Website" Property="x => x.WebsiteUrl" Editable="true" />
+        <PropertyColumn Property="x => x.SortKey" Editable="true" InitialDirection="SortDirection.Ascending" />
+        <BoolColumn Title="Active" Property="x => x.IsActive" Editable="true" />
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" Editable="false" ImageSrcFunc="x => x.Logo"/>
+    </Columns>
+</EntityDataGrid>
+
+
+@code {
+
+    [Parameter]
+    public int TournamentId { get; set; }
+
+    private int? _tournamentId;
+
+    private EntityDataGrid<TournamentSponsor>? _dataGrid;
+    private static readonly TournamentSponsorComparer _comparer = new();
+
+    private Expression<Func<TournamentSponsor, bool>>? _filter;
+    
+    protected override Task OnParametersSetAsync()
+    {
+        if (_tournamentId == TournamentId)
+            return Task.CompletedTask;
+        _tournamentId = TournamentId;
+        
+        _filter = x => x.TournamentId == _tournamentId;
+        return _dataGrid is not null
+            ? _dataGrid.ReloadAsync()
+            : Task.CompletedTask;
+    }
+    
+    private async Task UpdateLogo(ImageUploadResult<TournamentSponsor> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey)) 
+            return;
+        await StorageService.UpdateAssetAsync<TournamentSponsor>(
+            DbContext,
+            AssetKeyGenerator,
+            ts => ts.Id == result.Item.Id,
+            ts => ts.Logo,
+            result.NewKey,
+            result.Item.Id.ToString("N")
+        );
+    }
+
+}
