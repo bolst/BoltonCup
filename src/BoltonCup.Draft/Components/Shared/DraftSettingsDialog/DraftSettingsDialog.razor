@@ -19,10 +19,13 @@
                     <MudTextField @bind-Value="@_model.Title" For="@(() => _model.Title)"
                                   Margin="Margin.Dense" Label="Draft name" FullWidth />
                         
-                    <MudRadioGroup @bind-Value="@_model.DraftType" For="@(() => _model.DraftType)" Disabled="@(DraftState.Draft?.Status != Sdk.DraftStatus.Pending)">
-                        <MudRadio Value="@Sdk.DraftType.Standard" Color="Color.Primary" Label="Standard" />
-                        <MudRadio Value="@Sdk.DraftType.Snake" Color="Color.Primary" Label="Snake" />
-                    </MudRadioGroup>
+                    <div>
+                        <MudText Typo="Typo.caption">Draft type</MudText>
+                        <MudRadioGroup @bind-Value="@_model.DraftType" For="@(() => _model.DraftType)" Disabled="@(DraftState.Draft?.Status != Sdk.DraftStatus.Pending)">
+                            <MudRadio Value="@Sdk.DraftType.Standard" Color="Color.Primary" Label="Standard"/>
+                            <MudRadio Value="@Sdk.DraftType.Snake" Color="Color.Primary" Label="Snake"/>
+                        </MudRadioGroup>
+                    </div>
                     
                 </DraftSettingsForm>
                 
@@ -40,7 +43,7 @@
     [CascadingParameter]
     public IMudDialogInstance Dialog { get; set; } = null!;
     
-    private GeneralSettingsFormModel _model = new();
+    private readonly GeneralSettingsFormModel _model = new();
     
     protected override Task OnInitializedAsync()
     {
@@ -65,7 +68,7 @@
     }
 
     
-    private async Task UpdateGeneralSettingsAsync()
+    private async Task UpdateGeneralSettingsAsync(EditContext editContext)
     {
         if (DraftState.Draft is not {} draft)
             return;
@@ -76,6 +79,7 @@
             DraftType = _model.DraftType
         });
 
+        editContext.MarkAsUnmodified();
         Snackbar.Add("Your changes have been saved.", Severity.Success);
     }
 
