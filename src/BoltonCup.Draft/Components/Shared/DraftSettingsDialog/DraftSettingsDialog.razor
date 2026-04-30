@@ -15,7 +15,7 @@
             HideSlider>
             <MudTabPanel Text="General Settings" PanelClass="mud-width-full">
                 
-                <DraftSettingsForm Model="@_model" OnValidSubmit="@UpdateGeneralSettingsAsync" Title="General Settings">
+                <DraftSettingsForm Model="@_model" OnValidSubmit="@UpdateGeneralSettingsAsync" Title="General Settings" DisableIfUnmodified>
                     <MudTextField @bind-Value="@_model.Title" For="@(() => _model.Title)"
                                   Margin="Margin.Dense" Label="Draft name" FullWidth />
                         

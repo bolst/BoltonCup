@@ -23,7 +23,7 @@
         Width="100%"
         Height="54px" 
         Square>
-        <MudButton ButtonType="ButtonType.Submit" form="@FormID" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_editContext?.IsModified() ?? true)">Save Changes</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" form="@FormID" Variant="Variant.Filled" Color="Color.Primary" Disabled="@SaveDisabled">Save Changes</MudButton>
     </MudPaper>
 </div>
 
@@ -41,10 +41,15 @@
     
     [Parameter]
     public EventCallback<EditContext> OnValidSubmit { get; set; }
+    
+    [Parameter]
+    public bool DisableIfUnmodified { get; set; }
 
     private const string FormID = "bc__draft_settings_form";
 
     private EditContext? _editContext;
+
+    private bool SaveDisabled => DisableIfUnmodified && (!_editContext?.IsModified() ?? true);
 
     protected override void OnParametersSet()
     {
