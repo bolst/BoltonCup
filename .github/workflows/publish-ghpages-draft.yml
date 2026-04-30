@@ -27,7 +27,7 @@ jobs:
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.BOLTON_CUP_DRAFT_BUILD_PAT }}
+          token: ${{ secrets.BOLTON_CUP_EXT_BUILD_PAT }}
           repository-name: bolst/bolton-cup-draft-build
           branch: gh-pages
           folder: out/BoltonCupDraft/wwwroot
