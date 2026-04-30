@@ -347,7 +347,7 @@ public class DraftService(
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
     
-    public async Task GenerateDraftRankingsAsync(Draft draft, CancellationToken cancellationToken = default)
+    private async Task GenerateDraftRankingsAsync(Draft draft, CancellationToken cancellationToken = default)
     {
         var players = await _dbContext.Players
             .Include(p => p.Account)
