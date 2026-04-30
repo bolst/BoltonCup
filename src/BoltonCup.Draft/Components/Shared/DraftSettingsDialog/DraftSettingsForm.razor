@@ -18,12 +18,13 @@
         </EditForm>
     </div>
     <MudPaper 
-        Class="absolute d-flex align-center pa-2 border-t mud-border-lines-default" 
+        Class="absolute d-flex align-center pa-2 border-t mud-border-lines-default justify-space-between" 
         Style="bottom: 0"
         Width="100%"
         Height="54px" 
         Square>
         <MudButton ButtonType="ButtonType.Submit" form="@FormID" Variant="Variant.Filled" Color="Color.Primary" Disabled="@SaveDisabled">Save Changes</MudButton>
+        <MudAlert Severity="Severity.Error" Dense>Most settings cannot change once draft starts.</MudAlert>
     </MudPaper>
 </div>
 
