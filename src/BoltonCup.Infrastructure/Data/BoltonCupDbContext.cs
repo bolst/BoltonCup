@@ -8,11 +8,6 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BoltonCup.Infrastructure.Data;
 
 
-/*
- * dotnet ef migrations add [migration_name] --project ./BoltonCup.Infrastructure --startup-project ./BoltonCup.WebAPI -c BoltonCupDbContext
- * dotnet ef database update --project ./BoltonCup.Infrastructure --startup-project ./BoltonCup.WebAPI -c BoltonCupDbContext
- */
-
 public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options) 
     : DbContext(options)
 {
@@ -174,6 +169,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.DraftId).HasColumnName("draft_id");
             entity.Property(e => e.OverallPick).HasColumnName("overall_pick_number");
+            entity.Property(e => e.Round).HasColumnName("round_number");
+            entity.Property(e => e.RoundPick).HasColumnName("round_pick_number");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.Version).HasColumnName("row_version").IsRowVersion();
@@ -215,7 +212,12 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.GameTime).HasColumnName("game_time");
             entity.Property(e => e.HomeTeamId).HasColumnName("home_team_id");
             entity.Property(e => e.AwayTeamId).HasColumnName("away_team_id");
-            entity.Property(e => e.GameType).HasColumnName("game_type").HasConversion(new EnumMemberConverter<GameType>());
+            entity.Property(e => e.GameType).HasColumnName("game_type")
+                .HasConversion(new EnumMemberConverter<GameType>())
+                .HasDefaultValue(GameType.RoundRobin);
+            entity.Property(e => e.GameState).HasColumnName("game_state")
+                .HasConversion(new EnumMemberConverter<GameState>())
+                .HasDefaultValue(GameState.Pending);
             entity.Property(e => e.Venue).HasColumnName("venue");
             entity.Property(e => e.Rink).HasColumnName("rink");
         });

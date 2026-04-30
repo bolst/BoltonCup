@@ -1,7 +1,9 @@
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Auth;
 
@@ -20,15 +22,22 @@ public class DraftAccessHandler(BoltonCupDbContext _dbContext)
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context, 
         AccessDraftRequirement requirement, 
-        int tournamentId
+        int draftId
     )
     {
+        if (context.User.IsInRole(Admin))
+        {
+            context.Succeed(requirement);
+            return;
+        }
+            
         if (!context.User.TryGetAccountId(out var accountId))
             return;
         
-        var isTournamentGm = await _dbContext.Teams
-            .Where(t => t.TournamentId == tournamentId)
-            .AnyAsync(t => t.GmAccountId == accountId);
+        var isTournamentGm = await _dbContext.Drafts
+            .Where(d => d.Id == draftId)
+            .Where(d => d.Tournament.Teams.Any(t => t.GmAccountId == accountId))
+            .AnyAsync();
         
         if (isTournamentGm)
             context.Succeed(requirement);

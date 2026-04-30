@@ -64,8 +64,11 @@
         await Dialog.SetOptionsAsync(Dialog.Options with
         {
             CloseOnEscapeKey = false,
-            BackdropClick = false,
-            NoHeader = true
+            BackdropClick = true,
+            NoHeader = true,
+            CloseButton = false,
+            MaxWidth = MaxWidth.ExtraSmall,
+            FullWidth = true,
         });
         
         var response = await BoltonCupApi.GetTournamentsAsync();

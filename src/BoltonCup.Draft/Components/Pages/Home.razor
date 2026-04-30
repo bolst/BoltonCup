@@ -7,113 +7,77 @@
 
 <PageTitle>Drafts</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large">
-    <MudDataGrid
-        @ref="_dataGrid"
-        T="Sdk.DraftDto"
-        Class="filter-datagrid"
-        ServerData="ServerReload"
-        Breakpoint="Breakpoint.None"
-        RowStyle="height: 50px"
-        RowsPerPage="50"
-        Elevation="0"
-        ShowColumnOptions="false"
-        AllowUnsorted
-        Striped
-        Dense>
-        <ToolBarContent>
-            <div class="d-flex flex-row align-center gap-3 flex-wrap">
-                <FilterToolbarField
-                    T="Sdk.TournamentDto?" Label="Tournament"
-                    Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="@_dataGrid.ReloadServerData"
-                    ToStringFunc="x => x?.Name">
-                    <TournamentFilter/>
-                </FilterToolbarField>
-            </div>
-            
-            <MudSpacer />
-            
-            <AuthorizeView Roles="Admin">
-                <MudButton
-                    OnClick="@CreateNewDraftAsync" Variant="Variant.Filled" Class="mr-1"
-                    Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add">
-                    New Draft
-                </MudButton>
-            </AuthorizeView>
-        </ToolBarContent>
-        <Columns>
-            <PropertyColumn Title="Draft" Property="x => x.Title">
-                <CellTemplate>
-                    <MudLink Href="@($"/drafts/{context.Item.Id}")" Color="Color.Primary" Typo="Typo.body2"><b>@context.Item.Title</b></MudLink>
-                </CellTemplate>
-            </PropertyColumn>
-            <PropertyColumn Title="Status" Property="x => x.Status">
-                <CellTemplate>
-                    <DraftStatusChip Status="@context.Item.Status" />
-                </CellTemplate>
-            </PropertyColumn>
-            <PropertyColumn Title="Tournament" Property="x => x.Tournament.Name"/>
-            <TemplateColumn>
-                <CellTemplate>
-                    <MudButtonGroup OverrideStyles="false" Size="Size.Small">
-                        <MudIconButton Href="@($"/drafts/{context.Item.Id}")" Icon="@Icons.Material.Rounded.RemoveRedEye" Color="Color.Info"/>
-                        
-                        <AuthorizeView Roles="Admin" Context="_">
-                            <MudIconButton Href="@($"/drafts/{context.Item.Id}/manager")" Icon="@Icons.Material.Rounded.ListAlt" Color="Color.Secondary" Disabled="@(context.Item.Status == DraftStatus.Pending)" />
-                        </AuthorizeView>
-                        
-                        <AuthorizeView Roles="Admin" Context="_">
-                            <MudIconButton Href="@($"/drafts/{context.Item.Id}/config")" Icon="@Icons.Material.Rounded.Settings" Color="Color.Default"/>
-                        </AuthorizeView>
-                    </MudButtonGroup>
-                </CellTemplate>
-            </TemplateColumn>
-        </Columns>
-        <NoRecordsContent>
-            <div class="mud-width-full d-flex justify-center align-center" style="height: 300px">
-                <MudText Typo="Typo.body2">No drafts found :(</MudText>
-            </div>
-        </NoRecordsContent>
-    </MudDataGrid>
+<MudContainer Class="py-2" MaxWidth="MaxWidth.Medium">
+    <div class="mud-width-full d-flex align-center justify-center py-2 gap-3">
+        <MudToggleGroup
+            T="bool" Value="@_showInProgress" ValueChanged="@SetShowInProgress" Color="Color.Primary">
+            <MudToggleItem T="bool" Value="true">In Progress</MudToggleItem>
+            <MudToggleItem T="bool" Value="false">Completed</MudToggleItem>
+        </MudToggleGroup>
+        
+        <AuthorizeView Roles="Admin">
+            <MudButton OnClick="@CreateNewDraftAsync" Color="Color.Primary" StartIcon="@Icons.Material.Rounded.Add">New</MudButton>
+        </AuthorizeView>
+    </div>
+    
+    <MudStack Class="mud-width-full" AlignItems="AlignItems.Center">
+        @foreach (var draft in _drafts)
+        {
+            <MudPaper Class="pa-4 d-flex flex-column align-center justify-space-between cursor-pointer" 
+                      @onclick="@(_ => NavigateToDraft(draft.Id))" Width="100%" Height="150px" Elevation="0" Square Outlined>
+                <div class="mud-width-full d-flex flex-row align-center justify-space-between">
+                    <MudChip T="string" Color="Color.Info" Variant="Variant.Filled" Size="Size.Small" Label="true">@draft.Status.ToString()</MudChip>
+                    <MudText Typo="Typo.caption">@DateTime.Now.ToString("g")</MudText>
+                </div>
+                <div class="d-flex flex-row align-center gap-1">
+                    <MudText Typo="Typo.h6">@draft.Title</MudText>
+                    <MudImage Src="@draft.Tournament.Logo" Height="32"/>
+                </div>
+                <div class="mud-width-full d-flex flex-row align-center justify-space-evenly flex-grow-1">
+                    @ValueLabel("15", "Rounds")
+                    <MudDivider FlexItem Vertical/>
+                    @ValueLabel("4", "Teams")
+                    <MudDivider FlexItem Vertical/>
+                    @ValueLabel("2 Min", "Timer")
+                </div>
+            </MudPaper>
+        }
+    </MudStack>
 </MudContainer>
 
 
 @code {
 
-    private MudDataGrid<Sdk.DraftDto> _dataGrid = null!;
+    private bool _showInProgress = true;
+    private ICollection<Sdk.DraftDto>? _draftsSource;
+    private ICollection<Sdk.DraftDto> _drafts = [];
 
-    private readonly DraftsFilterModel _filter = new();
-
-    private async Task<GridData<Sdk.DraftDto>> ServerReload(GridState<Sdk.DraftDto> state, CancellationToken cancellationToken)
+    protected override Task OnInitializedAsync()
     {
-        string? sortBy = null;
-        bool? descending = null;
-        var sortDefinition = state.SortDefinitions.FirstOrDefault();
-        if (sortDefinition is not null)
-        {
-            sortBy = sortDefinition.SortBy;
-            descending = sortDefinition.Descending;
-        }
-
-        var data = await BoltonCupApi.GetDraftsAsync(
-            tournamentId: _filter.Tournament?.Id,
-            page: state.Page + 1, 
-            size: state.PageSize,
-            sortBy: sortBy,
-            descending: descending, 
-            cancellationToken: cancellationToken
-        );
-        
-        return new GridData<Sdk.DraftDto> {
-            TotalItems = data.Total,
-            Items = data.Items,
-        };
+        return LoadDraftsAsync();
     }
-    
-    private Task OnFilterTournamentChange(Sdk.TournamentDto? tournament)
+
+    private async Task LoadDraftsAsync()
     {
-        _filter.Tournament = tournament;
-        return _dataGrid.ReloadServerData();
+        _draftsSource ??= (await BoltonCupApi.GetDraftsAsync()).Items;
+        _drafts = _draftsSource.Where(
+                d => _showInProgress 
+                ? d.Status != DraftStatus.Completed
+                : d.Status == DraftStatus.Completed
+            )
+            .ToList();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private Task SetShowInProgress(bool showInProgress)
+    {
+        _showInProgress = showInProgress;
+        return LoadDraftsAsync();
+    }
+
+    private void NavigateToDraft(int draftId)
+    {
+        Navigation.NavigateTo($"/drafts/{draftId}");
     }
     
     private async Task CreateNewDraftAsync()
@@ -122,12 +86,15 @@
         var result = await dialog.Result;
         if (result?.Data is int newDraftId)
         {
-            Navigation.NavigateTo($"/drafts/{newDraftId}/config");
+            NavigateToDraft(newDraftId);
         }
     }
-    
-    private class DraftsFilterModel
+
+    private RenderFragment ValueLabel(string value, string label)
     {
-        public Sdk.TournamentDto? Tournament { get; set; }
+        return @<div>
+                   <MudText Typo="Typo.subtitle1" Align="Align.Center">@value</MudText>
+                   <MudText Typo="Typo.caption" Align="Align.Center">@label</MudText>
+               </div>;
     }
 }

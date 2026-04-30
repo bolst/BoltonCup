@@ -1,0 +1,28 @@
+<MudDrawer Class="pa-2"
+    @bind-Open="@_open" Elevation="2" Variant="DrawerVariant.Mini" MiniWidth="72px">
+    <div class="mud-width-full d-flex flex-row align-center justify-center mb-4">
+        @if (_open)
+        {
+            <BoltonCupLogo Width="48"/>
+            <MudSpacer/>
+        }
+        <MudToggleIconButton
+            @bind-Toggled="@_open"
+            Class="rounded"
+            Icon="@Icons.Material.Rounded.Menu"
+            ToggledIcon="@Icons.Material.Rounded.MenuOpen"/>
+    </div>
+    <MudNavMenu Class="mud-height-full d-flex flex-column" Margin="Margin.Normal" Rounded>
+        <MudNavLink Href="/" Icon="@Icons.Material.Rounded.FormatListNumbered" Match="NavLinkMatch.All">Drafts</MudNavLink>
+        
+        <MudSpacer />
+        
+        <UserMenu Mini="!_open" />
+    </MudNavMenu>
+</MudDrawer>
+
+@code {
+
+    private bool _open = true;
+
+}

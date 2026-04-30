@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 using BoltonCup.Sdk;
+using BoltonCup.Shared;
 
 namespace BoltonCup.Common.Auth;
 
@@ -25,7 +26,16 @@ public class CookieAuthenticationStateProvider(IBoltonCupApi _api) : Authenticat
 
             var accountIdString = currentUser.AccountId?.ToString();
             if (!string.IsNullOrEmpty(accountIdString))
-                claims.Add(new Claim("AccountId", accountIdString));
+                claims.Add(new Claim(BoltonCupClaimTypes.AccountId, accountIdString));
+            
+            claims.AddRange(
+                currentUser.TeamGmIds
+                    .Select(id => new Claim(BoltonCupClaimTypes.TeamGm, id.ToString()))
+            );
+            claims.AddRange(
+                currentUser.TournamentGmIds
+                    .Select(id => new Claim(BoltonCupClaimTypes.TournamentGm, id.ToString()))
+            );
             
             var identity = new ClaimsIdentity(claims, "ServerCookie");
             return new AuthenticationState(new ClaimsPrincipal(identity));

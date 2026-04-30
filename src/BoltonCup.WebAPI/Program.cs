@@ -66,6 +66,7 @@ builder.Services.AddSwaggerGen(options =>
     
     options.OperationFilter<ProblemDetailsOperationFilter>();
     options.OperationFilter<SecurityRequirementsOperationFilter>();
+    options.DocumentFilter<SignalRSchemaFilter>();
     
     // generate operation IDs based on method names
     options.CustomOperationIds(description =>
@@ -81,7 +82,11 @@ builder.Services.AddSwaggerGen(options =>
     // add docstrings
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    options.IncludeXmlComments(xmlPath);
+
+    if (builder.Environment.IsDevelopment())
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
 });
 
 var app = builder.Build();
@@ -126,7 +131,7 @@ app.MapGet("/", async context =>
     await Task.CompletedTask;
 });
 
-app.MapHub<DraftLobbyHub>(Hubs.DraftLobby);
+app.MapHub<DraftHub>(Hubs.Draft);
 
 // Sentry
 app.UseSentryTracing();

@@ -376,6 +376,14 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("player_id");
 
+                    b.Property<int>("Round")
+                        .HasColumnType("integer")
+                        .HasColumnName("round_number");
+
+                    b.Property<int>("RoundPick")
+                        .HasColumnType("integer")
+                        .HasColumnName("round_pick_number");
+
                     b.Property<int>("TeamId")
                         .HasColumnType("integer")
                         .HasColumnName("team_id");
@@ -473,13 +481,22 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("created_by");
 
+                    b.Property<string>("GameState")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Pending")
+                        .HasColumnName("game_state");
+
                     b.Property<DateTime>("GameTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("game_time");
 
                     b.Property<string>("GameType")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text")
+                        .HasDefaultValue("Round robin")
                         .HasColumnName("game_type");
 
                     b.Property<int?>("HomeTeamId")

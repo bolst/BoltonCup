@@ -1,12 +1,13 @@
 @page "/drafts/{DraftId:int}/manager"
-@attribute [Authorize(Roles = "Admin")]
+@attribute [Authorize]
 @inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
 
 @if (_loading)
 {
     
 }
-else
+else if (_draft is not null)
 {
     <MudDrawer 
         Open="@_drawerOpen" OpenChanged="@SetDrawerOpen" Elevation="1"
@@ -61,7 +62,7 @@ else
                     {
                         <div class="d-flex flex-row align-center gap-1">
                             <MudText Typo="Typo.button">Drafted</MudText>
-                            <MudImage Src="@_selectedPlayer.Team?.Logo" Height="24" />
+                            <MudImage Src="@_selectedPlayer.DraftPick?.Team.Logo" Height="24" />
                         </div>
                     }
                     else
@@ -143,7 +144,7 @@ else
                     <CellTemplate>
                         <div class="d-flex flex-row align-center gap-1">
                             <MudText Typo="Typo.body2"><b>@context.Item.Player.FullName</b></MudText>
-                            @if (context.Item.Team?.Logo is {} logo)
+                            @if (context.Item.DraftPick?.Team?.Logo is {} logo)
                             {
                                 <MudImage Src="@logo" Height="24" />
                             }
@@ -184,6 +185,9 @@ else
 
 @code {
 
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+    
     [Parameter]
     [EditorRequired]
     public required int DraftId { get; set; }
@@ -208,8 +212,18 @@ else
         _draftId = DraftId;
 
         _loading = true;
-        
+
         _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
+        if (_draft is null)
+            return;
+        
+        var authState = await AuthStateTask;
+        if (!authState.User.CanAccessDraft(_draft))
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+        
         await LoadCurrentPickAsync();
 
         _loading = false;
@@ -246,7 +260,7 @@ else
             descending = false;
         }
         
-        var data = await BoltonCupApi.GetDraftRankingsAsync(
+        var data = await BoltonCupApi.GetDraftPlayerRankingsAsync(
             id: _draft.Id,
             position: _filter.Position,
             teamId: _filter.TeamId,

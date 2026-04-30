@@ -15,6 +15,7 @@
                        Filter="@(x => (y => y.TournamentId == x.TournamentId))"/>
         <DateTimePickerColumn Title="Date" Property="x => x.GameTime" />
         <EnumColumn Title="Type" Property="x => x.GameType"/>
+        <EnumColumn Title="State" Property="x => x.GameState" />
         <PropertyColumn Title="Venue" Property="x => x.Venue"/>
         <PropertyColumn Title="Rink" Property="x => x.Rink"/>
         <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament!"

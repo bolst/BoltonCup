@@ -8,6 +8,7 @@ public class Game : EntityBase
     public int? HomeTeamId { get; set; }
     public int? AwayTeamId { get; set; }
     public GameType GameType { get; set; }
+    public GameState GameState { get; set; }
     public string? Venue  { get; set; }
     public string? Rink { get; set; }
     

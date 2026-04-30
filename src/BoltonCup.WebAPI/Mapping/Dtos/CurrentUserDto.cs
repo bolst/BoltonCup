@@ -6,5 +6,7 @@ public record CurrentUserDto(
     string Name,
     List<string> Roles,
     bool IsAuthenticated,
-    int? AccountId
+    int? AccountId,
+    IEnumerable<int> TeamGmIds,
+    IEnumerable<int> TournamentGmIds
 );

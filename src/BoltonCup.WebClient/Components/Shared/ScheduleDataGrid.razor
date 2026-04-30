@@ -27,27 +27,61 @@
             </FilterToolbarField>
         </div>
     </ToolBarContent>
-    <HeaderContent>
-        <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-            <MudTh Class="align-center">Matchup</MudTh>
-            <MudTh></MudTh>
-            <MudTh>Time</MudTh>
-            <MudTh>Location</MudTh>
-            <MudTh></MudTh>
-        </MudHidden>
-    </HeaderContent>
     <GroupHeaderTemplate>
-        <MudTh colspan="5"><MudText Typo="Typo.h6">@context.Key</MudText></MudTh>
+            @switch (context.Key)
+            {
+                case TournamentGroupKey key:
+                    <MudTh colspan="5">
+                        <div class="d-flex flex-row align-center gap-1">
+                            <MudText Typo="Typo.h6"><b>@key.TournamentName</b></MudText>
+                            @if (!string.IsNullOrEmpty(key.TournamentLogo))
+                            {
+                                <MudImage Src="@key.TournamentLogo" Height="48" />
+                            }
+                        </div>
+                    </MudTh>
+                    break;
+                case GameDayGroupKey key:
+                    <MudTh colspan="5">
+                        <MudText Typo="Typo.h6"><b>@key.GameTime</b></MudText>
+                    </MudTh>
+                    break;
+                case GameStateGroupKey key:
+                    <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+                        <MudTh>
+                            <div class="mud-width-full d-flex justify-center align-center">
+                                <div style="width: 100px">&nbsp;</div>
+                                <b>Matchup</b>
+                            </div>
+                        </MudTh>
+                        <MudTh><b>@key.DetailHeaderName</b></MudTh>
+                        <MudTh><b>Location</b></MudTh>
+                        <MudTh></MudTh>
+                    </MudHidden>
+                    break;    
+            }
     </GroupHeaderTemplate>
     <RowTemplate>
         <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
             <MudTd DataLabel="Matchup">@MatchupCell(context)</MudTd>
-            <MudTd DataLabel="Result">@GameScoreText(context)</MudTd>
-            <MudTd DataLabel="Time"><b>@context.GameTime.ToLocalTime().ToString("hh:mm tt")</b></MudTd>
+            @switch (context.GameState)
+            {
+                case GameState.Pending:
+                    <MudTd DataLabel="Time"><b>@context.GameTime.ToLocalTime().ToString("hh:mm tt")</b></MudTd>
+                    break;
+                case GameState.InProgress:
+                    <MudTd DataLabel="Score">@GameScoreText(context)</MudTd>
+                    break;
+                case GameState.Completed:
+                    <MudTd DataLabel="Result">@GameScoreText(context)</MudTd>
+                    break;
+            }
             <MudTd DataLabel="Location">@context.Venue <b>(@context.Rink)</b></MudTd>
             <MudTd>
                 <MudButtonGroup>
-                    <MudButton Href="@($"/games/{context.Id}")" StartIcon="@Icons.Material.Filled.SportsHockey" IconColor="Color.Info" Color="Color.Info">Gamecenter</MudButton>
+                    <MudBadge Color="Color.Error" Visible="@(context.GameState == GameState.InProgress)" Dot>
+                        <MudButton Href="@($"/games/{context.Id}")" StartIcon="@Icons.Material.Filled.SportsHockey" IconColor="Color.Info" Color="Color.Info">Gamecenter</MudButton>
+                    </MudBadge>
                 </MudButtonGroup>
             </MudTd>
         </MudHidden>
@@ -77,18 +111,25 @@
 
     private readonly ScheduleFilterModel _filter = new();
 
-    private TableGroupDefinition<Sdk.GameDto> _groupDefinition = new()
+    private readonly TableGroupDefinition<Sdk.GameDto> _groupDefinition = new()
     {
         GroupName = "Tournament",
         Indentation = true,
         Expandable = false,
-        Selector = e => e.Tournament.Name ?? string.Empty,
+        Selector = e => new TournamentGroupKey(e),
         InnerGroup = new TableGroupDefinition<GameDto>
         {
             GroupName = "Date",
             Indentation = false,
             Expandable = false,
-            Selector = e => e.GameTime.ToLocalTime().Date.ToLongDateString(),
+            Selector = e => new GameDayGroupKey(e),
+            InnerGroup = new TableGroupDefinition<GameDto>
+            {
+                GroupName = "State",
+                Indentation = false,
+                Expandable = false,
+                Selector = e => new GameStateGroupKey(e)
+            }
         }
     };
 
@@ -127,22 +168,61 @@
             </div>
         </div>;
     
-    private RenderFragment GameScoreText(Sdk.GameDto context) => builder =>
+    private RenderFragment GameScoreText(Sdk.GameDto context)
     {
         if (context.HomeTeam is null || context.AwayTeam is null)
-            return;
+            return _ => { };
+        
         var (winner, loser) = context.HomeTeam.Goals >= context.AwayTeam.Goals
             ? (context.HomeTeam, context.AwayTeam)
             : (context.AwayTeam, context.HomeTeam);
-        builder.OpenElement(0, "div");
-        builder.AddAttribute(1, "class", "d-flex flex-row align-center justify-center gap-1");
-        builder.OpenElement(2, "b");
-        builder.AddContent(3, $"{winner.Abbreviation} {winner.Goals}");
-        builder.CloseElement();
-        builder.AddContent(4, ", ");
-        builder.AddContent(5, $"{loser.Abbreviation} {loser.Goals}");
-        builder.CloseElement();
-    };
+        var style = context.GameState == GameState.InProgress
+            ? "color: #16B011"
+            : string.Empty;
+
+        return @<MudText Typo="Typo.body2" Style="@style">
+                   <b>@winner.Abbreviation @winner.Goals,</b> @loser.Abbreviation @loser.Goals
+               </MudText>;
+    }
+
+    private record TournamentGroupKey
+    {
+        public string TournamentName { get; init; }
+        public string? TournamentLogo { get; init; }
+        
+        public TournamentGroupKey(GameDto game)
+        {
+            TournamentName = game.Tournament.Name ?? string.Empty;
+            TournamentLogo = game.Tournament.Logo;
+        }
+    }
+
+    private record GameDayGroupKey
+    {
+        public string GameTime { get; init; }
+        
+        public GameDayGroupKey(GameDto game)
+        {
+            GameTime = game.GameTime.ToLocalTime().Date.ToLongDateString();
+        }
+    }
+
+    private record GameStateGroupKey
+    {
+        public GameState GameState { get; init; }
+        public string DetailHeaderName { get; init; }
+
+        public GameStateGroupKey(GameDto game)
+        {
+            GameState = game.GameState;
+            DetailHeaderName = game.GameState switch
+            {
+                GameState.InProgress => "Score",
+                GameState.Completed => "Result",
+                _ => "Time"
+            };
+        }
+    }
     
     private class ScheduleFilterModel
     {

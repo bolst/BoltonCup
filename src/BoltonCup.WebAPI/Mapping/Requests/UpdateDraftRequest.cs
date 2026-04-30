@@ -4,7 +4,11 @@ namespace BoltonCup.WebAPI.Mapping;
 
 public record UpdateDraftRequest
 {
-    public DraftType DraftType { get; set; }
-    public DraftStatus DraftStatus { get; set; }
-    public string Title { get; set; }
+    public string? Title { get; set; }
+    
+    public DraftType? DraftType { get; set; }
+    
+    public List<DraftOrderingRequestEntry>? Ordering { get; set; }
 }
+
+public sealed record DraftOrderingRequestEntry(int TeamId, int Pick);

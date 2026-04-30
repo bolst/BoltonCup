@@ -133,7 +133,6 @@
         "tags": [
           "Accounts"
         ],
-        "description": "Gets the currently logged-in user",
         "operationId": "GetMe",
         "responses": {
           "200": {
@@ -479,7 +478,6 @@
         "tags": [
           "Accounts"
         ],
-        "description": "Updates an account's avatar by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateAvatar",
         "parameters": [
           {
@@ -589,7 +587,6 @@
         "tags": [
           "Accounts"
         ],
-        "description": "Updates an account's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateBanner",
         "parameters": [
           {
@@ -699,7 +696,6 @@
         "tags": [
           "Assets"
         ],
-        "description": "Generates a pre-signed URL and temporary key for uploads.",
         "operationId": "GenerateUploadCredentials",
         "parameters": [
           {
@@ -2980,6 +2976,312 @@
         ]
       }
     },
+    "/api/drafts/{id}/start": {
+      "patch": {
+        "tags": [
+          "Drafts"
+        ],
+        "operationId": "StartDraft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/drafts/{id}/pause": {
+      "patch": {
+        "tags": [
+          "Drafts"
+        ],
+        "operationId": "PauseDraft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/drafts/{id}/end": {
+      "patch": {
+        "tags": [
+          "Drafts"
+        ],
+        "operationId": "EndDraft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/drafts/{id}/currentpick": {
       "get": {
         "tags": [
@@ -3222,12 +3524,12 @@
         ]
       }
     },
-    "/api/drafts/{id}/ordering": {
+    "/api/drafts/{id}/players": {
       "get": {
         "tags": [
           "Drafts"
         ],
-        "operationId": "GetDraftRankings",
+        "operationId": "GetDraftPlayerRankings",
         "parameters": [
           {
             "name": "id",
@@ -3382,148 +3684,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
-      }
-    },
-    "/api/drafts/{id}/order": {
-      "put": {
-        "tags": [
-          "Drafts"
-        ],
-        "operationId": "UpdateDraftOrder",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateDraftOrderingRequest"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
+        }
       }
     },
     "/api/games": {
@@ -3531,7 +3692,6 @@
         "tags": [
           "Games"
         ],
-        "description": "Gets a paginated list of games.",
         "operationId": "GetGames",
         "parameters": [
           {
@@ -3684,7 +3844,6 @@
         "tags": [
           "Games"
         ],
-        "description": "Gets a single game by its ID.",
         "operationId": "GetGameById",
         "parameters": [
           {
@@ -3796,7 +3955,6 @@
         "tags": [
           "GoalieStats"
         ],
-        "description": "Gets a paginated list of goalie statistics.",
         "operationId": "GetGoalieStats",
         "parameters": [
           {
@@ -3960,7 +4118,6 @@
         "tags": [
           "InfoGuides"
         ],
-        "description": "Gets a paginated list of info guides.",
         "operationId": "GetInfoGuides",
         "parameters": [
           {
@@ -4097,7 +4254,6 @@
         "tags": [
           "InfoGuides"
         ],
-        "description": "Gets a single info guide by its ID.",
         "operationId": "GetInfoGuideById",
         "parameters": [
           {
@@ -4209,7 +4365,6 @@
         "tags": [
           "InfoGuides"
         ],
-        "description": "Gets an info guide by tournament ID.",
         "operationId": "GetInfoGuideByTournamentId",
         "parameters": [
           {
@@ -4321,7 +4476,6 @@
         "tags": [
           "Players"
         ],
-        "description": "Gets a paginated list of players.",
         "operationId": "GetPlayers",
         "parameters": [
           {
@@ -4474,7 +4628,6 @@
         "tags": [
           "Players"
         ],
-        "description": "Gets a single player by its ID.",
         "operationId": "GetPlayerById",
         "parameters": [
           {
@@ -4586,7 +4739,6 @@
         "tags": [
           "SkaterStats"
         ],
-        "description": "Gets a paginated list of skater statistics.",
         "operationId": "GetSkaterStats",
         "parameters": [
           {
@@ -4757,7 +4909,6 @@
         "tags": [
           "Teams"
         ],
-        "description": "Gets a paginated list of teams.",
         "operationId": "GetTeams",
         "parameters": [
           {
@@ -4902,7 +5053,6 @@
         "tags": [
           "Teams"
         ],
-        "description": "Gets a single team by its ID.",
         "operationId": "GetTeamById",
         "parameters": [
           {
@@ -5014,7 +5164,6 @@
         "tags": [
           "Teams"
         ],
-        "description": "Updates a team's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTeamLogo",
         "parameters": [
           {
@@ -5124,7 +5273,6 @@
         "tags": [
           "Teams"
         ],
-        "description": "Updates a team's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTeamBanner",
         "parameters": [
           {
@@ -5634,7 +5782,6 @@
         "tags": [
           "Tournaments"
         ],
-        "description": "Gets a paginated list of tournaments.",
         "operationId": "GetTournaments",
         "parameters": [
           {
@@ -5778,7 +5925,6 @@
         "tags": [
           "Tournaments"
         ],
-        "description": "Gets a single tournament by its ID.",
         "operationId": "GetTournamentById",
         "parameters": [
           {
@@ -5890,7 +6036,6 @@
         "tags": [
           "Tournaments"
         ],
-        "description": "Updates a tournament's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTournamentLogo",
         "parameters": [
           {
@@ -6495,6 +6640,20 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "teamGmIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "tournamentGmIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         },
         "additionalProperties": false
@@ -6583,6 +6742,111 @@
         },
         "additionalProperties": false
       },
+      "DraftPickBriefDto": {
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overallPick": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "round": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roundPick": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "team": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "DraftPickDto": {
+        "required": [
+          "draftId",
+          "overallPick",
+          "round",
+          "roundPick",
+          "team"
+        ],
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overallPick": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "round": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roundPick": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "team": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ]
+          },
+          "player": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DraftPickMadeEventDto": {
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedPick": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftPickBriefDto"
+              }
+            ]
+          },
+          "draftedPlayer": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ]
+          },
+          "nextPick": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftPickSingleDto"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DraftPickOrderDto": {
         "required": [
           "pick",
@@ -6608,6 +6872,8 @@
         "required": [
           "draftId",
           "overallPick",
+          "round",
+          "roundPick",
           "team"
         ],
         "type": "object",
@@ -6617,6 +6883,14 @@
             "format": "int32"
           },
           "overallPick": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "round": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roundPick": {
             "type": "integer",
             "format": "int32"
           },
@@ -6659,7 +6933,7 @@
       "DraftRankingDto": {
         "required": [
           "player",
-          "tournament"
+          "tournamentId"
         ],
         "type": "object",
         "properties": {
@@ -6668,6 +6942,10 @@
             "format": "int32"
           },
           "draftId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tournamentId": {
             "type": "integer",
             "format": "int32"
           },
@@ -6682,24 +6960,12 @@
               }
             ]
           },
-          "tournament": {
+          "draftPick": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/TournamentBriefDto"
-              }
-            ]
-          },
-          "team": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TeamBriefDto"
+                "$ref": "#/components/schemas/DraftPickBriefDto"
               }
             ],
-            "nullable": true
-          },
-          "overallPick": {
-            "type": "integer",
-            "format": "int32",
             "nullable": true
           },
           "gamesPlayed": {
@@ -6709,9 +6975,6 @@
           "totalPoints": {
             "type": "integer",
             "format": "int32"
-          },
-          "isChampion": {
-            "type": "boolean"
           },
           "draftRanking": {
             "type": "number",
@@ -6760,6 +7023,7 @@
       },
       "DraftSingleDto": {
         "required": [
+          "draftPicksByRound",
           "id",
           "pickOrder",
           "status",
@@ -6803,6 +7067,15 @@
             "items": {
               "$ref": "#/components/schemas/DraftPickOrderDto"
             }
+          },
+          "draftPicksByRound": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoundDraftPicks"
+            }
+          },
+          "canEditDraft": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -6811,6 +7084,7 @@
         "enum": [
           "Pending",
           "InProgress",
+          "Paused",
           "Completed"
         ],
         "type": "string"
@@ -6821,6 +7095,27 @@
           "Snake"
         ],
         "type": "string"
+      },
+      "DraftUpdateEventDto": {
+        "type": "object",
+        "properties": {
+          "draft": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftSingleDto"
+              }
+            ]
+          },
+          "nextPick": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DraftPickSingleDto"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "ForgotPasswordRequest": {
         "type": "object",
@@ -6855,6 +7150,7 @@
       },
       "GameDto": {
         "required": [
+          "gameState",
           "gameTime",
           "id",
           "tournament"
@@ -6881,8 +7177,14 @@
               {
                 "$ref": "#/components/schemas/GameType"
               }
-            ],
-            "nullable": true
+            ]
+          },
+          "gameState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameState"
+              }
+            ]
           },
           "venue": {
             "type": "string",
@@ -7038,6 +7340,7 @@
       },
       "GameSingleDto": {
         "required": [
+          "gameState",
           "gameTime",
           "goals",
           "highlights",
@@ -7068,8 +7371,14 @@
               {
                 "$ref": "#/components/schemas/GameType"
               }
-            ],
-            "nullable": true
+            ]
+          },
+          "gameState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameState"
+              }
+            ]
           },
           "venue": {
             "type": "string",
@@ -7144,6 +7453,14 @@
           }
         },
         "additionalProperties": false
+      },
+      "GameState": {
+        "enum": [
+          "Pending",
+          "InProgress",
+          "Completed"
+        ],
+        "type": "string"
       },
       "GameType": {
         "enum": [
@@ -8005,6 +8322,22 @@
         },
         "additionalProperties": false
       },
+      "RoundDraftPicks": {
+        "type": "object",
+        "properties": {
+          "round": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "picks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DraftPickDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "SkaterStatDto": {
         "required": [
           "accountId",
@@ -8692,40 +9025,27 @@
         },
         "additionalProperties": false
       },
-      "UpdateDraftOrderingRequest": {
-        "required": [
-          "ordering"
-        ],
-        "type": "object",
-        "properties": {
-          "ordering": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DraftOrderingRequestEntry"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "UpdateDraftRequest": {
         "type": "object",
         "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
           "draftType": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/DraftType"
               }
-            ]
+            ],
+            "nullable": true
           },
-          "draftStatus": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DraftStatus"
-              }
-            ]
-          },
-          "title": {
-            "type": "string"
+          "ordering": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DraftOrderingRequestEntry"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

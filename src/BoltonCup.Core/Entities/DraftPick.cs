@@ -5,6 +5,8 @@ public class DraftPick : EntityBase
     public int Id { get; set; }
     public int DraftId { get; set; }
     public int OverallPick { get; set; }
+    public int Round { get; set; }
+    public int RoundPick { get; set; }
     public int TeamId { get; set; }
     public int? PlayerId { get; set; }
     public byte[] Version { get; set; }

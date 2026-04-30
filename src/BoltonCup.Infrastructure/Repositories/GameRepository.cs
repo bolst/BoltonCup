@@ -19,7 +19,13 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
             .Include(p => p.Goals)
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
-            .ApplySorting(query, x => x.OrderByDescending(p => p.Tournament.StartDate).ThenBy(p => p.GameTime))
+            .ApplySorting(
+                query, 
+                x => x
+                    .OrderByDescending(p => p.Tournament.StartDate)
+                    .ThenBy(p => p.GameTime)
+                    .ThenBy(p => p.GameState == GameState.InProgress ? 0 : (p.GameState == GameState.Pending ? 1 : 2))
+            )
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }       
     

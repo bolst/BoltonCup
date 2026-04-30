@@ -1,0 +1,116 @@
+@using BoltonCup.Draft.Services
+@using BoltonCup.Sdk
+@implements IDisposable
+@inject DraftStateService DraftState
+@inject IDialogService DialogService
+@inject NavigationManager Navigation
+@inject IBoltonCupApi BoltonCupApi
+
+<MudAppBar Elevation="1" ToolBarClass="d-flex flex-row align-center justify-space-between">
+    <MudButtonGroup OverrideStyles="false">
+        <MudIconButton
+            Href="/" Icon="@Icons.Material.Rounded.KeyboardArrowLeft" Class="rounded"/>
+    </MudButtonGroup>
+
+    @switch (DraftState.Draft?.Status)
+    {
+        case DraftStatus.Pending or DraftStatus.Paused:
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    <MudButton OnClick="@StartDraftAsync" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large">Start Draft</MudButton>
+                </Authorized>
+                <NotAuthorized>
+                    <MudChip T="string" Icon="@Icons.Material.Rounded.PauseCircleFilled" Text="Paused" Label="true"/>
+                </NotAuthorized>
+            </AuthorizeView>
+            break;
+        case DraftStatus.InProgress when DraftState.CurrentPick is {} currentPick:
+            <div class="d-flex flex-row align-center gap-3">
+                <MudText Typo="Typo.h6">Pick @currentPick.OverallPick</MudText>
+                <MudImage Src="@currentPick.Team.Logo" Height="36" />
+            </div>
+            break;
+    }
+
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <MudButtonGroup OverrideStyles="false">
+                <MudMenu Icon="@Icons.Material.Filled.DisplaySettings">
+                    <MudMenuItem
+                        OnClick="@OpenDraftSettingsAsync"
+                        Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
+                    @if (DraftState.Draft?.Status == DraftStatus.InProgress)
+                    {
+                        <MudMenuItem
+                            OnClick="@PauseDraftAsync"
+                            Icon="@Icons.Material.Rounded.PauseCircle">Pause Draft</MudMenuItem>
+                    }
+                    <MudMenuItem
+                        OnClick="@DeleteDraftAsync"
+                        Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
+                </MudMenu>
+            </MudButtonGroup>
+        </Authorized>
+        <NotAuthorized>
+            <div>&nbsp;</div>
+        </NotAuthorized>
+    </AuthorizeView>
+</MudAppBar>
+
+@code {
+
+    private bool _drawerOpen;
+
+    private void OpenDrawer() => _drawerOpen = true;
+    private void CloseDrawer() => _drawerOpen = false;
+
+    protected override void OnInitialized()
+    {
+        DraftState.OnStateChanged += StateHasChanged;
+    }
+
+    private async Task OpenDraftSettingsAsync()
+    {
+        await DialogService.ShowAsync<DraftSettingsDialog>();
+    }
+    
+    private async Task StartDraftAsync()
+    {
+        if (DraftState.Draft?.Id is not { } draftId)
+            return;
+
+        await BoltonCupApi.StartDraftAsync(draftId);
+    }
+
+    private async Task PauseDraftAsync()
+    {
+        if (DraftState.Draft is not { Status: DraftStatus.InProgress } draft)
+            return;
+
+        await BoltonCupApi.PauseDraftAsync(draft.Id);
+    }
+
+    private async Task DeleteDraftAsync()
+    {
+        if (DraftState.Draft is not { } draft)
+            return;
+
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Confirm Delete",
+            "You will lose this draft forever.",
+            yesText: "Delete",
+            cancelText: "Cancel"
+        );
+        if (confirm != true)
+            return;
+        
+        await BoltonCupApi.DeleteDraftAsync(draft.Id);
+        Navigation.NavigateTo("/", true);
+    }
+
+    public void Dispose()
+    {
+        DraftState.OnStateChanged -= StateHasChanged;
+    }
+
+}

@@ -29,6 +29,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BoltonCup.Core\BoltonCup.Core.csproj" />
+      <ProjectReference Include="..\BoltonCup.Shared\BoltonCup.Shared.csproj" />
     </ItemGroup>
     
     <ItemGroup>

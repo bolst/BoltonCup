@@ -60,6 +60,8 @@ public static class ServiceCollectionExtensions
                     return Task.CompletedTask;
                 };
             })
+            .AddScoped<IAuthorizationHandler, DraftAccessHandler>()
+            .AddScoped<IAuthorizationHandler, TeamManagerHandler>()
             .AddAuthorization(options => 
             {
                 options.DefaultPolicy = new AuthorizationPolicyBuilder()
@@ -78,7 +80,7 @@ public static class ServiceCollectionExtensions
                 
                 options.AddPolicy(BoltonCupPolicy.CanManageTeam, policy =>
                     policy.Requirements.Add(new ManageTeamRequirement()));
-            });
+            }) ;
     }
     
     private static IServiceCollection AddCorsServices(this IServiceCollection services)

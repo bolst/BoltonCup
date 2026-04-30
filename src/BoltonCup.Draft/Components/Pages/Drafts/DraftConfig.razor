@@ -188,7 +188,6 @@
         if (_draft is not null)
         {
             _updateDraftRequest.Title = _draft.Title ?? "";
-            _updateDraftRequest.DraftStatus = _draft.Status;
             _updateDraftRequest.DraftType = _draft.Type;
 
             _isDirty = false;
@@ -239,7 +238,7 @@
         
         try
         {
-            await BoltonCupApi.UpdateDraftOrderAsync(DraftId, new Sdk.UpdateDraftOrderingRequest
+            await BoltonCupApi.UpdateDraftAsync(DraftId, new UpdateDraftRequest
             {
                 Ordering = _draft.PickOrder
                     .Select(x => new Sdk.DraftOrderingRequestEntry
@@ -268,9 +267,8 @@
         );
         if (confirm != true)
             return;
-        
-        _updateDraftRequest.DraftStatus = DraftStatus.InProgress;
-        await BoltonCupApi.UpdateDraftAsync(DraftId, _updateDraftRequest);
+
+        await BoltonCupApi.StartDraftAsync(DraftId);
         Navigation.NavigateTo($"/drafts/{DraftId}/manager");
     }
 

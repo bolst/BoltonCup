@@ -3,6 +3,7 @@ using BoltonCup.Core;
 using BoltonCup.Infrastructure.Extensions;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Services;
+using BoltonCup.Shared;
 using BoltonCup.WebAPI.Mapping;
 using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
 using Microsoft.AspNetCore.Authorization;

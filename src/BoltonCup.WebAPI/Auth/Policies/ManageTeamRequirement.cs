@@ -1,7 +1,9 @@
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Auth;
 
@@ -23,6 +25,12 @@ public class TeamManagerHandler(BoltonCupDbContext _dbContext)
         int teamId
     )
     {
+        if (context.User.IsInRole(Admin))
+        {
+            context.Succeed(requirement);
+            return;
+        }
+        
         if (!context.User.TryGetAccountId(out var accountId))
             return;
         
