@@ -78,7 +78,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
                 .GroupBy(dto => dto.Round)
                 .Select(group => new RoundDraftPicks(group.Key, group.Select(ToDtoListItem).OrderBy(x => x.RoundPick)))
                 .OrderBy(group => group.Round),
-            CanEditDraft = isAuthorized
+            CanEditDraft = isAuthorized && draft.Status != DraftStatus.Completed,
         };
     }
 

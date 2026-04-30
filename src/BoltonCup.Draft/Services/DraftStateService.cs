@@ -44,6 +44,10 @@ public class DraftStateService : IAsyncDisposable
         _draftId = draftId;
         
         Draft = await _api.GetDraftByIdAsync(draftId);
+
+        if (Draft is { Status: DraftStatus.Completed })
+            return;
+        
         CurrentPick = await _api.GetCurrentDraftPickAsync(draftId);
         PlayerRankings = (await _api.GetDraftPlayerRankingsAsync(draftId, size: 200)).Items.ToList();
 
