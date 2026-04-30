@@ -45,6 +45,12 @@
                             OnClick="@PauseDraftAsync"
                             Icon="@Icons.Material.Rounded.PauseCircle">Pause Draft</MudMenuItem>
                     }
+                    @if (DraftState.Draft?.Status is DraftStatus.InProgress or DraftStatus.Paused)
+                    {
+                        <MudMenuItem
+                            OnClick="@EndDraftAsync"
+                            Icon="@Icons.Material.Rounded.CheckCircle" IconColor="Color.Success">End Draft</MudMenuItem>
+                    }
                     <MudMenuItem
                         OnClick="@DeleteDraftAsync"
                         Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
@@ -88,6 +94,14 @@
             return;
 
         await BoltonCupApi.PauseDraftAsync(draft.Id);
+    }
+
+    private async Task EndDraftAsync()
+    {
+        if (DraftState.Draft is not { Status: DraftStatus.InProgress or DraftStatus.Paused } draft)
+            return;
+
+        await BoltonCupApi.EndDraftAsync(draft.Id);
     }
 
     private async Task DeleteDraftAsync()
