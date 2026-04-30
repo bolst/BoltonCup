@@ -590,6 +590,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany(t => t.Tournaments)
                 .HasForeignKey(e => e.GalleryId)
                 .OnDelete(DeleteBehavior.SetNull);
+            entity
+                .HasIndex(e => e.IsActive)
+                .HasFilter("is_active = TRUE")
+                .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Logo).HasColumnName("logo_key");
