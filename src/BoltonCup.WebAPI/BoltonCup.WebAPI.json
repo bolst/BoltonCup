@@ -9088,6 +9088,30 @@
               }
             ],
             "nullable": true
+          },
+          "sponsors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TournamentSponsorDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "TournamentSponsorDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "websiteUrl": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

@@ -27,6 +27,10 @@ public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepos
             .Include(e => e.Games)
             .Include(e => e.Teams)
             .Include(e => e.Gallery)
+            .Include(e => e.Sponsors
+                .Where(s => s.IsActive)
+                .OrderBy(s => s.SortKey)
+            )
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken: cancellationToken);
     }
 
@@ -38,6 +42,10 @@ public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepos
             .Include(e => e.Games)
             .Include(e => e.Teams)
             .Include(e => e.Gallery)
+            .Include(e => e.Sponsors
+                .Where(s => s.IsActive)
+                .OrderBy(s => s.SortKey)
+            )
             .FirstOrDefaultAsync(e => e.IsActive, cancellationToken: cancellationToken);
     }
 }
