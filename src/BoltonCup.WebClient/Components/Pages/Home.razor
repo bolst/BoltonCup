@@ -61,8 +61,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // TODO: dont hardcode this
-        _tournament ??= await BoltonCupApi.GetTournamentByIdAsync(3);
+        _tournament ??= await BoltonCupApi.GetActiveTournamentAsync();
         await InvokeAsync(StateHasChanged);
     }
 
