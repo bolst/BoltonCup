@@ -85,6 +85,8 @@
 
     private Task OnRowClick(DataGridRowClickEventArgs<DraftRankingDto> args)
     {
+        // TODO
+        return Task.CompletedTask;
         return DialogService.ShowAsync<PlayerDialog>(new DialogParameters<PlayerDialog>
         {
             { x => x.PlayerId, args.Item.Player.Id }
