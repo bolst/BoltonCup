@@ -61,7 +61,15 @@ public class TournamentMapper(IAssetUrlResolver _urlResolver, IBriefMapper _brie
                 SkaterLimit = tournament.SkaterLimit,
                 GoalieLimit = tournament.GoalieLimit,
                 InfoGuide = tournament.InfoGuide is null ? null : _briefMapper.ToInfoGuideBriefDto(tournament.InfoGuide),
-                Gallery = tournament.Gallery is null ? null : _briefMapper.ToGalleryBriefDto(tournament.Gallery)
+                Gallery = tournament.Gallery is null ? null : _briefMapper.ToGalleryBriefDto(tournament.Gallery),
+                Sponsors = tournament.Sponsors
+                    .Select(sponsor => new TournamentSponsorDto
+                    {
+                        Name = sponsor.Name,
+                        LogoUrl = _urlResolver.GetFullUrl(sponsor.Logo),
+                        WebsiteUrl = sponsor.WebsiteUrl,
+                    })
+                    .ToList()
             };
     }
 }

@@ -1,14 +1,14 @@
 @page "/"
+@using BoltonCup.WebClient.Services
 @attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-02-01")]
-@inject IBoltonCupApi BoltonCupApi
+@inject TournamentStateService TournamentState
 
 <PageTitle>Bolton Cup</PageTitle>
 
 
 <MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
-    
-    <div class="home-banner-background">
-        <div class="d-flex flex-column align-center justify-center gap-6 mud-width-full px-2" style="height: 500px">
+    <div class="home-banner-background py-2" style="min-height: 500px">
+        <div class="d-flex flex-column align-center justify-center gap-6 mud-width-full px-2" style="height: 350px">
             <div class="d-flex flex-row align-center">
                 @if (_tournament is not null)
                 {
@@ -25,6 +25,23 @@
                 </MudAlert>
             }
         </div>
+        
+        @if (_tournament?.Sponsors is { Count: > 0 } sponsors)
+        {
+            <div class="mud-full-width d-flex flex-column align-center gap-3">
+                <MudText Typo="Typo.h6" Color="Color.Tertiary"><b>BROUGHT TO YOU BY</b></MudText>
+                <River AnimationDuration="50">
+                    @foreach (var sponsor in sponsors)
+                    {
+                        <RiverItem Class="d-flex align-center justify-center pa-1" Style="height: 150px; width: 150px">
+                            <a href="@sponsor.WebsiteUrl" target="_blank">
+                                <MudImage Src="@sponsor.LogoUrl" Fluid/>
+                            </a>
+                        </RiverItem>
+                    }
+                </River>
+            </div>
+        }
     </div>
     
     <Highlight Title="2025 Leaders" Href="stats">
@@ -43,16 +60,6 @@
             </MudItem>
         </MudGrid>
     </Highlight>
-
-    @if (false)
-    {
-        <Highlight Title="Must Watch" Href="video" Class="d-flex flex-row align-start justify-space-evenly gap-3">
-            <MudSkeleton Height="225px" Width="400px"/>
-            <MudSkeleton Height="225px" Width="400px"/>
-            <MudSkeleton Height="225px" Width="400px"/>
-            <MudSkeleton Height="225px" Width="400px"/>
-        </Highlight>
-    }
 </MudContainer>
 
 @code {
@@ -61,9 +68,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // TODO: dont hardcode this
-        _tournament ??= await BoltonCupApi.GetTournamentByIdAsync(3);
-        await InvokeAsync(StateHasChanged);
+        if (_tournament is null)
+        {
+            _tournament = await TournamentState.GetActiveTournamentAsync();
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
 }

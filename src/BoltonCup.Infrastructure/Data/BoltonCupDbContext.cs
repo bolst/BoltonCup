@@ -32,6 +32,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<Tournament> Tournaments { get; set; }
     public DbSet<TournamentBudgetItem> TournamentBudgetItems { get; set; }
     public DbSet<TournamentRegistration> TournamentRegistrations { get; set; }
+    public DbSet<TournamentSponsor> TournamentSponsors { get; set; }
     
     public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
     
@@ -589,6 +590,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany(t => t.Tournaments)
                 .HasForeignKey(e => e.GalleryId)
                 .OnDelete(DeleteBehavior.SetNull);
+            entity
+                .HasIndex(e => e.IsActive)
+                .HasFilter("is_active = TRUE")
+                .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Logo).HasColumnName("logo_key");
@@ -645,6 +650,24 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.CurrentStep).HasColumnName("current_step");
             entity.Property(e => e.Payload).HasColumnName("payload");
             entity.Property(e => e.IsComplete).HasColumnName("is_complete");
+        });
+
+        modelBuilder.Entity<TournamentSponsor>(entity =>
+        {
+            entity
+                .ToTable("tournament_sponsors")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Tournament)
+                .WithMany(e => e.Sponsors)
+                .HasForeignKey(e => e.TournamentId);
+            entity.Property(e => e.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.Name).HasColumnName("sponsor_name");
+            entity.Property(e => e.Logo).HasColumnName("logo_key");
+            entity.Property(e => e.WebsiteUrl).HasColumnName("website_url");
+            entity.Property(e => e.SortKey).HasColumnName("sort_key");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
         });
         
         
