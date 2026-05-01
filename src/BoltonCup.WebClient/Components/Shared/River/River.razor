@@ -1,0 +1,16 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+<div class="@Classname" 
+     style="@Stylename">
+    <div class="fluid-carousel-track">
+        @* Render the primary set of items *@
+        <div class="fluid-carousel-group">
+            @ChildContent
+        </div>
+        
+        @* Render the duplicate set of items for the seamless loop *@
+        <div class="fluid-carousel-group" aria-hidden="true">
+            @ChildContent
+        </div>
+    </div>
+</div>
