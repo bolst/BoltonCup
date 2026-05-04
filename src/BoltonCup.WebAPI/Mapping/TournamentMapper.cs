@@ -7,6 +7,8 @@ public interface ITournamentMapper
     GetTournamentsQuery ToQuery(GetTournamentsRequest request);
     IPagedList<TournamentDto> ToDtoList(IPagedList<Tournament> tournaments);
     TournamentSingleDto? ToDto(Tournament? tournament);
+    PlayerStatLeadersDto ToDto(string title, IEnumerable<SkaterStat> stats, Func<SkaterStat, double> selector, string? format = null);
+    PlayerStatLeadersDto ToDto(string title, IEnumerable<GoalieStat> stats, Func<GoalieStat, double> selector, string? format = null);
 }
 
 public class TournamentMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMapper) : ITournamentMapper
@@ -71,5 +73,57 @@ public class TournamentMapper(IAssetUrlResolver _urlResolver, IBriefMapper _brie
                     })
                     .ToList()
             };
+    }
+    
+    
+    public PlayerStatLeadersDto ToDto(string title, IEnumerable<SkaterStat> stats, Func<SkaterStat, double> selector, string? format = null)
+    {
+        return new PlayerStatLeadersDto
+        {
+            Title = title,
+            Leaders = stats.Select(stat => new PlayerStatDto
+            {
+                PlayerId = stat.PlayerId,
+                AccountId = stat.AccountId,
+                FirstName = stat.FirstName,
+                LastName = stat.LastName,
+                Position = stat.Position,
+                JerseyNumber = stat.JerseyNumber,
+                Birthday = stat.Birthday,
+                ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture),
+                TeamId = stat.TeamId,
+                TeamName = stat.TeamName,
+                TeamLogoUrl = _urlResolver.GetFullUrl(stat.TeamLogoUrl),
+                TeamAbbreviation = stat.TeamAbbreviation,
+                StatValue = selector(stat),
+                StatString = selector(stat).ToString(format)
+            })
+        };
+    }
+    
+    
+    public PlayerStatLeadersDto ToDto(string title, IEnumerable<GoalieStat> stats, Func<GoalieStat, double> selector, string? format = null)
+    {
+        return new PlayerStatLeadersDto
+        {
+            Title = title,
+            Leaders = stats.Select(stat => new PlayerStatDto
+            {
+                PlayerId = stat.PlayerId,
+                AccountId = stat.AccountId,
+                FirstName = stat.FirstName,
+                LastName = stat.LastName,
+                Position = stat.Position,
+                JerseyNumber = stat.JerseyNumber,
+                Birthday = stat.Birthday,
+                ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture),
+                TeamId = stat.TeamId,
+                TeamName = stat.TeamName,
+                TeamLogoUrl = _urlResolver.GetFullUrl(stat.TeamLogoUrl),
+                TeamAbbreviation = stat.TeamAbbreviation,
+                StatValue = selector(stat),
+                StatString = selector(stat).ToString(format)
+            })
+        };
     }
 }

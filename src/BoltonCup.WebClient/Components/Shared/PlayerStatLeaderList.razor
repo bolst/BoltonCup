@@ -1,0 +1,65 @@
+@using BoltonCup.Sdk
+@namespace BoltonCup.WebClient.Components.Shared
+
+
+<MudList T="PlayerStatDto" @bind-SelectedValue="_selectedPlayer" Color="Color.Primary" Class="mud-width-full mud-height-full" Dense>
+    <MudListSubheader>
+        <a class="d-flex flex-row align-center justify-space-between" href="@SelectedPlayerHref">
+            @if (_selectedPlayer is not null)
+            {
+                <div class="d-flex flex-row align-center gap-3">
+                    <MudAvatar Size="Size.Large">
+                        <MudImage Src="@_selectedPlayer.ProfilePicture" Alt="@_selectedPlayer.FullName" Height="80" Width="80"/>
+                    </MudAvatar>
+                    <div class="d-flex flex-column align-start justify-space-evenly">
+                        <MudText Typo="Typo.subtitle2" Color="Color.Info"><b>@PlayerStatLeaders?.Title</b></MudText>
+                        <MudText Typo="Typo.subtitle2" Color="Color.Primary">@_selectedPlayer.FullName</MudText>
+                        <div class="d-flex flex-row align-center gap-1">
+                            <MudImage Src="@_selectedPlayer.TeamLogoUrl" Alt="@_selectedPlayer.TeamName" Width="20" Height="20"/>
+                            <MudText Typo="Typo.caption">@_selectedPlayer.Position?.ToUpper().First()</MudText>
+                            <MudText Typo="Typo.caption">@_selectedPlayer.JerseyNumberLabel</MudText>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column align-center justify-space-evenly">
+                    <MudText Typo="Typo.h6" Color="Color.Primary">@_selectedPlayer.StatString</MudText>
+                    <MudText Typo="Typo.caption">@PlayerStatLeaders?.Title.ToUpper()</MudText>
+                </div>
+            }
+        </a>
+    </MudListSubheader>
+    @foreach (var (playerStat, i) in _playerStats.Select((playerStat, i) => (playerStat, i)))
+    {
+        <MudListItem Value="playerStat" @onmouseover="@(() => _selectedPlayer = playerStat)">
+            <div class="d-flex flex-row align-center justify-space-between">
+                <MudText><MudText Typo="Typo.caption" Inline>@(i + 1).</MudText> @playerStat.FullName</MudText>
+                <MudText>@playerStat.StatString</MudText>
+            </div>
+        </MudListItem>
+    }
+</MudList>
+
+@code {
+
+    [Parameter]
+    public PlayerStatLeadersDto? PlayerStatLeaders { get; set; }
+    
+    [Parameter]
+    public int Limit { get; set; } = 5;
+    
+    private PlayerStatDto? _selectedPlayer;
+    
+    private string? SelectedPlayerHref => _selectedPlayer is not null 
+        ? $"/players/{_selectedPlayer.PlayerId}"
+        : null;
+
+    private ICollection<PlayerStatDto> _playerStats = [];
+    
+    protected override Task OnParametersSetAsync()
+    {
+        _playerStats = PlayerStatLeaders?.Leaders ?? [];
+        _selectedPlayer ??= _playerStats.FirstOrDefault();
+        return InvokeAsync(StateHasChanged);
+    }
+
+}

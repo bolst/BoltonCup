@@ -11,7 +11,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped<ITournamentRegistrationService, TournamentRegistrationService>();
-builder.Services.AddSingleton<TournamentStateService>();
+builder.Services.AddSingleton<BcStateService>();
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
 builder.Logging.AddBoltonCupSentry(builder.Configuration);

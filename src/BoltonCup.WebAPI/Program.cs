@@ -79,12 +79,12 @@ builder.Services.AddSwaggerGen(options =>
         }
         return null;
     });
-    // add docstrings
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
-    if (builder.Environment.IsDevelopment())
+    if (false) //(builder.Environment.IsDevelopment())
     {
+        // add docstrings
+        var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
         options.IncludeXmlComments(xmlPath);
     }
 });

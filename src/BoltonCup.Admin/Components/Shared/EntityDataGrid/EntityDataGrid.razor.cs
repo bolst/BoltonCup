@@ -18,8 +18,8 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     : ComponentBaseWithState, IDisposable
     where T : class
 {
-    private CancellationTokenSource _cts;
-    private string _itemChangedStyle = new StyleBuilder()
+    private readonly CancellationTokenSource _cts;
+    private readonly string _itemChangedStyle = new StyleBuilder()
         .AddStyle("background-color", "var(--mud-palette-dark-lighten)")
         .AddStyle("background-image", "linear-gradient(135deg, hsla(0, 0%, 100%, 0.05) 25%, transparent 0, transparent 50%, hsla(0, 0%, 100%, 0.05) 0, hsla(0, 0%, 100%, 0.05) 75%, transparent 0, transparent)")
         .AddStyle("background-size", "20px 20px")
@@ -27,7 +27,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     private const string _height = "calc(100vh - 64px - 64px - var(--mud-appbar-height))";
     private const string _noPagerHeight = "calc(100vh - 64px - var(--mud-appbar-height))";
     private readonly int[] _pageSizeOptions = [15, 50, 100, 500];
-    private ChangeTracker<T> _changeTracker;
+    private readonly ChangeTracker<T> _changeTracker;
     private MudDataGrid<T> _dataGrid = null!;
     private string? _search;
     private readonly ParameterState<string?> _searchState;
@@ -265,8 +265,18 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         var newItem = await NewItemFunc();
         if (newItem is not null)
         {
-            _changeTracker.TrackNew(newItem);
+            AddNewItem(newItem);
         }
+    }
+
+    public void AddNewItem(T item)
+    {
+        _changeTracker.TrackNew(item);
+    }
+    
+    public void AddNewItems(IEnumerable<T> items)
+    {
+        _changeTracker.TrackNewRange(items);
     }
 
     public void RegisterInclude(Func<IQueryable<T>, IQueryable<T>> includeQuery)

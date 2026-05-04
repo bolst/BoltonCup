@@ -18,6 +18,8 @@ public class Tournament : EntityBase
     public decimal? SkaterRegistrationFee { get; set; }
     public decimal? GoalieRegistrationFee { get; set; }
     public int? GalleryId { get; set; }
+    public bool IsStatsFeatured { get; set; }
+    public string? FeaturedStatsLabel { get; set; }
 
     public ICollection<Player> Players { get; set; } = [];
     public ICollection<Team> Teams { get; set; } = [];

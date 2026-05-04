@@ -4904,6 +4904,106 @@
         }
       }
     },
+    "/api/system/context": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "operationId": "GetSystemContext",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemContextDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemContextDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemContextDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/teams": {
       "get": {
         "tags": [
@@ -5937,106 +6037,6 @@
             }
           }
         ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/TournamentSingleDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TournamentSingleDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TournamentSingleDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/tournaments/active": {
-      "get": {
-        "tags": [
-          "Tournaments"
-        ],
-        "operationId": "GetActiveTournament",
         "responses": {
           "200": {
             "description": "OK",
@@ -8308,6 +8308,96 @@
         },
         "additionalProperties": false
       },
+      "PlayerStatDto": {
+        "required": [
+          "statString",
+          "statValue"
+        ],
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "jerseyNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "profilePicture": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "teamName": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamLogoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamAbbreviation": {
+            "type": "string",
+            "nullable": true
+          },
+          "statValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "statString": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "jerseyNumberLabel": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PlayerStatLeadersDto": {
+        "required": [
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "leaders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerStatDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PlayerTournamentStats": {
         "required": [
           "assists",
@@ -8567,6 +8657,28 @@
           },
           "value": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SystemContextDto": {
+        "type": "object",
+        "properties": {
+          "activeTournament": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentSingleDto"
+              }
+            ],
+            "nullable": true
+          },
+          "featuredStats": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentStatLeadersDto"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -9116,6 +9228,29 @@
         },
         "additionalProperties": false
       },
+      "TournamentStatLeadersDto": {
+        "required": [
+          "title",
+          "tournamentId"
+        ],
+        "type": "object",
+        "properties": {
+          "tournamentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "statLeaders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerStatLeadersDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateAccountRequest": {
         "type": "object",
         "properties": {
@@ -9244,6 +9379,9 @@
     },
     {
       "name": "SkaterStats"
+    },
+    {
+      "name": "System"
     },
     {
       "name": "Teams"

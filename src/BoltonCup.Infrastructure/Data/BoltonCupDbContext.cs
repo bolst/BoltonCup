@@ -594,6 +594,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasIndex(e => e.IsActive)
                 .HasFilter("is_active = TRUE")
                 .IsUnique();
+            entity
+                .HasIndex(e => e.IsStatsFeatured)
+                .HasFilter("is_stats_featured = TRUE")
+                .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Logo).HasColumnName("logo_key");
@@ -610,6 +614,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.SkaterRegistrationFee).HasColumnName("skater_registration_fee");
             entity.Property(e => e.GoalieRegistrationFee).HasColumnName("goalie_registration_fee");
             entity.Property(e => e.GalleryId).HasColumnName("gallery_id");
+            entity.Property(e => e.IsStatsFeatured).HasColumnName("is_stats_featured");
+            entity.Property(e => e.FeaturedStatsLabel).HasColumnName("featured_stats_label");
         });
 
         modelBuilder.Entity<TournamentBudgetItem>(entity =>

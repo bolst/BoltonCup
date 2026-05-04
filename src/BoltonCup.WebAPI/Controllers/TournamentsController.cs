@@ -38,22 +38,6 @@ public class TournamentsController(
     }
     
     /// <remarks>
-    /// Gets the active tournament, if one exists. There is either one or none.
-    /// </remarks>
-    [AllowAnonymous]
-    [HttpGet("active")]
-    [ResponseCache(Duration = 300)]
-    public async Task<ActionResult<TournamentSingleDto>> GetActiveTournament()
-    {
-        var tournament = await _cache.GetOrCreateAsync(nameof(GetActiveTournament), async entry =>
-        {
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
-            return await _tournaments.GetActiveAsync();
-        });
-        return OkOrNoContent(_mapper.ToDto(tournament));
-    }
-    
-    /// <remarks>
     /// Updates a tournament's logo by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
     /// </remarks>
