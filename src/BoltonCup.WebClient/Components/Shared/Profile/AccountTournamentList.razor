@@ -18,7 +18,7 @@
         </MudPaper>
     }
 
-    <MudText Typo="Typo.body2"><b>Past Tournaments</b></MudText>
+    <MudText Typo="Typo.body2"><b>My Tournaments</b></MudText>
 
     <MudList T="string" Gutters Padding ReadOnly>
         @foreach (var (player, index) in _userTournaments.Where(t => t.Team is not null).Select((player, i) => (player ,i)))
