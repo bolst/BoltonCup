@@ -73,7 +73,7 @@
         <Columns>
             @if (ChildRowContent is not null)
             {
-                <HierarchyColumn T="T" EnableHeaderToggle />
+                <HierarchyColumn T="T" InitiallyExpandedFunc="@(_ => true)" EnableHeaderToggle />
             }
             @if (Selectable)
             {
