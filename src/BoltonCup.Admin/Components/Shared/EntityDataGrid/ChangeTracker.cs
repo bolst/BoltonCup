@@ -128,9 +128,31 @@ public sealed class ChangeTracker<T>
         }
         
         // delete items
-        if (DeleteItems.Count > 0)
+        foreach (var item in DeleteItems)
         {
-            dbSet.RemoveRange(DeleteItems);
+            var entry = dbContext.Entry(item);
+            if (entry.Metadata.FindPrimaryKey() is { } pk)
+            {
+                var keyValues = pk.Properties.Select(p => entry.Property(p.Name).CurrentValue).ToArray();
+                
+                // check if we are already tracking an entity with this key
+                var existingTracked = dbContext.ChangeTracker
+                    .Entries()
+                    .FirstOrDefault(
+                        e => e.Metadata.ClrType == entry.Metadata.ClrType &&
+                             e.Metadata.FindPrimaryKey()?.Properties
+                                 .Select(p => e.Property(p.Name).CurrentValue)
+                                 .SequenceEqual(keyValues) == true
+                    );
+
+                if (existingTracked is not null)
+                {
+                    existingTracked.State = EntityState.Deleted;
+                    continue;
+                }
+            }
+            
+            entry.State = EntityState.Deleted;
         }
         
         await dbContext.SaveChangesAsync();
