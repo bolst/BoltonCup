@@ -28,6 +28,8 @@
                        EqualityComparer="new TeamComparer()" ImageSrcFunc="t => t.Logo" />
         <ForeignColumn Title="Gallery" Property="x => x.Gallery" PropertySetter="(t, g) => { t.Gallery = g; t.GalleryId = g?.Id; }"
                        EqualityComparer="new GalleryComparer()" Required="false" />
+        <BoolColumn Title="Stats Featured?" Property="x => x.IsStatsFeatured" />
+        <PropertyColumn Title="Featured Stats Label" Property="x => x.FeaturedStatsLabel" Required />
     </Columns>
     <ChildRowContent>
         <div class="pa-2 d-flex flex-row align-center gap-1">

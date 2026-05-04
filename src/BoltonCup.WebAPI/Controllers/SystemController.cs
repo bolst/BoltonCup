@@ -1,12 +1,15 @@
 using BoltonCup.Core;
+using BoltonCup.Infrastructure.Data;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace BoltonCup.WebAPI.Controllers;
 
 public class SystemController(
+    BoltonCupDbContext _dbContext,
     ITournamentRepository _tournamentRepo,
     ISkaterStatRepository _skaterStatRepo,
     IGoalieStatRepository _goalieStatRepo,
@@ -25,7 +28,7 @@ public class SystemController(
         var context = await _cache.GetOrCreateAsync(nameof(GetSystemContext), async entry =>
         {
             var activeTournament = await _tournamentRepo.GetActiveAsync();
-            var featuredStats = await GetFeaturedStats();
+            var featuredStats = await GetFeaturedStatsOrDefault();
             
             return new SystemContextDto(
                 ActiveTournament: _tournamentMapper.ToDto(activeTournament),
@@ -37,13 +40,12 @@ public class SystemController(
     }
 
 
-    private async Task<TournamentStatLeadersDto> GetFeaturedStats()
+    private async Task<TournamentStatLeadersDto?> GetFeaturedStatsOrDefault()
     {
-        // TODO
-        var statsTournamentId = 2;
-        var statsTitle = "2025 Leaders";
-        var baseSkaterQuery = new GetSkaterStatsQuery { TournamentId = statsTournamentId, Size = 5, Descending = true };
-        var baseGoalieQuery = new GetGoalieStatsQuery { TournamentId = statsTournamentId, Size = 5 };
+        if (await _dbContext.Tournaments.FirstOrDefaultAsync(t => t.IsStatsFeatured) is not { } featuredStatsTournament)
+            return null;
+        var baseSkaterQuery = new GetSkaterStatsQuery { TournamentId = featuredStatsTournament.Id, Size = 5, Descending = true };
+        var baseGoalieQuery = new GetGoalieStatsQuery { TournamentId = featuredStatsTournament.Id, Size = 5 };
             
         var points = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with { SortBy = nameof(SkaterStat.Points)});
         var goals = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with { SortBy = nameof(SkaterStat.Goals)});
@@ -52,8 +54,8 @@ public class SystemController(
 
         return new TournamentStatLeadersDto
         {
-            TournamentId = statsTournamentId,
-            Title = statsTitle,
+            TournamentId = featuredStatsTournament.Id,
+            Title = featuredStatsTournament.FeaturedStatsLabel ?? featuredStatsTournament.Name,
             StatLeaders =
             [
                 _tournamentMapper.ToDto(
