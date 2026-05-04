@@ -8,7 +8,7 @@
 
 <MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
     <div class="home-banner-background py-2" style="min-height: 500px">
-        <div class="d-flex flex-column align-center justify-center gap-6 mud-width-full px-2" style="height: 350px">
+        <div class="d-flex flex-column align-center justify-center gap-6 mud-width-full px-2" style="min-height: 350px">
             @if (_context?.ActiveTournament is { } tournament)
             {
                 <div class="d-flex flex-row align-center">
@@ -29,7 +29,7 @@
         
         @if (_context?.ActiveTournament?.Sponsors is { Count: > 0 } sponsors)
         {
-            <div class="mud-full-width d-flex flex-column align-center gap-3">
+            <div class="mt-2 mud-full-width d-flex flex-column align-center gap-3">
                 <MudText Typo="Typo.h6" Color="Color.Tertiary"><b>BROUGHT TO YOU BY</b></MudText>
                 <River AnimationDuration="50">
                     @foreach (var sponsor in sponsors)
