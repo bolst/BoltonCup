@@ -8308,6 +8308,96 @@
         },
         "additionalProperties": false
       },
+      "PlayerStatDto": {
+        "required": [
+          "statString",
+          "statValue"
+        ],
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "jerseyNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "profilePicture": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "teamName": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamLogoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamAbbreviation": {
+            "type": "string",
+            "nullable": true
+          },
+          "statValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "statString": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "jerseyNumberLabel": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PlayerStatLeadersDto": {
+        "required": [
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "leaders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerStatDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PlayerTournamentStats": {
         "required": [
           "assists",
@@ -8574,14 +8664,20 @@
       "SystemContextDto": {
         "type": "object",
         "properties": {
-          "activeTournamentId": {
-            "type": "integer",
-            "format": "int32",
+          "activeTournament": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentSingleDto"
+              }
+            ],
             "nullable": true
           },
-          "featuredStatsTournamentId": {
-            "type": "integer",
-            "format": "int32",
+          "featuredStats": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentStatLeadersDto"
+              }
+            ],
             "nullable": true
           }
         },
@@ -9128,6 +9224,29 @@
           "websiteUrl": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TournamentStatLeadersDto": {
+        "required": [
+          "title",
+          "tournamentId"
+        ],
+        "type": "object",
+        "properties": {
+          "tournamentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "statLeaders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerStatLeadersDto"
+            }
           }
         },
         "additionalProperties": false
