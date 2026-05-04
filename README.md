@@ -1,29 +1,7 @@
 # Bolton Cup
 
-## Intro
+## Overview
 
-This is the repo for the software tools developed for the Bolton Cup hockey tournament. It contains the website and mobile app along with the scoresheet and draft tool.
+This is the repository for the software tools developed for the Bolton Cup hockey tournament. It is a full-stack web platform for managing tournament registration, team and player data, game scheduling, scoring, and statistics.
 
-## Website URL
-
-[https://boltoncup.ca](https://boltoncup.ca)
-
-
-## Using the shared library `BoltonCup.Shared`
-
-Add to `_Imports.razor`:
-
-```razor
-@using BoltonCup.Shared.Data
-@using BoltonCup.Shared.Components.Shared
-```
-
-Add to the relevant sections of `Program.cs`:
-
-```c#
-using BoltonCup.Shared.Data;
-```
-
-```c#
-builder.Services.AddBoltonCupServices(builder.Configuration);
-```
+**Website:** [https://boltoncup.ca](https://boltoncup.ca)
