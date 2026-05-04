@@ -131,7 +131,9 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
                 )
             );
         
-        return gameByGames.Select(pg => new PlayerGameByGame
+        return gameByGames
+            .Where(pg => pg.Game.GameState != GameState.Pending)
+            .Select(pg => new PlayerGameByGame 
             {
                 Goals = pg.Game.Goals.Count(x => x.GoalPlayerId == pg.Player.Id),
                 Assists = pg.Game.Goals.Count(x =>
