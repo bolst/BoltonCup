@@ -41,15 +41,22 @@ public sealed class ChangeTracker<T>
     
     public void TrackDeletes(IEnumerable<T> items)
     {
-        var enumerable = items.ToHashSet();
-        EditItems.ExceptWith(enumerable);
-        DeleteItems.UnionWith(enumerable);
+        var itemsHash = items.ToHashSet();
+        EditItems.ExceptWith(itemsHash);
+        DeleteItems.UnionWith(itemsHash);
     }
 
     public void TrackNew(T item)
     {
         EditItems.Remove(item);
         NewItems.Add(item);
+    }
+
+    public void TrackNewRange(IEnumerable<T> items)
+    {
+        var itemsHash = items.ToHashSet();
+        EditItems.ExceptWith(itemsHash);
+        NewItems.UnionWith(itemsHash);
     }
 
     public async Task SaveChangesAsync(DbContext dbContext)

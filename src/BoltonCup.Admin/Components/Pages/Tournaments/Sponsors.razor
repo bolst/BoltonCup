@@ -4,19 +4,27 @@
 @inject BoltonCupDbContext DbContext
 @inject IAssetKeyGenerator AssetKeyGenerator
 
-<EntityDataGrid 
-    @ref="_dataGrid" 
+<EntityDataGrid
+    @ref="_dataGrid"
     T="TournamentSponsor"
     SearchBy="x => x.Name"
     Filter="@_filter"
     NewItemFunc="@(() => Task.FromResult(new TournamentSponsor { TournamentId = TournamentId })!)"
     Comparer="_comparer">
+    <ActionMenu>
+        <MudMenu Label="Copy from">
+            @foreach (var tournament in _otherTournaments)
+            {
+                <MudMenuItem OnClick="@(_ => CloneSponsors(tournament))" Label="@tournament.Name" />
+            }
+        </MudMenu>
+    </ActionMenu>
     <Columns>
         <PropertyColumn Title="Sponsor" Property="x => x.Name" Editable="true"/>
-        <ImageColumn T="TournamentSponsor" Title="Logo" Property="x => x.Logo" OnImageUploaded="@UpdateLogo" />
-        <LinkColumn Title="Website" Property="x => x.WebsiteUrl" Editable="true" />
-        <PropertyColumn Property="x => x.SortKey" Editable="true" InitialDirection="SortDirection.Ascending" />
-        <BoolColumn Title="Active" Property="x => x.IsActive" Editable="true" />
+        <ImageColumn T="TournamentSponsor" Title="Logo" Property="x => x.Logo" OnImageUploaded="@UpdateLogo"/>
+        <LinkColumn Title="Website" Property="x => x.WebsiteUrl" Editable="true"/>
+        <PropertyColumn Property="x => x.SortKey" Editable="true" InitialDirection="SortDirection.Ascending"/>
+        <BoolColumn Title="Active" Property="x => x.IsActive" Editable="true"/>
         <ForeignColumn Title="Tournament" Property="x => x.Tournament" Editable="false" ImageSrcFunc="x => x.Logo"/>
     </Columns>
 </EntityDataGrid>
@@ -33,17 +41,38 @@
     private static readonly TournamentSponsorComparer _comparer = new();
 
     private Expression<Func<TournamentSponsor, bool>>? _filter;
+
+    private List<Tournament> _otherTournaments = [];
     
-    protected override Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
     {
         if (_tournamentId == TournamentId)
-            return Task.CompletedTask;
+            return;
         _tournamentId = TournamentId;
+
+        _filter = x => x.TournamentId == TournamentId;
+        await (_dataGrid?.ReloadAsync() ?? Task.CompletedTask);
         
-        _filter = x => x.TournamentId == _tournamentId;
-        return _dataGrid is not null
-            ? _dataGrid.ReloadAsync()
-            : Task.CompletedTask;
+        _otherTournaments = await DbContext.Tournaments
+            .Where(t => t.Id != TournamentId)
+            .Include(t => t.Sponsors)
+            .OrderBy(t => t.Name)
+            .ToListAsync();
+    }
+
+    private void CloneSponsors(Tournament tournament)
+    {
+        var sponsors = tournament.Sponsors
+            .Select(s => new TournamentSponsor
+            {
+                TournamentId = TournamentId,
+                Name = s.Name,
+                Logo = s.Logo,
+                WebsiteUrl = s.WebsiteUrl,
+                SortKey = s.SortKey,
+                IsActive = s.IsActive,
+            });
+        _dataGrid?.AddNewItems(sponsors);
     }
     
     private async Task UpdateLogo(ImageUploadResult<TournamentSponsor> result)

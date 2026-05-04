@@ -265,8 +265,18 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         var newItem = await NewItemFunc();
         if (newItem is not null)
         {
-            _changeTracker.TrackNew(newItem);
+            AddNewItem(newItem);
         }
+    }
+
+    public void AddNewItem(T item)
+    {
+        _changeTracker.TrackNew(item);
+    }
+    
+    public void AddNewItems(IEnumerable<T> items)
+    {
+        _changeTracker.TrackNewRange(items);
     }
 
     public void RegisterInclude(Func<IQueryable<T>, IQueryable<T>> includeQuery)
