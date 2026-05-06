@@ -215,7 +215,6 @@ public class DraftStateService : IAsyncDisposable
         if (_hubConnection.State == HubConnectionState.Disconnected)
         {
             await _hubConnection.StartAsync();
-            ConnectionState = DraftConnectionState.Disconnected;
         }
 
         if (_hubConnection.State == HubConnectionState.Connected)

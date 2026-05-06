@@ -51,7 +51,12 @@ else if (DraftState.Draft is not null)
     private bool _loading = true;
 
     private DraftConnectionState _connectionState;
-    
+
+    protected override void OnInitialized()
+    {
+        DraftState.OnStateChanged += HandleDraftStateChange;
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         if (DraftId == _draftId)
@@ -61,7 +66,6 @@ else if (DraftState.Draft is not null)
         _loading = true;
 
         await DraftState.InitializeAsync(DraftId);
-        DraftState.OnStateChanged += HandleDraftStateChange;
 
         _loading = false;
         await InvokeAsync(StateHasChanged);
