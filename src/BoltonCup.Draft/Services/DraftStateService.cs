@@ -16,7 +16,7 @@ public class DraftStateService : IAsyncDisposable
     private readonly CancellationTokenSource _cts;
     
     private bool _disposed;
-    private Timer? _fallbackPollTimer;
+    private CancellationTokenSource? _pollCts;
     private int? _draftId;
 
     public DraftSingleDto? Draft { get; private set; }
@@ -77,18 +77,12 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private async Task OnReconnecting(Exception? error)
+    private Task OnReconnecting(Exception? error)
     {
         ConnectionState = DraftConnectionState.Reconnecting;
         NotifyStateChanged();
-        
-        StopFallbackPoll();
-        _fallbackPollTimer = new Timer(
-            async _ => await FetchStateAsync(),
-            null,
-            dueTime: TimeSpan.FromSeconds(3),
-            period: TimeSpan.FromSeconds(8)
-        );
+        StartFallbackPoll();
+        return Task.CompletedTask;
     }
 
 
@@ -111,6 +105,23 @@ public class DraftStateService : IAsyncDisposable
         StopFallbackPoll();
         NotifyStateChanged();
         return Task.CompletedTask;
+    }
+
+
+    private async Task RunFallbackPollAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(8));
+
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                await FetchStateAsync();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
     }
 
 
@@ -213,12 +224,23 @@ public class DraftStateService : IAsyncDisposable
             ConnectionState = DraftConnectionState.Connected;   
         }
     }
-    
+
+
+    private void StartFallbackPoll()
+    {
+        StopFallbackPoll();
+        _pollCts = new CancellationTokenSource();
+        _ = RunFallbackPollAsync(_pollCts.Token);
+    }
 
     private void StopFallbackPoll()
     {
-        _fallbackPollTimer?.Dispose();
-        _fallbackPollTimer = null;
+        if (_pollCts is null) 
+            return;
+        
+        _pollCts.Cancel();
+        _pollCts.Dispose();
+        _pollCts = null;
     }
 
     private async Task StopHubAsync()
