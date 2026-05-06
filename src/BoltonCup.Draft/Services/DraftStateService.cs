@@ -183,11 +183,10 @@ public class DraftStateService : IAsyncDisposable
 
         try
         {
-            var draft = await _api.GetDraftByIdAsync(draftId, token);
+            Draft = await _api.GetDraftByIdAsync(draftId, token);
             var currentPick = await _api.GetCurrentDraftPickAsync(draftId, token);
             var playerRankings = await _api.GetDraftPlayerRankingsAsync(draftId, size: 200, cancellationToken: token);
 
-            Draft = draft;
             CurrentPick = currentPick;
             PlayerRankings = playerRankings.Items.ToList();
         }
