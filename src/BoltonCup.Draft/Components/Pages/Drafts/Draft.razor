@@ -10,7 +10,7 @@
 }
 else if (DraftState.Draft is not null)
 {
-    if (_isReconnecting)
+    if (_connectionState == DraftConnectionState.Reconnecting)
     {
         <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Square Dense>We are having issues connecting to the server so you may see inaccurate results. We are attempting to reconnect you...</MudAlert>
     }
@@ -50,7 +50,7 @@ else if (DraftState.Draft is not null)
 
     private bool _loading = true;
 
-    private bool _isReconnecting;
+    private DraftConnectionState _connectionState;
     
     protected override async Task OnParametersSetAsync()
     {
@@ -69,9 +69,9 @@ else if (DraftState.Draft is not null)
 
     private void HandleDraftStateChange()
     {
-        if (_isReconnecting == DraftState.IsReconnecting)
+        if (_connectionState == DraftState.ConnectionState)
             return;
-        _isReconnecting = DraftState.IsReconnecting;
+        _connectionState = DraftState.ConnectionState;
         StateHasChanged();
     }
     
