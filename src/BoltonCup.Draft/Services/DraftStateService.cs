@@ -41,6 +41,11 @@ public class DraftStateService : IAsyncDisposable
 
     public async Task InitializeAsync(int draftId)
     {
+        if (_draftId.HasValue && _draftId.Value != draftId && _hubConnection.State == HubConnectionState.Connected)
+        {
+            await _hubConnection.InvokeAsync("LeaveLiveDraft", _draftId.Value);
+        }
+        
         _draftId = draftId;
         
         Draft = await _api.GetDraftByIdAsync(draftId);

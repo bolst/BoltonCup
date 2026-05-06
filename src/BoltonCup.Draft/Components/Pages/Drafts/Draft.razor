@@ -1,7 +1,6 @@
 @page "/drafts/{DraftId:int}"
 @using BoltonCup.Draft.Services
 @layout Layout.DraftLayout
-@implements IAsyncDisposable
 @inject DraftStateService DraftState
 
 @if (_loading)
@@ -57,11 +56,5 @@ else if (DraftState.Draft is not null)
 
         _loading = false;
         await InvokeAsync(StateHasChanged);
-    }
-    
-
-    public ValueTask DisposeAsync()
-    {
-        return DraftState.DisposeAsync();
     }
 }
