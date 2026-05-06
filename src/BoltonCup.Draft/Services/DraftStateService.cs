@@ -108,6 +108,7 @@ public class DraftStateService : IAsyncDisposable
     private Task OnClosed(Exception? error)
     {
         ConnectionState = DraftConnectionState.Disconnected;
+        StopFallbackPoll();
         NotifyStateChanged();
         return Task.CompletedTask;
     }
@@ -121,12 +122,18 @@ public class DraftStateService : IAsyncDisposable
     }
 
     
-    private void HandleDraftStatusChange(DraftStatus newStatus)
+    private async Task HandleDraftStatusChange(DraftStatus newStatus)
     {
         if (Draft is null) 
             return;
         Draft.Status = newStatus;
         NotifyStateChanged();
+        
+        if (newStatus == DraftStatus.Completed)
+        {
+            StopFallbackPoll();
+            await StopHubAsync();
+        }
     }
 
     
