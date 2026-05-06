@@ -11,12 +11,15 @@ public class DraftStateService : IAsyncDisposable
 {
     private readonly IBoltonCupApi _api;
     private readonly HubConnection _hubConnection;
+    private Timer? _fallbackPollTimer;
     private int? _draftId;
 
     public DraftSingleDto? Draft { get; private set; }
     public DraftPickSingleDto? CurrentPick { get; private set; }
     public List<DraftRankingDto> PlayerRankings { get; private set; } = [];
 
+    public bool IsReconnecting { get; private set; }
+    
     public bool CanEditDraft => Draft?.CanEditDraft ?? false;
 
     public event Action? OnStateChanged;
@@ -34,6 +37,27 @@ public class DraftStateService : IAsyncDisposable
             .WithAutomaticReconnect()
             .Build();
 
+        _hubConnection.Reconnecting += _ =>
+        {
+            IsReconnecting = true;
+            NotifyStateChanged();
+            
+            _fallbackPollTimer?.Dispose();
+            _fallbackPollTimer = new Timer(async _ => await FetchStateAsync(), null, 0, 5000);
+            
+            return Task.CompletedTask;
+        };
+
+        _hubConnection.Reconnected += _ =>
+        {
+            IsReconnecting = false;
+            
+            _fallbackPollTimer?.Dispose();
+            _fallbackPollTimer = null;
+            
+            return FetchStateAsync();
+        };
+
         _hubConnection.On<DraftUpdateEventDto>(HubEvents.Draft.OnDraftUpdate, HandleDraftUpdate);
         _hubConnection.On<DraftStatus>(HubEvents.Draft.OnDraftStatusChange, HandleDraftStatusChange);
         _hubConnection.On<DraftPickMadeEventDto>(HubEvents.Draft.OnPickMade, HandlePickMade);
@@ -48,13 +72,11 @@ public class DraftStateService : IAsyncDisposable
         
         _draftId = draftId;
         
-        Draft = await _api.GetDraftByIdAsync(draftId);
-
-        if (Draft is { Status: DraftStatus.Completed })
-            return;
+        await FetchStateAsync();
         
-        CurrentPick = await _api.GetCurrentDraftPickAsync(draftId);
-        PlayerRankings = (await _api.GetDraftPlayerRankingsAsync(draftId, size: 200)).Items.ToList();
+        // a completed draft will not have any updates
+        if (Draft is null or { Status: DraftStatus.Completed })
+            return;
 
         if (_hubConnection.State == HubConnectionState.Disconnected)
         {
@@ -62,8 +84,28 @@ public class DraftStateService : IAsyncDisposable
         }
 
         await _hubConnection.InvokeAsync("JoinLiveDraft", draftId);
-        
-        NotifyStateChanged();
+    }
+
+
+    private async Task FetchStateAsync()
+    {
+        if (_draftId is not { } draftId)
+            return;
+
+        try
+        {
+            Draft = await _api.GetDraftByIdAsync(draftId);
+            CurrentPick = await _api.GetCurrentDraftPickAsync(draftId);
+            PlayerRankings = (await _api.GetDraftPlayerRankingsAsync(draftId, size: 200)).Items.ToList();
+        }
+        catch (Exception)
+        {
+
+        }
+        finally
+        {
+            NotifyStateChanged();
+        }
     }
 
 
@@ -106,10 +148,14 @@ public class DraftStateService : IAsyncDisposable
         NotifyStateChanged();
     }
 
+    
     private void NotifyStateChanged() => OnStateChanged?.Invoke();
 
+    
     public async ValueTask DisposeAsync()
     {
+        await (_fallbackPollTimer?.DisposeAsync() ?? ValueTask.CompletedTask);
+        
         if (_hubConnection.State == HubConnectionState.Connected && _draftId.HasValue)
         {
             await _hubConnection.InvokeAsync("LeaveLiveDraft", _draftId.Value);

@@ -1,6 +1,7 @@
 @page "/drafts/{DraftId:int}"
 @using BoltonCup.Draft.Services
 @layout Layout.DraftLayout
+@implements IDisposable
 @inject DraftStateService DraftState
 
 @if (_loading)
@@ -9,6 +10,11 @@
 }
 else if (DraftState.Draft is not null)
 {
+    if (_isReconnecting)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Square Dense>We are having issues connecting to the server so you may see inaccurate results. We are attempting to reconnect you...</MudAlert>
+    }
+    
     if (DraftState.CanEditDraft)
     {
         <MudSplitPanel 
@@ -43,6 +49,8 @@ else if (DraftState.Draft is not null)
     private int? _draftId;
 
     private bool _loading = true;
+
+    private bool _isReconnecting;
     
     protected override async Task OnParametersSetAsync()
     {
@@ -53,8 +61,22 @@ else if (DraftState.Draft is not null)
         _loading = true;
 
         await DraftState.InitializeAsync(DraftId);
+        DraftState.OnStateChanged += HandleDraftStateChange;
 
         _loading = false;
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleDraftStateChange()
+    {
+        if (_isReconnecting == DraftState.IsReconnecting)
+            return;
+        _isReconnecting = DraftState.IsReconnecting;
+        StateHasChanged();
+    }
+    
+    public void Dispose()
+    {
+        DraftState.OnStateChanged -= HandleDraftStateChange;
     }
 }
