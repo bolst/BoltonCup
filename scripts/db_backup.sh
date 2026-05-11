@@ -3,7 +3,7 @@
 # Configuration
 CONTAINER_NAME="ix-boltoncup-postgres-postgres-1"
 DB_USER="bcadmin"
-DB_SUPERUSER="postgres"
+DB_SUPERUSER="bcadmin"
 DB_NAME="boltoncup"
 BACKUP_DIR="/mnt/seagate-2tb/db_backups"
 DATE=$(date +"%Y%m%d_%H%M%S")
