@@ -40,23 +40,33 @@ public static class ServiceCollectionExtensions
         var connectionString = builder.Configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
         builder.Services
             .AddDbContextFactory<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
-            .AddDbContextFactory<AuthDbContext>(options => options.UseNpgsql(connectionString))
-            .AddTransient<IAccountRepository, AccountRepository>()
-            .AddTransient<IDraftService, DraftService>()
-            .AddTransient<IGameRepository, GameRepository>()
-            .AddTransient<IGoalieStatRepository, GoalieStatRepository>()
-            .AddTransient<IInfoGuideRepository, InfoGuideRepository>()
-            .AddTransient<IPlayerRepository, PlayerRepository>()
-            .AddTransient<ISkaterStatRepository, SkaterStatRepository>()
-            .AddTransient<ITeamRepository, TeamRepository>()
-            .AddTransient<ITournamentRepository, TournamentRepository>()
-            .AddTransient<IAccountService, AccountService>()
-            .AddTransient<ITeamService, TeamService>()
-            .AddTransient<ITournamentService, TournamentService>()
-            .AddTransient<ITournamentRegistrationService, TournamentRegistrationService>()
-            .AddTransient<IUserService, UserService>()
-            .AddTransient<Core.BracketChallenge.IBracketChallengeService, BracketChallengeService>();
+            .AddDbContextFactory<AuthDbContext>(options => options.UseNpgsql(connectionString));
+
+        RegisterByConvention(builder.Services, typeof(AccountRepository).Assembly, "Repository");
+        RegisterByConvention(builder.Services, typeof(AccountRepository).Assembly, "Service");
+
         return builder;
+    }
+
+    // Registers all concrete classes ending with `suffix` against their matching interface (I<ClassName>)
+    // found in any loaded assembly. Skips classes with no matching interface.
+    private static void RegisterByConvention(IServiceCollection services, System.Reflection.Assembly implAssembly, string suffix)
+    {
+        var interfaceAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+        var concreteTypes = implAssembly.GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith(suffix));
+
+        foreach (var impl in concreteTypes)
+        {
+            var interfaceName = $"I{impl.Name}";
+            var serviceType = interfaceAssemblies
+                .SelectMany(a => { try { return a.GetTypes(); } catch { return []; } })
+                .FirstOrDefault(t => t.IsInterface && t.Name == interfaceName);
+
+            if (serviceType is not null)
+                services.AddTransient(serviceType, impl);
+        }
     }
 
     public static WebApplicationBuilder AddBoltonCupAssetUrlResolver(this WebApplicationBuilder builder)
