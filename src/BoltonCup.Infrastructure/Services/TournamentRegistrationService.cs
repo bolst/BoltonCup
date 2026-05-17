@@ -1,3 +1,4 @@
+using System.Data;
 using System.Text.Json;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
@@ -55,22 +56,24 @@ public class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITou
         var registration = await _dbContext.TournamentRegistrations
                                .AsNoTracking()
                                .Include(e => e.Account)
-                               .FirstOrDefaultAsync(x => x.AccountId == accountId && x.TournamentId == tournamentId, cancellationToken) 
+                               .FirstOrDefaultAsync(x => x.AccountId == accountId && x.TournamentId == tournamentId, cancellationToken)
                            ?? throw new EntityNotFoundException(nameof(TournamentRegistration), new { tournamentId, accountId });
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
         if (await _dbContext.Players.FirstOrDefaultAsync(p =>
                 p.TournamentId == registration.TournamentId && p.AccountId == registration.AccountId, cancellationToken: cancellationToken) is not null)
         {
             throw new AccountAlreadyInTournamentException(registration.AccountId, registration.TournamentId);
         }
-        
+
         var player = new Player
         {
             TournamentId = tournamentId,
             AccountId = accountId,
             PaymentId = paymentId
         };
-        
+
         if (registration.TryParsePayload(out var data))
         {
             player.Position = data.UserInfo.Position;
@@ -84,9 +87,10 @@ public class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITou
             registration.Account.Phone = data.UserInfo.Phone;
             _dbContext.Accounts.Update(registration.Account);
         }
-        
+
         _dbContext.Players.Add(player);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
     }
 }
 
