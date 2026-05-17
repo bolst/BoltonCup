@@ -7,6 +7,7 @@ using BoltonCup.WebAPI.Errors;
 using BoltonCup.WebAPI.Extensions;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
+using BoltonCup.WebAPI.Stripe;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -148,7 +149,8 @@ public static class ServiceCollectionExtensions
             .AddTransient<ITournamentRegistrationMapper, TournamentRegistrationMapper>()
             .AddTransient<ITournamentPaymentMapper, TournamentPaymentMapper>()
             .AddTransient<IUserMapper, UserMapper>()
-            .AddTransient<IStripeMapper, StripeMapper>();
+            .AddTransient<IStripeMapper, StripeMapper>()
+            .AddTransient<IStripeEventConstructor, StripeEventConstructor>();
     }
 
     private static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
