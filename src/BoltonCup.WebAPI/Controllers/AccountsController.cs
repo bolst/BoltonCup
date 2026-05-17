@@ -70,10 +70,12 @@ public class AccountsController(
     [HttpPut("{id:int}/avatar")]
     public async Task<ActionResult> UpdateAvatar(int id, string tempKey)
     {
+        if (id != User.GetAccountId())
+            return Forbid();
         await _accountService.UpdateAvatarAsync(id, tempKey);
         return Ok();
     }
-    
+
     /// <remarks>
     /// Updates an account's banner by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
@@ -82,6 +84,8 @@ public class AccountsController(
     [HttpPut("{id:int}/banner")]
     public async Task<ActionResult> UpdateBanner(int id, string tempKey)
     {
+        if (id != User.GetAccountId())
+            return Forbid();
         await _accountService.UpdateBannerAsync(id, tempKey);
         return Ok();
     }
