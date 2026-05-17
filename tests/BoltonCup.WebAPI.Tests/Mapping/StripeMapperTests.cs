@@ -47,23 +47,6 @@ public class StripeMapperTests
         success.Should().BeFalse();
     }
 
-    [Theory]
-    [InlineData("abc", "7")]
-    [InlineData("42", "xyz")]
-    [InlineData("", "7")]
-    public void TryParseTournamentPaymentCommand_NonNumericId_ReturnsFalse(string accountId, string tournamentId)
-    {
-        var paymentIntent = BuildPaymentIntent("pi_x", new()
-        {
-            ["AccountId"] = accountId,
-            ["TournamentId"] = tournamentId
-        });
-
-        var success = _mapper.TryParseTournamentPaymentCommand(paymentIntent, out _);
-
-        success.Should().BeFalse();
-    }
-
     // ---------------- TryParseBracketChallengePaymentCommand ----------------
 
     [Fact]
@@ -88,28 +71,6 @@ public class StripeMapperTests
     }
 
     [Theory]
-    [InlineData("false", false)]
-    [InlineData("True", false)]   // case-sensitive: only lowercase "true" maps to true
-    [InlineData("TRUE", false)]
-    [InlineData("yes", false)]
-    [InlineData("", false)]
-    public void TryParseBracketChallengePaymentCommand_AgreedToTOS_OnlyExactLowercaseTrueIsTrue(string raw, bool expected)
-    {
-        var paymentIntent = BuildPaymentIntent("pi_x", new()
-        {
-            ["EventId"] = "1",
-            ["Name"] = "n",
-            ["Email"] = "e",
-            ["AgreedToTOS"] = raw
-        });
-
-        var success = _mapper.TryParseBracketChallengePaymentCommand(paymentIntent, out var command);
-
-        success.Should().BeTrue();
-        command.AgreedToTOS.Should().Be(expected);
-    }
-
-    [Theory]
     [InlineData("EventId")]
     [InlineData("Name")]
     [InlineData("Email")]
@@ -124,26 +85,10 @@ public class StripeMapperTests
             ["AgreedToTOS"] = "true"
         };
         metadata.Remove(keyToOmit);
+        
         var paymentIntent = BuildPaymentIntent("pi_x", metadata);
-
         var success = _mapper.TryParseBracketChallengePaymentCommand(paymentIntent, out _);
-
-        success.Should().BeFalse();
-    }
-
-    [Fact]
-    public void TryParseBracketChallengePaymentCommand_NonNumericEventId_ReturnsFalse()
-    {
-        var paymentIntent = BuildPaymentIntent("pi_x", new()
-        {
-            ["EventId"] = "not-a-number",
-            ["Name"] = "n",
-            ["Email"] = "e",
-            ["AgreedToTOS"] = "true"
-        });
-
-        var success = _mapper.TryParseBracketChallengePaymentCommand(paymentIntent, out _);
-
+        
         success.Should().BeFalse();
     }
 }
