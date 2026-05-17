@@ -10,7 +10,7 @@ internal static class ClaimsHelper
     public static ControllerContext WithAccountId(int accountId)
     {
         var identity = new ClaimsIdentity(
-            new[] { new Claim(BoltonCupClaimTypes.AccountId, accountId.ToString()) },
+            [new Claim(BoltonCupClaimTypes.AccountId, accountId.ToString())],
             "TestAuth");
 
         return new ControllerContext

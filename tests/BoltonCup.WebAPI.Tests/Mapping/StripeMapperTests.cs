@@ -34,10 +34,8 @@ public class StripeMapperTests
     [Fact]
     public void TryParseTournamentPaymentCommand_MissingAccountId_ReturnsFalse()
     {
-        var paymentIntent = BuildPaymentIntent("pi_x", new() { ["TournamentId"] = "7" });
-
+        var paymentIntent = BuildPaymentIntent("pi_x", new Dictionary<string, string> { ["TournamentId"] = "7" });
         var success = _mapper.TryParseTournamentPaymentCommand(paymentIntent, out _);
-
         success.Should().BeFalse();
     }
 
@@ -45,9 +43,7 @@ public class StripeMapperTests
     public void TryParseTournamentPaymentCommand_MissingTournamentId_ReturnsFalse()
     {
         var paymentIntent = BuildPaymentIntent("pi_x", new() { ["AccountId"] = "42" });
-
         var success = _mapper.TryParseTournamentPaymentCommand(paymentIntent, out _);
-
         success.Should().BeFalse();
     }
 
