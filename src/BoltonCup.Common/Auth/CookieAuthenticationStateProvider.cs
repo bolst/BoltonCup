@@ -41,6 +41,9 @@ public class CookieAuthenticationStateProvider(IBoltonCupApi _api, ILogger<Cooki
             var identity = new ClaimsIdentity(claims, "ServerCookie");
             return new AuthenticationState(new ClaimsPrincipal(identity));
         }
+        catch (ApiException ex) when (ex is { StatusCode: 401 })
+        {
+        }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             // 401 Unauthorized is expected when not logged in; anything else is unexpected
