@@ -3,6 +3,7 @@ using BoltonCup.Core.BracketChallenge;
 using BoltonCup.Infrastructure;
 using BoltonCup.Infrastructure.Settings;
 using BoltonCup.WebAPI.Mapping;
+using BoltonCup.WebAPI.Stripe;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -11,16 +12,17 @@ using Stripe;
 namespace BoltonCup.WebAPI.Controllers;
 
 public class WebhooksController(
-    IOptions<StripeSettings> _stripeSettings, 
+    IOptions<StripeSettings> _stripeSettings,
     IStripeMapper _mapper,
     ITournamentPaymentService _tournamentPaymentService,
     IBracketChallengeService _bracketChallengeService,
-    ILogger<WebhooksController> _logger
+    ILogger<WebhooksController> _logger,
+    IStripeEventConstructor _eventConstructor
 ) : BoltonCupControllerBase
 {
-    
+
     private readonly string _stripeWebhookSecret = _stripeSettings.Value.WebhookSecret;
-    
+
     [AllowAnonymous]
     [HttpPost("stripe")]
     [IgnoreAntiforgeryToken]
@@ -30,7 +32,7 @@ public class WebhooksController(
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
             var signature = Request.Headers["Stripe-Signature"].ToString();
-            var stripeEvent = EventUtility.ConstructEvent(json, signature, _stripeWebhookSecret);
+            var stripeEvent = _eventConstructor.ConstructEvent(json, signature, _stripeWebhookSecret);
 
             if (stripeEvent.Type == EventTypes.PaymentIntentSucceeded 
                 && stripeEvent.Data.Object is PaymentIntent paymentIntent)
