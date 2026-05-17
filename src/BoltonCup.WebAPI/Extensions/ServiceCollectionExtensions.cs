@@ -7,7 +7,6 @@ using BoltonCup.WebAPI.Errors;
 using BoltonCup.WebAPI.Extensions;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
-using BoltonCup.WebAPI.Stripe;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -133,24 +132,21 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddMappers(this IServiceCollection services)
     {
-        return services
-            .AddTransient<IBriefMapper, BriefMapper>()
-            .AddTransient<IAccountMapper, AccountMapper>()
-            .AddTransient<IBracketChallengeMapper, BracketChallengeMapper>()
-            .AddTransient<IDraftMapper, DraftMapper>()
-            .AddTransient<IGameMapper, GameMapper>()
-            .AddTransient<IGameHighlightMapper, GameHighlightMapper>()
-            .AddTransient<IGoalieStatMapper, GoalieStatMapper>()
-            .AddTransient<IInfoGuideMapper, InfoGuideMapper>()
-            .AddTransient<IPlayerMapper, PlayerMapper>()
-            .AddTransient<ISkaterStatMapper, SkaterStatMapper>()
-            .AddTransient<ITeamMapper, TeamMapper>()
-            .AddTransient<ITournamentMapper, TournamentMapper>()
-            .AddTransient<ITournamentRegistrationMapper, TournamentRegistrationMapper>()
-            .AddTransient<ITournamentPaymentMapper, TournamentPaymentMapper>()
-            .AddTransient<IUserMapper, UserMapper>()
-            .AddTransient<IStripeMapper, StripeMapper>()
-            .AddTransient<IStripeEventConstructor, StripeEventConstructor>();
+        var assembly = typeof(Controllers.BoltonCupControllerBase).Assembly;
+        var mapperTypes = assembly.GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Mapper"));
+
+        foreach (var impl in mapperTypes)
+        {
+            var interfaceName = $"I{impl.Name}";
+            var serviceType = assembly.GetTypes()
+                .FirstOrDefault(t => t.IsInterface && t.Name == interfaceName);
+
+            if (serviceType is not null)
+                services.AddTransient(serviceType, impl);
+        }
+
+        return services;
     }
 
     private static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
