@@ -132,7 +132,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddMappers(this IServiceCollection services)
     {
-        var assembly = typeof(BoltonCupControllerBase).Assembly;
+        var assembly = typeof(Controllers.BoltonCupControllerBase).Assembly;
         var mapperTypes = assembly.GetTypes()
             .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Mapper"));
 
