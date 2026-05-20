@@ -67,12 +67,11 @@ public class AccountsController(
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
     /// </remarks>
     [Authorize(Policy = RequireCompletedAccount)]
-    [HttpPut("{id:int}/avatar")]
-    public async Task<ActionResult> UpdateAvatar(int id, string tempKey)
+    [HttpPut("avatar")]
+    public async Task<ActionResult> UpdateAvatar(string tempKey)
     {
-        if (id != User.GetAccountId())
-            return Forbid();
-        await _accountService.UpdateAvatarAsync(id, tempKey);
+        var accountId = User.GetAccountId();
+        await _accountService.UpdateAvatarAsync(accountId, tempKey);
         return Ok();
     }
 
@@ -81,12 +80,11 @@ public class AccountsController(
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
     /// </remarks>
     [Authorize(Policy = RequireCompletedAccount)]
-    [HttpPut("{id:int}/banner")]
-    public async Task<ActionResult> UpdateBanner(int id, string tempKey)
+    [HttpPut("banner")]
+    public async Task<ActionResult> UpdateBanner(string tempKey)
     {
-        if (id != User.GetAccountId())
-            return Forbid();
-        await _accountService.UpdateBannerAsync(id, tempKey);
+        var accountId = User.GetAccountId();
+        await _accountService.UpdateBannerAsync(accountId, tempKey);
         return Ok();
     }
 }
