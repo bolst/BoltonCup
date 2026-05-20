@@ -140,7 +140,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.DraftId).HasColumnName("draft_id");
-            entity.Property(e => e.TeamId).HasColumnName("tournament_id");
+            entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.Pick).HasColumnName("pick_number");
         });
 
