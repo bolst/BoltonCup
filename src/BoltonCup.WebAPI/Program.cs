@@ -125,10 +125,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 // for now
-app.MapGet("/", async context =>
+app.MapGet("/", context =>
 {
     context.Response.Redirect("/docs");
-    await Task.CompletedTask;
+    return Task.CompletedTask;
 });
 
 app.MapHub<DraftHub>(Hubs.Draft);
