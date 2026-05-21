@@ -1,4 +1,5 @@
 using BoltonCup.Infrastructure;
+using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Shared;
 using BoltonCup.WebAPI;
@@ -91,7 +92,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-await app.Services.SeedDatabaseAsync(app.Configuration);
+await app.Services.InitializeDbAsync(app.Configuration);
 
 // Configure the HTTP request pipeline.
 if (true) //(app.Environment.IsDevelopment())
@@ -132,6 +133,9 @@ app.MapGet("/", async context =>
 });
 
 app.MapHub<DraftHub>(Hubs.Draft);
+
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
+    .AllowAnonymous();
 
 // Sentry
 app.UseSentryTracing();
