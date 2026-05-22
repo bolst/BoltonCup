@@ -1,9 +1,9 @@
 # BoltonCup PostgreSQL (standalone)
 #
 # Usage:
-#   docker compose -f docker-compose.postgres.yml up -d
-#   docker compose -f docker-compose.postgres.yml down
-#   docker compose -f docker-compose.postgres.yml down -v   # also deletes the data volume
+#   docker compose -f Docker/postgres.yml up -d
+#   docker compose -f Docker/postgres.yml down
+#   docker compose -f Docker/postgres.yml down -v   # also deletes the data volume
 
 services:
   postgres:
