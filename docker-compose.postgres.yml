@@ -18,7 +18,7 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bcadmin}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bcadmin} -d ${POSTGRES_DB:-boltoncup}"]
       interval: 5s
       timeout: 5s
       retries: 5
