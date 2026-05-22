@@ -21,7 +21,7 @@ services:
       CloudflareR2__AccountId: ${R2_ACCOUNT_ID:-}
       CloudflareR2__AccessKey: ${R2_ACCESS_KEY:-}
       CloudflareR2__SecretKey: ${R2_SECRET_KEY:-}
-      CloudflareR2__BaseUrl: ${R2_BASE_URL:-https://assets.boltoncup.ca}
+      CloudflareR2__BaseUrl: ${R2_BASE_URL:-https://assets.boltoncup.ca/}
       Smtp__Host: ${SMTP_HOST:-smtp.resend.com}
       Smtp__Port: ${SMTP_PORT:-465}
       Smtp__Username: ${SMTP_USERNAME:-resend}
