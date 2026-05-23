@@ -9,7 +9,7 @@ public interface IUserMapper
     CurrentUserDto? ToDto(ClaimsPrincipal claims);
 }
 
-public class UserMapper(IBriefMapper _briefMapper) : IUserMapper
+public class UserMapper : IUserMapper
 {
     public CurrentUserDto? ToDto(ClaimsPrincipal claims)
     {

@@ -9,7 +9,7 @@ public interface IInfoGuideMapper
     InfoGuideSingleDto? ToDto(InfoGuide? guide);
 }
 
-public class InfoGuideMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMapper) : IInfoGuideMapper
+public class InfoGuideMapper(IBriefMapper _briefMapper) : IInfoGuideMapper
 {
     public GetInfoGuidesQuery ToQuery(GetInfoGuidesRequest request)
     {

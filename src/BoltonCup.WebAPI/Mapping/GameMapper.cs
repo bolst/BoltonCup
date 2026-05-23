@@ -10,7 +10,6 @@ public interface IGameMapper
 }
 
 public class GameMapper(
-    IAssetUrlResolver _urlResolver, 
     IBriefMapper _briefMapper, 
     IGameHighlightMapper _gameHighlightMapper
 ) : IGameMapper

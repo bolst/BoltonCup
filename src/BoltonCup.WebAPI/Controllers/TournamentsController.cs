@@ -10,8 +10,7 @@ namespace BoltonCup.WebAPI.Controllers;
 public class TournamentsController(
     ITournamentRepository _tournaments, 
     ITournamentService _tournamentService,
-    ITournamentMapper _mapper,
-    IMemoryCache _cache
+    ITournamentMapper _mapper
 ) : BoltonCupControllerBase
 {
     /// <remarks>

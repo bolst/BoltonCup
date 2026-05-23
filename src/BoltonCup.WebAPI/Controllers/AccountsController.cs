@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace BoltonCup.WebAPI.Controllers;
 
 public class AccountsController(
-    IPlayerRepository _players,
     IAccountRepository _accounts,
     IAccountService _accountService, 
     IUserService _userService,

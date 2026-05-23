@@ -7,7 +7,7 @@ public interface ITournamentRegistrationMapper
     TournamentRegistrationDto? ToDto(TournamentRegistration? registration);
 }
 
-public class TournamentRegistrationMapper(IAssetUrlResolver _urlResolver) : ITournamentRegistrationMapper
+public class TournamentRegistrationMapper : ITournamentRegistrationMapper
 {
     public TournamentRegistrationDto? ToDto(TournamentRegistration? registration)
     {

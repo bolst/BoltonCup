@@ -9,12 +9,12 @@ public record CompleteUserAccountRequest
     [Required(ErrorMessage = "First name is required.")]
     [MaxLength(50, ErrorMessage = "First name cannot exceed 50 characters.")]
     [Display(Name = "First name")]
-    public string FirstName { get; set; }
+    public required string FirstName { get; set; }
 
     [Required(ErrorMessage = "Last name is required.")]
     [MaxLength(50)]
     [Display(Name = "Last name")]
-    public string LastName { get; set; }
+    public required string LastName { get; set; }
 
     [Required(ErrorMessage = "Birthday is required.")]
     public DateTime Birthday { get; set; }

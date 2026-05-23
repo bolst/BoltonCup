@@ -4,7 +4,7 @@ namespace BoltonCup.WebAPI.Mapping;
 public record PlayerStatLeadersDto
 {
     public required string Title { get; init; }
-    public IEnumerable<PlayerStatDto> Leaders { get; init; }
+    public IEnumerable<PlayerStatDto> Leaders { get; init; } = [];
 }
 
 
