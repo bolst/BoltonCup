@@ -1,0 +1,32 @@
+# Local dev stack — runs WebAPI and Auth with HTTPS via ASP.NET dev cert
+#
+# First time setup:
+#   dotnet dev-certs https -ep ~/.aspnet/https/boltoncup.pfx -p devpassword
+#   dotnet dev-certs https --trust
+#
+# Usage:
+#   docker compose -f Docker/webapi.yml -f Docker/dev-stack.yml up -d
+
+services:
+  webapi:
+    ports:
+      - "${WEBAPI_HTTPS_PORT:-7159}:8081"
+    volumes:
+      - ${HOME}/.aspnet/https:/https:ro
+    environment:
+      ASPNETCORE_URLS: "https://+:8081;http://+:8080"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/boltoncup.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERT_PASSWORD:-devpassword}
+
+  auth:
+    build:
+      context: ../src
+      dockerfile: BoltonCup.Auth/Dockerfile
+    ports:
+      - "${AUTH_PORT:-7269}:8080"
+    volumes:
+      - ${HOME}/.aspnet/https:/https:ro
+    environment:
+      ASPNETCORE_URLS: "https://+:8081;http://+:8080"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/boltoncup.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERT_PASSWORD:-devpassword}

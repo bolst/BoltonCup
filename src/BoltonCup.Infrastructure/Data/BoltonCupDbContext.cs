@@ -8,10 +8,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BoltonCup.Infrastructure.Data;
 
 
-public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options) 
+public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     : DbContext(options)
 {
-    
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Core.BracketChallenge.Event> BracketChallenges { get; set; }
     public DbSet<Core.BracketChallenge.Registration> BracketChallengeRegistrations { get; set; }
@@ -140,7 +139,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.DraftId).HasColumnName("draft_id");
-            entity.Property(e => e.TeamId).HasColumnName("tournament_id");
+            entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.Pick).HasColumnName("pick_number");
         });
 

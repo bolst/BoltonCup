@@ -33,3 +33,19 @@ jobs:
         file: src/BoltonCup.WebAPI/Dockerfile
         push: true
         tags: bolst/boltoncup-webapi:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to Droplet
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: root
+        key: ${{ secrets.DEPLOY_SSH_KEY }}
+        script: |
+          cd /opt/boltoncup
+          docker compose -f ./docker/webapi.yml pull
+          docker compose -f ./docker/webapi.yml up -d

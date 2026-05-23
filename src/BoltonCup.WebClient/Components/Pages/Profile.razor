@@ -48,7 +48,7 @@
             return;
         try
         {
-            await BoltonCupApi.UpdateBannerAsync(_accountInfo.Id, newSrc);
+            await BoltonCupApi.UpdateBannerAsync(newSrc);
             _accountInfo.Banner = newSrc;
             Snackbar.Add("Your banner has been updated.", Severity.Success);
             await InvokeAsync(StateHasChanged);
@@ -65,7 +65,7 @@
             return;
         try
         {
-            await BoltonCupApi.UpdateAvatarAsync(_accountInfo.Id, newSrc);
+            await BoltonCupApi.UpdateAvatarAsync(newSrc);
             _accountInfo.Avatar = newSrc;
             Snackbar.Add("Your avatar has been updated.", Severity.Success);
             await InvokeAsync(StateHasChanged);
