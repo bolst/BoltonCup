@@ -17,13 +17,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Sentry
 builder.WebHost.UseSentry();
 
-var keyDirectory = builder.Configuration["DataProtection:KeyDirectory"];
-if (!string.IsNullOrEmpty(keyDirectory))
-{
-    builder.Services.AddDataProtection()
-        .PersistKeysToFileSystem(new DirectoryInfo(keyDirectory))
-        .SetApplicationName("BoltonCup.SharedAuth");
-}
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<AuthDbContext>()
+    .SetApplicationName("BoltonCup.SharedAuth");
 
 builder.Services.AddIdentityApiEndpoints<BoltonCupUser>();
 
