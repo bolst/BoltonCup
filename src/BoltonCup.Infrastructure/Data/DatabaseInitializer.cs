@@ -1,6 +1,5 @@
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,23 +14,39 @@ public static class DatabaseInitializer
 
         try
         {
-            var coreContextFactory = services.GetRequiredService<IDbContextFactory<BoltonCupDbContext>>();
-            var authContextFactory = services.GetRequiredService<IDbContextFactory<AuthDbContext>>();
-
-            await using var coreContext = await coreContextFactory.CreateDbContextAsync();
-            await using var authContext = await authContextFactory.CreateDbContextAsync();
-
-            await coreContext.Database.MigrateAsync();
-            await authContext.Database.MigrateAsync();
-
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = services.GetRequiredService<UserManager<BoltonCupUser>>();
 
-            await RoleSeeder.SeedRolesAsync(roleManager, userManager, configuration);
+            await RoleSeeder.SeedAdminUserAsync(roleManager, userManager, configuration);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Database initialization skipped: {ex.Message}");
+            Console.WriteLine(ex);
+        }
+    }
+}
+
+internal static class RoleSeeder
+{
+    internal static async Task SeedAdminUserAsync(
+        RoleManager<IdentityRole> roleManager, 
+        UserManager<BoltonCupUser> userManager, 
+        IConfiguration configuration)
+    {
+        foreach (var roleName in BoltonCupRole.All)
+        {
+            if (!await roleManager.RoleExistsAsync(roleName))
+                await roleManager.CreateAsync(new IdentityRole(roleName));
+        }
+
+        var adminEmail = configuration["BoltonCup:AdminEmail"]; 
+        if (string.IsNullOrEmpty(adminEmail)) 
+            return; 
+
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+        if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, "Admin"))
+        {
+            await userManager.AddToRoleAsync(adminUser, "Admin");
         }
     }
 }
