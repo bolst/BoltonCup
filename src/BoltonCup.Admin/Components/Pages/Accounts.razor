@@ -45,13 +45,13 @@
     {
         if (string.IsNullOrEmpty(result.NewKey)) 
             return;
-        await AccountService.UpdateAvatarAsync(result.NewKey);
+        await AccountService.UpdateAvatarAsync(result.Item.Id, result.NewKey);
     }    
     
     private async Task UpdateBanner(ImageUploadResult<Account> result)
     {
         if (string.IsNullOrEmpty(result.NewKey)) 
             return;
-        await AccountService.UpdateBannerAsync(result.NewKey);
+        await AccountService.UpdateBannerAsync(result.Item.Id, result.NewKey);
     }
 }
