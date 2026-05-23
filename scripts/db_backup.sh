@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Configuration
-CONTAINER_NAME="ix-boltoncup-postgres-postgres-1"
+CONTAINER_NAME="boltoncup-postgres-1"
 DB_USER="bcadmin"
 DB_SUPERUSER="bcadmin"
 DB_NAME="boltoncup"
-BACKUP_DIR="/mnt/seagate-2tb/db_backups"
+BACKUP_DIR="/opt/BoltonCup/db_backups"
 DATE=$(date +"%Y%m%d_%H%M%S")
 DUMP_FILE="boltoncup_db_backup_$DATE.dump"
 GLOBALS_FILE="boltoncup_globals_$DATE.sql"
