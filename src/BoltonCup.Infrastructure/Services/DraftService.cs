@@ -9,8 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace BoltonCup.Infrastructure.Services;
 
 public class DraftService(
-    BoltonCupDbContext _dbContext,
-    ILogger<DraftService> _logger
+    BoltonCupDbContext _dbContext
 ) : IDraftService
 {
     public async Task<IPagedList<Draft>> GetAsync(GetDraftsQuery query, CancellationToken cancellationToken = default)
@@ -33,7 +32,7 @@ public class DraftService(
                 .ThenInclude(d => d.Team)
             .Include(d => d.DraftPicks)
                 .ThenInclude(d => d.Player)
-                .ThenInclude(p => p.Account)
+                .ThenInclude(p => p!.Account)
             .OrderByDescending(d => d.CreatedAt)
             .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
     }
@@ -205,7 +204,7 @@ public class DraftService(
         return await _dbContext.DraftPicks
             .Include(dp => dp.Team)
             .Include(dp => dp.Player)
-                .ThenInclude(p => p.Account)
+                .ThenInclude(p => p!.Account)
             .Where(dp => dp.DraftId == draft.Id)
             .Where(dp => dp.PlayerId == null)
             .OrderBy(dp => dp.OverallPick)
@@ -221,7 +220,7 @@ public class DraftService(
             .Include(d => d.Player)
                 .ThenInclude(p => p.Account)
             .Include(d => d.DraftPick)
-                .ThenInclude(dp => dp.Team)
+                .ThenInclude(dp => dp!.Team)
             .Include(d => d.Tournament)
             .Where(d => d.DraftId == draftId)
             .ConditionalWhere(d => d.Player.Position == query.Position, !string.IsNullOrEmpty(query.Position))
@@ -239,7 +238,7 @@ public class DraftService(
                         .ThenInclude(dp => dp.Team)
                         .Include(d => d.DraftPicks)
                         .ThenInclude(dp => dp.Player)
-                        .ThenInclude(p => p.Account)
+                        .ThenInclude(p => p!.Account)
                         .SingleOrDefaultAsync(e => e.Id == command.DraftId, cancellationToken)
                     ?? throw new EntityNotFoundException(nameof(Draft), command.DraftId);
         
@@ -282,7 +281,7 @@ public class DraftService(
             nextPick = await _dbContext.DraftPicks
                 .Include(dp => dp.Team)
                 .Include(dp => dp.Player)
-                .ThenInclude(p => p.Account)
+                .ThenInclude(p => p!.Account)
                 .Where(dp => dp.DraftId == draft.Id)
                 .Where(dp => dp.PlayerId == null)
                 .OrderBy(dp => dp.OverallPick)

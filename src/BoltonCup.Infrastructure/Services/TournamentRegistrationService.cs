@@ -122,19 +122,19 @@ public static class TournamentRegistrationExtensions
 
 public class UserRegistration
 {
-    public UserInfo UserInfo { get; set; }
-    public Documents Documents { get; set; }
+    public UserInfo UserInfo { get; set; } = null!;
+    public Documents Documents { get; set; } = null!;
 }
 
 public class UserInfo
 {
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string Email { get; set; }
-    public string HighestLevel { get; set; }
-    public string Phone { get; set; }
-    public string JerseySize { get; set; }
-    public string Position { get; set; }
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string HighestLevel { get; set; } = null!;
+    public string Phone { get; set; } = null!;
+    public string JerseySize { get; set; } = null!;
+    public string Position { get; set; } = null!;
     public bool CanPlayEitherPosition { get; set; }
     public string? Friends { get; set; }
 }
