@@ -45,7 +45,7 @@
         <PropertyColumn Title="Account ID" Property="x => x.AccountId">
             <EditTemplate>
                 <MudNumericField 
-                    T="int?" Value="@context.Item.AccountId" ValueChanged="v => { context.Item.AccountId = v; _dataGrid.NotifyItemChangedAsync(context.Item); }"
+                    T="int?" Value="@context.Item.AccountId" ValueChanged="async v => { context.Item.AccountId = v; await _dataGrid.NotifyItemChangedAsync(context.Item); }"
                     Margin="Margin.Dense" Variant="Variant.Text" Underline="false" Min="0" 
                     HideSpinButtons FullWidth
                 />

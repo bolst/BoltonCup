@@ -22,7 +22,7 @@
             </ItemTemplate>
         </ForeignColumn>
         <ForeignColumn Title="Player" Property="x => x.Player" PropertySetter="(gs, player) => gs.Player = player"
-                       EqualityComparer="new PlayerComparer()" Include="x => x.Include(p => p.Account)"
+                       EqualityComparer="new PlayerComparer()!" Include="x => x.Include(p => p.Account)"
                        Filter="@(x => y => y.TournamentId == x.Game.TournamentId)"
                        SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"/>
         <PropertyColumn Title="Title" Property="x => x.Title" />
