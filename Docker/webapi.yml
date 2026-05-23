@@ -1,0 +1,31 @@
+# BoltonCup WebAPI
+#
+# Usage:
+#   cp .env.example .env       # then fill in CONNECTION_STRING + secrets
+#   docker compose up -d
+#   docker compose down
+
+services:
+  webapi:
+    image: bolst/boltoncup-webapi:${WEBAPI_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "${WEBAPI_PORT:-8080}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      BoltonCup__ConnectionString: ${CONNECTION_STRING:?required}
+      BoltonCup__AdminEmail: ${ADMIN_EMAIL:-}
+      BoltonCup__Authentication__AdminApiKey: ${ADMIN_API_KEY:-}
+      Stripe__ApiKey: ${STRIPE_API_KEY:-}
+      Stripe__WebhookSecret: ${STRIPE_WEBHOOK_SECRET:-}
+      CloudflareR2__AccountId: ${R2_ACCOUNT_ID:-}
+      CloudflareR2__AccessKey: ${R2_ACCESS_KEY:-}
+      CloudflareR2__SecretKey: ${R2_SECRET_KEY:-}
+      CloudflareR2__BaseUrl: ${R2_BASE_URL:-https://assets.boltoncup.ca/}
+      Smtp__Host: ${SMTP_HOST:-smtp.resend.com}
+      Smtp__Port: ${SMTP_PORT:-465}
+      Smtp__Username: ${SMTP_USERNAME:-resend}
+      Smtp__Password: ${SMTP_PASSWORD:-}
+      Smtp__SenderName: ${SMTP_SENDER_NAME:-Bolton Cup}
+      Smtp__SenderEmail: ${SMTP_SENDER_EMAIL:-notifications@boltoncup.ca}
+      Sentry__Dsn: ${SENTRY_DSN:-}

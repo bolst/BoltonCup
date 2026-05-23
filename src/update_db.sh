@@ -1,15 +1,26 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
-    echo "Updating database to the latest migration..."
+CONTEXT="BoltonCupDbContext"
+MIGRATION=""
+
+for arg in "$@"; do
+    if [ "$arg" = "--auth" ]; then
+        CONTEXT="AuthDbContext"
+    else
+        MIGRATION="$arg"
+    fi
+done
+
+if [ -z "$MIGRATION" ]; then
+    echo "Updating $CONTEXT to the latest migration..."
     dotnet ef database update \
         --project ./BoltonCup.Infrastructure \
         --startup-project ./BoltonCup.WebAPI \
-        -c BoltonCupDbContext
+        -c "$CONTEXT"
 else
-    echo "Updating database to migration: '$1'..."
-    dotnet ef database update "$1" \
+    echo "Updating $CONTEXT to migration: '$MIGRATION'..."
+    dotnet ef database update "$MIGRATION" \
         --project ./BoltonCup.Infrastructure \
         --startup-project ./BoltonCup.WebAPI \
-        -c BoltonCupDbContext
+        -c "$CONTEXT"
 fi

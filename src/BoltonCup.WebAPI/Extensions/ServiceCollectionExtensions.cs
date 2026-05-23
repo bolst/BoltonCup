@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
         builder.Services
             .AddAuthentication()
             .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.Scheme, null);
-        
+
         return builder.Services
             .ConfigureApplicationCookie(options =>
             {
@@ -85,7 +85,7 @@ public static class ServiceCollectionExtensions
     
     private static IServiceCollection AddCorsServices(this IServiceCollection services)
     {
-        services.AddCors(options => 
+        services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>
             {

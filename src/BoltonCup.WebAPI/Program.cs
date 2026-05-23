@@ -1,4 +1,5 @@
 using BoltonCup.Infrastructure;
+using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Shared;
 using BoltonCup.WebAPI;
@@ -16,13 +17,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Sentry
 builder.WebHost.UseSentry();
 
-var keyDirectory = builder.Configuration["DataProtection:KeyDirectory"];
-if (!string.IsNullOrEmpty(keyDirectory))
-{
-    builder.Services.AddDataProtection()
-        .PersistKeysToFileSystem(new DirectoryInfo(keyDirectory))
-        .SetApplicationName("BoltonCup.SharedAuth");
-}
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<AuthDbContext>()
+    .SetApplicationName("BoltonCup.SharedAuth");
 
 builder.Services.AddIdentityApiEndpoints<BoltonCupUser>();
 
@@ -91,7 +88,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-await app.Services.SeedDatabaseAsync(app.Configuration);
+await app.Services.InitializeDbAsync(app.Configuration);
 
 // Configure the HTTP request pipeline.
 if (true) //(app.Environment.IsDevelopment())
@@ -132,6 +129,9 @@ app.MapGet("/", context =>
 });
 
 app.MapHub<DraftHub>(Hubs.Draft);
+
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
+    .AllowAnonymous();
 
 // Sentry
 app.UseSentryTracing();

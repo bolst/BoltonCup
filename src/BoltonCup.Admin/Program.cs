@@ -1,6 +1,7 @@
 using BoltonCup.Admin.Components;
 using BoltonCup.Common;
 using BoltonCup.Infrastructure;
+using BoltonCup.Infrastructure.Data;
 using BoltonCup.Sdk;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
@@ -15,13 +16,9 @@ var cultureInfo = new System.Globalization.CultureInfo("en-US");
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
-var keyDirectory = builder.Configuration["DataProtection:KeyDirectory"];
-if (!string.IsNullOrEmpty(keyDirectory))
-{
-    builder.Services.AddDataProtection()
-        .PersistKeysToFileSystem(new DirectoryInfo(keyDirectory))
-        .SetApplicationName("BoltonCup.SharedAuth");
-}
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<AuthDbContext>()
+    .SetApplicationName("BoltonCup.SharedAuth");
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

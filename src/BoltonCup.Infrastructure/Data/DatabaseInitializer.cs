@@ -1,8 +1,30 @@
+using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BoltonCup.Infrastructure.Identity;
+namespace BoltonCup.Infrastructure.Data;
+
+public static class DatabaseInitializer
+{
+    public static async Task InitializeDbAsync(this IServiceProvider serviceProvider, IConfiguration configuration)
+    {
+        using var scope = serviceProvider.CreateScope();
+        var services = scope.ServiceProvider;
+
+        try
+        {
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = services.GetRequiredService<UserManager<BoltonCupUser>>();
+
+            await RoleSeeder.SeedAdminUserAsync(roleManager, userManager, configuration);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+}
 
 internal static class RoleSeeder
 {
@@ -25,28 +47,6 @@ internal static class RoleSeeder
         if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, "Admin"))
         {
             await userManager.AddToRoleAsync(adminUser, "Admin");
-        }
-    }
-}
-
-
-public static class DatabaseSeederExtensions
-{
-    public static async Task SeedDatabaseAsync(this IServiceProvider serviceProvider, IConfiguration configuration)
-    {
-        using var scope = serviceProvider.CreateScope();
-        var services = scope.ServiceProvider;
-
-        try
-        {
-            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = services.GetRequiredService<UserManager<BoltonCupUser>>();
-
-            await RoleSeeder.SeedAdminUserAsync(roleManager, userManager, configuration);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
         }
     }
 }
