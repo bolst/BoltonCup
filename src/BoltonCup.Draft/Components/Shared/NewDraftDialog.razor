@@ -85,7 +85,7 @@
         {
             var draftId = await BoltonCupApi.CreateDraftAsync(new Sdk.CreateDraftRequest
             {
-                Title = _model.Title,
+                Title = _model.Title ?? "New Draft",
                 TournamentId = _model.Tournament!.Id
             });
             Dialog.Close(DialogResult.Ok(draftId));
