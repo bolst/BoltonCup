@@ -9,7 +9,7 @@
         SelectedValues="@ContextValue"
         SelectedValuesChanged="@ContextValueChanged"
         Disabled="@Disabled"
-        Comparer="_comparer"
+        Comparer="@(_comparer!)"
         SelectionMode="SelectionMode.MultiSelection"
         CheckBoxColor="Color.Primary"
         Dense>
@@ -56,7 +56,7 @@ else
             else
             {
                 var result = await BoltonCupApi.GetTeamsAsync();
-                _options = result.Items.Where(x => x.Tournament.Id == TournamentId.Value).ToList();
+                _options = result.Items.Where(x => x.Tournament?.Id == TournamentId.Value).ToList();
                 _teamCache[TournamentId.Value] = _options;
             }
         }
