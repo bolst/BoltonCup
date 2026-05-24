@@ -18,7 +18,7 @@
 
     private ICollection<Sdk.TournamentDto>? _options;
 
-    private async Task<IEnumerable<Sdk.TournamentDto>>? SearchFunc(string? search, CancellationToken cancellationToken)
+    private async Task<IEnumerable<Sdk.TournamentDto>> SearchFunc(string? search, CancellationToken cancellationToken)
     {
         if (_options is null)
         {
