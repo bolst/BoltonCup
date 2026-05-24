@@ -9,7 +9,7 @@ namespace BoltonCup.WebAPI.Controllers;
 /// <summary>Manages bracket challenge queries and payment intents.</summary>
 public class BracketChallengesController(
     IBracketChallengeService _bracketChallengeService,
-    IBracketChallengeMapper _mapper
+    IMapper _mapper
 ) : BoltonCupControllerBase
 {
     /// <summary>Gets a paginated list of bracket challenges.</summary>

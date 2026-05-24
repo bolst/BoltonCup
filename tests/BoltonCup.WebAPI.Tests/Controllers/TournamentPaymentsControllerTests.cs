@@ -15,14 +15,14 @@ public class TournamentPaymentsControllerTests
     private const int AccountId = 42;
 
     private readonly Mock<ITournamentPaymentService> _paymentService = new();
-    private readonly Mock<ITournamentPaymentMapper> _paymentMapper = new();
+    private readonly Mock<IMapper> _mapper = new();
     private readonly TournamentPaymentsController _controller;
 
     public TournamentPaymentsControllerTests()
     {
         _controller = new TournamentPaymentsController(
             _paymentService.Object,
-            _paymentMapper.Object
+            _mapper.Object
         )
         {
             ControllerContext = ClaimsHelper.WithAccountId(AccountId)
@@ -36,19 +36,19 @@ public class TournamentPaymentsControllerTests
     public async Task CreateTournamentPaymentIntent_CallsServiceWithCorrectTournamentId()
     {
         var request = new CreateTournamentPaymentIntentRequest { Position = "Forward" };
-        _paymentMapper
+        _mapper
             .Setup(m => m.ToCommand(It.IsAny<int>(), It.IsAny<int>(), request))
             .Returns(new CreateTournamentPaymentIntentCommand(AccountId, 5, "Forward"));
         _paymentService
             .Setup(s => s.CreateTournamentPaymentIntentAsync(It.IsAny<CreateTournamentPaymentIntentCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(BuildPaymentIntent());
-        _paymentMapper
+        _mapper
             .Setup(m => m.ToDto(It.IsAny<TournamentPaymentIntent>()))
             .Returns(new TournamentPaymentIntentDto("secret_123", 1000m, "USD", []));
 
         await _controller.CreateTournamentPaymentIntent(5, request);
 
-        _paymentMapper.Verify(m => m.ToCommand(5, AccountId, request), Times.Once);
+        _mapper.Verify(m => m.ToCommand(5, AccountId, request), Times.Once);
         _paymentService.Verify(s => s.CreateTournamentPaymentIntentAsync(It.IsAny<CreateTournamentPaymentIntentCommand>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -58,13 +58,13 @@ public class TournamentPaymentsControllerTests
         var request = new CreateTournamentPaymentIntentRequest { Position = "Goalie" };
         var expectedDto = new TournamentPaymentIntentDto("secret_abc", 2500m, "CAD", []);
 
-        _paymentMapper
+        _mapper
             .Setup(m => m.ToCommand(It.IsAny<int>(), It.IsAny<int>(), request))
             .Returns(new CreateTournamentPaymentIntentCommand(AccountId, 5, "Goalie"));
         _paymentService
             .Setup(s => s.CreateTournamentPaymentIntentAsync(It.IsAny<CreateTournamentPaymentIntentCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(BuildPaymentIntent());
-        _paymentMapper
+        _mapper
             .Setup(m => m.ToDto(It.IsAny<TournamentPaymentIntent>()))
             .Returns(expectedDto);
 

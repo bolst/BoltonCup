@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BoltonCup.WebAPI.Controllers;
 
 /// <summary>Provides read access to tournament info guides.</summary>
-public class InfoGuidesController(IInfoGuideRepository _infoGuides, IInfoGuideMapper _mapper) : BoltonCupControllerBase
+public class InfoGuidesController(IInfoGuideRepository _infoGuides, IMapper _mapper) : BoltonCupControllerBase
 {
     /// <summary>Gets a paginated list of info guides.</summary>
     /// <remarks>

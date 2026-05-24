@@ -17,7 +17,7 @@ public class AccountsController(
     IAccountRepository _accounts,
     IAccountService _accountService,
     IUserService _userService,
-    IAccountMapper _accountMapper,
+    IMapper _mapper,
     SignInManager<BoltonCupUser> _signInManager
 ) : BoltonCupControllerBase
 {
@@ -29,7 +29,7 @@ public class AccountsController(
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
             return Unauthorized("ID claim is missing.");
-        var command = _accountMapper.ToCommand(request, User);
+        var command = _mapper.ToCommand(request, User);
         var user = await _userService.CompleteUserAccountAsync(userId, command);
         await _signInManager.RefreshSignInAsync(user);
         return Ok();
@@ -44,14 +44,14 @@ public class AccountsController(
     public async Task<ActionResult<AccountDto>> GetMe()
     {
         var account = await _userService.GetMyAccountAsync(User);
-        return OkOrNoContent(_accountMapper.ToDto(account, User));
+        return OkOrNoContent(_mapper.ToDto(account, User));
     }
 
     /// <summary>Updates the authenticated user's account details.</summary>
     [HttpPut("me")]
     public async Task<ActionResult> UpdateAccount([FromBody] UpdateAccountRequest request)
     {
-        var command = _accountMapper.ToCommand(request, User);
+        var command = _mapper.ToCommand(request, User);
         await _accountService.UpdateAsync(command);
         return NoContent();
     }
@@ -63,7 +63,7 @@ public class AccountsController(
     {
         var accountId = User.GetAccountId();
         var account = await _accounts.GetByIdAsync(accountId);
-        return Ok(_accountMapper.ToAccountTournamentDtoList(account));
+        return Ok(_mapper.ToAccountTournamentDtoList(account));
     }
     
     /// <summary>Updates the authenticated user's avatar using a pre-signed S3 key.</summary>

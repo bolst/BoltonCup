@@ -9,12 +9,12 @@ namespace BoltonCup.WebAPI.Tests.Mapping;
 
 public class DraftMapperTests
 {
-    private readonly Mock<IBriefMapper> _briefMapper = new();
-    private readonly DraftMapper _mapper;
+    private readonly Mock<IAssetUrlResolver> _urlResolver = new();
+    private readonly Mapper _mapper;
 
     public DraftMapperTests()
     {
-        _mapper = new DraftMapper(_briefMapper.Object);
+        _mapper = new Mapper(_urlResolver.Object);
     }
 
     // ---------- ToQuery ----------

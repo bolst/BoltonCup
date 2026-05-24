@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BoltonCup.WebAPI.Controllers;
 
 /// <summary>Provides read access to tournament games.</summary>
-public class GamesController(IGameRepository _games, IGameMapper _gameMapper) : BoltonCupControllerBase
+public class GamesController(IGameRepository _games, IMapper _mapper) : BoltonCupControllerBase
 {
     /// <summary>Gets a paginated list of games.</summary>
     /// <remarks>
@@ -16,9 +16,9 @@ public class GamesController(IGameRepository _games, IGameMapper _gameMapper) : 
     [HttpGet]
     public async Task<ActionResult<IPagedList<GameDto>>> GetGames([FromQuery] GetGamesRequest request)
     {
-        var query = _gameMapper.ToQuery(request);
+        var query = _mapper.ToQuery(request);
         var games = await _games.GetAllAsync(query);
-        return Ok(_gameMapper.ToDtoList(games));
+        return Ok(_mapper.ToDtoList(games));
     }
 
     /// <summary>Gets a single game by its ID.</summary>
@@ -30,6 +30,6 @@ public class GamesController(IGameRepository _games, IGameMapper _gameMapper) : 
     public async Task<ActionResult<GameSingleDto>> GetGameById(int id)
     {
         var game = await _games.GetByIdAsync(id);
-        return OkOrNoContent(_gameMapper.ToDto(game));
+        return OkOrNoContent(_mapper.ToDto(game));
     }
 }

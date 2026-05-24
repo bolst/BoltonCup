@@ -12,7 +12,7 @@ namespace BoltonCup.WebAPI.Controllers;
 [Route("api/tournaments/{id:int}/registrations")]
 public class TournamentRegistrationsController(
     ITournamentRegistrationService _registrationService,
-    ITournamentRegistrationMapper _registrationMapper
+    IMapper _mapper
 ) : BoltonCupControllerBase
 {
     /// <summary>Gets the authenticated user's registration for a tournament.</summary>
@@ -22,7 +22,7 @@ public class TournamentRegistrationsController(
     {
         var accountId = User.GetAccountId();
         var tournament = await _registrationService.GetAsync(id, accountId);
-        return OkOrNoContent(_registrationMapper.ToDto(tournament));
+        return OkOrNoContent(_mapper.ToDto(tournament));
     }
 
     /// <summary>Creates or updates the authenticated user's registration for a tournament.</summary>

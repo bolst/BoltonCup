@@ -1,13 +1,14 @@
 using BoltonCup.Core;
 using BoltonCup.WebAPI.Mapping;
 using FluentAssertions;
+using Moq;
 using Xunit;
 
 namespace BoltonCup.WebAPI.Tests.Mapping;
 
 public class TournamentPaymentMapperTests
 {
-    private readonly TournamentPaymentMapper _mapper = new();
+    private readonly Mapper _mapper = new(new Mock<IAssetUrlResolver>().Object);
 
     // ---------- ToDto ----------
 

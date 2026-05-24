@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BoltonCup.WebAPI.Controllers;
 
 /// <summary>Provides read access to goaltender statistics.</summary>
-public class GoalieStatsController(IGoalieStatRepository _goalieStats, IGoalieStatMapper _mapper) : BoltonCupControllerBase
+public class GoalieStatsController(IGoalieStatRepository _goalieStats, IMapper _mapper) : BoltonCupControllerBase
 {
     /// <summary>Gets a paginated list of goalie statistics.</summary>
     /// <remarks>

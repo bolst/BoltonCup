@@ -11,7 +11,7 @@ namespace BoltonCup.WebAPI.Controllers;
 public class TournamentsController(
     ITournamentRepository _tournaments,
     ITournamentService _tournamentService,
-    ITournamentMapper _mapper
+    IMapper _mapper
 ) : BoltonCupControllerBase
 {
     /// <summary>Gets a paginated list of tournaments.</summary>

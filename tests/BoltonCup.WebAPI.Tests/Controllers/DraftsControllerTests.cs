@@ -13,13 +13,13 @@ namespace BoltonCup.WebAPI.Tests.Controllers;
 public class DraftsControllerTests
 {
     private readonly Mock<IDraftService> _draftService = new();
-    private readonly Mock<IDraftMapper> _draftMapper = new();
+    private readonly Mock<IMapper> _mapper = new();
     private readonly Mock<IAuthorizationService> _authService = new();
     private readonly DraftsController _controller;
 
     public DraftsControllerTests()
     {
-        _controller = new DraftsController(_draftService.Object, _draftMapper.Object, _authService.Object);
+        _controller = new DraftsController(_draftService.Object, _mapper.Object, _authService.Object);
     }
 
     private void SetupAuthSuccess()
@@ -50,9 +50,9 @@ public class DraftsControllerTests
         var request = new GetDraftsRequest { TournamentId = 1, Status = DraftStatus.Completed };
         var query = new GetDraftsQuery { TournamentId = 1, Status = DraftStatus.Completed };
 
-        _draftMapper.Setup(m => m.ToQuery(request)).Returns(query);
+        _mapper.Setup(m => m.ToQuery(request)).Returns(query);
         _draftService.Setup(s => s.GetAsync(It.IsAny<GetDraftsQuery>())).ReturnsAsync(Mock.Of<IPagedList<Draft>>());
-        _draftMapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<Draft>>())).Returns(Mock.Of<IPagedList<DraftDto>>());
+        _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<Draft>>())).Returns(Mock.Of<IPagedList<DraftDto>>());
 
         var result = await _controller.GetDrafts(request);
 
@@ -67,7 +67,7 @@ public class DraftsControllerTests
     {
         SetupAuthSuccess();
         _draftService.Setup(s => s.GetByIdAsync(5)).ReturnsAsync(new Draft());
-        _draftMapper.Setup(m => m.ToDto(It.IsAny<Draft?>(), It.IsAny<bool>())).Returns(Mock.Of<DraftSingleDto>());
+        _mapper.Setup(m => m.ToDto(It.IsAny<Draft?>(), It.IsAny<bool>())).Returns(Mock.Of<DraftSingleDto>());
 
         var result = await _controller.GetDraftById(5);
 
@@ -79,7 +79,7 @@ public class DraftsControllerTests
     {
         SetupAuthSuccess();
         _draftService.Setup(s => s.GetByIdAsync(5)).ReturnsAsync((Draft?)null);
-        _draftMapper.Setup(m => m.ToDto(It.IsAny<Draft?>(), It.IsAny<bool>())).Returns((DraftSingleDto?)null);
+        _mapper.Setup(m => m.ToDto(It.IsAny<Draft?>(), It.IsAny<bool>())).Returns((DraftSingleDto?)null);
 
         var result = await _controller.GetDraftById(5);
 
@@ -94,7 +94,7 @@ public class DraftsControllerTests
         var request = new CreateDraftRequest { TournamentId = 1, Title = "Test Draft" };
         const int newDraftId = 42;
 
-        _draftMapper.Setup(m => m.ToCommand(request)).Returns(new CreateDraftCommand(1, "Test Draft"));
+        _mapper.Setup(m => m.ToCommand(request)).Returns(new CreateDraftCommand(1, "Test Draft"));
         _draftService.Setup(s => s.CreateAsync(It.IsAny<CreateDraftCommand>())).ReturnsAsync(newDraftId);
 
         var result = await _controller.CreateDraft(request);
@@ -122,7 +122,7 @@ public class DraftsControllerTests
     public async Task GetCurrentDraftPick_NotFound_ReturnsNoContent()
     {
         _draftService.Setup(s => s.GetCurrentPickAsync(5)).ReturnsAsync((DraftPick?)null);
-        _draftMapper.Setup(m => m.ToDto(It.IsAny<DraftPick?>())).Returns((DraftPickSingleDto?)null);
+        _mapper.Setup(m => m.ToDto(It.IsAny<DraftPick?>())).Returns((DraftPickSingleDto?)null);
 
         var result = await _controller.GetCurrentDraftPick(5);
 
@@ -150,7 +150,7 @@ public class DraftsControllerTests
         var query = new GetDraftRankingsQuery();
 
         _draftService.Setup(s => s.GetDraftRankingsAsync(5, It.IsAny<GetDraftRankingsQuery>())).ReturnsAsync(Mock.Of<IPagedList<PlayerDraftRanking>>());
-        _draftMapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<PlayerDraftRanking>>())).Returns(Mock.Of<IPagedList<DraftRankingDto>>());
+        _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<PlayerDraftRanking>>())).Returns(Mock.Of<IPagedList<DraftRankingDto>>());
 
         var result = await _controller.GetDraftPlayerRankings(5, query);
 

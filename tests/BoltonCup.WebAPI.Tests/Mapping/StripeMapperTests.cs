@@ -1,5 +1,6 @@
 using BoltonCup.WebAPI.Mapping;
 using FluentAssertions;
+using Moq;
 using Stripe;
 using Xunit;
 
@@ -7,7 +8,7 @@ namespace BoltonCup.WebAPI.Tests.Mapping;
 
 public class StripeMapperTests
 {
-    private readonly StripeMapper _mapper = new();
+    private readonly Mapper _mapper = new(new Mock<BoltonCup.Core.IAssetUrlResolver>().Object);
 
     private static PaymentIntent BuildPaymentIntent(string id, Dictionary<string, string> metadata) =>
         new() { Id = id, Metadata = metadata };
