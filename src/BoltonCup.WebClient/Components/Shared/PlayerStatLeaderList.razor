@@ -2,7 +2,7 @@
 @namespace BoltonCup.WebClient.Components.Shared
 
 
-<MudList T="PlayerStatDto" @bind-SelectedValue="_selectedPlayer" Color="Color.Primary" Class="mud-width-full mud-height-full" Dense>
+<MudList T="PlayerStatDto" @bind-SelectedValue="_selectedPlayer" Color="Color.Primary" Class="mud-width-full mud-height-full" ReadOnly Dense>
     <MudListSubheader>
         <a class="d-flex flex-row align-center justify-space-between" href="@SelectedPlayerHref">
             @if (_selectedPlayer is not null)
