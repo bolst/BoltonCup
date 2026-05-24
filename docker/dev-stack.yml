@@ -5,7 +5,7 @@
 #   dotnet dev-certs https --trust
 #
 # Usage:
-#   docker compose -f Docker/webapi.yml -f Docker/dev-stack.yml up -d
+#   docker compose -f docker/webapi.yml -f docker/dev-stack.yml up -d
 
 services:
   webapi:
@@ -14,6 +14,7 @@ services:
     volumes:
       - ${HOME}/.aspnet/https:/https:ro
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: "https://+:8081;http://+:8080"
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/boltoncup.pfx
       ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERT_PASSWORD:-devpassword}
@@ -23,10 +24,11 @@ services:
       context: ../src
       dockerfile: BoltonCup.Auth/Dockerfile
     ports:
-      - "${AUTH_PORT:-7269}:8080"
+      - "${AUTH_PORT:-7269}:443"
     volumes:
       - ${HOME}/.aspnet/https:/https:ro
     environment:
-      ASPNETCORE_URLS: "https://+:8081;http://+:8080"
-      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/boltoncup.pfx
-      ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERT_PASSWORD:-devpassword}
+      CERT_PASSWORD: ${CERT_PASSWORD:-devpassword}
+      BOLTONCUP_API_BASE_URL: https://localhost:7159/
+      BOLTONCUP_AUTH_BASE_URL: https://localhost:7269/
+      BOLTONCUP_WEB_BASE_URL: https://localhost:7266/
