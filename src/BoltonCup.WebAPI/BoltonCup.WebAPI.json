@@ -11,7 +11,7 @@
         "tags": [
           "Accounts"
         ],
-        "summary": "Completes the account setup for the currently logged-in user.",
+        "description": "Completes the account setup for the currently logged-in user.",
         "operationId": "CompleteMyAccount",
         "requestBody": {
           "content": {
@@ -137,8 +137,7 @@
         "tags": [
           "Accounts"
         ],
-        "summary": "Gets the currently logged-in user's account.",
-        "description": "Gets the currently logged-in user",
+        "description": "Gets the currently logged-in user's account.\n\nGets the currently logged-in user",
         "operationId": "GetMe",
         "responses": {
           "200": {
@@ -245,7 +244,7 @@
         "tags": [
           "Accounts"
         ],
-        "summary": "Updates the authenticated user's account details.",
+        "description": "Updates the authenticated user's account details.",
         "operationId": "UpdateAccount",
         "requestBody": {
           "content": {
@@ -371,7 +370,7 @@
         "tags": [
           "Accounts"
         ],
-        "summary": "Gets the tournaments associated with the authenticated user's account.",
+        "description": "Gets the tournaments associated with the authenticated user's account.",
         "operationId": "GetMyTournaments",
         "responses": {
           "200": {
@@ -489,8 +488,7 @@
         "tags": [
           "Accounts"
         ],
-        "summary": "Updates the authenticated user's avatar using a pre-signed S3 key.",
-        "description": "Updates an account's avatar by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
+        "description": "Updates the authenticated user's avatar using a pre-signed S3 key.\n\nUpdates an account's avatar by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateAvatar",
         "parameters": [
           {
@@ -591,8 +589,7 @@
         "tags": [
           "Accounts"
         ],
-        "summary": "Updates the authenticated user's banner using a pre-signed S3 key.",
-        "description": "Updates an account's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
+        "description": "Updates the authenticated user's banner using a pre-signed S3 key.\n\nUpdates an account's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateBanner",
         "parameters": [
           {
@@ -693,8 +690,7 @@
         "tags": [
           "Assets"
         ],
-        "summary": "Generates a pre-signed URL and temporary key for uploading an asset to S3.",
-        "description": "Generates a pre-signed URL and temporary key for uploads.",
+        "description": "Generates a pre-signed URL and temporary key for uploading an asset to S3.\n\nGenerates a pre-signed URL and temporary key for uploads.",
         "operationId": "GenerateUploadCredentials",
         "parameters": [
           {
@@ -819,7 +815,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Returns the currently authenticated user's identity information.",
+        "description": "Returns the currently authenticated user's identity information.",
         "operationId": "GetCurrentUser",
         "responses": {
           "200": {
@@ -928,7 +924,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Authenticates a user with email and password.",
+        "description": "Authenticates a user with email and password.",
         "operationId": "Login",
         "requestBody": {
           "content": {
@@ -1046,7 +1042,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Registers a new user account.",
+        "description": "Registers a new user account.",
         "operationId": "Register",
         "requestBody": {
           "content": {
@@ -1161,7 +1157,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Resends the email confirmation link to the specified address.",
+        "description": "Resends the email confirmation link to the specified address.",
         "operationId": "ResendConfirmationEmail",
         "requestBody": {
           "content": {
@@ -1276,7 +1272,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Verifies a password reset code without applying the reset.",
+        "description": "Verifies a password reset code without applying the reset.",
         "operationId": "VerifyPasswordResetCode",
         "requestBody": {
           "content": {
@@ -1394,7 +1390,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Initiates the forgot-password flow by sending a reset email.",
+        "description": "Initiates the forgot-password flow by sending a reset email.",
         "operationId": "ForgotPassword",
         "requestBody": {
           "content": {
@@ -1512,7 +1508,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Resets the user's password using a valid reset code.",
+        "description": "Resets the user's password using a valid reset code.",
         "operationId": "ResetPassword",
         "requestBody": {
           "content": {
@@ -1627,7 +1623,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Confirms the user's email address using the code sent during registration.",
+        "description": "Confirms the user's email address using the code sent during registration.",
         "operationId": "ConfirmEmail",
         "requestBody": {
           "content": {
@@ -1745,7 +1741,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Signs the current user out and optionally redirects to a return URL.",
+        "description": "Signs the current user out and optionally redirects to a return URL.",
         "operationId": "Logout",
         "parameters": [
           {
@@ -1846,7 +1842,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Checks whether a user account exists for the given email address.",
+        "description": "Checks whether a user account exists for the given email address.",
         "operationId": "CheckUserAsync",
         "requestBody": {
           "content": {
@@ -2071,7 +2067,7 @@
         "tags": [
           "BracketChallenges"
         ],
-        "summary": "Gets a paginated list of bracket challenges.",
+        "description": "Gets a paginated list of bracket challenges.",
         "operationId": "GetBracketChallenges",
         "parameters": [
           {
@@ -2212,7 +2208,7 @@
         "tags": [
           "BracketChallenges"
         ],
-        "summary": "Gets a single bracket challenge by its ID.",
+        "description": "Gets a single bracket challenge by its ID.",
         "operationId": "GetBracketChallengeByIdAsync",
         "parameters": [
           {
@@ -2322,7 +2318,7 @@
         "tags": [
           "BracketChallenges"
         ],
-        "summary": "Creates a Stripe payment intent for a bracket challenge registration.",
+        "description": "Creates a Stripe payment intent for a bracket challenge registration.",
         "operationId": "CreateBracketChallengePaymentIntent",
         "parameters": [
           {
@@ -2468,7 +2464,7 @@
         "tags": [
           "Drafts"
         ],
-        "summary": "Gets a paginated list of drafts.",
+        "description": "Gets a paginated list of drafts.",
         "operationId": "GetDrafts",
         "parameters": [
           {
@@ -2628,7 +2624,7 @@
         "tags": [
           "Drafts"
         ],
-        "summary": "Creates a new draft (admin only).",
+        "description": "Creates a new draft (admin only).",
         "operationId": "CreateDraft",
         "requestBody": {
           "content": {
@@ -2774,7 +2770,7 @@
         "tags": [
           "Drafts"
         ],
-        "summary": "Gets a single draft by its ID.",
+        "description": "Gets a single draft by its ID.",
         "operationId": "GetDraftById",
         "parameters": [
           {
@@ -2884,7 +2880,7 @@
         "tags": [
           "Drafts"
         ],
-        "summary": "Updates draft settings and broadcasts the new state to connected clients (admin only).",
+        "description": "Updates draft settings and broadcasts the new state to connected clients (admin only).",
         "operationId": "UpdateDraft",
         "parameters": [
           {
@@ -3019,7 +3015,7 @@
         "tags": [
           "Drafts"
         ],
-        "summary": "Deletes a draft (admin only).",
+        "description": "Deletes a draft (admin only).",
         "operationId": "DeleteDraft",
         "parameters": [
           {
@@ -3122,7 +3118,7 @@
         "tags": [
           "Drafts"
         ],
-        "summary": "Starts the draft and notifies connected clients (admin only).",
+        "description": "Starts the draft and notifies connected clients (admin only).",
         "operationId": "StartDraft",
         "parameters": [
           {
@@ -3225,7 +3221,7 @@
         "tags": [
           "Drafts"
         ],
-        "summary": "Pauses the draft and notifies connected clients (admin only).",
+        "description": "Pauses the draft and notifies connected clients (admin only).",
         "operationId": "PauseDraft",
         "parameters": [
           {
@@ -3328,7 +3324,7 @@
         "tags": [
           "Drafts"
         ],
-        "summary": "Ends the draft and notifies connected clients (admin only).",
+        "description": "Ends the draft and notifies connected clients (admin only).",
         "operationId": "EndDraft",
         "parameters": [
           {
@@ -3431,7 +3427,7 @@
         "tags": [
           "Drafts"
         ],
-        "summary": "Gets the current pick for the specified draft.",
+        "description": "Gets the current pick for the specified draft.",
         "operationId": "GetCurrentDraftPick",
         "parameters": [
           {
@@ -3541,7 +3537,7 @@
         "tags": [
           "Drafts"
         ],
-        "summary": "Submits a player pick for the current draft slot.",
+        "description": "Submits a player pick for the current draft slot.",
         "operationId": "DraftPlayer",
         "parameters": [
           {
@@ -3678,7 +3674,7 @@
         "tags": [
           "Drafts"
         ],
-        "summary": "Gets the player rankings for a draft.",
+        "description": "Gets the player rankings for a draft.",
         "operationId": "GetDraftPlayerRankings",
         "parameters": [
           {
@@ -3842,8 +3838,7 @@
         "tags": [
           "Games"
         ],
-        "summary": "Gets a paginated list of games.",
-        "description": "Gets a paginated list of games.",
+        "description": "Gets a paginated list of games.\n\nGets a paginated list of games.",
         "operationId": "GetGames",
         "parameters": [
           {
@@ -4002,8 +3997,7 @@
         "tags": [
           "Games"
         ],
-        "summary": "Gets a single game by its ID.",
-        "description": "Gets a single game by its ID.",
+        "description": "Gets a single game by its ID.\n\nGets a single game by its ID.",
         "operationId": "GetGameById",
         "parameters": [
           {
@@ -4115,8 +4109,7 @@
         "tags": [
           "GoalieStats"
         ],
-        "summary": "Gets a paginated list of goalie statistics.",
-        "description": "Gets a paginated list of goalie statistics.",
+        "description": "Gets a paginated list of goalie statistics.\n\nGets a paginated list of goalie statistics.",
         "operationId": "GetGoalieStats",
         "parameters": [
           {
@@ -4287,8 +4280,7 @@
         "tags": [
           "InfoGuides"
         ],
-        "summary": "Gets a paginated list of info guides.",
-        "description": "Gets a paginated list of info guides.",
+        "description": "Gets a paginated list of info guides.\n\nGets a paginated list of info guides.",
         "operationId": "GetInfoGuides",
         "parameters": [
           {
@@ -4429,8 +4421,7 @@
         "tags": [
           "InfoGuides"
         ],
-        "summary": "Gets a single info guide by its ID.",
-        "description": "Gets a single info guide by its ID.",
+        "description": "Gets a single info guide by its ID.\n\nGets a single info guide by its ID.",
         "operationId": "GetInfoGuideById",
         "parameters": [
           {
@@ -4542,8 +4533,7 @@
         "tags": [
           "InfoGuides"
         ],
-        "summary": "Gets an info guide by tournament ID.",
-        "description": "Gets an info guide by tournament ID.",
+        "description": "Gets an info guide by tournament ID.\n\nGets an info guide by tournament ID.",
         "operationId": "GetInfoGuideByTournamentId",
         "parameters": [
           {
@@ -4655,8 +4645,7 @@
         "tags": [
           "Players"
         ],
-        "summary": "Gets a paginated list of players.",
-        "description": "Gets a paginated list of players.",
+        "description": "Gets a paginated list of players.\n\nGets a paginated list of players.",
         "operationId": "GetPlayers",
         "parameters": [
           {
@@ -4815,8 +4804,7 @@
         "tags": [
           "Players"
         ],
-        "summary": "Gets a single player by its ID.",
-        "description": "Gets a single player by its ID.",
+        "description": "Gets a single player by its ID.\n\nGets a single player by its ID.",
         "operationId": "GetPlayerById",
         "parameters": [
           {
@@ -4928,8 +4916,7 @@
         "tags": [
           "SkaterStats"
         ],
-        "summary": "Gets a paginated list of skater statistics.",
-        "description": "Gets a paginated list of skater statistics.",
+        "description": "Gets a paginated list of skater statistics.\n\nGets a paginated list of skater statistics.",
         "operationId": "GetSkaterStats",
         "parameters": [
           {
@@ -5108,8 +5095,7 @@
         "tags": [
           "System"
         ],
-        "summary": "Gets the contextual configuration of the system (e.g., active tournament and featured stats).",
-        "description": "Gets the contextual configuration of the system (e.g., active tournament and featured stats).",
+        "description": "Gets the contextual configuration of the system (e.g., active tournament and featured stats).\n\nGets the contextual configuration of the system (e.g., active tournament and featured stats).",
         "operationId": "GetSystemContext",
         "responses": {
           "200": {
@@ -5210,8 +5196,7 @@
         "tags": [
           "Teams"
         ],
-        "summary": "Gets a paginated list of teams.",
-        "description": "Gets a paginated list of teams.",
+        "description": "Gets a paginated list of teams.\n\nGets a paginated list of teams.",
         "operationId": "GetTeams",
         "parameters": [
           {
@@ -5361,8 +5346,7 @@
         "tags": [
           "Teams"
         ],
-        "summary": "Gets a single team by its ID.",
-        "description": "Gets a single team by its ID.",
+        "description": "Gets a single team by its ID.\n\nGets a single team by its ID.",
         "operationId": "GetTeamById",
         "parameters": [
           {
@@ -5474,8 +5458,7 @@
         "tags": [
           "Teams"
         ],
-        "summary": "Updates a team's logo using a pre-signed S3 key (admin only).",
-        "description": "Updates a team's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
+        "description": "Updates a team's logo using a pre-signed S3 key (admin only).\n\nUpdates a team's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTeamLogo",
         "parameters": [
           {
@@ -5585,8 +5568,7 @@
         "tags": [
           "Teams"
         ],
-        "summary": "Updates a team's banner using a pre-signed S3 key (admin only).",
-        "description": "Updates a team's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
+        "description": "Updates a team's banner using a pre-signed S3 key (admin only).\n\nUpdates a team's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTeamBanner",
         "parameters": [
           {
@@ -5696,7 +5678,7 @@
         "tags": [
           "TournamentPayments"
         ],
-        "summary": "Creates a Stripe payment intent for a tournament registration.",
+        "description": "Creates a Stripe payment intent for a tournament registration.",
         "operationId": "CreateTournamentPaymentIntent",
         "parameters": [
           {
@@ -5850,7 +5832,7 @@
         "tags": [
           "TournamentRegistrations"
         ],
-        "summary": "Gets the authenticated user's registration for a tournament.",
+        "description": "Gets the authenticated user's registration for a tournament.",
         "operationId": "GetMyTournamentRegistration",
         "parameters": [
           {
@@ -5968,7 +5950,7 @@
         "tags": [
           "TournamentRegistrations"
         ],
-        "summary": "Creates or updates the authenticated user's registration for a tournament.",
+        "description": "Creates or updates the authenticated user's registration for a tournament.",
         "operationId": "UpdateMyTournamentRegistration",
         "parameters": [
           {
@@ -6105,8 +6087,7 @@
         "tags": [
           "Tournaments"
         ],
-        "summary": "Gets a paginated list of tournaments.",
-        "description": "Gets a paginated list of tournaments.",
+        "description": "Gets a paginated list of tournaments.\n\nGets a paginated list of tournaments.",
         "operationId": "GetTournaments",
         "parameters": [
           {
@@ -6255,8 +6236,7 @@
         "tags": [
           "Tournaments"
         ],
-        "summary": "Gets a single tournament by its ID.",
-        "description": "Gets a single tournament by its ID.",
+        "description": "Gets a single tournament by its ID.\n\nGets a single tournament by its ID.",
         "operationId": "GetTournamentById",
         "parameters": [
           {
@@ -6368,8 +6348,7 @@
         "tags": [
           "Tournaments"
         ],
-        "summary": "Updates a tournament's logo using a pre-signed S3 key (admin only).",
-        "description": "Updates a tournament's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
+        "description": "Updates a tournament's logo using a pre-signed S3 key (admin only).\n\nUpdates a tournament's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTournamentLogo",
         "parameters": [
           {
@@ -6479,7 +6458,7 @@
         "tags": [
           "Webhooks"
         ],
-        "summary": "Receives and processes Stripe webhook events.",
+        "description": "Receives and processes Stripe webhook events.",
         "operationId": "StripeWebhook",
         "responses": {
           "200": {
