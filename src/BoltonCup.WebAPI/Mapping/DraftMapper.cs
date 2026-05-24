@@ -3,23 +3,37 @@ using BoltonCup.Core.Commands;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Maps draft domain models to DTOs and commands.</summary>
 public interface IDraftMapper
 {
+    /// <summary>Maps a paged list of drafts to a paged list of <see cref="DraftDto"/>.</summary>
     IPagedList<DraftDto> ToDtoList(IPagedList<Draft> drafts);
+    /// <summary>Maps a paged list of draft picks to a paged list of <see cref="DraftPickDto"/>.</summary>
     IPagedList<DraftPickDto> ToDtoList(IPagedList<DraftPick> draftPicks);
+    /// <summary>Maps a paged list of player draft rankings to a paged list of <see cref="DraftRankingDto"/>.</summary>
     IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings);
+    /// <summary>Maps a <see cref="Draft"/> to a <see cref="DraftSingleDto"/>.</summary>
     DraftSingleDto? ToDto(Draft? draft, bool isAuthorized);
+    /// <summary>Maps a <see cref="DraftPick"/> to a <see cref="DraftPickSingleDto"/>.</summary>
     DraftPickSingleDto? ToDto(DraftPick? draftPick);
+    /// <summary>Maps a <see cref="CurrentDraftState"/> to a <see cref="DraftUpdateEventDto"/>.</summary>
     DraftUpdateEventDto ToDto(CurrentDraftState draftState, bool isAuthorized);
+    /// <summary>Maps a <see cref="CurrentDraftStateWithPick"/> to a <see cref="DraftPickMadeEventDto"/>.</summary>
     DraftPickMadeEventDto ToDto(CurrentDraftStateWithPick draftState);
+    /// <summary>Maps a <see cref="GetDraftsRequest"/> to a <see cref="GetDraftsQuery"/>.</summary>
     GetDraftsQuery ToQuery(GetDraftsRequest request);
+    /// <summary>Maps a <see cref="CreateDraftRequest"/> to a <see cref="CreateDraftCommand"/>.</summary>
     CreateDraftCommand ToCommand(CreateDraftRequest request);
+    /// <summary>Maps an <see cref="UpdateDraftRequest"/> to an <see cref="UpdateDraftCommand"/>.</summary>
     UpdateDraftCommand ToCommand(UpdateDraftRequest request);
+    /// <summary>Maps a draft player request to a <see cref="DraftPlayerCommand"/>.</summary>
     DraftPlayerCommand ToCommand(int id, DraftPlayerRequest request);
 }
 
+/// <summary>Maps draft domain models to DTOs and commands.</summary>
 public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
 {
+    /// <inheritdoc/>
     public IPagedList<DraftDto> ToDtoList(IPagedList<Draft> drafts)
     {
         return drafts.ProjectTo(draft => new DraftDto
@@ -32,11 +46,13 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         });
     }
 
+    /// <inheritdoc/>
     public IPagedList<DraftPickDto> ToDtoList(IPagedList<DraftPick> draftPicks)
     {
         return draftPicks.ProjectTo(ToDtoListItem);
     }
 
+    /// <inheritdoc/>
     public IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings)
     {
         return rankings.ProjectTo(draft => new DraftRankingDto
@@ -56,6 +72,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         });
     }
     
+    /// <inheritdoc/>
     public DraftSingleDto? ToDto(Draft? draft, bool isAuthorized)
     {
         if (draft is null)
@@ -82,6 +99,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         };
     }
 
+    /// <inheritdoc/>
     public DraftPickSingleDto? ToDto(DraftPick? draftPick)
     {
         if (draftPick is null)
@@ -97,6 +115,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         };
     }
 
+    /// <inheritdoc/>
     public DraftUpdateEventDto ToDto(CurrentDraftState draftState, bool isAuthorized)
     {
         return new DraftUpdateEventDto(
@@ -105,6 +124,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         );
     }
 
+    /// <inheritdoc/>
     public DraftPickMadeEventDto ToDto(CurrentDraftStateWithPick draftState)
     {
         return new DraftPickMadeEventDto(
@@ -115,6 +135,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         );
     }
 
+    /// <inheritdoc/>
     public GetDraftsQuery ToQuery(GetDraftsRequest request)
     {
         return new GetDraftsQuery
@@ -124,6 +145,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         };
     }
     
+    /// <inheritdoc/>
     public CreateDraftCommand ToCommand(CreateDraftRequest request)
     {
         return new CreateDraftCommand(
@@ -132,6 +154,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         );
     }
     
+    /// <inheritdoc/>
     public UpdateDraftCommand ToCommand(UpdateDraftRequest request)
     {
         return new UpdateDraftCommand
@@ -144,6 +167,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
         };
     }
 
+    /// <inheritdoc/>
     public DraftPlayerCommand ToCommand(int id, DraftPlayerRequest request)
     {
         return new DraftPlayerCommand(
@@ -155,6 +179,7 @@ public class DraftMapper(IBriefMapper _briefMapper) : IDraftMapper
     }
 
 
+    /// <summary>Maps a <see cref="DraftPick"/> to a <see cref="DraftPickDto"/>.</summary>
     public DraftPickDto ToDtoListItem(DraftPick draftPick)
     {
         return new DraftPickDto

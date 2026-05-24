@@ -8,10 +8,10 @@
     Comparer="_comparer">
     <Columns>
         <ForeignColumn Title="Home" Property="x => x.HomeTeam" PropertySetter="(game, team) => game.HomeTeam = team" 
-                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo"
+                       EqualityComparer="new TeamComparer()!" ImageSrcFunc="x => x.Logo"
                        Filter="@(x => (y => y.TournamentId == x.TournamentId))"/>
         <ForeignColumn Title="Away" Property="x => x.AwayTeam" PropertySetter="(game, team) => game.AwayTeam = team" 
-                       EqualityComparer="new TeamComparer()" ImageSrcFunc="x => x.Logo"
+                       EqualityComparer="new TeamComparer()!" ImageSrcFunc="x => x.Logo"
                        Filter="@(x => (y => y.TournamentId == x.TournamentId))"/>
         <DateTimePickerColumn Title="Date" Property="x => x.GameTime" />
         <EnumColumn Title="Type" Property="x => x.GameType"/>
@@ -19,7 +19,7 @@
         <PropertyColumn Title="Venue" Property="x => x.Venue"/>
         <PropertyColumn Title="Rink" Property="x => x.Rink"/>
         <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament!"
-                       EqualityComparer="new TournamentComparer()" ImageSrcFunc="t => t.Logo" />
+                       EqualityComparer="new TournamentComparer()!" ImageSrcFunc="t => t.Logo" />
     </Columns>
     <ChildRowContent>
         @{

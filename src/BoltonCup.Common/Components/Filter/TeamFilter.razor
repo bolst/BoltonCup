@@ -7,7 +7,7 @@
     Value="@ContextValue"
     ValueChanged="@ContextValueChanged"
     Disabled="@Disabled"
-    Comparer="@_comparer"
+    Comparer="@(_comparer!)"
     Label="Team"
     Typo="Typo.subtitle2"
     Variant="Variant.Outlined"
@@ -47,7 +47,7 @@
             else
             {
                 var result = await BoltonCupApi.GetTeamsAsync();
-                _options = result.Items.Where(x => x.Tournament.Id == TournamentId.Value).ToList();
+                _options = result.Items.Where(x => x.Tournament?.Id == TournamentId.Value).ToList();
                 _teamCache[TournamentId.Value] = _options;
             }
         }

@@ -8,10 +8,12 @@ using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Manages Stripe payment intent creation for tournament registrations.</summary>
 [Route("api/tournaments/{id:int}/payments")]
-public class TournamentPaymentsController(ITournamentPaymentService _paymentService, ITournamentPaymentMapper _paymentMapper) 
+public class TournamentPaymentsController(ITournamentPaymentService _paymentService, ITournamentPaymentMapper _paymentMapper)
     : BoltonCupControllerBase
 {
+    /// <summary>Creates a Stripe payment intent for a tournament registration.</summary>
     [Authorize(Policy = RequireCompletedAccount)]
     [HttpPost("createIntent")]
     public async Task<ActionResult<TournamentPaymentIntentDto>> CreateTournamentPaymentIntent(int id, [FromBody] CreateTournamentPaymentIntentRequest request)

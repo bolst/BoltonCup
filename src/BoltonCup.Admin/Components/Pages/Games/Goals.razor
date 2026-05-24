@@ -30,16 +30,16 @@
                        ImageSrcFunc="x => x.Logo" 
                        Required />
         <ForeignColumn Title="Scorer" Property="x => x.Scorer" PropertySetter="(gs, sp) => gs.Scorer = sp"
-                       EqualityComparer="new PlayerComparer()" Include="x => x.Include(p => p.Account)"
+                       EqualityComparer="new PlayerComparer()!" Include="x => x.Include(p => p.Account)"
                        Filter="@(x => (y => y.TeamId == x.TeamId))"
                        SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName" 
                        Required/>
         <ForeignColumn Title="Primary Assist" Property="x => x.Assist1Player" PropertySetter="(gs, ap) => gs.Assist1Player = ap"
-                       EqualityComparer="new PlayerComparer()" Include="x => x.Include(p => p.Account)"
+                       EqualityComparer="new PlayerComparer()!" Include="x => x.Include(p => p.Account)"
                        Filter="@(x => (y => y.TeamId == x.TeamId))"
                        SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"/>
         <ForeignColumn Title="Secondary Assist" Property="x => x.Assist2Player" PropertySetter="(gs, ap) => gs.Assist2Player = ap"
-                       EqualityComparer="new PlayerComparer()" Include="x => x.Include(p => p.Account)"
+                       EqualityComparer="new PlayerComparer()!" Include="x => x.Include(p => p.Account)"
                        Filter="@(x => (y => y.TeamId == x.TeamId))"
                        SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"/>
         <PropertyColumn Title="Period" Property="x => x.Period" />
@@ -74,8 +74,8 @@
     private static readonly Func<IQueryable<Goal>, IQueryable<Goal>> _includes = 
         x => x
             .Include(g => g.Scorer).ThenInclude(p => p.Account)
-            .Include(g => g.Assist1Player).ThenInclude(p => p.Account)
-            .Include(g => g.Assist2Player).ThenInclude(p => p.Account)
+            .Include(g => g.Assist1Player).ThenInclude(p => p!.Account)
+            .Include(g => g.Assist2Player).ThenInclude(p => p!.Account)
             .Include(g => g.Game).ThenInclude(g => g.HomeTeam)
             .Include(g => g.Game).ThenInclude(g => g.AwayTeam)
             .Include(g => g.Game).ThenInclude(g => g.Tournament);

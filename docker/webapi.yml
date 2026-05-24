@@ -8,6 +8,7 @@
 services:
   webapi:
     image: bolst/boltoncup-webapi:${WEBAPI_TAG:-latest}
+    container_name: boltoncup-webapi-1
     restart: unless-stopped
     ports:
       - "${WEBAPI_PORT:-8080}:8080"

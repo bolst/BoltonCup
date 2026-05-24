@@ -11,6 +11,7 @@
         "tags": [
           "Accounts"
         ],
+        "summary": "Completes the account setup for the currently logged-in user.",
         "operationId": "CompleteMyAccount",
         "requestBody": {
           "content": {
@@ -20,7 +21,8 @@
                   {
                     "$ref": "#/components/schemas/CompleteUserAccountRequest"
                   }
-                ]
+                ],
+                "description": "Request to complete a new user account with personal details."
               }
             },
             "text/json": {
@@ -29,7 +31,8 @@
                   {
                     "$ref": "#/components/schemas/CompleteUserAccountRequest"
                   }
-                ]
+                ],
+                "description": "Request to complete a new user account with personal details."
               }
             },
             "application/*+json": {
@@ -38,7 +41,8 @@
                   {
                     "$ref": "#/components/schemas/CompleteUserAccountRequest"
                   }
-                ]
+                ],
+                "description": "Request to complete a new user account with personal details."
               }
             }
           }
@@ -133,6 +137,8 @@
         "tags": [
           "Accounts"
         ],
+        "summary": "Gets the currently logged-in user's account.",
+        "description": "Gets the currently logged-in user",
         "operationId": "GetMe",
         "responses": {
           "200": {
@@ -239,6 +245,7 @@
         "tags": [
           "Accounts"
         ],
+        "summary": "Updates the authenticated user's account details.",
         "operationId": "UpdateAccount",
         "requestBody": {
           "content": {
@@ -248,7 +255,8 @@
                   {
                     "$ref": "#/components/schemas/UpdateAccountRequest"
                   }
-                ]
+                ],
+                "description": "Request to update an existing user account's profile information."
               }
             },
             "text/json": {
@@ -257,7 +265,8 @@
                   {
                     "$ref": "#/components/schemas/UpdateAccountRequest"
                   }
-                ]
+                ],
+                "description": "Request to update an existing user account's profile information."
               }
             },
             "application/*+json": {
@@ -266,7 +275,8 @@
                   {
                     "$ref": "#/components/schemas/UpdateAccountRequest"
                   }
-                ]
+                ],
+                "description": "Request to update an existing user account's profile information."
               }
             }
           }
@@ -361,6 +371,7 @@
         "tags": [
           "Accounts"
         ],
+        "summary": "Gets the tournaments associated with the authenticated user's account.",
         "operationId": "GetMyTournaments",
         "responses": {
           "200": {
@@ -478,6 +489,8 @@
         "tags": [
           "Accounts"
         ],
+        "summary": "Updates the authenticated user's avatar using a pre-signed S3 key.",
+        "description": "Updates an account's avatar by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateAvatar",
         "parameters": [
           {
@@ -578,6 +591,8 @@
         "tags": [
           "Accounts"
         ],
+        "summary": "Updates the authenticated user's banner using a pre-signed S3 key.",
+        "description": "Updates an account's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateBanner",
         "parameters": [
           {
@@ -678,6 +693,8 @@
         "tags": [
           "Assets"
         ],
+        "summary": "Generates a pre-signed URL and temporary key for uploading an asset to S3.",
+        "description": "Generates a pre-signed URL and temporary key for uploads.",
         "operationId": "GenerateUploadCredentials",
         "parameters": [
           {
@@ -802,6 +819,7 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Returns the currently authenticated user's identity information.",
         "operationId": "GetCurrentUser",
         "responses": {
           "200": {
@@ -910,6 +928,7 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Authenticates a user with email and password.",
         "operationId": "Login",
         "requestBody": {
           "content": {
@@ -919,7 +938,8 @@
                   {
                     "$ref": "#/components/schemas/LoginRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for authenticating a user."
               }
             },
             "text/json": {
@@ -928,7 +948,8 @@
                   {
                     "$ref": "#/components/schemas/LoginRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for authenticating a user."
               }
             },
             "application/*+json": {
@@ -937,7 +958,8 @@
                   {
                     "$ref": "#/components/schemas/LoginRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for authenticating a user."
               }
             }
           }
@@ -1024,6 +1046,7 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Registers a new user account.",
         "operationId": "Register",
         "requestBody": {
           "content": {
@@ -1138,6 +1161,7 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Resends the email confirmation link to the specified address.",
         "operationId": "ResendConfirmationEmail",
         "requestBody": {
           "content": {
@@ -1252,6 +1276,7 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Verifies a password reset code without applying the reset.",
         "operationId": "VerifyPasswordResetCode",
         "requestBody": {
           "content": {
@@ -1261,7 +1286,8 @@
                   {
                     "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for verifying a password reset code."
               }
             },
             "text/json": {
@@ -1270,7 +1296,8 @@
                   {
                     "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for verifying a password reset code."
               }
             },
             "application/*+json": {
@@ -1279,7 +1306,8 @@
                   {
                     "$ref": "#/components/schemas/VerifyPasswordResetCodeRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for verifying a password reset code."
               }
             }
           }
@@ -1366,6 +1394,7 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Initiates the forgot-password flow by sending a reset email.",
         "operationId": "ForgotPassword",
         "requestBody": {
           "content": {
@@ -1375,7 +1404,8 @@
                   {
                     "$ref": "#/components/schemas/ForgotPasswordRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for initiating a forgot-password flow."
               }
             },
             "text/json": {
@@ -1384,7 +1414,8 @@
                   {
                     "$ref": "#/components/schemas/ForgotPasswordRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for initiating a forgot-password flow."
               }
             },
             "application/*+json": {
@@ -1393,7 +1424,8 @@
                   {
                     "$ref": "#/components/schemas/ForgotPasswordRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for initiating a forgot-password flow."
               }
             }
           }
@@ -1480,6 +1512,7 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Resets the user's password using a valid reset code.",
         "operationId": "ResetPassword",
         "requestBody": {
           "content": {
@@ -1594,6 +1627,7 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Confirms the user's email address using the code sent during registration.",
         "operationId": "ConfirmEmail",
         "requestBody": {
           "content": {
@@ -1603,7 +1637,8 @@
                   {
                     "$ref": "#/components/schemas/ConfirmEmailRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for confirming an email address."
               }
             },
             "text/json": {
@@ -1612,7 +1647,8 @@
                   {
                     "$ref": "#/components/schemas/ConfirmEmailRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for confirming an email address."
               }
             },
             "application/*+json": {
@@ -1621,7 +1657,8 @@
                   {
                     "$ref": "#/components/schemas/ConfirmEmailRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for confirming an email address."
               }
             }
           }
@@ -1708,6 +1745,7 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Signs the current user out and optionally redirects to a return URL.",
         "operationId": "Logout",
         "parameters": [
           {
@@ -1808,6 +1846,7 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Checks whether a user account exists for the given email address.",
         "operationId": "CheckUserAsync",
         "requestBody": {
           "content": {
@@ -1817,7 +1856,8 @@
                   {
                     "$ref": "#/components/schemas/CheckUserRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for checking whether an account exists for an email."
               }
             },
             "text/json": {
@@ -1826,7 +1866,8 @@
                   {
                     "$ref": "#/components/schemas/CheckUserRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for checking whether an account exists for an email."
               }
             },
             "application/*+json": {
@@ -1835,7 +1876,8 @@
                   {
                     "$ref": "#/components/schemas/CheckUserRequest"
                   }
-                ]
+                ],
+                "description": "Request payload for checking whether an account exists for an email."
               }
             }
           }
@@ -2029,11 +2071,13 @@
         "tags": [
           "BracketChallenges"
         ],
+        "summary": "Gets a paginated list of bracket challenges.",
         "operationId": "GetBracketChallenges",
         "parameters": [
           {
             "name": "Page",
             "in": "query",
+            "description": "Gets or sets the 1-based page number to retrieve.",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -2044,6 +2088,7 @@
           {
             "name": "Size",
             "in": "query",
+            "description": "Gets or sets the number of items per page.",
             "schema": {
               "maximum": 100,
               "minimum": 1,
@@ -2054,6 +2099,7 @@
           {
             "name": "SortBy",
             "in": "query",
+            "description": "Gets or sets the field name to sort results by.",
             "schema": {
               "type": "string"
             }
@@ -2061,6 +2107,7 @@
           {
             "name": "Descending",
             "in": "query",
+            "description": "Gets or sets whether to sort results in descending order.",
             "schema": {
               "type": "boolean"
             }
@@ -2165,6 +2212,7 @@
         "tags": [
           "BracketChallenges"
         ],
+        "summary": "Gets a single bracket challenge by its ID.",
         "operationId": "GetBracketChallengeByIdAsync",
         "parameters": [
           {
@@ -2274,6 +2322,7 @@
         "tags": [
           "BracketChallenges"
         ],
+        "summary": "Creates a Stripe payment intent for a bracket challenge registration.",
         "operationId": "CreateBracketChallengePaymentIntent",
         "parameters": [
           {
@@ -2294,7 +2343,8 @@
                   {
                     "$ref": "#/components/schemas/CreateBracketChallengePaymentIntentRequest"
                   }
-                ]
+                ],
+                "description": "Request to create a Stripe payment intent for a bracket challenge entry."
               }
             },
             "text/json": {
@@ -2303,7 +2353,8 @@
                   {
                     "$ref": "#/components/schemas/CreateBracketChallengePaymentIntentRequest"
                   }
-                ]
+                ],
+                "description": "Request to create a Stripe payment intent for a bracket challenge entry."
               }
             },
             "application/*+json": {
@@ -2312,7 +2363,8 @@
                   {
                     "$ref": "#/components/schemas/CreateBracketChallengePaymentIntentRequest"
                   }
-                ]
+                ],
+                "description": "Request to create a Stripe payment intent for a bracket challenge entry."
               }
             }
           }
@@ -2416,11 +2468,13 @@
         "tags": [
           "Drafts"
         ],
+        "summary": "Gets a paginated list of drafts.",
         "operationId": "GetDrafts",
         "parameters": [
           {
             "name": "TournamentId",
             "in": "query",
+            "description": "Gets or sets an optional tournament ID to filter drafts by.",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -2429,6 +2483,7 @@
           {
             "name": "Status",
             "in": "query",
+            "description": "Gets or sets an optional status to filter drafts by.",
             "schema": {
               "allOf": [
                 {
@@ -2440,6 +2495,7 @@
           {
             "name": "Page",
             "in": "query",
+            "description": "Gets or sets the 1-based page number to retrieve.",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -2450,6 +2506,7 @@
           {
             "name": "Size",
             "in": "query",
+            "description": "Gets or sets the number of items per page.",
             "schema": {
               "maximum": 100,
               "minimum": 1,
@@ -2460,6 +2517,7 @@
           {
             "name": "SortBy",
             "in": "query",
+            "description": "Gets or sets the field name to sort results by.",
             "schema": {
               "type": "string"
             }
@@ -2467,6 +2525,7 @@
           {
             "name": "Descending",
             "in": "query",
+            "description": "Gets or sets whether to sort results in descending order.",
             "schema": {
               "type": "boolean"
             }
@@ -2569,6 +2628,7 @@
         "tags": [
           "Drafts"
         ],
+        "summary": "Creates a new draft (admin only).",
         "operationId": "CreateDraft",
         "requestBody": {
           "content": {
@@ -2578,7 +2638,8 @@
                   {
                     "$ref": "#/components/schemas/CreateDraftRequest"
                   }
-                ]
+                ],
+                "description": "Request to create a new draft for a tournament."
               }
             },
             "text/json": {
@@ -2587,7 +2648,8 @@
                   {
                     "$ref": "#/components/schemas/CreateDraftRequest"
                   }
-                ]
+                ],
+                "description": "Request to create a new draft for a tournament."
               }
             },
             "application/*+json": {
@@ -2596,7 +2658,8 @@
                   {
                     "$ref": "#/components/schemas/CreateDraftRequest"
                   }
-                ]
+                ],
+                "description": "Request to create a new draft for a tournament."
               }
             }
           }
@@ -2711,6 +2774,7 @@
         "tags": [
           "Drafts"
         ],
+        "summary": "Gets a single draft by its ID.",
         "operationId": "GetDraftById",
         "parameters": [
           {
@@ -2820,6 +2884,7 @@
         "tags": [
           "Drafts"
         ],
+        "summary": "Updates draft settings and broadcasts the new state to connected clients (admin only).",
         "operationId": "UpdateDraft",
         "parameters": [
           {
@@ -2840,7 +2905,8 @@
                   {
                     "$ref": "#/components/schemas/UpdateDraftRequest"
                   }
-                ]
+                ],
+                "description": "Request to update an existing draft's settings."
               }
             },
             "text/json": {
@@ -2849,7 +2915,8 @@
                   {
                     "$ref": "#/components/schemas/UpdateDraftRequest"
                   }
-                ]
+                ],
+                "description": "Request to update an existing draft's settings."
               }
             },
             "application/*+json": {
@@ -2858,7 +2925,8 @@
                   {
                     "$ref": "#/components/schemas/UpdateDraftRequest"
                   }
-                ]
+                ],
+                "description": "Request to update an existing draft's settings."
               }
             }
           }
@@ -2951,6 +3019,7 @@
         "tags": [
           "Drafts"
         ],
+        "summary": "Deletes a draft (admin only).",
         "operationId": "DeleteDraft",
         "parameters": [
           {
@@ -3053,6 +3122,7 @@
         "tags": [
           "Drafts"
         ],
+        "summary": "Starts the draft and notifies connected clients (admin only).",
         "operationId": "StartDraft",
         "parameters": [
           {
@@ -3155,6 +3225,7 @@
         "tags": [
           "Drafts"
         ],
+        "summary": "Pauses the draft and notifies connected clients (admin only).",
         "operationId": "PauseDraft",
         "parameters": [
           {
@@ -3257,6 +3328,7 @@
         "tags": [
           "Drafts"
         ],
+        "summary": "Ends the draft and notifies connected clients (admin only).",
         "operationId": "EndDraft",
         "parameters": [
           {
@@ -3359,6 +3431,7 @@
         "tags": [
           "Drafts"
         ],
+        "summary": "Gets the current pick for the specified draft.",
         "operationId": "GetCurrentDraftPick",
         "parameters": [
           {
@@ -3468,6 +3541,7 @@
         "tags": [
           "Drafts"
         ],
+        "summary": "Submits a player pick for the current draft slot.",
         "operationId": "DraftPlayer",
         "parameters": [
           {
@@ -3488,7 +3562,8 @@
                   {
                     "$ref": "#/components/schemas/DraftPlayerRequest"
                   }
-                ]
+                ],
+                "description": "Request to record a draft pick selection."
               }
             },
             "text/json": {
@@ -3497,7 +3572,8 @@
                   {
                     "$ref": "#/components/schemas/DraftPlayerRequest"
                   }
-                ]
+                ],
+                "description": "Request to record a draft pick selection."
               }
             },
             "application/*+json": {
@@ -3506,7 +3582,8 @@
                   {
                     "$ref": "#/components/schemas/DraftPlayerRequest"
                   }
-                ]
+                ],
+                "description": "Request to record a draft pick selection."
               }
             }
           }
@@ -3601,6 +3678,7 @@
         "tags": [
           "Drafts"
         ],
+        "summary": "Gets the player rankings for a draft.",
         "operationId": "GetDraftPlayerRankings",
         "parameters": [
           {
@@ -3764,11 +3842,14 @@
         "tags": [
           "Games"
         ],
+        "summary": "Gets a paginated list of games.",
+        "description": "Gets a paginated list of games.",
         "operationId": "GetGames",
         "parameters": [
           {
             "name": "TournamentId",
             "in": "query",
+            "description": "Gets or sets an optional tournament ID to filter games by.",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -3777,6 +3858,7 @@
           {
             "name": "TeamId",
             "in": "query",
+            "description": "Gets or sets an optional team ID to filter games by.",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -3785,6 +3867,7 @@
           {
             "name": "Page",
             "in": "query",
+            "description": "Gets or sets the 1-based page number to retrieve.",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -3795,6 +3878,7 @@
           {
             "name": "Size",
             "in": "query",
+            "description": "Gets or sets the number of items per page.",
             "schema": {
               "maximum": 100,
               "minimum": 1,
@@ -3805,6 +3889,7 @@
           {
             "name": "SortBy",
             "in": "query",
+            "description": "Gets or sets the field name to sort results by.",
             "schema": {
               "type": "string"
             }
@@ -3812,6 +3897,7 @@
           {
             "name": "Descending",
             "in": "query",
+            "description": "Gets or sets whether to sort results in descending order.",
             "schema": {
               "type": "boolean"
             }
@@ -3916,6 +4002,8 @@
         "tags": [
           "Games"
         ],
+        "summary": "Gets a single game by its ID.",
+        "description": "Gets a single game by its ID.",
         "operationId": "GetGameById",
         "parameters": [
           {
@@ -4027,11 +4115,14 @@
         "tags": [
           "GoalieStats"
         ],
+        "summary": "Gets a paginated list of goalie statistics.",
+        "description": "Gets a paginated list of goalie statistics.",
         "operationId": "GetGoalieStats",
         "parameters": [
           {
             "name": "TournamentId",
             "in": "query",
+            "description": "Gets or sets an optional tournament ID to filter stats by.",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -4040,6 +4131,7 @@
           {
             "name": "TeamIds",
             "in": "query",
+            "description": "Gets or sets an optional list of team IDs to filter stats by.",
             "schema": {
               "type": "array",
               "items": {
@@ -4051,6 +4143,7 @@
           {
             "name": "GameId",
             "in": "query",
+            "description": "Gets or sets an optional game ID to filter stats by.",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -4059,6 +4152,7 @@
           {
             "name": "Page",
             "in": "query",
+            "description": "Gets or sets the 1-based page number to retrieve.",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -4069,6 +4163,7 @@
           {
             "name": "Size",
             "in": "query",
+            "description": "Gets or sets the number of items per page.",
             "schema": {
               "maximum": 100,
               "minimum": 1,
@@ -4079,6 +4174,7 @@
           {
             "name": "SortBy",
             "in": "query",
+            "description": "Gets or sets the field name to sort results by.",
             "schema": {
               "type": "string"
             }
@@ -4086,6 +4182,7 @@
           {
             "name": "Descending",
             "in": "query",
+            "description": "Gets or sets whether to sort results in descending order.",
             "schema": {
               "type": "boolean"
             }
@@ -4190,11 +4287,14 @@
         "tags": [
           "InfoGuides"
         ],
+        "summary": "Gets a paginated list of info guides.",
+        "description": "Gets a paginated list of info guides.",
         "operationId": "GetInfoGuides",
         "parameters": [
           {
             "name": "Page",
             "in": "query",
+            "description": "Gets or sets the 1-based page number to retrieve.",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -4205,6 +4305,7 @@
           {
             "name": "Size",
             "in": "query",
+            "description": "Gets or sets the number of items per page.",
             "schema": {
               "maximum": 100,
               "minimum": 1,
@@ -4215,6 +4316,7 @@
           {
             "name": "SortBy",
             "in": "query",
+            "description": "Gets or sets the field name to sort results by.",
             "schema": {
               "type": "string"
             }
@@ -4222,6 +4324,7 @@
           {
             "name": "Descending",
             "in": "query",
+            "description": "Gets or sets whether to sort results in descending order.",
             "schema": {
               "type": "boolean"
             }
@@ -4326,6 +4429,8 @@
         "tags": [
           "InfoGuides"
         ],
+        "summary": "Gets a single info guide by its ID.",
+        "description": "Gets a single info guide by its ID.",
         "operationId": "GetInfoGuideById",
         "parameters": [
           {
@@ -4437,6 +4542,8 @@
         "tags": [
           "InfoGuides"
         ],
+        "summary": "Gets an info guide by tournament ID.",
+        "description": "Gets an info guide by tournament ID.",
         "operationId": "GetInfoGuideByTournamentId",
         "parameters": [
           {
@@ -4548,11 +4655,14 @@
         "tags": [
           "Players"
         ],
+        "summary": "Gets a paginated list of players.",
+        "description": "Gets a paginated list of players.",
         "operationId": "GetPlayers",
         "parameters": [
           {
             "name": "TournamentId",
             "in": "query",
+            "description": "Gets or sets an optional tournament ID to filter players by.",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -4561,6 +4671,7 @@
           {
             "name": "TeamId",
             "in": "query",
+            "description": "Gets or sets an optional team ID to filter players by.",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -4569,6 +4680,7 @@
           {
             "name": "Page",
             "in": "query",
+            "description": "Gets or sets the 1-based page number to retrieve.",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -4579,6 +4691,7 @@
           {
             "name": "Size",
             "in": "query",
+            "description": "Gets or sets the number of items per page.",
             "schema": {
               "maximum": 100,
               "minimum": 1,
@@ -4589,6 +4702,7 @@
           {
             "name": "SortBy",
             "in": "query",
+            "description": "Gets or sets the field name to sort results by.",
             "schema": {
               "type": "string"
             }
@@ -4596,6 +4710,7 @@
           {
             "name": "Descending",
             "in": "query",
+            "description": "Gets or sets whether to sort results in descending order.",
             "schema": {
               "type": "boolean"
             }
@@ -4700,6 +4815,8 @@
         "tags": [
           "Players"
         ],
+        "summary": "Gets a single player by its ID.",
+        "description": "Gets a single player by its ID.",
         "operationId": "GetPlayerById",
         "parameters": [
           {
@@ -4811,11 +4928,14 @@
         "tags": [
           "SkaterStats"
         ],
+        "summary": "Gets a paginated list of skater statistics.",
+        "description": "Gets a paginated list of skater statistics.",
         "operationId": "GetSkaterStats",
         "parameters": [
           {
             "name": "TournamentId",
             "in": "query",
+            "description": "Gets or sets an optional tournament ID to filter stats by.",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -4824,6 +4944,7 @@
           {
             "name": "Position",
             "in": "query",
+            "description": "Gets or sets an optional position to filter stats by.",
             "schema": {
               "type": "string"
             }
@@ -4831,6 +4952,7 @@
           {
             "name": "TeamIds",
             "in": "query",
+            "description": "Gets or sets an optional list of team IDs to filter stats by.",
             "schema": {
               "type": "array",
               "items": {
@@ -4842,6 +4964,7 @@
           {
             "name": "GameId",
             "in": "query",
+            "description": "Gets or sets an optional game ID to filter stats by.",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -4850,6 +4973,7 @@
           {
             "name": "Page",
             "in": "query",
+            "description": "Gets or sets the 1-based page number to retrieve.",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -4860,6 +4984,7 @@
           {
             "name": "Size",
             "in": "query",
+            "description": "Gets or sets the number of items per page.",
             "schema": {
               "maximum": 100,
               "minimum": 1,
@@ -4870,6 +4995,7 @@
           {
             "name": "SortBy",
             "in": "query",
+            "description": "Gets or sets the field name to sort results by.",
             "schema": {
               "type": "string"
             }
@@ -4877,6 +5003,7 @@
           {
             "name": "Descending",
             "in": "query",
+            "description": "Gets or sets whether to sort results in descending order.",
             "schema": {
               "type": "boolean"
             }
@@ -4981,6 +5108,8 @@
         "tags": [
           "System"
         ],
+        "summary": "Gets the contextual configuration of the system (e.g., active tournament and featured stats).",
+        "description": "Gets the contextual configuration of the system (e.g., active tournament and featured stats).",
         "operationId": "GetSystemContext",
         "responses": {
           "200": {
@@ -5081,11 +5210,14 @@
         "tags": [
           "Teams"
         ],
+        "summary": "Gets a paginated list of teams.",
+        "description": "Gets a paginated list of teams.",
         "operationId": "GetTeams",
         "parameters": [
           {
             "name": "TournamentId",
             "in": "query",
+            "description": "Gets or sets an optional tournament ID to filter teams by.",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -5094,6 +5226,7 @@
           {
             "name": "Page",
             "in": "query",
+            "description": "Gets or sets the 1-based page number to retrieve.",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -5104,6 +5237,7 @@
           {
             "name": "Size",
             "in": "query",
+            "description": "Gets or sets the number of items per page.",
             "schema": {
               "maximum": 100,
               "minimum": 1,
@@ -5114,6 +5248,7 @@
           {
             "name": "SortBy",
             "in": "query",
+            "description": "Gets or sets the field name to sort results by.",
             "schema": {
               "type": "string"
             }
@@ -5121,6 +5256,7 @@
           {
             "name": "Descending",
             "in": "query",
+            "description": "Gets or sets whether to sort results in descending order.",
             "schema": {
               "type": "boolean"
             }
@@ -5225,6 +5361,8 @@
         "tags": [
           "Teams"
         ],
+        "summary": "Gets a single team by its ID.",
+        "description": "Gets a single team by its ID.",
         "operationId": "GetTeamById",
         "parameters": [
           {
@@ -5336,6 +5474,8 @@
         "tags": [
           "Teams"
         ],
+        "summary": "Updates a team's logo using a pre-signed S3 key (admin only).",
+        "description": "Updates a team's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTeamLogo",
         "parameters": [
           {
@@ -5445,6 +5585,8 @@
         "tags": [
           "Teams"
         ],
+        "summary": "Updates a team's banner using a pre-signed S3 key (admin only).",
+        "description": "Updates a team's banner by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTeamBanner",
         "parameters": [
           {
@@ -5554,6 +5696,7 @@
         "tags": [
           "TournamentPayments"
         ],
+        "summary": "Creates a Stripe payment intent for a tournament registration.",
         "operationId": "CreateTournamentPaymentIntent",
         "parameters": [
           {
@@ -5574,7 +5717,8 @@
                   {
                     "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
                   }
-                ]
+                ],
+                "description": "Request to create a Stripe payment intent for tournament registration."
               }
             },
             "text/json": {
@@ -5583,7 +5727,8 @@
                   {
                     "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
                   }
-                ]
+                ],
+                "description": "Request to create a Stripe payment intent for tournament registration."
               }
             },
             "application/*+json": {
@@ -5592,7 +5737,8 @@
                   {
                     "$ref": "#/components/schemas/CreateTournamentPaymentIntentRequest"
                   }
-                ]
+                ],
+                "description": "Request to create a Stripe payment intent for tournament registration."
               }
             }
           }
@@ -5704,6 +5850,7 @@
         "tags": [
           "TournamentRegistrations"
         ],
+        "summary": "Gets the authenticated user's registration for a tournament.",
         "operationId": "GetMyTournamentRegistration",
         "parameters": [
           {
@@ -5821,6 +5968,7 @@
         "tags": [
           "TournamentRegistrations"
         ],
+        "summary": "Creates or updates the authenticated user's registration for a tournament.",
         "operationId": "UpdateMyTournamentRegistration",
         "parameters": [
           {
@@ -5841,7 +5989,8 @@
                   {
                     "$ref": "#/components/schemas/TournamentRegistrationDto"
                   }
-                ]
+                ],
+                "description": "DTO representing the state of a tournament registration flow."
               }
             },
             "text/json": {
@@ -5850,7 +5999,8 @@
                   {
                     "$ref": "#/components/schemas/TournamentRegistrationDto"
                   }
-                ]
+                ],
+                "description": "DTO representing the state of a tournament registration flow."
               }
             },
             "application/*+json": {
@@ -5859,7 +6009,8 @@
                   {
                     "$ref": "#/components/schemas/TournamentRegistrationDto"
                   }
-                ]
+                ],
+                "description": "DTO representing the state of a tournament registration flow."
               }
             }
           }
@@ -5954,11 +6105,14 @@
         "tags": [
           "Tournaments"
         ],
+        "summary": "Gets a paginated list of tournaments.",
+        "description": "Gets a paginated list of tournaments.",
         "operationId": "GetTournaments",
         "parameters": [
           {
             "name": "RegistrationOpen",
             "in": "query",
+            "description": "Gets or sets an optional filter to return only tournaments with open registration.",
             "schema": {
               "type": "boolean"
             }
@@ -5966,6 +6120,7 @@
           {
             "name": "Page",
             "in": "query",
+            "description": "Gets or sets the 1-based page number to retrieve.",
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
@@ -5976,6 +6131,7 @@
           {
             "name": "Size",
             "in": "query",
+            "description": "Gets or sets the number of items per page.",
             "schema": {
               "maximum": 100,
               "minimum": 1,
@@ -5986,6 +6142,7 @@
           {
             "name": "SortBy",
             "in": "query",
+            "description": "Gets or sets the field name to sort results by.",
             "schema": {
               "type": "string"
             }
@@ -5993,6 +6150,7 @@
           {
             "name": "Descending",
             "in": "query",
+            "description": "Gets or sets whether to sort results in descending order.",
             "schema": {
               "type": "boolean"
             }
@@ -6097,6 +6255,8 @@
         "tags": [
           "Tournaments"
         ],
+        "summary": "Gets a single tournament by its ID.",
+        "description": "Gets a single tournament by its ID.",
         "operationId": "GetTournamentById",
         "parameters": [
           {
@@ -6208,6 +6368,8 @@
         "tags": [
           "Tournaments"
         ],
+        "summary": "Updates a tournament's logo using a pre-signed S3 key (admin only).",
+        "description": "Updates a tournament's logo by accepting a pre-signed S3 key.\nThe client is responsible for uploading the image to S3 before calling this endpoint.",
         "operationId": "UpdateTournamentLogo",
         "parameters": [
           {
@@ -6317,6 +6479,7 @@
         "tags": [
           "Webhooks"
         ],
+        "summary": "Receives and processes Stripe webhook events.",
         "operationId": "StripeWebhook",
         "responses": {
           "200": {
@@ -6403,65 +6566,80 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the account ID.",
             "format": "int32"
           },
           "email": {
             "type": "string",
+            "description": "Gets or sets the account email address.",
             "nullable": true
           },
           "firstName": {
             "type": "string",
+            "description": "Gets or sets the account holder's first name.",
             "nullable": true
           },
           "lastName": {
             "type": "string",
+            "description": "Gets or sets the account holder's last name.",
             "nullable": true
           },
           "name": {
             "type": "string",
+            "description": "Gets or sets the account holder's full name.",
             "nullable": true
           },
           "phone": {
             "type": "string",
+            "description": "Gets or sets the account holder's phone number.",
             "nullable": true
           },
           "birthday": {
             "type": "string",
+            "description": "Gets or sets the account holder's date of birth.",
             "format": "date-time"
           },
           "highestLevel": {
             "type": "string",
+            "description": "Gets or sets the highest level of hockey the account holder has played.",
             "nullable": true
           },
           "avatar": {
             "type": "string",
+            "description": "Gets or sets the URL of the account holder's avatar image.",
             "nullable": true
           },
           "banner": {
             "type": "string",
+            "description": "Gets or sets the URL of the account holder's banner image.",
             "nullable": true
           },
           "preferredBeer": {
             "type": "string",
+            "description": "Gets or sets the account holder's preferred beer.",
             "nullable": true
           },
           "heightFeet": {
             "type": "integer",
+            "description": "Gets or sets the account holder's height in feet.",
             "format": "int32",
             "nullable": true
           },
           "heightInches": {
             "type": "integer",
+            "description": "Gets or sets the account holder's height in inches.",
             "format": "int32",
             "nullable": true
           },
           "weight": {
             "type": "integer",
+            "description": "Gets or sets the account holder's weight.",
             "format": "int32",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a user account."
       },
       "AccountTournamentDto": {
         "required": [
@@ -6474,7 +6652,8 @@
               {
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
-            ]
+            ],
+            "description": "Gets the tournament summary."
           },
           "team": {
             "allOf": [
@@ -6482,60 +6661,73 @@
                 "$ref": "#/components/schemas/TeamBriefDto"
               }
             ],
+            "description": "Gets the team the account participated on, if any.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a tournament associated with an account."
       },
       "BoltonCupProblemDetails": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
+            "description": "A URI reference identifying the problem type.",
             "nullable": true
           },
           "title": {
             "type": "string",
+            "description": "A short, human-readable summary of the problem type.",
             "nullable": true
           },
           "status": {
             "type": "integer",
+            "description": "The HTTP status code for this problem.",
             "format": "int32",
             "nullable": true
           },
           "detail": {
             "type": "string",
+            "description": "A human-readable explanation specific to this occurrence of the problem.",
             "nullable": true
           },
           "instance": {
             "type": "string",
+            "description": "A URI reference identifying the specific occurrence of the problem.",
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": { },
+        "description": "Represents structured problem details returned by the API for errors."
       },
       "BoltonCupValidationProblemDetails": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
+            "description": "A URI reference identifying the problem type.",
             "nullable": true
           },
           "title": {
             "type": "string",
+            "description": "A short, human-readable summary of the problem type.",
             "nullable": true
           },
           "status": {
             "type": "integer",
+            "description": "The HTTP status code for this problem.",
             "format": "int32",
             "nullable": true
           },
           "detail": {
             "type": "string",
+            "description": "A human-readable explanation specific to this occurrence of the problem.",
             "nullable": true
           },
           "instance": {
             "type": "string",
+            "description": "A URI reference identifying the specific occurrence of the problem.",
             "nullable": true
           },
           "errors": {
@@ -6545,45 +6737,55 @@
               "items": {
                 "type": "string"
               }
-            }
+            },
+            "description": "The validation errors keyed by field name."
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": { },
+        "description": "Represents structured validation problem details with field-level errors."
       },
       "BracketChallengeDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets the bracket challenge ID.",
             "format": "int32"
           },
           "title": {
             "type": "string",
+            "description": "Gets the bracket challenge title.",
             "nullable": true
           },
           "link": {
             "type": "string",
+            "description": "Gets the external link for the bracket challenge.",
             "nullable": true
           },
           "fee": {
             "type": "number",
+            "description": "Gets the entry fee for the bracket challenge.",
             "format": "double",
             "nullable": true
           },
           "isOpen": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets whether the bracket challenge is currently open for registration."
           },
           "logo": {
             "type": "string",
+            "description": "Gets the URL of the bracket challenge logo.",
             "nullable": true
           },
           "closeDate": {
             "type": "string",
+            "description": "Gets the date when registration closes.",
             "format": "date-time",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a bracket challenge event."
       },
       "BracketChallengeDtoIPagedList": {
         "type": "object",
@@ -6617,62 +6819,76 @@
         "type": "object",
         "properties": {
           "clientSecret": {
-            "type": "string"
+            "type": "string",
+            "description": "The Stripe client secret for the payment intent."
           },
           "totalAmount": {
             "type": "number",
+            "description": "The total amount to be charged.",
             "format": "double"
           },
           "currency": {
-            "type": "string"
+            "type": "string",
+            "description": "The currency code for the payment."
           },
           "breakdown": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PaymentBreakdown"
-            }
+            },
+            "description": "The itemized breakdown of the payment amount."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a payment intent for a bracket challenge entry fee."
       },
       "BracketChallengeSingleDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets the bracket challenge ID.",
             "format": "int32"
           },
           "title": {
             "type": "string",
+            "description": "Gets the bracket challenge title.",
             "nullable": true
           },
           "link": {
             "type": "string",
+            "description": "Gets the external link for the bracket challenge.",
             "nullable": true
           },
           "fee": {
             "type": "number",
+            "description": "Gets the entry fee for the bracket challenge.",
             "format": "double",
             "nullable": true
           },
           "isOpen": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets whether the bracket challenge is currently open for registration."
           },
           "logo": {
             "type": "string",
+            "description": "Gets the URL of the bracket challenge logo.",
             "nullable": true
           },
           "closeDate": {
             "type": "string",
+            "description": "Gets the date when registration closes.",
             "format": "date-time",
             "nullable": true
           },
           "tosMarkdown": {
             "type": "string",
+            "description": "Gets or sets the Markdown content of the terms of service.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single bracket challenge, including terms of service."
       },
       "CheckUserRequest": {
         "type": "object",
@@ -6681,7 +6897,8 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request payload for checking whether an account exists for an email."
       },
       "CompleteUserAccountRequest": {
         "required": [
@@ -6697,46 +6914,55 @@
           "firstName": {
             "maxLength": 50,
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the user's first name."
           },
           "lastName": {
             "maxLength": 50,
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the user's last name."
           },
           "birthday": {
             "type": "string",
+            "description": "Gets or sets the user's date of birth.",
             "format": "date-time"
           },
           "heightFeet": {
             "maximum": 8,
             "minimum": 1,
             "type": "integer",
+            "description": "Gets or sets the feet component of the user's height.",
             "format": "int32"
           },
           "heightInches": {
             "maximum": 11,
             "minimum": 0,
             "type": "integer",
+            "description": "Gets or sets the inches component of the user's height.",
             "format": "int32"
           },
           "weight": {
             "maximum": 1000000,
             "minimum": 0,
             "type": "integer",
+            "description": "Gets or sets the user's weight in pounds.",
             "format": "int32"
           },
           "highestLevel": {
             "type": "string",
+            "description": "Gets or sets the highest level of hockey the user has played.",
             "nullable": true
           },
           "preferredBeer": {
             "maxLength": 100,
             "type": "string",
+            "description": "Gets or sets the user's preferred beer.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request to complete a new user account with personal details."
       },
       "ConfirmEmailRequest": {
         "type": "object",
@@ -6748,68 +6974,95 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request payload for confirming an email address."
       },
       "CreateBracketChallengePaymentIntentRequest": {
+        "required": [
+          "email",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the entrant's display name."
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the entrant's email address."
           },
           "agreedToTOS": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether the entrant has agreed to the terms of service."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request to create a Stripe payment intent for a bracket challenge entry."
       },
       "CreateDraftRequest": {
+        "required": [
+          "title",
+          "tournamentId"
+        ],
         "type": "object",
         "properties": {
           "tournamentId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the tournament this draft belongs to.",
             "format": "int32"
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the display title of the draft."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request to create a new draft for a tournament."
       },
       "CreateTournamentPaymentIntentRequest": {
+        "required": [
+          "position"
+        ],
         "type": "object",
         "properties": {
           "position": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the player's position (Forward, Defense, or Goalie)."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request to create a Stripe payment intent for tournament registration."
       },
       "CurrentUserDto": {
         "type": "object",
         "properties": {
           "userId": {
-            "type": "string"
+            "type": "string",
+            "description": "The unique identifier of the user from the identity provider."
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "description": "The user's email address."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "The user's display name."
           },
           "roles": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "description": "The list of roles assigned to the user."
           },
           "isAuthenticated": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the user is currently authenticated."
           },
           "accountId": {
             "type": "integer",
+            "description": "The Bolton Cup account ID linked to this user, if any.",
             "format": "int32",
             "nullable": true
           },
@@ -6818,17 +7071,20 @@
             "items": {
               "type": "integer",
               "format": "int32"
-            }
+            },
+            "description": "The IDs of teams for which the user is a general manager."
           },
           "tournamentGmIds": {
             "type": "array",
             "items": {
               "type": "integer",
               "format": "int32"
-            }
+            },
+            "description": "The IDs of tournaments for which the user is a general manager."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing the currently authenticated user."
       },
       "DraftDto": {
         "required": [
@@ -6842,10 +7098,12 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the draft ID.",
             "format": "int32"
           },
           "title": {
             "type": "string",
+            "description": "Gets or sets the draft title.",
             "nullable": true
           },
           "type": {
@@ -6853,24 +7111,28 @@
               {
                 "$ref": "#/components/schemas/DraftType"
               }
-            ]
+            ],
+            "description": "Gets or sets the type of draft."
           },
           "status": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/DraftStatus"
               }
-            ]
+            ],
+            "description": "Gets or sets the current status of the draft."
           },
           "tournament": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the tournament this draft belongs to."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a draft."
       },
       "DraftDtoIPagedList": {
         "type": "object",
@@ -6905,32 +7167,39 @@
         "properties": {
           "teamId": {
             "type": "integer",
+            "description": "The team ID.",
             "format": "int32"
           },
           "pick": {
             "type": "integer",
+            "description": "The pick number assigned to the team.",
             "format": "int32"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Specifies a team's pick position in the draft order."
       },
       "DraftPickBriefDto": {
         "type": "object",
         "properties": {
           "draftId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the draft this pick belongs to.",
             "format": "int32"
           },
           "overallPick": {
             "type": "integer",
+            "description": "Gets or sets the overall pick number.",
             "format": "int32"
           },
           "round": {
             "type": "integer",
+            "description": "Gets or sets the round number.",
             "format": "int32"
           },
           "roundPick": {
             "type": "integer",
+            "description": "Gets or sets the pick number within the round.",
             "format": "int32"
           },
           "team": {
@@ -6938,10 +7207,12 @@
               {
                 "$ref": "#/components/schemas/TeamBriefDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the team that made this pick."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Brief summary of a draft pick."
       },
       "DraftPickDto": {
         "required": [
@@ -6955,18 +7226,22 @@
         "properties": {
           "draftId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the draft this pick belongs to.",
             "format": "int32"
           },
           "overallPick": {
             "type": "integer",
+            "description": "Gets or sets the overall pick number.",
             "format": "int32"
           },
           "round": {
             "type": "integer",
+            "description": "Gets or sets the round number.",
             "format": "int32"
           },
           "roundPick": {
             "type": "integer",
+            "description": "Gets or sets the pick number within the round.",
             "format": "int32"
           },
           "team": {
@@ -6974,7 +7249,8 @@
               {
                 "$ref": "#/components/schemas/TeamBriefDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the team that holds this pick."
           },
           "player": {
             "allOf": [
@@ -6982,16 +7258,19 @@
                 "$ref": "#/components/schemas/PlayerBriefDto"
               }
             ],
+            "description": "Gets or sets the player selected with this pick, if any.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a draft pick."
       },
       "DraftPickMadeEventDto": {
         "type": "object",
         "properties": {
           "draftId": {
             "type": "integer",
+            "description": "The ID of the draft in which the pick was made.",
             "format": "int32"
           },
           "completedPick": {
@@ -6999,14 +7278,16 @@
               {
                 "$ref": "#/components/schemas/DraftPickBriefDto"
               }
-            ]
+            ],
+            "description": "The pick that was just completed."
           },
           "draftedPlayer": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/PlayerBriefDto"
               }
-            ]
+            ],
+            "description": "The player who was selected."
           },
           "nextPick": {
             "allOf": [
@@ -7014,10 +7295,12 @@
                 "$ref": "#/components/schemas/DraftPickSingleDto"
               }
             ],
+            "description": "The next pick on the clock, if any.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a real-time event broadcast when a draft pick is made."
       },
       "DraftPickOrderDto": {
         "required": [
@@ -7028,6 +7311,7 @@
         "properties": {
           "pick": {
             "type": "integer",
+            "description": "Gets or sets the pick number in the overall draft order.",
             "format": "int32"
           },
           "team": {
@@ -7035,10 +7319,12 @@
               {
                 "$ref": "#/components/schemas/TeamBriefDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the team assigned to this pick slot."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing an entry in the draft pick order."
       },
       "DraftPickSingleDto": {
         "required": [
@@ -7052,18 +7338,22 @@
         "properties": {
           "draftId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the draft this pick belongs to.",
             "format": "int32"
           },
           "overallPick": {
             "type": "integer",
+            "description": "Gets or sets the overall pick number.",
             "format": "int32"
           },
           "round": {
             "type": "integer",
+            "description": "Gets or sets the round number.",
             "format": "int32"
           },
           "roundPick": {
             "type": "integer",
+            "description": "Gets or sets the pick number within the round.",
             "format": "int32"
           },
           "team": {
@@ -7071,7 +7361,8 @@
               {
                 "$ref": "#/components/schemas/TeamBriefDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the team that holds this pick."
           },
           "player": {
             "allOf": [
@@ -7079,28 +7370,34 @@
                 "$ref": "#/components/schemas/PlayerBriefDto"
               }
             ],
+            "description": "Gets or sets the player selected with this pick, if any.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single draft pick."
       },
       "DraftPlayerRequest": {
         "type": "object",
         "properties": {
           "playerId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the player being drafted.",
             "format": "int32"
           },
           "teamId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the team making the pick.",
             "format": "int32"
           },
           "overallPick": {
             "type": "integer",
+            "description": "Gets or sets the overall pick number in the draft.",
             "format": "int32"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request to record a draft pick selection."
       },
       "DraftRankingDto": {
         "required": [
@@ -7111,18 +7408,22 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the draft ranking record ID.",
             "format": "int32"
           },
           "draftId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the draft this ranking belongs to.",
             "format": "int32"
           },
           "tournamentId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the tournament this ranking belongs to.",
             "format": "int32"
           },
           "playerPhone": {
             "type": "string",
+            "description": "Gets or sets the player's phone number.",
             "nullable": true
           },
           "player": {
@@ -7130,7 +7431,8 @@
               {
                 "$ref": "#/components/schemas/PlayerBriefDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the player being ranked."
           },
           "draftPick": {
             "allOf": [
@@ -7138,32 +7440,40 @@
                 "$ref": "#/components/schemas/DraftPickBriefDto"
               }
             ],
+            "description": "Gets or sets the draft pick used to select this player, if drafted.",
             "nullable": true
           },
           "gamesPlayed": {
             "type": "integer",
+            "description": "Gets or sets the number of games played by the player.",
             "format": "int32"
           },
           "totalPoints": {
             "type": "integer",
+            "description": "Gets or sets the player's total points.",
             "format": "int32"
           },
           "draftRanking": {
             "type": "number",
+            "description": "Gets or sets the player's calculated draft ranking score.",
             "format": "double"
           },
           "overrideRanking": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether the ranking has been manually overridden."
           },
           "isDrafted": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether the player has already been drafted."
           },
           "pointsPerGame": {
             "type": "number",
+            "description": "Gets or sets the player's points per game average.",
             "format": "double"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a player's ranking in a draft pool."
       },
       "DraftRankingDtoIPagedList": {
         "type": "object",
@@ -7207,10 +7517,12 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the draft ID.",
             "format": "int32"
           },
           "title": {
             "type": "string",
+            "description": "Gets or sets the draft title.",
             "nullable": true
           },
           "type": {
@@ -7218,39 +7530,46 @@
               {
                 "$ref": "#/components/schemas/DraftType"
               }
-            ]
+            ],
+            "description": "Gets or sets the type of draft."
           },
           "status": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/DraftStatus"
               }
-            ]
+            ],
+            "description": "Gets or sets the current status of the draft."
           },
           "tournament": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the tournament this draft belongs to."
           },
           "pickOrder": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DraftPickOrderDto"
-            }
+            },
+            "description": "Gets or sets the ordered list of teams in the draft pick order."
           },
           "draftPicksByRound": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RoundDraftPicks"
-            }
+            },
+            "description": "Gets or sets the draft picks grouped and ordered by round."
           },
           "canEditDraft": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether the current user can edit this draft."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single draft, including pick order and picks by round."
       },
       "DraftStatus": {
         "enum": [
@@ -7276,7 +7595,8 @@
               {
                 "$ref": "#/components/schemas/DraftSingleDto"
               }
-            ]
+            ],
+            "description": "The current full state of the draft."
           },
           "nextPick": {
             "allOf": [
@@ -7284,10 +7604,12 @@
                 "$ref": "#/components/schemas/DraftPickSingleDto"
               }
             ],
+            "description": "The next pick on the clock, if any.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a real-time event broadcast when the draft state changes."
       },
       "ForgotPasswordRequest": {
         "type": "object",
@@ -7296,29 +7618,35 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request payload for initiating a forgot-password flow."
       },
       "GalleryBriefDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the gallery item ID.",
             "format": "int32"
           },
           "title": {
             "type": "string",
+            "description": "Gets or sets the gallery item title.",
             "nullable": true
           },
           "description": {
             "type": "string",
+            "description": "Gets or sets the gallery item description.",
             "nullable": true
           },
           "url": {
             "type": "string",
+            "description": "Gets or sets the URL of the gallery media.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Brief summary of a gallery item."
       },
       "GameDto": {
         "required": [
@@ -7331,10 +7659,12 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets the game ID.",
             "format": "int32"
           },
           "gameTime": {
             "type": "string",
+            "description": "Gets the scheduled game time.",
             "format": "date-time"
           },
           "tournament": {
@@ -7342,28 +7672,33 @@
               {
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
-            ]
+            ],
+            "description": "Gets the tournament this game belongs to."
           },
           "gameType": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/GameType"
               }
-            ]
+            ],
+            "description": "Gets the type of game (e.g. regular season, playoff)."
           },
           "gameState": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/GameState"
               }
-            ]
+            ],
+            "description": "Gets the current state of the game."
           },
           "venue": {
             "type": "string",
+            "description": "Gets the venue where the game is played.",
             "nullable": true
           },
           "rink": {
             "type": "string",
+            "description": "Gets the rink where the game is played.",
             "nullable": true
           },
           "homeTeam": {
@@ -7372,6 +7707,7 @@
                 "$ref": "#/components/schemas/TeamInGameDto"
               }
             ],
+            "description": "Gets the home team with their goal count.",
             "nullable": true
           },
           "awayTeam": {
@@ -7380,10 +7716,12 @@
                 "$ref": "#/components/schemas/TeamInGameDto"
               }
             ],
+            "description": "Gets the away team with their goal count.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a game."
       },
       "GameDtoIPagedList": {
         "type": "object",
@@ -7417,17 +7755,21 @@
         "type": "object",
         "properties": {
           "videoUrl": {
-            "type": "string"
+            "type": "string",
+            "description": "The URL of the highlight video."
           },
           "thumbnailUrl": {
-            "type": "string"
+            "type": "string",
+            "description": "The URL of the video thumbnail image."
           },
           "title": {
             "type": "string",
+            "description": "The title of the highlight.",
             "nullable": true
           },
           "description": {
             "type": "string",
+            "description": "A description of the highlight.",
             "nullable": true
           },
           "player": {
@@ -7436,10 +7778,12 @@
                 "$ref": "#/components/schemas/PlayerBriefDto"
               }
             ],
+            "description": "The player featured in the highlight, if any.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a game highlight video."
       },
       "GameOfTeamDto": {
         "required": [
@@ -7459,17 +7803,21 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the game ID.",
             "format": "int32"
           },
           "tournamentId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the tournament this game belongs to.",
             "format": "int32"
           },
           "tournamentName": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the name of the tournament this game belongs to."
           },
           "gameTime": {
             "type": "string",
+            "description": "Gets or sets the scheduled game time.",
             "format": "date-time"
           },
           "gameType": {
@@ -7478,25 +7826,31 @@
                 "$ref": "#/components/schemas/GameType"
               }
             ],
+            "description": "Gets or sets the type of game (e.g. regular season, playoff).",
             "nullable": true
           },
           "venue": {
             "type": "string",
+            "description": "Gets or sets the venue where the game is played.",
             "nullable": true
           },
           "rink": {
             "type": "string",
+            "description": "Gets or sets the rink where the game is played.",
             "nullable": true
           },
           "isHome": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets whether the team is the home team in this game."
           },
           "goalsFor": {
             "type": "integer",
+            "description": "Gets the number of goals scored by the team.",
             "format": "int32"
           },
           "goalsAgainst": {
             "type": "integer",
+            "description": "Gets the number of goals scored against the team.",
             "format": "int32"
           },
           "opponent": {
@@ -7505,10 +7859,12 @@
                 "$ref": "#/components/schemas/TeamBriefDto"
               }
             ],
+            "description": "Gets the opposing team.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Brief summary of a game from a specific team's perspective."
       },
       "GameSingleDto": {
         "required": [
@@ -7525,10 +7881,12 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets the game ID.",
             "format": "int32"
           },
           "gameTime": {
             "type": "string",
+            "description": "Gets the scheduled game time.",
             "format": "date-time"
           },
           "tournament": {
@@ -7536,28 +7894,33 @@
               {
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
-            ]
+            ],
+            "description": "Gets the tournament this game belongs to."
           },
           "gameType": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/GameType"
               }
-            ]
+            ],
+            "description": "Gets the type of game (e.g. regular season, playoff)."
           },
           "gameState": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/GameState"
               }
-            ]
+            ],
+            "description": "Gets the current state of the game."
           },
           "venue": {
             "type": "string",
+            "description": "Gets the venue where the game is played.",
             "nullable": true
           },
           "rink": {
             "type": "string",
+            "description": "Gets the rink where the game is played.",
             "nullable": true
           },
           "homeTeam": {
@@ -7566,6 +7929,7 @@
                 "$ref": "#/components/schemas/TeamInGameDto"
               }
             ],
+            "description": "Gets the home team with their goal count.",
             "nullable": true
           },
           "awayTeam": {
@@ -7574,40 +7938,47 @@
                 "$ref": "#/components/schemas/TeamInGameDto"
               }
             ],
+            "description": "Gets the away team with their goal count.",
             "nullable": true
           },
           "goals": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/GoalBriefDto"
-            }
+            },
+            "description": "Gets the list of goals scored in the game."
           },
           "penalties": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PenaltyBriefDto"
-            }
+            },
+            "description": "Gets the list of penalties called in the game."
           },
           "stars": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/GameStarDto"
-            }
+            },
+            "description": "Gets the list of game stars."
           },
           "highlights": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/GameHighlightDto"
-            }
+            },
+            "description": "Gets the list of highlight videos for the game."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single game, including goals, penalties, stars, and highlights."
       },
       "GameStarDto": {
         "type": "object",
         "properties": {
           "starRank": {
             "type": "integer",
+            "description": "The star ranking (1 = first star, 2 = second star, etc.).",
             "format": "int32"
           },
           "player": {
@@ -7615,16 +7986,19 @@
               {
                 "$ref": "#/components/schemas/PlayerBriefDto"
               }
-            ]
+            ],
+            "description": "The player who received the star."
           },
           "stats": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/StatItem"
-            }
+            },
+            "description": "The relevant stats for this game star."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a game star award."
       },
       "GameState": {
         "enum": [
@@ -7658,14 +8032,17 @@
         "properties": {
           "timeRemaining": {
             "type": "string",
+            "description": "Gets or sets the time remaining in the period when the goal was scored.",
             "format": "date-span"
           },
           "period": {
             "type": "integer",
+            "description": "Gets or sets the period in which the goal was scored.",
             "format": "int32"
           },
           "teamId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the team that scored the goal.",
             "format": "int32"
           },
           "scorer": {
@@ -7673,7 +8050,8 @@
               {
                 "$ref": "#/components/schemas/PlayerBriefDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the player who scored the goal."
           },
           "primaryAssist": {
             "allOf": [
@@ -7681,6 +8059,7 @@
                 "$ref": "#/components/schemas/PlayerBriefDto"
               }
             ],
+            "description": "Gets or sets the player credited with the primary assist.",
             "nullable": true
           },
           "secondaryAssist": {
@@ -7689,24 +8068,29 @@
                 "$ref": "#/components/schemas/PlayerBriefDto"
               }
             ],
+            "description": "Gets or sets the player credited with the secondary assist.",
             "nullable": true
           },
           "periodLabel": {
             "type": "string",
+            "description": "Gets the display label for the period.",
             "nullable": true,
             "readOnly": true
           },
           "periodAbbreviation": {
             "type": "string",
+            "description": "Gets the abbreviated label for the period.",
             "nullable": true,
             "readOnly": true
           },
           "timeString": {
             "type": "string",
+            "description": "Gets the formatted time remaining as a mm:ss string.",
             "readOnly": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Brief summary of a goal event."
       },
       "GoalieStatDto": {
         "required": [
@@ -7734,102 +8118,127 @@
         "properties": {
           "playerId": {
             "type": "integer",
+            "description": "Gets the player ID.",
             "format": "int32"
           },
           "accountId": {
             "type": "integer",
+            "description": "Gets the account ID associated with this player.",
             "format": "int32"
           },
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the player's first name."
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the player's last name."
           },
           "position": {
             "type": "string",
+            "description": "Gets the player's position.",
             "nullable": true
           },
           "jerseyNumber": {
             "type": "integer",
+            "description": "Gets the player's jersey number.",
             "format": "int32",
             "nullable": true
           },
           "birthday": {
             "type": "string",
+            "description": "Gets the player's date of birth.",
             "format": "date-time"
           },
           "profilePicture": {
             "type": "string",
+            "description": "Gets the URL of the player's profile picture.",
             "nullable": true
           },
           "teamId": {
             "type": "integer",
+            "description": "Gets the ID of the player's team.",
             "format": "int32",
             "nullable": true
           },
           "teamName": {
             "type": "string",
+            "description": "Gets the name of the player's team.",
             "nullable": true
           },
           "teamLogoUrl": {
             "type": "string",
+            "description": "Gets the URL of the team logo.",
             "nullable": true
           },
           "teamAbbreviation": {
             "type": "string",
+            "description": "Gets the team abbreviation.",
             "nullable": true
           },
           "gamesPlayed": {
             "type": "integer",
+            "description": "Gets the number of games played.",
             "format": "int32"
           },
           "goals": {
             "type": "integer",
+            "description": "Gets the number of goals scored.",
             "format": "int32"
           },
           "assists": {
             "type": "integer",
+            "description": "Gets the number of assists.",
             "format": "int32"
           },
           "penaltyMinutes": {
             "type": "number",
+            "description": "Gets the total penalty minutes.",
             "format": "double"
           },
           "goalsAgainst": {
             "type": "integer",
+            "description": "Gets the total goals allowed.",
             "format": "int32"
           },
           "goalsAgainstAverage": {
             "type": "number",
+            "description": "Gets the goals against average.",
             "format": "double"
           },
           "shotsAgainst": {
             "type": "integer",
+            "description": "Gets the total shots faced.",
             "format": "int32"
           },
           "saves": {
             "type": "integer",
+            "description": "Gets the total saves made.",
             "format": "int32"
           },
           "savePercentage": {
             "type": "number",
+            "description": "Gets the save percentage.",
             "format": "double"
           },
           "shutouts": {
             "type": "integer",
+            "description": "Gets the number of shutouts.",
             "format": "int32"
           },
           "wins": {
             "type": "integer",
+            "description": "Gets the number of wins.",
             "format": "int32"
           },
           "fullName": {
             "type": "string",
+            "description": "Gets the player's full name.",
             "readOnly": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a goalie's statistical line."
       },
       "GoalieStatDtoIPagedList": {
         "type": "object",
@@ -7864,14 +8273,17 @@
         "properties": {
           "title": {
             "type": "string",
+            "description": "Gets or sets the info guide title.",
             "nullable": true
           },
           "markdownContent": {
             "type": "string",
+            "description": "Gets or sets the Markdown content of the info guide.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Brief summary of an info guide."
       },
       "InfoGuideDto": {
         "required": [
@@ -7881,14 +8293,17 @@
         "properties": {
           "id": {
             "type": "string",
+            "description": "Gets the unique identifier of the info guide.",
             "format": "uuid"
           },
           "title": {
             "type": "string",
+            "description": "Gets or sets the title of the info guide.",
             "nullable": true
           },
           "tournamentId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the tournament this info guide is associated with.",
             "format": "int32",
             "nullable": true
           },
@@ -7898,10 +8313,12 @@
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
             ],
+            "description": "Gets the tournament this info guide is associated with.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing an info guide."
       },
       "InfoGuideDtoIPagedList": {
         "type": "object",
@@ -7939,14 +8356,17 @@
         "properties": {
           "id": {
             "type": "string",
+            "description": "Gets the unique identifier of the info guide.",
             "format": "uuid"
           },
           "title": {
             "type": "string",
+            "description": "Gets or sets the title of the info guide.",
             "nullable": true
           },
           "tournamentId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the tournament this info guide is associated with.",
             "format": "int32",
             "nullable": true
           },
@@ -7956,14 +8376,17 @@
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
             ],
+            "description": "Gets the tournament this info guide is associated with.",
             "nullable": true
           },
           "markdownContent": {
             "type": "string",
+            "description": "Gets or sets the Markdown content of the info guide.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single info guide, including its Markdown content."
       },
       "LoginRequest": {
         "type": "object",
@@ -7978,7 +8401,8 @@
             "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request payload for authenticating a user."
       },
       "PaymentBreakdown": {
         "type": "object",
@@ -8010,14 +8434,17 @@
         "properties": {
           "timeRemaining": {
             "type": "string",
+            "description": "Gets or sets the time remaining in the period when the penalty occurred.",
             "format": "date-span"
           },
           "period": {
             "type": "integer",
+            "description": "Gets or sets the period in which the penalty occurred.",
             "format": "int32"
           },
           "teamId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the team that received the penalty.",
             "format": "int32"
           },
           "player": {
@@ -8025,84 +8452,108 @@
               {
                 "$ref": "#/components/schemas/PlayerBriefDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the player who received the penalty."
           },
           "infraction": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the name of the infraction."
           },
           "durationMins": {
             "type": "integer",
+            "description": "Gets or sets the duration of the penalty in minutes.",
             "format": "int32"
           },
           "periodLabel": {
             "type": "string",
+            "description": "Gets the display label for the period.",
             "nullable": true,
             "readOnly": true
           },
           "periodAbbreviation": {
             "type": "string",
+            "description": "Gets the abbreviated label for the period.",
             "nullable": true,
             "readOnly": true
           },
           "timeString": {
             "type": "string",
+            "description": "Gets the formatted time remaining as a mm:ss string.",
             "readOnly": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Brief summary of a penalty event."
       },
       "PlayerBriefDto": {
+        "required": [
+          "firstName",
+          "lastName"
+        ],
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the player ID.",
             "format": "int32"
           },
           "accountId": {
             "type": "integer",
+            "description": "Gets or sets the account ID associated with this player.",
             "format": "int32"
           },
           "position": {
             "type": "string",
+            "description": "Gets or sets the player's position.",
             "nullable": true
           },
           "jerseyNumber": {
             "type": "integer",
+            "description": "Gets or sets the player's jersey number.",
             "format": "int32",
             "nullable": true
           },
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the player's first name."
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the player's last name."
           },
           "birthday": {
             "type": "string",
+            "description": "Gets or sets the player's date of birth.",
             "format": "date-time"
           },
           "profilePicture": {
             "type": "string",
+            "description": "Gets or sets the URL of the player's profile picture.",
             "nullable": true
           },
           "captaincyTag": {
             "type": "string",
+            "description": "Gets or sets the captaincy designation character (C or A).",
             "nullable": true
           },
           "isGoalie": {
             "type": "boolean",
+            "description": "Gets whether the player is a goalie.",
             "readOnly": true
           },
           "fullName": {
             "type": "string",
+            "description": "Gets the player's full name.",
             "readOnly": true
           },
           "jerseyNumberLabel": {
             "type": "string",
+            "description": "Gets the formatted jersey number label.",
             "readOnly": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Brief summary of a player."
       },
       "PlayerDto": {
         "required": [
@@ -8113,45 +8564,55 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets the player ID.",
             "format": "int32"
           },
           "accountId": {
             "type": "integer",
+            "description": "Gets the account ID associated with this player.",
             "format": "int32",
             "nullable": true
           },
           "position": {
             "type": "string",
+            "description": "Gets the player's position.",
             "nullable": true
           },
           "jerseyNumber": {
             "type": "integer",
+            "description": "Gets the player's jersey number.",
             "format": "int32",
             "nullable": true
           },
           "firstName": {
             "type": "string",
+            "description": "Gets the player's first name.",
             "nullable": true
           },
           "lastName": {
             "type": "string",
+            "description": "Gets the player's last name.",
             "nullable": true
           },
           "birthday": {
             "type": "string",
+            "description": "Gets the player's date of birth.",
             "format": "date-time",
             "nullable": true
           },
           "profilePicture": {
             "type": "string",
+            "description": "Gets the URL of the player's profile picture.",
             "nullable": true
           },
           "bannerPicture": {
             "type": "string",
+            "description": "Gets the URL of the player's banner picture.",
             "nullable": true
           },
           "preferredBeer": {
             "type": "string",
+            "description": "Gets the player's preferred beer.",
             "nullable": true
           },
           "tournament": {
@@ -8159,7 +8620,8 @@
               {
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
-            ]
+            ],
+            "description": "Gets the tournament this player is registered in."
           },
           "team": {
             "allOf": [
@@ -8167,22 +8629,27 @@
                 "$ref": "#/components/schemas/TeamBriefDto"
               }
             ],
+            "description": "Gets the team this player belongs to, if assigned.",
             "nullable": true
           },
           "fullName": {
             "type": "string",
+            "description": "Gets the player's full name.",
             "readOnly": true
           },
           "jerseyNumberLabel": {
             "type": "string",
+            "description": "Gets the formatted jersey number label.",
             "readOnly": true
           },
           "isGoalie": {
             "type": "boolean",
+            "description": "Gets whether the player is a goalie.",
             "readOnly": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a player in a tournament."
       },
       "PlayerDtoIPagedList": {
         "type": "object",
@@ -8228,30 +8695,37 @@
         "properties": {
           "goals": {
             "type": "integer",
+            "description": "Gets or sets the number of goals scored in the game.",
             "format": "int32"
           },
           "assists": {
             "type": "integer",
+            "description": "Gets or sets the number of assists in the game.",
             "format": "int32"
           },
           "points": {
             "type": "integer",
+            "description": "Gets the total points (goals plus assists) for the game.",
             "format": "int32",
             "readOnly": true
           },
           "penaltyMinutes": {
             "type": "integer",
+            "description": "Gets or sets the penalty minutes accumulated in the game.",
             "format": "int32"
           },
           "win": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether the player's team won the game."
           },
           "shutouts": {
             "type": "integer",
+            "description": "Gets or sets the number of shutouts recorded in the game (goalie stat).",
             "format": "int32"
           },
           "goalsAgainst": {
             "type": "integer",
+            "description": "Gets or sets the goals allowed in the game (goalie stat).",
             "format": "int32"
           },
           "tournament": {
@@ -8259,14 +8733,16 @@
               {
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the tournament this game was part of."
           },
           "game": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/GameOfTeamDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the game details from the team's perspective."
           },
           "team": {
             "allOf": [
@@ -8274,10 +8750,12 @@
                 "$ref": "#/components/schemas/TeamBriefDto"
               }
             ],
+            "description": "Gets or sets the team the player was on for this game.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a player's stats for a single game."
       },
       "PlayerSingleDto": {
         "required": [
@@ -8288,45 +8766,55 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets the player ID.",
             "format": "int32"
           },
           "accountId": {
             "type": "integer",
+            "description": "Gets the account ID associated with this player.",
             "format": "int32",
             "nullable": true
           },
           "position": {
             "type": "string",
+            "description": "Gets the player's position.",
             "nullable": true
           },
           "jerseyNumber": {
             "type": "integer",
+            "description": "Gets the player's jersey number.",
             "format": "int32",
             "nullable": true
           },
           "firstName": {
             "type": "string",
+            "description": "Gets the player's first name.",
             "nullable": true
           },
           "lastName": {
             "type": "string",
+            "description": "Gets the player's last name.",
             "nullable": true
           },
           "birthday": {
             "type": "string",
+            "description": "Gets the player's date of birth.",
             "format": "date-time",
             "nullable": true
           },
           "profilePicture": {
             "type": "string",
+            "description": "Gets the URL of the player's profile picture.",
             "nullable": true
           },
           "bannerPicture": {
             "type": "string",
+            "description": "Gets the URL of the player's banner picture.",
             "nullable": true
           },
           "preferredBeer": {
             "type": "string",
+            "description": "Gets the player's preferred beer.",
             "nullable": true
           },
           "tournament": {
@@ -8334,7 +8822,8 @@
               {
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
-            ]
+            ],
+            "description": "Gets the tournament this player is registered in."
           },
           "team": {
             "allOf": [
@@ -8342,26 +8831,32 @@
                 "$ref": "#/components/schemas/TeamBriefDto"
               }
             ],
+            "description": "Gets the team this player belongs to, if assigned.",
             "nullable": true
           },
           "fullName": {
             "type": "string",
+            "description": "Gets the player's full name.",
             "readOnly": true
           },
           "jerseyNumberLabel": {
             "type": "string",
+            "description": "Gets the formatted jersey number label.",
             "readOnly": true
           },
           "isGoalie": {
             "type": "boolean",
+            "description": "Gets whether the player is a goalie.",
             "readOnly": true
           },
           "height": {
             "type": "string",
+            "description": "Gets or sets the player's formatted height (e.g. \"6'1\").",
             "nullable": true
           },
           "weight": {
             "type": "integer",
+            "description": "Gets or sets the player's weight.",
             "format": "int32",
             "nullable": true
           },
@@ -8369,16 +8864,19 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlayerGameByGame"
-            }
+            },
+            "description": "Gets the player's game-by-game stat history."
           },
           "tournamentStats": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlayerTournamentStats"
-            }
+            },
+            "description": "Gets the player's aggregated stats per tournament."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single player, including game-by-game and tournament stats."
       },
       "PlayerStatDto": {
         "required": [
@@ -8389,68 +8887,85 @@
         "properties": {
           "playerId": {
             "type": "integer",
+            "description": "Gets the player ID.",
             "format": "int32"
           },
           "accountId": {
             "type": "integer",
+            "description": "Gets the account ID associated with this player.",
             "format": "int32"
           },
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the player's first name."
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the player's last name."
           },
           "position": {
             "type": "string",
+            "description": "Gets the player's position.",
             "nullable": true
           },
           "jerseyNumber": {
             "type": "integer",
+            "description": "Gets the player's jersey number.",
             "format": "int32",
             "nullable": true
           },
           "birthday": {
             "type": "string",
+            "description": "Gets the player's date of birth.",
             "format": "date-time"
           },
           "profilePicture": {
             "type": "string",
+            "description": "Gets the URL of the player's profile picture.",
             "nullable": true
           },
           "teamId": {
             "type": "integer",
+            "description": "Gets the ID of the player's team.",
             "format": "int32"
           },
           "teamName": {
             "type": "string",
+            "description": "Gets the name of the player's team.",
             "nullable": true
           },
           "teamLogoUrl": {
             "type": "string",
+            "description": "Gets the URL of the team logo.",
             "nullable": true
           },
           "teamAbbreviation": {
             "type": "string",
+            "description": "Gets the team abbreviation.",
             "nullable": true
           },
           "statValue": {
             "type": "number",
+            "description": "Gets the raw numeric value of the stat.",
             "format": "double"
           },
           "statString": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the formatted display string of the stat."
           },
           "fullName": {
             "type": "string",
+            "description": "Gets the player's full name.",
             "readOnly": true
           },
           "jerseyNumberLabel": {
             "type": "string",
+            "description": "Gets the formatted jersey number label.",
             "readOnly": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a player's entry in a stat leaderboard."
       },
       "PlayerStatLeadersDto": {
         "required": [
@@ -8459,16 +8974,19 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the title of this leaderboard category."
           },
           "leaders": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlayerStatDto"
-            }
+            },
+            "description": "Gets the ranked list of players for this category."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a leaderboard category with its top players."
       },
       "PlayerTournamentStats": {
         "required": [
@@ -8486,35 +9004,43 @@
         "properties": {
           "gamesPlayed": {
             "type": "integer",
+            "description": "Gets or sets the number of games played.",
             "format": "int32"
           },
           "goals": {
             "type": "integer",
+            "description": "Gets or sets the number of goals scored.",
             "format": "int32"
           },
           "assists": {
             "type": "integer",
+            "description": "Gets or sets the number of assists.",
             "format": "int32"
           },
           "points": {
             "type": "integer",
+            "description": "Gets the total points (goals plus assists).",
             "format": "int32",
             "readOnly": true
           },
           "penaltyMinutes": {
             "type": "integer",
+            "description": "Gets or sets the total penalty minutes.",
             "format": "int32"
           },
           "wins": {
             "type": "integer",
+            "description": "Gets or sets the number of wins (goalie stat).",
             "format": "int32"
           },
           "shutouts": {
             "type": "integer",
+            "description": "Gets or sets the number of shutouts (goalie stat).",
             "format": "int32"
           },
           "goalsAgainstAverage": {
             "type": "number",
+            "description": "Gets or sets the goals against average (goalie stat).",
             "format": "double",
             "nullable": true
           },
@@ -8523,7 +9049,8 @@
               {
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
-            ]
+            ],
+            "description": "Gets or sets the tournament these stats are from."
           },
           "team": {
             "allOf": [
@@ -8531,10 +9058,12 @@
                 "$ref": "#/components/schemas/TeamBriefDto"
               }
             ],
+            "description": "Gets or sets the team the player was on during this tournament.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a player's aggregated stats for a single tournament."
       },
       "RegisterRequest": {
         "required": [
@@ -8589,16 +9118,19 @@
         "properties": {
           "round": {
             "type": "integer",
+            "description": "The round number.",
             "format": "int32"
           },
           "picks": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DraftPickDto"
-            }
+            },
+            "description": "The ordered picks within this round."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Represents the ordered picks for a single draft round."
       },
       "SkaterStatDto": {
         "required": [
@@ -8620,78 +9152,97 @@
         "properties": {
           "playerId": {
             "type": "integer",
+            "description": "Gets the player ID.",
             "format": "int32"
           },
           "accountId": {
             "type": "integer",
+            "description": "Gets the account ID associated with this player.",
             "format": "int32"
           },
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the player's first name."
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the player's last name."
           },
           "position": {
             "type": "string",
+            "description": "Gets the player's position.",
             "nullable": true
           },
           "jerseyNumber": {
             "type": "integer",
+            "description": "Gets the player's jersey number.",
             "format": "int32",
             "nullable": true
           },
           "birthday": {
             "type": "string",
+            "description": "Gets the player's date of birth.",
             "format": "date-time"
           },
           "profilePicture": {
             "type": "string",
+            "description": "Gets the URL of the player's profile picture.",
             "nullable": true
           },
           "teamId": {
             "type": "integer",
+            "description": "Gets the ID of the player's team.",
             "format": "int32",
             "nullable": true
           },
           "teamName": {
             "type": "string",
+            "description": "Gets the name of the player's team.",
             "nullable": true
           },
           "teamLogoUrl": {
             "type": "string",
+            "description": "Gets the URL of the team logo.",
             "nullable": true
           },
           "teamAbbreviation": {
             "type": "string",
+            "description": "Gets the team abbreviation.",
             "nullable": true
           },
           "gamesPlayed": {
             "type": "integer",
+            "description": "Gets the number of games played.",
             "format": "int32"
           },
           "goals": {
             "type": "integer",
+            "description": "Gets the number of goals scored.",
             "format": "int32"
           },
           "assists": {
             "type": "integer",
+            "description": "Gets the number of assists.",
             "format": "int32"
           },
           "points": {
             "type": "integer",
+            "description": "Gets the total points (goals plus assists).",
             "format": "int32"
           },
           "penaltyMinutes": {
             "type": "number",
+            "description": "Gets the total penalty minutes.",
             "format": "double"
           },
           "fullName": {
             "type": "string",
+            "description": "Gets the player's full name.",
             "readOnly": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a skater's statistical line."
       },
       "SkaterStatDtoIPagedList": {
         "type": "object",
@@ -8725,13 +9276,16 @@
         "type": "object",
         "properties": {
           "tag": {
-            "type": "string"
+            "type": "string",
+            "description": "The label or category of the statistic."
           },
           "value": {
-            "type": "string"
+            "type": "string",
+            "description": "The formatted value of the statistic."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Represents a single displayed statistic."
       },
       "SystemContextDto": {
         "type": "object",
@@ -8742,6 +9296,7 @@
                 "$ref": "#/components/schemas/TournamentSingleDto"
               }
             ],
+            "description": "Detailed DTO for a single tournament, including info guide and sponsors.",
             "nullable": true
           },
           "featuredStats": {
@@ -8750,50 +9305,64 @@
                 "$ref": "#/components/schemas/TournamentStatLeadersDto"
               }
             ],
+            "description": "Contains stat leader information for a featured tournament.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Contains the system-wide contextual data returned by the context endpoint."
       },
       "TeamBriefDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the team ID.",
             "format": "int32"
           },
           "name": {
             "type": "string",
+            "description": "Gets or sets the full team name.",
             "nullable": true
           },
           "nameShort": {
             "type": "string",
+            "description": "Gets or sets the short team name.",
             "nullable": true
           },
           "abbreviation": {
             "type": "string",
+            "description": "Gets or sets the team abbreviation.",
             "nullable": true
           },
           "logo": {
             "type": "string",
+            "description": "Gets or sets the URL of the team logo.",
             "nullable": true
           },
           "banner": {
             "type": "string",
+            "description": "Gets or sets the URL of the team banner image.",
             "nullable": true
           },
           "primaryColorHex": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the primary color hex code.",
+            "nullable": true
           },
           "secondaryColorHex": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the secondary color hex code.",
+            "nullable": true
           },
           "tertiaryColorHex": {
             "type": "string",
+            "description": "Gets or sets the tertiary color hex code.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Brief summary of a team."
       },
       "TeamDto": {
         "required": [
@@ -8808,16 +9377,20 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets the team ID.",
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the full team name."
           },
           "nameShort": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the short team name."
           },
           "abbreviation": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the team abbreviation."
           },
           "tournament": {
             "allOf": [
@@ -8825,53 +9398,66 @@
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
             ],
+            "description": "Gets the tournament this team participates in.",
             "nullable": true
           },
           "logoUrl": {
             "type": "string",
+            "description": "Gets the URL of the team logo.",
             "nullable": true
           },
           "bannerUrl": {
             "type": "string",
+            "description": "Gets the URL of the team banner image.",
             "nullable": true
           },
           "primaryColorHex": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the primary color hex code."
           },
           "secondaryColorHex": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the secondary color hex code."
           },
           "tertiaryColorHex": {
             "type": "string",
+            "description": "Gets the tertiary color hex code.",
             "nullable": true
           },
           "goalSongUrl": {
             "type": "string",
+            "description": "Gets the URL of the team's goal celebration song.",
             "nullable": true
           },
           "penaltySongUrl": {
             "type": "string",
+            "description": "Gets the URL of the team's penalty song.",
             "nullable": true
           },
           "gmAccountId": {
             "type": "integer",
+            "description": "Gets the account ID of the general manager.",
             "format": "int32",
             "nullable": true
           },
           "gmFirstName": {
             "type": "string",
+            "description": "Gets the first name of the general manager.",
             "nullable": true
           },
           "gmLastName": {
             "type": "string",
+            "description": "Gets the last name of the general manager.",
             "nullable": true
           },
           "gmProfilePicture": {
             "type": "string",
+            "description": "Gets the URL of the general manager's profile picture.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a team."
       },
       "TeamDtoIPagedList": {
         "type": "object",
@@ -8906,44 +9492,57 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the team ID.",
             "format": "int32"
           },
           "name": {
             "type": "string",
+            "description": "Gets or sets the full team name.",
             "nullable": true
           },
           "nameShort": {
             "type": "string",
+            "description": "Gets or sets the short team name.",
             "nullable": true
           },
           "abbreviation": {
             "type": "string",
+            "description": "Gets or sets the team abbreviation.",
             "nullable": true
           },
           "logo": {
             "type": "string",
+            "description": "Gets or sets the URL of the team logo.",
             "nullable": true
           },
           "banner": {
             "type": "string",
+            "description": "Gets or sets the URL of the team banner image.",
             "nullable": true
           },
           "primaryColorHex": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the primary color hex code.",
+            "nullable": true
           },
           "secondaryColorHex": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the secondary color hex code.",
+            "nullable": true
           },
           "tertiaryColorHex": {
             "type": "string",
+            "description": "Gets or sets the tertiary color hex code.",
             "nullable": true
           },
           "goals": {
             "type": "integer",
+            "description": "Gets or sets the number of goals scored by the team in the game.",
             "format": "int32"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Brief summary of a team with their goal count for a specific game."
       },
       "TeamSingleDto": {
         "required": [
@@ -8959,16 +9558,20 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets the team ID.",
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the full team name."
           },
           "nameShort": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the short team name."
           },
           "abbreviation": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the team abbreviation."
           },
           "tournament": {
             "allOf": [
@@ -8976,98 +9579,121 @@
                 "$ref": "#/components/schemas/TournamentBriefDto"
               }
             ],
+            "description": "Gets the tournament this team participates in.",
             "nullable": true
           },
           "logoUrl": {
             "type": "string",
+            "description": "Gets the URL of the team logo.",
             "nullable": true
           },
           "bannerUrl": {
             "type": "string",
+            "description": "Gets the URL of the team banner image.",
             "nullable": true
           },
           "primaryColorHex": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the primary color hex code."
           },
           "secondaryColorHex": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets the secondary color hex code."
           },
           "tertiaryColorHex": {
             "type": "string",
+            "description": "Gets the tertiary color hex code.",
             "nullable": true
           },
           "goalSongUrl": {
             "type": "string",
+            "description": "Gets the URL of the team's goal celebration song.",
             "nullable": true
           },
           "penaltySongUrl": {
             "type": "string",
+            "description": "Gets the URL of the team's penalty song.",
             "nullable": true
           },
           "gmAccountId": {
             "type": "integer",
+            "description": "Gets the account ID of the general manager.",
             "format": "int32",
             "nullable": true
           },
           "gmFirstName": {
             "type": "string",
+            "description": "Gets the first name of the general manager.",
             "nullable": true
           },
           "gmLastName": {
             "type": "string",
+            "description": "Gets the last name of the general manager.",
             "nullable": true
           },
           "gmProfilePicture": {
             "type": "string",
+            "description": "Gets the URL of the general manager's profile picture.",
             "nullable": true
           },
           "players": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlayerBriefDto"
-            }
+            },
+            "description": "Gets the list of players on the team's roster."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single team, including its roster."
       },
       "TournamentBriefDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the tournament ID.",
             "format": "int32"
           },
           "name": {
             "type": "string",
+            "description": "Gets or sets the tournament name.",
             "nullable": true
           },
           "startDate": {
             "type": "string",
+            "description": "Gets or sets the tournament start date.",
             "format": "date-time",
             "nullable": true
           },
           "endDate": {
             "type": "string",
+            "description": "Gets or sets the tournament end date.",
             "format": "date-time",
             "nullable": true
           },
           "winningTeamId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the team that won the tournament.",
             "format": "int32",
             "nullable": true
           },
           "isActive": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether the tournament is currently active."
           },
           "isRegistrationOpen": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether registration is currently open."
           },
           "logo": {
             "type": "string",
+            "description": "Gets or sets the URL of the tournament logo.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Brief summary of a tournament."
       },
       "TournamentDto": {
         "required": [
@@ -9081,46 +9707,57 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the tournament ID.",
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the tournament name."
           },
           "logo": {
             "type": "string",
+            "description": "Gets or sets the URL of the tournament logo.",
             "nullable": true
           },
           "startDate": {
             "type": "string",
+            "description": "Gets or sets the tournament start date.",
             "format": "date-time",
             "nullable": true
           },
           "endDate": {
             "type": "string",
+            "description": "Gets or sets the tournament end date.",
             "format": "date-time",
             "nullable": true
           },
           "winningTeamId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the team that won the tournament.",
             "format": "int32",
             "nullable": true
           },
           "isActive": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether the tournament is currently active."
           },
           "isRegistrationOpen": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether registration is currently open."
           },
           "isPaymentOpen": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether payment is currently open."
           },
           "skaterLimit": {
             "type": "integer",
+            "description": "Gets or sets the maximum number of skaters allowed to register.",
             "format": "int32",
             "nullable": true
           },
           "goalieLimit": {
             "type": "integer",
+            "description": "Gets or sets the maximum number of goalies allowed to register.",
             "format": "int32",
             "nullable": true
           },
@@ -9130,10 +9767,12 @@
                 "$ref": "#/components/schemas/GalleryBriefDto"
               }
             ],
+            "description": "Gets or sets the gallery associated with this tournament.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a tournament."
       },
       "TournamentDtoIPagedList": {
         "type": "object",
@@ -9167,40 +9806,49 @@
         "type": "object",
         "properties": {
           "clientSecret": {
-            "type": "string"
+            "type": "string",
+            "description": "The Stripe client secret for the payment intent."
           },
           "totalAmount": {
             "type": "number",
+            "description": "The total amount to be charged.",
             "format": "double"
           },
           "currency": {
-            "type": "string"
+            "type": "string",
+            "description": "The currency code for the payment."
           },
           "breakdown": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PaymentBreakdown"
-            }
+            },
+            "description": "The itemized breakdown of the payment amount."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a payment intent for a tournament registration fee."
       },
       "TournamentRegistrationDto": {
         "type": "object",
         "properties": {
           "currentStep": {
             "type": "integer",
+            "description": "Gets or sets the current step in the registration process.",
             "format": "int32"
           },
           "payload": {
             "type": "string",
+            "description": "Gets or sets the serialized payload for the current registration step.",
             "nullable": true
           },
           "isComplete": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether the registration has been completed."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing the state of a tournament registration flow."
       },
       "TournamentSingleDto": {
         "required": [
@@ -9214,46 +9862,57 @@
         "properties": {
           "id": {
             "type": "integer",
+            "description": "Gets or sets the tournament ID.",
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the tournament name."
           },
           "logo": {
             "type": "string",
+            "description": "Gets or sets the URL of the tournament logo.",
             "nullable": true
           },
           "startDate": {
             "type": "string",
+            "description": "Gets or sets the tournament start date.",
             "format": "date-time",
             "nullable": true
           },
           "endDate": {
             "type": "string",
+            "description": "Gets or sets the tournament end date.",
             "format": "date-time",
             "nullable": true
           },
           "winningTeamId": {
             "type": "integer",
+            "description": "Gets or sets the ID of the team that won the tournament.",
             "format": "int32",
             "nullable": true
           },
           "isActive": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether the tournament is currently active."
           },
           "isRegistrationOpen": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether registration is currently open."
           },
           "isPaymentOpen": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Gets or sets whether payment is currently open."
           },
           "skaterLimit": {
             "type": "integer",
+            "description": "Gets or sets the maximum number of skaters allowed to register.",
             "format": "int32",
             "nullable": true
           },
           "goalieLimit": {
             "type": "integer",
+            "description": "Gets or sets the maximum number of goalies allowed to register.",
             "format": "int32",
             "nullable": true
           },
@@ -9263,6 +9922,7 @@
                 "$ref": "#/components/schemas/GalleryBriefDto"
               }
             ],
+            "description": "Gets or sets the gallery associated with this tournament.",
             "nullable": true
           },
           "infoGuide": {
@@ -9271,34 +9931,41 @@
                 "$ref": "#/components/schemas/InfoGuideBriefDto"
               }
             ],
+            "description": "Gets the info guide associated with this tournament, if any.",
             "nullable": true
           },
           "sponsors": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TournamentSponsorDto"
-            }
+            },
+            "description": "Gets the list of sponsors for this tournament."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single tournament, including info guide and sponsors."
       },
       "TournamentSponsorDto": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
+            "description": "Gets the sponsor's name.",
             "nullable": true
           },
           "logoUrl": {
             "type": "string",
+            "description": "Gets the URL of the sponsor's logo.",
             "nullable": true
           },
           "websiteUrl": {
             "type": "string",
+            "description": "Gets or sets the sponsor's website URL.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "DTO representing a tournament sponsor."
       },
       "TournamentStatLeadersDto": {
         "required": [
@@ -9309,58 +9976,71 @@
         "properties": {
           "tournamentId": {
             "type": "integer",
+            "description": "The ID of the featured tournament.",
             "format": "int32"
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "description": "The display title for the featured stats section."
           },
           "statLeaders": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlayerStatLeadersDto"
-            }
+            },
+            "description": "The list of stat leader categories."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Contains stat leader information for a featured tournament."
       },
       "UpdateAccountRequest": {
         "type": "object",
         "properties": {
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the user's first name."
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "description": "Gets or sets the user's last name."
           },
           "birthday": {
             "type": "string",
+            "description": "Gets or sets the user's date of birth.",
             "format": "date-time"
           },
           "highestLevel": {
             "type": "string",
+            "description": "Gets or sets the highest level of hockey the user has played.",
             "nullable": true
           },
           "preferredBeer": {
             "type": "string",
+            "description": "Gets or sets the user's preferred beer.",
             "nullable": true
           },
           "height": {
             "type": "string",
+            "description": "Gets or sets the user's height in FT'IN format (e.g., \"5'11\").",
             "nullable": true
           },
           "weight": {
             "type": "integer",
+            "description": "Gets or sets the user's weight in pounds.",
             "format": "int32",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request to update an existing user account's profile information."
       },
       "UpdateDraftRequest": {
         "type": "object",
         "properties": {
           "title": {
             "type": "string",
+            "description": "Gets or sets the updated display title for the draft.",
             "nullable": true
           },
           "draftType": {
@@ -9369,6 +10049,7 @@
                 "$ref": "#/components/schemas/DraftType"
               }
             ],
+            "description": "Gets or sets the updated draft type.",
             "nullable": true
           },
           "ordering": {
@@ -9376,10 +10057,12 @@
             "items": {
               "$ref": "#/components/schemas/DraftOrderingRequestEntry"
             },
+            "description": "Gets or sets the updated pick ordering for each team.",
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request to update an existing draft's settings."
       },
       "UploadCredentials": {
         "type": "object",
@@ -9403,7 +10086,8 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Request payload for verifying a password reset code."
       }
     },
     "securitySchemes": {

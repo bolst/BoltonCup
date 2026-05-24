@@ -88,7 +88,8 @@ public class TournamentPaymentService(
 
     public async Task ProcessPaymentIntentAsync(ProcessTournamentPaymentIntentCommand command, CancellationToken cancellationToken = default)
     {
-        // _logger.LogInformation("Payment succeeded for account ID {AccountId} in tournament ID {TournamentId}", command.AccountId, command.TournamentId);
+        _logger.LogInformation("Processing payment for account {AccountId} in tournament {TournamentId}", 
+            command.AccountId, command.TournamentId);
         await _registrationService.CompleteRegistrationAsync(
             accountId: command.AccountId, 
             tournamentId: command.TournamentId, 

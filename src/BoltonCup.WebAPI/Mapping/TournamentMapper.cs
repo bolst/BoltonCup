@@ -2,17 +2,29 @@ using BoltonCup.Core;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Maps <see cref="Tournament"/> entities to DTOs and queries.</summary>
 public interface ITournamentMapper
 {
+    /// <summary>Maps a <see cref="GetTournamentsRequest"/> to a <see cref="GetTournamentsQuery"/>.</summary>
     GetTournamentsQuery ToQuery(GetTournamentsRequest request);
+
+    /// <summary>Maps a paged list of <see cref="Tournament"/> entities to a paged list of <see cref="TournamentDto"/>.</summary>
     IPagedList<TournamentDto> ToDtoList(IPagedList<Tournament> tournaments);
+
+    /// <summary>Maps a <see cref="Tournament"/> to a <see cref="TournamentSingleDto"/>, or returns <see langword="null"/> if the tournament is null.</summary>
     TournamentSingleDto? ToDto(Tournament? tournament);
+
+    /// <summary>Maps a collection of skater stats to a player stat leaders DTO.</summary>
     PlayerStatLeadersDto ToDto(string title, IEnumerable<SkaterStat> stats, Func<SkaterStat, double> selector, string? format = null);
+
+    /// <summary>Maps a collection of goalie stats to a player stat leaders DTO.</summary>
     PlayerStatLeadersDto ToDto(string title, IEnumerable<GoalieStat> stats, Func<GoalieStat, double> selector, string? format = null);
 }
 
+/// <summary>Maps <see cref="Tournament"/> entities to DTOs and queries.</summary>
 public class TournamentMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMapper) : ITournamentMapper
 {
+    /// <inheritdoc/>
     public GetTournamentsQuery ToQuery(GetTournamentsRequest request)
     {
         return new GetTournamentsQuery
@@ -25,6 +37,7 @@ public class TournamentMapper(IAssetUrlResolver _urlResolver, IBriefMapper _brie
         };
     }
     
+    /// <inheritdoc/>
     public IPagedList<TournamentDto> ToDtoList(IPagedList<Tournament> tournaments)
     {
         return tournaments.ProjectTo(tournament => new TournamentDto
@@ -45,6 +58,7 @@ public class TournamentMapper(IAssetUrlResolver _urlResolver, IBriefMapper _brie
     }    
     
     
+    /// <inheritdoc/>
     public TournamentSingleDto? ToDto(Tournament? tournament)
     {
         return tournament is null
@@ -76,6 +90,7 @@ public class TournamentMapper(IAssetUrlResolver _urlResolver, IBriefMapper _brie
     }
     
     
+    /// <inheritdoc/>
     public PlayerStatLeadersDto ToDto(string title, IEnumerable<SkaterStat> stats, Func<SkaterStat, double> selector, string? format = null)
     {
         return new PlayerStatLeadersDto
@@ -102,6 +117,7 @@ public class TournamentMapper(IAssetUrlResolver _urlResolver, IBriefMapper _brie
     }
     
     
+    /// <inheritdoc/>
     public PlayerStatLeadersDto ToDto(string title, IEnumerable<GoalieStat> stats, Func<GoalieStat, double> selector, string? format = null)
     {
         return new PlayerStatLeadersDto

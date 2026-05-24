@@ -8,6 +8,10 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
+    <PropertyGroup>
+      <NoWarn>1701;1702;8669</NoWarn>
+    </PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="MudBlazor" Version="9.4.0" />
       <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.2" />

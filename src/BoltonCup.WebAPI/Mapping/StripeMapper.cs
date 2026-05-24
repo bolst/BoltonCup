@@ -4,16 +4,21 @@ using Stripe;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Maps Stripe <see cref="PaymentIntent"/> objects to application commands.</summary>
 public interface IStripeMapper
 {
+    /// <summary>Attempts to parse a tournament payment intent into a <see cref="ProcessTournamentPaymentIntentCommand"/>.</summary>
     bool TryParseTournamentPaymentCommand(PaymentIntent paymentIntent, out ProcessTournamentPaymentIntentCommand command);
 
+    /// <summary>Attempts to parse a bracket challenge payment intent into a <see cref="ProcessBracketChallengePaymentIntentCommand"/>.</summary>
     bool TryParseBracketChallengePaymentCommand(PaymentIntent paymentIntent,
         out ProcessBracketChallengePaymentIntentCommand command);
 }
 
+/// <summary>Maps Stripe <see cref="PaymentIntent"/> objects to application commands.</summary>
 public class StripeMapper() : IStripeMapper
 {
+    /// <inheritdoc/>
     public bool TryParseTournamentPaymentCommand(PaymentIntent paymentIntent, out ProcessTournamentPaymentIntentCommand command)
     {
         command = null!;
@@ -33,6 +38,7 @@ public class StripeMapper() : IStripeMapper
         return false;
     }
 
+    /// <inheritdoc/>
     public bool TryParseBracketChallengePaymentCommand(PaymentIntent paymentIntent,
         out ProcessBracketChallengePaymentIntentCommand command)
     {

@@ -2,15 +2,23 @@ using BoltonCup.Core;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Maps <see cref="Player"/> entities to DTOs and queries.</summary>
 public interface IPlayerMapper
 {
+    /// <summary>Maps a <see cref="GetPlayersRequest"/> to a <see cref="GetPlayersQuery"/>.</summary>
     GetPlayersQuery ToQuery(GetPlayersRequest request);
+
+    /// <summary>Maps a paged list of <see cref="Player"/> entities to a paged list of <see cref="PlayerDto"/>.</summary>
     IPagedList<PlayerDto> ToDtoList(IPagedList<Player> players);
+
+    /// <summary>Maps a <see cref="Player"/> to a <see cref="PlayerSingleDto"/>, or returns <see langword="null"/> if the player is null.</summary>
     PlayerSingleDto? ToDto(Player? player);
 }
 
+/// <summary>Maps <see cref="Player"/> entities to DTOs and queries.</summary>
 public class PlayerMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMapper) : IPlayerMapper
 {
+    /// <inheritdoc/>
     public GetPlayersQuery ToQuery(GetPlayersRequest request)
     {
         return new GetPlayersQuery
@@ -24,6 +32,7 @@ public class PlayerMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMap
         };
     }
     
+    /// <inheritdoc/>
     public IPagedList<PlayerDto> ToDtoList(IPagedList<Player> players)
     {
         return players.ProjectTo(player => new PlayerDto
@@ -44,6 +53,7 @@ public class PlayerMapper(IAssetUrlResolver _urlResolver, IBriefMapper _briefMap
     }    
     
     
+    /// <inheritdoc/>
     public PlayerSingleDto? ToDto(Player? player)
     {
         if (player is null)

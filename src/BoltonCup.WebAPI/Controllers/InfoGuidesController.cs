@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Provides read access to tournament info guides.</summary>
 public class InfoGuidesController(IInfoGuideRepository _infoGuides, IInfoGuideMapper _mapper) : BoltonCupControllerBase
 {
+    /// <summary>Gets a paginated list of info guides.</summary>
     /// <remarks>
     /// Gets a paginated list of info guides.
     /// </remarks>
@@ -19,6 +21,7 @@ public class InfoGuidesController(IInfoGuideRepository _infoGuides, IInfoGuideMa
         return Ok(_mapper.ToDtoList(guides));
     }
 
+    /// <summary>Gets a single info guide by its ID.</summary>
     /// <remarks>
     /// Gets a single info guide by its ID.
     /// </remarks>
@@ -30,6 +33,7 @@ public class InfoGuidesController(IInfoGuideRepository _infoGuides, IInfoGuideMa
         return OkOrNoContent(_mapper.ToDto(guide));
     }
 
+    /// <summary>Gets an info guide by tournament ID.</summary>
     /// <remarks>
     /// Gets an info guide by tournament ID.
     /// </remarks>

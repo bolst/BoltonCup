@@ -3,17 +3,25 @@ using BoltonCup.Core.BracketChallenge;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Maps bracket challenge domain models to DTOs and commands.</summary>
 public interface IBracketChallengeMapper
 {
+    /// <summary>Maps a <see cref="GetBracketChallengesRequest"/> to a <see cref="GetBracketChallengesQuery"/>.</summary>
     GetBracketChallengesQuery ToQuery(GetBracketChallengesRequest request);
+    /// <summary>Maps a paged list of bracket challenge events to a paged list of <see cref="BracketChallengeDto"/>.</summary>
     IPagedList<BracketChallengeDto> ToDtoList(IPagedList<Core.BracketChallenge.Event> bracketChallenges);
+    /// <summary>Maps a bracket challenge event to a <see cref="BracketChallengeSingleDto"/>.</summary>
     BracketChallengeSingleDto? ToDto(Core.BracketChallenge.Event? bracketChallenge);
+    /// <summary>Maps a <see cref="BracketChallengePaymentIntent"/> to a <see cref="BracketChallengePaymentIntentDto"/>.</summary>
     BracketChallengePaymentIntentDto ToDto(BracketChallengePaymentIntent paymentIntent);
+    /// <summary>Maps a request to a <see cref="CreateBracketChallengePaymentIntentCommand"/>.</summary>
     CreateBracketChallengePaymentIntentCommand ToCommand(int bracketChallengeId, CreateBracketChallengePaymentIntentRequest request);
 }
 
+/// <summary>Maps bracket challenge domain models to DTOs and commands.</summary>
 public class BracketChallengeMapper(IAssetUrlResolver _urlResolver) : IBracketChallengeMapper
 {
+    /// <inheritdoc/>
     public GetBracketChallengesQuery ToQuery(GetBracketChallengesRequest request)
     {
         return new GetBracketChallengesQuery
@@ -25,6 +33,7 @@ public class BracketChallengeMapper(IAssetUrlResolver _urlResolver) : IBracketCh
         };
     }
 
+    /// <inheritdoc/>
     public IPagedList<BracketChallengeDto> ToDtoList(IPagedList<Core.BracketChallenge.Event> bracketChallenges)
     {
         return bracketChallenges.ProjectTo(challenge => new BracketChallengeDto
@@ -39,6 +48,7 @@ public class BracketChallengeMapper(IAssetUrlResolver _urlResolver) : IBracketCh
         });
     }
 
+    /// <inheritdoc/>
     public BracketChallengeSingleDto? ToDto(Core.BracketChallenge.Event? challenge)
     {
         if (challenge is null)
@@ -56,6 +66,7 @@ public class BracketChallengeMapper(IAssetUrlResolver _urlResolver) : IBracketCh
         };
     }
     
+    /// <inheritdoc/>
     public BracketChallengePaymentIntentDto ToDto(BracketChallengePaymentIntent paymentIntent)
     {
         return new BracketChallengePaymentIntentDto(
@@ -66,6 +77,7 @@ public class BracketChallengeMapper(IAssetUrlResolver _urlResolver) : IBracketCh
         );
     }
     
+    /// <inheritdoc/>
     public CreateBracketChallengePaymentIntentCommand ToCommand(int bracketChallengeId, CreateBracketChallengePaymentIntentRequest request)
     {
         return new CreateBracketChallengePaymentIntentCommand(

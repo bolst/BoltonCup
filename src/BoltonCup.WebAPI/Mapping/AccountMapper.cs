@@ -6,16 +6,23 @@ using BoltonCup.Shared;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Maps account domain models to DTOs and commands.</summary>
 public interface IAccountMapper
 {
+    /// <summary>Maps an <see cref="Account"/> to an <see cref="AccountDto"/>.</summary>
     AccountDto? ToDto(Account? account, ClaimsPrincipal claims);
+    /// <summary>Maps an <see cref="Account"/> to a list of <see cref="AccountTournamentDto"/>.</summary>
     ICollection<AccountTournamentDto> ToAccountTournamentDtoList(Account? account);
+    /// <summary>Maps a <see cref="CompleteUserAccountRequest"/> to a <see cref="CreateAccountCommand"/>.</summary>
     CreateAccountCommand ToCommand(CompleteUserAccountRequest request, ClaimsPrincipal claims);
+    /// <summary>Maps an <see cref="UpdateAccountRequest"/> to an <see cref="UpdateAccountCommand"/>.</summary>
     UpdateAccountCommand ToCommand(UpdateAccountRequest request, ClaimsPrincipal claims);
 }
 
+/// <summary>Maps account domain models to DTOs and commands.</summary>
 public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
 {
+    /// <inheritdoc/>
     public AccountDto? ToDto(Account? account, ClaimsPrincipal claims)
     {
         if (account?.Id is null)
@@ -39,6 +46,7 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
         };
     }
 
+    /// <inheritdoc/>
     public ICollection<AccountTournamentDto> ToAccountTournamentDtoList(Account? account)
     {
         if (account is null)
@@ -53,6 +61,7 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
             .ToList();
     }
 
+    /// <inheritdoc/>
     public CreateAccountCommand ToCommand(CompleteUserAccountRequest request, ClaimsPrincipal claims)
     {
         return new CreateAccountCommand(
@@ -68,6 +77,7 @@ public class AccountMapper(IBriefMapper _briefMapper) : IAccountMapper
         );
     }
 
+    /// <inheritdoc/>
     public UpdateAccountCommand ToCommand(UpdateAccountRequest request, ClaimsPrincipal claims)
     {
         var (feet, inches) = ParseHeight(request.Height);

@@ -19,7 +19,7 @@ internal class SystemTextJsonSerializer : IJsonSerializer
     }
 
     public T Deserialize<T>(string data) 
-        => JsonSerializer.Deserialize<T>(data, _options);
+        => JsonSerializer.Deserialize<T>(data, _options)!;
 
     public string Serialize<T>(T data)
         => JsonSerializer.Serialize(data, _options);

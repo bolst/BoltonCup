@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Base controller that provides shared helpers for all BoltonCup API controllers.</summary>
 [Route("api/[controller]")]
 [ApiController]
 public class BoltonCupControllerBase : ControllerBase

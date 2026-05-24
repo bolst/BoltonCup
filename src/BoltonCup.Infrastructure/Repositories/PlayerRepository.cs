@@ -44,42 +44,42 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
             // home game goals
             .Include(a => a.Players)
                 .ThenInclude(p => p.Team)
-                .ThenInclude(t => t.HomeGames)
+                .ThenInclude(t => t!.HomeGames)
                 .ThenInclude(g => g.Goals)
             // home game penalties
             .Include(a => a.Players)
                 .ThenInclude(p => p.Team)
-                .ThenInclude(t => t.HomeGames)
+                .ThenInclude(t => t!.HomeGames)
                 .ThenInclude(g => g.Penalties)
             // home game tournament
             .Include(a => a.Players)
                 .ThenInclude(p => p.Team)
-                .ThenInclude(t => t.HomeGames)
+                .ThenInclude(t => t!.HomeGames)
                 .ThenInclude(g => g.Tournament)
             // home game opponent
             .Include(a => a.Players)
                 .ThenInclude(p => p.Team)
-                .ThenInclude(t => t.HomeGames)
+                .ThenInclude(t => t!.HomeGames)
                 .ThenInclude(g => g.AwayTeam)
             // away game goals
             .Include(a => a.Players)
                 .ThenInclude(p => p.Team)
-                .ThenInclude(t => t.AwayGames)
+                .ThenInclude(t => t!.AwayGames)
                 .ThenInclude(g => g.Goals)
             // away game penalties
             .Include(a => a.Players)
                 .ThenInclude(p => p.Team)
-                .ThenInclude(t => t.AwayGames)
+                .ThenInclude(t => t!.AwayGames)
                 .ThenInclude(g => g.Penalties)
             // away game tournament
             .Include(a => a.Players)
                 .ThenInclude(p => p.Team)
-                .ThenInclude(t => t.AwayGames)
+                .ThenInclude(t => t!.AwayGames)
                 .ThenInclude(g => g.Tournament)
             // away game opponent
             .Include(a => a.Players)
                 .ThenInclude(p => p.Team)
-                .ThenInclude(t => t.AwayGames)
+                .ThenInclude(t => t!.AwayGames)
                 .ThenInclude(g => g.HomeTeam)
             .FirstOrDefaultAsync(a => a.Players.Any(p => p.Id == id), cancellationToken: cancellationToken);
         return account?.Players.FirstOrDefault(p => p.Id == id);

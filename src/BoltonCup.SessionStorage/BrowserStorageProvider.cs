@@ -13,7 +13,7 @@ internal class BrowserStorageProvider : IStorageProvider
     public BrowserStorageProvider(IJSRuntime jSRuntime)
     {
         _jSRuntime = jSRuntime;
-        _jSInProcessRuntime = jSRuntime as IJSInProcessRuntime;
+        _jSInProcessRuntime = (jSRuntime as IJSInProcessRuntime)!;
     }
 
     public async ValueTask ClearAsync(CancellationToken cancellationToken = default)

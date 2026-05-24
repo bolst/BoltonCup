@@ -46,6 +46,6 @@ jobs:
         username: root
         key: ${{ secrets.DEPLOY_SSH_KEY }}
         script: |
-          cd /opt/boltoncup
-          docker compose -f ./docker/webapi.yml pull
-          docker compose -f ./docker/webapi.yml up -d
+          cd /opt/BoltonCup
+          docker compose -f ./docker/webapi.yml --env-file .env pull
+          docker compose -f ./docker/webapi.yml --env-file .env up -d

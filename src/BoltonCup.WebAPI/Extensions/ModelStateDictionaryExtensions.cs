@@ -13,8 +13,10 @@ namespace BoltonCup.WebAPI.Extensions;
  * new BoltonCupValidationProblems(modelState.ToErrorDictionary()) { ... }
  */
 
+/// <summary>Extension methods for <see cref="ModelStateDictionary"/>.</summary>
 public static class ModelStateDictionaryExtensions
 {
+    /// <summary>Converts model state errors to a dictionary keyed by field name.</summary>
     public static IDictionary<string, string[]> ToErrorDictionary(this ModelStateDictionary modelState)
     {
         ArgumentNullException.ThrowIfNull(modelState);

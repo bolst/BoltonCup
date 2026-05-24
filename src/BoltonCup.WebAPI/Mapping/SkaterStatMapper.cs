@@ -2,14 +2,20 @@ using BoltonCup.Core;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Maps <see cref="SkaterStat"/> entities to DTOs and queries.</summary>
 public interface ISkaterStatMapper
 {
+    /// <summary>Maps a <see cref="GetSkaterStatsRequest"/> to a <see cref="GetSkaterStatsQuery"/>.</summary>
     GetSkaterStatsQuery ToQuery(GetSkaterStatsRequest request);
+
+    /// <summary>Maps a paged list of <see cref="SkaterStat"/> entities to a paged list of <see cref="SkaterStatDto"/>.</summary>
     IPagedList<SkaterStatDto> ToDtoList(IPagedList<SkaterStat> skaters);
 }
 
+/// <summary>Maps <see cref="SkaterStat"/> entities to DTOs and queries.</summary>
 public class SkaterStatMapper(IAssetUrlResolver _urlResolver) : ISkaterStatMapper
 {
+    /// <inheritdoc/>
     public GetSkaterStatsQuery ToQuery(GetSkaterStatsRequest request)
     {
         return new GetSkaterStatsQuery
@@ -24,8 +30,9 @@ public class SkaterStatMapper(IAssetUrlResolver _urlResolver) : ISkaterStatMappe
             Descending = request.Descending
         };
     }
-    
-    
+
+
+    /// <inheritdoc/>
     public IPagedList<SkaterStatDto> ToDtoList(IPagedList<SkaterStat> skaters)
     {
         return skaters.ProjectTo(skater => new SkaterStatDto

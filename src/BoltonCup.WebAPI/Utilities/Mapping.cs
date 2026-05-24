@@ -3,8 +3,10 @@ namespace BoltonCup.WebAPI.Utilities;
 // temporary solution
 // when I decide to be more pragmatic I will delete this
 
+/// <summary>Utility helpers for converting raw domain values to display strings.</summary>
 public static class Mapping
 {
+    /// <summary>Returns the full period name for the given period number, or <see langword="null"/> if unrecognised.</summary>
     public static string? TryGetPeriodName(int period)
     {
         return period switch
@@ -18,6 +20,7 @@ public static class Mapping
         };
     }
 
+    /// <summary>Returns the abbreviated period label for the given period number, or <see langword="null"/> if unrecognised.</summary>
     public static string? TryGetPeriodAbbreviation(int period)
     {
         return period switch

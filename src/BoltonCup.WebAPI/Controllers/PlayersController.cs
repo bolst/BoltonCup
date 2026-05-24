@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Provides read access to player information.</summary>
 public class PlayersController(IPlayerRepository _players, IPlayerMapper _mapper) : BoltonCupControllerBase
 {
+    /// <summary>Gets a paginated list of players.</summary>
     /// <remarks>
     /// Gets a paginated list of players.
     /// </remarks>
@@ -19,6 +21,7 @@ public class PlayersController(IPlayerRepository _players, IPlayerMapper _mapper
         return Ok(_mapper.ToDtoList(players));
     }
 
+    /// <summary>Gets a single player by its ID.</summary>
     /// <remarks>
     /// Gets a single player by its ID.
     /// </remarks>

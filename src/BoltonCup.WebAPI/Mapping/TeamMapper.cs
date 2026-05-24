@@ -2,15 +2,23 @@ using BoltonCup.Core;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Maps <see cref="Team"/> entities to DTOs and queries.</summary>
 public interface ITeamMapper
 {
+    /// <summary>Maps a <see cref="GetTeamsRequest"/> to a <see cref="GetTeamsQuery"/>.</summary>
     GetTeamsQuery ToQuery(GetTeamsRequest request);
+
+    /// <summary>Maps a paged list of <see cref="Team"/> entities to a paged list of <see cref="TeamDto"/>.</summary>
     IPagedList<TeamDto> ToDtoList(IPagedList<Team> teams);
+
+    /// <summary>Maps a <see cref="Team"/> to a <see cref="TeamSingleDto"/>, or returns <see langword="null"/> if the team is null.</summary>
     TeamSingleDto? ToDto(Team? team);
 }
 
+/// <summary>Maps <see cref="Team"/> entities to DTOs and queries.</summary>
 public class TeamMapper(IBriefMapper _briefMapper, IAssetUrlResolver _urlResolver) : ITeamMapper
 {
+    /// <inheritdoc/>
     public GetTeamsQuery ToQuery(GetTeamsRequest request)
     {
         return new GetTeamsQuery
@@ -23,6 +31,7 @@ public class TeamMapper(IBriefMapper _briefMapper, IAssetUrlResolver _urlResolve
         };
     }
     
+    /// <inheritdoc/>
     public IPagedList<TeamDto> ToDtoList(IPagedList<Team> teams)
     {
         return teams.ProjectTo(team => new TeamDto
@@ -47,6 +56,7 @@ public class TeamMapper(IBriefMapper _briefMapper, IAssetUrlResolver _urlResolve
     }    
     
     
+    /// <inheritdoc/>
     public TeamSingleDto? ToDto(Team? team)
     {
         return team is null

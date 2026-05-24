@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Manages the authenticated user's tournament registration.</summary>
 [Route("api/tournaments/{id:int}/registrations")]
 public class TournamentRegistrationsController(
-    ITournamentRegistrationService _registrationService, 
+    ITournamentRegistrationService _registrationService,
     ITournamentRegistrationMapper _registrationMapper
 ) : BoltonCupControllerBase
 {
+    /// <summary>Gets the authenticated user's registration for a tournament.</summary>
     [Authorize(Policy = RequireCompletedAccount)]
     [HttpGet]
     public async Task<ActionResult<TournamentRegistrationDto>> GetMyTournamentRegistration(int id)
@@ -23,6 +25,7 @@ public class TournamentRegistrationsController(
         return OkOrNoContent(_registrationMapper.ToDto(tournament));
     }
 
+    /// <summary>Creates or updates the authenticated user's registration for a tournament.</summary>
     [Authorize(Policy = RequireCompletedAccount)]
     [HttpPost]
     public async Task<IActionResult> UpdateMyTournamentRegistration(int id, [FromBody] TournamentRegistrationDto data)

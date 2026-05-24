@@ -70,7 +70,7 @@
             Snackbar.Add("Your avatar has been updated.", Severity.Success);
             await InvokeAsync(StateHasChanged);
         }
-        catch(Exception _)
+        catch
         {
             Snackbar.Add("Your image was uploaded but for some reason we could not assign it to you...", Severity.Error);
         }
