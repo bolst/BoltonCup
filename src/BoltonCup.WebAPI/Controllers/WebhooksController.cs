@@ -14,7 +14,7 @@ namespace BoltonCup.WebAPI.Controllers;
 /// <summary>Handles incoming webhook events from third-party services.</summary>
 public class WebhooksController(
     IOptions<StripeSettings> _stripeSettings,
-    IStripeMapper _mapper,
+    IMapper _mapper,
     ITournamentPaymentService _tournamentPaymentService,
     IBracketChallengeService _bracketChallengeService,
     ILogger<WebhooksController> _logger,

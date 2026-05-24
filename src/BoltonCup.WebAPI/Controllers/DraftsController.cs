@@ -12,7 +12,7 @@ namespace BoltonCup.WebAPI.Controllers;
 /// <summary>Manages draft creation, state transitions, pick submissions, and player rankings.</summary>
 public class DraftsController(
     IDraftService _draftService,
-    IDraftMapper _mapper,
+    IMapper _mapper,
     IAuthorizationService _authService
 ) : BoltonCupControllerBase
 {

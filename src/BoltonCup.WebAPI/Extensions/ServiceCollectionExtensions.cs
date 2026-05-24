@@ -133,20 +133,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddMappers(this IServiceCollection services)
     {
-        var assembly = typeof(Controllers.BoltonCupControllerBase).Assembly;
-        var mapperTypes = assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Mapper"));
-
-        foreach (var impl in mapperTypes)
-        {
-            var interfaceName = $"I{impl.Name}";
-            var serviceType = assembly.GetTypes()
-                .FirstOrDefault(t => t.IsInterface && t.Name == interfaceName);
-
-            if (serviceType is not null)
-                services.AddTransient(serviceType, impl);
-        }
-
+        services.AddTransient<IMapper, Mapper>();
         return services;
     }
 

@@ -15,7 +15,7 @@ namespace BoltonCup.WebAPI.Controllers;
 [Tags("Auth")]
 public class AuthController(
     IUserService _userService,
-    IUserMapper _userMapper,
+    IMapper _mapper,
     UserManager<BoltonCupUser> _userManager,
     SignInManager<BoltonCupUser> _signInManager
     ) : BoltonCupControllerBase
@@ -25,7 +25,7 @@ public class AuthController(
     [HttpGet("me")]
     public ActionResult<CurrentUserDto?> GetCurrentUser()
     {
-        var user = _userMapper.ToDto(User);
+        var user = _mapper.ToDto(User);
         return user is not null
             ? Ok(user)
             : Unauthorized();

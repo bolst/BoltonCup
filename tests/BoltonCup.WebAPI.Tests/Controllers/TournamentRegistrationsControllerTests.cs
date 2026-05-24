@@ -14,14 +14,14 @@ public class TournamentRegistrationsControllerTests
     private const int AccountId = 42;
 
     private readonly Mock<ITournamentRegistrationService> _registrationService = new();
-    private readonly Mock<ITournamentRegistrationMapper> _registrationMapper = new();
+    private readonly Mock<IMapper> _mapper = new();
     private readonly TournamentRegistrationsController _controller;
 
     public TournamentRegistrationsControllerTests()
     {
         _controller = new TournamentRegistrationsController(
             _registrationService.Object,
-            _registrationMapper.Object
+            _mapper.Object
         )
         {
             ControllerContext = ClaimsHelper.WithAccountId(AccountId)
@@ -38,7 +38,7 @@ public class TournamentRegistrationsControllerTests
         _registrationService
             .Setup(s => s.GetAsync(5, AccountId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(registration);
-        _registrationMapper
+        _mapper
             .Setup(m => m.ToDto(registration))
             .Returns(dto);
 
@@ -54,8 +54,8 @@ public class TournamentRegistrationsControllerTests
         _registrationService
             .Setup(s => s.GetAsync(5, AccountId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((TournamentRegistration?)null);
-        _registrationMapper
-            .Setup(m => m.ToDto(null))
+        _mapper
+            .Setup(m => m.ToDto((TournamentRegistration?)null))
             .Returns((TournamentRegistrationDto?)null);
 
         var result = await _controller.GetMyTournamentRegistration(5);

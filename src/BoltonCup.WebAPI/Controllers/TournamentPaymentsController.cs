@@ -10,7 +10,7 @@ namespace BoltonCup.WebAPI.Controllers;
 
 /// <summary>Manages Stripe payment intent creation for tournament registrations.</summary>
 [Route("api/tournaments/{id:int}/payments")]
-public class TournamentPaymentsController(ITournamentPaymentService _paymentService, ITournamentPaymentMapper _paymentMapper)
+public class TournamentPaymentsController(ITournamentPaymentService _paymentService, IMapper _mapper)
     : BoltonCupControllerBase
 {
     /// <summary>Creates a Stripe payment intent for a tournament registration.</summary>
@@ -19,8 +19,8 @@ public class TournamentPaymentsController(ITournamentPaymentService _paymentServ
     public async Task<ActionResult<TournamentPaymentIntentDto>> CreateTournamentPaymentIntent(int id, [FromBody] CreateTournamentPaymentIntentRequest request)
     {
         var accountId = User.GetAccountId();
-        var command = _paymentMapper.ToCommand(id, accountId, request);
+        var command = _mapper.ToCommand(id, accountId, request);
         var result = await _paymentService.CreateTournamentPaymentIntentAsync(command);
-        return _paymentMapper.ToDto(result);
+        return _mapper.ToDto(result);
     }
 }

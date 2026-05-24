@@ -8,7 +8,7 @@ namespace BoltonCup.WebAPI.Controllers;
 /// <summary>Provides read access to skater statistics.</summary>
 public class SkaterStatsController(
     ISkaterStatRepository _skaterStats,
-    ISkaterStatMapper _mapper
+    IMapper _mapper
 ) : BoltonCupControllerBase
 {
     /// <summary>Gets a paginated list of skater statistics.</summary>

@@ -4,16 +4,17 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 
+
 namespace BoltonCup.WebAPI.Tests.Mapping;
 
 public class TournamentRegistrationMapperTests
 {
-    private readonly TournamentRegistrationMapper _mapper = new TournamentRegistrationMapper();
+    private readonly Mapper _mapper = new Mapper(new Mock<IAssetUrlResolver>().Object);
 
     [Fact]
     public void ToDto_NullRegistration_ReturnsNull()
     {
-        _mapper.ToDto(null).Should().BeNull();
+        _mapper.ToDto((TournamentRegistration?)null).Should().BeNull();
     }
 
     [Fact]

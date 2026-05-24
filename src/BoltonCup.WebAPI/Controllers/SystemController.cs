@@ -14,7 +14,7 @@ public class SystemController(
     ITournamentRepository _tournamentRepo,
     ISkaterStatRepository _skaterStatRepo,
     IGoalieStatRepository _goalieStatRepo,
-    ITournamentMapper _tournamentMapper,
+    IMapper _mapper,
     IMemoryCache _cache
 ) : BoltonCupControllerBase
 {
@@ -33,7 +33,7 @@ public class SystemController(
             var featuredStats = await GetFeaturedStatsOrDefault();
             
             return new SystemContextDto(
-                ActiveTournament: _tournamentMapper.ToDto(activeTournament),
+                ActiveTournament: _mapper.ToDto(activeTournament),
                 FeaturedStats: featuredStats
             );
         });
@@ -60,23 +60,23 @@ public class SystemController(
             Title = featuredStatsTournament.FeaturedStatsLabel ?? featuredStatsTournament.Name,
             StatLeaders =
             [
-                _tournamentMapper.ToDto(
+                _mapper.ToDto(
                     "Points", 
                     points.Items,
                     x => x.Points
                 ),
-                _tournamentMapper.ToDto(
+                _mapper.ToDto(
                     "Goals", 
                     goals.Items,
                     x => x.Goals
                 ),
-                _tournamentMapper.ToDto(
+                _mapper.ToDto(
                     "PIM", 
                     pims.Items,
                     x => x.PenaltyMinutes,
                     "N0"
                 ),
-                _tournamentMapper.ToDto(
+                _mapper.ToDto(
                     "GAA", 
                     gaa.Items,
                     x => x.GoalsAgainstAverage,
