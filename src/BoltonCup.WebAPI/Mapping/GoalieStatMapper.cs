@@ -2,14 +2,20 @@ using BoltonCup.Core;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Maps <see cref="GoalieStat"/> entities to DTOs and queries.</summary>
 public interface IGoalieStatMapper
 {
+    /// <summary>Maps a <see cref="GetGoalieStatsRequest"/> to a <see cref="GetGoalieStatsQuery"/>.</summary>
     GetGoalieStatsQuery ToQuery(GetGoalieStatsRequest request);
+
+    /// <summary>Maps a paged list of <see cref="GoalieStat"/> entities to a paged list of <see cref="GoalieStatDto"/>.</summary>
     IPagedList<GoalieStatDto> ToDtoList(IPagedList<GoalieStat> goalies);
 }
 
+/// <summary>Maps <see cref="GoalieStat"/> entities to DTOs and queries.</summary>
 public class GoalieStatMapper(IAssetUrlResolver _urlResolver) : IGoalieStatMapper
 {
+    /// <inheritdoc/>
     public GetGoalieStatsQuery ToQuery(GetGoalieStatsRequest request)
     {
         return new GetGoalieStatsQuery
@@ -24,6 +30,7 @@ public class GoalieStatMapper(IAssetUrlResolver _urlResolver) : IGoalieStatMappe
         };
     }
     
+    /// <inheritdoc/>
     public IPagedList<GoalieStatDto> ToDtoList(IPagedList<GoalieStat> goalies)
     {
         return goalies.ProjectTo(goalie => new GoalieStatDto

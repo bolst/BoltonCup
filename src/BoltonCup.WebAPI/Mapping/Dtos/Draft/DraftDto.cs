@@ -2,11 +2,17 @@ using BoltonCup.Core;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>DTO representing a draft.</summary>
 public record DraftDto
 {
+    /// <summary>Gets or sets the draft ID.</summary>
     public required int Id { get; set; }
+    /// <summary>Gets or sets the draft title.</summary>
     public required string? Title { get; set; }
+    /// <summary>Gets or sets the type of draft.</summary>
     public required DraftType Type { get; set; }
+    /// <summary>Gets or sets the current status of the draft.</summary>
     public required DraftStatus Status { get; set; }
+    /// <summary>Gets or sets the tournament this draft belongs to.</summary>
     public required TournamentBriefDto Tournament { get; set; }
 }

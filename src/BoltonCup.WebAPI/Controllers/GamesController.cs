@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Provides read access to tournament games.</summary>
 public class GamesController(IGameRepository _games, IGameMapper _gameMapper) : BoltonCupControllerBase
 {
+    /// <summary>Gets a paginated list of games.</summary>
     /// <remarks>
     /// Gets a paginated list of games.
     /// </remarks>
@@ -19,6 +21,7 @@ public class GamesController(IGameRepository _games, IGameMapper _gameMapper) : 
         return Ok(_gameMapper.ToDtoList(games));
     }
 
+    /// <summary>Gets a single game by its ID.</summary>
     /// <remarks>
     /// Gets a single game by its ID.
     /// </remarks>

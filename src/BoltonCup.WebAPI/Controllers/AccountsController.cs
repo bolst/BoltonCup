@@ -12,14 +12,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Manages the authenticated user's account details.</summary>
 public class AccountsController(
     IAccountRepository _accounts,
-    IAccountService _accountService, 
+    IAccountService _accountService,
     IUserService _userService,
     IAccountMapper _accountMapper,
     SignInManager<BoltonCupUser> _signInManager
 ) : BoltonCupControllerBase
 {
+    /// <summary>Completes the account setup for the currently logged-in user.</summary>
     [Authorize]
     [HttpPost("complete-account")]
     public async Task<IActionResult> CompleteMyAccount([FromBody] CompleteUserAccountRequest request)
@@ -33,6 +35,7 @@ public class AccountsController(
         return Ok();
     }
     
+    /// <summary>Gets the currently logged-in user's account.</summary>
     /// <remarks>
     /// Gets the currently logged-in user
     /// </remarks>
@@ -44,6 +47,7 @@ public class AccountsController(
         return OkOrNoContent(_accountMapper.ToDto(account, User));
     }
 
+    /// <summary>Updates the authenticated user's account details.</summary>
     [HttpPut("me")]
     public async Task<ActionResult> UpdateAccount([FromBody] UpdateAccountRequest request)
     {
@@ -52,6 +56,7 @@ public class AccountsController(
         return NoContent();
     }
 
+    /// <summary>Gets the tournaments associated with the authenticated user's account.</summary>
     [Authorize(Policy = RequireCompletedAccount)]
     [HttpGet("tournaments")]
     public async Task<ActionResult<ICollection<AccountTournamentDto>>> GetMyTournaments()
@@ -61,6 +66,7 @@ public class AccountsController(
         return Ok(_accountMapper.ToAccountTournamentDtoList(account));
     }
     
+    /// <summary>Updates the authenticated user's avatar using a pre-signed S3 key.</summary>
     /// <remarks>
     /// Updates an account's avatar by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
@@ -74,6 +80,7 @@ public class AccountsController(
         return Ok();
     }
 
+    /// <summary>Updates the authenticated user's banner using a pre-signed S3 key.</summary>
     /// <remarks>
     /// Updates an account's banner by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.

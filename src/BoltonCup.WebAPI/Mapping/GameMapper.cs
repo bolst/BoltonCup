@@ -2,18 +2,26 @@ using BoltonCup.Core;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Maps <see cref="Game"/> entities to DTOs and queries.</summary>
 public interface IGameMapper
 {
+    /// <summary>Maps a <see cref="GetGamesRequest"/> to a <see cref="GetGamesQuery"/>.</summary>
     GetGamesQuery ToQuery(GetGamesRequest request);
+
+    /// <summary>Maps a paged list of <see cref="Game"/> entities to a paged list of <see cref="GameDto"/>.</summary>
     IPagedList<GameDto> ToDtoList(IPagedList<Game> games);
+
+    /// <summary>Maps a <see cref="Game"/> to a <see cref="GameSingleDto"/>, or returns <see langword="null"/> if the game is null.</summary>
     GameSingleDto? ToDto(Game? game);
 }
 
+/// <summary>Maps <see cref="Game"/> entities to DTOs and queries.</summary>
 public class GameMapper(
-    IBriefMapper _briefMapper, 
+    IBriefMapper _briefMapper,
     IGameHighlightMapper _gameHighlightMapper
 ) : IGameMapper
 {
+    /// <inheritdoc/>
     public GetGamesQuery ToQuery(GetGamesRequest request)
     {
         return new GetGamesQuery
@@ -27,6 +35,7 @@ public class GameMapper(
         };
     }
     
+    /// <inheritdoc/>
     public IPagedList<GameDto> ToDtoList(IPagedList<Game> games)
     {
         return games.ProjectTo(game => new GameDto
@@ -41,9 +50,10 @@ public class GameMapper(
             HomeTeam = _briefMapper.ToTeamInGameDto(game, home: true),
             AwayTeam = _briefMapper.ToTeamInGameDto(game, home: false),
         });
-    }    
-    
-    
+    }
+
+
+    /// <inheritdoc/>
     public GameSingleDto? ToDto(Game? game)
     {
         return game is null

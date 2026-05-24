@@ -2,24 +2,39 @@ using BoltonCup.Core;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Maps domain models to their corresponding brief DTOs.</summary>
 public interface IBriefMapper
 {
+    /// <summary>Maps a <see cref="DraftPick"/> to a <see cref="DraftPickBriefDto"/>.</summary>
     DraftPickBriefDto? ToDraftPickBriefDto(DraftPick? draftPick);
+    /// <summary>Maps a <see cref="Gallery"/> to a <see cref="GalleryBriefDto"/>.</summary>
     GalleryBriefDto ToGalleryBriefDto(Gallery gallery);
+    /// <summary>Maps a <see cref="Game"/> to a <see cref="GameBriefDto"/>.</summary>
     GameBriefDto ToGameBriefDto(Game game);
+    /// <summary>Maps a <see cref="Goal"/> to a <see cref="GoalBriefDto"/>.</summary>
     GoalBriefDto ToGoalBriefDto(Goal goal);
+    /// <summary>Maps an <see cref="InfoGuide"/> to an <see cref="InfoGuideBriefDto"/>.</summary>
     InfoGuideBriefDto ToInfoGuideBriefDto(InfoGuide infoGuide);
+    /// <summary>Maps a <see cref="Penalty"/> to a <see cref="PenaltyBriefDto"/>.</summary>
     PenaltyBriefDto ToPenaltyBriefDto(Penalty penalty);
+    /// <summary>Maps a <see cref="Player"/> to a <see cref="PlayerBriefDto"/>.</summary>
     PlayerBriefDto ToPlayerBriefDto(Player player);
+    /// <summary>Maps a <see cref="Player"/>'s game history to a list of <see cref="PlayerGameByGame"/> entries.</summary>
     List<PlayerGameByGame> ToPlayerGameByGameDtos(Player player);
+    /// <summary>Maps a <see cref="Player"/>'s stats to a list of <see cref="PlayerTournamentStats"/> entries.</summary>
     List<PlayerTournamentStats> ToPlayerTournamentStatsDto(Player player);
+    /// <summary>Maps a <see cref="Team"/> to a <see cref="TeamBriefDto"/>.</summary>
     TeamBriefDto ToTeamBriefDto(Team team);
+    /// <summary>Maps a <see cref="Game"/> to a <see cref="TeamInGameDto"/> for the home or away team.</summary>
     TeamInGameDto? ToTeamInGameDto(Game game, bool home);
+    /// <summary>Maps a <see cref="Tournament"/> to a <see cref="TournamentBriefDto"/>.</summary>
     TournamentBriefDto ToTournamentBriefDto(Tournament tournament);
 }
 
+/// <summary>Maps domain models to their corresponding brief DTOs.</summary>
 public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
 {
+    /// <inheritdoc/>
     public DraftPickBriefDto? ToDraftPickBriefDto(DraftPick? draftPick)
     {
         return draftPick is null
@@ -34,6 +49,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
             };
     }
 
+    /// <inheritdoc/>
     public GalleryBriefDto ToGalleryBriefDto(Gallery gallery)
     {
         return new GalleryBriefDto
@@ -45,6 +61,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
         };
     }
     
+    /// <inheritdoc/>
     public GameBriefDto ToGameBriefDto(Game game)
     {
         return new GameBriefDto
@@ -60,6 +77,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
     }
     
     
+    /// <inheritdoc/>
     public GoalBriefDto ToGoalBriefDto(Goal goal)
     {
         return new GoalBriefDto
@@ -74,6 +92,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
     }
 
 
+    /// <inheritdoc/>
     public InfoGuideBriefDto ToInfoGuideBriefDto(InfoGuide infoGuide)
     {
         return new InfoGuideBriefDto
@@ -84,6 +103,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
     }
     
     
+    /// <inheritdoc/>
     public PenaltyBriefDto ToPenaltyBriefDto(Penalty penalty)
     {
         return new PenaltyBriefDto
@@ -98,6 +118,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
     }
     
     
+    /// <inheritdoc/>
     public PlayerBriefDto ToPlayerBriefDto(Player player)
     {
         return new PlayerBriefDto
@@ -120,6 +141,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
     }
 
 
+    /// <inheritdoc/>
     public List<PlayerGameByGame> ToPlayerGameByGameDtos(Player player)
     {
         var gameByGames = player.Account.Players
@@ -164,6 +186,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
     }
     
     
+    /// <inheritdoc/>
     public List<PlayerTournamentStats> ToPlayerTournamentStatsDto(Player player)
     {
         return player.Account.Players.GroupBy(p => p.Tournament)
@@ -187,6 +210,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
     }
     
     
+    /// <inheritdoc/>
     public TeamBriefDto ToTeamBriefDto(Team team)
     {
         return new TeamBriefDto
@@ -204,6 +228,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
     }
 
 
+    /// <inheritdoc/>
     public TeamInGameDto? ToTeamInGameDto(Game game, bool home)
     {
         var team = home ? game.HomeTeam : game.AwayTeam;
@@ -222,6 +247,7 @@ public class BriefMapper(IAssetUrlResolver _urlResolver) : IBriefMapper
     }
     
     
+    /// <inheritdoc/>
     public TournamentBriefDto ToTournamentBriefDto(Tournament tournament)
     {
         return new TournamentBriefDto

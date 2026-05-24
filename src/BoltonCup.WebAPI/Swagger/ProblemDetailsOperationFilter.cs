@@ -6,8 +6,10 @@ namespace BoltonCup.WebAPI.Swagger;
 
 // Let there be exception response schemas in the OpenAPI spec.
 
+/// <summary>Adds standardised problem-details response schemas (400, 429, and domain error codes) to every OpenAPI operation.</summary>
 public sealed class ProblemDetailsOperationFilter : IOperationFilter
 {
+    /// <summary>Applies the filter to the given operation, injecting problem-details response entries.</summary>
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         operation.Responses ??= new OpenApiResponses();

@@ -5,8 +5,10 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace BoltonCup.WebAPI.Swagger;
 
+/// <summary>Adds API key and Bearer security requirements to every non-anonymous OpenAPI operation.</summary>
 public class SecurityRequirementsOperationFilter : IOperationFilter
 {
+    /// <summary>Applies the filter, attaching security schemes to operations that require authentication.</summary>
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         var hasAllowAnonymous = 

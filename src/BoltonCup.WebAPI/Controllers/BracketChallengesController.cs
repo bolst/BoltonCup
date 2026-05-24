@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Manages bracket challenge queries and payment intents.</summary>
 public class BracketChallengesController(
-    IBracketChallengeService _bracketChallengeService, 
+    IBracketChallengeService _bracketChallengeService,
     IBracketChallengeMapper _mapper
 ) : BoltonCupControllerBase
 {
+    /// <summary>Gets a paginated list of bracket challenges.</summary>
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IPagedList<BracketChallengeDto>>> GetBracketChallenges(
@@ -21,6 +23,7 @@ public class BracketChallengesController(
         return Ok(_mapper.ToDtoList(bracketChallenges));
     }
 
+    /// <summary>Gets a single bracket challenge by its ID.</summary>
     [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<ActionResult<BracketChallengeSingleDto>> GetBracketChallengeByIdAsync(int id)
@@ -29,6 +32,7 @@ public class BracketChallengesController(
         return OkOrNoContent(_mapper.ToDto(bracketChallenge));
     }
     
+    /// <summary>Creates a Stripe payment intent for a bracket challenge registration.</summary>
     [AllowAnonymous]
     [HttpPost("{id:int}")]
     public async Task<ActionResult<BracketChallengePaymentIntentDto>> CreateBracketChallengePaymentIntent(int id, [FromBody] CreateBracketChallengePaymentIntentRequest request)

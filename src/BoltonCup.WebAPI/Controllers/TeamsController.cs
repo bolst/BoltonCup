@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Manages team queries and team asset uploads.</summary>
 public class TeamsController(ITeamRepository _teams, ITeamService _teamService, ITeamMapper _teamMapper) : BoltonCupControllerBase
 {
+    /// <summary>Gets a paginated list of teams.</summary>
     /// <remarks>
     /// Gets a paginated list of teams.
     /// </remarks>
@@ -20,6 +22,7 @@ public class TeamsController(ITeamRepository _teams, ITeamService _teamService, 
         return Ok(_teamMapper.ToDtoList(teams));
     }
 
+    /// <summary>Gets a single team by its ID.</summary>
     /// <remarks>
     /// Gets a single team by its ID.
     /// </remarks>
@@ -31,6 +34,7 @@ public class TeamsController(ITeamRepository _teams, ITeamService _teamService, 
         return OkOrNoContent(_teamMapper.ToDto(team));
     }
 
+    /// <summary>Updates a team's logo using a pre-signed S3 key (admin only).</summary>
     /// <remarks>
     /// Updates a team's logo by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
@@ -43,6 +47,7 @@ public class TeamsController(ITeamRepository _teams, ITeamService _teamService, 
         return Ok();
     }
     
+    /// <summary>Updates a team's banner using a pre-signed S3 key (admin only).</summary>
     /// <remarks>
     /// Updates a team's banner by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.
