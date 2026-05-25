@@ -9,15 +9,36 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepository
 {
+    public async Task<IReadOnlyList<SkaterStat>> GetCareerStatsAsync(int tournamentId, int? teamId, CancellationToken cancellationToken = default)
+    {
+        var teamAccountIds = await _context.Players
+            .ConditionalWhere(x => x.TeamId == teamId!.Value, teamId.HasValue)
+            .Where(x => x.TournamentId == tournamentId)
+            .Select(x => x.AccountId)
+            .ToListAsync(cancellationToken);
+        if (teamAccountIds.Count == 0)
+        {
+            return [];
+        }
+
+        return (await GetAllAsync(new GetSkaterStatsQuery
+        {
+            AccountIds = teamAccountIds,
+            Size = 100,
+        }, cancellationToken)).Items;
+    }
+
     public async Task<IPagedList<SkaterStat>> GetAllAsync(GetSkaterStatsQuery query, CancellationToken cancellationToken = default)
     {
         return await _context.SkaterStats
             .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => query.TeamIds!.Contains(p.TeamId), query.TeamIds?.Count > 0)
+            .ConditionalWhere(p => query.AccountIds!.Contains(p.AccountId), query.AccountIds?.Count > 0)
             .ConditionalWhere(p => p.Position == query.Position, !string.IsNullOrEmpty(query.Position))
             .ConditionalWhere(p => p.GameId == query.GameId, query.GameId.HasValue)
             .OrderBy(x => x.AccountId)
+            .ThenByDescending(x => x.TournamentId)
             .ThenByDescending(x => x.GameTime)
             .GroupBy(x => x.AccountId)
             .Select(g => new SkaterStat
