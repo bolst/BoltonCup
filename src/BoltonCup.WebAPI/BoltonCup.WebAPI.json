@@ -7947,6 +7947,13 @@
               "$ref": "#/components/schemas/GameHighlightDto"
             },
             "description": "Gets the list of highlight videos for the game."
+          },
+          "playersToWatch": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameStatLeaderDto"
+            },
+            "description": "Gets the top point, goal, and assist leader from each team."
           }
         },
         "additionalProperties": false,
@@ -7978,6 +7985,34 @@
         },
         "additionalProperties": false,
         "description": "DTO representing a game star award."
+      },
+      "GameStatLeaderDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "homeLeader": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerStatDto"
+              }
+            ],
+            "description": "DTO representing a player's entry in a stat leaderboard.",
+            "nullable": true
+          },
+          "awayLeader": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerStatDto"
+              }
+            ],
+            "description": "DTO representing a player's entry in a stat leaderboard.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Stat leader pair for a single category (e.g. Points) in a game."
       },
       "GameState": {
         "enum": [
