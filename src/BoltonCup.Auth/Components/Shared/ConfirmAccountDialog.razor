@@ -72,7 +72,7 @@
             _isSubmitting = true;
             await BoltonCupApi.ConfirmEmailAsync(new ConfirmEmailRequest
             {
-                Email = Context.Email,
+                Email = Context.Email!,
                 Code = _model.Code,
             });
             MudDialog.Close(DialogResult.Ok(true));
@@ -99,7 +99,7 @@
             var delayTask = Task.Delay(300);
             await BoltonCupApi.ResendConfirmationEmailAsync(new ResendConfirmationEmailRequest
             {
-                Email = Context.Email
+                Email = Context.Email!
             });
             await delayTask;
             Snackbar.Add($"An email with a code has been sent to {Context.Email}.", Severity.Success);

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI;
 
+/// <summary>Extension methods for registering BoltonCup WebAPI services with the DI container.</summary>
 public static class ServiceCollectionExtensions
 {
     private static IServiceCollection AddFluentValidationServices(this IServiceCollection services)
@@ -132,20 +133,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddMappers(this IServiceCollection services)
     {
-        var assembly = typeof(Controllers.BoltonCupControllerBase).Assembly;
-        var mapperTypes = assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Mapper"));
-
-        foreach (var impl in mapperTypes)
-        {
-            var interfaceName = $"I{impl.Name}";
-            var serviceType = assembly.GetTypes()
-                .FirstOrDefault(t => t.IsInterface && t.Name == interfaceName);
-
-            if (serviceType is not null)
-                services.AddTransient(serviceType, impl);
-        }
-
+        services.AddTransient<IMapper, Mapper>();
         return services;
     }
 
@@ -186,6 +174,7 @@ public static class ServiceCollectionExtensions
         return services.AddMemoryCache();
     }
 
+    /// <summary>Registers all BoltonCup WebAPI services including auth, validation, CORS, rate limiting, and controllers.</summary>
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
     {
         builder

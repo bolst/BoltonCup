@@ -41,10 +41,10 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
                 .ThenInclude(p => p.Account)
             .Include(p => p.Goals)
                 .ThenInclude(g => g.Assist1Player)
-                .ThenInclude(p => p.Account)
+                .ThenInclude(p => p!.Account)
             .Include(p => p.Goals)
                 .ThenInclude(g => g.Assist2Player)
-                .ThenInclude(p => p.Account)
+                .ThenInclude(p => p!.Account)
             .Include(p => p.Penalties)
                 .ThenInclude(x => x.Player)
                 .ThenInclude(x => x.Account)
@@ -53,7 +53,7 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
                 .ThenInclude(p => p.Account)
             .Include(p => p.Highlights.Take(3))
                 .ThenInclude(h => h.Player)
-                .ThenInclude(p => p.Account)
+                .ThenInclude(p => p!.Account)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken: cancellationToken);
     }
 }

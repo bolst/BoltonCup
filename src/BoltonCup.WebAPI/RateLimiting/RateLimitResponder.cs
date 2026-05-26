@@ -5,8 +5,10 @@ using BoltonCup.WebAPI.Errors;
 
 namespace BoltonCup.WebAPI.RateLimiting;
 
+/// <summary>Writes a standardised 429 problem-details response when a rate limit is exceeded.</summary>
 public static class RateLimitResponder
 {
+    /// <summary>Writes a 429 Too Many Requests response with a <see cref="BoltonCupProblemDetails"/> body.</summary>
     public static async ValueTask WriteResponseAsync(
         OnRejectedContext context, 
         string title = "Too Many Requests.", 

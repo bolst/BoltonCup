@@ -5,12 +5,14 @@ using Microsoft.Extensions.Options;
 
 namespace BoltonCup.WebAPI.Auth;
 
+/// <summary>Handles API key authentication by validating the <c>BoltonCup-Api-Key</c> request header.</summary>
 public class ApiKeyAuthenticationHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,
     UrlEncoder encoder)
     : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
+    /// <inheritdoc/>
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         // ensure header is present

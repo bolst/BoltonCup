@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Provides read access to skater statistics.</summary>
 public class SkaterStatsController(
-    ISkaterStatRepository _skaterStats, 
-    ISkaterStatMapper _mapper
+    ISkaterStatRepository _skaterStats,
+    IMapper _mapper
 ) : BoltonCupControllerBase
 {
+    /// <summary>Gets a paginated list of skater statistics.</summary>
     /// <remarks>
     /// Gets a paginated list of skater statistics.
     /// </remarks>

@@ -578,7 +578,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnName("title");
 
                     b.Property<string>("VideoId")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("video_id");
 

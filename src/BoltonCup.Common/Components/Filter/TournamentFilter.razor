@@ -17,7 +17,7 @@
 @code {
 
     private ICollection<Sdk.TournamentDto>? _options;
-    
+
     private async Task<IEnumerable<Sdk.TournamentDto>> SearchFunc(string? search, CancellationToken cancellationToken)
     {
         if (_options is null)
@@ -25,12 +25,11 @@
             var result = await BoltonCupApi.GetTournamentsAsync(cancellationToken: cancellationToken);
             _options = result.Items;
         }
-
         if (string.IsNullOrEmpty(search))
+        {
             return _options;
-
+        }
         return _options.Where(x => x.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
-
     }
     
 }

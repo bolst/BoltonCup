@@ -11,9 +11,10 @@ using Stripe;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Handles incoming webhook events from third-party services.</summary>
 public class WebhooksController(
     IOptions<StripeSettings> _stripeSettings,
-    IStripeMapper _mapper,
+    IMapper _mapper,
     ITournamentPaymentService _tournamentPaymentService,
     IBracketChallengeService _bracketChallengeService,
     ILogger<WebhooksController> _logger,
@@ -23,6 +24,7 @@ public class WebhooksController(
 
     private readonly string _stripeWebhookSecret = _stripeSettings.Value.WebhookSecret;
 
+    /// <summary>Receives and processes Stripe webhook events.</summary>
     [AllowAnonymous]
     [HttpPost("stripe")]
     [IgnoreAntiforgeryToken]

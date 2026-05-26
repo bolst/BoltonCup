@@ -3,27 +3,35 @@ using FluentValidation;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+/// <summary>Request to update an existing user account's profile information.</summary>
 public record UpdateAccountRequest
 {
-    public string FirstName { get; set; }
+    /// <summary>Gets or sets the user's first name.</summary>
+    public string FirstName { get; set; } = null!;
 
-    public string LastName { get; set; }
+    /// <summary>Gets or sets the user's last name.</summary>
+    public string LastName { get; set; } = null!;
 
+    /// <summary>Gets or sets the user's date of birth.</summary>
     public DateTime Birthday { get; set; }
 
+    /// <summary>Gets or sets the highest level of hockey the user has played.</summary>
     public string? HighestLevel { get; set; }
 
+    /// <summary>Gets or sets the user's preferred beer.</summary>
     public string? PreferredBeer { get; set; }
 
+    /// <summary>Gets or sets the user's height in FT'IN format (e.g., "5'11").</summary>
     public string? Height { get; set; }
-    
+
+    /// <summary>Gets or sets the user's weight in pounds.</summary>
     public int? Weight { get; set; }
 }
 
-
-
+/// <summary>Validates an <see cref="UpdateAccountRequest"/>.</summary>
 public class UpdateAccountRequestValidator : AbstractValidator<UpdateAccountRequest>
 {
+    /// <summary>Initializes a new instance of <see cref="UpdateAccountRequestValidator"/>.</summary>
     public UpdateAccountRequestValidator()
     {
         RuleFor(x => x.FirstName)

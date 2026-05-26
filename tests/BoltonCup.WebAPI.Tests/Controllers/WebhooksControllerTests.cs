@@ -23,7 +23,7 @@ public class WebhooksControllerTests
     private const string WebhookSecret = "whsec_test";
 
     private readonly Mock<IStripeEventConstructor> _eventConstructor = new();
-    private readonly Mock<IStripeMapper> _stripeMapper = new();
+    private readonly Mock<IMapper> _mapper = new();
     private readonly Mock<ITournamentPaymentService> _tournamentPaymentService = new();
     private readonly Mock<IBracketChallengeService> _bracketChallengeService = new();
     private readonly Mock<ILogger<WebhooksController>> _logger = new();
@@ -35,7 +35,7 @@ public class WebhooksControllerTests
 
         _controller = new WebhooksController(
             settings,
-            _stripeMapper.Object,
+            _mapper.Object,
             _tournamentPaymentService.Object,
             _bracketChallengeService.Object,
             _logger.Object,
@@ -86,7 +86,7 @@ public class WebhooksControllerTests
         SetupStripeEvent(evt);
 
         var expectedCommand = new ProcessTournamentPaymentIntentCommand(42, 7, "pi_test_123");
-        _stripeMapper
+        _mapper
             .Setup(m => m.TryParseTournamentPaymentCommand(
                 It.IsAny<PaymentIntent>(), out expectedCommand))
             .Returns(true);
@@ -109,7 +109,7 @@ public class WebhooksControllerTests
         SetupStripeEvent(evt);
 
         var expectedCommand = new ProcessBracketChallengePaymentIntentCommand(1, "Jane", "j@test.com", "pi_test_123", true);
-        _stripeMapper
+        _mapper
             .Setup(m => m.TryParseBracketChallengePaymentCommand(
                 It.IsAny<PaymentIntent>(), out expectedCommand))
             .Returns(true);
@@ -163,7 +163,7 @@ public class WebhooksControllerTests
         SetupStripeEvent(evt);
 
         ProcessTournamentPaymentIntentCommand? nullCmd = null;
-        _stripeMapper
+        _mapper
             .Setup(m => m.TryParseTournamentPaymentCommand(
                 It.IsAny<PaymentIntent>(), out nullCmd!))
             .Returns(false);

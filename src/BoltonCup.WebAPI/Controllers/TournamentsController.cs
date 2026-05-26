@@ -7,13 +7,14 @@ using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Provides access to tournament data and admin tournament management.</summary>
 public class TournamentsController(
-    ITournamentRepository _tournaments, 
+    ITournamentRepository _tournaments,
     ITournamentService _tournamentService,
-    ITournamentMapper _mapper,
-    IMemoryCache _cache
+    IMapper _mapper
 ) : BoltonCupControllerBase
 {
+    /// <summary>Gets a paginated list of tournaments.</summary>
     /// <remarks>
     /// Gets a paginated list of tournaments.
     /// </remarks>
@@ -26,6 +27,7 @@ public class TournamentsController(
         return Ok(_mapper.ToDtoList(tournaments));
     }
 
+    /// <summary>Gets a single tournament by its ID.</summary>
     /// <remarks>
     /// Gets a single tournament by its ID.
     /// </remarks>
@@ -37,6 +39,7 @@ public class TournamentsController(
         return OkOrNoContent(_mapper.ToDto(tournament));
     }
     
+    /// <summary>Updates a tournament's logo using a pre-signed S3 key (admin only).</summary>
     /// <remarks>
     /// Updates a tournament's logo by accepting a pre-signed S3 key.
     /// The client is responsible for uploading the image to S3 before calling this endpoint.

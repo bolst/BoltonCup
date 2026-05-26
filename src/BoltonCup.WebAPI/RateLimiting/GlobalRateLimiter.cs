@@ -2,8 +2,10 @@ using System.Threading.RateLimiting;
 
 namespace BoltonCup.WebAPI.RateLimiting;
 
+/// <summary>Provides a global sliding-window rate limiter partitioned by user identity or IP address.</summary>
 public static class GlobalRateLimiter
 {
+    /// <summary>Creates a partitioned rate limiter that allows 100 requests per minute per user or IP.</summary>
     public static PartitionedRateLimiter<HttpContext> Create()
     {
         return PartitionedRateLimiter.Create<HttpContext, string>(context =>

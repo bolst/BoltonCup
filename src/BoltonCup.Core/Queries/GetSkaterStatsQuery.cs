@@ -7,5 +7,6 @@ public sealed record GetSkaterStatsQuery : QueryBase
     public int? TournamentId { get; set; }
     public string? Position { get; set; }
     public List<int>? TeamIds { get; set; }
+    public List<int>? AccountIds { get; set; }
     public int? GameId { get; set; }
 }

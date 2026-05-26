@@ -12,9 +12,10 @@
         <div class="mud-width-full d-flex flex-column align-center justify-center">
             <MudImage Src="@AssetUrlResolver.GetFullUrl(_src)" Width="300" />
             <MudFileUpload T="IBrowserFile" FilesChanged="FilesChanged" Accept=".png, .jpg, .webp, .svg">
-                <ActivatorContent>
+                <CustomContent>
                     <MudButton Variant="Variant.Filled"
                                Color="Color.Primary"
+                               OnClick="@context.OpenFilePickerAsync"
                                StartIcon="@Icons.Material.Filled.CloudUpload"
                                Disabled="_loading">
                         @if (string.IsNullOrEmpty(_uploadFilename))
@@ -26,7 +27,7 @@
                             <MudText Typo="Typo.button">@_uploadFilename</MudText>
                         }
                     </MudButton>
-                </ActivatorContent>
+                </CustomContent>
             </MudFileUpload>
         </div>
     </DialogContent>

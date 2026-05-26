@@ -22,7 +22,7 @@ internal class SessionStorageService : ISessionStorageService, ISyncSessionStora
         if (string.IsNullOrWhiteSpace(key))
             throw new ArgumentNullException(nameof(key));
 
-        var e = await RaiseOnChangingAsync(key, data).ConfigureAwait(false);
+        var e = await RaiseOnChangingAsync(key, data!).ConfigureAwait(false);
 
         if (e.Cancel)
             return;
@@ -30,7 +30,7 @@ internal class SessionStorageService : ISessionStorageService, ISyncSessionStora
         var serialisedData = _serializer.Serialize(data);
         await _storageProvider.SetItemAsync(key, serialisedData, cancellationToken).ConfigureAwait(false);
 
-        RaiseOnChanged(key, e.OldValue, data);
+        RaiseOnChanged(key, e.OldValue, data!);
     }
 
     public async ValueTask SetItemAsStringAsync(string key, string data, CancellationToken cancellationToken = default)
@@ -59,7 +59,7 @@ internal class SessionStorageService : ISessionStorageService, ISyncSessionStora
         var serialisedData = await _storageProvider.GetItemAsync(key, cancellationToken).ConfigureAwait(false);
 
         if (string.IsNullOrWhiteSpace(serialisedData))
-            return default;
+            return default!;
 
         try
         {
@@ -109,7 +109,7 @@ internal class SessionStorageService : ISessionStorageService, ISyncSessionStora
         if (string.IsNullOrWhiteSpace(key))
             throw new ArgumentNullException(nameof(key));
 
-        var e = RaiseOnChangingSync(key, data);
+        var e = RaiseOnChangingSync(key, data!);
 
         if (e.Cancel)
             return;
@@ -117,7 +117,7 @@ internal class SessionStorageService : ISessionStorageService, ISyncSessionStora
         var serialisedData = _serializer.Serialize(data);
         _storageProvider.SetItem(key, serialisedData);
 
-        RaiseOnChanged(key, e.OldValue, data);
+        RaiseOnChanged(key, e.OldValue, data!);
     }
 
     public void SetItemAsString(string key, string data)
@@ -146,7 +146,7 @@ internal class SessionStorageService : ISessionStorageService, ISyncSessionStora
         var serialisedData = _storageProvider.GetItem(key);
 
         if (string.IsNullOrWhiteSpace(serialisedData))
-            return default;
+            return default!;
 
         try
         {
@@ -202,7 +202,7 @@ internal class SessionStorageService : ISessionStorageService, ISyncSessionStora
     public bool ContainKey(string key)
         => _storageProvider.ContainKey(key);
 
-    public event EventHandler<ChangingEventArgs> Changing;
+    public event EventHandler<ChangingEventArgs>? Changing;
     private async Task<ChangingEventArgs> RaiseOnChangingAsync(string key, object data)
     {
         var e = new ChangingEventArgs
@@ -239,7 +239,7 @@ internal class SessionStorageService : ISessionStorageService, ISyncSessionStora
         var serialisedData = await _storageProvider.GetItemAsync(key).ConfigureAwait(false);
 
         if (string.IsNullOrWhiteSpace(serialisedData))
-            return default;
+            return default!;
         try
         {
             return _serializer.Deserialize<T>(serialisedData);
@@ -258,7 +258,7 @@ internal class SessionStorageService : ISessionStorageService, ISyncSessionStora
         var serialisedData = _storageProvider.GetItem(key);
 
         if (string.IsNullOrWhiteSpace(serialisedData))
-            return default;
+            return default!;
 
         try
         {
@@ -270,7 +270,7 @@ internal class SessionStorageService : ISessionStorageService, ISyncSessionStora
         }
     }
 
-    public event EventHandler<ChangedEventArgs> Changed;
+    public event EventHandler<ChangedEventArgs>? Changed;
     private void RaiseOnChanged(string key, object oldValue, object data)
     {
         var e = new ChangedEventArgs

@@ -15,7 +15,7 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     where TEntity : EntityBase
 {
 
-    private string _entityName;
+    private string? _entityName;
     private Func<T, TEntity?>? _compiledExpression;
     private List<TEntity> _options = [];
     private bool _pendingRegistration = true;

@@ -6,8 +6,10 @@ namespace BoltonCup.WebAPI.Errors;
 
 // Let there be a defined list of exceptions with associated status codes.
 
+/// <summary>Maps known BoltonCup exception types to HTTP status codes and problem-detail types.</summary>
 public static class BoltonCupExceptionMappings
 {
+    /// <summary>The ordered list of exception-to-status-code mappings evaluated at runtime.</summary>
     public static readonly IReadOnlyList<ExceptionMappingConfig> Values =
     [
         new( 
@@ -74,6 +76,7 @@ public static class BoltonCupExceptionMappings
         )
     ];
     
+    /// <summary>Returns a <see cref="BoltonCupProblemDetails"/> for the given exception, or <c>null</c> if no mapping exists.</summary>
     public static BoltonCupProblemDetails? GetProblemDetails(Exception exception)
     {
         var mapping = Values.FirstOrDefault(m => 
@@ -92,6 +95,7 @@ public static class BoltonCupExceptionMappings
     }
 
     
+    /// <summary>Defines the mapping between an exception type and its HTTP response metadata.</summary>
     public record ExceptionMappingConfig(Type ExceptionType, int StatusCode, string ErrorType, string Title);
     
 }

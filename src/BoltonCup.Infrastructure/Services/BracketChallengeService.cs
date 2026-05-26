@@ -13,8 +13,7 @@ public class BracketChallengeService(
     BoltonCupDbContext _dbContext,
     IStorageService _storageService,
     IAssetKeyGenerator _assetKeyGenerator,
-    IEmailer _emailer,
-    ILogger<BracketChallengeService> _logger
+    IEmailer _emailer
 ) : IBracketChallengeService
 {
 

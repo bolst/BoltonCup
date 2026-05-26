@@ -10,7 +10,7 @@ namespace BoltonCup.SessionStorage;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddBoltonCupSessionStorage(this IServiceCollection services)
-        => AddBoltonCupSessionStorage(services, null);
+        => AddBoltonCupSessionStorage(services, null!);
 
     public static IServiceCollection AddBoltonCupSessionStorage(this IServiceCollection services, Action<SessionStorageOptions> configure)
     {
@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <returns></returns>
     public static IServiceCollection AddBlazoredSessionStorageAsSingleton(this IServiceCollection services)
-        => AddBlazoredSessionStorageAsSingleton(services, null);
+        => AddBlazoredSessionStorageAsSingleton(services, null!);
         
     /// <summary>
     /// Registers the Blazored SessionStorage services as singletons. This should only be used in Blazor WebAssembly applications.

@@ -5,11 +5,11 @@ public class GameHighlight : EntityBase
     public int Id { get; set; }
     public int GameId { get; set; }
     public int? PlayerId { get; set; }
-    public string VideoId { get; set; }
+    public string? VideoId { get; set; }
     public string? Title { get; set; }
     public string? Description { get; set; }
 
-    public Game Game { get; set; }
+    public Game Game { get; set; } = null!;
     public Player? Player { get; set; }
 }
 

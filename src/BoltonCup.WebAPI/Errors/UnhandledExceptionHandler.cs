@@ -5,11 +5,13 @@ namespace BoltonCup.WebAPI.Errors;
 
 // we shall handle the unhandled
 
+/// <summary>Catches all unhandled exceptions and returns a generic 500 problem-detail response.</summary>
 public sealed class UnhandledExceptionHandler(
     ILogger<UnhandledExceptionHandler> _logger,
     IHub _sentryHub
 ) : IExceptionHandler
 {
+    /// <inheritdoc/>
     public async ValueTask<bool> TryHandleAsync(
         HttpContext context,
         Exception exception,

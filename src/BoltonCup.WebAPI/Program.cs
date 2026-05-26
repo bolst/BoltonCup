@@ -64,7 +64,7 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<ProblemDetailsOperationFilter>();
     options.OperationFilter<SecurityRequirementsOperationFilter>();
     options.DocumentFilter<SignalRSchemaFilter>();
-    
+
     // generate operation IDs based on method names
     options.CustomOperationIds(description =>
     {
@@ -77,13 +77,12 @@ builder.Services.AddSwaggerGen(options =>
         return null;
     });
 
-    if (false) //(builder.Environment.IsDevelopment())
-    {
-        // add docstrings
-        var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-        options.IncludeXmlComments(xmlPath);
-    }
+    // add docstrings — must be registered before SummaryToDescriptionOperationFilter
+    // so XML comments are applied before that filter moves summary to description
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+    options.OperationFilter<SummaryToDescriptionOperationFilter>();
 });
 
 var app = builder.Build();

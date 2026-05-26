@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Diagnostics;
 
 namespace BoltonCup.WebAPI.Errors;
 
+/// <summary>Handles known BoltonCup domain exceptions and converts them to structured problem-detail responses.</summary>
 public sealed class BoltonCupExceptionHandler(
     ILogger<BoltonCupExceptionHandler> _logger,
     IHub _sentryHub
 ) : IExceptionHandler
 {
+    /// <inheritdoc/>
     public async ValueTask<bool> TryHandleAsync(
         HttpContext context,
         Exception exception,

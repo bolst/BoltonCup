@@ -5,12 +5,13 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
-        <AssemblyName>BoltonCup.Auth</AssemblyName>
-        <RootNamespace>BoltonCup.Auth</RootNamespace>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <WasmBuildNative>true</WasmBuildNative>
 
         <!-- for ios 16? -->
         <WasmEnableSIMD>false</WasmEnableSIMD>
+
+        <!--github.com/RicoSuter/NSwag/issues/5301-->
+        <WasmEnableStreamingResponse>false</WasmEnableStreamingResponse>
     </PropertyGroup>
 
     <ItemGroup>
