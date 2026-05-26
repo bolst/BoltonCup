@@ -11,6 +11,8 @@ public sealed record GameSingleDto : GameDto
     public required List<GameStarDto> Stars { get; init; } = [];
     /// <summary>Gets the list of highlight videos for the game.</summary>
     public required List<GameHighlightDto> Highlights { get; init; } = [];
+    /// <summary>Gets the top point, goal, and assist leader from each team.</summary>
+    public List<GameStatLeaderDto> PlayersToWatch { get; init; } = [];
 }
 
 

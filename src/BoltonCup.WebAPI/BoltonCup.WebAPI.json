@@ -7947,6 +7947,13 @@
               "$ref": "#/components/schemas/GameHighlightDto"
             },
             "description": "Gets the list of highlight videos for the game."
+          },
+          "playersToWatch": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameStatLeaderDto"
+            },
+            "description": "Gets the top point, goal, and assist leader from each team."
           }
         },
         "additionalProperties": false,
@@ -7978,6 +7985,98 @@
         },
         "additionalProperties": false,
         "description": "DTO representing a game star award."
+      },
+      "GameStatLeaderDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "homeLeader": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameStatLeaderPlayerDto"
+              }
+            ],
+            "description": "DTO representing the leader of a single stat category for one team in a game.",
+            "nullable": true
+          },
+          "awayLeader": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameStatLeaderPlayerDto"
+              }
+            ],
+            "description": "DTO representing the leader of a single stat category for one team in a game.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Stat leader pair for a single category (e.g. Points) in a game."
+      },
+      "GameStatLeaderPlayerDto": {
+        "required": [
+          "statString",
+          "statValue"
+        ],
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "description": "Gets the player ID.",
+            "format": "int32"
+          },
+          "accountId": {
+            "type": "integer",
+            "description": "Gets the account ID associated with this player.",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Gets the player's first name."
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Gets the player's last name."
+          },
+          "position": {
+            "type": "string",
+            "description": "Gets the player's position.",
+            "nullable": true
+          },
+          "jerseyNumber": {
+            "type": "integer",
+            "description": "Gets the player's jersey number.",
+            "format": "int32",
+            "nullable": true
+          },
+          "profilePicture": {
+            "type": "string",
+            "description": "Gets the URL of the player's profile picture.",
+            "nullable": true
+          },
+          "statValue": {
+            "type": "number",
+            "description": "Gets the raw numeric value of the stat.",
+            "format": "double"
+          },
+          "statString": {
+            "type": "string",
+            "description": "Gets the formatted display string of the stat."
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Gets the player's full name.",
+            "readOnly": true
+          },
+          "jerseyNumberLabel": {
+            "type": "string",
+            "description": "Gets the formatted jersey number label.",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing the leader of a single stat category for one team in a game."
       },
       "GameState": {
         "enum": [

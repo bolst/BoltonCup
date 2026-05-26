@@ -1,10 +1,82 @@
+@using BoltonCup.Sdk
 @namespace BoltonCup.WebClient.Components.Shared
 
 
 <div class="d-flex flex-column gap-2">
     @if (Game is { HomeTeam: not null, AwayTeam: not null })
     {
-        <GameSummarySection Title="Three Stars of the Game" Visible="@Game.Stars.Any()">
+        <GameSummarySection Title="Players to Watch"
+                            Visible="@(Game.GameState == GameState.Pending)">
+            <MudGrid Spacing="3">
+                <MudItem xs="12">
+                    <div class="d-flex flex-row justify-space-between mud-width-full">
+                        <MudImage Src="@Game.AwayTeam.Logo" Height="36"/>
+                        <MudImage Src="@Game.HomeTeam.Logo" Height="36"/>
+                    </div>
+                </MudItem>
+                @foreach (var playersToWatch in Game.PlayersToWatch)
+                {
+                    if (playersToWatch is not { HomeLeader: not null, AwayLeader: not null } context)
+                    {
+                        continue;
+                    }
+                    var total = context.HomeLeader.StatValue + context.AwayLeader.StatValue;
+                    var awayStatPctg = context.AwayLeader.StatValue / total;
+                    var homeStatPctg = 1 - awayStatPctg;
+                    <MudItem xs="4">
+                        <div class="d-flex flex-row align-center gap-3">
+                            <MudAvatar>
+                                <MudImage Src="@context.AwayLeader.ProfilePicture" Alt="@context.AwayLeader.FullName"/>
+                            </MudAvatar>
+                            <MudLink Href="@($"/players/{context.AwayLeader.PlayerId}")" Underline="Underline.None">
+                                <div class="d-flex flex-column align-start">
+                                    <MudText Typo="Typo.caption">@context.AwayLeader.FirstName</MudText>
+                                    <MudText Typo="Typo.h6" Style="line-height: 1rem">@context.AwayLeader.LastName</MudText>
+                                    <MudText Typo="Typo.caption">@context.AwayLeader.JerseyNumberLabel</MudText>
+                                </div>
+                            </MudLink>
+                        </div>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <div class="d-flex flex-row align-center justify-space-between">
+                            <MudText Typo="Typo.h4"><b>@context.AwayLeader.StatString</b></MudText>
+                            <MudText>@context.Title</MudText>
+                            <MudText Typo="Typo.h4"><b>@context.HomeLeader.StatString</b></MudText>
+                        </div>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <div class="d-flex flex-row-reverse align-center gap-3">
+                            <MudAvatar>
+                                <MudImage Src="@context.HomeLeader.ProfilePicture" Alt="@context.HomeLeader.FullName"/>
+                            </MudAvatar>
+                            <MudLink Href="@($"/players/{context.HomeLeader.PlayerId}")" Underline="Underline.None">
+                                <div class="d-flex flex-column align-end">
+                                    <MudText Typo="Typo.caption">@context.HomeLeader.FirstName</MudText>
+                                    <MudText Typo="Typo.h6" Style="line-height: 1rem">@context.HomeLeader.LastName</MudText>
+                                    <MudText Typo="Typo.caption">@context.HomeLeader.JerseyNumberLabel</MudText>
+                                </div>
+                            </MudLink>
+                        </div>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <div class="d-flex flex-row align-center gap-2 mud-width-full">
+                            <div class="d-flex" style="@($"flex: {awayStatPctg}; background-color: {Game.AwayTeam.PrimaryColorHex}")">
+                                <div class="mud-width-full" style="height: 8px"></div>
+                            </div>
+                            <div class="d-flex" style="@($"flex: {homeStatPctg}; background-color: {Game.HomeTeam.PrimaryColorHex}")">
+                                <div class="mud-width-full" style="height: 8px"></div>
+                            </div>
+                        </div>
+                    </MudItem>
+                    <MudItem xs="12">
+                        &nbsp;
+                    </MudItem>
+                }
+            </MudGrid>
+        </GameSummarySection>
+        
+        <GameSummarySection Title="Three Stars of the Game" 
+                            Visible="@(Game.GameState == GameState.Completed && Game.Stars.Any())">
             <MudGrid>
                 @foreach (var star in Game.Stars.Where(x => x.StarRank is >= 1 and <= 3).OrderBy(x => x.StarRank))
                 {
@@ -27,7 +99,8 @@
             </MudGrid>
         </GameSummarySection>
         
-        <GameSummarySection Title="Scoring" Visible="@Game.Goals.Any()">
+        <GameSummarySection Title="Scoring" 
+                            Visible="@(Game.GameState != GameState.Pending && Game.Goals.Any())">
             @foreach (var periodGoals in Game.Goals.GroupBy(g => g.PeriodLabel))
             {
                 <MudText Typo="Typo.subtitle1"><b>@periodGoals.Key</b></MudText>
@@ -79,7 +152,9 @@
             }
         </GameSummarySection>
         
-        <GameSummarySection Title="Highlights" Visible="@Game.Highlights.Any()">
+        <GameSummarySection 
+            Title="Highlights" 
+            Visible="@(Game.GameState != GameState.Pending && Game.Highlights.Any())">
             <MudGrid>
                 @foreach (var highlight in Game.Highlights.Take(3))
                 {
@@ -90,7 +165,8 @@
             </MudGrid>
         </GameSummarySection>
 
-        <GameSummarySection Title="Penalties" Visible="@Game.Penalties.Any()">
+        <GameSummarySection Title="Penalties" 
+                            Visible="@(Game.GameState != GameState.Pending && Game.Penalties.Any())">
             <MudSimpleTable Elevation="0" Striped Square>
                 @foreach (var periodPenalties in Game.Penalties.GroupBy(p => p.PeriodLabel))
                 {

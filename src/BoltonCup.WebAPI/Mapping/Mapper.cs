@@ -373,7 +373,7 @@ public class Mapper : IMapper
         });
     }
 
-    public GameSingleDto? ToDto(Game? game)
+    public GameSingleDto? ToDto(Game? game, IReadOnlyList<SkaterStat> homeStats, IReadOnlyList<SkaterStat> awayStats)
     {
         return game is null
             ? null
@@ -402,6 +402,12 @@ public class Mapper : IMapper
                 Highlights = game.Highlights
                     .Select(ToGameHighlightDto)
                     .ToList(),
+                PlayersToWatch = homeStats.Count == 0 || awayStats.Count == 0 ? [] :
+                [
+                    ToGameStatLeaderDto("Points",  homeStats.MaxBy(x => x.Points),  awayStats.MaxBy(x => x.Points),  x => x.Points),
+                    ToGameStatLeaderDto("Goals",   homeStats.MaxBy(x => x.Goals),   awayStats.MaxBy(x => x.Goals),   x => x.Goals),
+                    ToGameStatLeaderDto("Assists", homeStats.MaxBy(x => x.Assists), awayStats.MaxBy(x => x.Assists), x => x.Assists),
+                ],
             };
     }
 
@@ -827,23 +833,53 @@ public class Mapper : IMapper
         return new PlayerStatLeadersDto
         {
             Title = title,
-            Leaders = stats.Select(stat => new PlayerStatDto
-            {
-                PlayerId = stat.PlayerId,
-                AccountId = stat.AccountId,
-                FirstName = stat.FirstName,
-                LastName = stat.LastName,
-                Position = stat.Position,
-                JerseyNumber = stat.JerseyNumber,
-                Birthday = stat.Birthday,
-                ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture),
-                TeamId = stat.TeamId,
-                TeamName = stat.TeamName,
-                TeamLogoUrl = _urlResolver.GetFullUrl(stat.TeamLogoUrl),
-                TeamAbbreviation = stat.TeamAbbreviation,
-                StatValue = selector(stat),
-                StatString = selector(stat).ToString(format)
-            })
+            Leaders = stats.Select(stat => ToPlayerStatDto(stat, selector, format))
+        };
+    }
+
+    public GameStatLeaderDto ToGameStatLeaderDto(string title, SkaterStat? home, SkaterStat? away, Func<SkaterStat, double> selector, string? format = null)
+    {
+        return new GameStatLeaderDto(
+            Title: title,
+            HomeLeader: home is null ? null : ToGameStatLeaderPlayerDto(home, selector, format),
+            AwayLeader: away is null ? null : ToGameStatLeaderPlayerDto(away, selector, format)
+        );
+    }
+
+    private GameStatLeaderPlayerDto ToGameStatLeaderPlayerDto(SkaterStat stat, Func<SkaterStat, double> selector, string? format = null)
+    {
+        return new GameStatLeaderPlayerDto
+        {
+            PlayerId = stat.PlayerId,
+            AccountId = stat.AccountId,
+            FirstName = stat.FirstName,
+            LastName = stat.LastName,
+            Position = stat.Position,
+            JerseyNumber = stat.JerseyNumber,
+            ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture),
+            StatValue = selector(stat),
+            StatString = selector(stat).ToString(format)
+        };
+    }
+
+    private PlayerStatDto ToPlayerStatDto(SkaterStat stat, Func<SkaterStat, double> selector, string? format = null)
+    {
+        return new PlayerStatDto
+        {
+            PlayerId = stat.PlayerId,
+            AccountId = stat.AccountId,
+            FirstName = stat.FirstName,
+            LastName = stat.LastName,
+            Position = stat.Position,
+            JerseyNumber = stat.JerseyNumber,
+            Birthday = stat.Birthday,
+            ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture),
+            TeamId = stat.TeamId,
+            TeamName = stat.TeamName,
+            TeamLogoUrl = _urlResolver.GetFullUrl(stat.TeamLogoUrl),
+            TeamAbbreviation = stat.TeamAbbreviation,
+            StatValue = selector(stat),
+            StatString = selector(stat).ToString(format)
         };
     }
 
@@ -1088,6 +1124,9 @@ public class Mapper : IMapper
             Logo = _urlResolver.GetFullUrl(team.Logo),
             Banner = _urlResolver.GetFullUrl(team.Banner),
             Goals = game.Goals.Count(g => g.TeamId == team.Id),
+            PrimaryColorHex = team.PrimaryColorHex,
+            SecondaryColorHex = team.SecondaryColorHex,
+            TertiaryColorHex = team.TertiaryColorHex
         };
     }
 
