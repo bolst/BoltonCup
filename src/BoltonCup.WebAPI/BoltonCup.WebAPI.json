@@ -3838,7 +3838,7 @@
         "tags": [
           "Games"
         ],
-        "description": "Gets a paginated list of games.\n\nGets a paginated list of games.",
+        "description": "Gets a paginated list of games.",
         "operationId": "GetGames",
         "parameters": [
           {
@@ -3997,7 +3997,7 @@
         "tags": [
           "Games"
         ],
-        "description": "Gets a single game by its ID.\n\nGets a single game by its ID.",
+        "description": "Gets a single game by its ID.",
         "operationId": "GetGameById",
         "parameters": [
           {
@@ -4102,6 +4102,1106 @@
             }
           }
         }
+      }
+    },
+    "/api/games/{id}/state": {
+      "patch": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Updates a game's state (timekeeper or admin only).",
+        "operationId": "UpdateGameState",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateGameStateRequest"
+                  }
+                ],
+                "description": "Request to update a game's state."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateGameStateRequest"
+                  }
+                ],
+                "description": "Request to update a game's state."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateGameStateRequest"
+                  }
+                ],
+                "description": "Request to update a game's state."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/games/{id}/goals": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Records a goal in a game (timekeeper or admin only).",
+        "operationId": "AddGoal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateGoalRequest"
+                  }
+                ],
+                "description": "Request to record a goal in a game."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateGoalRequest"
+                  }
+                ],
+                "description": "Request to record a goal in a game."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateGoalRequest"
+                  }
+                ],
+                "description": "Request to record a goal in a game."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/games/{id}/goals/{goalId}": {
+      "put": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Updates an existing goal (timekeeper or admin only).",
+        "operationId": "UpdateGoal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "goalId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateGoalRequest"
+                  }
+                ],
+                "description": "Request to update an existing goal. All fields are replaced."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateGoalRequest"
+                  }
+                ],
+                "description": "Request to update an existing goal. All fields are replaced."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateGoalRequest"
+                  }
+                ],
+                "description": "Request to update an existing goal. All fields are replaced."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Deletes a goal (timekeeper or admin only).",
+        "operationId": "DeleteGoal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "goalId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/games/{id}/penalties": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Records a penalty in a game (timekeeper or admin only).",
+        "operationId": "AddPenalty",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePenaltyRequest"
+                  }
+                ],
+                "description": "Request to record a penalty in a game."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePenaltyRequest"
+                  }
+                ],
+                "description": "Request to record a penalty in a game."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePenaltyRequest"
+                  }
+                ],
+                "description": "Request to record a penalty in a game."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/games/{id}/penalties/{penaltyId}": {
+      "put": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Updates an existing penalty (timekeeper or admin only).",
+        "operationId": "UpdatePenalty",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "penaltyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdatePenaltyRequest"
+                  }
+                ],
+                "description": "Request to update an existing penalty. All fields are replaced."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdatePenaltyRequest"
+                  }
+                ],
+                "description": "Request to update an existing penalty. All fields are replaced."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdatePenaltyRequest"
+                  }
+                ],
+                "description": "Request to update an existing penalty. All fields are replaced."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Deletes a penalty (timekeeper or admin only).",
+        "operationId": "DeletePenalty",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "penaltyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/games/{id}/stars": {
+      "put": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Replaces the 1st/2nd/3rd stars for a game (timekeeper or admin only).",
+        "operationId": "SetGameStars",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetGameStarsRequest"
+                  }
+                ],
+                "description": "Request to set the 1st/2nd/3rd stars for a game. Replaces any existing stars."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetGameStarsRequest"
+                  }
+                ],
+                "description": "Request to set the 1st/2nd/3rd stars for a game. Replaces any existing stars."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetGameStarsRequest"
+                  }
+                ],
+                "description": "Request to set the 1st/2nd/3rd stars for a game. Replaces any existing stars."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
     "/api/goaliestats": {
@@ -6999,6 +8099,99 @@
         "additionalProperties": false,
         "description": "Request to create a new draft for a tournament."
       },
+      "CreateGoalRequest": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the team that scored.",
+            "format": "int32"
+          },
+          "period": {
+            "type": "integer",
+            "description": "Gets or sets the period number.",
+            "format": "int32"
+          },
+          "periodLabel": {
+            "type": "string",
+            "description": "Gets or sets the period label (e.g. \"1st\", \"OT\")."
+          },
+          "periodTimeRemaining": {
+            "type": "string",
+            "description": "Gets or sets the time remaining in the period when the goal was scored.",
+            "format": "date-span"
+          },
+          "goalPlayerId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the player who scored.",
+            "format": "int32"
+          },
+          "assist1PlayerId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the primary assist player, if any.",
+            "format": "int32",
+            "nullable": true
+          },
+          "assist2PlayerId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the secondary assist player, if any.",
+            "format": "int32",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "description": "Gets or sets optional notes about the goal.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to record a goal in a game."
+      },
+      "CreatePenaltyRequest": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the penalized team.",
+            "format": "int32"
+          },
+          "period": {
+            "type": "integer",
+            "description": "Gets or sets the period number.",
+            "format": "int32"
+          },
+          "periodLabel": {
+            "type": "string",
+            "description": "Gets or sets the period label (e.g. \"1st\", \"OT\")."
+          },
+          "periodTimeRemaining": {
+            "type": "string",
+            "description": "Gets or sets the time remaining in the period when the penalty was called.",
+            "format": "date-span"
+          },
+          "playerId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the penalized player.",
+            "format": "int32"
+          },
+          "infractionName": {
+            "type": "string",
+            "description": "Gets or sets the infraction name (e.g. \"Tripping\", \"Hooking\")."
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "description": "Gets or sets the penalty duration in minutes.",
+            "format": "int32"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Gets or sets optional notes about the penalty.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to record a penalty in a game."
+      },
       "CreateTournamentPaymentIntentRequest": {
         "required": [
           "position"
@@ -9210,6 +10403,31 @@
         "additionalProperties": false,
         "description": "Represents the ordered picks for a single draft round."
       },
+      "SetGameStarsRequest": {
+        "type": "object",
+        "properties": {
+          "firstStarPlayerId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the first star player, if any.",
+            "format": "int32",
+            "nullable": true
+          },
+          "secondStarPlayerId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the second star player, if any.",
+            "format": "int32",
+            "nullable": true
+          },
+          "thirdStarPlayerId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the third star player, if any.",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to set the 1st/2nd/3rd stars for a game. Replaces any existing stars."
+      },
       "SkaterStatDto": {
         "required": [
           "accountId",
@@ -10141,6 +11359,114 @@
         },
         "additionalProperties": false,
         "description": "Request to update an existing draft's settings."
+      },
+      "UpdateGameStateRequest": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameState"
+              }
+            ],
+            "description": "Gets or sets the new game state."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to update a game's state."
+      },
+      "UpdateGoalRequest": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the team that scored.",
+            "format": "int32"
+          },
+          "period": {
+            "type": "integer",
+            "description": "Gets or sets the period number.",
+            "format": "int32"
+          },
+          "periodLabel": {
+            "type": "string",
+            "description": "Gets or sets the period label (e.g. \"1st\", \"OT\")."
+          },
+          "periodTimeRemaining": {
+            "type": "string",
+            "description": "Gets or sets the time remaining in the period when the goal was scored.",
+            "format": "date-span"
+          },
+          "goalPlayerId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the player who scored.",
+            "format": "int32"
+          },
+          "assist1PlayerId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the primary assist player, if any.",
+            "format": "int32",
+            "nullable": true
+          },
+          "assist2PlayerId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the secondary assist player, if any.",
+            "format": "int32",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "description": "Gets or sets optional notes about the goal.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to update an existing goal. All fields are replaced."
+      },
+      "UpdatePenaltyRequest": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the penalized team.",
+            "format": "int32"
+          },
+          "period": {
+            "type": "integer",
+            "description": "Gets or sets the period number.",
+            "format": "int32"
+          },
+          "periodLabel": {
+            "type": "string",
+            "description": "Gets or sets the period label (e.g. \"1st\", \"OT\")."
+          },
+          "periodTimeRemaining": {
+            "type": "string",
+            "description": "Gets or sets the time remaining in the period when the penalty was called.",
+            "format": "date-span"
+          },
+          "playerId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the penalized player.",
+            "format": "int32"
+          },
+          "infractionName": {
+            "type": "string",
+            "description": "Gets or sets the infraction name (e.g. \"Tripping\", \"Hooking\")."
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "description": "Gets or sets the penalty duration in minutes.",
+            "format": "int32"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Gets or sets optional notes about the penalty.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to update an existing penalty. All fields are replaced."
       },
       "UploadCredentials": {
         "type": "object",

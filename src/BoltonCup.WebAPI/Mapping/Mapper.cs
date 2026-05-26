@@ -464,6 +464,71 @@ public class Mapper : IMapper
         );
     }
 
+    public UpdateGameStateCommand ToCommand(int gameId, UpdateGameStateRequest request)
+        => new(gameId, request.State);
+
+    public CreateGoalCommand ToCommand(int gameId, CreateGoalRequest request)
+        => new(
+            GameId: gameId,
+            TeamId: request.TeamId,
+            Period: request.Period,
+            PeriodLabel: request.PeriodLabel,
+            PeriodTimeRemaining: request.PeriodTimeRemaining,
+            GoalPlayerId: request.GoalPlayerId,
+            Assist1PlayerId: request.Assist1PlayerId,
+            Assist2PlayerId: request.Assist2PlayerId,
+            Notes: request.Notes
+        );
+
+    public UpdateGoalCommand ToCommand(int gameId, int goalId, UpdateGoalRequest request)
+        => new(
+            GameId: gameId,
+            GoalId: goalId,
+            TeamId: request.TeamId,
+            Period: request.Period,
+            PeriodLabel: request.PeriodLabel,
+            PeriodTimeRemaining: request.PeriodTimeRemaining,
+            GoalPlayerId: request.GoalPlayerId,
+            Assist1PlayerId: request.Assist1PlayerId,
+            Assist2PlayerId: request.Assist2PlayerId,
+            Notes: request.Notes
+        );
+
+    public CreatePenaltyCommand ToCommand(int gameId, CreatePenaltyRequest request)
+        => new(
+            GameId: gameId,
+            TeamId: request.TeamId,
+            Period: request.Period,
+            PeriodLabel: request.PeriodLabel,
+            PeriodTimeRemaining: request.PeriodTimeRemaining,
+            PlayerId: request.PlayerId,
+            InfractionName: request.InfractionName,
+            DurationMinutes: request.DurationMinutes,
+            Notes: request.Notes
+        );
+
+    public UpdatePenaltyCommand ToCommand(int gameId, int penaltyId, UpdatePenaltyRequest request)
+        => new(
+            GameId: gameId,
+            PenaltyId: penaltyId,
+            TeamId: request.TeamId,
+            Period: request.Period,
+            PeriodLabel: request.PeriodLabel,
+            PeriodTimeRemaining: request.PeriodTimeRemaining,
+            PlayerId: request.PlayerId,
+            InfractionName: request.InfractionName,
+            DurationMinutes: request.DurationMinutes,
+            Notes: request.Notes
+        );
+
+    public SetGameStarsCommand ToCommand(int gameId, SetGameStarsRequest request)
+        => new(
+            GameId: gameId,
+            FirstStarPlayerId: request.FirstStarPlayerId,
+            SecondStarPlayerId: request.SecondStarPlayerId,
+            ThirdStarPlayerId: request.ThirdStarPlayerId
+        );
+
 
     // ---------- GoalieStat ----------
 
