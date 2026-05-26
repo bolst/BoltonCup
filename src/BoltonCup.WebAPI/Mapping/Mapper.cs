@@ -1124,6 +1124,9 @@ public class Mapper : IMapper
             Logo = _urlResolver.GetFullUrl(team.Logo),
             Banner = _urlResolver.GetFullUrl(team.Banner),
             Goals = game.Goals.Count(g => g.TeamId == team.Id),
+            PrimaryColorHex = team.PrimaryColorHex,
+            SecondaryColorHex = team.SecondaryColorHex,
+            TertiaryColorHex = team.TertiaryColorHex
         };
     }
 
