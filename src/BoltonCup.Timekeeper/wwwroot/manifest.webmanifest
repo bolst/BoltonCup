@@ -1,0 +1,24 @@
+{
+    "name": "Bolton Cup Timekeeper",
+    "short_name": "Timekeeper",
+    "id": "./",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#0B2551",
+    "theme_color": "#0B2551",
+    "icons": [
+        {
+            "src": "_content/BoltonCup.Common/images/boltoncup.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "any"
+        },
+        {
+            "src": "_content/BoltonCup.Common/images/boltoncup.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable"
+        }
+    ]
+}

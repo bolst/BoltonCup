@@ -1,0 +1,17 @@
+@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="GetTheme()" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <NavMenu />
+    <MudMainContent Style="min-height: 100vh">
+        <BoltonCupErrorBoundary>
+            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
+                @Body
+            </MudContainer>
+        </BoltonCupErrorBoundary>
+    </MudMainContent>
+</MudLayout>
