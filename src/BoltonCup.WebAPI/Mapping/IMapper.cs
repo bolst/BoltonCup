@@ -77,7 +77,7 @@ public interface IMapper
     TournamentSingleDto? ToDto(Tournament? tournament);
     PlayerStatLeadersDto ToDto(string title, IEnumerable<SkaterStat> stats, Func<SkaterStat, double> selector, string? format = null);
     PlayerStatLeadersDto ToDto(string title, IEnumerable<GoalieStat> stats, Func<GoalieStat, double> selector, string? format = null);
-    GameStatLeaderDto ToDto(string title, SkaterStat? home, SkaterStat? away, Func<SkaterStat, double> selector, string? format = null);
+    GameStatLeaderDto ToGameStatLeaderDto(string title, SkaterStat? home, SkaterStat? away, Func<SkaterStat, double> selector, string? format = null);
 
     // TournamentPayment
     TournamentPaymentIntentDto ToDto(TournamentPaymentIntent paymentIntent);

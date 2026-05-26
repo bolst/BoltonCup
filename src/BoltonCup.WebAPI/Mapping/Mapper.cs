@@ -404,9 +404,9 @@ public class Mapper : IMapper
                     .ToList(),
                 PlayersToWatch = homeStats.Count == 0 || awayStats.Count == 0 ? [] :
                 [
-                    ToDto("Points",  homeStats.MaxBy(x => x.Points),  awayStats.MaxBy(x => x.Points),  x => x.Points),
-                    ToDto("Goals",   homeStats.MaxBy(x => x.Goals),   awayStats.MaxBy(x => x.Goals),   x => x.Goals),
-                    ToDto("Assists", homeStats.MaxBy(x => x.Assists), awayStats.MaxBy(x => x.Assists), x => x.Assists),
+                    ToGameStatLeaderDto("Points",  homeStats.MaxBy(x => x.Points),  awayStats.MaxBy(x => x.Points),  x => x.Points),
+                    ToGameStatLeaderDto("Goals",   homeStats.MaxBy(x => x.Goals),   awayStats.MaxBy(x => x.Goals),   x => x.Goals),
+                    ToGameStatLeaderDto("Assists", homeStats.MaxBy(x => x.Assists), awayStats.MaxBy(x => x.Assists), x => x.Assists),
                 ],
             };
     }
@@ -837,13 +837,29 @@ public class Mapper : IMapper
         };
     }
 
-    public GameStatLeaderDto ToDto(string title, SkaterStat? home, SkaterStat? away, Func<SkaterStat, double> selector, string? format = null)
+    public GameStatLeaderDto ToGameStatLeaderDto(string title, SkaterStat? home, SkaterStat? away, Func<SkaterStat, double> selector, string? format = null)
     {
         return new GameStatLeaderDto(
             Title: title,
-            HomeLeader: home is null ? null : ToPlayerStatDto(home, selector, format),
-            AwayLeader: away is null ? null : ToPlayerStatDto(away, selector, format)
+            HomeLeader: home is null ? null : ToGameStatLeaderPlayerDto(home, selector, format),
+            AwayLeader: away is null ? null : ToGameStatLeaderPlayerDto(away, selector, format)
         );
+    }
+
+    private GameStatLeaderPlayerDto ToGameStatLeaderPlayerDto(SkaterStat stat, Func<SkaterStat, double> selector, string? format = null)
+    {
+        return new GameStatLeaderPlayerDto
+        {
+            PlayerId = stat.PlayerId,
+            AccountId = stat.AccountId,
+            FirstName = stat.FirstName,
+            LastName = stat.LastName,
+            Position = stat.Position,
+            JerseyNumber = stat.JerseyNumber,
+            ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture),
+            StatValue = selector(stat),
+            StatString = selector(stat).ToString(format)
+        };
     }
 
     private PlayerStatDto ToPlayerStatDto(SkaterStat stat, Func<SkaterStat, double> selector, string? format = null)
