@@ -1,4 +1,5 @@
 using BoltonCup.Common;
+using BoltonCup.Timekeeper.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using BoltonCup.Timekeeper.Components;
@@ -17,5 +18,6 @@ if (builder.HostEnvironment.IsProduction())
 }
 
 builder.Services.AddMudServices();
+builder.Services.AddScoped<TimekeeperStateService>();
 
 await builder.Build().RunAsync();

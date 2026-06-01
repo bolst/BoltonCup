@@ -4,7 +4,7 @@ using MudBlazor;
 
 namespace BoltonCup.Timekeeper.Components.Pages;
 
-public partial class Home
+public partial class Home : ComponentBase
 {
     [Inject] 
     private IBoltonCupApi BoltonCupApi { get; set; } = null!;
@@ -30,7 +30,7 @@ public partial class Home
 
     private void SelectGame(GameDto game)
     {
-        Snackbar.Add("Game console coming soon.", Severity.Info);
+        Navigation.NavigateTo($"/game/{game.Id}");
     }
 
     private static Color GetStateColor(GameState state) => state switch

@@ -1042,6 +1042,7 @@ public class Mapper : IMapper
     {
         return new GoalBriefDto
         {
+            Id = goal.Id,
             TimeRemaining = goal.PeriodTimeRemaining,
             Period = goal.Period,
             TeamId = goal.TeamId,
@@ -1064,6 +1065,7 @@ public class Mapper : IMapper
     {
         return new PenaltyBriefDto
         {
+            Id = penalty.Id,
             TimeRemaining = penalty.PeriodTimeRemaining,
             Period = penalty.Period,
             TeamId = penalty.TeamId,

@@ -9292,6 +9292,7 @@
       },
       "GoalBriefDto": {
         "required": [
+          "id",
           "period",
           "primaryAssist",
           "scorer",
@@ -9301,6 +9302,11 @@
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the goal ID.",
+            "format": "int32"
+          },
           "timeRemaining": {
             "type": "string",
             "description": "Gets or sets the time remaining in the period when the goal was scored.",
@@ -9695,6 +9701,7 @@
       "PenaltyBriefDto": {
         "required": [
           "durationMins",
+          "id",
           "infraction",
           "period",
           "player",
@@ -9703,6 +9710,11 @@
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the penalty ID.",
+            "format": "int32"
+          },
           "timeRemaining": {
             "type": "string",
             "description": "Gets or sets the time remaining in the period when the penalty occurred.",

@@ -1,0 +1,113 @@
+@namespace BoltonCup.Timekeeper.Dialogs
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="3" Class="pt-1">
+            <MudText Typo="Typo.subtitle1" Class="mb-1">Select the three stars of the game</MudText>
+
+            <MudAutocomplete T="PlayerDto"
+                             Label="1st Star"
+                             @bind-Value="_firstStar"
+                             SearchFunc="@SearchPlayers"
+                             ToStringFunc="@PlayerLabel"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             Clearable
+                             ResetValueOnEmptyText />
+
+            <MudAutocomplete T="PlayerDto"
+                             Label="2nd Star"
+                             @bind-Value="_secondStar"
+                             SearchFunc="@SearchPlayers"
+                             ToStringFunc="@PlayerLabel"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             Clearable
+                             ResetValueOnEmptyText />
+
+            <MudAutocomplete T="PlayerDto"
+                             Label="3rd Star"
+                             @bind-Value="_thirdStar"
+                             SearchFunc="@SearchPlayers"
+                             ToStringFunc="@PlayerLabel"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             Clearable
+                             ResetValueOnEmptyText />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Dialog.Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   OnClick="@Submit">
+            Save Stars
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter] public List<PlayerDto> AllPlayers { get; set; } = [];
+    [Parameter] public ICollection<GameStarDto> ExistingStars { get; set; } = [];
+
+    private PlayerDto? _firstStar;
+    private PlayerDto? _secondStar;
+    private PlayerDto? _thirdStar;
+
+    protected override void OnInitialized()
+    {
+        foreach (var star in ExistingStars)
+        {
+            var player = AllPlayers.FirstOrDefault(p => p.Id == star.Player.Id);
+            if (player is null) continue;
+            switch (star.StarRank)
+            {
+                case 1: _firstStar = player; break;
+                case 2: _secondStar = player; break;
+                case 3: _thirdStar = player; break;
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        await Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick = false,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+        });
+    }
+
+    private static string PlayerLabel(PlayerDto? p) =>
+        p is null ? string.Empty : $"#{p.JerseyNumber?.ToString() ?? "-"} {p.FirstName} {p.LastName}".Trim();
+
+    private Task<IEnumerable<PlayerDto>> SearchPlayers(string? value, CancellationToken ct)
+    {
+        var players = (IEnumerable<PlayerDto>)AllPlayers;
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            var lower = value.ToLowerInvariant();
+            players = players.Where(p => PlayerLabel(p).ToLowerInvariant().Contains(lower));
+        }
+        return Task.FromResult(players);
+    }
+
+    private void Submit()
+    {
+        var request = new SetGameStarsRequest
+        {
+            FirstStarPlayerId = _firstStar?.Id,
+            SecondStarPlayerId = _secondStar?.Id,
+            ThirdStarPlayerId = _thirdStar?.Id,
+        };
+        Dialog.Close(DialogResult.Ok(request));
+    }
+
+}
