@@ -89,8 +89,13 @@ public static class ServiceCollectionExtensions
             .Build();
 
         builder.Services.AddSingleton<IRazorLightEngine>(razorEngine);
-        
-        builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
+
+        builder.Services.Configure<ResendSettings>(builder.Configuration.GetSection("Resend"));
+        builder.Services.AddHttpClient<IEmailTransport, ResendEmailTransport>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.resend.com/");
+        });
+
         return builder.Services
             .AddSingleton<IEmailQueue, EmailQueue>()
             .AddHostedService<EmailBackgroundService>()

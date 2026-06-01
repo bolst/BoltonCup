@@ -1,13 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using MimeKit;
 using RazorLight;
-using System.Text.RegularExpressions;
-using BoltonCup.Infrastructure.Settings;
 
 namespace BoltonCup.Infrastructure.Services;
 
@@ -37,8 +31,8 @@ public class EmailBackgroundService : BackgroundService
 
                 using var scope = _serviceProvider.CreateScope();
                 var razorEngine = scope.ServiceProvider.GetRequiredService<IRazorLightEngine>();
-                var smtpSettings = scope.ServiceProvider.GetRequiredService<IOptions<SmtpSettings>>().Value;
-                await ProcessEmailAsync(payload, razorEngine, smtpSettings, stoppingToken);
+                var transport = scope.ServiceProvider.GetRequiredService<IEmailTransport>();
+                await ProcessEmailAsync(payload, razorEngine, transport, stoppingToken);
             }
             catch (OperationCanceledException)
             {
@@ -51,29 +45,16 @@ public class EmailBackgroundService : BackgroundService
         }
     }
 
-    private async Task ProcessEmailAsync(EmailPayload payload, IRazorLightEngine razor, SmtpSettings settings, CancellationToken token)
+    private async Task ProcessEmailAsync(EmailPayload payload, IRazorLightEngine razor, IEmailTransport transport, CancellationToken token)
     {
         try
         {
             _logger.LogInformation("Processing email for {Email}", payload.Email);
 
             var htmlMessage = await razor.CompileRenderAsync(payload.TemplateName, payload.Model);
+            var textMessage = new Html2Markdown.Converter().Convert(htmlMessage);
 
-            var converter = new Html2Markdown.Converter();
-            var textMessage = converter.Convert(htmlMessage);
-
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(settings.SenderName, settings.SenderEmail));
-            message.To.Add(new MailboxAddress("", payload.Email));
-            message.Subject = payload.Subject;
-            message.Body = new BodyBuilder { HtmlBody = htmlMessage, TextBody = textMessage }.ToMessageBody();
-
-            // Connect and send
-            using var client = new SmtpClient { CheckCertificateRevocation = false };
-            await client.ConnectAsync(settings.Host, settings.Port, SecureSocketOptions.SslOnConnect, token);
-            await client.AuthenticateAsync(settings.Username, settings.Password, token);
-            await client.SendAsync(message, token);
-            await client.DisconnectAsync(true, token);
+            await transport.SendAsync(payload.Email, payload.Subject, htmlMessage, textMessage, token);
 
             _logger.LogInformation("Successfully sent email to {Email}", payload.Email);
         }
