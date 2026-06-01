@@ -5,7 +5,12 @@
 <PageTitle>Timekeeper</PageTitle>
 
 <MudContainer Class="py-4" MaxWidth="MaxWidth.Medium">
-    <MudText Typo="Typo.h5" Class="mb-4">Today's Games</MudText>
+    <div class="d-flex flex-row align-center gap-3 mb-4">
+        <MudText Typo="Typo.h5">Games</MudText>
+        <MudSpacer />
+        <MudDatePicker Date="_selectedDate" DateChanged="OnDateChanged"
+                       Variant="Variant.Outlined" Margin="Margin.Dense" />
+    </div>
 
     @if (_loading)
     {
@@ -16,7 +21,7 @@
     else if (_games.Count == 0)
     {
         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-            No games scheduled for today.
+            No games scheduled for @(_selectedDate?.ToString("MMMM d") ?? "this date").
         </MudAlert>
     }
     else
