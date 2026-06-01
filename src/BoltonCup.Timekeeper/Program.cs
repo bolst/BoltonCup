@@ -18,6 +18,10 @@ if (builder.HostEnvironment.IsProduction())
 }
 
 builder.Services.AddMudServices();
+builder.Services.AddSingleton<IOfflineStore, LocalStorageOfflineStore>();
+builder.Services.AddSingleton<SyncService>();
 builder.Services.AddScoped<TimekeeperStateService>();
 
-await builder.Build().RunAsync();
+var host = builder.Build();
+_ = host.Services.GetRequiredService<SyncService>().StartAsync();
+await host.RunAsync();

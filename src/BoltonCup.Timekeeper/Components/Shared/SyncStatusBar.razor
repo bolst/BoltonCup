@@ -1,0 +1,49 @@
+@using BoltonCup.Timekeeper.Services
+@implements IDisposable
+@inject SyncService SyncService
+
+@if (!SyncService.IsOnline || SyncService.PendingCount > 0 || SyncService.LastSyncAt.HasValue)
+{
+    <div class="d-flex align-center gap-2 px-4 py-1" style="background: var(--mud-palette-background-grey); border-bottom: 1px solid var(--mud-palette-divider);">
+        @if (SyncService.IsOnline)
+        {
+            <MudChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Filled" Label="true"
+                     Icon="@Icons.Material.Rounded.CloudDone">Online</MudChip>
+        }
+        else
+        {
+            <MudChip T="string" Color="Color.Error" Size="Size.Small" Variant="Variant.Filled" Label="true"
+                     Icon="@Icons.Material.Rounded.CloudOff">Offline</MudChip>
+        }
+
+        @if (SyncService.PendingCount > 0)
+        {
+            <MudChip T="string" Color="Color.Warning" Size="Size.Small" Variant="Variant.Filled" Label="true"
+                     Icon="@Icons.Material.Rounded.Sync">@SyncService.PendingCount pending</MudChip>
+        }
+
+        @if (SyncService.LastSyncAt.HasValue)
+        {
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Last synced @SyncService.LastSyncAt.Value.ToString("h:mm:ss tt")
+            </MudText>
+        }
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        SyncService.OnStatusChanged += HandleStatusChanged;
+    }
+
+    private void HandleStatusChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        SyncService.OnStatusChanged -= HandleStatusChanged;
+    }
+}
