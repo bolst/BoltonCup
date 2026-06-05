@@ -1,0 +1,122 @@
+@namespace BoltonCup.Admin.Components.Shared
+@using BoltonCup.Infrastructure.Identity
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<BoltonCupUser> UserManager
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Manage roles</MudText>
+        @if (!string.IsNullOrEmpty(UserLabel))
+        {
+            <MudText Typo="Typo.body2" Class="mud-text-secondary">@UserLabel</MudText>
+        }
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Dense Class="my-2">@_errorMessage</MudAlert>
+        }
+
+        <MudDivider Class="my-2" />
+
+        <div class="pa-2 d-flex flex-column align-start gap-1">
+            @foreach (var role in BoltonCupRole.All)
+            {
+                var roleName = role;
+                <MudCheckBox T="bool"
+                             Value="@_selected.Contains(roleName)"
+                             ValueChanged="@(v => ToggleRole(roleName, v))"
+                             Label="@roleName"
+                             Dense />
+            }
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Dialog.Cancel">Cancel</MudButton>
+        <MudButton OnClick="@Save" Color="Color.Primary" Disabled="@_saving">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter]
+    public string UserId { get; set; } = null!;
+
+    [Parameter]
+    public string? UserLabel { get; set; }
+
+    private BoltonCupUser? _user;
+    private HashSet<string> _currentRoles = new();
+    private readonly HashSet<string> _selected = new();
+    private string? _errorMessage;
+    private bool _saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            NoHeader = true,
+            BackdropClick = false,
+            MaxWidth = MaxWidth.ExtraSmall,
+            FullWidth = true
+        });
+
+        _user = await UserManager.FindByIdAsync(UserId);
+        if (_user is null)
+        {
+            _errorMessage = "User not found.";
+            return;
+        }
+
+        _currentRoles = (await UserManager.GetRolesAsync(_user)).ToHashSet();
+        _selected.Clear();
+        _selected.UnionWith(_currentRoles);
+    }
+
+    private void ToggleRole(string role, bool selected)
+    {
+        if (selected)
+            _selected.Add(role);
+        else
+            _selected.Remove(role);
+    }
+
+    private async Task Save()
+    {
+        if (_user is null)
+            return;
+
+        _errorMessage = null;
+        _saving = true;
+
+        var toAdd = _selected.Except(_currentRoles).ToList();
+        var toRemove = _currentRoles.Except(_selected).ToList();
+
+        if (toAdd.Count > 0)
+        {
+            var addResult = await UserManager.AddToRolesAsync(_user, toAdd);
+            if (!addResult.Succeeded)
+            {
+                _errorMessage = string.Join(" ", addResult.Errors.Select(e => e.Description));
+                _saving = false;
+                return;
+            }
+        }
+
+        if (toRemove.Count > 0)
+        {
+            var removeResult = await UserManager.RemoveFromRolesAsync(_user, toRemove);
+            if (!removeResult.Succeeded)
+            {
+                _errorMessage = string.Join(" ", removeResult.Errors.Select(e => e.Description));
+                _saving = false;
+                return;
+            }
+        }
+
+        Dialog.Close(DialogResult.Ok(true));
+    }
+
+}
