@@ -123,6 +123,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             );
             entity.Property(e => e.IsVisible).HasColumnName("is_visible").HasDefaultValue(false);
             entity.Property(e => e.DraftOwnerAccountId).HasColumnName("draft_owner_account_id");
+            entity.Property(e => e.Rounds).HasColumnName("rounds").HasDefaultValue(0);
+            entity.Property(e => e.Teams).HasColumnName("teams").HasDefaultValue(0);
         });
 
         modelBuilder.Entity<DraftOrder>(entity =>

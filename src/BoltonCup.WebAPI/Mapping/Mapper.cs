@@ -205,6 +205,8 @@ public class Mapper : IMapper
             Status = draft.Status,
             Tournament = ToTournamentBriefDto(draft.Tournament),
             IsVisible = draft.IsVisible,
+            Rounds = draft.Rounds,
+            Teams = draft.Teams,
         });
     }
 
@@ -243,6 +245,8 @@ public class Mapper : IMapper
             Type = draft.Type,
             Status = draft.Status,
             IsVisible = draft.IsVisible,
+            Rounds = draft.Rounds,
+            Teams = draft.Teams,
             Tournament = ToTournamentBriefDto(draft.Tournament),
             PickOrder = draft.DraftOrders
                 .Select(order => new DraftPickOrderDto

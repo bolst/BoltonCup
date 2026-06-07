@@ -17,4 +17,8 @@ public record DraftDto
     public required TournamentBriefDto Tournament { get; set; }
     /// <summary>Gets or sets whether this draft is publicly visible.</summary>
     public bool IsVisible { get; set; }
+    /// <summary>Gets or sets the number of rounds in the draft.</summary>
+    public int Rounds { get; set; }
+    /// <summary>Gets or sets the number of teams in the draft.</summary>
+    public int Teams { get; set; }
 }

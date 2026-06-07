@@ -353,6 +353,9 @@ public class DraftService(
             });
         }
 
+        draft.Teams = teamCount;
+        draft.Rounds = (int)Math.Ceiling((double)totalPlayerCount / teamCount);
+
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
     

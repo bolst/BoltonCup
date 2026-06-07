@@ -47,9 +47,9 @@
                     <MudImage Src="@draft.Tournament.Logo" Height="32"/>
                 </div>
                 <div class="mud-width-full d-flex flex-row align-center justify-space-evenly flex-grow-1">
-                    @ValueLabel("15", "Rounds")
+                    @ValueLabel(draft.Rounds.ToString(), "Rounds")
                     <MudDivider FlexItem Vertical/>
-                    @ValueLabel("4", "Teams")
+                    @ValueLabel(draft.Teams.ToString(), "Teams")
                     <MudDivider FlexItem Vertical/>
                     @ValueLabel("2 Min", "Timer")
                 </div>
