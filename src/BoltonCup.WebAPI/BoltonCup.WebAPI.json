@@ -8305,6 +8305,16 @@
           "isVisible": {
             "type": "boolean",
             "description": "Gets or sets whether this draft is publicly visible."
+          },
+          "rounds": {
+            "type": "integer",
+            "description": "Gets or sets the number of rounds in the draft.",
+            "format": "int32"
+          },
+          "teams": {
+            "type": "integer",
+            "description": "Gets or sets the number of teams in the draft.",
+            "format": "int32"
           }
         },
         "additionalProperties": false,
@@ -8728,6 +8738,16 @@
           "isVisible": {
             "type": "boolean",
             "description": "Gets or sets whether this draft is publicly visible."
+          },
+          "rounds": {
+            "type": "integer",
+            "description": "Gets or sets the number of rounds in the draft.",
+            "format": "int32"
+          },
+          "teams": {
+            "type": "integer",
+            "description": "Gets or sets the number of teams in the draft.",
+            "format": "int32"
           },
           "pickOrder": {
             "type": "array",

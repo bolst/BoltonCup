@@ -10,6 +10,8 @@ public class Draft : EntityBase
     public DraftStatus Status { get; set; }
     public bool IsVisible { get; set; }
     public int? DraftOwnerAccountId { get; set; }
+    public int Rounds { get; set; }
+    public int Teams { get; set; }
 
     public Tournament Tournament { get; set; } = null!;
     public Account? DraftOwner { get; set; }
