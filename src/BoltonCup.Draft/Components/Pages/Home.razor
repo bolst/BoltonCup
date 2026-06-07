@@ -15,8 +15,13 @@
             <MudToggleItem T="bool" Value="false">Completed</MudToggleItem>
         </MudToggleGroup>
         
-        <AuthorizeView Roles="Admin">
-            <MudButton OnClick="@CreateNewDraftAsync" Color="Color.Primary" StartIcon="@Icons.Material.Rounded.Add">New</MudButton>
+        <AuthorizeView>
+            <Authorized>
+                @if (context.User.IsInRole("Admin") || context.User.GetTournamentGmIds().Any())
+                {
+                    <MudButton OnClick="@CreateNewDraftAsync" Color="Color.Primary" StartIcon="@Icons.Material.Rounded.Add">New</MudButton>
+                }
+            </Authorized>
         </AuthorizeView>
     </div>
     
