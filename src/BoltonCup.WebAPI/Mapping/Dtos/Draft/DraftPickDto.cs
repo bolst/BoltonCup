@@ -15,4 +15,6 @@ public record DraftPickDto
     public required TeamBriefDto Team { get; set; }
     /// <summary>Gets or sets the player selected with this pick, if any.</summary>
     public PlayerBriefDto? Player { get; set; }
+    /// <summary>Gets or sets the UTC time this pick went on the clock, if any.</summary>
+    public DateTime? ClockStartedAt { get; set; }
 }

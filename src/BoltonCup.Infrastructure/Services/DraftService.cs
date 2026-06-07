@@ -120,6 +120,9 @@ public class DraftService(
         if (command.IsVisible.HasValue)
             draft.IsVisible = command.IsVisible.Value;
 
+        if (command.SecondsPerPick.HasValue)
+            draft.SecondsPerPick = command.SecondsPerPick.Value;
+
         if (command.Ordering is not null)
         {
             if (!command.Ordering.All(x => draft.DraftOrders.Any(d => d.TeamId == x.TeamId)))
@@ -128,16 +131,28 @@ public class DraftService(
                 command.Ordering.Count != command.Ordering.Distinct().Count())
                 throw new InvalidOperationException("Supplied orderings are invalid (non-distinct picks or missing/extra teams).");
             
+            var existingAutoPick = draft.DraftOrders.ToDictionary(d => d.TeamId, d => d.AutoPick);
             draft.DraftOrders = command.Ordering
                 .Select(d => new DraftOrder
                 {
                     DraftId = draftId,
                     TeamId = d.TeamId,
                     Pick = d.Pick,
+                    AutoPick = existingAutoPick.GetValueOrDefault(d.TeamId),
                 })
                 .ToList();
         }
-        
+
+        if (command.AutoPickSettings is not null)
+        {
+            foreach (var setting in command.AutoPickSettings)
+            {
+                var order = draft.DraftOrders.FirstOrDefault(d => d.TeamId == setting.TeamId);
+                if (order is not null)
+                    order.AutoPick = setting.AutoPick;
+            }
+        }
+
         await _dbContext.SaveChangesAsync(cancellationToken);
         
         if (regenerate)
@@ -170,6 +185,15 @@ public class DraftService(
             throw new InvalidOperationException($"Draft {draft.Id} is completed and cannot be started.");
 
         draft.Status = DraftStatus.InProgress;
+
+        // Start (or, on resume, reset) the clock on the pick currently on the clock.
+        var currentPick = await _dbContext.DraftPicks
+            .Where(dp => dp.DraftId == draft.Id)
+            .Where(dp => dp.PlayerId == null)
+            .OrderBy(dp => dp.OverallPick)
+            .FirstOrDefaultAsync(cancellationToken);
+        currentPick?.ClockStartedAt = DateTime.UtcNow;
+
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
     
@@ -296,8 +320,14 @@ public class DraftService(
                 .Where(dp => dp.PlayerId == null)
                 .OrderBy(dp => dp.OverallPick)
                 .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+
+            if (nextPick is not null)
+            {
+                nextPick.ClockStartedAt = DateTime.UtcNow;
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
         }
-        
+
         await _dbContext.Entry(pick)
             .Reference(p => p.Player)
             .Query()
@@ -311,20 +341,49 @@ public class DraftService(
         );
     }
 
-    public async Task<CurrentDraftStateWithPick> AutoPickAsync(int draftId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<CurrentDraftStateWithPick>> ResolveAutoPicksAsync(int draftId, CancellationToken cancellationToken = default)
     {
-        var currentPick = await GetCurrentPickAsync(draftId, cancellationToken)
-            ?? throw new InvalidOperationException("No pick is currently on the clock.");
+        var results = new List<CurrentDraftStateWithPick>();
 
-        var best = await _dbContext.PlayerDraftRankings
+        while (true)
+        {
+            var draft = await _dbContext.Drafts
+                .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+            if (draft.Status != DraftStatus.InProgress)
+                break;
+
+            var currentPick = await _dbContext.DraftPicks
+                .Where(dp => dp.DraftId == draftId)
+                .Where(dp => dp.PlayerId == null)
+                .OrderBy(dp => dp.OverallPick)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (currentPick is null)
+                break;
+
+            var order = await _dbContext.DraftOrders
+                .FirstOrDefaultAsync(o => o.DraftId == draftId && o.TeamId == currentPick.TeamId, cancellationToken);
+            if (order is null || !order.AutoPick)
+                break;
+
+            var best = await GetBestAvailablePlayerAsync(draftId, cancellationToken);
+            if (best is null)
+                break;
+
+            var command = new DraftPlayerCommand(draftId, best.PlayerId, currentPick.TeamId, currentPick.OverallPick);
+            results.Add(await DraftPlayerAsync(command, cancellationToken));
+        }
+
+        return results;
+    }
+
+    private async Task<PlayerDraftRanking?> GetBestAvailablePlayerAsync(int draftId, CancellationToken cancellationToken)
+    {
+        return await _dbContext.PlayerDraftRankings
             .Where(p => p.DraftId == draftId)
             .Where(p => p.DraftPickId == null)
             .OrderBy(p => p.DraftRanking)
-            .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new InvalidOperationException("No available players to auto-pick.");
-
-        var command = new DraftPlayerCommand(draftId, best.PlayerId, currentPick.TeamId, currentPick.OverallPick);
-        return await DraftPlayerAsync(command, cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
 

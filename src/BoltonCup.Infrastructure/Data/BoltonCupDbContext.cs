@@ -125,6 +125,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.DraftOwnerAccountId).HasColumnName("draft_owner_account_id");
             entity.Property(e => e.Rounds).HasColumnName("rounds").HasDefaultValue(0);
             entity.Property(e => e.Teams).HasColumnName("teams").HasDefaultValue(0);
+            entity.Property(e => e.SecondsPerPick).HasColumnName("seconds_per_pick").HasDefaultValue(120);
         });
 
         modelBuilder.Entity<DraftOrder>(entity =>
@@ -150,6 +151,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.DraftId).HasColumnName("draft_id");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.Pick).HasColumnName("pick_number");
+            entity.Property(e => e.AutoPick).HasColumnName("auto_pick");
         });
 
         modelBuilder.Entity<DraftPick>(entity =>
@@ -182,6 +184,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.RoundPick).HasColumnName("round_pick_number");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
+            entity.Property(e => e.ClockStartedAt).HasColumnName("clock_started_at");
             entity.Property(e => e.Version).HasColumnName("row_version").IsRowVersion();
         });
 

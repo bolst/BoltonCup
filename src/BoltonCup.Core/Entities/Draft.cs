@@ -12,6 +12,7 @@ public class Draft : EntityBase
     public int? DraftOwnerAccountId { get; set; }
     public int Rounds { get; set; }
     public int Teams { get; set; }
+    public int SecondsPerPick { get; set; } = 120;
 
     public Tournament Tournament { get; set; } = null!;
     public Account? DraftOwner { get; set; }

@@ -207,6 +207,7 @@ public class Mapper : IMapper
             IsVisible = draft.IsVisible,
             Rounds = draft.Rounds,
             Teams = draft.Teams,
+            SecondsPerPick = draft.SecondsPerPick,
         });
     }
 
@@ -247,12 +248,14 @@ public class Mapper : IMapper
             IsVisible = draft.IsVisible,
             Rounds = draft.Rounds,
             Teams = draft.Teams,
+            SecondsPerPick = draft.SecondsPerPick,
             Tournament = ToTournamentBriefDto(draft.Tournament),
             PickOrder = draft.DraftOrders
                 .Select(order => new DraftPickOrderDto
                 {
                     Pick = order.Pick,
-                    Team = ToTeamBriefDto(order.Team)
+                    Team = ToTeamBriefDto(order.Team),
+                    AutoPick = order.AutoPick
                 })
                 .OrderBy(d => d.Pick),
             DraftPicksByRound = draft.DraftPicks
@@ -276,6 +279,7 @@ public class Mapper : IMapper
             RoundPick = draftPick.RoundPick,
             Team = ToTeamBriefDto(draftPick.Team),
             Player = draftPick.Player is null ? null : ToPlayerBriefDto(draftPick.Player),
+            ClockStartedAt = draftPick.ClockStartedAt,
         };
     }
 
@@ -327,6 +331,10 @@ public class Mapper : IMapper
                 .Select(x => new DraftOrderCommandEntry(x.TeamId, x.Pick))
                 .ToList(),
             IsVisible = request.IsVisible,
+            SecondsPerPick = request.SecondsPerPick,
+            AutoPickSettings = request.AutoPickSettings?
+                .Select(x => new DraftAutoPickEntry(x.TeamId, x.AutoPick))
+                .ToList(),
         };
     }
 
@@ -350,6 +358,7 @@ public class Mapper : IMapper
             RoundPick = draftPick.RoundPick,
             Team = ToTeamBriefDto(draftPick.Team),
             Player = draftPick.Player is null ? null : ToPlayerBriefDto(draftPick.Player),
+            ClockStartedAt = draftPick.ClockStartedAt,
         };
     }
 
