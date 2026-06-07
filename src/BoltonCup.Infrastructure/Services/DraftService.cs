@@ -311,6 +311,22 @@ public class DraftService(
         );
     }
 
+    public async Task<CurrentDraftStateWithPick> AutoPickAsync(int draftId, CancellationToken cancellationToken = default)
+    {
+        var currentPick = await GetCurrentPickAsync(draftId, cancellationToken)
+            ?? throw new InvalidOperationException("No pick is currently on the clock.");
+
+        var best = await _dbContext.PlayerDraftRankings
+            .Where(p => p.DraftId == draftId)
+            .Where(p => p.DraftPickId == null)
+            .OrderBy(p => p.DraftRanking)
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? throw new InvalidOperationException("No available players to auto-pick.");
+
+        var command = new DraftPlayerCommand(draftId, best.PlayerId, currentPick.TeamId, currentPick.OverallPick);
+        return await DraftPlayerAsync(command, cancellationToken);
+    }
+
 
     private async Task GenerateDraftPicksAsync(Draft draft, CancellationToken cancellationToken)
     {
