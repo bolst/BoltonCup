@@ -19,6 +19,13 @@
                                   Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info"
                                   IconSize="Size.Medium" Variant="Variant.Text" Margin="Margin.Dense" DebounceInterval="200" FullWidth Clearable Immediate/>
                 </div>
+                <MudSpacer/>
+                @if (DraftState.CanManageDraft && DraftState.Draft?.Status == DraftStatus.InProgress && DraftState.CurrentPick is not null)
+                {
+                    <MudButton OnClick="@AutoPickAsync" StartIcon="@Icons.Material.Rounded.AutoAwesome" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Small">
+                        Auto-pick
+                    </MudButton>
+                }
             </div>
         </ToolBarContent>
         <Columns>
@@ -112,6 +119,11 @@
             TeamId = DraftState.CurrentPick!.Team.Id,
             OverallPick = DraftState.CurrentPick!.OverallPick
         });
+    }
+
+    private async Task AutoPickAsync()
+    {
+        await BoltonCupApi.AutoPickAsync(DraftState.Draft!.Id);
     }
 
     public void Dispose()

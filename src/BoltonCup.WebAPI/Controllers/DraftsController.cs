@@ -168,6 +168,23 @@ public class DraftsController(
         return Ok();
     }
 
+    /// <summary>Auto-picks the best available player for the current slot and notifies clients (admin or draft owner).</summary>
+    [Authorize]
+    [HttpPost("{id:int}/autopick")]
+    public async Task<IActionResult> AutoPick(int id, [FromServices] IHubContext<Hubs.DraftHub> hubContext)
+    {
+        if (await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: false })
+        {
+            return Forbid();
+        }
+
+        var draftState = await _draftService.AutoPickAsync(id);
+        var payloadDto = _mapper.ToDto(draftState);
+        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnPickMade, payloadDto);
+
+        return Ok();
+    }
+
     /// <summary>Gets the player rankings for a draft.</summary>
     [AllowAnonymous]
     [HttpGet("{id:int}/players")]
