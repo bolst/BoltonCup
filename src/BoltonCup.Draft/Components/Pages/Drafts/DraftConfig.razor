@@ -6,7 +6,8 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
-@attribute [Authorize(Roles = "Admin")]
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthStateProvider
 
 <MudContainer Class="py-1" MaxWidth="MaxWidth.Large" Gutters="false">
     @if (_loading)
@@ -183,10 +184,19 @@
     private async Task LoadDraftDataAsync()
     {
         _loading = true;
-        
+
         _draft = await BoltonCupApi.GetDraftByIdAsync(DraftId);
+
         if (_draft is not null)
         {
+            // redirect if user cannot manage this draft
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            if (!authState.User.CanManageDraft(_draft))
+            {
+                Navigation.NavigateTo($"/drafts/{DraftId}", true);
+                return;
+            }
+
             _updateDraftRequest.Title = _draft.Title ?? "";
             _updateDraftRequest.DraftType = _draft.Type;
 
