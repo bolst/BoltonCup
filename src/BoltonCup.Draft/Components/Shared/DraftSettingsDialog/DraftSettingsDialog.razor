@@ -27,7 +27,7 @@
                         </MudRadioGroup>
                     </div>
 
-                    <MudSwitch @bind-Value="@_model.IsVisible" Color="Color.Primary" Label="Visible to everyone" />
+                    <MudSwitch @bind-Value="@_model.IsVisible" For="@(() => _model.IsVisible)" Color="Color.Primary" Label="Visible to everyone" />
 
                 </DraftSettingsForm>
                 
