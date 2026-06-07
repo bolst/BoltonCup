@@ -189,6 +189,23 @@ public class DraftsController(
     public async Task<ActionResult<IPagedList<DraftRankingDto>>> GetDraftPlayerRankings(int id, [FromQuery] GetDraftRankingsQuery query)
     {
         var rankings = await _draftService.GetDraftRankingsAsync(id, query);
-        return Ok(_mapper.ToDtoList(rankings));
+        var favouritePlayerIds = User.GetAccountIdOrDefault() is { } accountId
+            ? await _draftService.GetFavouritePlayerIdsAsync(id, accountId)
+            : new HashSet<int>();
+        return Ok(_mapper.ToDtoList(rankings, favouritePlayerIds));
+    }
+
+    /// <summary>Toggles the current GM's favourite status for a player in the draft and returns the new state.</summary>
+    [Authorize]
+    [HttpPut("{id:int}/players/{playerId:int}/favourite")]
+    public async Task<ActionResult<bool>> ToggleFavourite(int id, int playerId)
+    {
+        if (await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: false })
+        {
+            return Forbid();
+        }
+
+        var isFavourite = await _draftService.ToggleFavouriteAsync(id, playerId, User.GetAccountId());
+        return Ok(isFavourite);
     }
 }

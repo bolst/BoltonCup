@@ -14,6 +14,7 @@
         <ToolBarContent>
             <div class="d-flex flex-row align-center gap-3 flex-wrap">
                 <MudCheckBox @bind-Value="@_filterState.ShowDrafted" Size="Size.Small" Label="Show Drafted" Dense/>
+                <MudCheckBox @bind-Value="@_filterState.FavouritesOnly" Size="Size.Small" Label="Favourites only" Dense/>
                 <div style="width: 300px">
                     <MudTextField @bind-Value="@_filterState.Search" Placeholder="Search"
                                   Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info"
@@ -22,6 +23,15 @@
             </div>
         </ToolBarContent>
         <Columns>
+            <TemplateColumn Title="" CellStyle="width: 40px" Sortable="false">
+                <CellTemplate>
+                    <MudIconButton
+                        OnClick="@(_ => ToggleFavouriteAsync(context.Item))"
+                        Icon="@(context.Item.IsFavourite ? Icons.Material.Rounded.Star : Icons.Material.Rounded.StarBorder)"
+                        Color="@(context.Item.IsFavourite ? Color.Warning : Color.Default)"
+                        Size="Size.Small"/>
+                </CellTemplate>
+            </TemplateColumn>
             <PropertyColumn Title="Rank" Property="x => x.DraftRanking" CellStyle="width: 50px">
                 <CellTemplate>
                     <div class="d-flex flex-row align-center gap-1">
@@ -87,7 +97,10 @@
         
         if (!_filterState.ShowDrafted)
             result = result && !ranking.IsDrafted;
-        
+
+        if (_filterState.FavouritesOnly)
+            result = result && ranking.IsFavourite;
+
         return result;
     }
 
@@ -119,6 +132,21 @@
         });
     }
 
+    private async Task ToggleFavouriteAsync(Sdk.DraftRankingDto ranking)
+    {
+        ranking.IsFavourite = !ranking.IsFavourite;
+        StateHasChanged();
+        try
+        {
+            await BoltonCupApi.ToggleFavouriteAsync(DraftState.Draft!.Id, ranking.Player.Id);
+        }
+        catch
+        {
+            ranking.IsFavourite = !ranking.IsFavourite;
+            StateHasChanged();
+        }
+    }
+
     public void Dispose()
     {
         DraftState.OnStateChanged -= HandleStateChanged;
@@ -127,6 +155,8 @@
     private class FilterState
     {
         public bool ShowDrafted { get; set; }
+
+        public bool FavouritesOnly { get; set; }
 
         public string Search { get; set; } = string.Empty;
     }
