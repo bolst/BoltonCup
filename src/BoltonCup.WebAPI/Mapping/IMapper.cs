@@ -30,12 +30,12 @@ public interface IMapper
     IPagedList<DraftDto> ToDtoList(IPagedList<Draft> drafts);
     IPagedList<DraftPickDto> ToDtoList(IPagedList<DraftPick> draftPicks);
     IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings);
-    DraftSingleDto? ToDto(Draft? draft, bool isAuthorized);
+    DraftSingleDto? ToDto(Draft? draft, bool isAuthorized, bool canManage);
     DraftPickSingleDto? ToDto(DraftPick? draftPick);
-    DraftUpdateEventDto ToDto(CurrentDraftState draftState, bool isAuthorized);
+    DraftUpdateEventDto ToDto(CurrentDraftState draftState, bool isAuthorized, bool canManage);
     DraftPickMadeEventDto ToDto(CurrentDraftStateWithPick draftState);
-    GetDraftsQuery ToQuery(GetDraftsRequest request);
-    CreateDraftCommand ToCommand(CreateDraftRequest request);
+    GetDraftsQuery ToQuery(GetDraftsRequest request, ClaimsPrincipal user);
+    CreateDraftCommand ToCommand(CreateDraftRequest request, ClaimsPrincipal user);
     UpdateDraftCommand ToCommand(UpdateDraftRequest request);
     DraftPlayerCommand ToCommand(int id, DraftPlayerRequest request);
 

@@ -18,6 +18,11 @@ public class DraftService(
             .Include(d => d.Tournament)
             .ConditionalWhere(d => d.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(d => d.Status == query.Status, query.Status.HasValue)
+            // non-admins can only see visible drafts or drafts they own
+            .ConditionalWhere(
+                d => d.IsVisible || d.DraftOwnerAccountId == query.AccountId,
+                !query.IsAdmin
+            )
             .OrderByDescending(d => d.CreatedAt)
             .ToPagedListAsync(query, cancellationToken);
     }
@@ -50,6 +55,8 @@ public class DraftService(
             TournamentId = command.TournamentId,
             Title = command.Title,
             Status = DraftStatus.Pending,
+            IsVisible = false,
+            DraftOwnerAccountId = command.OwnerAccountId,
         };
         _dbContext.Drafts.Add(newDraft);
 
@@ -109,6 +116,9 @@ public class DraftService(
         
         if (!string.IsNullOrEmpty(command.Title))
             draft.Title = command.Title;
+
+        if (command.IsVisible.HasValue)
+            draft.IsVisible = command.IsVisible.Value;
 
         if (command.Ordering is not null)
         {

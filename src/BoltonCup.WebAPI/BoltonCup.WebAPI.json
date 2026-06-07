@@ -2624,7 +2624,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Creates a new draft (admin only).",
+        "description": "Creates a new draft (admin or tournament GM for their tournament).",
         "operationId": "CreateDraft",
         "requestBody": {
           "content": {
@@ -2880,7 +2880,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Updates draft settings and broadcasts the new state to connected clients (admin only).",
+        "description": "Updates draft settings and broadcasts the new state to connected clients (admin or draft owner).",
         "operationId": "UpdateDraft",
         "parameters": [
           {
@@ -3015,7 +3015,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Deletes a draft (admin only).",
+        "description": "Deletes a draft (admin or draft owner).",
         "operationId": "DeleteDraft",
         "parameters": [
           {
@@ -3118,7 +3118,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Starts the draft and notifies connected clients (admin only).",
+        "description": "Starts the draft and notifies connected clients (admin or draft owner).",
         "operationId": "StartDraft",
         "parameters": [
           {
@@ -3221,7 +3221,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Pauses the draft and notifies connected clients (admin only).",
+        "description": "Pauses the draft and notifies connected clients (admin or draft owner).",
         "operationId": "PauseDraft",
         "parameters": [
           {
@@ -3324,7 +3324,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Ends the draft and notifies connected clients (admin only).",
+        "description": "Ends the draft and notifies connected clients (admin or draft owner).",
         "operationId": "EndDraft",
         "parameters": [
           {
@@ -7108,6 +7108,10 @@
               }
             ],
             "description": "Gets or sets the tournament this draft belongs to."
+          },
+          "isVisible": {
+            "type": "boolean",
+            "description": "Gets or sets whether this draft is publicly visible."
           }
         },
         "additionalProperties": false,
@@ -7528,6 +7532,10 @@
             ],
             "description": "Gets or sets the tournament this draft belongs to."
           },
+          "isVisible": {
+            "type": "boolean",
+            "description": "Gets or sets whether this draft is publicly visible."
+          },
           "pickOrder": {
             "type": "array",
             "items": {
@@ -7545,6 +7553,10 @@
           "canEditDraft": {
             "type": "boolean",
             "description": "Gets or sets whether the current user can edit this draft."
+          },
+          "canManageDraft": {
+            "type": "boolean",
+            "description": "Gets or sets whether the current user can manage this draft (admin or draft owner)."
           }
         },
         "additionalProperties": false,
@@ -10136,6 +10148,11 @@
               "$ref": "#/components/schemas/DraftOrderingRequestEntry"
             },
             "description": "Gets or sets the updated pick ordering for each team.",
+            "nullable": true
+          },
+          "isVisible": {
+            "type": "boolean",
+            "description": "Gets or sets whether the draft should be publicly visible.",
             "nullable": true
           }
         },

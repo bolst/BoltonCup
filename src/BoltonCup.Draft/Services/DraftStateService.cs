@@ -26,6 +26,7 @@ public class DraftStateService : IAsyncDisposable
     public DraftConnectionState ConnectionState { get; private set; } = DraftConnectionState.Disconnected;
     
     public bool CanEditDraft => Draft?.CanEditDraft ?? false;
+    public bool CanManageDraft => Draft?.CanManageDraft ?? false;
 
     public event Action? OnStateChanged;
 

@@ -2,6 +2,7 @@ using BoltonCup.Core;
 using BoltonCup.Core.Commands;
 using BoltonCup.WebAPI.Controllers;
 using BoltonCup.WebAPI.Mapping;
+using BoltonCup.WebAPI.Tests.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,7 +51,7 @@ public class DraftsControllerTests
         var request = new GetDraftsRequest { TournamentId = 1, Status = DraftStatus.Completed };
         var query = new GetDraftsQuery { TournamentId = 1, Status = DraftStatus.Completed };
 
-        _mapper.Setup(m => m.ToQuery(request)).Returns(query);
+        _mapper.Setup(m => m.ToQuery(request, It.IsAny<System.Security.Claims.ClaimsPrincipal>())).Returns(query);
         _draftService.Setup(s => s.GetAsync(It.IsAny<GetDraftsQuery>())).ReturnsAsync(Mock.Of<IPagedList<Draft>>());
         _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<Draft>>())).Returns(Mock.Of<IPagedList<DraftDto>>());
 
@@ -67,7 +68,7 @@ public class DraftsControllerTests
     {
         SetupAuthSuccess();
         _draftService.Setup(s => s.GetByIdAsync(5)).ReturnsAsync(new Draft());
-        _mapper.Setup(m => m.ToDto(It.IsAny<Draft?>(), It.IsAny<bool>())).Returns(Mock.Of<DraftSingleDto>());
+        _mapper.Setup(m => m.ToDto(It.IsAny<Draft?>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Mock.Of<DraftSingleDto>());
 
         var result = await _controller.GetDraftById(5);
 
@@ -79,7 +80,7 @@ public class DraftsControllerTests
     {
         SetupAuthSuccess();
         _draftService.Setup(s => s.GetByIdAsync(5)).ReturnsAsync((Draft?)null);
-        _mapper.Setup(m => m.ToDto(It.IsAny<Draft?>(), It.IsAny<bool>())).Returns((DraftSingleDto?)null);
+        _mapper.Setup(m => m.ToDto(It.IsAny<Draft?>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns((DraftSingleDto?)null);
 
         var result = await _controller.GetDraftById(5);
 
@@ -94,7 +95,8 @@ public class DraftsControllerTests
         var request = new CreateDraftRequest { TournamentId = 1, Title = "Test Draft" };
         const int newDraftId = 42;
 
-        _mapper.Setup(m => m.ToCommand(request)).Returns(new CreateDraftCommand(1, "Test Draft"));
+        _controller.ControllerContext = ClaimsHelper.WithAdminRole();
+        _mapper.Setup(m => m.ToCommand(request, It.IsAny<System.Security.Claims.ClaimsPrincipal>())).Returns(new CreateDraftCommand(1, "Test Draft", null));
         _draftService.Setup(s => s.CreateAsync(It.IsAny<CreateDraftCommand>())).ReturnsAsync(newDraftId);
 
         var result = await _controller.CreateDraft(request);

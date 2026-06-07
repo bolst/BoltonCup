@@ -9,6 +9,8 @@ public record DraftSingleDto : DraftDto
     public required IOrderedEnumerable<RoundDraftPicks> DraftPicksByRound { get; set; }
     /// <summary>Gets or sets whether the current user can edit this draft.</summary>
     public bool CanEditDraft { get; set; }
+    /// <summary>Gets or sets whether the current user can manage this draft (admin or draft owner).</summary>
+    public bool CanManageDraft { get; set; }
 }
 
 /// <summary>Represents the ordered picks for a single draft round.</summary>

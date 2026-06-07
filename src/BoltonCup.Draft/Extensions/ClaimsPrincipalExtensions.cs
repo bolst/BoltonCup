@@ -15,4 +15,9 @@ public static class ClaimsPrincipalExtensions
     {
         return principal.IsGmForTournament(draft.Tournament.Id) || principal.IsInRole("Admin");
     }
+
+    public static bool CanManageDraft(this ClaimsPrincipal principal, Sdk.DraftSingleDto draft)
+    {
+        return draft.CanManageDraft;
+    }
 }
