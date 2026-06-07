@@ -20,7 +20,7 @@ public class DraftService(
             .ConditionalWhere(d => d.Status == query.Status, query.Status.HasValue)
             // non-admins can only see visible drafts or drafts they own
             .ConditionalWhere(
-                d => d.IsVisible || d.DraftOwnerAccountId == query.AccountId,
+                d => d.IsVisible || (d.DraftOwnerAccountId != null && d.DraftOwnerAccountId == query.AccountId),
                 !query.IsAdmin
             )
             .OrderByDescending(d => d.CreatedAt)
