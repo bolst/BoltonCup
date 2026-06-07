@@ -17,6 +17,9 @@ public interface IDraftService
     Task<IPagedList<PlayerDraftRanking>> GetDraftRankingsAsync(int draftId, GetDraftRankingsQuery query, CancellationToken cancellationToken = default);
     Task<CurrentDraftStateWithPick> DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<CurrentDraftStateWithPick>> ResolveAutoPicksAsync(int draftId, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlySet<int>> GetFavouritePlayerIdsAsync(int draftId, int accountId, CancellationToken cancellationToken = default);
+    Task<bool> ToggleFavouriteAsync(int draftId, int playerId, int accountId, CancellationToken cancellationToken = default);
 }
 
 

@@ -34,7 +34,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<TournamentSponsor> TournamentSponsors { get; set; }
     
     public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
-    
+    public DbSet<PlayerFavourite> PlayerFavourites { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("core");
@@ -282,6 +283,33 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.HasIndex(e => e.GameId);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.PlayerId).HasColumnName("player_id");
+        });
+
+        modelBuilder.Entity<PlayerFavourite>(entity =>
+        {
+            entity
+                .ToTable("player_favourites")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Account)
+                .WithMany()
+                .HasForeignKey(e => e.AccountId);
+            entity
+                .HasOne(e => e.Draft)
+                .WithMany()
+                .HasForeignKey(e => e.DraftId);
+            entity
+                .HasOne(e => e.Player)
+                .WithMany()
+                .HasForeignKey(e => e.PlayerId);
+            entity
+                .HasIndex(e => new { e.AccountId, e.DraftId, e.PlayerId })
+                .IsUnique();
+            entity.HasIndex(e => new { e.AccountId, e.DraftId });
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.AccountId).HasColumnName("account_id");
+            entity.Property(e => e.DraftId).HasColumnName("draft_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
         });
 

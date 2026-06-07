@@ -216,7 +216,7 @@ public class Mapper : IMapper
         return draftPicks.ProjectTo(ToDraftPickDto);
     }
 
-    public IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings)
+    public IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings, IReadOnlySet<int> favouritePlayerIds)
     {
         return rankings.ProjectTo(draft => new DraftRankingDto
         {
@@ -232,6 +232,7 @@ public class Mapper : IMapper
             OverrideRanking = draft.OverrideRanking,
             IsDrafted = draft.IsDrafted,
             PointsPerGame = draft.PointsPerGame,
+            IsFavourite = favouritePlayerIds.Contains(draft.PlayerId),
         });
     }
 

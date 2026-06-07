@@ -263,7 +263,44 @@ public class DraftService(
             .ApplySorting(query, x => x.OrderBy(y => y.DraftRanking))
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }
-    
+
+    public async Task<IReadOnlySet<int>> GetFavouritePlayerIdsAsync(int draftId, int accountId,
+        CancellationToken cancellationToken = default)
+    {
+        var playerIds = await _dbContext.PlayerFavourites
+            .AsNoTracking()
+            .Where(f => f.DraftId == draftId && f.AccountId == accountId)
+            .Select(f => f.PlayerId)
+            .ToListAsync(cancellationToken);
+
+        return playerIds.ToHashSet();
+    }
+
+    public async Task<bool> ToggleFavouriteAsync(int draftId, int playerId, int accountId,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await _dbContext.PlayerFavourites
+            .SingleOrDefaultAsync(
+                f => f.DraftId == draftId && f.AccountId == accountId && f.PlayerId == playerId,
+                cancellationToken);
+
+        if (existing is not null)
+        {
+            _dbContext.PlayerFavourites.Remove(existing);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return false;
+        }
+
+        _dbContext.PlayerFavourites.Add(new PlayerFavourite
+        {
+            DraftId = draftId,
+            AccountId = accountId,
+            PlayerId = playerId,
+        });
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
 
     public async Task<CurrentDraftStateWithPick> DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default)
     {
