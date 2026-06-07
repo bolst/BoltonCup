@@ -18,7 +18,7 @@
                 <DraftSettingsForm Model="@_model" OnValidSubmit="@UpdateGeneralSettingsAsync" Title="General Settings" DisableIfUnmodified>
                     <MudTextField @bind-Value="@_model.Title" For="@(() => _model.Title)"
                                   Margin="Margin.Dense" Label="Draft name" FullWidth />
-                        
+
                     <div>
                         <MudText Typo="Typo.caption">Draft type</MudText>
                         <MudRadioGroup @bind-Value="@_model.DraftType" For="@(() => _model.DraftType)" Disabled="@(DraftState.Draft?.Status != Sdk.DraftStatus.Pending)">
@@ -26,7 +26,9 @@
                             <MudRadio Value="@Sdk.DraftType.Snake" Color="Color.Primary" Label="Snake"/>
                         </MudRadioGroup>
                     </div>
-                    
+
+                    <MudSwitch @bind-Value="@_model.IsVisible" Color="Color.Primary" Label="Visible to everyone" />
+
                 </DraftSettingsForm>
                 
             </MudTabPanel>
@@ -78,6 +80,7 @@
 
         _model.Title = DraftState.Draft.Title;
         _model.DraftType = DraftState.Draft.Type;
+        _model.IsVisible = DraftState.Draft.IsVisible;
         _pickOrder = DraftState.Draft.PickOrder.ToList();
         
         return Dialog.SetOptionsAsync(Dialog.Options with
@@ -100,7 +103,8 @@
         await BoltonCupApi.UpdateDraftAsync(draft.Id, new Sdk.UpdateDraftRequest
         {
             Title = _model.Title,
-            DraftType = _model.DraftType
+            DraftType = _model.DraftType,
+            IsVisible = _model.IsVisible
         });
 
         editContext.MarkAsUnmodified();
@@ -168,8 +172,10 @@
     {
         [Required(ErrorMessage = "Draft name cannot be null.")]
         public string? Title { get; set; }
-        
+
         public Sdk.DraftType DraftType { get; set; }
+
+        public bool IsVisible { get; set; }
     }
     
 }
