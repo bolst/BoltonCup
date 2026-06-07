@@ -19,11 +19,6 @@
                                   Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info"
                                   IconSize="Size.Medium" Variant="Variant.Text" Margin="Margin.Dense" DebounceInterval="200" FullWidth Clearable Immediate/>
                 </div>
-                <MudSpacer/>
-                @if (DraftState.CanManageDraft && DraftState.Draft?.Status == DraftStatus.InProgress)
-                {
-                    <MudSwitch T="bool" @bind-Value="AutoPickEnabled" Color="Color.Secondary" Label="Auto-pick" />
-                }
             </div>
         </ToolBarContent>
         <Columns>
@@ -75,7 +70,12 @@
 
     protected override void OnInitialized()
     {
-        DraftState.OnStateChanged += StateHasChanged;
+        DraftState.OnStateChanged += HandleStateChanged;
+    }
+
+    private void HandleStateChanged()
+    {
+        StateHasChanged();
     }
 
     private bool QuickFilter(Sdk.DraftRankingDto ranking)
@@ -119,75 +119,9 @@
         });
     }
 
-    private System.Timers.Timer? _autoPickTimer;
-    private bool _autoPickEnabled;
-    private bool _autoPicking;
-
-    private bool AutoPickEnabled
-    {
-        get => _autoPickEnabled;
-        set
-        {
-            if (_autoPickEnabled == value)
-                return;
-            _autoPickEnabled = value;
-
-            if (value)
-            {
-                _autoPickTimer ??= CreateAutoPickTimer();
-                _autoPickTimer.Start();
-            }
-            else
-            {
-                _autoPickTimer?.Stop();
-            }
-        }
-    }
-
-    private System.Timers.Timer CreateAutoPickTimer()
-    {
-        var timer = new System.Timers.Timer(2000) { AutoReset = true };
-        timer.Elapsed += (_, _) => _ = InvokeAsync(AutoPickTickAsync);
-        return timer;
-    }
-
-    private async Task AutoPickTickAsync()
-    {
-        if (_autoPicking)
-            return;
-
-        // Stop auto-picking once the draft is no longer on the clock.
-        if (!DraftState.CanManageDraft || DraftState.Draft?.Status != DraftStatus.InProgress || DraftState.CurrentPick is null)
-        {
-            AutoPickEnabled = false;
-            StateHasChanged();
-            return;
-        }
-
-        _autoPicking = true;
-        try
-        {
-            await BoltonCupApi.AutoPickAsync(DraftState.Draft.Id);
-        }
-        catch
-        {
-            // Stop on error rather than hammering the server.
-            AutoPickEnabled = false;
-        }
-        finally
-        {
-            _autoPicking = false;
-        }
-    }
-
     public void Dispose()
     {
-        DraftState.OnStateChanged -= StateHasChanged;
-        if (_autoPickTimer is not null)
-        {
-            _autoPickTimer.Stop();
-            _autoPickTimer.Dispose();
-        }
+        DraftState.OnStateChanged -= HandleStateChanged;
     }
 
     private class FilterState

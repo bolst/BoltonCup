@@ -73,6 +73,8 @@ public class DraftsController(
         var payloadDto = _mapper.ToDto(draftState, authorized, canManage);
         await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftUpdate, payloadDto);
 
+        await BroadcastAutoPicksAsync(id, hubContext);
+
         return Ok();
     }
 
@@ -88,6 +90,7 @@ public class DraftsController(
 
         await _draftService.StartAsync(id);
         await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftStatusChange, DraftStatus.InProgress);
+        await BroadcastAutoPicksAsync(id, hubContext);
         return Ok();
     }
 
@@ -165,24 +168,19 @@ public class DraftsController(
         var payloadDto = _mapper.ToDto(draftState);
         await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnPickMade, payloadDto);
 
+        await BroadcastAutoPicksAsync(id, hubContext);
+
         return Ok();
     }
 
-    /// <summary>Auto-picks the best available player for the current slot and notifies clients (admin or draft owner).</summary>
-    [Authorize]
-    [HttpPost("{id:int}/autopick")]
-    public async Task<IActionResult> AutoPick(int id, [FromServices] IHubContext<Hubs.DraftHub> hubContext)
+    /// <summary>Resolves any auto-picks for teams on the clock and broadcasts each to connected clients.</summary>
+    private async Task BroadcastAutoPicksAsync(int id, IHubContext<Hubs.DraftHub> hubContext)
     {
-        if (await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: false })
+        var autoPicks = await _draftService.ResolveAutoPicksAsync(id);
+        foreach (var autoPick in autoPicks)
         {
-            return Forbid();
+            await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnPickMade, _mapper.ToDto(autoPick));
         }
-
-        var draftState = await _draftService.AutoPickAsync(id);
-        var payloadDto = _mapper.ToDto(draftState);
-        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnPickMade, payloadDto);
-
-        return Ok();
     }
 
     /// <summary>Gets the player rankings for a draft.</summary>

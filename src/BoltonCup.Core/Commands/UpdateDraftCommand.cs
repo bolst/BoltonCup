@@ -9,6 +9,12 @@ public sealed record UpdateDraftCommand
     public List<DraftOrderCommandEntry>? Ordering { get; init; }
 
     public bool? IsVisible { get; init; }
+
+    public int? SecondsPerPick { get; init; }
+
+    public List<DraftAutoPickEntry>? AutoPickSettings { get; init; }
 }
 
 public sealed record DraftOrderCommandEntry(int TeamId, int Pick);
+
+public sealed record DraftAutoPickEntry(int TeamId, bool AutoPick);

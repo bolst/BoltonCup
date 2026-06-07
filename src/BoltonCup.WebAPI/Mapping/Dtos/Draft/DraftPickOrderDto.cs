@@ -7,4 +7,6 @@ public record DraftPickOrderDto
     public required int Pick { get; set; }
     /// <summary>Gets or sets the team assigned to this pick slot.</summary>
     public required TeamBriefDto Team { get; set; }
+    /// <summary>Gets or sets whether the team auto-picks the best available player on its turn.</summary>
+    public required bool AutoPick { get; set; }
 }

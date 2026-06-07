@@ -29,6 +29,9 @@
 
                     <MudSwitch @bind-Value="@_model.IsVisible" For="@(() => _model.IsVisible)" Color="Color.Primary" Label="Visible to everyone" />
 
+                    <MudNumericField @bind-Value="@_model.SecondsPerPick" For="@(() => _model.SecondsPerPick)"
+                                     Margin="Margin.Dense" Label="Seconds per pick" Min="10" Max="600" FullWidth />
+
                 </DraftSettingsForm>
                 
             </MudTabPanel>
@@ -46,6 +49,12 @@
                                     </div>
                                 </CellTemplate>
                             </PropertyColumn>
+                            <TemplateColumn Title="Auto-pick">
+                                <CellTemplate>
+                                    <MudCheckBox T="bool" Value="@context.Item.AutoPick" Dense Disabled="@(!DraftState.CanManageDraft)"
+                                                 ValueChanged="@(value => ToggleAutoPickAsync(context.Item, value))"/>
+                                </CellTemplate>
+                            </TemplateColumn>
                             <TemplateColumn>
                                 <CellTemplate>
                                     <MudButtonGroup OverrideStyles="false" Size="Size.Small">
@@ -81,6 +90,7 @@
         _model.Title = DraftState.Draft.Title;
         _model.DraftType = DraftState.Draft.Type;
         _model.IsVisible = DraftState.Draft.IsVisible;
+        _model.SecondsPerPick = DraftState.Draft.SecondsPerPick;
         _pickOrder = DraftState.Draft.PickOrder.ToList();
         
         return Dialog.SetOptionsAsync(Dialog.Options with
@@ -104,7 +114,8 @@
         {
             Title = _model.Title,
             DraftType = _model.DraftType,
-            IsVisible = _model.IsVisible
+            IsVisible = _model.IsVisible,
+            SecondsPerPick = _model.SecondsPerPick
         });
 
         editContext.MarkAsUnmodified();
@@ -141,6 +152,35 @@
 
     
     
+    private async Task ToggleAutoPickAsync(Sdk.DraftPickOrderDto draftPick, bool value)
+    {
+        if (DraftState.Draft is null)
+            return;
+
+        var previous = draftPick.AutoPick;
+        draftPick.AutoPick = value;
+
+        try
+        {
+            await BoltonCupApi.UpdateDraftAsync(DraftState.Draft.Id, new Sdk.UpdateDraftRequest
+            {
+                AutoPickSettings = _pickOrder
+                    .Select(x => new Sdk.DraftAutoPickRequestEntry
+                    {
+                        TeamId = x.Team.Id,
+                        AutoPick = x.AutoPick
+                    })
+                    .ToList()
+            });
+        }
+        catch (Sdk.ApiException e)
+        {
+            draftPick.AutoPick = previous;
+            Snackbar.Add($"Unable to save changes: {e.Message}", Severity.Error);
+        }
+    }
+
+
     private Task ShiftTeamOrderUp(Sdk.DraftPickOrderDto draftPick)
     {
         if (draftPick.Pick == 1)
@@ -176,6 +216,9 @@
         public Sdk.DraftType DraftType { get; set; }
 
         public bool IsVisible { get; set; }
+
+        [Range(10, 600, ErrorMessage = "Seconds per pick must be between 10 and 600.")]
+        public int SecondsPerPick { get; set; } = 120;
     }
     
 }

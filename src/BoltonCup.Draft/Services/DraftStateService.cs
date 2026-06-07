@@ -17,11 +17,15 @@ public class DraftStateService : IAsyncDisposable
     
     private bool _disposed;
     private CancellationTokenSource? _pollCts;
+    private CancellationTokenSource? _countdownCts;
     private int? _draftId;
 
     public DraftSingleDto? Draft { get; private set; }
     public DraftPickSingleDto? CurrentPick { get; private set; }
     public List<DraftRankingDto> PlayerRankings { get; private set; } = [];
+
+    /// <summary>Seconds left on the current pick's clock, or null when no clock is running.</summary>
+    public int? RemainingSeconds { get; private set; }
 
     public DraftConnectionState ConnectionState { get; private set; } = DraftConnectionState.Disconnected;
     
@@ -130,25 +134,34 @@ public class DraftStateService : IAsyncDisposable
     {
         Draft = eventDto.Draft;
         CurrentPick = eventDto.NextPick;
+        SyncCountdown();
         NotifyStateChanged();
     }
 
-    
+
     private async Task HandleDraftStatusChange(DraftStatus newStatus)
     {
-        if (Draft is null) 
+        if (Draft is null)
             return;
         Draft.Status = newStatus;
-        NotifyStateChanged();
-        
+
         if (newStatus == DraftStatus.Completed)
         {
             StopFallbackPoll();
             await StopHubAsync();
         }
+
+        // On start/resume the server stamps a fresh ClockStartedAt; refetch so we pick it up.
+        if (newStatus == DraftStatus.InProgress)
+        {
+            await FetchStateAsync();
+        }
+
+        SyncCountdown();
+        NotifyStateChanged();
     }
 
-    
+
     private void HandlePickMade(DraftPickMadeEventDto eventDto)
     {
         var existingPick = Draft?.DraftPicksByRound
@@ -167,11 +180,12 @@ public class DraftStateService : IAsyncDisposable
         }
 
         CurrentPick = eventDto.NextPick;
-        
+
+        SyncCountdown();
         NotifyStateChanged();
     }
-    
-    
+
+
     private async Task FetchStateAsync()
     {
         if (_draftId is not { } draftId || _disposed)
@@ -204,9 +218,74 @@ public class DraftStateService : IAsyncDisposable
             _fetchLock.Release();
             if (!_disposed)
             {
+                SyncCountdown();
                 NotifyStateChanged();
             }
         }
+    }
+
+
+    private void SyncCountdown()
+    {
+        var shouldRun = Draft is { Status: DraftStatus.InProgress } && CurrentPick?.ClockStartedAt is not null;
+        if (shouldRun)
+        {
+            RecomputeRemaining();
+            StartCountdown();
+        }
+        else
+        {
+            StopCountdown();
+            RemainingSeconds = null;
+        }
+    }
+
+    private void RecomputeRemaining()
+    {
+        if (Draft?.SecondsPerPick is not { } perPick || CurrentPick?.ClockStartedAt is not { } startedAt)
+        {
+            RemainingSeconds = null;
+            return;
+        }
+
+        var elapsed = (DateTime.UtcNow - startedAt.ToUniversalTime()).TotalSeconds;
+        RemainingSeconds = Math.Max(0, perPick - (int)elapsed);
+    }
+
+    private void StartCountdown()
+    {
+        if (_countdownCts is not null)
+            return;
+
+        _countdownCts = new CancellationTokenSource();
+        _ = RunCountdownAsync(_countdownCts.Token);
+    }
+
+    private async Task RunCountdownAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                RecomputeRemaining();
+                NotifyStateChanged();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void StopCountdown()
+    {
+        if (_countdownCts is null)
+            return;
+
+        _countdownCts.Cancel();
+        _countdownCts.Dispose();
+        _countdownCts = null;
     }
 
     
@@ -267,6 +346,7 @@ public class DraftStateService : IAsyncDisposable
         _cts.Dispose();
         
         StopFallbackPoll();
+        StopCountdown();
         _fetchLock.Dispose();
 
         await StopHubAsync();

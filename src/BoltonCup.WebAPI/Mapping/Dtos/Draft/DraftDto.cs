@@ -21,4 +21,6 @@ public record DraftDto
     public int Rounds { get; set; }
     /// <summary>Gets or sets the number of teams in the draft.</summary>
     public int Teams { get; set; }
+    /// <summary>Gets or sets the number of seconds each team has to make a pick.</summary>
+    public int SecondsPerPick { get; set; }
 }
