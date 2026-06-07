@@ -2,6 +2,7 @@ using System.Security.Claims;
 using BoltonCup.Core;
 using BoltonCup.Core.BracketChallenge;
 using BoltonCup.Core.Commands;
+using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Shared;
 using Stripe;
 using Account = BoltonCup.Core.Account;
@@ -203,6 +204,7 @@ public class Mapper : IMapper
             Type = draft.Type,
             Status = draft.Status,
             Tournament = ToTournamentBriefDto(draft.Tournament),
+            IsVisible = draft.IsVisible,
         });
     }
 
@@ -230,7 +232,7 @@ public class Mapper : IMapper
         });
     }
 
-    public DraftSingleDto? ToDto(Draft? draft, bool isAuthorized)
+    public DraftSingleDto? ToDto(Draft? draft, bool isAuthorized, bool canManage)
     {
         if (draft is null)
             return null;
@@ -240,6 +242,7 @@ public class Mapper : IMapper
             Title = draft.Title,
             Type = draft.Type,
             Status = draft.Status,
+            IsVisible = draft.IsVisible,
             Tournament = ToTournamentBriefDto(draft.Tournament),
             PickOrder = draft.DraftOrders
                 .Select(order => new DraftPickOrderDto
@@ -253,6 +256,7 @@ public class Mapper : IMapper
                 .Select(group => new RoundDraftPicks(group.Key, group.Select(ToDraftPickDto).OrderBy(x => x.RoundPick)))
                 .OrderBy(group => group.Round),
             CanEditDraft = isAuthorized && draft.Status != DraftStatus.Completed,
+            CanManageDraft = canManage,
         };
     }
 
@@ -271,10 +275,10 @@ public class Mapper : IMapper
         };
     }
 
-    public DraftUpdateEventDto ToDto(CurrentDraftState draftState, bool isAuthorized)
+    public DraftUpdateEventDto ToDto(CurrentDraftState draftState, bool isAuthorized, bool canManage)
     {
         return new DraftUpdateEventDto(
-            Draft: ToDto(draftState.Draft, isAuthorized)!,
+            Draft: ToDto(draftState.Draft, isAuthorized, canManage)!,
             NextPick: ToDto(draftState.NextPick)
         );
     }
@@ -289,20 +293,23 @@ public class Mapper : IMapper
         );
     }
 
-    public GetDraftsQuery ToQuery(GetDraftsRequest request)
+    public GetDraftsQuery ToQuery(GetDraftsRequest request, ClaimsPrincipal user)
     {
         return new GetDraftsQuery
         {
             TournamentId = request.TournamentId,
-            Status = request.Status
+            Status = request.Status,
+            AccountId = user.GetAccountIdOrDefault(),
+            IsAdmin = user.IsInRole(BoltonCupRole.Admin),
         };
     }
 
-    public CreateDraftCommand ToCommand(CreateDraftRequest request)
+    public CreateDraftCommand ToCommand(CreateDraftRequest request, ClaimsPrincipal user)
     {
         return new CreateDraftCommand(
             TournamentId: request.TournamentId,
-            Title: request.Title
+            Title: request.Title,
+            OwnerAccountId: user.GetAccountIdOrDefault()
         );
     }
 
@@ -315,6 +322,7 @@ public class Mapper : IMapper
             Ordering = request.Ordering?
                 .Select(x => new DraftOrderCommandEntry(x.TeamId, x.Pick))
                 .ToList(),
+            IsVisible = request.IsVisible,
         };
     }
 

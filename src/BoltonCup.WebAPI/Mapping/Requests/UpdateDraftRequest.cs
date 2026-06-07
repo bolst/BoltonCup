@@ -13,6 +13,9 @@ public record UpdateDraftRequest
 
     /// <summary>Gets or sets the updated pick ordering for each team.</summary>
     public List<DraftOrderingRequestEntry>? Ordering { get; set; }
+
+    /// <summary>Gets or sets whether the draft should be publicly visible.</summary>
+    public bool? IsVisible { get; set; }
 }
 
 /// <summary>Specifies a team's pick position in the draft order.</summary>

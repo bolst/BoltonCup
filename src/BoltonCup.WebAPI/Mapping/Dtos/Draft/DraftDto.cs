@@ -15,4 +15,6 @@ public record DraftDto
     public required DraftStatus Status { get; set; }
     /// <summary>Gets or sets the tournament this draft belongs to.</summary>
     public required TournamentBriefDto Tournament { get; set; }
+    /// <summary>Gets or sets whether this draft is publicly visible.</summary>
+    public bool IsVisible { get; set; }
 }

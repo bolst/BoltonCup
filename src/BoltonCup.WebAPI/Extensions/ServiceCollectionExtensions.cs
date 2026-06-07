@@ -63,26 +63,30 @@ public static class ServiceCollectionExtensions
                 };
             })
             .AddScoped<IAuthorizationHandler, DraftAccessHandler>()
+            .AddScoped<IAuthorizationHandler, DraftManagerHandler>()
             .AddScoped<IAuthorizationHandler, TeamManagerHandler>()
-            .AddAuthorization(options => 
+            .AddAuthorization(options =>
             {
                 options.DefaultPolicy = new AuthorizationPolicyBuilder()
                     .AddAuthenticationSchemes(IdentityConstants.ApplicationScheme, ApiKeyConstants.Scheme)
                     .RequireAuthenticatedUser()
                     .Build();
-                
+
                 options.AddPolicy(BoltonCupPolicy.RequireCompletedAccount, policy =>
                 {
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim(BoltonCupClaimTypes.AccountId);
                 });
-                
+
                 options.AddPolicy(BoltonCupPolicy.CanAccessDraft, policy =>
                     policy.Requirements.Add(new AccessDraftRequirement()));
-                
+
                 options.AddPolicy(BoltonCupPolicy.CanManageTeam, policy =>
                     policy.Requirements.Add(new ManageTeamRequirement()));
-            }) ;
+
+                options.AddPolicy(BoltonCupPolicy.CanManageDraft, policy =>
+                    policy.Requirements.Add(new ManageDraftRequirement()));
+            });
     }
     
     private static IServiceCollection AddCorsServices(this IServiceCollection services)

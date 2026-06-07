@@ -28,18 +28,19 @@ public class DraftMapperTests
             Status = DraftStatus.InProgress
         };
 
-        var query = _mapper.ToQuery(request);
+        var user = new System.Security.Claims.ClaimsPrincipal();
+        var query = _mapper.ToQuery(request, user);
 
         query.TournamentId.Should().Be(3);
         query.Status.Should().Be(DraftStatus.InProgress);
     }
 
-    // ---------- ToDto (Draft, isAuthorized) ----------
+    // ---------- ToDto (Draft, isAuthorized, canManage) ----------
 
     [Fact]
     public void ToDto_NullDraft_ReturnsNull()
     {
-        _mapper.ToDto((Draft?)null, isAuthorized: true).Should().BeNull();
+        _mapper.ToDto((Draft?)null, isAuthorized: true, canManage: false).Should().BeNull();
     }
 
     // ---------- ToCreateDraftCommand ----------
@@ -53,7 +54,8 @@ public class DraftMapperTests
             Title = "Championship Draft"
         };
 
-        var command = _mapper.ToCommand(request);
+        var user = new System.Security.Claims.ClaimsPrincipal();
+        var command = _mapper.ToCommand(request, user);
 
         command.TournamentId.Should().Be(4);
         command.Title.Should().Be("Championship Draft");
@@ -68,6 +70,7 @@ public class DraftMapperTests
         {
             Title = "Updated Title",
             DraftType = DraftType.Snake,
+            IsVisible = true,
             Ordering =
             [
                 new DraftOrderingRequestEntry(1, 1),
@@ -79,6 +82,7 @@ public class DraftMapperTests
 
         command.Title.Should().Be("Updated Title");
         command.DraftType.Should().Be(DraftType.Snake);
+        command.IsVisible.Should().BeTrue();
         command.Ordering.Should().HaveCount(2);
         command.Ordering![0].TeamId.Should().Be(1);
         command.Ordering![1].TeamId.Should().Be(2);
