@@ -104,6 +104,11 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Tournament)
                 .WithMany()
                 .HasForeignKey(e => e.TournamentId);
+            entity
+                .HasOne(e => e.DraftOwner)
+                .WithMany()
+                .HasForeignKey(e => e.DraftOwnerAccountId)
+                .IsRequired(false);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.Title).HasColumnName("draft_title");
@@ -116,6 +121,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 e => e.ToString()!.ToLower(),
                 s => Enum.Parse<DraftStatus>(s, true)
             );
+            entity.Property(e => e.IsVisible).HasColumnName("is_visible").HasDefaultValue(false);
+            entity.Property(e => e.DraftOwnerAccountId).HasColumnName("draft_owner_account_id");
         });
 
         modelBuilder.Entity<DraftOrder>(entity =>
