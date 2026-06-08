@@ -15,52 +15,58 @@
     @switch (DraftState.Draft?.Status)
     {
         case DraftStatus.Pending or DraftStatus.Paused:
-            <AuthorizeView Roles="Admin">
-                <Authorized>
-                    <MudButton OnClick="@StartDraftAsync" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large">Start Draft</MudButton>
-                </Authorized>
-                <NotAuthorized>
-                    <MudChip T="string" Icon="@Icons.Material.Rounded.PauseCircleFilled" Text="Paused" Label="true"/>
-                </NotAuthorized>
-            </AuthorizeView>
+            @if (DraftState.CanManageDraft)
+            {
+                <MudButton OnClick="@StartDraftAsync" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large">Start Draft</MudButton>
+            }
+            else
+            {
+                <MudChip T="string" Icon="@Icons.Material.Rounded.PauseCircleFilled" Text="Paused" Label="true"/>
+            }
             break;
         case DraftStatus.InProgress when DraftState.CurrentPick is {} currentPick:
             <div class="d-flex flex-row align-center gap-3">
                 <MudText Typo="Typo.h6">Pick @currentPick.OverallPick</MudText>
                 <MudImage Src="@currentPick.Team.Logo" Height="36" />
+                @if (DraftState.RemainingSeconds is { } remaining)
+                {
+                    <MudText Typo="Typo.h6" Color="@(remaining < 30 ? Color.Error : Color.Default)">
+                        @TimeSpan.FromSeconds(remaining).ToString(@"mm\:ss")
+                    </MudText>
+                }
             </div>
             break;
     }
 
-    <AuthorizeView Roles="Admin">
-        <Authorized>
-            <MudButtonGroup OverrideStyles="false">
-                <MudMenu Icon="@Icons.Material.Filled.DisplaySettings">
+    @if (DraftState.CanManageDraft)
+    {
+        <MudButtonGroup OverrideStyles="false">
+            <MudMenu Icon="@Icons.Material.Filled.DisplaySettings">
+                <MudMenuItem
+                    OnClick="@OpenDraftSettingsAsync"
+                    Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
+                @if (DraftState.Draft?.Status == DraftStatus.InProgress)
+                {
                     <MudMenuItem
-                        OnClick="@OpenDraftSettingsAsync"
-                        Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
-                    @if (DraftState.Draft?.Status == DraftStatus.InProgress)
-                    {
-                        <MudMenuItem
-                            OnClick="@PauseDraftAsync"
-                            Icon="@Icons.Material.Rounded.PauseCircle">Pause Draft</MudMenuItem>
-                    }
-                    @if (DraftState.Draft?.Status is DraftStatus.InProgress or DraftStatus.Paused)
-                    {
-                        <MudMenuItem
-                            OnClick="@EndDraftAsync"
-                            Icon="@Icons.Material.Rounded.CheckCircle" IconColor="Color.Success">End Draft</MudMenuItem>
-                    }
+                        OnClick="@PauseDraftAsync"
+                        Icon="@Icons.Material.Rounded.PauseCircle">Pause Draft</MudMenuItem>
+                }
+                @if (DraftState.Draft?.Status is DraftStatus.InProgress or DraftStatus.Paused)
+                {
                     <MudMenuItem
-                        OnClick="@DeleteDraftAsync"
-                        Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
-                </MudMenu>
-            </MudButtonGroup>
-        </Authorized>
-        <NotAuthorized>
-            <div>&nbsp;</div>
-        </NotAuthorized>
-    </AuthorizeView>
+                        OnClick="@EndDraftAsync"
+                        Icon="@Icons.Material.Rounded.CheckCircle" IconColor="Color.Success">End Draft</MudMenuItem>
+                }
+                <MudMenuItem
+                    OnClick="@DeleteDraftAsync"
+                    Icon="@Icons.Material.Rounded.Delete" IconColor="Color.Error">Delete Draft</MudMenuItem>
+            </MudMenu>
+        </MudButtonGroup>
+    }
+    else
+    {
+        <div>&nbsp;</div>
+    }
 </MudAppBar>
 
 @code {

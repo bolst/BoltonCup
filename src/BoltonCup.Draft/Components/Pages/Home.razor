@@ -15,8 +15,13 @@
             <MudToggleItem T="bool" Value="false">Completed</MudToggleItem>
         </MudToggleGroup>
         
-        <AuthorizeView Roles="Admin">
-            <MudButton OnClick="@CreateNewDraftAsync" Color="Color.Primary" StartIcon="@Icons.Material.Rounded.Add">New</MudButton>
+        <AuthorizeView>
+            <Authorized>
+                @if (context.User.IsInRole("Admin") || context.User.GetTournamentGmIds().Any())
+                {
+                    <MudButton OnClick="@CreateNewDraftAsync" Color="Color.Primary" StartIcon="@Icons.Material.Rounded.Add">New</MudButton>
+                }
+            </Authorized>
         </AuthorizeView>
     </div>
     
@@ -42,11 +47,11 @@
                     <MudImage Src="@draft.Tournament.Logo" Height="32"/>
                 </div>
                 <div class="mud-width-full d-flex flex-row align-center justify-space-evenly flex-grow-1">
-                    @ValueLabel("15", "Rounds")
+                    @ValueLabel(draft.Rounds.ToString(), "Rounds")
                     <MudDivider FlexItem Vertical/>
-                    @ValueLabel("4", "Teams")
+                    @ValueLabel(draft.Teams.ToString(), "Teams")
                     <MudDivider FlexItem Vertical/>
-                    @ValueLabel("2 Min", "Timer")
+                    @ValueLabel(TimeSpan.FromSeconds(draft.SecondsPerPick).ToString(@"m\:ss"), "Timer")
                 </div>
             </MudPaper>
         }

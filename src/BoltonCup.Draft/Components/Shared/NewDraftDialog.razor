@@ -3,6 +3,7 @@
 @using BoltonCup.Common
 @implements IDisposable
 @inject IBoltonCupApi BoltonCupApi
+@inject AuthenticationStateProvider AuthStateProvider
 
 <MudDialog>
     <DialogContent>
@@ -71,8 +72,16 @@
             FullWidth = true,
         });
         
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
         var response = await BoltonCupApi.GetTournamentsAsync();
-        _tournamentOptions = response.Items;
+        var allTournaments = response.Items;
+
+        // GMs only see the tournaments they manage; admins see all
+        _tournamentOptions = user.IsInRole("Admin")
+            ? allTournaments
+            : allTournaments.Where(t => user.IsGmForTournament(t.Id)).ToList();
         
         _editContext = new EditContext(_model);
         _messageStore = new ValidationMessageStore(_editContext);

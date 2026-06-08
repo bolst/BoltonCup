@@ -1,6 +1,7 @@
 namespace BoltonCup.Core.Commands;
 
-public sealed record CreateDraftCommand( 
+public sealed record CreateDraftCommand(
     int TournamentId,
-    string Title
+    string Title,
+    int? OwnerAccountId
 );

@@ -27,4 +27,6 @@ public sealed record DraftRankingDto
     public bool IsDrafted { get; set; }
     /// <summary>Gets or sets the player's points per game average.</summary>
     public double PointsPerGame { get; set; }
+    /// <summary>Gets or sets whether the requesting user has favourited this player in the draft.</summary>
+    public bool IsFavourite { get; set; }
 }
