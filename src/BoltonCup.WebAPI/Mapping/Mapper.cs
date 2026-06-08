@@ -349,6 +349,62 @@ public class Mapper : IMapper
         );
     }
 
+    // ---------- CustomRanking ----------
+
+    public IReadOnlyList<CustomRankingDto> ToDtoList(IReadOnlyList<CustomRanking> rankings)
+    {
+        return rankings
+            .Select(ranking => new CustomRankingDto
+            {
+                Id = ranking.Id,
+                Title = ranking.Title,
+                Tournament = ToTournamentBriefDto(ranking.Tournament),
+                PlayerCount = ranking.Players.Count,
+                CreatedAt = ranking.CreatedAt,
+            })
+            .ToList();
+    }
+
+    public CustomRankingSingleDto? ToDto(CustomRanking? ranking)
+    {
+        if (ranking is null)
+            return null;
+        return new CustomRankingSingleDto
+        {
+            Id = ranking.Id,
+            Title = ranking.Title,
+            Tournament = ToTournamentBriefDto(ranking.Tournament),
+            Players = ranking.Players
+                .OrderBy(p => p.Rank)
+                .Select(p => new CustomRankingPlayerDto
+                {
+                    Rank = p.Rank,
+                    Player = ToPlayerBriefDto(p.Player),
+                    GamesPlayed = p.GamesPlayed,
+                    TotalPoints = p.TotalPoints,
+                    PointsPerGame = p.PointsPerGame,
+                })
+                .ToList(),
+        };
+    }
+
+    public CreateCustomRankingCommand ToCommand(CreateCustomRankingRequest request, ClaimsPrincipal user)
+    {
+        return new CreateCustomRankingCommand(
+            TournamentId: request.TournamentId,
+            Title: request.Title,
+            OwnerAccountId: user.GetAccountId()
+        );
+    }
+
+    public UpdateCustomRankingCommand ToCommand(UpdateCustomRankingRequest request)
+    {
+        return new UpdateCustomRankingCommand(
+            Title: request.Title,
+            OrderedPlayerIds: request.OrderedPlayerIds
+        );
+    }
+
     private DraftPickDto ToDraftPickDto(DraftPick draftPick)
     {
         return new DraftPickDto

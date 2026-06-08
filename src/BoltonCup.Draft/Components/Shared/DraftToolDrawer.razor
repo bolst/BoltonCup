@@ -15,6 +15,17 @@
             <div class="d-flex flex-row align-center gap-3 flex-wrap">
                 <MudCheckBox @bind-Value="@_filterState.ShowDrafted" Size="Size.Small" Label="Show Drafted" Dense/>
                 <MudCheckBox @bind-Value="@_filterState.FavouritesOnly" Size="Size.Small" Label="Favourites only" Dense/>
+                @if (DraftState.AvailableCustomRankings.Count > 0)
+                {
+                    <MudSelect T="int?" Value="@DraftState.SelectedCustomRankingId" ValueChanged="@DraftState.SelectCustomRankingAsync"
+                               Label="Ranking" Variant="Variant.Outlined" Margin="Margin.Dense" Dense Style="min-width: 180px">
+                        <MudSelectItem T="int?" Value="@((int?)null)">Default</MudSelectItem>
+                        @foreach (var ranking in DraftState.AvailableCustomRankings)
+                        {
+                            <MudSelectItem T="int?" Value="@ranking.Id">@ranking.Title</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
                 <div style="width: 300px">
                     <MudTextField @bind-Value="@_filterState.Search" Placeholder="Search"
                                   Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info"

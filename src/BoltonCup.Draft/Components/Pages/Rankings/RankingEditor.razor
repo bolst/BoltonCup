@@ -1,0 +1,238 @@
+@page "/rankings/{Id:int}"
+@attribute [Authorize]
+@using BoltonCup.Sdk
+@using Position = BoltonCup.Core.Values.Position
+@inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+
+<PageTitle>@(_ranking?.Title ?? "Ranking")</PageTitle>
+
+<MudContainer Class="py-2" MaxWidth="MaxWidth.Medium">
+    @if (_loading)
+    {
+        <MudProgressLinear Indeterminate Color="Color.Primary"/>
+    }
+    else if (_ranking is null)
+    {
+        <MudAlert Severity="Severity.Error">Ranking not found.</MudAlert>
+    }
+    else
+    {
+        <div class="mud-width-full d-flex align-center justify-space-between py-2 gap-3 flex-wrap">
+            <div class="d-flex flex-row align-center gap-3">
+                <MudIconButton Icon="@Icons.Material.Rounded.ArrowBack" OnClick="@(() => Navigation.NavigateTo("/rankings"))"/>
+                <MudImage Src="@_ranking.Tournament.Logo" Height="32"/>
+                <div>
+                    <MudText Typo="Typo.h6">@_ranking.Title</MudText>
+                    <MudText Typo="Typo.caption">@_ranking.Tournament.Name</MudText>
+                </div>
+            </div>
+
+            <div class="d-flex flex-row align-center gap-3">
+                <MudToggleGroup T="string?" Value="@_positionFilter" ValueChanged="@PositionFilterChanged"
+                                Size="Size.Small" Color="Color.Primary">
+                    <MudToggleItem T="string?" Value="@(null)" Text="All"/>
+                    <MudToggleItem T="string?" Value="@Position.Forward" Text="F"/>
+                    <MudToggleItem T="string?" Value="@Position.Defense" Text="D"/>
+                    <MudToggleItem T="string?" Value="@Position.Goalie" Text="G"/>
+                </MudToggleGroup>
+
+                <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                           StartIcon="@Icons.Material.Rounded.Save" Disabled="@(!_dirty)"
+                           OnClick="@SaveAsync">Save</MudButton>
+            </div>
+        </div>
+
+        <MudDropContainer T="Sdk.CustomRankingPlayerDto" @ref="_dropContainer"
+                          Items="_players"
+                          ItemsSelector="@((item, zone) => _positionFilter is null || item.Player.Position == _positionFilter)"
+                          ItemDropped="@ItemDropped"
+                          Class="mud-width-full">
+            <ChildContent>
+                <MudDropZone T="Sdk.CustomRankingPlayerDto" Identifier="ranking" Class="mud-width-full"
+                             AllowReorder="true"/>
+            </ChildContent>
+            <ItemRenderer>
+                <MudPaper Class="pa-3 my-1 d-flex flex-row align-center justify-space-between cursor-grab"
+                          Elevation="0" Square Outlined>
+                    <div class="d-flex flex-row align-center gap-3">
+                        <MudIcon Icon="@Icons.Material.Rounded.DragIndicator" Color="Color.Default"/>
+                        <MudText Typo="Typo.h6" Style="min-width: 2.5rem;">@context.Rank</MudText>
+                        <PositionChip Position="@context.Player.Position" Variant="Variant.Text" Size="Size.Small"/>
+                        <MudText Typo="Typo.body1"><b>@context.Player.FullName</b></MudText>
+                    </div>
+                    <div class="d-flex flex-row align-center gap-3">
+                        <div class="d-flex flex-row align-center gap-4">
+                            @StatLabel(context.PointsPerGame.ToString("F2"), "PPG")
+                            @StatLabel(context.TotalPoints.ToString(), "P")
+                            @StatLabel(context.GamesPlayed.ToString(), "GP")
+                        </div>
+                        <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                            <MudIconButton OnClick="@(_ => MoveToTop(context))" Icon="@Icons.Material.Rounded.KeyboardDoubleArrowUp" Disabled="@IsFirstVisible(context)"/>
+                            <MudIconButton OnClick="@(_ => MoveUp(context))" Icon="@Icons.Material.Rounded.KeyboardArrowUp" Disabled="@IsFirstVisible(context)"/>
+                            <MudIconButton OnClick="@(_ => MoveDown(context))" Icon="@Icons.Material.Rounded.KeyboardArrowDown" Disabled="@IsLastVisible(context)"/>
+                            <MudIconButton OnClick="@(_ => MoveToBottom(context))" Icon="@Icons.Material.Rounded.KeyboardDoubleArrowDown" Disabled="@IsLastVisible(context)"/>
+                        </MudButtonGroup>
+                    </div>
+                </MudPaper>
+            </ItemRenderer>
+        </MudDropContainer>
+    }
+</MudContainer>
+
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required int Id { get; set; }
+
+    private bool _loading = true;
+    private bool _dirty;
+    private string? _positionFilter;
+
+    private Sdk.CustomRankingSingleDto? _ranking;
+    private List<Sdk.CustomRankingPlayerDto> _players = [];
+    private MudDropContainer<Sdk.CustomRankingPlayerDto> _dropContainer = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _ranking = await BoltonCupApi.GetCustomRankingByIdAsync(Id);
+            _players = _ranking?.Players.OrderBy(p => p.Rank).ToList() ?? [];
+        }
+        catch (Sdk.ApiException)
+        {
+            Navigation.NavigateTo("/rankings");
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void PositionFilterChanged(string? position)
+    {
+        _positionFilter = position;
+        _dropContainer.Refresh();
+    }
+
+    private IReadOnlyList<Sdk.CustomRankingPlayerDto> VisiblePlayers()
+        => _positionFilter is null
+            ? _players
+            : _players.Where(p => p.Player.Position == _positionFilter).ToList();
+
+    private bool IsFirstVisible(Sdk.CustomRankingPlayerDto player) => VisiblePlayers().FirstOrDefault() == player;
+
+    private bool IsLastVisible(Sdk.CustomRankingPlayerDto player) => VisiblePlayers().LastOrDefault() == player;
+
+    private void ItemDropped(MudItemDropInfo<Sdk.CustomRankingPlayerDto> info)
+    {
+        var item = info.Item;
+        if (item is null)
+            return;
+
+        var visible = VisiblePlayers().Where(p => p != item).ToList();
+        var target = Math.Clamp(info.IndexInZone, 0, visible.Count);
+
+        _players.Remove(item);
+        if (target >= visible.Count)
+        {
+            if (visible.Count == 0)
+                _players.Add(item);
+            else
+                _players.Insert(_players.IndexOf(visible[^1]) + 1, item);
+        }
+        else
+        {
+            _players.Insert(_players.IndexOf(visible[target]), item);
+        }
+
+        Renumber();
+        _dirty = true;
+        _dropContainer.Refresh();
+    }
+
+    private void MoveUp(Sdk.CustomRankingPlayerDto player)
+    {
+        var visible = VisiblePlayers();
+        var vi = visible.ToList().IndexOf(player);
+        if (vi <= 0)
+            return;
+
+        var prev = visible[vi - 1];
+        _players.Remove(player);
+        _players.Insert(_players.IndexOf(prev), player);
+        Renumber();
+        _dirty = true;
+        _dropContainer.Refresh();
+    }
+
+    private void MoveDown(Sdk.CustomRankingPlayerDto player)
+    {
+        var visible = VisiblePlayers();
+        var vi = visible.ToList().IndexOf(player);
+        if (vi < 0 || vi >= visible.Count - 1)
+            return;
+
+        var next = visible[vi + 1];
+        _players.Remove(player);
+        _players.Insert(_players.IndexOf(next) + 1, player);
+        Renumber();
+        _dirty = true;
+        _dropContainer.Refresh();
+    }
+
+    private void MoveToTop(Sdk.CustomRankingPlayerDto player)
+    {
+        var visible = VisiblePlayers();
+        var first = visible.FirstOrDefault();
+        if (first is null || first == player)
+            return;
+
+        _players.Remove(player);
+        _players.Insert(_players.IndexOf(first), player);
+        Renumber();
+        _dirty = true;
+        _dropContainer.Refresh();
+    }
+
+    private void MoveToBottom(Sdk.CustomRankingPlayerDto player)
+    {
+        var visible = VisiblePlayers();
+        var last = visible.LastOrDefault();
+        if (last is null || last == player)
+            return;
+
+        _players.Remove(player);
+        _players.Insert(_players.IndexOf(last) + 1, player);
+        Renumber();
+        _dirty = true;
+        _dropContainer.Refresh();
+    }
+
+    private void Renumber()
+    {
+        for (var i = 0; i < _players.Count; i++)
+            _players[i].Rank = i + 1;
+    }
+
+    private async Task SaveAsync()
+    {
+        await BoltonCupApi.UpdateCustomRankingAsync(Id, new Sdk.UpdateCustomRankingRequest
+        {
+            OrderedPlayerIds = _players.Select(p => p.Player.Id).ToList()
+        });
+        _dirty = false;
+        Snackbar.Add("Ranking saved", Severity.Success);
+    }
+
+    private RenderFragment StatLabel(string value, string label) =>
+        @<div>
+            <MudText Typo="Typo.subtitle2" Align="Align.Center">@value</MudText>
+            <MudText Typo="Typo.caption" Align="Align.Center">@label</MudText>
+        </div>;
+}
