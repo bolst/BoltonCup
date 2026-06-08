@@ -151,8 +151,9 @@ public class DraftsControllerTests
     {
         var query = new GetDraftRankingsQuery();
 
+        _controller.ControllerContext = ClaimsHelper.WithAdminRole();
         _draftService.Setup(s => s.GetDraftRankingsAsync(5, It.IsAny<GetDraftRankingsQuery>())).ReturnsAsync(Mock.Of<IPagedList<PlayerDraftRanking>>());
-        _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<PlayerDraftRanking>>())).Returns(Mock.Of<IPagedList<DraftRankingDto>>());
+        _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<PlayerDraftRanking>>(), It.IsAny<IReadOnlySet<int>>())).Returns(Mock.Of<IPagedList<DraftRankingDto>>());
 
         var result = await _controller.GetDraftPlayerRankings(5, query);
 
