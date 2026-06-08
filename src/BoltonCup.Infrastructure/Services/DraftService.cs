@@ -106,30 +106,40 @@ public class DraftService(
 
         await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
         
-        // regenerate if draft type changes or ordering changes
-        var regenerate = (command.DraftType.HasValue && command.DraftType != draft.Type) || command.Ordering is not null;
-        if (regenerate && draft.Status != DraftStatus.Pending)
+        // regenerate draft picks if draft type changes or ordering changes
+        var regeneratePicks = (command.DraftType.HasValue && command.DraftType != draft.Type) || command.Ordering is not null;
+        if (regeneratePicks && draft.Status != DraftStatus.Pending)
+        {
             throw new InvalidOperationException("Draft type/ordering cannot be changed once draft has started.");
+        }
         
         if (command.DraftType.HasValue)
+        {
             draft.Type = command.DraftType.Value;
-        
+        }
         if (!string.IsNullOrEmpty(command.Title))
+        {
             draft.Title = command.Title;
-
+        }
         if (command.IsVisible.HasValue)
+        {
             draft.IsVisible = command.IsVisible.Value;
-
+        }
         if (command.SecondsPerPick.HasValue)
+        {
             draft.SecondsPerPick = command.SecondsPerPick.Value;
-
+        }
         if (command.Ordering is not null)
         {
             if (!command.Ordering.All(x => draft.DraftOrders.Any(d => d.TeamId == x.TeamId)))
+            {
                 throw new InvalidOperationException($"Invalid teams for draft {draft.Id}");
+            }
             if (draft.DraftOrders.Count != command.Ordering.Count ||
                 command.Ordering.Count != command.Ordering.Distinct().Count())
+            {
                 throw new InvalidOperationException("Supplied orderings are invalid (non-distinct picks or missing/extra teams).");
+            }
             
             var existingAutoPick = draft.DraftOrders.ToDictionary(d => d.TeamId, d => d.AutoPick);
             draft.DraftOrders = command.Ordering
@@ -142,21 +152,21 @@ public class DraftService(
                 })
                 .ToList();
         }
-
         if (command.AutoPickSettings is not null)
         {
             foreach (var setting in command.AutoPickSettings)
             {
                 var order = draft.DraftOrders.FirstOrDefault(d => d.TeamId == setting.TeamId);
-                if (order is not null)
-                    order.AutoPick = setting.AutoPick;
+                order?.AutoPick = setting.AutoPick;
             }
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
-        
-        if (regenerate)
+
+        if (regeneratePicks)
+        {
             await GenerateDraftPicksAsync(draft, cancellationToken);
+        }
         
         var nextPick = await _dbContext.DraftPicks
             .Include(dp => dp.Team)
