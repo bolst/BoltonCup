@@ -1,6 +1,7 @@
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
 using BoltonCup.Core.Exceptions;
+using BoltonCup.Core.Values;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -328,6 +329,7 @@ public class DraftService(
 
         var player = await _dbContext.PlayerDraftRankings
             .Where(p => p.DraftId == command.DraftId)
+            .Include(p => p.Player)
             .FirstOrDefaultAsync(p => p.PlayerId == command.PlayerId, cancellationToken: cancellationToken)
             ?? throw new EntityNotFoundException(nameof(PlayerDraftRanking), command.PlayerId);
 
@@ -335,14 +337,16 @@ public class DraftService(
         {
             throw new InvalidOperationException($"Player {command.PlayerId} is already drafted");
         }
-        
+
         // make sure pick exists and matches command
         var pick = draft.DraftPicks
                        .Where(dp => dp.OverallPick == command.OverallPick)
-                       .Where(dp => dp.TeamId == command.TeamId) 
+                       .Where(dp => dp.TeamId == command.TeamId)
                        .FirstOrDefault(dp => dp.PlayerId == null)
                    ?? throw new InvalidOperationException($"No available draft pick for player {command.PlayerId} in Draft {command.DraftId}");
-        
+
+        await EnforceGoalieRulesAsync(draft, command.TeamId, player.Player.Position, cancellationToken);
+
         // draft player
         pick.PlayerId = command.PlayerId;
         player.DraftPickId = pick.Id;
@@ -413,7 +417,7 @@ public class DraftService(
             if (order is null || !order.AutoPick)
                 break;
 
-            var best = await GetBestAvailablePlayerAsync(draftId, cancellationToken);
+            var best = await GetBestAvailablePlayerAsync(draftId, currentPick.TeamId, cancellationToken);
             if (best is null)
                 break;
 
@@ -424,13 +428,56 @@ public class DraftService(
         return results;
     }
 
-    private async Task<PlayerDraftRanking?> GetBestAvailablePlayerAsync(int draftId, CancellationToken cancellationToken)
+    private async Task<PlayerDraftRanking?> GetBestAvailablePlayerAsync(int draftId, int teamId, CancellationToken cancellationToken)
     {
-        return await _dbContext.PlayerDraftRankings
+        var available = await _dbContext.PlayerDraftRankings
             .Where(p => p.DraftId == draftId)
             .Where(p => p.DraftPickId == null)
-            .OrderBy(p => p.DraftRanking)
-            .FirstOrDefaultAsync(cancellationToken);
+            .Include(p => p.Player)
+            .ToListAsync(cancellationToken);
+        if (available.Count == 0)
+            return null;
+
+        var roster = await _dbContext.DraftPicks
+            .Where(dp => dp.DraftId == draftId && dp.TeamId == teamId && dp.PlayerId != null)
+            .Select(dp => new RosteredPlayer(dp.Player!.Position, dp.Player.CanPlayEitherPosition))
+            .ToListAsync(cancellationToken);
+
+        var remainingPicks = await _dbContext.DraftPicks
+            .CountAsync(dp => dp.DraftId == draftId && dp.TeamId == teamId && dp.PlayerId == null, cancellationToken);
+
+        var candidates = available
+            .Select(p => new AutoPickCandidate(p.PlayerId, p.DraftRanking, p.Player.Position, p.Player.CanPlayEitherPosition))
+            .ToList();
+
+        var chosen = SmartAutoPickSelector.Select(candidates, roster, remainingPicks);
+        if (chosen is null)
+            return null;
+
+        return available.First(p => p.PlayerId == chosen.Value.PlayerId);
+    }
+
+    private async Task EnforceGoalieRulesAsync(Draft draft, int teamId, string? position, CancellationToken cancellationToken)
+    {
+        var teamPicks = draft.DraftPicks.Where(dp => dp.TeamId == teamId).ToList();
+        var teamGoalies = teamPicks.Count(dp =>
+            dp.PlayerId != null &&
+            string.Equals(dp.Player?.Position, Position.Goalie, StringComparison.OrdinalIgnoreCase));
+        var teamRemaining = teamPicks.Count(dp => dp.PlayerId == null);
+
+        var draftingGoalie = string.Equals(position, Position.Goalie, StringComparison.OrdinalIgnoreCase);
+
+        if (draftingGoalie && teamGoalies >= 1)
+            throw new InvalidOperationException("Team already has a goalie.");
+
+        if (!draftingGoalie && teamGoalies == 0 && teamRemaining == 1)
+        {
+            var goalieAvailable = await _dbContext.PlayerDraftRankings
+                .Where(p => p.DraftId == draft.Id && p.DraftPickId == null)
+                .AnyAsync(p => p.Player.Position == Position.Goalie, cancellationToken);
+            if (goalieAvailable)
+                throw new InvalidOperationException("Team must use its final pick on a goalie.");
+        }
     }
 
 
