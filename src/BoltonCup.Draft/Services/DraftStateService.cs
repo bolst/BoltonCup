@@ -3,6 +3,7 @@ using BoltonCup.Sdk;
 using BoltonCup.Shared;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
+using Microsoft.JSInterop;
 
 namespace BoltonCup.Draft.Services;
 
@@ -11,18 +12,23 @@ public class DraftStateService : IAsyncDisposable
 {
     private readonly IBoltonCupApi _api;
     private readonly ILogger<DraftStateService> _logger;
+    private readonly IJSRuntime _js;
     private readonly HubConnection _hubConnection;
     private readonly SemaphoreSlim _fetchLock;
     private readonly CancellationTokenSource _cts;
-    
+
     private bool _disposed;
     private CancellationTokenSource? _pollCts;
     private CancellationTokenSource? _countdownCts;
     private int? _draftId;
+    private Dictionary<int, int>? _customRankByPlayerId;
 
     public DraftSingleDto? Draft { get; private set; }
     public DraftPickSingleDto? CurrentPick { get; private set; }
     public List<DraftRankingDto> PlayerRankings { get; private set; } = [];
+
+    public List<CustomRankingDto> AvailableCustomRankings { get; private set; } = [];
+    public int? SelectedCustomRankingId { get; private set; }
 
     /// <summary>Seconds left on the current pick's clock, or null when no clock is running.</summary>
     public int? RemainingSeconds { get; private set; }
@@ -37,11 +43,13 @@ public class DraftStateService : IAsyncDisposable
     public DraftStateService(
         IBoltonCupApi api,
         ILogger<DraftStateService> logger,
+        IJSRuntime js,
         IOptions<BoltonCupConfiguration> config
     )
     {
         _api = api;
         _logger = logger;
+        _js = js;
         _fetchLock = new SemaphoreSlim(1, 1);
         _cts = new CancellationTokenSource();
 
@@ -71,14 +79,139 @@ public class DraftStateService : IAsyncDisposable
         }
         
         _draftId = draftId;
-        
+
         await FetchStateAsync();
-        
+
+        await LoadCustomRankingsAsync(draftId);
+
         // a completed draft will not have any updates
         if (Draft is null or { Status: DraftStatus.Completed })
             return;
 
         await EnsureConnectedAndJoinedAsync(draftId);
+    }
+
+
+    private async Task LoadCustomRankingsAsync(int draftId)
+    {
+        if (Draft is null)
+            return;
+
+        try
+        {
+            var rankings = await _api.GetCustomRankingsAsync(Draft.Tournament.Id, _cts.Token);
+            AvailableCustomRankings = rankings.ToList();
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error loading custom rankings");
+            AvailableCustomRankings = [];
+        }
+
+        var persisted = await GetPersistedRankingIdAsync(draftId);
+        if (persisted is { } rankingId && AvailableCustomRankings.Any(r => r.Id == rankingId))
+        {
+            await SelectCustomRankingAsync(rankingId);
+        }
+        else
+        {
+            NotifyStateChanged();
+        }
+    }
+
+
+    public async Task SelectCustomRankingAsync(int? rankingId)
+    {
+        SelectedCustomRankingId = rankingId;
+
+        if (rankingId is null)
+        {
+            _customRankByPlayerId = null;
+            await RemovePersistedRankingAsync();
+            await FetchStateAsync();
+            return;
+        }
+
+        try
+        {
+            var ranking = await _api.GetCustomRankingByIdAsync(rankingId.Value, _cts.Token);
+            _customRankByPlayerId = ranking.Players.ToDictionary(p => p.Player.Id, p => p.Rank);
+            await PersistRankingAsync(rankingId.Value);
+            ApplyCustomRanking();
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error applying custom ranking {RankingId}", rankingId);
+        }
+
+        NotifyStateChanged();
+    }
+
+
+    private void ApplyCustomRanking()
+    {
+        if (_customRankByPlayerId is not { } order)
+            return;
+
+        foreach (var item in PlayerRankings)
+            item.DraftRanking = order.TryGetValue(item.Player.Id, out var rank) ? rank : int.MaxValue;
+
+        PlayerRankings = PlayerRankings.OrderBy(p => p.DraftRanking).ToList();
+    }
+
+
+    private string RankingStorageKey(int draftId) => $"bc-draft-{draftId}-custom-ranking";
+
+    private async Task<int?> GetPersistedRankingIdAsync(int draftId)
+    {
+        try
+        {
+            var value = await _js.InvokeAsync<string?>("localStorage.getItem", _cts.Token, RankingStorageKey(draftId));
+            return int.TryParse(value, out var id) ? id : null;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error reading persisted custom ranking");
+            return null;
+        }
+    }
+
+    private async Task PersistRankingAsync(int rankingId)
+    {
+        if (_draftId is not { } draftId)
+            return;
+
+        try
+        {
+            await _js.InvokeVoidAsync("localStorage.setItem", _cts.Token, RankingStorageKey(draftId), rankingId.ToString());
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error persisting custom ranking");
+        }
+    }
+
+    private async Task RemovePersistedRankingAsync()
+    {
+        if (_draftId is not { } draftId)
+            return;
+
+        try
+        {
+            await _js.InvokeVoidAsync("localStorage.removeItem", _cts.Token, RankingStorageKey(draftId));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error removing persisted custom ranking");
+        }
     }
 
 
@@ -204,6 +337,7 @@ public class DraftStateService : IAsyncDisposable
 
             CurrentPick = currentPick;
             PlayerRankings = playerRankings.Items.ToList();
+            ApplyCustomRanking();
         }
         catch (OperationCanceledException)
         {
