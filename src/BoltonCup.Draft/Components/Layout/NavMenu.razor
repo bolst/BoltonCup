@@ -14,9 +14,18 @@
     </div>
     <MudNavMenu Class="mud-height-full d-flex flex-column" Margin="Margin.Normal" Rounded>
         <MudNavLink Href="/" Icon="@Icons.Material.Rounded.FormatListNumbered" Match="NavLinkMatch.All">Drafts</MudNavLink>
-        
+
+        <AuthorizeView>
+            <Authorized>
+                @if (context.User.IsInRole("Admin") || context.User.GetTournamentGmIds().Any())
+                {
+                    <MudNavLink Href="/rankings" Icon="@Icons.Material.Rounded.Leaderboard">Player Rankings</MudNavLink>
+                }
+            </Authorized>
+        </AuthorizeView>
+
         <MudSpacer />
-        
+
         <UserMenu Mini="!_open" />
     </MudNavMenu>
 </MudDrawer>
