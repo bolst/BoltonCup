@@ -18,7 +18,7 @@
                 <DraftSettingsForm Model="@_model" OnValidSubmit="@UpdateGeneralSettingsAsync" Title="General Settings" DisableIfUnmodified>
                     <MudTextField @bind-Value="@_model.Title" For="@(() => _model.Title)"
                                   Margin="Margin.Dense" Label="Draft name" FullWidth />
-                        
+
                     <div>
                         <MudText Typo="Typo.caption">Draft type</MudText>
                         <MudRadioGroup @bind-Value="@_model.DraftType" For="@(() => _model.DraftType)" Disabled="@(DraftState.Draft?.Status != Sdk.DraftStatus.Pending)">
@@ -26,13 +26,18 @@
                             <MudRadio Value="@Sdk.DraftType.Snake" Color="Color.Primary" Label="Snake"/>
                         </MudRadioGroup>
                     </div>
-                    
+
+                    <MudSwitch @bind-Value="@_model.IsVisible" For="@(() => _model.IsVisible)" Color="Color.Primary" Label="Visible to everyone" />
+
+                    <MudNumericField @bind-Value="@_model.SecondsPerPick" For="@(() => _model.SecondsPerPick)"
+                                     Margin="Margin.Dense" Label="Seconds per pick" Min="10" Max="600" FullWidth />
+
                 </DraftSettingsForm>
                 
             </MudTabPanel>
             
             <MudTabPanel Text="Draft Order" PanelClass="mud-width-full">
-                <DraftSettingsForm Model="@_model" OnValidSubmit="@UpdateDraftOrderingAsync" Title="Draft Order" Context="_" DisableIfUnmodified="@(DraftState.Draft?.Status != Sdk.DraftStatus.Pending)">
+                <DraftSettingsForm Model="@_model" OnValidSubmit="@UpdateDraftOrderingAsync" Title="Draft Order" Context="editContext" DisableIfUnmodified="@(DraftState.Draft?.Status != Sdk.DraftStatus.Pending)">
                     <MudDataGrid Class="mud-width-full" Items="@_pickOrder" SortMode="SortMode.None" Filterable="false" ShowColumnOptions="false" Elevation="0" Outlined Square Dense>
                         <Columns>
                             <PropertyColumn Title="Pick" Property="x => x.Pick" InitialDirection="SortDirection.Ascending" Sortable="false" CellStyle="text-align: right"/>
@@ -44,6 +49,12 @@
                                     </div>
                                 </CellTemplate>
                             </PropertyColumn>
+                            <TemplateColumn Title="Auto-pick">
+                                <CellTemplate>
+                                    <MudCheckBox T="bool" Value="@context.Item.AutoPick" Dense Disabled="@(!DraftState.CanManageDraft)"
+                                                 ValueChanged="@(value => OnAutoPickChanged(editContext, context.Item, value))"/>
+                                </CellTemplate>
+                            </TemplateColumn>
                             <TemplateColumn>
                                 <CellTemplate>
                                     <MudButtonGroup OverrideStyles="false" Size="Size.Small">
@@ -78,7 +89,17 @@
 
         _model.Title = DraftState.Draft.Title;
         _model.DraftType = DraftState.Draft.Type;
-        _pickOrder = DraftState.Draft.PickOrder.ToList();
+        _model.IsVisible = DraftState.Draft.IsVisible;
+        _model.SecondsPerPick = DraftState.Draft.SecondsPerPick;
+        // clone each entry so edits to ordering/auto-pick don't mutate shared DraftState until saved
+        _pickOrder = DraftState.Draft.PickOrder
+            .Select(p => new Sdk.DraftPickOrderDto
+            {
+                Pick = p.Pick,
+                Team = p.Team,
+                AutoPick = p.AutoPick,
+            })
+            .ToList();
         
         return Dialog.SetOptionsAsync(Dialog.Options with
         {
@@ -100,7 +121,9 @@
         await BoltonCupApi.UpdateDraftAsync(draft.Id, new Sdk.UpdateDraftRequest
         {
             Title = _model.Title,
-            DraftType = _model.DraftType
+            DraftType = _model.DraftType,
+            IsVisible = _model.IsVisible,
+            SecondsPerPick = _model.SecondsPerPick
         });
 
         editContext.MarkAsUnmodified();
@@ -113,19 +136,32 @@
         if (DraftState.Draft is null)
             return;
         
+        // ordering can only change while the draft is pending; sending it once the draft
+        // has started makes the server regenerate picks and throw. Auto-pick can change anytime.
+        var includeOrdering = DraftState.Draft.Status == Sdk.DraftStatus.Pending;
+
         try
         {
             await BoltonCupApi.UpdateDraftAsync(DraftState.Draft.Id, new Sdk.UpdateDraftRequest
             {
-                Ordering = _pickOrder
-                    .Select(x => new Sdk.DraftOrderingRequestEntry
+                Ordering = includeOrdering
+                    ? _pickOrder
+                        .Select(x => new Sdk.DraftOrderingRequestEntry
+                        {
+                            TeamId = x.Team.Id,
+                            Pick = x.Pick
+                        })
+                        .ToList()
+                    : null,
+                AutoPickSettings = _pickOrder
+                    .Select(x => new Sdk.DraftAutoPickRequestEntry
                     {
                         TeamId = x.Team.Id,
-                        Pick = x.Pick
+                        AutoPick = x.AutoPick
                     })
                     .ToList()
             });
-            
+
             editContext.MarkAsUnmodified();
             Snackbar.Add("Saved changes", Severity.Success);
         }
@@ -135,8 +171,15 @@
         }
     }
 
-    
-    
+
+
+    private void OnAutoPickChanged(EditContext editContext, Sdk.DraftPickOrderDto draftPick, bool value)
+    {
+        draftPick.AutoPick = value;
+        editContext.NotifyFieldChanged(editContext.Field(nameof(Sdk.DraftPickOrderDto.AutoPick)));
+    }
+
+
     private Task ShiftTeamOrderUp(Sdk.DraftPickOrderDto draftPick)
     {
         if (draftPick.Pick == 1)
@@ -168,8 +211,13 @@
     {
         [Required(ErrorMessage = "Draft name cannot be null.")]
         public string? Title { get; set; }
-        
+
         public Sdk.DraftType DraftType { get; set; }
+
+        public bool IsVisible { get; set; }
+
+        [Range(10, 600, ErrorMessage = "Seconds per pick must be between 10 and 600.")]
+        public int SecondsPerPick { get; set; } = 120;
     }
     
 }

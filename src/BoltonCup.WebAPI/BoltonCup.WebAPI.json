@@ -2624,7 +2624,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Creates a new draft (admin only).",
+        "description": "Creates a new draft (admin or tournament GM for their tournament).",
         "operationId": "CreateDraft",
         "requestBody": {
           "content": {
@@ -2880,7 +2880,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Updates draft settings and broadcasts the new state to connected clients (admin only).",
+        "description": "Updates draft settings and broadcasts the new state to connected clients (admin or draft owner).",
         "operationId": "UpdateDraft",
         "parameters": [
           {
@@ -3015,7 +3015,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Deletes a draft (admin only).",
+        "description": "Deletes a draft (admin or draft owner).",
         "operationId": "DeleteDraft",
         "parameters": [
           {
@@ -3118,7 +3118,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Starts the draft and notifies connected clients (admin only).",
+        "description": "Starts the draft and notifies connected clients (admin or draft owner).",
         "operationId": "StartDraft",
         "parameters": [
           {
@@ -3221,7 +3221,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Pauses the draft and notifies connected clients (admin only).",
+        "description": "Pauses the draft and notifies connected clients (admin or draft owner).",
         "operationId": "PauseDraft",
         "parameters": [
           {
@@ -3324,7 +3324,7 @@
         "tags": [
           "Drafts"
         ],
-        "description": "Ends the draft and notifies connected clients (admin only).",
+        "description": "Ends the draft and notifies connected clients (admin or draft owner).",
         "operationId": "EndDraft",
         "parameters": [
           {
@@ -3831,6 +3831,135 @@
             }
           }
         }
+      }
+    },
+    "/api/drafts/{id}/players/{playerId}/favourite": {
+      "put": {
+        "tags": [
+          "Drafts"
+        ],
+        "description": "Toggles the current GM's favourite status for a player in the draft and returns the new state.",
+        "operationId": "ToggleFavourite",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
     "/api/games": {
@@ -8258,6 +8387,22 @@
         "additionalProperties": false,
         "description": "DTO representing the currently authenticated user."
       },
+      "DraftAutoPickRequestEntry": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "description": "The team ID.",
+            "format": "int32"
+          },
+          "autoPick": {
+            "type": "boolean",
+            "description": "Whether the team auto-picks the best available player on its turn."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Specifies whether a team auto-picks when on the clock."
+      },
       "DraftDto": {
         "required": [
           "id",
@@ -8301,6 +8446,25 @@
               }
             ],
             "description": "Gets or sets the tournament this draft belongs to."
+          },
+          "isVisible": {
+            "type": "boolean",
+            "description": "Gets or sets whether this draft is publicly visible."
+          },
+          "rounds": {
+            "type": "integer",
+            "description": "Gets or sets the number of rounds in the draft.",
+            "format": "int32"
+          },
+          "teams": {
+            "type": "integer",
+            "description": "Gets or sets the number of teams in the draft.",
+            "format": "int32"
+          },
+          "secondsPerPick": {
+            "type": "integer",
+            "description": "Gets or sets the number of seconds each team has to make a pick.",
+            "format": "int32"
           }
         },
         "additionalProperties": false,
@@ -8432,6 +8596,12 @@
             ],
             "description": "Gets or sets the player selected with this pick, if any.",
             "nullable": true
+          },
+          "clockStartedAt": {
+            "type": "string",
+            "description": "Gets or sets the UTC time this pick went on the clock, if any.",
+            "format": "date-time",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -8476,6 +8646,7 @@
       },
       "DraftPickOrderDto": {
         "required": [
+          "autoPick",
           "pick",
           "team"
         ],
@@ -8493,6 +8664,10 @@
               }
             ],
             "description": "Gets or sets the team assigned to this pick slot."
+          },
+          "autoPick": {
+            "type": "boolean",
+            "description": "Gets or sets whether the team auto-picks the best available player on its turn."
           }
         },
         "additionalProperties": false,
@@ -8543,6 +8718,12 @@
               }
             ],
             "description": "Gets or sets the player selected with this pick, if any.",
+            "nullable": true
+          },
+          "clockStartedAt": {
+            "type": "string",
+            "description": "Gets or sets the UTC time this pick went on the clock, if any.",
+            "format": "date-time",
             "nullable": true
           }
         },
@@ -8642,6 +8823,10 @@
             "type": "number",
             "description": "Gets or sets the player's points per game average.",
             "format": "double"
+          },
+          "isFavourite": {
+            "type": "boolean",
+            "description": "Gets or sets whether the requesting user has favourited this player in the draft."
           }
         },
         "additionalProperties": false,
@@ -8721,6 +8906,25 @@
             ],
             "description": "Gets or sets the tournament this draft belongs to."
           },
+          "isVisible": {
+            "type": "boolean",
+            "description": "Gets or sets whether this draft is publicly visible."
+          },
+          "rounds": {
+            "type": "integer",
+            "description": "Gets or sets the number of rounds in the draft.",
+            "format": "int32"
+          },
+          "teams": {
+            "type": "integer",
+            "description": "Gets or sets the number of teams in the draft.",
+            "format": "int32"
+          },
+          "secondsPerPick": {
+            "type": "integer",
+            "description": "Gets or sets the number of seconds each team has to make a pick.",
+            "format": "int32"
+          },
           "pickOrder": {
             "type": "array",
             "items": {
@@ -8738,6 +8942,10 @@
           "canEditDraft": {
             "type": "boolean",
             "description": "Gets or sets whether the current user can edit this draft."
+          },
+          "canManageDraft": {
+            "type": "boolean",
+            "description": "Gets or sets whether the current user can manage this draft (admin or draft owner)."
           }
         },
         "additionalProperties": false,
@@ -11366,6 +11574,25 @@
               "$ref": "#/components/schemas/DraftOrderingRequestEntry"
             },
             "description": "Gets or sets the updated pick ordering for each team.",
+            "nullable": true
+          },
+          "isVisible": {
+            "type": "boolean",
+            "description": "Gets or sets whether the draft should be publicly visible.",
+            "nullable": true
+          },
+          "secondsPerPick": {
+            "type": "integer",
+            "description": "Gets or sets the number of seconds each team has to make a pick.",
+            "format": "int32",
+            "nullable": true
+          },
+          "autoPickSettings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DraftAutoPickRequestEntry"
+            },
+            "description": "Gets or sets the per-team auto-pick settings to apply.",
             "nullable": true
           }
         },

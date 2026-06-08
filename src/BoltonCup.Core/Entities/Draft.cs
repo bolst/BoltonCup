@@ -8,8 +8,14 @@ public class Draft : EntityBase
     public DateTime? StartDate { get; set; }
     public DraftType Type { get; set; }
     public DraftStatus Status { get; set; }
+    public bool IsVisible { get; set; }
+    public int? DraftOwnerAccountId { get; set; }
+    public int Rounds { get; set; }
+    public int Teams { get; set; }
+    public int SecondsPerPick { get; set; } = 120;
 
     public Tournament Tournament { get; set; } = null!;
+    public Account? DraftOwner { get; set; }
     public ICollection<DraftOrder> DraftOrders { get; set; } = [];
     public ICollection<DraftPick> DraftPicks { get; set; } = [];
 }

@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260607135815_AddDraftRoundsAndTeams")]
+    partial class AddDraftRoundsAndTeams
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -272,12 +275,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasDefaultValue(0)
                         .HasColumnName("rounds");
 
-                    b.Property<int>("SecondsPerPick")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(120)
-                        .HasColumnName("seconds_per_pick");
-
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("start_date");
@@ -323,10 +320,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("AutoPick")
-                        .HasColumnType("boolean")
-                        .HasColumnName("auto_pick");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -379,10 +372,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("ClockStartedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("clock_started_at");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -1223,59 +1212,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.ToTable("draft_rankings", "core");
                 });
 
-            modelBuilder.Entity("BoltonCup.Core.PlayerFavourite", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("integer")
-                        .HasColumnName("account_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<int>("DraftId")
-                        .HasColumnType("integer")
-                        .HasColumnName("draft_id");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_modified");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("last_modified_by");
-
-                    b.Property<int>("PlayerId")
-                        .HasColumnType("integer")
-                        .HasColumnName("player_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DraftId");
-
-                    b.HasIndex("PlayerId");
-
-                    b.HasIndex("AccountId", "DraftId");
-
-                    b.HasIndex("AccountId", "DraftId", "PlayerId")
-                        .IsUnique();
-
-                    b.ToTable("player_favourites", "core");
-                });
-
             modelBuilder.Entity("BoltonCup.Core.SkaterStat", b =>
                 {
                     b.Property<int>("GameId")
@@ -2079,33 +2015,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Navigation("Player");
 
                     b.Navigation("Tournament");
-                });
-
-            modelBuilder.Entity("BoltonCup.Core.PlayerFavourite", b =>
-                {
-                    b.HasOne("BoltonCup.Core.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BoltonCup.Core.Draft", "Draft")
-                        .WithMany()
-                        .HasForeignKey("DraftId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BoltonCup.Core.Player", "Player")
-                        .WithMany()
-                        .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-
-                    b.Navigation("Draft");
-
-                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("BoltonCup.Core.SkaterStat", b =>

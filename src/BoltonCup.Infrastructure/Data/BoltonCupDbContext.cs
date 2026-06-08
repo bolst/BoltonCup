@@ -34,7 +34,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<TournamentSponsor> TournamentSponsors { get; set; }
     
     public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
-    
+    public DbSet<PlayerFavourite> PlayerFavourites { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("core");
@@ -104,6 +105,11 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Tournament)
                 .WithMany()
                 .HasForeignKey(e => e.TournamentId);
+            entity
+                .HasOne(e => e.DraftOwner)
+                .WithMany()
+                .HasForeignKey(e => e.DraftOwnerAccountId)
+                .IsRequired(false);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.Title).HasColumnName("draft_title");
@@ -116,6 +122,11 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 e => e.ToString()!.ToLower(),
                 s => Enum.Parse<DraftStatus>(s, true)
             );
+            entity.Property(e => e.IsVisible).HasColumnName("is_visible").HasDefaultValue(false);
+            entity.Property(e => e.DraftOwnerAccountId).HasColumnName("draft_owner_account_id");
+            entity.Property(e => e.Rounds).HasColumnName("rounds").HasDefaultValue(0);
+            entity.Property(e => e.Teams).HasColumnName("teams").HasDefaultValue(0);
+            entity.Property(e => e.SecondsPerPick).HasColumnName("seconds_per_pick").HasDefaultValue(120);
         });
 
         modelBuilder.Entity<DraftOrder>(entity =>
@@ -141,6 +152,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.DraftId).HasColumnName("draft_id");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.Pick).HasColumnName("pick_number");
+            entity.Property(e => e.AutoPick).HasColumnName("auto_pick");
         });
 
         modelBuilder.Entity<DraftPick>(entity =>
@@ -173,6 +185,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.RoundPick).HasColumnName("round_pick_number");
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
+            entity.Property(e => e.ClockStartedAt).HasColumnName("clock_started_at");
             entity.Property(e => e.Version).HasColumnName("row_version").IsRowVersion();
         });
 
@@ -270,6 +283,33 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.HasIndex(e => e.GameId);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.PlayerId).HasColumnName("player_id");
+        });
+
+        modelBuilder.Entity<PlayerFavourite>(entity =>
+        {
+            entity
+                .ToTable("player_favourites")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Account)
+                .WithMany()
+                .HasForeignKey(e => e.AccountId);
+            entity
+                .HasOne(e => e.Draft)
+                .WithMany()
+                .HasForeignKey(e => e.DraftId);
+            entity
+                .HasOne(e => e.Player)
+                .WithMany()
+                .HasForeignKey(e => e.PlayerId);
+            entity
+                .HasIndex(e => new { e.AccountId, e.DraftId, e.PlayerId })
+                .IsUnique();
+            entity.HasIndex(e => new { e.AccountId, e.DraftId });
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.AccountId).HasColumnName("account_id");
+            entity.Property(e => e.DraftId).HasColumnName("draft_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
         });
 

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using BoltonCup.Core;
 using BoltonCup.Core.BracketChallenge;
 using BoltonCup.Core.Commands;
+using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Shared;
 using Stripe;
 using Account = BoltonCup.Core.Account;
@@ -203,6 +204,10 @@ public class Mapper : IMapper
             Type = draft.Type,
             Status = draft.Status,
             Tournament = ToTournamentBriefDto(draft.Tournament),
+            IsVisible = draft.IsVisible,
+            Rounds = draft.Rounds,
+            Teams = draft.Teams,
+            SecondsPerPick = draft.SecondsPerPick,
         });
     }
 
@@ -211,7 +216,7 @@ public class Mapper : IMapper
         return draftPicks.ProjectTo(ToDraftPickDto);
     }
 
-    public IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings)
+    public IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings, IReadOnlySet<int> favouritePlayerIds)
     {
         return rankings.ProjectTo(draft => new DraftRankingDto
         {
@@ -227,10 +232,11 @@ public class Mapper : IMapper
             OverrideRanking = draft.OverrideRanking,
             IsDrafted = draft.IsDrafted,
             PointsPerGame = draft.PointsPerGame,
+            IsFavourite = favouritePlayerIds.Contains(draft.PlayerId),
         });
     }
 
-    public DraftSingleDto? ToDto(Draft? draft, bool isAuthorized)
+    public DraftSingleDto? ToDto(Draft? draft, bool isAuthorized, bool canManage)
     {
         if (draft is null)
             return null;
@@ -240,12 +246,17 @@ public class Mapper : IMapper
             Title = draft.Title,
             Type = draft.Type,
             Status = draft.Status,
+            IsVisible = draft.IsVisible,
+            Rounds = draft.Rounds,
+            Teams = draft.Teams,
+            SecondsPerPick = draft.SecondsPerPick,
             Tournament = ToTournamentBriefDto(draft.Tournament),
             PickOrder = draft.DraftOrders
                 .Select(order => new DraftPickOrderDto
                 {
                     Pick = order.Pick,
-                    Team = ToTeamBriefDto(order.Team)
+                    Team = ToTeamBriefDto(order.Team),
+                    AutoPick = order.AutoPick
                 })
                 .OrderBy(d => d.Pick),
             DraftPicksByRound = draft.DraftPicks
@@ -253,6 +264,7 @@ public class Mapper : IMapper
                 .Select(group => new RoundDraftPicks(group.Key, group.Select(ToDraftPickDto).OrderBy(x => x.RoundPick)))
                 .OrderBy(group => group.Round),
             CanEditDraft = isAuthorized && draft.Status != DraftStatus.Completed,
+            CanManageDraft = canManage,
         };
     }
 
@@ -268,13 +280,14 @@ public class Mapper : IMapper
             RoundPick = draftPick.RoundPick,
             Team = ToTeamBriefDto(draftPick.Team),
             Player = draftPick.Player is null ? null : ToPlayerBriefDto(draftPick.Player),
+            ClockStartedAt = draftPick.ClockStartedAt,
         };
     }
 
-    public DraftUpdateEventDto ToDto(CurrentDraftState draftState, bool isAuthorized)
+    public DraftUpdateEventDto ToDto(CurrentDraftState draftState, bool isAuthorized, bool canManage)
     {
         return new DraftUpdateEventDto(
-            Draft: ToDto(draftState.Draft, isAuthorized)!,
+            Draft: ToDto(draftState.Draft, isAuthorized, canManage)!,
             NextPick: ToDto(draftState.NextPick)
         );
     }
@@ -289,20 +302,23 @@ public class Mapper : IMapper
         );
     }
 
-    public GetDraftsQuery ToQuery(GetDraftsRequest request)
+    public GetDraftsQuery ToQuery(GetDraftsRequest request, ClaimsPrincipal user)
     {
         return new GetDraftsQuery
         {
             TournamentId = request.TournamentId,
-            Status = request.Status
+            Status = request.Status,
+            AccountId = user.GetAccountIdOrDefault(),
+            IsAdmin = user.IsInRole(BoltonCupRole.Admin),
         };
     }
 
-    public CreateDraftCommand ToCommand(CreateDraftRequest request)
+    public CreateDraftCommand ToCommand(CreateDraftRequest request, ClaimsPrincipal user)
     {
         return new CreateDraftCommand(
             TournamentId: request.TournamentId,
-            Title: request.Title
+            Title: request.Title,
+            OwnerAccountId: user.GetAccountIdOrDefault()
         );
     }
 
@@ -314,6 +330,11 @@ public class Mapper : IMapper
             DraftType = request.DraftType,
             Ordering = request.Ordering?
                 .Select(x => new DraftOrderCommandEntry(x.TeamId, x.Pick))
+                .ToList(),
+            IsVisible = request.IsVisible,
+            SecondsPerPick = request.SecondsPerPick,
+            AutoPickSettings = request.AutoPickSettings?
+                .Select(x => new DraftAutoPickEntry(x.TeamId, x.AutoPick))
                 .ToList(),
         };
     }
@@ -338,6 +359,7 @@ public class Mapper : IMapper
             RoundPick = draftPick.RoundPick,
             Team = ToTeamBriefDto(draftPick.Team),
             Player = draftPick.Player is null ? null : ToPlayerBriefDto(draftPick.Player),
+            ClockStartedAt = draftPick.ClockStartedAt,
         };
     }
 
