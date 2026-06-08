@@ -20,7 +20,9 @@ public static class SmartAutoPickSelector
         int remainingPicks)
     {
         if (available.Count == 0)
+        {
             return null;
+        }
 
         var goalies = roster.Count(IsGoalie);
         var dedicatedForwards = roster.Count(r => !r.CanPlayEither && IsForward(r.Position));
@@ -35,14 +37,18 @@ public static class SmartAutoPickSelector
         {
             var forcedGoalie = BestRanked(available.Where(c => IsGoalie(c.Position)));
             if (forcedGoalie is not null)
+            {
                 return forcedGoalie;
+            }
             // No goalie available — fall through and pick the best skater rather than return nothing.
         }
 
         // Never draft a second goalie, and reserve the final slot for a still-needed goalie.
         var skaters = available.Where(c => !IsGoalie(c.Position)).ToList();
         if (skaters.Count == 0)
+        {
             return BestRanked(available);
+        }
 
         // Allocate fluid players to the side with the larger remaining deficit.
         var effForwards = dedicatedForwards;
@@ -50,9 +56,13 @@ public static class SmartAutoPickSelector
         for (var i = 0; i < flex; i++)
         {
             if (TargetForwards - effForwards >= TargetDefense - effDefense)
+            {
                 effForwards++;
+            }
             else
+            {
                 effDefense++;
+            }
         }
 
         var needForwards = Math.Max(0, TargetForwards - effForwards);
@@ -89,13 +99,15 @@ public static class SmartAutoPickSelector
         foreach (var candidate in candidates)
         {
             if (best is null || candidate.Ranking < best.Value.Ranking)
+            {
                 best = candidate;
+            }
         }
-
         return best;
     }
 
-    private static bool IsGoalie(RosteredPlayer player) => IsGoalie(player.Position);
+    private static bool IsGoalie(RosteredPlayer player) 
+        => IsGoalie(player.Position);
 
     private static bool IsGoalie(string? position) =>
         string.Equals(position, Position.Goalie, StringComparison.OrdinalIgnoreCase);
