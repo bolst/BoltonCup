@@ -39,6 +39,12 @@ public interface IMapper
     UpdateDraftCommand ToCommand(UpdateDraftRequest request);
     DraftPlayerCommand ToCommand(int id, DraftPlayerRequest request);
 
+    // CustomRanking
+    IReadOnlyList<CustomRankingDto> ToDtoList(IReadOnlyList<CustomRanking> rankings);
+    CustomRankingSingleDto? ToDto(CustomRanking? ranking);
+    CreateCustomRankingCommand ToCommand(CreateCustomRankingRequest request, ClaimsPrincipal user);
+    UpdateCustomRankingCommand ToCommand(UpdateCustomRankingRequest request);
+
     // Game
     GetGamesQuery ToQuery(GetGamesRequest request);
     IPagedList<GameDto> ToDtoList(IPagedList<Game> games);
