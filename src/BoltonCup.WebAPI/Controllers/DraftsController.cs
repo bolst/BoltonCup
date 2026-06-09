@@ -218,6 +218,24 @@ public class DraftsController(
         return Ok();
     }
 
+    /// <summary>Clears all picks and returns the draft to its starting state (admin or draft owner).</summary>
+    [Authorize]
+    [HttpPatch("{id:int}/reset")]
+    public async Task<IActionResult> ResetDraft(int id, [FromServices] IHubContext<Hubs.DraftHub> hubContext)
+    {
+        var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
+        if (!canManage)
+        {
+            return Forbid();
+        }
+
+        var draftState = await _draftService.ResetDraftAsync(id);
+        var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
+        var payloadDto = _mapper.ToDto(draftState, authorized, canManage);
+        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftUpdate, payloadDto);
+        return Ok();
+    }
+
     /// <summary>Resolves any auto-picks for teams on the clock and broadcasts each to connected clients.</summary>
     private async Task BroadcastAutoPicksAsync(int id, IHubContext<Hubs.DraftHub> hubContext)
     {
