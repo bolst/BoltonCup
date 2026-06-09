@@ -76,7 +76,7 @@ else if (DraftState.Draft is not null)
         if (_connectionState == DraftState.ConnectionState)
             return;
         _connectionState = DraftState.ConnectionState;
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
     
     public void Dispose()

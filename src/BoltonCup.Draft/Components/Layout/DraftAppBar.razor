@@ -73,8 +73,10 @@
 
     protected override void OnInitialized()
     {
-        DraftState.OnStateChanged += StateHasChanged;
+        DraftState.OnStateChanged += OnDraftStateChanged;
     }
+
+    private void OnDraftStateChanged() => InvokeAsync(StateHasChanged);
 
     private async Task OpenDraftSettingsAsync()
     {
@@ -125,7 +127,7 @@
 
     public void Dispose()
     {
-        DraftState.OnStateChanged -= StateHasChanged;
+        DraftState.OnStateChanged -= OnDraftStateChanged;
     }
 
 }
