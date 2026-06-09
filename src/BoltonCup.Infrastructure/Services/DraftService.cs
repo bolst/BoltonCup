@@ -186,6 +186,81 @@ public class DraftService(
         );
     }
 
+    public async Task<CurrentDraftState> ApplyDefaultRankingAsync(int draftId, int? rankingId, int callerAccountId,
+        bool isAdmin, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts
+                        .Include(d => d.Tournament)
+                        .Include(d => d.DraftOrders)
+                        .ThenInclude(o => o.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Player)
+                        .ThenInclude(p => p!.Account)
+                        .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var rankings = await _dbContext.PlayerDraftRankings
+            .Where(r => r.DraftId == draftId)
+            .ToListAsync(cancellationToken);
+
+        if (rankingId is null)
+        {
+            ResetDraftRankingsToDefault(rankings);
+            draft.DefaultCustomRankingId = null;
+        }
+        else
+        {
+            var ranking = await _dbContext.CustomRankings
+                              .Include(r => r.Players)
+                              .FirstOrDefaultAsync(r => r.Id == rankingId.Value, cancellationToken)
+                          ?? throw new EntityNotFoundException(nameof(CustomRanking), rankingId.Value);
+
+            if (!isAdmin && ranking.AccountId != callerAccountId)
+                throw new InvalidOperationException("Cannot apply a custom ranking you do not own.");
+
+            if (ranking.TournamentId != draft.TournamentId)
+                throw new InvalidOperationException("Custom ranking belongs to a different tournament than the draft.");
+
+            var rankByPlayerId = ranking.Players.ToDictionary(p => p.PlayerId, p => p.Rank);
+            foreach (var row in rankings)
+            {
+                row.DraftRanking = rankByPlayerId.TryGetValue(row.PlayerId, out var rank) ? rank : int.MaxValue;
+            }
+
+            draft.DefaultCustomRankingId = rankingId.Value;
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var nextPick = await _dbContext.DraftPicks
+            .Include(dp => dp.Team)
+            .Include(dp => dp.Player)
+            .ThenInclude(p => p!.Account)
+            .Where(dp => dp.DraftId == draft.Id)
+            .Where(dp => dp.PlayerId == null)
+            .OrderBy(dp => dp.OverallPick)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
+
+        return new CurrentDraftState(Draft: draft, NextPick: nextPick);
+    }
+
+    private static void ResetDraftRankingsToDefault(List<PlayerDraftRanking> rankings)
+    {
+        var ordered = rankings
+            .OrderByDescending(r => r.PointsPerGame)
+            .ToList();
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            ordered[i].DraftRanking = i + 1;
+        }
+    }
+
     public async Task StartAsync(int draftId, CancellationToken cancellationToken = default)
     {
         var draft = await _dbContext.Drafts 

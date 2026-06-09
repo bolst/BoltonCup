@@ -263,12 +263,16 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private void HandleDraftUpdate(DraftUpdateEventDto eventDto)
+    private async Task HandleDraftUpdate(DraftUpdateEventDto eventDto)
     {
         Draft = eventDto.Draft;
         CurrentPick = eventDto.NextPick;
         SyncCountdown();
         NotifyStateChanged();
+
+        // Settings changes can include a newly applied/cleared default ranking; refetch so the
+        // player list order propagates to every connected GM (their own selection is reapplied on top).
+        await FetchStateAsync();
     }
 
 

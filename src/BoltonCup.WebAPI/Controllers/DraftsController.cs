@@ -78,6 +78,31 @@ public class DraftsController(
         return Ok();
     }
 
+    /// <summary>Applies a custom ranking as the draft's default player ordering and broadcasts it (admin or draft owner).</summary>
+    [Authorize]
+    [HttpPatch("{id:int}/default-ranking")]
+    public async Task<IActionResult> ApplyDefaultRanking(
+        int id,
+        [FromBody] ApplyDefaultRankingRequest request,
+        [FromServices] IHubContext<Hubs.DraftHub> hubContext
+    )
+    {
+        var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
+        if (!canManage)
+        {
+            return Forbid();
+        }
+
+        var draftState = await _draftService.ApplyDefaultRankingAsync(
+            id, request.RankingId, User.GetAccountId(), User.IsInRole(Admin));
+
+        var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
+        var payloadDto = _mapper.ToDto(draftState, authorized, canManage);
+        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftUpdate, payloadDto);
+
+        return Ok();
+    }
+
     /// <summary>Starts the draft and notifies connected clients (admin or draft owner).</summary>
     [Authorize]
     [HttpPatch("{id:int}/start")]

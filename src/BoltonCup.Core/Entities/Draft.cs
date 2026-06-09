@@ -13,9 +13,11 @@ public class Draft : EntityBase
     public int Rounds { get; set; }
     public int Teams { get; set; }
     public int SecondsPerPick { get; set; } = 120;
+    public int? DefaultCustomRankingId { get; set; }
 
     public Tournament Tournament { get; set; } = null!;
     public Account? DraftOwner { get; set; }
+    public CustomRanking? DefaultCustomRanking { get; set; }
     public ICollection<DraftOrder> DraftOrders { get; set; } = [];
     public ICollection<DraftPick> DraftPicks { get; set; } = [];
 }
