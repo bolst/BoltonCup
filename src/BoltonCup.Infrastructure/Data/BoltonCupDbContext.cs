@@ -195,6 +195,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.ClockStartedAt).HasColumnName("clock_started_at");
+            entity.Property(e => e.IsAutoPick).HasColumnName("is_auto_pick").HasDefaultValue(false);
             entity.Property(e => e.Version).HasColumnName("row_version").IsRowVersion();
         });
 

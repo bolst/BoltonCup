@@ -497,6 +497,7 @@ public class DraftService(
 
         // draft player
         pick.PlayerId = command.PlayerId;
+        pick.IsAutoPick = command.IsAutoPick;
         player.DraftPickId = pick.Id;
 
         try
@@ -569,11 +570,84 @@ public class DraftService(
             if (best is null)
                 break;
 
-            var command = new DraftPlayerCommand(draftId, best.PlayerId, currentPick.TeamId, currentPick.OverallPick);
+            var command = new DraftPlayerCommand(draftId, best.PlayerId, currentPick.TeamId, currentPick.OverallPick, IsAutoPick: true);
             results.Add(await DraftPlayerAsync(command, cancellationToken));
         }
 
         return results;
+    }
+
+    public async Task<CurrentDraftState> UndoLastPickAsync(int draftId, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts
+                        .Include(d => d.Tournament)
+                        .Include(d => d.DraftOrders)
+                        .ThenInclude(o => o.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Player)
+                        .ThenInclude(p => p!.Account)
+                        .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var madeDescending = draft.DraftPicks
+            .Where(p => p.PlayerId != null)
+            .OrderByDescending(p => p.OverallPick)
+            .ToList();
+
+        if (madeDescending.Count == 0)
+            throw new InvalidOperationException("There are no picks to undo.");
+
+        // Revert the trailing run of auto-picks plus the first manual pick beneath them
+        // (landing back on the previous human decision point). If every made pick is an
+        // auto-pick, revert them all.
+        var picksToRevert = new List<DraftPick>();
+        foreach (var pick in madeDescending)
+        {
+            picksToRevert.Add(pick);
+            if (!pick.IsAutoPick)
+                break;
+        }
+
+        var revertedPlayerIds = picksToRevert.Select(p => p.PlayerId!.Value).ToList();
+        var rankings = await _dbContext.PlayerDraftRankings
+            .Where(r => r.DraftId == draftId && revertedPlayerIds.Contains(r.PlayerId))
+            .ToListAsync(cancellationToken);
+
+        foreach (var pick in picksToRevert)
+        {
+            pick.PlayerId = null;
+            pick.IsAutoPick = false;
+            pick.ClockStartedAt = null;
+        }
+
+        foreach (var ranking in rankings)
+            ranking.DraftPickId = null;
+
+        if (draft.Status == DraftStatus.Completed)
+            draft.Status = DraftStatus.InProgress;
+
+        // Reopen the earliest reverted pick on the clock.
+        var reopened = picksToRevert.OrderBy(p => p.OverallPick).First();
+        reopened.ClockStartedAt = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var nextPick = await _dbContext.DraftPicks
+            .Include(dp => dp.Team)
+            .Include(dp => dp.Player)
+            .ThenInclude(p => p!.Account)
+            .Where(dp => dp.DraftId == draft.Id)
+            .Where(dp => dp.PlayerId == null)
+            .OrderBy(dp => dp.OverallPick)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
+
+        return new CurrentDraftState(Draft: draft, NextPick: nextPick);
     }
 
     private async Task<PlayerDraftRanking?> GetBestAvailablePlayerAsync(int draftId, int teamId, CancellationToken cancellationToken)

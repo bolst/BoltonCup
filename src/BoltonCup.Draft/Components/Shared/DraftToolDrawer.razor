@@ -43,6 +43,11 @@
                                   Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info"
                                   IconSize="Size.Medium" Variant="Variant.Text" Margin="Margin.Dense" DebounceInterval="200" FullWidth Clearable Immediate/>
                 </div>
+                @if (DraftState.CanManageDraft && DraftState.Draft?.Status is DraftStatus.InProgress or DraftStatus.Completed)
+                {
+                    <MudButton OnClick="@UndoLastPickAsync" StartIcon="@Icons.Material.Rounded.Undo"
+                               Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">Undo last pick</MudButton>
+                }
             </div>
         </ToolBarContent>
         <Columns>
@@ -153,6 +158,28 @@
             TeamId = DraftState.CurrentPick!.Team.Id,
             OverallPick = DraftState.CurrentPick!.OverallPick
         });
+    }
+
+    private async Task UndoLastPickAsync()
+    {
+        if (DraftState.Draft is not { } draft)
+            return;
+
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Undo last pick",
+            "This will revert the last pick and any auto-picks that followed it.",
+            yesText: "Undo", cancelText: "Cancel");
+        if (confirm != true)
+            return;
+
+        try
+        {
+            await BoltonCupApi.UndoLastPickAsync(draft.Id);
+        }
+        catch (ApiException e)
+        {
+            Snackbar.Add($"Unable to undo last pick: {e.Message}", Severity.Error);
+        }
     }
 
     private async Task ApplyDefaultRankingAsync(int? rankingId)
