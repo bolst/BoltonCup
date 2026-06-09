@@ -78,6 +78,31 @@ public class DraftsController(
         return Ok();
     }
 
+    /// <summary>Applies a custom ranking as the draft's default player ordering and broadcasts it (admin or draft owner).</summary>
+    [Authorize]
+    [HttpPatch("{id:int}/default-ranking")]
+    public async Task<IActionResult> ApplyDefaultRanking(
+        int id,
+        [FromBody] ApplyDefaultRankingRequest request,
+        [FromServices] IHubContext<Hubs.DraftHub> hubContext
+    )
+    {
+        var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
+        if (!canManage)
+        {
+            return Forbid();
+        }
+
+        var draftState = await _draftService.ApplyDefaultRankingAsync(
+            id, request.RankingId, User.GetAccountId(), User.IsInRole(Admin));
+
+        var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
+        var payloadDto = _mapper.ToDto(draftState, authorized, canManage);
+        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftUpdate, payloadDto);
+
+        return Ok();
+    }
+
     /// <summary>Starts the draft and notifies connected clients (admin or draft owner).</summary>
     [Authorize]
     [HttpPatch("{id:int}/start")]
@@ -173,6 +198,26 @@ public class DraftsController(
         return Ok();
     }
 
+    /// <summary>Reverts the last manual pick and any auto-picks that followed it, then broadcasts the new state (admin or draft owner).</summary>
+    [Authorize]
+    [HttpPatch("{id:int}/undo")]
+    public async Task<IActionResult> UndoLastPick(int id, [FromServices] IHubContext<Hubs.DraftHub> hubContext)
+    {
+        var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
+        if (!canManage)
+        {
+            return Forbid();
+        }
+
+        var draftState = await _draftService.UndoLastPickAsync(id);
+
+        var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
+        var payloadDto = _mapper.ToDto(draftState, authorized, canManage);
+        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftUpdate, payloadDto);
+
+        return Ok();
+    }
+
     /// <summary>Resolves any auto-picks for teams on the clock and broadcasts each to connected clients.</summary>
     private async Task BroadcastAutoPicksAsync(int id, IHubContext<Hubs.DraftHub> hubContext)
     {
@@ -193,6 +238,31 @@ public class DraftsController(
             ? await _draftService.GetFavouritePlayerIdsAsync(id, accountId)
             : new HashSet<int>();
         return Ok(_mapper.ToDtoList(rankings, favouritePlayerIds));
+    }
+
+    /// <summary>Sets the draft's player pool (ordering + exclusions) before it starts and broadcasts it (admin or draft owner).</summary>
+    [Authorize]
+    [HttpPut("{id:int}/players")]
+    public async Task<IActionResult> SetPlayerPool(
+        int id,
+        [FromBody] SetPlayerPoolRequest request,
+        [FromServices] IHubContext<Hubs.DraftHub> hubContext
+    )
+    {
+        var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
+        if (!canManage)
+        {
+            return Forbid();
+        }
+
+        var command = _mapper.ToCommand(request);
+        var draftState = await _draftService.SetPlayerPoolAsync(id, command);
+
+        var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
+        var payloadDto = _mapper.ToDto(draftState, authorized, canManage);
+        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftUpdate, payloadDto);
+
+        return Ok();
     }
 
     /// <summary>Toggles the current GM's favourite status for a player in the draft and returns the new state.</summary>

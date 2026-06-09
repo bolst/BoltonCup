@@ -34,7 +34,7 @@ public class DraftStateService : IAsyncDisposable
     public int? RemainingSeconds { get; private set; }
 
     public DraftConnectionState ConnectionState { get; private set; } = DraftConnectionState.Disconnected;
-    
+
     public bool CanEditDraft => Draft?.CanEditDraft ?? false;
     public bool CanManageDraft => Draft?.CanManageDraft ?? false;
 
@@ -263,12 +263,16 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private void HandleDraftUpdate(DraftUpdateEventDto eventDto)
+    private async Task HandleDraftUpdate(DraftUpdateEventDto eventDto)
     {
         Draft = eventDto.Draft;
         CurrentPick = eventDto.NextPick;
         SyncCountdown();
         NotifyStateChanged();
+
+        // Settings changes can include a newly applied/cleared default ranking; refetch so the
+        // player list order propagates to every connected GM (their own selection is reapplied on top).
+        await FetchStateAsync();
     }
 
 
@@ -332,7 +336,17 @@ public class DraftStateService : IAsyncDisposable
         try
         {
             Draft = await _api.GetDraftByIdAsync(draftId, token);
-            var currentPick = await _api.GetCurrentDraftPickAsync(draftId, token);
+
+            DraftPickSingleDto? currentPick = null;
+            try
+            {
+                currentPick = await _api.GetCurrentDraftPickAsync(draftId, token);
+            }
+            catch (ApiException e) when (e.StatusCode == 204)
+            {
+                // no picks remaining — all picks are done
+            }
+
             var playerRankings = await _api.GetDraftPlayerRankingsAsync(draftId, size: 200, cancellationToken: token);
 
             CurrentPick = currentPick;
@@ -341,7 +355,7 @@ public class DraftStateService : IAsyncDisposable
         }
         catch (OperationCanceledException)
         {
-            
+
         }
         catch (Exception e)
         {

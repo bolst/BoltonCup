@@ -4,5 +4,6 @@ public sealed record DraftPlayerCommand(
     int DraftId,
     int PlayerId,
     int TeamId,
-    int OverallPick
+    int OverallPick,
+    bool IsAutoPick = false
 );

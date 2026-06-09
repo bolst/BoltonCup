@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260609014302_AddDraftDefaultRanking")]
+    partial class AddDraftDefaultRanking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -511,12 +514,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<int>("DraftId")
                         .HasColumnType("integer")
                         .HasColumnName("draft_id");
-
-                    b.Property<bool>("IsAutoPick")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_auto_pick");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone")
@@ -1304,12 +1301,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<bool>("IsChampion")
                         .HasColumnType("boolean")
                         .HasColumnName("is_champion");
-
-                    b.Property<bool>("IsExcluded")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_excluded");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone")
