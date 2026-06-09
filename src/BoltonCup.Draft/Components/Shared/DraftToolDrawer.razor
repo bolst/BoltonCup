@@ -94,10 +94,7 @@
         DraftState.OnStateChanged += HandleStateChanged;
     }
 
-    private void HandleStateChanged()
-    {
-        StateHasChanged();
-    }
+    private void HandleStateChanged() => InvokeAsync(StateHasChanged);
 
     private bool QuickFilter(Sdk.DraftRankingDto ranking)
     {
