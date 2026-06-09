@@ -2459,6 +2459,634 @@
         }
       }
     },
+    "/api/customrankings": {
+      "get": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Gets the current user's custom rankings, optionally filtered by tournament.",
+        "operationId": "GetCustomRankings",
+        "parameters": [
+          {
+            "name": "tournamentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomRankingDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomRankingDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomRankingDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Creates a new custom ranking (admin or tournament GM for their tournament).",
+        "operationId": "CreateCustomRanking",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to create a new custom player ranking for a tournament."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to create a new custom player ranking for a tournament."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to create a new custom player ranking for a tournament."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/customrankings/{id}": {
+      "get": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Gets a single custom ranking by its ID (owner or admin only).",
+        "operationId": "GetCustomRankingById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRankingSingleDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRankingSingleDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRankingSingleDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Updates a custom ranking's title and/or player order (owner or admin only).",
+        "operationId": "UpdateCustomRanking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to update an existing custom player ranking."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to update an existing custom player ranking."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to update an existing custom player ranking."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Deletes a custom ranking (owner or admin only).",
+        "operationId": "DeleteCustomRanking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/drafts": {
       "get": {
         "tags": [
@@ -3113,6 +3741,143 @@
         ]
       }
     },
+    "/api/drafts/{id}/default-ranking": {
+      "patch": {
+        "tags": [
+          "Drafts"
+        ],
+        "description": "Applies a custom ranking as the draft's default player ordering and broadcasts it (admin or draft owner).",
+        "operationId": "ApplyDefaultRanking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyDefaultRankingRequest"
+                  }
+                ],
+                "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyDefaultRankingRequest"
+                  }
+                ],
+                "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyDefaultRankingRequest"
+                  }
+                ],
+                "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/drafts/{id}/start": {
       "patch": {
         "tags": [
@@ -3669,6 +4434,109 @@
         ]
       }
     },
+    "/api/drafts/{id}/undo": {
+      "patch": {
+        "tags": [
+          "Drafts"
+        ],
+        "description": "Reverts the last manual pick and any auto-picks that followed it, then broadcasts the new state (admin or draft owner).",
+        "operationId": "UndoLastPick",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/drafts/{id}/players": {
       "get": {
         "tags": [
@@ -3831,6 +4699,141 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [
+          "Drafts"
+        ],
+        "description": "Sets the draft's player pool (ordering + exclusions) before it starts and broadcasts it (admin or draft owner).",
+        "operationId": "SetPlayerPool",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetPlayerPoolRequest"
+                  }
+                ],
+                "description": "Request to set a draft's player pool by listing the players excluded from the draft."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetPlayerPoolRequest"
+                  }
+                ],
+                "description": "Request to set a draft's player pool by listing the players excluded from the draft."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetPlayerPoolRequest"
+                  }
+                ],
+                "description": "Request to set a draft's player pool by listing the players excluded from the draft."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
     "/api/drafts/{id}/players/{playerId}/favourite": {
@@ -3967,7 +4970,7 @@
         "tags": [
           "Games"
         ],
-        "description": "Gets a paginated list of games.",
+        "description": "Gets a paginated list of games.\n\nGets a paginated list of games.",
         "operationId": "GetGames",
         "parameters": [
           {
@@ -4126,7 +5129,7 @@
         "tags": [
           "Games"
         ],
-        "description": "Gets a single game by its ID.",
+        "description": "Gets a single game by its ID.\n\nGets a single game by its ID.",
         "operationId": "GetGameById",
         "parameters": [
           {
@@ -4231,1106 +5234,6 @@
             }
           }
         }
-      }
-    },
-    "/api/games/{id}/state": {
-      "patch": {
-        "tags": [
-          "Games"
-        ],
-        "description": "Updates a game's state (timekeeper or admin only).",
-        "operationId": "UpdateGameState",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateGameStateRequest"
-                  }
-                ],
-                "description": "Request to update a game's state."
-              }
-            },
-            "text/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateGameStateRequest"
-                  }
-                ],
-                "description": "Request to update a game's state."
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateGameStateRequest"
-                  }
-                ],
-                "description": "Request to update a game's state."
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
-      }
-    },
-    "/api/games/{id}/goals": {
-      "post": {
-        "tags": [
-          "Games"
-        ],
-        "description": "Records a goal in a game (timekeeper or admin only).",
-        "operationId": "AddGoal",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/CreateGoalRequest"
-                  }
-                ],
-                "description": "Request to record a goal in a game."
-              }
-            },
-            "text/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/CreateGoalRequest"
-                  }
-                ],
-                "description": "Request to record a goal in a game."
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/CreateGoalRequest"
-                  }
-                ],
-                "description": "Request to record a goal in a game."
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
-      }
-    },
-    "/api/games/{id}/goals/{goalId}": {
-      "put": {
-        "tags": [
-          "Games"
-        ],
-        "description": "Updates an existing goal (timekeeper or admin only).",
-        "operationId": "UpdateGoal",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "goalId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateGoalRequest"
-                  }
-                ],
-                "description": "Request to update an existing goal. All fields are replaced."
-              }
-            },
-            "text/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateGoalRequest"
-                  }
-                ],
-                "description": "Request to update an existing goal. All fields are replaced."
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateGoalRequest"
-                  }
-                ],
-                "description": "Request to update an existing goal. All fields are replaced."
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Games"
-        ],
-        "description": "Deletes a goal (timekeeper or admin only).",
-        "operationId": "DeleteGoal",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "goalId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
-      }
-    },
-    "/api/games/{id}/penalties": {
-      "post": {
-        "tags": [
-          "Games"
-        ],
-        "description": "Records a penalty in a game (timekeeper or admin only).",
-        "operationId": "AddPenalty",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/CreatePenaltyRequest"
-                  }
-                ],
-                "description": "Request to record a penalty in a game."
-              }
-            },
-            "text/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/CreatePenaltyRequest"
-                  }
-                ],
-                "description": "Request to record a penalty in a game."
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/CreatePenaltyRequest"
-                  }
-                ],
-                "description": "Request to record a penalty in a game."
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
-      }
-    },
-    "/api/games/{id}/penalties/{penaltyId}": {
-      "put": {
-        "tags": [
-          "Games"
-        ],
-        "description": "Updates an existing penalty (timekeeper or admin only).",
-        "operationId": "UpdatePenalty",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "penaltyId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdatePenaltyRequest"
-                  }
-                ],
-                "description": "Request to update an existing penalty. All fields are replaced."
-              }
-            },
-            "text/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdatePenaltyRequest"
-                  }
-                ],
-                "description": "Request to update an existing penalty. All fields are replaced."
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdatePenaltyRequest"
-                  }
-                ],
-                "description": "Request to update an existing penalty. All fields are replaced."
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Games"
-        ],
-        "description": "Deletes a penalty (timekeeper or admin only).",
-        "operationId": "DeletePenalty",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "penaltyId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
-      }
-    },
-    "/api/games/{id}/stars": {
-      "put": {
-        "tags": [
-          "Games"
-        ],
-        "description": "Replaces the 1st/2nd/3rd stars for a game (timekeeper or admin only).",
-        "operationId": "SetGameStars",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/SetGameStarsRequest"
-                  }
-                ],
-                "description": "Request to set the 1st/2nd/3rd stars for a game. Replaces any existing stars."
-              }
-            },
-            "text/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/SetGameStarsRequest"
-                  }
-                ],
-                "description": "Request to set the 1st/2nd/3rd stars for a game. Replaces any existing stars."
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/SetGameStarsRequest"
-                  }
-                ],
-                "description": "Request to set the 1st/2nd/3rd stars for a game. Replaces any existing stars."
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Validation Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "APIKey": [ ]
-          },
-          {
-            "Bearer": [ ]
-          }
-        ]
       }
     },
     "/api/goaliestats": {
@@ -7876,6 +7779,19 @@
         "additionalProperties": false,
         "description": "DTO representing a tournament associated with an account."
       },
+      "ApplyDefaultRankingRequest": {
+        "type": "object",
+        "properties": {
+          "rankingId": {
+            "type": "integer",
+            "description": "Gets or sets the custom ranking ID to apply, or null to reset to the points-per-game default.",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+      },
       "BoltonCupProblemDetails": {
         "type": "object",
         "properties": {
@@ -8208,6 +8124,26 @@
         "additionalProperties": false,
         "description": "Request to create a Stripe payment intent for a bracket challenge entry."
       },
+      "CreateCustomRankingRequest": {
+        "required": [
+          "title",
+          "tournamentId"
+        ],
+        "type": "object",
+        "properties": {
+          "tournamentId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the tournament this ranking belongs to.",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "Gets or sets the display title of the ranking."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to create a new custom player ranking for a tournament."
+      },
       "CreateDraftRequest": {
         "required": [
           "title",
@@ -8227,99 +8163,6 @@
         },
         "additionalProperties": false,
         "description": "Request to create a new draft for a tournament."
-      },
-      "CreateGoalRequest": {
-        "type": "object",
-        "properties": {
-          "teamId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the team that scored.",
-            "format": "int32"
-          },
-          "period": {
-            "type": "integer",
-            "description": "Gets or sets the period number.",
-            "format": "int32"
-          },
-          "periodLabel": {
-            "type": "string",
-            "description": "Gets or sets the period label (e.g. \"1st\", \"OT\")."
-          },
-          "periodTimeRemaining": {
-            "type": "string",
-            "description": "Gets or sets the time remaining in the period when the goal was scored.",
-            "format": "date-span"
-          },
-          "goalPlayerId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the player who scored.",
-            "format": "int32"
-          },
-          "assist1PlayerId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the primary assist player, if any.",
-            "format": "int32",
-            "nullable": true
-          },
-          "assist2PlayerId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the secondary assist player, if any.",
-            "format": "int32",
-            "nullable": true
-          },
-          "notes": {
-            "type": "string",
-            "description": "Gets or sets optional notes about the goal.",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false,
-        "description": "Request to record a goal in a game."
-      },
-      "CreatePenaltyRequest": {
-        "type": "object",
-        "properties": {
-          "teamId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the penalized team.",
-            "format": "int32"
-          },
-          "period": {
-            "type": "integer",
-            "description": "Gets or sets the period number.",
-            "format": "int32"
-          },
-          "periodLabel": {
-            "type": "string",
-            "description": "Gets or sets the period label (e.g. \"1st\", \"OT\")."
-          },
-          "periodTimeRemaining": {
-            "type": "string",
-            "description": "Gets or sets the time remaining in the period when the penalty was called.",
-            "format": "date-span"
-          },
-          "playerId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the penalized player.",
-            "format": "int32"
-          },
-          "infractionName": {
-            "type": "string",
-            "description": "Gets or sets the infraction name (e.g. \"Tripping\", \"Hooking\")."
-          },
-          "durationMinutes": {
-            "type": "integer",
-            "description": "Gets or sets the penalty duration in minutes.",
-            "format": "int32"
-          },
-          "notes": {
-            "type": "string",
-            "description": "Gets or sets optional notes about the penalty.",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false,
-        "description": "Request to record a penalty in a game."
       },
       "CreateTournamentPaymentIntentRequest": {
         "required": [
@@ -8386,6 +8229,118 @@
         },
         "additionalProperties": false,
         "description": "DTO representing the currently authenticated user."
+      },
+      "CustomRankingDto": {
+        "required": [
+          "title",
+          "tournament"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the custom ranking ID.",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "Gets or sets the ranking title."
+          },
+          "tournament": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ],
+            "description": "Gets or sets the tournament this ranking belongs to."
+          },
+          "playerCount": {
+            "type": "integer",
+            "description": "Gets or sets the number of players in the ranking.",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Gets or sets when the ranking was created.",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a user's custom player ranking."
+      },
+      "CustomRankingPlayerDto": {
+        "required": [
+          "player"
+        ],
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "description": "Gets or sets the player's rank (1-based).",
+            "format": "int32"
+          },
+          "player": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ],
+            "description": "Gets or sets the player being ranked."
+          },
+          "gamesPlayed": {
+            "type": "integer",
+            "description": "Gets or sets the number of games played by the player.",
+            "format": "int32"
+          },
+          "totalPoints": {
+            "type": "integer",
+            "description": "Gets or sets the player's total points.",
+            "format": "int32"
+          },
+          "pointsPerGame": {
+            "type": "number",
+            "description": "Gets or sets the player's points per game average.",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a player's position within a custom ranking."
+      },
+      "CustomRankingSingleDto": {
+        "required": [
+          "players",
+          "title",
+          "tournament"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the custom ranking ID.",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "Gets or sets the ranking title."
+          },
+          "tournament": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ],
+            "description": "Gets or sets the tournament this ranking belongs to."
+          },
+          "players": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomRankingPlayerDto"
+            },
+            "description": "Gets or sets the ranked players ordered by rank."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single custom ranking, including its ordered players."
       },
       "DraftAutoPickRequestEntry": {
         "type": "object",
@@ -8827,6 +8782,10 @@
           "isFavourite": {
             "type": "boolean",
             "description": "Gets or sets whether the requesting user has favourited this player in the draft."
+          },
+          "isExcluded": {
+            "type": "boolean",
+            "description": "Gets or sets whether the player is excluded from this draft's pool."
           }
         },
         "additionalProperties": false,
@@ -8946,6 +8905,12 @@
           "canManageDraft": {
             "type": "boolean",
             "description": "Gets or sets whether the current user can manage this draft (admin or draft owner)."
+          },
+          "defaultCustomRankingId": {
+            "type": "integer",
+            "description": "Gets or sets the custom ranking applied as this draft's default player ordering, if any.",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -9500,7 +9465,6 @@
       },
       "GoalBriefDto": {
         "required": [
-          "id",
           "period",
           "primaryAssist",
           "scorer",
@@ -9510,11 +9474,6 @@
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Gets or sets the goal ID.",
-            "format": "int32"
-          },
           "timeRemaining": {
             "type": "string",
             "description": "Gets or sets the time remaining in the period when the goal was scored.",
@@ -9909,7 +9868,6 @@
       "PenaltyBriefDto": {
         "required": [
           "durationMins",
-          "id",
           "infraction",
           "period",
           "player",
@@ -9918,11 +9876,6 @@
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Gets or sets the penalty ID.",
-            "format": "int32"
-          },
           "timeRemaining": {
             "type": "string",
             "description": "Gets or sets the time remaining in the period when the penalty occurred.",
@@ -10623,30 +10576,20 @@
         "additionalProperties": false,
         "description": "Represents the ordered picks for a single draft round."
       },
-      "SetGameStarsRequest": {
+      "SetPlayerPoolRequest": {
         "type": "object",
         "properties": {
-          "firstStarPlayerId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the first star player, if any.",
-            "format": "int32",
-            "nullable": true
-          },
-          "secondStarPlayerId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the second star player, if any.",
-            "format": "int32",
-            "nullable": true
-          },
-          "thirdStarPlayerId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the third star player, if any.",
-            "format": "int32",
-            "nullable": true
+          "excludedPlayerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Gets or sets the player IDs excluded from the draft."
           }
         },
         "additionalProperties": false,
-        "description": "Request to set the 1st/2nd/3rd stars for a game. Replaces any existing stars."
+        "description": "Request to set a draft's player pool by listing the players excluded from the draft."
       },
       "SkaterStatDto": {
         "required": [
@@ -11551,6 +11494,27 @@
         "additionalProperties": false,
         "description": "Request to update an existing user account's profile information."
       },
+      "UpdateCustomRankingRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Gets or sets the updated display title for the ranking.",
+            "nullable": true
+          },
+          "orderedPlayerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Gets or sets the players in their new ranked order (must match the existing player set).",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to update an existing custom player ranking."
+      },
       "UpdateDraftRequest": {
         "type": "object",
         "properties": {
@@ -11598,114 +11562,6 @@
         },
         "additionalProperties": false,
         "description": "Request to update an existing draft's settings."
-      },
-      "UpdateGameStateRequest": {
-        "type": "object",
-        "properties": {
-          "state": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GameState"
-              }
-            ],
-            "description": "Gets or sets the new game state."
-          }
-        },
-        "additionalProperties": false,
-        "description": "Request to update a game's state."
-      },
-      "UpdateGoalRequest": {
-        "type": "object",
-        "properties": {
-          "teamId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the team that scored.",
-            "format": "int32"
-          },
-          "period": {
-            "type": "integer",
-            "description": "Gets or sets the period number.",
-            "format": "int32"
-          },
-          "periodLabel": {
-            "type": "string",
-            "description": "Gets or sets the period label (e.g. \"1st\", \"OT\")."
-          },
-          "periodTimeRemaining": {
-            "type": "string",
-            "description": "Gets or sets the time remaining in the period when the goal was scored.",
-            "format": "date-span"
-          },
-          "goalPlayerId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the player who scored.",
-            "format": "int32"
-          },
-          "assist1PlayerId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the primary assist player, if any.",
-            "format": "int32",
-            "nullable": true
-          },
-          "assist2PlayerId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the secondary assist player, if any.",
-            "format": "int32",
-            "nullable": true
-          },
-          "notes": {
-            "type": "string",
-            "description": "Gets or sets optional notes about the goal.",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false,
-        "description": "Request to update an existing goal. All fields are replaced."
-      },
-      "UpdatePenaltyRequest": {
-        "type": "object",
-        "properties": {
-          "teamId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the penalized team.",
-            "format": "int32"
-          },
-          "period": {
-            "type": "integer",
-            "description": "Gets or sets the period number.",
-            "format": "int32"
-          },
-          "periodLabel": {
-            "type": "string",
-            "description": "Gets or sets the period label (e.g. \"1st\", \"OT\")."
-          },
-          "periodTimeRemaining": {
-            "type": "string",
-            "description": "Gets or sets the time remaining in the period when the penalty was called.",
-            "format": "date-span"
-          },
-          "playerId": {
-            "type": "integer",
-            "description": "Gets or sets the ID of the penalized player.",
-            "format": "int32"
-          },
-          "infractionName": {
-            "type": "string",
-            "description": "Gets or sets the infraction name (e.g. \"Tripping\", \"Hooking\")."
-          },
-          "durationMinutes": {
-            "type": "integer",
-            "description": "Gets or sets the penalty duration in minutes.",
-            "format": "int32"
-          },
-          "notes": {
-            "type": "string",
-            "description": "Gets or sets optional notes about the penalty.",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false,
-        "description": "Request to update an existing penalty. All fields are replaced."
       },
       "UploadCredentials": {
         "type": "object",
@@ -11763,6 +11619,9 @@
     },
     {
       "name": "BracketChallenges"
+    },
+    {
+      "name": "CustomRankings"
     },
     {
       "name": "Drafts"

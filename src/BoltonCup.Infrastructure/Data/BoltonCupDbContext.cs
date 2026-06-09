@@ -35,6 +35,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     
     public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
     public DbSet<PlayerFavourite> PlayerFavourites { get; set; }
+    public DbSet<CustomRanking> CustomRankings { get; set; }
+    public DbSet<CustomRankingPlayer> CustomRankingPlayers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -110,6 +112,12 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany()
                 .HasForeignKey(e => e.DraftOwnerAccountId)
                 .IsRequired(false);
+            entity
+                .HasOne(e => e.DefaultCustomRanking)
+                .WithMany()
+                .HasForeignKey(e => e.DefaultCustomRankingId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.Title).HasColumnName("draft_title");
@@ -127,6 +135,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Rounds).HasColumnName("rounds").HasDefaultValue(0);
             entity.Property(e => e.Teams).HasColumnName("teams").HasDefaultValue(0);
             entity.Property(e => e.SecondsPerPick).HasColumnName("seconds_per_pick").HasDefaultValue(120);
+            entity.Property(e => e.DefaultCustomRankingId).HasColumnName("default_custom_ranking_id");
         });
 
         modelBuilder.Entity<DraftOrder>(entity =>
@@ -186,6 +195,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.ClockStartedAt).HasColumnName("clock_started_at");
+            entity.Property(e => e.IsAutoPick).HasColumnName("is_auto_pick").HasDefaultValue(false);
             entity.Property(e => e.Version).HasColumnName("row_version").IsRowVersion();
         });
 
@@ -311,6 +321,52 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.AccountId).HasColumnName("account_id");
             entity.Property(e => e.DraftId).HasColumnName("draft_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
+        });
+
+        modelBuilder.Entity<CustomRanking>(entity =>
+        {
+            entity
+                .ToTable("custom_rankings")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Account)
+                .WithMany()
+                .HasForeignKey(e => e.AccountId);
+            entity
+                .HasOne(e => e.Tournament)
+                .WithMany()
+                .HasForeignKey(e => e.TournamentId);
+            entity
+                .HasMany(e => e.Players)
+                .WithOne(e => e.CustomRanking)
+                .HasForeignKey(e => e.CustomRankingId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => new { e.AccountId, e.TournamentId });
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.AccountId).HasColumnName("account_id");
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.Title).HasColumnName("title");
+        });
+
+        modelBuilder.Entity<CustomRankingPlayer>(entity =>
+        {
+            entity
+                .ToTable("custom_ranking_players")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Player)
+                .WithMany()
+                .HasForeignKey(e => e.PlayerId);
+            entity
+                .HasIndex(e => new { e.CustomRankingId, e.PlayerId })
+                .IsUnique();
+            entity.HasIndex(e => e.CustomRankingId);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.CustomRankingId).HasColumnName("custom_ranking_id");
+            entity.Property(e => e.PlayerId).HasColumnName("player_id");
+            entity.Property(e => e.Rank).HasColumnName("rank");
+            entity.Property(e => e.GamesPlayed).HasColumnName("games_played");
+            entity.Property(e => e.TotalPoints).HasColumnName("total_points");
         });
 
         modelBuilder.Entity<Goal>(entity =>
@@ -531,6 +587,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.IsChampion).HasColumnName("is_champion");
             entity.Property(e => e.DraftRanking).HasColumnName("draft_ranking");
             entity.Property(e => e.OverrideRanking).HasColumnName("override_ranking");
+            entity.Property(e => e.IsExcluded).HasColumnName("is_excluded").HasDefaultValue(false);
         });
 
         modelBuilder.Entity<SkaterStat>(entity =>

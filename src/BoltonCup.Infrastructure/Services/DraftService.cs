@@ -1,6 +1,7 @@
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
 using BoltonCup.Core.Exceptions;
+using BoltonCup.Core.Values;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -82,8 +83,8 @@ public class DraftService(
         _dbContext.DraftOrders.AddRange(orderings);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await GenerateDraftPicksAsync(newDraft, cancellationToken);
         await GenerateDraftRankingsAsync(newDraft, cancellationToken);
+        await GenerateDraftPicksAsync(newDraft, cancellationToken);
 
         await transaction.CommitAsync(cancellationToken);
         
@@ -183,6 +184,135 @@ public class DraftService(
             Draft: draft,
             NextPick: nextPick
         );
+    }
+
+    public async Task<CurrentDraftState> ApplyDefaultRankingAsync(int draftId, int? rankingId, int callerAccountId,
+        bool isAdmin, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts
+                        .Include(d => d.Tournament)
+                        .Include(d => d.DraftOrders)
+                        .ThenInclude(o => o.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Player)
+                        .ThenInclude(p => p!.Account)
+                        .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var rankings = await _dbContext.PlayerDraftRankings
+            .Where(r => r.DraftId == draftId)
+            .ToListAsync(cancellationToken);
+
+        if (rankingId is null)
+        {
+            ResetDraftRankingsToDefault(rankings);
+            draft.DefaultCustomRankingId = null;
+        }
+        else
+        {
+            var ranking = await _dbContext.CustomRankings
+                              .Include(r => r.Players)
+                              .FirstOrDefaultAsync(r => r.Id == rankingId.Value, cancellationToken)
+                          ?? throw new EntityNotFoundException(nameof(CustomRanking), rankingId.Value);
+
+            if (!isAdmin && ranking.AccountId != callerAccountId)
+                throw new InvalidOperationException("Cannot apply a custom ranking you do not own.");
+
+            if (ranking.TournamentId != draft.TournamentId)
+                throw new InvalidOperationException("Custom ranking belongs to a different tournament than the draft.");
+
+            var rankByPlayerId = ranking.Players.ToDictionary(p => p.PlayerId, p => p.Rank);
+            foreach (var row in rankings)
+            {
+                row.DraftRanking = rankByPlayerId.TryGetValue(row.PlayerId, out var rank) ? rank : int.MaxValue;
+            }
+
+            draft.DefaultCustomRankingId = rankingId.Value;
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var nextPick = await _dbContext.DraftPicks
+            .Include(dp => dp.Team)
+            .Include(dp => dp.Player)
+            .ThenInclude(p => p!.Account)
+            .Where(dp => dp.DraftId == draft.Id)
+            .Where(dp => dp.PlayerId == null)
+            .OrderBy(dp => dp.OverallPick)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
+
+        return new CurrentDraftState(Draft: draft, NextPick: nextPick);
+    }
+
+    public async Task<CurrentDraftState> SetPlayerPoolAsync(int draftId, SetPlayerPoolCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts
+                        .Include(d => d.Tournament)
+                        .Include(d => d.DraftOrders)
+                        .ThenInclude(o => o.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Player)
+                        .ThenInclude(p => p!.Account)
+                        .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+
+        if (draft.Status != DraftStatus.Pending)
+            throw new InvalidOperationException("Player pool can only be changed before the draft starts.");
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var rankings = await _dbContext.PlayerDraftRankings
+            .Where(r => r.DraftId == draftId)
+            .ToListAsync(cancellationToken);
+
+        var excluded = command.ExcludedPlayerIds.ToHashSet();
+
+        // Every excluded player must belong to this draft.
+        var validPlayerIds = rankings.Select(r => r.PlayerId).ToHashSet();
+        if (!excluded.All(validPlayerIds.Contains))
+            throw new InvalidOperationException("Supplied player pool contains players not in the draft.");
+
+        // Exclusion is independent of ordering: the player's DraftRanking and any applied
+        // default custom ranking are left untouched.
+        foreach (var row in rankings)
+            row.IsExcluded = excluded.Contains(row.PlayerId);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await GenerateDraftPicksAsync(draft, cancellationToken);
+
+        var nextPick = await _dbContext.DraftPicks
+            .Include(dp => dp.Team)
+            .Include(dp => dp.Player)
+            .ThenInclude(p => p!.Account)
+            .Where(dp => dp.DraftId == draft.Id)
+            .Where(dp => dp.PlayerId == null)
+            .OrderBy(dp => dp.OverallPick)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
+
+        return new CurrentDraftState(Draft: draft, NextPick: nextPick);
+    }
+
+    private static void ResetDraftRankingsToDefault(List<PlayerDraftRanking> rankings)
+    {
+        var ordered = rankings
+            .OrderByDescending(r => r.PointsPerGame)
+            .ToList();
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            ordered[i].DraftRanking = i + 1;
+        }
     }
 
     public async Task StartAsync(int draftId, CancellationToken cancellationToken = default)
@@ -328,6 +458,7 @@ public class DraftService(
 
         var player = await _dbContext.PlayerDraftRankings
             .Where(p => p.DraftId == command.DraftId)
+            .Include(p => p.Player)
             .FirstOrDefaultAsync(p => p.PlayerId == command.PlayerId, cancellationToken: cancellationToken)
             ?? throw new EntityNotFoundException(nameof(PlayerDraftRanking), command.PlayerId);
 
@@ -335,16 +466,24 @@ public class DraftService(
         {
             throw new InvalidOperationException($"Player {command.PlayerId} is already drafted");
         }
-        
+
+        if (player.IsExcluded)
+        {
+            throw new InvalidOperationException($"Player {command.PlayerId} is excluded from this draft");
+        }
+
         // make sure pick exists and matches command
         var pick = draft.DraftPicks
                        .Where(dp => dp.OverallPick == command.OverallPick)
-                       .Where(dp => dp.TeamId == command.TeamId) 
+                       .Where(dp => dp.TeamId == command.TeamId)
                        .FirstOrDefault(dp => dp.PlayerId == null)
                    ?? throw new InvalidOperationException($"No available draft pick for player {command.PlayerId} in Draft {command.DraftId}");
-        
+
+        await EnforceGoalieRulesAsync(draft, command.TeamId, player.Player.Position, cancellationToken);
+
         // draft player
         pick.PlayerId = command.PlayerId;
+        pick.IsAutoPick = command.IsAutoPick;
         player.DraftPickId = pick.Id;
 
         try
@@ -413,24 +552,141 @@ public class DraftService(
             if (order is null || !order.AutoPick)
                 break;
 
-            var best = await GetBestAvailablePlayerAsync(draftId, cancellationToken);
+            var best = await GetBestAvailablePlayerAsync(draftId, currentPick.TeamId, cancellationToken);
             if (best is null)
                 break;
 
-            var command = new DraftPlayerCommand(draftId, best.PlayerId, currentPick.TeamId, currentPick.OverallPick);
+            var command = new DraftPlayerCommand(draftId, best.PlayerId, currentPick.TeamId, currentPick.OverallPick, IsAutoPick: true);
             results.Add(await DraftPlayerAsync(command, cancellationToken));
         }
 
         return results;
     }
 
-    private async Task<PlayerDraftRanking?> GetBestAvailablePlayerAsync(int draftId, CancellationToken cancellationToken)
+    public async Task<CurrentDraftState> UndoLastPickAsync(int draftId, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.PlayerDraftRankings
+        var draft = await _dbContext.Drafts
+                        .Include(d => d.Tournament)
+                        .Include(d => d.DraftOrders)
+                        .ThenInclude(o => o.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Player)
+                        .ThenInclude(p => p!.Account)
+                        .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var madeDescending = draft.DraftPicks
+            .Where(p => p.PlayerId != null)
+            .OrderByDescending(p => p.OverallPick)
+            .ToList();
+
+        if (madeDescending.Count == 0)
+            throw new InvalidOperationException("There are no picks to undo.");
+
+        // Revert the trailing run of auto-picks plus the first manual pick beneath them
+        // (landing back on the previous human decision point). If every made pick is an
+        // auto-pick, revert them all.
+        var picksToRevert = new List<DraftPick>();
+        foreach (var pick in madeDescending)
+        {
+            picksToRevert.Add(pick);
+            if (!pick.IsAutoPick)
+                break;
+        }
+
+        var revertedPlayerIds = picksToRevert.Select(p => p.PlayerId!.Value).ToList();
+        var rankings = await _dbContext.PlayerDraftRankings
+            .Where(r => r.DraftId == draftId && revertedPlayerIds.Contains(r.PlayerId))
+            .ToListAsync(cancellationToken);
+
+        foreach (var pick in picksToRevert)
+        {
+            pick.PlayerId = null;
+            pick.IsAutoPick = false;
+            pick.ClockStartedAt = null;
+        }
+
+        foreach (var ranking in rankings)
+            ranking.DraftPickId = null;
+
+        if (draft.Status == DraftStatus.Completed)
+            draft.Status = DraftStatus.InProgress;
+
+        // Reopen the earliest reverted pick on the clock.
+        var reopened = picksToRevert.OrderBy(p => p.OverallPick).First();
+        reopened.ClockStartedAt = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var nextPick = await _dbContext.DraftPicks
+            .Include(dp => dp.Team)
+            .Include(dp => dp.Player)
+            .ThenInclude(p => p!.Account)
+            .Where(dp => dp.DraftId == draft.Id)
+            .Where(dp => dp.PlayerId == null)
+            .OrderBy(dp => dp.OverallPick)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
+
+        return new CurrentDraftState(Draft: draft, NextPick: nextPick);
+    }
+
+    private async Task<PlayerDraftRanking?> GetBestAvailablePlayerAsync(int draftId, int teamId, CancellationToken cancellationToken)
+    {
+        var available = await _dbContext.PlayerDraftRankings
             .Where(p => p.DraftId == draftId)
             .Where(p => p.DraftPickId == null)
-            .OrderBy(p => p.DraftRanking)
-            .FirstOrDefaultAsync(cancellationToken);
+            .Where(p => !p.IsExcluded)
+            .Include(p => p.Player)
+            .ToListAsync(cancellationToken);
+        if (available.Count == 0)
+            return null;
+
+        var roster = await _dbContext.DraftPicks
+            .Where(dp => dp.DraftId == draftId && dp.TeamId == teamId && dp.PlayerId != null)
+            .Select(dp => new RosteredPlayer(dp.Player!.Position, dp.Player.CanPlayEitherPosition))
+            .ToListAsync(cancellationToken);
+
+        var remainingPicks = await _dbContext.DraftPicks
+            .CountAsync(dp => dp.DraftId == draftId && dp.TeamId == teamId && dp.PlayerId == null, cancellationToken);
+
+        var candidates = available
+            .Select(p => new AutoPickCandidate(p.PlayerId, p.DraftRanking, p.Player.Position, p.Player.CanPlayEitherPosition))
+            .ToList();
+
+        var chosen = SmartAutoPickSelector.Select(candidates, roster, remainingPicks);
+        if (chosen is null)
+            return null;
+
+        return available.First(p => p.PlayerId == chosen.Value.PlayerId);
+    }
+
+    private async Task EnforceGoalieRulesAsync(Draft draft, int teamId, string? position, CancellationToken cancellationToken)
+    {
+        var teamPicks = draft.DraftPicks.Where(dp => dp.TeamId == teamId).ToList();
+        var teamGoalies = teamPicks.Count(dp =>
+            dp.PlayerId != null &&
+            string.Equals(dp.Player?.Position, Position.Goalie, StringComparison.OrdinalIgnoreCase));
+        var teamRemaining = teamPicks.Count(dp => dp.PlayerId == null);
+
+        var draftingGoalie = string.Equals(position, Position.Goalie, StringComparison.OrdinalIgnoreCase);
+
+        if (draftingGoalie && teamGoalies >= 1)
+            throw new InvalidOperationException("Team already has a goalie.");
+
+        if (!draftingGoalie && teamGoalies == 0 && teamRemaining == 1)
+        {
+            var goalieAvailable = await _dbContext.PlayerDraftRankings
+                .Where(p => p.DraftId == draft.Id && p.DraftPickId == null)
+                .AnyAsync(p => p.Player.Position == Position.Goalie, cancellationToken);
+            if (goalieAvailable)
+                throw new InvalidOperationException("Team must use its final pick on a goalie.");
+        }
     }
 
 
@@ -447,8 +703,8 @@ public class DraftService(
         if (teamCount == 0)
             throw new InvalidOperationException($"Draft {draft.Id} has no teams/orders");
         
-        var totalPlayerCount = await _dbContext.Players
-            .Where(p => p.TournamentId == draft.TournamentId)
+        var totalPlayerCount = await _dbContext.PlayerDraftRankings
+            .Where(r => r.DraftId == draft.Id && !r.IsExcluded)
             .CountAsync(cancellationToken);
         
         for (int i = 0; i < totalPlayerCount; i++)
