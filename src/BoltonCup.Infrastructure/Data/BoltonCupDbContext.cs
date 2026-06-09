@@ -112,6 +112,12 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany()
                 .HasForeignKey(e => e.DraftOwnerAccountId)
                 .IsRequired(false);
+            entity
+                .HasOne(e => e.DefaultCustomRanking)
+                .WithMany()
+                .HasForeignKey(e => e.DefaultCustomRankingId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.Title).HasColumnName("draft_title");
@@ -129,6 +135,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Rounds).HasColumnName("rounds").HasDefaultValue(0);
             entity.Property(e => e.Teams).HasColumnName("teams").HasDefaultValue(0);
             entity.Property(e => e.SecondsPerPick).HasColumnName("seconds_per_pick").HasDefaultValue(120);
+            entity.Property(e => e.DefaultCustomRankingId).HasColumnName("default_custom_ranking_id");
         });
 
         modelBuilder.Entity<DraftOrder>(entity =>
@@ -188,6 +195,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TeamId).HasColumnName("team_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.ClockStartedAt).HasColumnName("clock_started_at");
+            entity.Property(e => e.IsAutoPick).HasColumnName("is_auto_pick").HasDefaultValue(false);
             entity.Property(e => e.Version).HasColumnName("row_version").IsRowVersion();
         });
 
@@ -579,6 +587,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.IsChampion).HasColumnName("is_champion");
             entity.Property(e => e.DraftRanking).HasColumnName("draft_ranking");
             entity.Property(e => e.OverrideRanking).HasColumnName("override_ranking");
+            entity.Property(e => e.IsExcluded).HasColumnName("is_excluded").HasDefaultValue(false);
         });
 
         modelBuilder.Entity<SkaterStat>(entity =>
