@@ -45,8 +45,11 @@
                 </div>
                 @if (DraftState.CanManageDraft && DraftState.Draft?.Status is DraftStatus.InProgress or DraftStatus.Completed)
                 {
-                    <MudButton OnClick="@UndoLastPickAsync" StartIcon="@Icons.Material.Rounded.Undo"
-                               Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">Undo last pick</MudButton>
+                    <MudMenu Icon="@Icons.Material.Rounded.MoreVert" Size="Size.Small"
+                             AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                        <MudMenuItem OnClick="@UndoLastPickAsync" Icon="@Icons.Material.Rounded.Undo">Undo last pick</MudMenuItem>
+                        <MudMenuItem OnClick="@ResetDraftAsync" Icon="@Icons.Material.Rounded.RestartAlt" IconColor="Color.Error">Reset draft</MudMenuItem>
+                    </MudMenu>
                 }
             </div>
         </ToolBarContent>
@@ -179,6 +182,28 @@
         catch (ApiException e)
         {
             Snackbar.Add($"Unable to undo last pick: {e.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ResetDraftAsync()
+    {
+        if (DraftState.Draft is not { } draft)
+            return;
+
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Reset draft",
+            "This will clear ALL picks and return the draft to the beginning. This cannot be undone.",
+            yesText: "Reset", cancelText: "Cancel");
+        if (confirm != true)
+            return;
+
+        try
+        {
+            await BoltonCupApi.ResetDraftAsync(draft.Id);
+        }
+        catch (ApiException e)
+        {
+            Snackbar.Add($"Unable to reset draft: {e.Message}", Severity.Error);
         }
     }
 
