@@ -158,4 +158,46 @@ public class SmartAutoPickSelectorTests
 
         chosen.Should().BeNull();
     }
+
+    [Fact]
+    public void Select_WithRandom_ProducesVariedResultsAcrossRuns()
+    {
+        // Closely-ranked skaters: noise should occasionally flip which one is chosen.
+        var available = new[]
+        {
+            Forward(1, 3),
+            Forward(2, 4),
+            Defense(3, 3),
+            Defense(4, 4),
+        };
+
+        var random = new Random(12345);
+        var chosenIds = new HashSet<int>();
+        for (var i = 0; i < 200; i++)
+        {
+            var chosen = SmartAutoPickSelector.Select(available, Roster(forwards: 4, defense: 4), remainingPicks: 7, random);
+            chosenIds.Add(chosen!.Value.PlayerId);
+        }
+
+        chosenIds.Count.Should().BeGreaterThan(1);
+    }
+
+    [Fact]
+    public void Select_WithRandom_StillPicksClearlySuperiorPlayer()
+    {
+        // Rank gap far exceeds NoiseMagnitude, so the top player must always win despite noise.
+        var available = new[]
+        {
+            Forward(1, 1),
+            Forward(2, 50),
+            Defense(3, 51),
+        };
+
+        var random = new Random(999);
+        for (var i = 0; i < 200; i++)
+        {
+            var chosen = SmartAutoPickSelector.Select(available, Roster(forwards: 4, defense: 4), remainingPicks: 7, random);
+            chosen!.Value.PlayerId.Should().Be(1);
+        }
+    }
 }
