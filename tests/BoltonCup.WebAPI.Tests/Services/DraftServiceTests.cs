@@ -133,39 +133,57 @@ public class DraftServiceTests
     public async Task SetPlayerPoolAsync_ExcludingPlayers_RegeneratesPicksAndRounds()
     {
         var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 2, playerCount: 6, DraftStatus.Pending);
-        draft.DefaultCustomRankingId = 99;
-        await db.SaveChangesAsync();
         var service = new DraftService(db);
 
         var excluded = new[] { playerIds[4], playerIds[5] };
-        var ordered = playerIds.Where(id => !excluded.Contains(id)).ToList();
 
-        await service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(ordered, excluded));
+        await service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(excluded));
 
         var picks = await db.DraftPicks.Where(p => p.DraftId == draft.Id).ToListAsync();
         picks.Should().HaveCount(4);
 
         var refreshed = await db.Drafts.SingleAsync(d => d.Id == draft.Id);
         refreshed.Rounds.Should().Be(2); // ceil(4/2)
-        refreshed.DefaultCustomRankingId.Should().BeNull();
 
         var rankings = await db.PlayerDraftRankings.Where(r => r.DraftId == draft.Id).ToListAsync();
         rankings.Where(r => r.IsExcluded).Select(r => r.PlayerId).Should().BeEquivalentTo(excluded);
     }
 
     [Fact]
-    public async Task SetPlayerPoolAsync_AssignsRankingBySuppliedOrder()
+    public async Task SetPlayerPoolAsync_PreservesOrderingAndDefaultRanking()
     {
-        var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.Pending);
+        var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 2, playerCount: 6, DraftStatus.Pending);
+        draft.DefaultCustomRankingId = 99;
+        await db.SaveChangesAsync();
         var service = new DraftService(db);
 
-        var ordered = playerIds.AsEnumerable().Reverse().ToList();
+        var rankingsBefore = await db.PlayerDraftRankings
+            .Where(r => r.DraftId == draft.Id)
+            .ToDictionaryAsync(r => r.PlayerId, r => r.DraftRanking);
 
-        await service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(ordered, Array.Empty<int>()));
+        await service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(new[] { playerIds[5] }));
 
-        var rankings = await db.PlayerDraftRankings.Where(r => r.DraftId == draft.Id).ToListAsync();
-        for (var i = 0; i < ordered.Count; i++)
-            rankings.Single(r => r.PlayerId == ordered[i]).DraftRanking.Should().Be(i + 1);
+        var refreshed = await db.Drafts.SingleAsync(d => d.Id == draft.Id);
+        refreshed.DefaultCustomRankingId.Should().Be(99); // exclusion does not touch the applied ranking
+
+        var rankingsAfter = await db.PlayerDraftRankings.Where(r => r.DraftId == draft.Id).ToListAsync();
+        foreach (var r in rankingsAfter)
+            r.DraftRanking.Should().Be(rankingsBefore[r.PlayerId]); // ordering untouched
+    }
+
+    [Fact]
+    public async Task SetPlayerPoolAsync_ReincludingPlayer_RestoresPickCount()
+    {
+        var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 2, playerCount: 6, DraftStatus.Pending);
+        var service = new DraftService(db);
+
+        await service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(new[] { playerIds[5] }));
+        await service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(Array.Empty<int>()));
+
+        var picks = await db.DraftPicks.Where(p => p.DraftId == draft.Id).ToListAsync();
+        picks.Should().HaveCount(6);
+        (await db.PlayerDraftRankings.Where(r => r.DraftId == draft.Id).ToListAsync())
+            .Should().OnlyContain(r => !r.IsExcluded);
     }
 
     [Fact]
@@ -174,21 +192,18 @@ public class DraftServiceTests
         var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.InProgress);
         var service = new DraftService(db);
 
-        var act = () => service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(playerIds, Array.Empty<int>()));
+        var act = () => service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(new[] { playerIds[0] }));
 
         await act.Should().ThrowAsync<InvalidOperationException>();
     }
 
     [Fact]
-    public async Task SetPlayerPoolAsync_WhenSuppliedSetMismatchesPlayers_Throws()
+    public async Task SetPlayerPoolAsync_WhenExcludingUnknownPlayer_Throws()
     {
-        var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.Pending);
+        var (db, draft, _, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.Pending);
         var service = new DraftService(db);
 
-        // drop one player from the supplied set
-        var ordered = playerIds.Take(3).ToList();
-
-        var act = () => service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(ordered, Array.Empty<int>()));
+        var act = () => service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(new[] { 9999 }));
 
         await act.Should().ThrowAsync<InvalidOperationException>();
     }

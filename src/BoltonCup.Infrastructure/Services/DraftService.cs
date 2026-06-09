@@ -274,31 +274,17 @@ public class DraftService(
             .Where(r => r.DraftId == draftId)
             .ToListAsync(cancellationToken);
 
-        var rankingByPlayerId = rankings.ToDictionary(r => r.PlayerId);
-
         var excluded = command.ExcludedPlayerIds.ToHashSet();
 
-        // The supplied ordered + excluded sets must exactly cover the draft's players.
-        var supplied = command.OrderedPlayerIds.Concat(command.ExcludedPlayerIds).ToHashSet();
-        if (supplied.Count != rankings.Count || !rankings.All(r => supplied.Contains(r.PlayerId)))
-            throw new InvalidOperationException("Supplied player pool does not match the draft's players.");
+        // Every excluded player must belong to this draft.
+        var validPlayerIds = rankings.Select(r => r.PlayerId).ToHashSet();
+        if (!excluded.All(validPlayerIds.Contains))
+            throw new InvalidOperationException("Supplied player pool contains players not in the draft.");
 
-        for (var i = 0; i < command.OrderedPlayerIds.Count; i++)
-        {
-            if (!rankingByPlayerId.TryGetValue(command.OrderedPlayerIds[i], out var row))
-                throw new InvalidOperationException($"Unknown player {command.OrderedPlayerIds[i]} for draft {draftId}.");
-            row.DraftRanking = i + 1;
-            row.IsExcluded = false;
-        }
-
-        foreach (var playerId in excluded)
-        {
-            if (rankingByPlayerId.TryGetValue(playerId, out var row))
-                row.IsExcluded = true;
-        }
-
-        // Manual curation supersedes an applied template.
-        draft.DefaultCustomRankingId = null;
+        // Exclusion is independent of ordering: the player's DraftRanking and any applied
+        // default custom ranking are left untouched.
+        foreach (var row in rankings)
+            row.IsExcluded = excluded.Contains(row.PlayerId);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
