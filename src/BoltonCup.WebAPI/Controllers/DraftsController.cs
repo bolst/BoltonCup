@@ -198,6 +198,26 @@ public class DraftsController(
         return Ok();
     }
 
+    /// <summary>Reverts the last manual pick and any auto-picks that followed it, then broadcasts the new state (admin or draft owner).</summary>
+    [Authorize]
+    [HttpPatch("{id:int}/undo")]
+    public async Task<IActionResult> UndoLastPick(int id, [FromServices] IHubContext<Hubs.DraftHub> hubContext)
+    {
+        var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
+        if (!canManage)
+        {
+            return Forbid();
+        }
+
+        var draftState = await _draftService.UndoLastPickAsync(id);
+
+        var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
+        var payloadDto = _mapper.ToDto(draftState, authorized, canManage);
+        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftUpdate, payloadDto);
+
+        return Ok();
+    }
+
     /// <summary>Resolves any auto-picks for teams on the clock and broadcasts each to connected clients.</summary>
     private async Task BroadcastAutoPicksAsync(int id, IHubContext<Hubs.DraftHub> hubContext)
     {
