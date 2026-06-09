@@ -281,6 +281,61 @@ public class DraftServiceTests
         await act.Should().ThrowAsync<InvalidOperationException>();
     }
 
+    [Fact]
+    public async Task ResetDraftAsync_ClearsAllPicks()
+    {
+        var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 2, playerCount: 6, DraftStatus.InProgress);
+
+        var picks = await db.DraftPicks.Where(p => p.DraftId == draft.Id).OrderBy(p => p.OverallPick).ToListAsync();
+        await MakePickAsync(db, picks[0], playerIds[0], isAuto: false);
+        await MakePickAsync(db, picks[1], playerIds[1], isAuto: true);
+        await MakePickAsync(db, picks[2], playerIds[2], isAuto: false);
+
+        var service = new DraftService(db);
+        var state = await service.ResetDraftAsync(draft.Id);
+
+        var made = await db.DraftPicks.Where(p => p.DraftId == draft.Id && p.PlayerId != null).ToListAsync();
+        made.Should().BeEmpty();
+
+        var firstPick = await db.DraftPicks.Where(p => p.DraftId == draft.Id).OrderBy(p => p.OverallPick).FirstAsync();
+        firstPick.ClockStartedAt.Should().NotBeNull();
+
+        var rankings = await db.PlayerDraftRankings.Where(r => r.DraftId == draft.Id).ToListAsync();
+        rankings.Should().OnlyContain(r => r.DraftPickId == null);
+
+        state.NextPick!.OverallPick.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task ResetDraftAsync_WhenCompleted_ReopensToInProgress()
+    {
+        var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 1, playerCount: 2, DraftStatus.Completed);
+
+        var picks = await db.DraftPicks.Where(p => p.DraftId == draft.Id).OrderBy(p => p.OverallPick).ToListAsync();
+        await MakePickAsync(db, picks[0], playerIds[0], isAuto: false);
+        await MakePickAsync(db, picks[1], playerIds[1], isAuto: false);
+
+        var service = new DraftService(db);
+        await service.ResetDraftAsync(draft.Id);
+
+        var refreshed = await db.Drafts.SingleAsync(d => d.Id == draft.Id);
+        refreshed.Status.Should().Be(DraftStatus.InProgress);
+
+        var made = await db.DraftPicks.Where(p => p.DraftId == draft.Id && p.PlayerId != null).ToListAsync();
+        made.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task ResetDraftAsync_WhenNoPicksMade_Throws()
+    {
+        var (db, draft, _, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.InProgress);
+        var service = new DraftService(db);
+
+        var act = () => service.ResetDraftAsync(draft.Id);
+
+        await act.Should().ThrowAsync<InvalidOperationException>();
+    }
+
     private static async Task MakePickAsync(BoltonCupDbContext db, DraftPick pick, int playerId, bool isAuto)
     {
         pick.PlayerId = playerId;

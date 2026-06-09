@@ -636,6 +636,64 @@ public class DraftService(
         return new CurrentDraftState(Draft: draft, NextPick: nextPick);
     }
 
+    public async Task<CurrentDraftState> ResetDraftAsync(int draftId, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts
+                        .Include(d => d.Tournament)
+                        .Include(d => d.DraftOrders) .ThenInclude(o => o.Team)
+                        .Include(d => d.DraftPicks) .ThenInclude(dp => dp.Team)
+                        .Include(d => d.DraftPicks) .ThenInclude(dp => dp.Player) .ThenInclude(p => p!.Account)
+                        .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var madePicks = draft.DraftPicks.Where(p => p.PlayerId != null).ToList();
+        if (madePicks.Count == 0)
+        {
+            throw new InvalidOperationException("There are no picks to reset.");
+        }
+
+        var revertedPlayerIds = madePicks.Select(p => p.PlayerId!.Value).ToList();
+        var rankings = await _dbContext.PlayerDraftRankings
+            .Where(r => r.DraftId == draftId && revertedPlayerIds.Contains(r.PlayerId))
+            .ToListAsync(cancellationToken);
+
+        foreach (var pick in draft.DraftPicks)
+        {
+            pick.PlayerId = null;
+            pick.IsAutoPick = false;
+            pick.ClockStartedAt = null;
+        }
+
+        foreach (var ranking in rankings)
+        {
+            ranking.DraftPickId = null;
+        }
+
+        if (draft.Status == DraftStatus.Completed)
+        {
+            draft.Status = DraftStatus.InProgress;
+        }
+
+        // Put the first pick back on the clock.
+        var firstPick = draft.DraftPicks.OrderBy(p => p.OverallPick).First();
+        firstPick.ClockStartedAt = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var nextPick = await _dbContext.DraftPicks
+            .Include(dp => dp.Team)
+            .Include(dp => dp.Player).ThenInclude(p => p!.Account)
+            .Where(dp => dp.DraftId == draft.Id && dp.PlayerId == null)
+            .OrderBy(dp => dp.OverallPick)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
+
+        return new CurrentDraftState(Draft: draft, NextPick: nextPick);
+    }
+
     private async Task<PlayerDraftRanking?> GetBestAvailablePlayerAsync(int draftId, int teamId, CancellationToken cancellationToken)
     {
         var available = await _dbContext.PlayerDraftRankings
