@@ -110,6 +110,9 @@
 
     private bool QuickFilter(Sdk.DraftRankingDto ranking)
     {
+        if (ranking.IsExcluded)
+            return false;
+
         var result = true;
 
         if (!string.IsNullOrEmpty(_filterState.Search))

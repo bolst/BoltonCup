@@ -38,6 +38,7 @@ public interface IMapper
     CreateDraftCommand ToCommand(CreateDraftRequest request, ClaimsPrincipal user);
     UpdateDraftCommand ToCommand(UpdateDraftRequest request);
     DraftPlayerCommand ToCommand(int id, DraftPlayerRequest request);
+    SetPlayerPoolCommand ToCommand(SetPlayerPoolRequest request);
 
     // CustomRanking
     IReadOnlyList<CustomRankingDto> ToDtoList(IReadOnlyList<CustomRanking> rankings);

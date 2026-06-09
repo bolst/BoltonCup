@@ -4596,6 +4596,141 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [
+          "Drafts"
+        ],
+        "description": "Sets the draft's player pool (ordering + exclusions) before it starts and broadcasts it (admin or draft owner).",
+        "operationId": "SetPlayerPool",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetPlayerPoolRequest"
+                  }
+                ],
+                "description": "Request to set a draft's player pool: the ordered (included) players and the excluded players."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetPlayerPoolRequest"
+                  }
+                ],
+                "description": "Request to set a draft's player pool: the ordered (included) players and the excluded players."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetPlayerPoolRequest"
+                  }
+                ],
+                "description": "Request to set a draft's player pool: the ordered (included) players and the excluded players."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
     "/api/drafts/{id}/players/{playerId}/favourite": {
@@ -8544,6 +8679,10 @@
           "isFavourite": {
             "type": "boolean",
             "description": "Gets or sets whether the requesting user has favourited this player in the draft."
+          },
+          "isExcluded": {
+            "type": "boolean",
+            "description": "Gets or sets whether the player is excluded from this draft's pool."
           }
         },
         "additionalProperties": false,
@@ -10333,6 +10472,29 @@
         },
         "additionalProperties": false,
         "description": "Represents the ordered picks for a single draft round."
+      },
+      "SetPlayerPoolRequest": {
+        "type": "object",
+        "properties": {
+          "orderedPlayerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Gets or sets the player IDs included in the draft, in their desired ranking order."
+          },
+          "excludedPlayerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Gets or sets the player IDs excluded from the draft."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to set a draft's player pool: the ordered (included) players and the excluded players."
       },
       "SkaterStatDto": {
         "required": [

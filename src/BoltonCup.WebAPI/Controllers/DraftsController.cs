@@ -220,6 +220,31 @@ public class DraftsController(
         return Ok(_mapper.ToDtoList(rankings, favouritePlayerIds));
     }
 
+    /// <summary>Sets the draft's player pool (ordering + exclusions) before it starts and broadcasts it (admin or draft owner).</summary>
+    [Authorize]
+    [HttpPut("{id:int}/players")]
+    public async Task<IActionResult> SetPlayerPool(
+        int id,
+        [FromBody] SetPlayerPoolRequest request,
+        [FromServices] IHubContext<Hubs.DraftHub> hubContext
+    )
+    {
+        var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
+        if (!canManage)
+        {
+            return Forbid();
+        }
+
+        var command = _mapper.ToCommand(request);
+        var draftState = await _draftService.SetPlayerPoolAsync(id, command);
+
+        var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
+        var payloadDto = _mapper.ToDto(draftState, authorized, canManage);
+        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftUpdate, payloadDto);
+
+        return Ok();
+    }
+
     /// <summary>Toggles the current GM's favourite status for a player in the draft and returns the new state.</summary>
     [Authorize]
     [HttpPut("{id:int}/players/{playerId:int}/favourite")]

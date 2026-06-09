@@ -83,8 +83,8 @@ public class DraftService(
         _dbContext.DraftOrders.AddRange(orderings);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await GenerateDraftPicksAsync(newDraft, cancellationToken);
         await GenerateDraftRankingsAsync(newDraft, cancellationToken);
+        await GenerateDraftPicksAsync(newDraft, cancellationToken);
 
         await transaction.CommitAsync(cancellationToken);
         
@@ -235,6 +235,74 @@ public class DraftService(
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var nextPick = await _dbContext.DraftPicks
+            .Include(dp => dp.Team)
+            .Include(dp => dp.Player)
+            .ThenInclude(p => p!.Account)
+            .Where(dp => dp.DraftId == draft.Id)
+            .Where(dp => dp.PlayerId == null)
+            .OrderBy(dp => dp.OverallPick)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
+
+        return new CurrentDraftState(Draft: draft, NextPick: nextPick);
+    }
+
+    public async Task<CurrentDraftState> SetPlayerPoolAsync(int draftId, SetPlayerPoolCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts
+                        .Include(d => d.Tournament)
+                        .Include(d => d.DraftOrders)
+                        .ThenInclude(o => o.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Team)
+                        .Include(d => d.DraftPicks)
+                        .ThenInclude(dp => dp.Player)
+                        .ThenInclude(p => p!.Account)
+                        .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+
+        if (draft.Status != DraftStatus.Pending)
+            throw new InvalidOperationException("Player pool can only be changed before the draft starts.");
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var rankings = await _dbContext.PlayerDraftRankings
+            .Where(r => r.DraftId == draftId)
+            .ToListAsync(cancellationToken);
+
+        var rankingByPlayerId = rankings.ToDictionary(r => r.PlayerId);
+
+        var excluded = command.ExcludedPlayerIds.ToHashSet();
+
+        // The supplied ordered + excluded sets must exactly cover the draft's players.
+        var supplied = command.OrderedPlayerIds.Concat(command.ExcludedPlayerIds).ToHashSet();
+        if (supplied.Count != rankings.Count || !rankings.All(r => supplied.Contains(r.PlayerId)))
+            throw new InvalidOperationException("Supplied player pool does not match the draft's players.");
+
+        for (var i = 0; i < command.OrderedPlayerIds.Count; i++)
+        {
+            if (!rankingByPlayerId.TryGetValue(command.OrderedPlayerIds[i], out var row))
+                throw new InvalidOperationException($"Unknown player {command.OrderedPlayerIds[i]} for draft {draftId}.");
+            row.DraftRanking = i + 1;
+            row.IsExcluded = false;
+        }
+
+        foreach (var playerId in excluded)
+        {
+            if (rankingByPlayerId.TryGetValue(playerId, out var row))
+                row.IsExcluded = true;
+        }
+
+        // Manual curation supersedes an applied template.
+        draft.DefaultCustomRankingId = null;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await GenerateDraftPicksAsync(draft, cancellationToken);
 
         var nextPick = await _dbContext.DraftPicks
             .Include(dp => dp.Team)
@@ -413,6 +481,11 @@ public class DraftService(
             throw new InvalidOperationException($"Player {command.PlayerId} is already drafted");
         }
 
+        if (player.IsExcluded)
+        {
+            throw new InvalidOperationException($"Player {command.PlayerId} is excluded from this draft");
+        }
+
         // make sure pick exists and matches command
         var pick = draft.DraftPicks
                        .Where(dp => dp.OverallPick == command.OverallPick)
@@ -508,6 +581,7 @@ public class DraftService(
         var available = await _dbContext.PlayerDraftRankings
             .Where(p => p.DraftId == draftId)
             .Where(p => p.DraftPickId == null)
+            .Where(p => !p.IsExcluded)
             .Include(p => p.Player)
             .ToListAsync(cancellationToken);
         if (available.Count == 0)
@@ -569,8 +643,8 @@ public class DraftService(
         if (teamCount == 0)
             throw new InvalidOperationException($"Draft {draft.Id} has no teams/orders");
         
-        var totalPlayerCount = await _dbContext.Players
-            .Where(p => p.TournamentId == draft.TournamentId)
+        var totalPlayerCount = await _dbContext.PlayerDraftRankings
+            .Where(r => r.DraftId == draft.Id && !r.IsExcluded)
             .CountAsync(cancellationToken);
         
         for (int i = 0; i < totalPlayerCount; i++)

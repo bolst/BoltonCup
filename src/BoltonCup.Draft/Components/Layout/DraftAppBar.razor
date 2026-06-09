@@ -45,6 +45,9 @@
                 <MudMenuItem
                     OnClick="@OpenDraftSettingsAsync"
                     Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
+                <MudMenuItem
+                    OnClick="@EditPlayersAsync"
+                    Icon="@Icons.Material.Rounded.Groups">Edit Players</MudMenuItem>
                 @if (DraftState.Draft?.Status == DraftStatus.InProgress)
                 {
                     <MudMenuItem
@@ -81,6 +84,12 @@
     private async Task OpenDraftSettingsAsync()
     {
         await DialogService.ShowAsync<DraftSettingsDialog>();
+    }
+
+    private void EditPlayersAsync()
+    {
+        if (DraftState.Draft?.Id is { } draftId)
+            Navigation.NavigateTo($"/drafts/{draftId}/players");
     }
     
     private async Task StartDraftAsync()
