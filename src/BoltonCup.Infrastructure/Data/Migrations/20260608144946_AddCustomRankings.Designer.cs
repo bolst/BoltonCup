@@ -3,6 +3,7 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608144946_AddCustomRankings")]
+    partial class AddCustomRankings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -356,10 +359,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("created_by");
 
-                    b.Property<int?>("DefaultCustomRankingId")
-                        .HasColumnType("integer")
-                        .HasColumnName("default_custom_ranking_id");
-
                     b.Property<int?>("DraftOwnerAccountId")
                         .HasColumnType("integer")
                         .HasColumnName("draft_owner_account_id");
@@ -419,8 +418,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnName("draft_type");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DefaultCustomRankingId");
 
                     b.HasIndex("DraftOwnerAccountId");
 
@@ -511,12 +508,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<int>("DraftId")
                         .HasColumnType("integer")
                         .HasColumnName("draft_id");
-
-                    b.Property<bool>("IsAutoPick")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_auto_pick");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone")
@@ -1305,12 +1296,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_champion");
 
-                    b.Property<bool>("IsExcluded")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_excluded");
-
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_modified");
@@ -1959,11 +1944,6 @@ namespace BoltonCup.Infrastructure.Migrations
 
             modelBuilder.Entity("BoltonCup.Core.Draft", b =>
                 {
-                    b.HasOne("BoltonCup.Core.CustomRanking", "DefaultCustomRanking")
-                        .WithMany()
-                        .HasForeignKey("DefaultCustomRankingId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("BoltonCup.Core.Account", "DraftOwner")
                         .WithMany()
                         .HasForeignKey("DraftOwnerAccountId");
@@ -1973,8 +1953,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasForeignKey("TournamentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("DefaultCustomRanking");
 
                     b.Navigation("DraftOwner");
 

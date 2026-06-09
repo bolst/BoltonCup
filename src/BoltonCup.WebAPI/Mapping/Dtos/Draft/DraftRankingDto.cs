@@ -29,4 +29,6 @@ public sealed record DraftRankingDto
     public double PointsPerGame { get; set; }
     /// <summary>Gets or sets whether the requesting user has favourited this player in the draft.</summary>
     public bool IsFavourite { get; set; }
+    /// <summary>Gets or sets whether the player is excluded from this draft's pool.</summary>
+    public bool IsExcluded { get; set; }
 }

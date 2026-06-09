@@ -5,6 +5,7 @@
 @inject DraftStateService DraftState
 @inject IBoltonCupApi BoltonCupApi
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <div class="mud-height-full mud-width-full">
     <MudDataGrid
@@ -15,11 +16,38 @@
             <div class="d-flex flex-row align-center gap-3 flex-wrap">
                 <MudCheckBox @bind-Value="@_filterState.ShowDrafted" Size="Size.Small" Label="Show Drafted" Dense/>
                 <MudCheckBox @bind-Value="@_filterState.FavouritesOnly" Size="Size.Small" Label="Favourites only" Dense/>
+                @if (DraftState.CanManageDraft && DraftState.AvailableCustomRankings.Count > 0)
+                {
+                    <MudSelect T="int?" Value="@DraftState.Draft?.DefaultCustomRankingId" ValueChanged="@ApplyDefaultRankingAsync"
+                               Label="Default Ranking" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable Dense Style="min-width: 180px">
+                        <MudSelectItem T="int?" Value="@((int?)null)">Points per game (default)</MudSelectItem>
+                        @foreach (var ranking in DraftState.AvailableCustomRankings)
+                        {
+                            <MudSelectItem T="int?" Value="@ranking.Id">@ranking.Title</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+                @if (DraftState.AvailableCustomRankings.Count > 0)
+                {
+                    <MudSelect T="int?" Value="@DraftState.SelectedCustomRankingId" ValueChanged="@DraftState.SelectCustomRankingAsync"
+                               Label="Ranking" Variant="Variant.Outlined" Margin="Margin.Dense" Dense Style="min-width: 180px">
+                        <MudSelectItem T="int?" Value="@((int?)null)">Default</MudSelectItem>
+                        @foreach (var ranking in DraftState.AvailableCustomRankings)
+                        {
+                            <MudSelectItem T="int?" Value="@ranking.Id">@ranking.Title</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
                 <div style="width: 300px">
                     <MudTextField @bind-Value="@_filterState.Search" Placeholder="Search"
                                   Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info"
                                   IconSize="Size.Medium" Variant="Variant.Text" Margin="Margin.Dense" DebounceInterval="200" FullWidth Clearable Immediate/>
                 </div>
+                @if (DraftState.CanManageDraft && DraftState.Draft?.Status is DraftStatus.InProgress or DraftStatus.Completed)
+                {
+                    <MudButton OnClick="@UndoLastPickAsync" StartIcon="@Icons.Material.Rounded.Undo"
+                               Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">Undo last pick</MudButton>
+                }
             </div>
         </ToolBarContent>
         <Columns>
@@ -83,13 +111,13 @@
         DraftState.OnStateChanged += HandleStateChanged;
     }
 
-    private void HandleStateChanged()
-    {
-        StateHasChanged();
-    }
+    private void HandleStateChanged() => InvokeAsync(StateHasChanged);
 
     private bool QuickFilter(Sdk.DraftRankingDto ranking)
     {
+        if (ranking.IsExcluded)
+            return false;
+
         var result = true;
 
         if (!string.IsNullOrEmpty(_filterState.Search))
@@ -130,6 +158,42 @@
             TeamId = DraftState.CurrentPick!.Team.Id,
             OverallPick = DraftState.CurrentPick!.OverallPick
         });
+    }
+
+    private async Task UndoLastPickAsync()
+    {
+        if (DraftState.Draft is not { } draft)
+            return;
+
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Undo last pick",
+            "This will revert the last pick and any auto-picks that followed it.",
+            yesText: "Undo", cancelText: "Cancel");
+        if (confirm != true)
+            return;
+
+        try
+        {
+            await BoltonCupApi.UndoLastPickAsync(draft.Id);
+        }
+        catch (ApiException e)
+        {
+            Snackbar.Add($"Unable to undo last pick: {e.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ApplyDefaultRankingAsync(int? rankingId)
+    {
+        if (DraftState.Draft is null)
+            return;
+        try
+        {
+            await BoltonCupApi.ApplyDefaultRankingAsync(DraftState.Draft.Id, new ApplyDefaultRankingRequest { RankingId = rankingId });
+        }
+        catch (ApiException e)
+        {
+            Snackbar.Add($"Unable to update default ranking: {e.Message}", Severity.Error);
+        }
     }
 
     private async Task ToggleFavouriteAsync(Sdk.DraftRankingDto ranking)

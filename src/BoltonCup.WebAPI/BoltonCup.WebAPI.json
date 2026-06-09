@@ -2459,6 +2459,634 @@
         }
       }
     },
+    "/api/customrankings": {
+      "get": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Gets the current user's custom rankings, optionally filtered by tournament.",
+        "operationId": "GetCustomRankings",
+        "parameters": [
+          {
+            "name": "tournamentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomRankingDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomRankingDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomRankingDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Creates a new custom ranking (admin or tournament GM for their tournament).",
+        "operationId": "CreateCustomRanking",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to create a new custom player ranking for a tournament."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to create a new custom player ranking for a tournament."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to create a new custom player ranking for a tournament."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/customrankings/{id}": {
+      "get": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Gets a single custom ranking by its ID (owner or admin only).",
+        "operationId": "GetCustomRankingById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRankingSingleDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRankingSingleDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRankingSingleDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Updates a custom ranking's title and/or player order (owner or admin only).",
+        "operationId": "UpdateCustomRanking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to update an existing custom player ranking."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to update an existing custom player ranking."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateCustomRankingRequest"
+                  }
+                ],
+                "description": "Request to update an existing custom player ranking."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Deletes a custom ranking (owner or admin only).",
+        "operationId": "DeleteCustomRanking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/drafts": {
       "get": {
         "tags": [
@@ -3113,6 +3741,143 @@
         ]
       }
     },
+    "/api/drafts/{id}/default-ranking": {
+      "patch": {
+        "tags": [
+          "Drafts"
+        ],
+        "description": "Applies a custom ranking as the draft's default player ordering and broadcasts it (admin or draft owner).",
+        "operationId": "ApplyDefaultRanking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyDefaultRankingRequest"
+                  }
+                ],
+                "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyDefaultRankingRequest"
+                  }
+                ],
+                "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyDefaultRankingRequest"
+                  }
+                ],
+                "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/drafts/{id}/start": {
       "patch": {
         "tags": [
@@ -3669,6 +4434,109 @@
         ]
       }
     },
+    "/api/drafts/{id}/undo": {
+      "patch": {
+        "tags": [
+          "Drafts"
+        ],
+        "description": "Reverts the last manual pick and any auto-picks that followed it, then broadcasts the new state (admin or draft owner).",
+        "operationId": "UndoLastPick",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/drafts/{id}/players": {
       "get": {
         "tags": [
@@ -3831,6 +4699,141 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [
+          "Drafts"
+        ],
+        "description": "Sets the draft's player pool (ordering + exclusions) before it starts and broadcasts it (admin or draft owner).",
+        "operationId": "SetPlayerPool",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetPlayerPoolRequest"
+                  }
+                ],
+                "description": "Request to set a draft's player pool by listing the players excluded from the draft."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetPlayerPoolRequest"
+                  }
+                ],
+                "description": "Request to set a draft's player pool by listing the players excluded from the draft."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SetPlayerPoolRequest"
+                  }
+                ],
+                "description": "Request to set a draft's player pool by listing the players excluded from the draft."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
     "/api/drafts/{id}/players/{playerId}/favourite": {
@@ -6776,6 +7779,19 @@
         "additionalProperties": false,
         "description": "DTO representing a tournament associated with an account."
       },
+      "ApplyDefaultRankingRequest": {
+        "type": "object",
+        "properties": {
+          "rankingId": {
+            "type": "integer",
+            "description": "Gets or sets the custom ranking ID to apply, or null to reset to the points-per-game default.",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+      },
       "BoltonCupProblemDetails": {
         "type": "object",
         "properties": {
@@ -7108,6 +8124,26 @@
         "additionalProperties": false,
         "description": "Request to create a Stripe payment intent for a bracket challenge entry."
       },
+      "CreateCustomRankingRequest": {
+        "required": [
+          "title",
+          "tournamentId"
+        ],
+        "type": "object",
+        "properties": {
+          "tournamentId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the tournament this ranking belongs to.",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "Gets or sets the display title of the ranking."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to create a new custom player ranking for a tournament."
+      },
       "CreateDraftRequest": {
         "required": [
           "title",
@@ -7193,6 +8229,118 @@
         },
         "additionalProperties": false,
         "description": "DTO representing the currently authenticated user."
+      },
+      "CustomRankingDto": {
+        "required": [
+          "title",
+          "tournament"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the custom ranking ID.",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "Gets or sets the ranking title."
+          },
+          "tournament": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ],
+            "description": "Gets or sets the tournament this ranking belongs to."
+          },
+          "playerCount": {
+            "type": "integer",
+            "description": "Gets or sets the number of players in the ranking.",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Gets or sets when the ranking was created.",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a user's custom player ranking."
+      },
+      "CustomRankingPlayerDto": {
+        "required": [
+          "player"
+        ],
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "description": "Gets or sets the player's rank (1-based).",
+            "format": "int32"
+          },
+          "player": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ],
+            "description": "Gets or sets the player being ranked."
+          },
+          "gamesPlayed": {
+            "type": "integer",
+            "description": "Gets or sets the number of games played by the player.",
+            "format": "int32"
+          },
+          "totalPoints": {
+            "type": "integer",
+            "description": "Gets or sets the player's total points.",
+            "format": "int32"
+          },
+          "pointsPerGame": {
+            "type": "number",
+            "description": "Gets or sets the player's points per game average.",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a player's position within a custom ranking."
+      },
+      "CustomRankingSingleDto": {
+        "required": [
+          "players",
+          "title",
+          "tournament"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the custom ranking ID.",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "Gets or sets the ranking title."
+          },
+          "tournament": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ],
+            "description": "Gets or sets the tournament this ranking belongs to."
+          },
+          "players": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomRankingPlayerDto"
+            },
+            "description": "Gets or sets the ranked players ordered by rank."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single custom ranking, including its ordered players."
       },
       "DraftAutoPickRequestEntry": {
         "type": "object",
@@ -7634,6 +8782,10 @@
           "isFavourite": {
             "type": "boolean",
             "description": "Gets or sets whether the requesting user has favourited this player in the draft."
+          },
+          "isExcluded": {
+            "type": "boolean",
+            "description": "Gets or sets whether the player is excluded from this draft's pool."
           }
         },
         "additionalProperties": false,
@@ -7753,6 +8905,12 @@
           "canManageDraft": {
             "type": "boolean",
             "description": "Gets or sets whether the current user can manage this draft (admin or draft owner)."
+          },
+          "defaultCustomRankingId": {
+            "type": "integer",
+            "description": "Gets or sets the custom ranking applied as this draft's default player ordering, if any.",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -9418,6 +10576,21 @@
         "additionalProperties": false,
         "description": "Represents the ordered picks for a single draft round."
       },
+      "SetPlayerPoolRequest": {
+        "type": "object",
+        "properties": {
+          "excludedPlayerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Gets or sets the player IDs excluded from the draft."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to set a draft's player pool by listing the players excluded from the draft."
+      },
       "SkaterStatDto": {
         "required": [
           "accountId",
@@ -10321,6 +11494,27 @@
         "additionalProperties": false,
         "description": "Request to update an existing user account's profile information."
       },
+      "UpdateCustomRankingRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Gets or sets the updated display title for the ranking.",
+            "nullable": true
+          },
+          "orderedPlayerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Gets or sets the players in their new ranked order (must match the existing player set).",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to update an existing custom player ranking."
+      },
       "UpdateDraftRequest": {
         "type": "object",
         "properties": {
@@ -10425,6 +11619,9 @@
     },
     {
       "name": "BracketChallenges"
+    },
+    {
+      "name": "CustomRankings"
     },
     {
       "name": "Drafts"

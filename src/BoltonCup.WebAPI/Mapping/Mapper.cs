@@ -233,6 +233,7 @@ public class Mapper : IMapper
             IsDrafted = draft.IsDrafted,
             PointsPerGame = draft.PointsPerGame,
             IsFavourite = favouritePlayerIds.Contains(draft.PlayerId),
+            IsExcluded = draft.IsExcluded,
         });
     }
 
@@ -265,6 +266,7 @@ public class Mapper : IMapper
                 .OrderBy(group => group.Round),
             CanEditDraft = isAuthorized && draft.Status != DraftStatus.Completed,
             CanManageDraft = canManage,
+            DefaultCustomRankingId = draft.DefaultCustomRankingId,
         };
     }
 
@@ -346,6 +348,69 @@ public class Mapper : IMapper
             PlayerId: request.PlayerId,
             TeamId: request.TeamId,
             OverallPick: request.OverallPick
+        );
+    }
+
+    public SetPlayerPoolCommand ToCommand(SetPlayerPoolRequest request)
+    {
+        return new SetPlayerPoolCommand(
+            ExcludedPlayerIds: request.ExcludedPlayerIds
+        );
+    }
+
+    // ---------- CustomRanking ----------
+
+    public IReadOnlyList<CustomRankingDto> ToDtoList(IReadOnlyList<CustomRanking> rankings)
+    {
+        return rankings
+            .Select(ranking => new CustomRankingDto
+            {
+                Id = ranking.Id,
+                Title = ranking.Title,
+                Tournament = ToTournamentBriefDto(ranking.Tournament),
+                PlayerCount = ranking.Players.Count,
+                CreatedAt = ranking.CreatedAt,
+            })
+            .ToList();
+    }
+
+    public CustomRankingSingleDto? ToDto(CustomRanking? ranking)
+    {
+        if (ranking is null)
+            return null;
+        return new CustomRankingSingleDto
+        {
+            Id = ranking.Id,
+            Title = ranking.Title,
+            Tournament = ToTournamentBriefDto(ranking.Tournament),
+            Players = ranking.Players
+                .OrderBy(p => p.Rank)
+                .Select(p => new CustomRankingPlayerDto
+                {
+                    Rank = p.Rank,
+                    Player = ToPlayerBriefDto(p.Player),
+                    GamesPlayed = p.GamesPlayed,
+                    TotalPoints = p.TotalPoints,
+                    PointsPerGame = p.PointsPerGame,
+                })
+                .ToList(),
+        };
+    }
+
+    public CreateCustomRankingCommand ToCommand(CreateCustomRankingRequest request, ClaimsPrincipal user)
+    {
+        return new CreateCustomRankingCommand(
+            TournamentId: request.TournamentId,
+            Title: request.Title,
+            OwnerAccountId: user.GetAccountId()
+        );
+    }
+
+    public UpdateCustomRankingCommand ToCommand(UpdateCustomRankingRequest request)
+    {
+        return new UpdateCustomRankingCommand(
+            Title: request.Title,
+            OrderedPlayerIds: request.OrderedPlayerIds
         );
     }
 

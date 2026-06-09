@@ -61,8 +61,10 @@
 
     protected override void OnInitialized()
     {
-        DraftState.OnStateChanged += StateHasChanged;
+        DraftState.OnStateChanged += OnDraftStateChanged;
     }
+
+    private void OnDraftStateChanged() => InvokeAsync(StateHasChanged);
 
     private Task OnCellClick(MouseEventArgs args, Sdk.DraftPickDto draftPick)
     {
@@ -90,6 +92,6 @@
     
     public void Dispose()
     {
-        DraftState.OnStateChanged -= StateHasChanged;
+        DraftState.OnStateChanged -= OnDraftStateChanged;
     }
 }
