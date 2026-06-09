@@ -659,7 +659,7 @@ public class DraftService(
             .Select(p => new AutoPickCandidate(p.PlayerId, p.DraftRanking, p.Player.Position, p.Player.CanPlayEitherPosition))
             .ToList();
 
-        var chosen = SmartAutoPickSelector.Select(candidates, roster, remainingPicks);
+        var chosen = SmartAutoPickSelector.Select(candidates, roster, remainingPicks, Random.Shared);
         if (chosen is null)
             return null;
 
