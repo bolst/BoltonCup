@@ -3741,6 +3741,143 @@
         ]
       }
     },
+    "/api/drafts/{id}/default-ranking": {
+      "patch": {
+        "tags": [
+          "Drafts"
+        ],
+        "description": "Applies a custom ranking as the draft's default player ordering and broadcasts it (admin or draft owner).",
+        "operationId": "ApplyDefaultRanking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyDefaultRankingRequest"
+                  }
+                ],
+                "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyDefaultRankingRequest"
+                  }
+                ],
+                "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyDefaultRankingRequest"
+                  }
+                ],
+                "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/drafts/{id}/start": {
       "patch": {
         "tags": [
@@ -7404,6 +7541,19 @@
         "additionalProperties": false,
         "description": "DTO representing a tournament associated with an account."
       },
+      "ApplyDefaultRankingRequest": {
+        "type": "object",
+        "properties": {
+          "rankingId": {
+            "type": "integer",
+            "description": "Gets or sets the custom ranking ID to apply, or null to reset to the points-per-game default.",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to apply (or clear) a custom ranking as a draft's default player ordering."
+      },
       "BoltonCupProblemDetails": {
         "type": "object",
         "properties": {
@@ -8513,6 +8663,12 @@
           "canManageDraft": {
             "type": "boolean",
             "description": "Gets or sets whether the current user can manage this draft (admin or draft owner)."
+          },
+          "defaultCustomRankingId": {
+            "type": "integer",
+            "description": "Gets or sets the custom ranking applied as this draft's default player ordering, if any.",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false,

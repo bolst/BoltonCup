@@ -11,6 +11,8 @@ public record DraftSingleDto : DraftDto
     public bool CanEditDraft { get; set; }
     /// <summary>Gets or sets whether the current user can manage this draft (admin or draft owner).</summary>
     public bool CanManageDraft { get; set; }
+    /// <summary>Gets or sets the custom ranking applied as this draft's default player ordering, if any.</summary>
+    public int? DefaultCustomRankingId { get; set; }
 }
 
 /// <summary>Represents the ordered picks for a single draft round.</summary>

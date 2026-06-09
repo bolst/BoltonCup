@@ -5,6 +5,7 @@
 @inject DraftStateService DraftState
 @inject IBoltonCupApi BoltonCupApi
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <div class="mud-height-full mud-width-full">
     <MudDataGrid
@@ -15,6 +16,17 @@
             <div class="d-flex flex-row align-center gap-3 flex-wrap">
                 <MudCheckBox @bind-Value="@_filterState.ShowDrafted" Size="Size.Small" Label="Show Drafted" Dense/>
                 <MudCheckBox @bind-Value="@_filterState.FavouritesOnly" Size="Size.Small" Label="Favourites only" Dense/>
+                @if (DraftState.CanManageDraft && DraftState.AvailableCustomRankings.Count > 0)
+                {
+                    <MudSelect T="int?" Value="@DraftState.Draft?.DefaultCustomRankingId" ValueChanged="@ApplyDefaultRankingAsync"
+                               Label="Default Ranking" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable Dense Style="min-width: 180px">
+                        <MudSelectItem T="int?" Value="@((int?)null)">Points per game (default)</MudSelectItem>
+                        @foreach (var ranking in DraftState.AvailableCustomRankings)
+                        {
+                            <MudSelectItem T="int?" Value="@ranking.Id">@ranking.Title</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
                 @if (DraftState.AvailableCustomRankings.Count > 0)
                 {
                     <MudSelect T="int?" Value="@DraftState.SelectedCustomRankingId" ValueChanged="@DraftState.SelectCustomRankingAsync"
@@ -138,6 +150,20 @@
             TeamId = DraftState.CurrentPick!.Team.Id,
             OverallPick = DraftState.CurrentPick!.OverallPick
         });
+    }
+
+    private async Task ApplyDefaultRankingAsync(int? rankingId)
+    {
+        if (DraftState.Draft is null)
+            return;
+        try
+        {
+            await BoltonCupApi.ApplyDefaultRankingAsync(DraftState.Draft.Id, new ApplyDefaultRankingRequest { RankingId = rankingId });
+        }
+        catch (ApiException e)
+        {
+            Snackbar.Add($"Unable to update default ranking: {e.Message}", Severity.Error);
+        }
     }
 
     private async Task ToggleFavouriteAsync(Sdk.DraftRankingDto ranking)

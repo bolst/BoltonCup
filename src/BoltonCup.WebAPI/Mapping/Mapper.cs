@@ -265,6 +265,7 @@ public class Mapper : IMapper
                 .OrderBy(group => group.Round),
             CanEditDraft = isAuthorized && draft.Status != DraftStatus.Completed,
             CanManageDraft = canManage,
+            DefaultCustomRankingId = draft.DefaultCustomRankingId,
         };
     }
 
