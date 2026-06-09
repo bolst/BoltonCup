@@ -354,7 +354,6 @@ public class Mapper : IMapper
     public SetPlayerPoolCommand ToCommand(SetPlayerPoolRequest request)
     {
         return new SetPlayerPoolCommand(
-            OrderedPlayerIds: request.OrderedPlayerIds,
             ExcludedPlayerIds: request.ExcludedPlayerIds
         );
     }

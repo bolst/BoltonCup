@@ -4726,7 +4726,7 @@
                     "$ref": "#/components/schemas/SetPlayerPoolRequest"
                   }
                 ],
-                "description": "Request to set a draft's player pool: the ordered (included) players and the excluded players."
+                "description": "Request to set a draft's player pool by listing the players excluded from the draft."
               }
             },
             "text/json": {
@@ -4736,7 +4736,7 @@
                     "$ref": "#/components/schemas/SetPlayerPoolRequest"
                   }
                 ],
-                "description": "Request to set a draft's player pool: the ordered (included) players and the excluded players."
+                "description": "Request to set a draft's player pool by listing the players excluded from the draft."
               }
             },
             "application/*+json": {
@@ -4746,7 +4746,7 @@
                     "$ref": "#/components/schemas/SetPlayerPoolRequest"
                   }
                 ],
-                "description": "Request to set a draft's player pool: the ordered (included) players and the excluded players."
+                "description": "Request to set a draft's player pool by listing the players excluded from the draft."
               }
             }
           }
@@ -10579,14 +10579,6 @@
       "SetPlayerPoolRequest": {
         "type": "object",
         "properties": {
-          "orderedPlayerIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "description": "Gets or sets the player IDs included in the draft, in their desired ranking order."
-          },
           "excludedPlayerIds": {
             "type": "array",
             "items": {
@@ -10597,7 +10589,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Request to set a draft's player pool: the ordered (included) players and the excluded players."
+        "description": "Request to set a draft's player pool by listing the players excluded from the draft."
       },
       "SkaterStatDto": {
         "required": [

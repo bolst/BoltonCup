@@ -31,7 +31,7 @@
             </div>
 
             <div class="d-flex flex-row align-center gap-3">
-                <MudToggleGroup T="string?" Value="@_positionFilter" ValueChanged="@PositionFilterChanged"
+                <MudToggleGroup T="string?" Value="@_positionFilter" ValueChanged="@(p => _positionFilter = p)"
                                 Size="Size.Small" Color="Color.Primary">
                     <MudToggleItem T="string?" Value="@(null)" Text="All"/>
                     <MudToggleItem T="string?" Value="@Position.Forward" Text="F"/>
@@ -50,46 +50,28 @@
             <MudAlert Severity="Severity.Info" Class="my-2" Dense>The player pool is locked because the draft has started.</MudAlert>
         }
 
-        <MudDropContainer T="Sdk.DraftRankingDto" @ref="_dropContainer"
-                          Items="_players"
-                          ItemsSelector="@((item, zone) => _positionFilter is null || item.Player.Position == _positionFilter)"
-                          ItemDropped="@ItemDropped" CanDrop="@((_, _) => !_locked)"
-                          Class="mud-width-full">
-            <ChildContent>
-                <MudDropZone T="Sdk.DraftRankingDto" Identifier="ranking" Class="mud-width-full"
-                             AllowReorder="true"/>
-            </ChildContent>
-            <ItemRenderer>
-                <MudPaper Class="@RowClass(context)" Elevation="0" Square Outlined>
-                    <div class="d-flex flex-row align-center gap-3">
-                        @if (!_locked && !context.IsExcluded)
-                        {
-                            <MudIcon Icon="@Icons.Material.Rounded.DragIndicator" Color="Color.Default"/>
-                        }
-                        else
-                        {
-                            <MudIcon Icon="@Icons.Material.Rounded.Block" Color="Color.Default"/>
-                        }
-                        <MudText Typo="Typo.h6" Style="min-width: 2.5rem;">@(context.IsExcluded ? "—" : DisplayRank(context).ToString())</MudText>
-                        <PositionChip Position="@context.Player.Position" Variant="Variant.Text" Size="Size.Small"/>
-                        <MudText Typo="Typo.body1"><b>@context.Player.FullName</b></MudText>
+        @foreach (var player in VisiblePlayers())
+        {
+            <MudPaper Class="@RowClass(player)" Elevation="0" Square Outlined>
+                <div class="d-flex flex-row align-center gap-3">
+                    <PositionChip Position="@player.Player.Position" Variant="Variant.Text" Size="Size.Small"/>
+                    <MudText Typo="Typo.body1"><b>@player.Player.FullName</b></MudText>
+                </div>
+                <div class="d-flex flex-row align-center gap-3">
+                    <div class="d-flex flex-row align-center gap-4">
+                        @StatLabel(player.PointsPerGame.ToString("F2"), "PPG")
+                        @StatLabel(player.TotalPoints.ToString(), "P")
+                        @StatLabel(player.GamesPlayed.ToString(), "GP")
                     </div>
-                    <div class="d-flex flex-row align-center gap-3">
-                        <div class="d-flex flex-row align-center gap-4">
-                            @StatLabel(context.PointsPerGame.ToString("F2"), "PPG")
-                            @StatLabel(context.TotalPoints.ToString(), "P")
-                            @StatLabel(context.GamesPlayed.ToString(), "GP")
-                        </div>
-                        <MudTooltip Text="@(context.IsExcluded ? "Include in draft" : "Exclude from draft")">
-                            <MudIconButton
-                                OnClick="@(_ => ToggleExcluded(context))" Disabled="@_locked"
-                                Icon="@(context.IsExcluded ? Icons.Material.Rounded.AddCircle : Icons.Material.Rounded.RemoveCircle)"
-                                Color="@(context.IsExcluded ? Color.Success : Color.Error)"/>
-                        </MudTooltip>
-                    </div>
-                </MudPaper>
-            </ItemRenderer>
-        </MudDropContainer>
+                    <MudTooltip Text="@(player.IsExcluded ? "Include in draft" : "Exclude from draft")">
+                        <MudIconButton
+                            OnClick="@(_ => ToggleExcluded(player))" Disabled="@_locked"
+                            Icon="@(player.IsExcluded ? Icons.Material.Rounded.AddCircle : Icons.Material.Rounded.RemoveCircle)"
+                            Color="@(player.IsExcluded ? Color.Success : Color.Error)"/>
+                    </MudTooltip>
+                </div>
+            </MudPaper>
+        }
     }
 </MudContainer>
 
@@ -107,7 +89,6 @@
 
     private Sdk.DraftSingleDto? _draft;
     private List<Sdk.DraftRankingDto> _players = [];
-    private MudDropContainer<Sdk.DraftRankingDto> _dropContainer = null!;
 
     private int IncludedCount => _players.Count(p => !p.IsExcluded);
     private int ExcludedCount => _players.Count(p => p.IsExcluded);
@@ -127,8 +108,7 @@
 
             var rankings = await BoltonCupApi.GetDraftPlayerRankingsAsync(DraftId, size: 200);
             _players = rankings.Items
-                .OrderBy(p => p.IsExcluded)
-                .ThenBy(p => p.DraftRanking)
+                .OrderBy(p => p.Player.FirstName)
                 .ToList();
         }
         catch (Sdk.ApiException)
@@ -141,27 +121,14 @@
         }
     }
 
-    private void PositionFilterChanged(string? position)
-    {
-        _positionFilter = position;
-        _dropContainer.Refresh();
-    }
+    private IEnumerable<Sdk.DraftRankingDto> VisiblePlayers()
+        => _players.Where(p => _positionFilter is null || p.Player.Position == _positionFilter);
 
     private string RowClass(Sdk.DraftRankingDto player)
     {
-        var grab = !_locked && !player.IsExcluded ? "cursor-grab" : string.Empty;
         var muted = player.IsExcluded ? "mud-opacity-50" : string.Empty;
-        return $"pa-3 my-1 d-flex flex-row align-center justify-space-between {grab} {muted}";
+        return $"pa-3 my-1 d-flex flex-row align-center justify-space-between {muted}";
     }
-
-    private int DisplayRank(Sdk.DraftRankingDto player)
-        => _players.Where(p => !p.IsExcluded).ToList().IndexOf(player) + 1;
-
-    private IReadOnlyList<Sdk.DraftRankingDto> VisibleIncluded()
-        => _players
-            .Where(p => !p.IsExcluded)
-            .Where(p => _positionFilter is null || p.Player.Position == _positionFilter)
-            .ToList();
 
     private void ToggleExcluded(Sdk.DraftRankingDto player)
     {
@@ -169,42 +136,7 @@
             return;
 
         player.IsExcluded = !player.IsExcluded;
-
-        // keep excluded players at the bottom so ordering reflects the included pool
-        _players.Remove(player);
-        if (player.IsExcluded)
-            _players.Add(player);
-        else
-            _players.Insert(_players.Count(p => !p.IsExcluded), player);
-
         _dirty = true;
-        _dropContainer.Refresh();
-    }
-
-    private void ItemDropped(MudItemDropInfo<Sdk.DraftRankingDto> info)
-    {
-        var item = info.Item;
-        if (item is null || _locked || item.IsExcluded)
-            return;
-
-        var visible = VisibleIncluded().Where(p => p != item).ToList();
-        var target = Math.Clamp(info.IndexInZone, 0, visible.Count);
-
-        _players.Remove(item);
-        if (target >= visible.Count)
-        {
-            if (visible.Count == 0)
-                _players.Insert(_players.Count(p => !p.IsExcluded), item);
-            else
-                _players.Insert(_players.IndexOf(visible[^1]) + 1, item);
-        }
-        else
-        {
-            _players.Insert(_players.IndexOf(visible[target]), item);
-        }
-
-        _dirty = true;
-        _dropContainer.Refresh();
     }
 
     private async Task SaveAsync()
@@ -213,7 +145,6 @@
         {
             await BoltonCupApi.SetPlayerPoolAsync(DraftId, new Sdk.SetPlayerPoolRequest
             {
-                OrderedPlayerIds = _players.Where(p => !p.IsExcluded).Select(p => p.Player.Id).ToList(),
                 ExcludedPlayerIds = _players.Where(p => p.IsExcluded).Select(p => p.Player.Id).ToList(),
             });
             _dirty = false;
