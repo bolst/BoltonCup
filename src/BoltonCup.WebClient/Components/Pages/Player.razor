@@ -3,7 +3,20 @@
 
 @if (_player is null)
 {
-    @:loading...
+    <div class="mud-full-width" style="background-color: var(--mud-palette-appbar-background)">
+        <MudContainer MaxWidth="MaxWidth.Medium" Style="background-color: white" Gutters="false">
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="220px" />
+            <div class="d-flex flex-column align-center gap-3 mt-n20">
+                <MudSkeleton SkeletonType="SkeletonType.Circle" Width="160px" Height="160px" />
+                <MudSkeleton SkeletonType="SkeletonType.Text" Width="280px" Height="40px" />
+                <MudSkeleton SkeletonType="SkeletonType.Text" Width="200px" />
+            </div>
+            <div class="my-6 px-4">
+                <MudSkeleton SkeletonType="SkeletonType.Text" Width="160px" Height="32px" Class="mb-2" />
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="300px" />
+            </div>
+        </MudContainer>
+    </div>
 }
 else
 {

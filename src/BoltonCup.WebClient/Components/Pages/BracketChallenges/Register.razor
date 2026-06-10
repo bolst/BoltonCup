@@ -6,7 +6,15 @@
 <PageTitle>Bracket Challenge Registration | Bolton Cup</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
-    @if (_bracketChallenge is not null)
+    @if (_bracketChallenge is null)
+    {
+        <div class="mb-2 ml-2">
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="280px" Height="40px" />
+        </div>
+        <MudDivider Class="my-2" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="420px" Width="100%" />
+    }
+    else
     {
         <div class="mb-2 ml-2 d-flex flex-row align-center gap-3">
             <MudText Typo="Typo.h6"><b>Register for @_bracketChallenge.Title</b></MudText>
