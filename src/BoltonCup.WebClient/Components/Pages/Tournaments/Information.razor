@@ -4,7 +4,17 @@
 <PageTitle>Info | Bolton Cup</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
-    @if (_infoGuide is not null)
+    @if (_infoGuide is null)
+    {
+        <div class="d-flex flex-column align-center mb-8">
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="320px" Height="48px" />
+        </div>
+        @for (var i = 0; i < 12; i++)
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="100%" />
+        }
+    }
+    else
     {
         <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-8"><b>@_infoGuide.Title</b></MudText>
 

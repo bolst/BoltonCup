@@ -9,7 +9,12 @@
 <MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
     <div class="home-banner-background py-2" style="min-height: 500px">
         <div class="d-flex flex-column align-center justify-center gap-6 mud-width-full px-2" style="min-height: 350px">
-            @if (_context?.ActiveTournament is { } tournament)
+            @if (_context is null)
+            {
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="120px" Width="320px" />
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="48px" Width="80%" />
+            }
+            else if (_context.ActiveTournament is { } tournament)
             {
                 <div class="d-flex flex-row align-center">
                     <Countdown To="@tournament.StartDate"/>
@@ -45,7 +50,21 @@
         }
     </div>
     
-    @if (_context?.FeaturedStats is {} featuredStats)
+    @if (_context is null)
+    {
+        <div class="pa-4">
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="240px" Height="40px" Class="mb-4" />
+            <MudGrid>
+                @for (var i = 0; i < 4; i++)
+                {
+                    <MudItem xs="12" md="6" lg="3">
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="240px" Width="100%" />
+                    </MudItem>
+                }
+            </MudGrid>
+        </div>
+    }
+    else if (_context.FeaturedStats is {} featuredStats)
     {
         <Highlight Title="@featuredStats.Title" Href="stats">
             <MudGrid>

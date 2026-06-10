@@ -4,8 +4,17 @@
 @if (_team is null)
 {
     <PageTitle>Roster</PageTitle>
-    
-    @:loading...
+
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="my-4" Gutters="false">
+        <div class="d-flex flex-row align-center gap-3">
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="120px" Height="40px" />
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="32px" Height="32px" />
+        </div>
+        @for (var i = 0; i < 12; i++)
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="100%" Height="48px" />
+        }
+    </MudContainer>
 }
 else
 {
