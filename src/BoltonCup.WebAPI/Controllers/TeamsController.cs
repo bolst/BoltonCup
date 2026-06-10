@@ -15,11 +15,16 @@ public class TeamsController(ITeamRepository _teams, ITeamService _teamService, 
     /// </remarks>
     [AllowAnonymous]
     [HttpGet]
+    [ResponseCache(Duration = 300, VaryByQueryKeys = ["*"])]
     public async Task<ActionResult<IPagedList<TeamDto>>> GetTeams([FromQuery] GetTeamsRequest request)
     {
-        var query = _mapper.ToQuery(request);
-        var teams = await _teams.GetAllAsync(query);
-        return Ok(_mapper.ToDtoList(teams));
+        var teams = await GetOrCreateAsync($"{nameof(GetTeams)}:{request}", async () =>
+        {
+            var query = _mapper.ToQuery(request);
+            var result = await _teams.GetAllAsync(query);
+            return _mapper.ToDtoList(result);
+        });
+        return Ok(teams);
     }
 
     /// <summary>Gets a single team by its ID.</summary>
