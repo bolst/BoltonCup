@@ -2,7 +2,6 @@ using BoltonCup.Core;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Controllers;
@@ -22,9 +21,13 @@ public class TournamentsController(
     [HttpGet]
     public async Task<ActionResult<IPagedList<TournamentDto>>> GetTournaments([FromQuery] GetTournamentsRequest request)
     {
-        var query = _mapper.ToQuery(request);
-        var tournaments = await _tournaments.GetAllAsync(query);
-        return Ok(_mapper.ToDtoList(tournaments));
+        var tournaments = await GetOrCreateAsync($"{nameof(GetTournaments)}:{request}", async () =>
+        {
+            var query = _mapper.ToQuery(request);
+            var result = await _tournaments.GetAllAsync(query);
+            return _mapper.ToDtoList(result);
+        });
+        return Ok(tournaments);
     }
 
     /// <summary>Gets a single tournament by its ID.</summary>

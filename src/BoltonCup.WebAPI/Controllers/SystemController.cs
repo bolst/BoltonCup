@@ -4,7 +4,6 @@ using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace BoltonCup.WebAPI.Controllers;
 
@@ -14,8 +13,7 @@ public class SystemController(
     ITournamentRepository _tournamentRepo,
     ISkaterStatRepository _skaterStatRepo,
     IGoalieStatRepository _goalieStatRepo,
-    IMapper _mapper,
-    IMemoryCache _cache
+    IMapper _mapper
 ) : BoltonCupControllerBase
 {
     /// <summary>Gets the contextual configuration of the system (e.g., active tournament and featured stats).</summary>
@@ -27,11 +25,11 @@ public class SystemController(
     [ResponseCache(Duration = 300)]
     public async Task<ActionResult<SystemContextDto>> GetSystemContext()
     {
-        var context = await _cache.GetOrCreateAsync(nameof(GetSystemContext), async entry =>
+        var context = await GetOrCreateAsync(nameof(GetSystemContext), async () =>
         {
             var activeTournament = await _tournamentRepo.GetActiveAsync();
             var featuredStats = await GetFeaturedStatsOrDefault();
-            
+
             return new SystemContextDto(
                 ActiveTournament: _mapper.ToDto(activeTournament),
                 FeaturedStats: featuredStats
