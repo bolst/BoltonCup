@@ -10,6 +10,15 @@
     </div>
     
     <MudGrid Spacing="3">
+        @if (_loading)
+        {
+            @for (var i = 0; i < 2; i++)
+            {
+                <MudItem xs="12">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="160px" Width="100%" />
+                </MudItem>
+            }
+        }
         @foreach (var bracketChallenge in _bracketChallenges)
         {
             var registerText = bracketChallenge.IsOpen ? "Register" : "Closed";
@@ -40,12 +49,14 @@
 @code {
 
     private List<Sdk.BracketChallengeDto> _bracketChallenges = [];
+    private bool _loading = true;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         var bracketChallengeList = await BoltonCupApi.GetBracketChallengesAsync();
         _bracketChallenges = bracketChallengeList.Items.ToList();
+        _loading = false;
     }
 
 }

@@ -10,6 +10,15 @@
     </div>
     
     <MudGrid Spacing="3">
+        @if (_loading)
+        {
+            @for (var i = 0; i < 3; i++)
+            {
+                <MudItem xs="12">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="160px" Width="100%" />
+                </MudItem>
+            }
+        }
         @foreach (var tournament in _tournaments)
         {
             var registerText = tournament.IsRegistrationOpen ? "Register" : "Closed";
@@ -50,6 +59,7 @@
 @code {
 
     private List<Sdk.TournamentDto> _tournaments = [];
+    private bool _loading = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -59,6 +69,7 @@
             .OrderByDescending(t => t.IsRegistrationOpen)
             .ThenByDescending(t => t.StartDate)
             .ToList();
+        _loading = false;
     }
 
 }
