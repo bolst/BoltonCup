@@ -8,6 +8,20 @@
 </HeadContent>
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="px-1" Gutters="false">
+    @if (_loading)
+    {
+        <div class="mud-width-full d-flex flex-row gap-3 align-center mt-6 mb-1 ml-2">
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="220px" Height="40px" />
+        </div>
+        <MudGrid Spacing="3">
+            @for (var i = 0; i < 4; i++)
+            {
+                <MudItem xs="12" md="6">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100px" Width="100%" />
+                </MudItem>
+            }
+        </MudGrid>
+    }
     @foreach (var group in _teamsByTournament)
     {
         var tournament = group.First().Tournament;
@@ -43,6 +57,7 @@
 @code {
 
     private IEnumerable<IGrouping<int?, Sdk.TeamDto>> _teamsByTournament = [];
+    private bool _loading = true;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -51,6 +66,7 @@
             .OrderByDescending(t => t.Tournament?.Id)
             .ThenBy(t => t.Name)
             .GroupBy(t => t.Tournament?.Id);
+        _loading = false;
     }
 
     

@@ -6,7 +6,29 @@
 
 <PageTitle>Profile | Bolton Cup</PageTitle>
 
-@if (_accountInfo is not null)
+@if (_accountInfo is null)
+{
+    <MudContainer Class="pb-4" MaxWidth="MaxWidth.Large">
+        <MudContainer MaxWidth="MaxWidth.Medium" Gutters="false">
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" Width="100%" />
+            <div class="d-flex flex-column align-center gap-3 mt-n16">
+                <MudSkeleton SkeletonType="SkeletonType.Circle" Width="160px" Height="160px" />
+            </div>
+        </MudContainer>
+
+        <MudDivider Class="my-4" />
+
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="360px" Width="100%" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="360px" Width="100%" />
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+}
+else
 {
     <MudContainer Class="pb-4" MaxWidth="MaxWidth.Large">
         <MudContainer MaxWidth="MaxWidth.Medium" Gutters="false">
@@ -17,9 +39,9 @@
                 <BoltonCupImage Src="@_accountInfo.Avatar" SrcChanged="UpdateAvatar" Height="160" Avatar Editable/>
             </div>
         </MudContainer>
-        
+
         <MudDivider Class="my-4" />
-        
+
         <MudGrid>
             <MudItem xs="12" md="6">
                 <AccountInfoForm />
@@ -28,7 +50,7 @@
                 <AccountTournamentList />
             </MudItem>
         </MudGrid>
-        
+
     </MudContainer>
 }
 
