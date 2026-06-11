@@ -11281,6 +11281,11 @@
             "description": "Gets or sets the URL of the tournament logo.",
             "nullable": true
           },
+          "backgroundImage": {
+            "type": "string",
+            "description": "Gets or sets the URL of the tournament background image.",
+            "nullable": true
+          },
           "startDate": {
             "type": "string",
             "description": "Gets or sets the tournament start date.",
@@ -11434,6 +11439,11 @@
           "logo": {
             "type": "string",
             "description": "Gets or sets the URL of the tournament logo.",
+            "nullable": true
+          },
+          "backgroundImage": {
+            "type": "string",
+            "description": "Gets or sets the URL of the tournament background image.",
             "nullable": true
           },
           "startDate": {
