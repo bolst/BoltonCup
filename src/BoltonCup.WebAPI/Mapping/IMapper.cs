@@ -28,7 +28,6 @@ public interface IMapper
 
     // Draft
     IPagedList<DraftDto> ToDtoList(IPagedList<Draft> drafts);
-    IPagedList<DraftPickDto> ToDtoList(IPagedList<DraftPick> draftPicks);
     IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings, IReadOnlySet<int> favouritePlayerIds);
     DraftSingleDto? ToDto(Draft? draft, bool isAuthorized, bool canManage);
     DraftPickSingleDto? ToDto(DraftPick? draftPick);

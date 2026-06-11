@@ -262,7 +262,9 @@ public class Mapper : IMapper
                 .OrderBy(d => d.Pick),
             DraftPicksByRound = draft.DraftPicks
                 .GroupBy(dto => dto.Round)
-                .Select(group => new RoundDraftPicks(group.Key, group.Select(ToDraftPickDto).OrderBy(x => x.RoundPick)))
+                .Select(group => new RoundDraftPicks(
+                    group.Key,
+                    group.Select(ToDraftPickDto).ToList()))
                 .OrderBy(group => group.Round),
             CanEditDraft = isAuthorized && draft.Status != DraftStatus.Completed,
             CanManageDraft = canManage,
