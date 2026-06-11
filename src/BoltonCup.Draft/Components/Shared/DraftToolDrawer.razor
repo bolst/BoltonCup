@@ -47,8 +47,8 @@
                 {
                     <MudMenu Icon="@Icons.Material.Rounded.MoreVert" Size="Size.Small"
                              AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
-                        <MudMenuItem OnClick="@UndoLastPickAsync" Icon="@Icons.Material.Rounded.Undo">Undo last pick</MudMenuItem>
-                        <MudMenuItem OnClick="@ResetDraftAsync" Icon="@Icons.Material.Rounded.RestartAlt" IconColor="Color.Error">Reset draft</MudMenuItem>
+                        <MudMenuItem OnClick="@UndoLastPickAsync" Label="Undo last pick" Icon="@Icons.Material.Rounded.Undo" Disabled="@(DraftState.CurrentPick?.OverallPick == 1)" />
+                        <MudMenuItem OnClick="@ResetDraftAsync" Label="Reset draft" Icon="@Icons.Material.Rounded.RestartAlt" IconColor="Color.Error" Disabled="@(DraftState.CurrentPick?.OverallPick == 1)" />
                     </MudMenu>
                 }
             </div>
