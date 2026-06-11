@@ -2,7 +2,8 @@
 
 /* /Components/Pages/Home.razor.rz.scp.css */
 .home-banner-background[b-np3zf1rhfg] {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url("https://assets.boltoncup.ca/static/branding/landing.webp");
+    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+        var(--banner-image, url("https://assets.boltoncup.ca/static/branding/landing.webp"));
     background-size: cover;
     background-position: center center;
 }
