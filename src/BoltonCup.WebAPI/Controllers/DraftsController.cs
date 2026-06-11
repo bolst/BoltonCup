@@ -239,8 +239,7 @@ public class DraftsController(
     /// <summary>Resolves any auto-picks for teams on the clock and broadcasts each to connected clients.</summary>
     private async Task BroadcastAutoPicksAsync(int id, IHubContext<Hubs.DraftHub> hubContext)
     {
-        var autoPicks = await _draftService.ResolveAutoPicksAsync(id);
-        foreach (var autoPick in autoPicks)
+        await foreach (var autoPick in _draftService.ResolveAutoPicksAsync(id))
         {
             await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnPickMade, _mapper.ToDto(autoPick));
         }

@@ -4,6 +4,7 @@ using BoltonCup.Core.Exceptions;
 using BoltonCup.Core.Values;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Extensions;
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -529,16 +530,14 @@ public class DraftService(
         );
     }
 
-    public async Task<IReadOnlyList<CurrentDraftStateWithPick>> ResolveAutoPicksAsync(int draftId, CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<CurrentDraftStateWithPick> ResolveAutoPicksAsync(int draftId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var results = new List<CurrentDraftStateWithPick>();
-
         var draft = await _dbContext.Drafts
             .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Draft), draftId);
         if (draft.Status != DraftStatus.InProgress)
         {
-            return results;
+            yield break;
         }
 
         while (true)
@@ -567,10 +566,8 @@ public class DraftService(
             }
 
             var command = new DraftPlayerCommand(draftId, best.PlayerId, currentPick.TeamId, currentPick.OverallPick, IsAutoPick: true);
-            results.Add(await DraftPlayerAsync(command, cancellationToken));
+            yield return await DraftPlayerAsync(command, cancellationToken);
         }
-
-        return results;
     }
 
     public async Task<CurrentDraftState> UndoLastPickAsync(int draftId, CancellationToken cancellationToken = default)
