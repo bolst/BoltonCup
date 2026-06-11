@@ -697,6 +697,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Logo).HasColumnName("logo_key");
+            entity.Property(e => e.BackgroundImage).HasColumnName("background_image_key");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.EndDate).HasColumnName("end_date");
             entity.Property(e => e.WinningTeamId).HasColumnName("winning_team_id");

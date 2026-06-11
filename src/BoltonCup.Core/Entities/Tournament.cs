@@ -5,6 +5,7 @@ public class Tournament : EntityBase
     public int Id { get; set; }
     public required string Name { get; set; }
     public string? Logo { get; set; }
+    public string? BackgroundImage { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public int? WinningTeamId { get; set; }
