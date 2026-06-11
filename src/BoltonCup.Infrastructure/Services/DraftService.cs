@@ -656,9 +656,9 @@ public class DraftService(
             throw new InvalidOperationException("There are no picks to reset.");
         }
 
-        var revertedPlayerIds = madePicks.Select(p => p.PlayerId!.Value).ToList();
         var rankings = await _dbContext.PlayerDraftRankings
-            .Where(r => r.DraftId == draftId && revertedPlayerIds.Contains(r.PlayerId))
+            .Where(r => r.DraftId == draftId)
+            .Where(r => r.DraftPickId != null)
             .ToListAsync(cancellationToken);
 
         foreach (var pick in draft.DraftPicks)
