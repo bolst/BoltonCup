@@ -24,6 +24,12 @@
                 <MudChip T="string" Icon="@Icons.Material.Rounded.PauseCircleFilled" Text="Paused" Label="true"/>
             }
             break;
+        case DraftStatus.InProgress when DraftState.IsAutoPicking:
+            <div class="d-flex flex-row align-center gap-3">
+                <MudProgressCircular Color="Color.Info" Size="Size.Small" Indeterminate />
+                <MudText Typo="Typo.h6">Auto-drafting…</MudText>
+            </div>
+            break;
         case DraftStatus.InProgress when DraftState.CurrentPick is {} currentPick:
             <div class="d-flex flex-row align-center gap-3">
                 <MudText Typo="Typo.h6">Pick @currentPick.OverallPick</MudText>

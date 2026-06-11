@@ -211,11 +211,6 @@ public class Mapper : IMapper
         });
     }
 
-    public IPagedList<DraftPickDto> ToDtoList(IPagedList<DraftPick> draftPicks)
-    {
-        return draftPicks.ProjectTo(ToDraftPickDto);
-    }
-
     public IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings, IReadOnlySet<int> favouritePlayerIds)
     {
         return rankings.ProjectTo(draft => new DraftRankingDto
@@ -262,7 +257,18 @@ public class Mapper : IMapper
                 .OrderBy(d => d.Pick),
             DraftPicksByRound = draft.DraftPicks
                 .GroupBy(dto => dto.Round)
-                .Select(group => new RoundDraftPicks(group.Key, group.Select(ToDraftPickDto).OrderBy(x => x.RoundPick)))
+                .Select(group => new RoundDraftPicks(
+                    group.Key,
+                    group.Select(dp => new DraftPickDto
+                    {
+                        DraftId = dp.DraftId,
+                        OverallPick = dp.OverallPick,
+                        Round = dp.Round,
+                        RoundPick = dp.RoundPick,
+                        Team = ToTeamBriefDto(dp.Team),
+                        Player = dp.Player is null ? null : ToPlayerBriefDto(dp.Player),
+                        ClockStartedAt = dp.ClockStartedAt,
+                    }).ToList()))
                 .OrderBy(group => group.Round),
             CanEditDraft = isAuthorized && draft.Status != DraftStatus.Completed,
             CanManageDraft = canManage,
@@ -412,20 +418,6 @@ public class Mapper : IMapper
             Title: request.Title,
             OrderedPlayerIds: request.OrderedPlayerIds
         );
-    }
-
-    private DraftPickDto ToDraftPickDto(DraftPick draftPick)
-    {
-        return new DraftPickDto
-        {
-            DraftId = draftPick.DraftId,
-            OverallPick = draftPick.OverallPick,
-            Round = draftPick.Round,
-            RoundPick = draftPick.RoundPick,
-            Team = ToTeamBriefDto(draftPick.Team),
-            Player = draftPick.Player is null ? null : ToPlayerBriefDto(draftPick.Player),
-            ClockStartedAt = draftPick.ClockStartedAt,
-        };
     }
 
 

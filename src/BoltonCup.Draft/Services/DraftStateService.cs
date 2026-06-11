@@ -35,6 +35,9 @@ public class DraftStateService : IAsyncDisposable
 
     public DraftConnectionState ConnectionState { get; private set; } = DraftConnectionState.Disconnected;
 
+    /// <summary>True while the server is resolving a run of auto-picks.</summary>
+    public bool IsAutoPicking { get; private set; }
+
     public bool CanEditDraft => Draft?.CanEditDraft ?? false;
     public bool CanManageDraft => Draft?.CanManageDraft ?? false;
 
@@ -68,6 +71,7 @@ public class DraftStateService : IAsyncDisposable
         _hubConnection.On<DraftUpdateEventDto>(HubEvents.Draft.OnDraftUpdate, HandleDraftUpdate);
         _hubConnection.On<DraftStatus>(HubEvents.Draft.OnDraftStatusChange, HandleDraftStatusChange);
         _hubConnection.On<DraftPickMadeEventDto>(HubEvents.Draft.OnPickMade, HandlePickMade);
+        _hubConnection.On<bool>(HubEvents.Draft.OnAutoPickStateChange, HandleAutoPickStateChange);
     }
 
     public async Task InitializeAsync(int draftId)
@@ -228,6 +232,7 @@ public class DraftStateService : IAsyncDisposable
     {
         StopFallbackPoll();
         ConnectionState = DraftConnectionState.Connected;
+        IsAutoPicking = false;
 
         if (_draftId.HasValue)
         {
@@ -240,6 +245,7 @@ public class DraftStateService : IAsyncDisposable
     private Task OnClosed(Exception? error)
     {
         ConnectionState = DraftConnectionState.Disconnected;
+        IsAutoPicking = false;
         StopFallbackPoll();
         NotifyStateChanged();
         return Task.CompletedTask;
@@ -282,6 +288,11 @@ public class DraftStateService : IAsyncDisposable
             return;
         Draft.Status = newStatus;
 
+        if (newStatus is DraftStatus.Paused or DraftStatus.Completed)
+        {
+            IsAutoPicking = false;
+        }
+
         if (newStatus == DraftStatus.Completed)
         {
             StopFallbackPoll();
@@ -295,6 +306,13 @@ public class DraftStateService : IAsyncDisposable
         }
 
         SyncCountdown();
+        NotifyStateChanged();
+    }
+
+
+    private void HandleAutoPickStateChange(bool isAutoPicking)
+    {
+        IsAutoPicking = isAutoPicking;
         NotifyStateChanged();
     }
 

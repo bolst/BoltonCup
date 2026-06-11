@@ -4,13 +4,16 @@ using BoltonCup.Core.Exceptions;
 using BoltonCup.Core.Values;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Extensions;
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace BoltonCup.Infrastructure.Services;
 
 public class DraftService(
-    BoltonCupDbContext _dbContext
+    BoltonCupDbContext _dbContext,
+    IConfiguration? _configuration = null
 ) : IDraftService
 {
     public async Task<IPagedList<Draft>> GetAsync(GetDraftsQuery query, CancellationToken cancellationToken = default)
@@ -527,17 +530,29 @@ public class DraftService(
         );
     }
 
-    public async Task<IReadOnlyList<CurrentDraftStateWithPick>> ResolveAutoPicksAsync(int draftId, CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<CurrentDraftStateWithPick> ResolveAutoPicksAsync(int draftId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var results = new List<CurrentDraftStateWithPick>();
+        var draft = await _dbContext.Drafts
+            .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+        if (draft.Status != DraftStatus.InProgress)
+        {
+            yield break;
+        }
 
         while (true)
         {
-            var draft = await _dbContext.Drafts
-                .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
-                ?? throw new EntityNotFoundException(nameof(Draft), draftId);
-            if (draft.Status != DraftStatus.InProgress)
+            // Re-read status as a scalar each iteration so a pause committed by another request
+            // (a different DbContext) is observed. A scalar projection bypasses the change tracker,
+            // so it reflects the latest committed state rather than the entity loaded above.
+            var status = await _dbContext.Drafts
+                .Where(d => d.Id == draftId)
+                .Select(d => d.Status)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (status != DraftStatus.InProgress)
+            {
                 break;
+            }
 
             var currentPick = await _dbContext.DraftPicks
                 .Where(dp => dp.DraftId == draftId)
@@ -545,22 +560,26 @@ public class DraftService(
                 .OrderBy(dp => dp.OverallPick)
                 .FirstOrDefaultAsync(cancellationToken);
             if (currentPick is null)
+            {
                 break;
+            }
 
             var order = await _dbContext.DraftOrders
                 .FirstOrDefaultAsync(o => o.DraftId == draftId && o.TeamId == currentPick.TeamId, cancellationToken);
-            if (order is null || !order.AutoPick)
+            if (order is not { AutoPick: true })
+            {
                 break;
+            }
 
             var best = await GetBestAvailablePlayerAsync(draftId, currentPick.TeamId, cancellationToken);
             if (best is null)
+            {
                 break;
+            }
 
             var command = new DraftPlayerCommand(draftId, best.PlayerId, currentPick.TeamId, currentPick.OverallPick, IsAutoPick: true);
-            results.Add(await DraftPlayerAsync(command, cancellationToken));
+            yield return await DraftPlayerAsync(command, cancellationToken);
         }
-
-        return results;
     }
 
     public async Task<CurrentDraftState> UndoLastPickAsync(int draftId, CancellationToken cancellationToken = default)
@@ -595,7 +614,9 @@ public class DraftService(
         {
             picksToRevert.Add(pick);
             if (!pick.IsAutoPick)
+            {
                 break;
+            }
         }
 
         var revertedPlayerIds = picksToRevert.Select(p => p.PlayerId!.Value).ToList();
@@ -614,7 +635,9 @@ public class DraftService(
             ranking.DraftPickId = null;
 
         if (draft.Status == DraftStatus.Completed)
+        {
             draft.Status = DraftStatus.InProgress;
+        }
 
         // Reopen the earliest reverted pick on the clock.
         var reopened = picksToRevert.OrderBy(p => p.OverallPick).First();
@@ -654,9 +677,9 @@ public class DraftService(
             throw new InvalidOperationException("There are no picks to reset.");
         }
 
-        var revertedPlayerIds = madePicks.Select(p => p.PlayerId!.Value).ToList();
         var rankings = await _dbContext.PlayerDraftRankings
-            .Where(r => r.DraftId == draftId && revertedPlayerIds.Contains(r.PlayerId))
+            .Where(r => r.DraftId == draftId)
+            .Where(r => r.DraftPickId != null)
             .ToListAsync(cancellationToken);
 
         foreach (var pick in draft.DraftPicks)
@@ -671,10 +694,7 @@ public class DraftService(
             ranking.DraftPickId = null;
         }
 
-        if (draft.Status == DraftStatus.Completed)
-        {
-            draft.Status = DraftStatus.InProgress;
-        }
+        draft.Status = DraftStatus.Pending;
 
         // Put the first pick back on the clock.
         var firstPick = draft.DraftPicks.OrderBy(p => p.OverallPick).First();
@@ -703,23 +723,30 @@ public class DraftService(
             .Include(p => p.Player)
             .ToListAsync(cancellationToken);
         if (available.Count == 0)
+        {
             return null;
+        }
 
         var roster = await _dbContext.DraftPicks
             .Where(dp => dp.DraftId == draftId && dp.TeamId == teamId && dp.PlayerId != null)
             .Select(dp => new RosteredPlayer(dp.Player!.Position, dp.Player.CanPlayEitherPosition))
             .ToListAsync(cancellationToken);
+        
 
         var remainingPicks = await _dbContext.DraftPicks
             .CountAsync(dp => dp.DraftId == draftId && dp.TeamId == teamId && dp.PlayerId == null, cancellationToken);
-
+        
         var candidates = available
             .Select(p => new AutoPickCandidate(p.PlayerId, p.DraftRanking, p.Player.Position, p.Player.CanPlayEitherPosition))
             .ToList();
 
-        var chosen = SmartAutoPickSelector.Select(candidates, roster, remainingPicks, Random.Shared);
+        var positionNeedWeight = _configuration?.GetValue("BoltonCup:Draft:PositionNeedWeight", SmartAutoPickSelector.DefaultPositionNeedWeight);
+        var noiseMagnitude = _configuration?.GetValue("BoltonCup:Draft:NoiseMagnitude", SmartAutoPickSelector.DefaultNoiseMagnitude);
+        var chosen = SmartAutoPickSelector.Select(candidates, roster, remainingPicks, Random.Shared, positionNeedWeight, noiseMagnitude);
         if (chosen is null)
+        {
             return null;
+        }
 
         return available.First(p => p.PlayerId == chosen.Value.PlayerId);
     }
@@ -768,16 +795,18 @@ public class DraftService(
         for (int i = 0; i < totalPlayerCount; i++)
         {
             var round = i / teamCount + 1;
-            var standardRoundPick = i % teamCount + 1;
-            var roundPick = standardRoundPick;
-            
-            // if draft is snake, we reverse the order in even rounds
-            if (draft.Type == DraftType.Snake && round % 2 == 0)
-                roundPick = teamCount - standardRoundPick + 1;
+            var roundPick = i % teamCount + 1;
 
-            if (draftOrders.GetValueOrDefault(roundPick)?.TeamId is not { } teamId) 
+            // In snake mode even rounds run in reverse, so the team on the clock is the mirror of the
+            // round pick. RoundPick still stores the true within-round sequence (1..N); only the team
+            // lookup is mirrored.
+            var teamSlot = draft.Type == DraftType.Snake && round % 2 == 0
+                ? teamCount - roundPick + 1
+                : roundPick;
+
+            if (draftOrders.GetValueOrDefault(teamSlot)?.TeamId is not { } teamId)
                 throw new InvalidOperationException($"Cannot generate picks: Draft {draft.Id} has an invalid ordering.");
-            
+
             _dbContext.DraftPicks.Add(new DraftPick
             {
                 DraftId = draft.Id,

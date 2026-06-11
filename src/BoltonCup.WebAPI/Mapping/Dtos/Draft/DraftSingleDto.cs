@@ -15,7 +15,7 @@ public record DraftSingleDto : DraftDto
     public int? DefaultCustomRankingId { get; set; }
 }
 
-/// <summary>Represents the ordered picks for a single draft round.</summary>
+/// <summary>Represents the picks for a single draft round.</summary>
 /// <param name="Round">The round number.</param>
-/// <param name="Picks">The ordered picks within this round.</param>
-public sealed record RoundDraftPicks(int Round, IOrderedEnumerable<DraftPickDto> Picks);
+/// <param name="Picks">The picks made in this round.</param>
+public sealed record RoundDraftPicks(int Round, IReadOnlyList<DraftPickDto> Picks);

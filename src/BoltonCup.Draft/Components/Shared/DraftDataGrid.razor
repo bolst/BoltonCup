@@ -26,21 +26,25 @@
             }
         </HeaderContent>
         <RowTemplate>
-            @foreach (var pick in context.Picks)
+            @foreach (var order in DraftState.Draft?.PickOrder ?? [])
             {
+                var pick = context.Picks.FirstOrDefault(p => p.Team.Id == order.Team.Id);
                 <MudTd Style="width: 120px">
-                    <MudPaper Class="@CellClassFunc(pick)" Height="64px" Width="100%" MinWidth="120px" Elevation="1" @onclick="@(x => OnCellClick(x, pick))">
-                        <div class="d-flex flex-row justify-space-between">
-                            <MudText Typo="Typo.body2"><b>@pick.Player?.FullName</b></MudText>
-                            <MudText Typo="Typo.caption">@pick.Round.@pick.RoundPick</MudText>
-                        </div>
-                        <div class="d-flex flex-row justify-space-between">
-                            <MudText Typo="Typo.body2">@pick.Player?.Position?.ToUpper().FirstOrDefault()</MudText>
-                            <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-                                <MudImage Src="@pick.Player?.ProfilePicture" Height="24" />
-                            </MudHidden>
-                        </div>
-                    </MudPaper>
+                    @if (pick is not null)
+                    {
+                        <MudPaper Class="@CellClassFunc(pick)" Height="64px" Width="100%" MinWidth="120px" Elevation="1" @onclick="@(x => OnCellClick(x, pick))">
+                            <div class="d-flex flex-row justify-space-between">
+                                <MudText Typo="Typo.body2"><b>@pick.Player?.FullName</b></MudText>
+                                <MudText Typo="Typo.caption">@pick.Round.@pick.RoundPick</MudText>
+                            </div>
+                            <div class="d-flex flex-row justify-space-between">
+                                <MudText Typo="Typo.body2">@pick.Player?.Position?.ToUpper().FirstOrDefault()</MudText>
+                                <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+                                    <MudImage Src="@pick.Player?.ProfilePicture" Height="24" />
+                                </MudHidden>
+                            </div>
+                        </MudPaper>
+                    }
                 </MudTd>
             }
         </RowTemplate>
