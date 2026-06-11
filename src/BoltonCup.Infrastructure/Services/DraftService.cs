@@ -5,12 +5,14 @@ using BoltonCup.Core.Values;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace BoltonCup.Infrastructure.Services;
 
 public class DraftService(
-    BoltonCupDbContext _dbContext
+    BoltonCupDbContext _dbContext,
+    IConfiguration? _configuration = null
 ) : IDraftService
 {
     public async Task<IPagedList<Draft>> GetAsync(GetDraftsQuery query, CancellationToken cancellationToken = default)
@@ -717,9 +719,13 @@ public class DraftService(
             .Select(p => new AutoPickCandidate(p.PlayerId, p.DraftRanking, p.Player.Position, p.Player.CanPlayEitherPosition))
             .ToList();
 
-        var chosen = SmartAutoPickSelector.Select(candidates, roster, remainingPicks, Random.Shared);
+        var positionNeedWeight = _configuration?.GetValue("BoltonCup:Draft:PositionNeedWeight", SmartAutoPickSelector.DefaultPositionNeedWeight);
+        var noiseMagnitude = _configuration?.GetValue("BoltonCup:Draft:NoiseMagnitude", SmartAutoPickSelector.DefaultNoiseMagnitude);
+        var chosen = SmartAutoPickSelector.Select(candidates, roster, remainingPicks, Random.Shared, positionNeedWeight, noiseMagnitude);
         if (chosen is null)
+        {
             return null;
+        }
 
         return available.First(p => p.PlayerId == chosen.Value.PlayerId);
     }
