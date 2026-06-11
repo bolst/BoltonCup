@@ -43,7 +43,7 @@
                                   Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info"
                                   IconSize="Size.Medium" Variant="Variant.Text" Margin="Margin.Dense" DebounceInterval="200" FullWidth Clearable Immediate/>
                 </div>
-                @if (DraftState.CanManageDraft && DraftState.Draft?.Status is DraftStatus.InProgress or DraftStatus.Completed)
+                @if (DraftState.CanManageDraft && DraftState.Draft?.Status is not DraftStatus.Pending)
                 {
                     <MudMenu Icon="@Icons.Material.Rounded.MoreVert" Size="Size.Small"
                              AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
