@@ -108,17 +108,19 @@ public class DraftServiceTests
         for (var i = 0; i < playerCount; i++)
         {
             var round = i / teamCount + 1;
-            var standardRoundPick = i % teamCount + 1;
-            var roundPick = type == DraftType.Snake && round % 2 == 0
-                ? teamCount - standardRoundPick + 1
-                : standardRoundPick;
+            var roundPick = i % teamCount + 1;
+            // Snake even rounds run in reverse: the team on the clock is mirrored, but RoundPick still
+            // stores the true within-round sequence.
+            var teamSlot = type == DraftType.Snake && round % 2 == 0
+                ? teamCount - roundPick + 1
+                : roundPick;
             db.DraftPicks.Add(new DraftPick
             {
                 DraftId = draft.Id,
                 OverallPick = i + 1,
                 Round = round,
                 RoundPick = roundPick,
-                TeamId = teamIds[roundPick - 1],
+                TeamId = teamIds[teamSlot - 1],
             });
         }
 
@@ -307,7 +309,7 @@ public class DraftServiceTests
     }
 
     [Fact]
-    public async Task ResetDraftAsync_WhenCompleted_ReopensToInProgress()
+    public async Task ResetDraftAsync_WhenCompleted_ReopensToPending()
     {
         var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 1, playerCount: 2, DraftStatus.Completed);
 
@@ -319,7 +321,7 @@ public class DraftServiceTests
         await service.ResetDraftAsync(draft.Id);
 
         var refreshed = await db.Drafts.SingleAsync(d => d.Id == draft.Id);
-        refreshed.Status.Should().Be(DraftStatus.InProgress);
+        refreshed.Status.Should().Be(DraftStatus.Pending);
 
         var made = await db.DraftPicks.Where(p => p.DraftId == draft.Id && p.PlayerId != null).ToListAsync();
         made.Should().BeEmpty();
