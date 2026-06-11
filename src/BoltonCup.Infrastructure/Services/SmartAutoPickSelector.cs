@@ -12,18 +12,22 @@ public static class SmartAutoPickSelector
     public const int TargetDefense = 6;
 
     // Ranks of bias applied per unit of positional deficit. Higher = stronger steer toward needs.
-    public const double PositionNeedWeight = 2.0;
+    public const double DefaultPositionNeedWeight = 2.0;
 
     // Max magnitude of random perturbation (in ranking units) applied to each candidate's effective
     // rank so repeated auto-drafts of the same scenario diverge. Only applied when a Random is supplied.
-    public const double NoiseMagnitude = 1.5;
+    public const double DefaultNoiseMagnitude = 1.5;
 
     public static AutoPickCandidate? Select(
         IReadOnlyCollection<AutoPickCandidate> available,
         IReadOnlyCollection<RosteredPlayer> roster,
         int remainingPicks,
-        Random? random = null)
+        Random? random = null,
+        double? positionNeedWeight = null,
+        double? noiseMagnitude = null)
     {
+        var posWeight = positionNeedWeight ?? DefaultPositionNeedWeight;
+        var noiseMag = noiseMagnitude ?? DefaultNoiseMagnitude;
         if (available.Count == 0)
         {
             return null;
@@ -40,7 +44,7 @@ public static class SmartAutoPickSelector
         // the pick is forced to a goalie.
         if (!hasGoalie && remainingPicks <= 1)
         {
-            var forcedGoalie = BestRanked(available.Where(c => IsGoalie(c.Position)), random);
+            var forcedGoalie = BestRanked(available.Where(c => IsGoalie(c.Position)), random, noiseMag);
             if (forcedGoalie is not null)
             {
                 return forcedGoalie;
@@ -52,7 +56,7 @@ public static class SmartAutoPickSelector
         var skaters = available.Where(c => !IsGoalie(c.Position)).ToList();
         if (skaters.Count == 0)
         {
-            return BestRanked(available, random);
+            return BestRanked(available, random, noiseMag);
         }
 
         // Allocate fluid players to the side with the larger remaining deficit.
@@ -72,8 +76,8 @@ public static class SmartAutoPickSelector
 
         var needForwards = Math.Max(0, TargetForwards - effForwards);
         var needDefense = Math.Max(0, TargetDefense - effDefense);
-        var bonusForwards = needForwards * PositionNeedWeight;
-        var bonusDefense = needDefense * PositionNeedWeight;
+        var bonusForwards = needForwards * posWeight;
+        var bonusDefense = needDefense * posWeight;
 
         AutoPickCandidate? best = null;
         var bestEffectiveRank = double.MaxValue;
@@ -85,7 +89,7 @@ public static class SmartAutoPickSelector
                 : IsForward(candidate.Position) ? bonusForwards
                 : 0;
 
-            var noise = random is null ? 0.0 : (random.NextDouble() - 0.5) * 2.0 * NoiseMagnitude;
+            var noise = random is null ? 0.0 : (random.NextDouble() - 0.5) * 2.0 * noiseMag;
             var effectiveRank = candidate.Ranking - bonus + noise;
             if (best is null
                 || effectiveRank < bestEffectiveRank
@@ -99,13 +103,13 @@ public static class SmartAutoPickSelector
         return best;
     }
 
-    private static AutoPickCandidate? BestRanked(IEnumerable<AutoPickCandidate> candidates, Random? random = null)
+    private static AutoPickCandidate? BestRanked(IEnumerable<AutoPickCandidate> candidates, Random? random, double noiseMagnitude)
     {
         AutoPickCandidate? best = null;
         var bestRank = double.MaxValue;
         foreach (var candidate in candidates)
         {
-            var noise = random is null ? 0.0 : (random.NextDouble() - 0.5) * 2.0 * NoiseMagnitude;
+            var noise = random is null ? 0.0 : (random.NextDouble() - 0.5) * 2.0 * noiseMagnitude;
             var rank = candidate.Ranking + noise;
             if (best is null || rank < bestRank)
             {
