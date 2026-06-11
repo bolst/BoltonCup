@@ -29,5 +29,18 @@ public class TournamentService : ITournamentService
             tournamentId.ToString(),
             cancellationToken
         );
-    }    
+    }
+
+    public Task UpdateBackgroundImageAsync(int tournamentId, string tempKey, CancellationToken cancellationToken = default)
+    {
+        return _storageService.UpdateAssetAsync<Tournament>(
+            _dbContext,
+            _assetKeyGenerator,
+            t => t.Id == tournamentId,
+            t => t.BackgroundImage,
+            tempKey,
+            tournamentId.ToString(),
+            cancellationToken
+        );
+    }
 }
