@@ -10,6 +10,7 @@
     <Columns>
         <PropertyColumn Title="Tournament" Property="x => x.Name" />
         <ImageColumn T="Tournament" Title="Logo" Property="x => x.Logo" OnImageUploaded="UpdateTournamentLogo" />
+        <ImageColumn T="Tournament" Title="Background" Property="x => x.BackgroundImage" OnImageUploaded="UpdateTournamentBackgroundImage" />
         <TemplateColumn Title="Info">
             <EditTemplate>
                 <TournamentInfoEditButton TournamentId="@context.Item.Id" />
@@ -62,9 +63,16 @@
     
     private async Task UpdateTournamentLogo(ImageUploadResult<Tournament> result)
     {
-        if (string.IsNullOrEmpty(result.NewKey)) 
+        if (string.IsNullOrEmpty(result.NewKey))
             return;
         await TournamentService.UpdateLogoAsync(result.Item.Id, result.NewKey);
+    }
+
+    private async Task UpdateTournamentBackgroundImage(ImageUploadResult<Tournament> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey))
+            return;
+        await TournamentService.UpdateBackgroundImageAsync(result.Item.Id, result.NewKey);
     }
 
 }

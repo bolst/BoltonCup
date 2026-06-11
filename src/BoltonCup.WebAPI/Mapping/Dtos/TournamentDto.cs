@@ -9,6 +9,8 @@ public record TournamentDto
     public required string Name { get; set; }
     /// <summary>Gets or sets the URL of the tournament logo.</summary>
     public string? Logo { get; set; }
+    /// <summary>Gets or sets the URL of the tournament background image.</summary>
+    public string? BackgroundImage { get; set; }
     /// <summary>Gets or sets the tournament start date.</summary>
     public DateTime? StartDate { get; set; }
     /// <summary>Gets or sets the tournament end date.</summary>
