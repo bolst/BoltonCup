@@ -542,6 +542,18 @@ public class DraftService(
 
         while (true)
         {
+            // Re-read status as a scalar each iteration so a pause committed by another request
+            // (a different DbContext) is observed. A scalar projection bypasses the change tracker,
+            // so it reflects the latest committed state rather than the entity loaded above.
+            var status = await _dbContext.Drafts
+                .Where(d => d.Id == draftId)
+                .Select(d => d.Status)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (status != DraftStatus.InProgress)
+            {
+                break;
+            }
+
             var currentPick = await _dbContext.DraftPicks
                 .Where(dp => dp.DraftId == draftId)
                 .Where(dp => dp.PlayerId == null)
