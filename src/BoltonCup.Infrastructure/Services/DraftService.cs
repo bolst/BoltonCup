@@ -783,16 +783,18 @@ public class DraftService(
         for (int i = 0; i < totalPlayerCount; i++)
         {
             var round = i / teamCount + 1;
-            var standardRoundPick = i % teamCount + 1;
-            var roundPick = standardRoundPick;
-            
-            // if draft is snake, we reverse the order in even rounds
-            if (draft.Type == DraftType.Snake && round % 2 == 0)
-                roundPick = teamCount - standardRoundPick + 1;
+            var roundPick = i % teamCount + 1;
 
-            if (draftOrders.GetValueOrDefault(roundPick)?.TeamId is not { } teamId) 
+            // In snake mode even rounds run in reverse, so the team on the clock is the mirror of the
+            // round pick. RoundPick still stores the true within-round sequence (1..N); only the team
+            // lookup is mirrored.
+            var teamSlot = draft.Type == DraftType.Snake && round % 2 == 0
+                ? teamCount - roundPick + 1
+                : roundPick;
+
+            if (draftOrders.GetValueOrDefault(teamSlot)?.TeamId is not { } teamId)
                 throw new InvalidOperationException($"Cannot generate picks: Draft {draft.Id} has an invalid ordering.");
-            
+
             _dbContext.DraftPicks.Add(new DraftPick
             {
                 DraftId = draft.Id,
