@@ -10673,11 +10673,11 @@
             "items": {
               "$ref": "#/components/schemas/DraftPickDto"
             },
-            "description": "The ordered picks within this round."
+            "description": "The picks made in this round."
           }
         },
         "additionalProperties": false,
-        "description": "Represents the ordered picks for a single draft round."
+        "description": "Represents the picks for a single draft round."
       },
       "SetPlayerPoolRequest": {
         "type": "object",

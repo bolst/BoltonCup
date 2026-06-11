@@ -43,12 +43,12 @@
                                   Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info"
                                   IconSize="Size.Medium" Variant="Variant.Text" Margin="Margin.Dense" DebounceInterval="200" FullWidth Clearable Immediate/>
                 </div>
-                @if (DraftState.CanManageDraft && DraftState.Draft?.Status is DraftStatus.InProgress or DraftStatus.Completed)
+                @if (DraftState.CanManageDraft && DraftState.Draft?.Status is not DraftStatus.Pending)
                 {
                     <MudMenu Icon="@Icons.Material.Rounded.MoreVert" Size="Size.Small"
                              AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
-                        <MudMenuItem OnClick="@UndoLastPickAsync" Icon="@Icons.Material.Rounded.Undo">Undo last pick</MudMenuItem>
-                        <MudMenuItem OnClick="@ResetDraftAsync" Icon="@Icons.Material.Rounded.RestartAlt" IconColor="Color.Error">Reset draft</MudMenuItem>
+                        <MudMenuItem OnClick="@UndoLastPickAsync" Label="Undo last pick" Icon="@Icons.Material.Rounded.Undo" Disabled="@(DraftState.CurrentPick?.OverallPick == 1)" />
+                        <MudMenuItem OnClick="@ResetDraftAsync" Label="Reset draft" Icon="@Icons.Material.Rounded.RestartAlt" IconColor="Color.Error" Disabled="@(DraftState.CurrentPick?.OverallPick == 1)" />
                     </MudMenu>
                 }
             </div>
@@ -69,7 +69,7 @@
                         @if (!context.Item.IsDrafted)
                         {
                             <MudIconButton
-                                OnClick="@(_ => DraftPlayerAsync(context.Item))" Disabled="@(DraftState.Draft?.Status != DraftStatus.InProgress)"
+                                OnClick="@(_ => DraftPlayerAsync(context.Item))" Disabled="@(DraftState.Draft?.Status != DraftStatus.InProgress || DraftState.IsAutoPicking)"
                                 Icon="@Icons.Material.Rounded.Add" Class="rounded" Size="Size.Small"/>
                         }
                         <MudSpacer/>
