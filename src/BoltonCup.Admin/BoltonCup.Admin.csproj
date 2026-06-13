@@ -6,6 +6,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+
+        <!-- required for RazorLight to compile email templates at runtime -->
+        <PreserveCompilationContext>true</PreserveCompilationContext>
     </PropertyGroup>
 
     <PropertyGroup>
