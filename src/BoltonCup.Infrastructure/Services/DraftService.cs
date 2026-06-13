@@ -444,6 +444,38 @@ public class DraftService(
         return true;
     }
 
+    public async Task<int> AssignPlayersToTeamsFromDraftAsync(int draftId, bool overwriteExisting, CancellationToken cancellationToken = default)
+    {
+        var picks = await _dbContext.DraftPicks
+            .Where(p => p.DraftId == draftId && p.PlayerId != null)
+            .Select(p => new { PlayerId = p.PlayerId!.Value, p.TeamId })
+            .ToListAsync(cancellationToken);
+        if (picks.Count == 0)
+            return 0;
+
+        var playerIds = picks.Select(p => p.PlayerId).ToList();
+        var players = await _dbContext.Players
+            .Where(p => playerIds.Contains(p.Id))
+            .ToListAsync(cancellationToken);
+        var teamByPlayer = picks.ToDictionary(p => p.PlayerId, p => p.TeamId);
+
+        var updated = 0;
+        foreach (var player in players)
+        {
+            if (!overwriteExisting && player.TeamId != null)
+                continue;
+            var newTeamId = teamByPlayer[player.Id];
+            if (player.TeamId == newTeamId)
+                continue;
+            player.TeamId = newTeamId;
+            updated++;
+        }
+
+        if (updated > 0)
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        return updated;
+    }
+
 
     public async Task<CurrentDraftStateWithPick> DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default)
     {
