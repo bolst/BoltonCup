@@ -1,0 +1,104 @@
+@namespace BoltonCup.Admin.Components.Shared
+@using BoltonCup.Common
+@inject IDraftService DraftService
+
+<MudDialog>
+    <DialogContent>
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Dense Class="mb-2">@_errorMessage</MudAlert>
+        }
+
+        @if (_drafts.Count == 0)
+        {
+            <MudText>No completed drafts found for this tournament.</MudText>
+        }
+        else
+        {
+            <MudSelect T="int?" @bind-Value="_selectedDraftId" Label="Draft" Variant="Variant.Outlined" Margin="Margin.Dense">
+                @foreach (var draft in _drafts)
+                {
+                    <MudSelectItem T="int?" Value="@draft.Id">@DraftLabel(draft)</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudCheckBox @bind-Value="_overwriteExisting" Color="Color.Primary" Class="mt-2"
+                         Label="Overwrite existing team assignments" />
+            <MudText Typo="Typo.caption">
+                When unchecked, only players without a team are assigned.
+            </MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Dialog.Cancel">Cancel</MudButton>
+        <MudButton OnClick="@Apply" Color="Color.Info" Disabled="@(_applying || _drafts.Count == 0)">Populate Teams</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter]
+    public int TournamentId { get; set; }
+
+    private List<Draft> _drafts = [];
+    private int? _selectedDraftId;
+    private bool _overwriteExisting;
+    private bool _applying;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        });
+
+        var result = await DraftService.GetAsync(new GetDraftsQuery
+        {
+            TournamentId = TournamentId,
+            Status = DraftStatus.Completed,
+            IsAdmin = true,
+            Page = 1,
+            Size = 100,
+        });
+        _drafts = result.Items.ToList();
+        _selectedDraftId = _drafts.FirstOrDefault()?.Id;
+    }
+
+    private async Task Apply()
+    {
+        _errorMessage = null;
+
+        if (_selectedDraftId is not { } draftId)
+        {
+            _errorMessage = "Select a draft to populate from.";
+            return;
+        }
+
+        _applying = true;
+        try
+        {
+            await DraftService.AssignPlayersToTeamsFromDraftAsync(draftId, _overwriteExisting);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+            _applying = false;
+            return;
+        }
+
+        Dialog.Close(DialogResult.Ok(true));
+    }
+
+    private static string DraftLabel(Draft draft)
+    {
+        var title = string.IsNullOrWhiteSpace(draft.Title) ? $"Draft {draft.Id}" : draft.Title;
+        return $"{title} ({draft.CreatedAt.ToEstString("g")})";
+    }
+
+}
