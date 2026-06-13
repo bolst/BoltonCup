@@ -2,6 +2,7 @@
 @using BoltonCup.WebClient.Services
 @inject IBoltonCupApi BoltonCupApi
 @inject BcStateService BcState
+@inject NavigationManager Nav
 @attribute [Sitemap(SitemapChangeFrequency.Daily, LastModified = "2026-02-01")]
 
 <PageTitle>Standings | Bolton Cup</PageTitle>
@@ -36,7 +37,7 @@
     }
     else
     {
-        <MudTabs Rounded KeepPanelsAlive>
+        <MudTabs Rounded KeepPanelsAlive ActivePanelIndex="_activeTabIndex" ActivePanelIndexChanged="OnTabChanged">
             <MudTabPanel Text="Round Robin">
                 <StandingsDataGrid Rows="_standings.RoundRobin" />
             </MudTabPanel>
@@ -48,8 +49,21 @@
 </MudContainer>
 
 @code {
+
+    private const string PlayoffsType = "playoffs";
+    private const string RoundRobinType = "roundrobin";
+
+    [Parameter, SupplyParameterFromQuery(Name = "tournament")]
+    public int? TournamentQuery { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = "type")]
+    public string? TypeQuery { get; set; }
+
     private List<Sdk.TournamentDto> _tournaments = [];
     private int _selectedTournamentId;
+    private int _defaultTournamentId;
+    private int _activeTabIndex;
+    private int _loadedTournamentId = -1;
     private Sdk.TournamentStandingsDto? _standings;
     private bool _loading = true;
 
@@ -58,16 +72,42 @@
         var context = await BcState.Context;
         var tournaments = await BoltonCupApi.GetTournamentsAsync();
         _tournaments = tournaments.Items.ToList();
-        _selectedTournamentId = context.ActiveTournament?.Id
+        _defaultTournamentId = context.ActiveTournament?.Id
             ?? _tournaments.FirstOrDefault()?.Id
             ?? 0;
-        await LoadStandingsAsync();
     }
 
-    private async Task OnTournamentChanged(int tournamentId)
+    protected override async Task OnParametersSetAsync()
     {
-        _selectedTournamentId = tournamentId;
-        await LoadStandingsAsync();
+        _selectedTournamentId = TournamentQuery is { } id && _tournaments.Any(t => t.Id == id)
+            ? id
+            : _defaultTournamentId;
+        _activeTabIndex = string.Equals(TypeQuery, PlayoffsType, StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+
+        if (_selectedTournamentId != _loadedTournamentId)
+        {
+            _loadedTournamentId = _selectedTournamentId;
+            await LoadStandingsAsync();
+        }
+    }
+
+    private void OnTournamentChanged(int tournamentId) => NavigateTo(tournamentId, _activeTabIndex);
+
+    private void OnTabChanged(int index)
+    {
+        if (index != _activeTabIndex)
+        {}
+            NavigateTo(_selectedTournamentId, index);
+    }
+
+    private void NavigateTo(int tournamentId, int tabIndex)
+    {
+        var uri = Nav.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["tournament"] = tournamentId,
+            ["type"] = tabIndex == 1 ? PlayoffsType : RoundRobinType,
+        });
+        Nav.NavigateTo(uri, replace: true);
     }
 
     private async Task LoadStandingsAsync()
