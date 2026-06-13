@@ -14,8 +14,9 @@ public interface IEmailer
     /// <summary>
     /// Sends a custom Markdown email to many recipients. The Markdown is converted to HTML once and
     /// enqueued individually so each recipient receives a separate message (no shared To/CC).
+    /// Returns the broadcast id stamped on every recipient's <see cref="EmailLog"/> for correlation.
     /// </summary>
-    Task SendBroadcastAsync(IEnumerable<BroadcastRecipient> recipients, string subject, string markdownBody, bool useLayout);
+    Task<Guid> SendBroadcastAsync(IEnumerable<BroadcastRecipient> recipients, string subject, string markdownBody, bool useLayout);
 }
 
 public sealed record BroadcastRecipient(string Email, string FirstName, string LastName);
@@ -58,8 +59,9 @@ public class EmailSender(
     }
 
 
-    public async Task SendBroadcastAsync(IEnumerable<BroadcastRecipient> recipients, string subject, string markdownBody, bool useLayout)
+    public async Task<Guid> SendBroadcastAsync(IEnumerable<BroadcastRecipient> recipients, string subject, string markdownBody, bool useLayout)
     {
+        var broadcastId = Guid.NewGuid();
         var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
         var bodyHtml = Markdown.ToHtml(markdownBody ?? string.Empty, pipeline);
         var logoUrl = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? "";
@@ -80,10 +82,13 @@ public class EmailSender(
                 Email: recipient.Email,
                 Subject: subject,
                 TemplateName: "Broadcast.Broadcast",
-                Model: model
+                Model: model,
+                BroadcastId: broadcastId
             );
             await _queue.EnqueueAsync(payload);
         }
+
+        return broadcastId;
     }
 
     public async Task SendBracketChallengeCredentialsAsync(Core.BracketChallenge.Event bracketChallenge, string email)

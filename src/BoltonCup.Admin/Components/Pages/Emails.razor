@@ -1,4 +1,5 @@
 @page "/emails"
+@using BoltonCup.Common
 @using BoltonCup.Infrastructure.Services
 @inject IDbContextFactory<BoltonCupDbContext> DbFactory
 @inject IEmailer Emailer
@@ -166,6 +167,54 @@
     </MudPaper>
 </div>
 
+@if (_recent.Count > 0)
+{
+    <div class="d-flex justify-center px-4 pb-8">
+        <div style="width: 100%; max-width: 880px;">
+            <div class="d-flex align-center mb-2">
+                <MudText Typo="Typo.subtitle1">Recently sent</MudText>
+                <MudIconButton Icon="@Icons.Material.Rounded.Refresh" Size="Size.Small"
+                               OnClick="LoadRecentAsync" title="Refresh delivery status" />
+            </div>
+            <MudPaper Elevation="1" Class="rounded-lg" Style="overflow: hidden;">
+                <MudExpansionPanels Elevation="0" Gutters="false">
+                    @foreach (var e in _recent)
+                    {
+                        var stat = _deliveryStats.TryGetValue(e.BroadcastId, out var s) ? s : (Sent: 0, Failed: 0);
+                        var pending = e.RecipientCount - stat.Sent - stat.Failed;
+                        <MudExpansionPanel>
+                            <TitleContent>
+                                <div class="d-flex align-center justify-space-between gap-2">
+                                    <div class="d-flex flex-column">
+                                        <MudText Typo="Typo.body1">@(string.IsNullOrWhiteSpace(e.Subject) ? "(no subject)" : e.Subject)</MudText>
+                                        <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                                            @e.Audience · @e.RecipientCount recipient@(e.RecipientCount == 1 ? "" : "s") · @e.CreatedAt.ToEstString("g")
+                                        </MudText>
+                                    </div>
+                                    <div class="d-flex gap-1">
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Success">@stat.Sent sent</MudChip>
+                                        @if (stat.Failed > 0)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Error">@stat.Failed failed</MudChip>
+                                        }
+                                        @if (pending > 0)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Default">@pending pending</MudChip>
+                                        }
+                                    </div>
+                                </div>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudMarkdown Value="@e.Body" />
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    }
+                </MudExpansionPanels>
+            </MudPaper>
+        </div>
+    </div>
+}
+
 @code {
     private enum AudienceKind { PlayerPool, Unpaid, AllAccounts }
     private sealed record TournamentOption(int Id, string Name);
@@ -178,6 +227,9 @@
 
     private List<BroadcastRecipient> _members = [];
     private HashSet<BroadcastRecipient> _selected = new(_comparer);
+
+    private List<SentEmail> _recent = [];
+    private Dictionary<Guid, (int Sent, int Failed)> _deliveryStats = [];
 
     private string _subject = "";
     private string _body = "";
@@ -209,6 +261,44 @@
             .ThenBy(t => t.Name)
             .Select(t => new TournamentOption(t.Id, t.Name))
             .ToListAsync();
+
+        await LoadRecentAsync();
+    }
+
+    private async Task LoadRecentAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        _recent = await db.SentEmails
+            .AsNoTracking()
+            .OrderByDescending(e => e.CreatedAt)
+            .Take(10)
+            .ToListAsync();
+
+        var ids = _recent.Select(e => e.BroadcastId).ToList();
+        _deliveryStats = (await db.EmailLogs
+                .AsNoTracking()
+                .Where(l => l.BroadcastId != null && ids.Contains(l.BroadcastId.Value))
+                .GroupBy(l => l.BroadcastId!.Value)
+                .Select(g => new
+                {
+                    BroadcastId = g.Key,
+                    Sent = g.Count(x => x.Succeeded),
+                    Failed = g.Count(x => !x.Succeeded),
+                })
+                .ToListAsync())
+            .ToDictionary(x => x.BroadcastId, x => (x.Sent, x.Failed));
+    }
+
+    private string BuildAudienceLabel()
+    {
+        var tournament = _tournaments.FirstOrDefault(t => t.Id == _tournamentId)?.Name ?? "tournament";
+        return _kind switch
+        {
+            AudienceKind.PlayerPool => $"Player pool · {tournament}",
+            AudienceKind.Unpaid => $"Signed up but not paid · {tournament}",
+            AudienceKind.AllAccounts => "All accounts",
+            _ => "",
+        };
     }
 
     private async Task OnKindChanged(AudienceKind kind)
@@ -291,7 +381,23 @@
         StateHasChanged();
         try
         {
-            await Emailer.SendBroadcastAsync(_selected.ToList(), _subject, _body, _useLayout);
+            var broadcastId = await Emailer.SendBroadcastAsync(_selected.ToList(), _subject, _body, _useLayout);
+
+            await using (var db = await DbFactory.CreateDbContextAsync())
+            {
+                db.SentEmails.Add(new SentEmail
+                {
+                    Subject = _subject,
+                    Body = _body,
+                    Audience = BuildAudienceLabel(),
+                    RecipientCount = count,
+                    UseLayout = _useLayout,
+                    BroadcastId = broadcastId,
+                });
+                await db.SaveChangesAsync();
+            }
+
+            await LoadRecentAsync();
             Snackbar.Add($"Queued email to {count} recipient{(count == 1 ? "" : "s")}.", Severity.Success);
         }
         catch (Exception ex)
