@@ -19,6 +19,7 @@ public interface IDraftService
     Task<IPagedList<PlayerDraftRanking>> GetDraftRankingsAsync(int draftId, GetDraftRankingsQuery query, CancellationToken cancellationToken = default);
     Task<CurrentDraftStateWithPick> DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default);
     IAsyncEnumerable<CurrentDraftStateWithPick> ResolveAutoPicksAsync(int draftId, CancellationToken cancellationToken = default);
+    Task<CurrentDraftState> ReplacePickAsync(ReplaceDraftPickCommand command, CancellationToken cancellationToken = default);
     Task<CurrentDraftState> UndoLastPickAsync(int draftId, CancellationToken cancellationToken = default);
     Task<CurrentDraftState> ResetDraftAsync(int draftId, CancellationToken cancellationToken = default);
 

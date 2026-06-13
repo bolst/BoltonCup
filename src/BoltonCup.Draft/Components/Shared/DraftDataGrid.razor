@@ -2,6 +2,7 @@
 @namespace BoltonCup.Draft.Components
 @implements IDisposable
 @inject DraftStateService DraftState
+@inject IDialogService DialogService
 
 @if (DraftState.Draft is not null)
 {
@@ -51,8 +52,8 @@
     </MudTable>
     
     <MudMenu @ref="@_contextMenu" id="_contextMenu" Modal="true" PositionAtCursor>
-        <MudMenuItem>
-            context menu item for @_contextDraftPick?.Player?.FullName
+        <MudMenuItem Icon="@Icons.Material.Rounded.SwapHoriz" OnClick="@OpenReplacePickDialog">
+            Change pick
         </MudMenuItem>
     </MudMenu>
 }
@@ -72,13 +73,25 @@
 
     private Task OnCellClick(MouseEventArgs args, Sdk.DraftPickDto draftPick)
     {
-        // TODO: improve
-        if (draftPick.Player is null)
+        // Only the draft owner/admin can change a pick, and only filled picks can be replaced.
+        if (!DraftState.CanManageDraft || draftPick.Player is null)
             return Task.CompletedTask;
-        return Task.CompletedTask;
-        
+
         _contextDraftPick = draftPick;
         return _contextMenu.OpenMenuAsync(args);
+    }
+
+    private Task OpenReplacePickDialog()
+    {
+        if (_contextDraftPick is not { } pick)
+            return Task.CompletedTask;
+
+        return DialogService.ShowAsync<ReplacePickDialog>(
+            "Change pick",
+            new DialogParameters<ReplacePickDialog>
+            {
+                { x => x.Pick, pick }
+            });
     }
 
 

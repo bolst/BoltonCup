@@ -1,0 +1,92 @@
+@using BoltonCup.Draft.Services
+@using BoltonCup.Sdk
+@namespace BoltonCup.Draft.Components.Shared
+@inject IBoltonCupApi BoltonCupApi
+@inject ISnackbar Snackbar
+@inject DraftStateService DraftState
+
+
+<MudDialog>
+    <TitleContent>
+        <div class="d-flex flex-row align-center gap-2">
+            <MudImage Src="@Pick.Team.Logo" Height="28" />
+            <MudText Typo="Typo.h6">
+                Replace @Pick.Player?.FullName
+                <MudText Typo="Typo.caption" Class="ml-1">(@Pick.Team.NameShort &middot; @Pick.Round.@Pick.RoundPick)</MudText>
+            </MudText>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <div style="height: 60vh">
+            <PlayerRankingsDataGrid
+                Items="@AvailablePlayers"
+                OnToggleFavourite="@ToggleFavouriteAsync"
+                ActionIcon="@Icons.Material.Rounded.SwapHoriz"
+                OnAction="@ReplaceAsync"
+                ActionDisabled="@(_ => _submitting)"/>
+        </div>
+    </DialogContent>
+</MudDialog>
+
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter]
+    public required DraftPickDto Pick { get; set; }
+
+    private bool _submitting;
+
+    private IEnumerable<DraftRankingDto> AvailablePlayers =>
+        DraftState.PlayerRankings.Where(r => !r.IsDrafted && !r.IsExcluded);
+
+    protected override Task OnInitializedAsync()
+    {
+        return Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            BackdropClick = true,
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+        });
+    }
+
+    private async Task ReplaceAsync(DraftRankingDto ranking)
+    {
+        if (_submitting)
+            return;
+        _submitting = true;
+
+        try
+        {
+            await BoltonCupApi.ReplacePickAsync(Pick.DraftId, Pick.OverallPick, new ReplaceDraftPickRequest
+            {
+                NewPlayerId = ranking.Player.Id
+            });
+            Dialog.Close();
+        }
+        catch (ApiException e)
+        {
+            Snackbar.Add($"Unable to replace pick: {e.Message}", Severity.Error);
+            _submitting = false;
+        }
+    }
+
+    private async Task ToggleFavouriteAsync(DraftRankingDto ranking)
+    {
+        ranking.IsFavourite = !ranking.IsFavourite;
+        StateHasChanged();
+        try
+        {
+            await BoltonCupApi.ToggleFavouriteAsync(DraftState.Draft!.Id, ranking.Player.Id);
+        }
+        catch
+        {
+            ranking.IsFavourite = !ranking.IsFavourite;
+            StateHasChanged();
+        }
+    }
+}
