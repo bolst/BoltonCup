@@ -6,10 +6,12 @@
         <PropertyColumn Property="x => x.Rank" Title="#" CellStyle="width: 40px" />
         <PropertyColumn Property="x => x.NameShort" Title="Team">
             <CellTemplate>
-                <div class="d-flex flex-row align-center gap-2">
-                    <MudImage Src="@context.Item.Logo" Alt="@context.Item.Abbreviation" Height="32" />
-                    <MudText Typo="Typo.body2"><b>@context.Item.NameShort</b></MudText>
-                </div>
+                <MudLink Href="@($"/teams/{context.Item.TeamId}/roster")" Underline="Underline.Hover" Color="Color.Inherit">
+                    <div class="d-flex flex-row align-center gap-2">
+                        <MudImage Src="@context.Item.Logo" Alt="@context.Item.Abbreviation" Height="32" />
+                        <MudText Typo="Typo.body2"><b>@context.Item.NameShort</b></MudText>
+                    </div>
+                </MudLink>
             </CellTemplate>
         </PropertyColumn>
         <PropertyColumn Property="x => x.GamesPlayed" Title="GP" CellStyle="width: 50px" />
