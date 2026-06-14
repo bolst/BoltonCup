@@ -25,6 +25,8 @@ public interface IDraftService
 
     Task<IReadOnlySet<int>> GetFavouritePlayerIdsAsync(int draftId, int accountId, CancellationToken cancellationToken = default);
     Task<bool> ToggleFavouriteAsync(int draftId, int playerId, int accountId, CancellationToken cancellationToken = default);
+
+    Task<int> AssignPlayersToTeamsFromDraftAsync(int draftId, bool overwriteExisting, CancellationToken cancellationToken = default);
 }
 
 
