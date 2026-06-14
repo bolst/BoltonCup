@@ -1,0 +1,37 @@
+@using BoltonCup.Sdk
+
+<MudDataGrid T="Sdk.StandingRowDto" Items="Rows" Breakpoint="Breakpoint.None" Filterable="false"
+             SortMode="SortMode.None" ShowColumnOptions="false" Elevation="0" Dense Striped Square>
+    <Columns>
+        <PropertyColumn Property="x => x.Rank" Title="#" CellStyle="width: 40px" />
+        <PropertyColumn Property="x => x.NameShort" Title="Team">
+            <CellTemplate>
+                <MudLink Href="@($"/teams/{context.Item.TeamId}/roster")" Underline="Underline.Hover" Color="Color.Inherit">
+                    <div class="d-flex flex-row align-center gap-2">
+                        <MudImage Src="@context.Item.Logo" Alt="@context.Item.Abbreviation" Height="32" />
+                        <MudText Typo="Typo.body2"><b>@context.Item.NameShort</b></MudText>
+                    </div>
+                </MudLink>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.GamesPlayed" Title="GP" CellStyle="width: 50px" />
+        <PropertyColumn Property="x => x.Wins" Title="W" CellStyle="width: 50px" />
+        <PropertyColumn Property="x => x.Losses" Title="L" CellStyle="width: 50px" />
+        <PropertyColumn Property="x => x.Ties" Title="T" CellStyle="width: 50px" />
+        <PropertyColumn Property="x => x.OtSoLosses" Title="OTL" CellStyle="width: 50px" />
+        <PropertyColumn Property="x => x.RegulationWins" Title="RW" CellStyle="width: 50px" />
+        <PropertyColumn Property="x => x.GoalsFor" Title="GF" CellStyle="width: 50px" />
+        <PropertyColumn Property="x => x.GoalsAgainst" Title="GA" CellStyle="width: 50px" />
+        <PropertyColumn Property="x => x.GoalDifferential" Title="DIFF" CellStyle="width: 60px" />
+        <PropertyColumn Property="x => x.Points" Title="PTS" CellStyle="width: 50px">
+            <CellTemplate>
+                <MudText Typo="Typo.body2"><b>@context.Item.Points</b></MudText>
+            </CellTemplate>
+        </PropertyColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    [Parameter, EditorRequired]
+    public required IEnumerable<Sdk.StandingRowDto> Rows { get; set; }
+}
