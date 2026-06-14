@@ -1,0 +1,121 @@
+@page "/standings"
+@using BoltonCup.WebClient.Services
+@inject IBoltonCupApi BoltonCupApi
+@inject BcStateService BcState
+@inject NavigationManager Nav
+@attribute [Sitemap(SitemapChangeFrequency.Daily, LastModified = "2026-02-01")]
+
+<PageTitle>Standings | Bolton Cup</PageTitle>
+<HeadContent>
+    <meta name="description" content="The official Bolton Cup standings including round robin and playoff results.">
+</HeadContent>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="my-4" Gutters="false">
+    <div class="d-flex flex-row align-center justify-space-between flex-wrap gap-2 ml-4 mr-4">
+        <MudText Typo="Typo.h6">Standings</MudText>
+        @if (_tournaments.Count > 1)
+        {
+            <MudSelect T="int" Value="_selectedTournamentId" ValueChanged="OnTournamentChanged"
+                       Label="Tournament" Variant="Variant.Outlined" Margin="Margin.Dense" Dense Style="max-width: 280px">
+                @foreach (var tournament in _tournaments)
+                {
+                    <MudSelectItem T="int" Value="tournament.Id">@tournament.Name</MudSelectItem>
+                }
+            </MudSelect>
+        }
+    </div>
+
+    @if (_loading)
+    {
+        <div class="d-flex justify-center my-8">
+            <MudProgressCircular Indeterminate Color="Color.Primary" />
+        </div>
+    }
+    else if (_standings is null)
+    {
+        <MudText Class="ml-4 my-4" Typo="Typo.body1">No standings are available yet.</MudText>
+    }
+    else
+    {
+        <MudTabs Rounded KeepPanelsAlive ActivePanelIndex="_activeTabIndex" ActivePanelIndexChanged="OnTabChanged">
+            <MudTabPanel Text="Round Robin">
+                <StandingsDataGrid Rows="_standings.RoundRobin" />
+            </MudTabPanel>
+            <MudTabPanel Text="Playoffs">
+                <StandingsDataGrid Rows="_standings.Playoffs" />
+            </MudTabPanel>
+        </MudTabs>
+    }
+</MudContainer>
+
+@code {
+
+    private const string PlayoffsType = "playoffs";
+    private const string RoundRobinType = "roundrobin";
+
+    [Parameter, SupplyParameterFromQuery(Name = "tournament")]
+    public int? TournamentQuery { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = "type")]
+    public string? TypeQuery { get; set; }
+
+    private List<Sdk.TournamentDto> _tournaments = [];
+    private int _selectedTournamentId;
+    private int _defaultTournamentId;
+    private int _activeTabIndex;
+    private int _loadedTournamentId = -1;
+    private Sdk.TournamentStandingsDto? _standings;
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var context = await BcState.Context;
+        var tournaments = await BoltonCupApi.GetTournamentsAsync();
+        _tournaments = tournaments.Items.ToList();
+        _defaultTournamentId = context.ActiveTournament?.Id
+            ?? _tournaments.FirstOrDefault()?.Id
+            ?? 0;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _selectedTournamentId = TournamentQuery is { } id && _tournaments.Any(t => t.Id == id)
+            ? id
+            : _defaultTournamentId;
+        _activeTabIndex = string.Equals(TypeQuery, PlayoffsType, StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+
+        if (_selectedTournamentId != _loadedTournamentId)
+        {
+            _loadedTournamentId = _selectedTournamentId;
+            await LoadStandingsAsync();
+        }
+    }
+
+    private void OnTournamentChanged(int tournamentId) => NavigateTo(tournamentId, _activeTabIndex);
+
+    private void OnTabChanged(int index)
+    {
+        if (index != _activeTabIndex)
+        {}
+            NavigateTo(_selectedTournamentId, index);
+    }
+
+    private void NavigateTo(int tournamentId, int tabIndex)
+    {
+        var uri = Nav.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["tournament"] = tournamentId,
+            ["type"] = tabIndex == 1 ? PlayoffsType : RoundRobinType,
+        });
+        Nav.NavigateTo(uri, replace: true);
+    }
+
+    private async Task LoadStandingsAsync()
+    {
+        _loading = true;
+        _standings = _selectedTournamentId == 0
+            ? null
+            : await BoltonCupApi.GetStandingsAsync(_selectedTournamentId);
+        _loading = false;
+    }
+}
