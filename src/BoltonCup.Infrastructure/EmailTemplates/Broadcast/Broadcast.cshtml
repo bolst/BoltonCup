@@ -1,0 +1,11 @@
+@using BoltonCup.Infrastructure.EmailTemplates
+@model BroadcastEmailViewModel
+@{
+    // ReSharper disable once Razor.LayoutNotResolved
+    if (Model.UseLayout)
+    {
+        Layout = EmailConstants.SharedLayout;
+    }
+}
+
+@Raw(Model.BodyHtml)

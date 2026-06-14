@@ -1,3 +1,6 @@
+using BoltonCup.Core;
+using BoltonCup.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,7 +35,8 @@ public class EmailBackgroundService : BackgroundService
                 using var scope = _serviceProvider.CreateScope();
                 var razorEngine = scope.ServiceProvider.GetRequiredService<IRazorLightEngine>();
                 var transport = scope.ServiceProvider.GetRequiredService<IEmailTransport>();
-                await ProcessEmailAsync(payload, razorEngine, transport, stoppingToken);
+                var dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<BoltonCupDbContext>>();
+                await ProcessEmailAsync(payload, razorEngine, transport, dbFactory, stoppingToken);
             }
             catch (OperationCanceledException)
             {
@@ -45,8 +49,10 @@ public class EmailBackgroundService : BackgroundService
         }
     }
 
-    private async Task ProcessEmailAsync(EmailPayload payload, IRazorLightEngine razor, IEmailTransport transport, CancellationToken token)
+    private async Task ProcessEmailAsync(EmailPayload payload, IRazorLightEngine razor, IEmailTransport transport, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
     {
+        var succeeded = false;
+        string? error = null;
         try
         {
             _logger.LogInformation("Processing email for {Email}", payload.Email);
@@ -56,12 +62,38 @@ public class EmailBackgroundService : BackgroundService
 
             await transport.SendAsync(payload.Email, payload.Subject, htmlMessage, textMessage, token);
 
+            succeeded = true;
             _logger.LogInformation("Successfully sent email to {Email}", payload.Email);
         }
         catch (Exception ex)
         {
             // (When we eventually need automatic retries on failure, this is where Hangfire comes in).
+            error = ex.Message;
             _logger.LogError(ex, "Failed to send email to {Email}", payload.Email);
+        }
+
+        await WriteLogAsync(payload, succeeded, error, dbFactory, token);
+    }
+
+    private async Task WriteLogAsync(EmailPayload payload, bool succeeded, string? error, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
+    {
+        try
+        {
+            await using var db = await dbFactory.CreateDbContextAsync(token);
+            db.EmailLogs.Add(new EmailLog
+            {
+                Recipient = payload.Email,
+                Subject = payload.Subject,
+                TemplateName = payload.TemplateName,
+                Succeeded = succeeded,
+                Error = error,
+                BroadcastId = payload.BroadcastId,
+            });
+            await db.SaveChangesAsync(token);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to write email log for {Email}", payload.Email);
         }
     }
 }
