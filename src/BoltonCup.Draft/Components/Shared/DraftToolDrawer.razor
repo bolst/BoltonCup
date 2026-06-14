@@ -8,106 +8,50 @@
 @inject ISnackbar Snackbar
 
 <div class="mud-height-full mud-width-full">
-    <MudDataGrid
-        T="DraftRankingDto" Items="@DraftState.PlayerRankings" Class="filter-datagrid d-flex flex-column mud-height-full pa-1"
-        QuickFilter="@QuickFilter" RowClassFunc="@RowClassFunc" RowClick="@OnRowClick" Breakpoint="Breakpoint.None"
-        ShowColumnOptions="false" Elevation="0" Hover Bordered Dense FixedHeader>
-        <ToolBarContent>
-            <div class="d-flex flex-row align-center gap-3 flex-wrap">
-                <MudCheckBox @bind-Value="@_filterState.ShowDrafted" Size="Size.Small" Label="Show Drafted" Dense/>
-                <MudCheckBox @bind-Value="@_filterState.FavouritesOnly" Size="Size.Small" Label="Favourites only" Dense/>
-                @if (DraftState.CanManageDraft && DraftState.AvailableCustomRankings.Count > 0)
-                {
-                    <MudSelect T="int?" Value="@DraftState.Draft?.DefaultCustomRankingId" ValueChanged="@ApplyDefaultRankingAsync"
-                               Label="Default Ranking" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable Dense Style="min-width: 180px">
-                        <MudSelectItem T="int?" Value="@((int?)null)">Points per game (default)</MudSelectItem>
-                        @foreach (var ranking in DraftState.AvailableCustomRankings)
-                        {
-                            <MudSelectItem T="int?" Value="@ranking.Id">@ranking.Title</MudSelectItem>
-                        }
-                    </MudSelect>
-                }
-                @if (DraftState.AvailableCustomRankings.Count > 0)
-                {
-                    <MudSelect T="int?" Value="@DraftState.SelectedCustomRankingId" ValueChanged="@DraftState.SelectCustomRankingAsync"
-                               Label="Ranking" Variant="Variant.Outlined" Margin="Margin.Dense" Dense Style="min-width: 180px">
-                        <MudSelectItem T="int?" Value="@((int?)null)">Default</MudSelectItem>
-                        @foreach (var ranking in DraftState.AvailableCustomRankings)
-                        {
-                            <MudSelectItem T="int?" Value="@ranking.Id">@ranking.Title</MudSelectItem>
-                        }
-                    </MudSelect>
-                }
-                <div style="width: 300px">
-                    <MudTextField @bind-Value="@_filterState.Search" Placeholder="Search"
-                                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info"
-                                  IconSize="Size.Medium" Variant="Variant.Text" Margin="Margin.Dense" DebounceInterval="200" FullWidth Clearable Immediate/>
-                </div>
-                @if (DraftState.CanManageDraft && DraftState.Draft?.Status is not DraftStatus.Pending)
-                {
-                    <MudMenu Icon="@Icons.Material.Rounded.MoreVert" Size="Size.Small"
-                             AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
-                        <MudMenuItem OnClick="@UndoLastPickAsync" Label="Undo last pick" Icon="@Icons.Material.Rounded.Undo" Disabled="@(DraftState.CurrentPick?.OverallPick == 1)" />
-                        <MudMenuItem OnClick="@ResetDraftAsync" Label="Reset draft" Icon="@Icons.Material.Rounded.RestartAlt" IconColor="Color.Error" Disabled="@(DraftState.CurrentPick?.OverallPick == 1)" />
-                    </MudMenu>
-                }
-            </div>
-        </ToolBarContent>
-        <Columns>
-            <TemplateColumn Title="" CellStyle="width: 40px" Sortable="false">
-                <CellTemplate>
-                    <MudIconButton
-                        OnClick="@(_ => ToggleFavouriteAsync(context.Item))"
-                        Icon="@(context.Item.IsFavourite ? Icons.Material.Rounded.Star : Icons.Material.Rounded.StarBorder)"
-                        Color="@(context.Item.IsFavourite ? Color.Warning : Color.Default)"
-                        Size="Size.Small"/>
-                </CellTemplate>
-            </TemplateColumn>
-            <PropertyColumn Title="Rank" Property="x => x.DraftRanking" CellStyle="width: 50px">
-                <CellTemplate>
-                    <div class="d-flex flex-row align-center gap-1">
-                        @if (!context.Item.IsDrafted)
-                        {
-                            <MudIconButton
-                                OnClick="@(_ => DraftPlayerAsync(context.Item))" Disabled="@(DraftState.Draft?.Status != DraftStatus.InProgress || DraftState.IsAutoPicking)"
-                                Icon="@Icons.Material.Rounded.Add" Class="rounded" Size="Size.Small"/>
-                        }
-                        <MudSpacer/>
-                        <MudText Typo="Typo.body2">@context.Item.DraftRanking</MudText>
-                    </div>
-                </CellTemplate>
-            </PropertyColumn>
-            <PropertyColumn Title="Player" Property="x => x.Player.FullName">
-                <CellTemplate>
-                    @if (context.Item.IsDrafted)
+    <PlayerRankingsDataGrid
+        Items="@DraftState.PlayerRankings"
+        OnToggleFavourite="@ToggleFavouriteAsync"
+        ActionIcon="@Icons.Material.Rounded.Add"
+        OnAction="@DraftPlayerAsync"
+        ActionVisible="@(r => !r.IsDrafted)"
+        ActionDisabled="@(_ => DraftState.Draft?.Status != DraftStatus.InProgress || DraftState.IsAutoPicking)">
+        <ToolbarExtras>
+            @if (DraftState.CanManageDraft && DraftState.AvailableCustomRankings.Count > 0)
+            {
+                <MudSelect T="int?" Value="@DraftState.Draft?.DefaultCustomRankingId" ValueChanged="@ApplyDefaultRankingAsync"
+                           Label="Default Ranking" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable Dense Style="min-width: 180px">
+                    <MudSelectItem T="int?" Value="@((int?)null)">Points per game (default)</MudSelectItem>
+                    @foreach (var ranking in DraftState.AvailableCustomRankings)
                     {
-                        <div class="d-flex flex-row align-center gap-1">
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">@context.Item.Player.FullName</MudText>
-                            <MudImage Src="@context.Item.DraftPick?.Team.Logo" Height="24"/>
-                        </div>
+                        <MudSelectItem T="int?" Value="@ranking.Id">@ranking.Title</MudSelectItem>
                     }
-                    else
+                </MudSelect>
+            }
+            @if (DraftState.AvailableCustomRankings.Count > 0)
+            {
+                <MudSelect T="int?" Value="@DraftState.SelectedCustomRankingId" ValueChanged="@DraftState.SelectCustomRankingAsync"
+                           Label="Ranking" Variant="Variant.Outlined" Margin="Margin.Dense" Dense Style="min-width: 180px">
+                    <MudSelectItem T="int?" Value="@((int?)null)">Default</MudSelectItem>
+                    @foreach (var ranking in DraftState.AvailableCustomRankings)
                     {
-                        <span>@context.Item.Player.FullName</span>
+                        <MudSelectItem T="int?" Value="@ranking.Id">@ranking.Title</MudSelectItem>
                     }
-                </CellTemplate>
-            </PropertyColumn>
-            <PropertyColumn Title="Pos" Property="x => x.Player.Position">
-                <CellTemplate>
-                    <PositionChip Position="@context.Item.Player.Position" Size="Size.Small"/>
-                </CellTemplate>
-            </PropertyColumn>
-            <PropertyColumn Title="PPG" Property="x => x.PointsPerGame" Format="F2"/>
-            <PropertyColumn Title="P" Property="x => x.TotalPoints"/>
-            <PropertyColumn Title="GP" Property="x => x.GamesPlayed"/>
-        </Columns>
-    </MudDataGrid>
+                </MudSelect>
+            }
+            @if (DraftState.CanManageDraft && DraftState.Draft?.Status is not DraftStatus.Pending)
+            {
+                <MudMenu Icon="@Icons.Material.Rounded.MoreVert" Size="Size.Small"
+                         AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                    <MudMenuItem OnClick="@UndoLastPickAsync" Label="Undo last pick" Icon="@Icons.Material.Rounded.Undo" Disabled="@(DraftState.CurrentPick?.OverallPick == 1)" />
+                    <MudMenuItem OnClick="@ResetDraftAsync" Label="Reset draft" Icon="@Icons.Material.Rounded.RestartAlt" IconColor="Color.Error" Disabled="@(DraftState.CurrentPick?.OverallPick == 1)" />
+                </MudMenu>
+            }
+        </ToolbarExtras>
+    </PlayerRankingsDataGrid>
 </div>
 
 
 @code {
-
-    private readonly FilterState _filterState = new();
 
     protected override void OnInitialized()
     {
@@ -116,44 +60,7 @@
 
     private void HandleStateChanged() => InvokeAsync(StateHasChanged);
 
-    private bool QuickFilter(Sdk.DraftRankingDto ranking)
-    {
-        if (ranking.IsExcluded)
-            return false;
-
-        var result = true;
-
-        if (!string.IsNullOrEmpty(_filterState.Search))
-            result = result && ranking.Player.FullName.Contains(_filterState.Search, StringComparison.OrdinalIgnoreCase);
-        
-        if (!_filterState.ShowDrafted)
-            result = result && !ranking.IsDrafted;
-
-        if (_filterState.FavouritesOnly)
-            result = result && ranking.IsFavourite;
-
-        return result;
-    }
-
-    private string RowClassFunc(Sdk.DraftRankingDto ranking, int rowNumber)
-    {
-        if (ranking.IsDrafted)
-            return "gray darken-3 mud-secondary-text";
-
-        return "cursor-pointer";
-    }
-
-    private Task OnRowClick(DataGridRowClickEventArgs<DraftRankingDto> args)
-    {
-        // TODO
-        return Task.CompletedTask;
-        return DialogService.ShowAsync<PlayerDialog>(new DialogParameters<PlayerDialog>
-        {
-            { x => x.PlayerId, args.Item.Player.Id }
-        });
-    }
-
-    private async Task DraftPlayerAsync(Sdk.DraftRankingDto ranking)
+    private async Task DraftPlayerAsync(DraftRankingDto ranking)
     {
         await BoltonCupApi.DraftPlayerAsync(DraftState.Draft!.Id, new DraftPlayerRequest
         {
@@ -221,7 +128,7 @@
         }
     }
 
-    private async Task ToggleFavouriteAsync(Sdk.DraftRankingDto ranking)
+    private async Task ToggleFavouriteAsync(DraftRankingDto ranking)
     {
         ranking.IsFavourite = !ranking.IsFavourite;
         StateHasChanged();
@@ -239,14 +146,5 @@
     public void Dispose()
     {
         DraftState.OnStateChanged -= HandleStateChanged;
-    }
-
-    private class FilterState
-    {
-        public bool ShowDrafted { get; set; }
-
-        public bool FavouritesOnly { get; set; }
-
-        public string Search { get; set; } = string.Empty;
     }
 }

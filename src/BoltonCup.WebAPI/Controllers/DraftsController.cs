@@ -198,6 +198,32 @@ public class DraftsController(
         return Ok();
     }
 
+    /// <summary>Replaces the player on an already-made pick with an available player and broadcasts the new state (admin or draft owner).</summary>
+    [Authorize]
+    [HttpPut("{id:int}/picks/{overallPick:int}")]
+    public async Task<IActionResult> ReplacePick(
+        int id,
+        int overallPick,
+        [FromBody] ReplaceDraftPickRequest request,
+        [FromServices] IHubContext<Hubs.DraftHub> hubContext
+    )
+    {
+        var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
+        if (!canManage)
+        {
+            return Forbid();
+        }
+
+        var command = _mapper.ToCommand(id, overallPick, request);
+        var draftState = await _draftService.ReplacePickAsync(command);
+
+        var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
+        var payloadDto = _mapper.ToDto(draftState, authorized, canManage);
+        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftUpdate, payloadDto);
+
+        return Ok();
+    }
+
     /// <summary>Reverts the last manual pick and any auto-picks that followed it, then broadcasts the new state (admin or draft owner).</summary>
     [Authorize]
     [HttpPatch("{id:int}/undo")]

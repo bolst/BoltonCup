@@ -1,0 +1,145 @@
+@using BoltonCup.Sdk
+@namespace BoltonCup.Draft.Components.Shared
+
+<MudDataGrid
+    T="DraftRankingDto" Items="@Items" Class="filter-datagrid d-flex flex-column mud-height-full pa-1"
+    QuickFilter="@QuickFilter" RowClassFunc="@RowClassFunc" RowClick="@HandleRowClick" Breakpoint="Breakpoint.None"
+    ShowColumnOptions="false" Elevation="0" Hover Bordered Dense FixedHeader>
+    <ToolBarContent>
+        <div class="d-flex flex-row align-center gap-3 flex-wrap">
+            <MudCheckBox @bind-Value="@_filterState.ShowDrafted" Size="Size.Small" Label="Show Drafted" Dense/>
+            <MudCheckBox @bind-Value="@_filterState.FavouritesOnly" Size="Size.Small" Label="Favourites only" Dense/>
+            @ToolbarExtras
+            <div style="width: 300px">
+                <MudTextField @bind-Value="@_filterState.Search" Placeholder="Search"
+                              Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search" AdornmentColor="Color.Info"
+                              IconSize="Size.Medium" Variant="Variant.Text" Margin="Margin.Dense" DebounceInterval="200" FullWidth Clearable Immediate/>
+            </div>
+        </div>
+    </ToolBarContent>
+    <Columns>
+        @if (ShowFavouriteColumn)
+        {
+            <TemplateColumn Title="" CellStyle="width: 40px" Sortable="false">
+                <CellTemplate>
+                    <MudIconButton
+                        OnClick="@(_ => OnToggleFavourite.InvokeAsync(context.Item))"
+                        Icon="@(context.Item.IsFavourite ? Icons.Material.Rounded.Star : Icons.Material.Rounded.StarBorder)"
+                        Color="@(context.Item.IsFavourite ? Color.Warning : Color.Default)"
+                        Size="Size.Small"/>
+                </CellTemplate>
+            </TemplateColumn>
+        }
+        <PropertyColumn Title="Rank" Property="x => x.DraftRanking" CellStyle="width: 50px">
+            <CellTemplate>
+                <div class="d-flex flex-row align-center gap-1">
+                    @if (ActionVisible(context.Item))
+                    {
+                        <MudIconButton
+                            OnClick="@(_ => OnAction.InvokeAsync(context.Item))" Disabled="@ActionDisabled(context.Item)"
+                            Icon="@ActionIcon" Class="rounded" Size="Size.Small"/>
+                    }
+                    <MudSpacer/>
+                    <MudText Typo="Typo.body2">@context.Item.DraftRanking</MudText>
+                </div>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Player" Property="x => x.Player.FullName">
+            <CellTemplate>
+                @if (context.Item.IsDrafted)
+                {
+                    <div class="d-flex flex-row align-center gap-1">
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@context.Item.Player.FullName</MudText>
+                        <MudImage Src="@context.Item.DraftPick?.Team.Logo" Height="24"/>
+                    </div>
+                }
+                else
+                {
+                    <span>@context.Item.Player.FullName</span>
+                }
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Pos" Property="x => x.Player.Position">
+            <CellTemplate>
+                <PositionChip Position="@context.Item.Player.Position" Size="Size.Small"/>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="PPG" Property="x => x.PointsPerGame" Format="F2"/>
+        <PropertyColumn Title="P" Property="x => x.TotalPoints"/>
+        <PropertyColumn Title="GP" Property="x => x.GamesPlayed"/>
+    </Columns>
+</MudDataGrid>
+
+
+@code {
+
+    [Parameter, EditorRequired]
+    public IEnumerable<DraftRankingDto> Items { get; set; } = [];
+
+    [Parameter]
+    public string ActionIcon { get; set; } = Icons.Material.Rounded.Add;
+
+    [Parameter]
+    public EventCallback<DraftRankingDto> OnAction { get; set; }
+
+    [Parameter]
+    public Func<DraftRankingDto, bool> ActionVisible { get; set; } = _ => true;
+
+    [Parameter]
+    public Func<DraftRankingDto, bool> ActionDisabled { get; set; } = _ => false;
+
+    [Parameter]
+    public bool ShowFavouriteColumn { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<DraftRankingDto> OnToggleFavourite { get; set; }
+
+    [Parameter]
+    public EventCallback<DraftRankingDto> OnRowClick { get; set; }
+
+    [Parameter]
+    public RenderFragment? ToolbarExtras { get; set; }
+
+    private readonly FilterState _filterState = new();
+
+    private bool QuickFilter(DraftRankingDto ranking)
+    {
+        if (ranking.IsExcluded)
+            return false;
+
+        var result = true;
+
+        if (!string.IsNullOrEmpty(_filterState.Search))
+            result = result && ranking.Player.FullName.Contains(_filterState.Search, StringComparison.OrdinalIgnoreCase);
+
+        if (!_filterState.ShowDrafted)
+            result = result && !ranking.IsDrafted;
+
+        if (_filterState.FavouritesOnly)
+            result = result && ranking.IsFavourite;
+
+        return result;
+    }
+
+    private string RowClassFunc(DraftRankingDto ranking, int rowNumber)
+    {
+        if (ranking.IsDrafted)
+            return "gray darken-3 mud-secondary-text";
+
+        return "cursor-pointer";
+    }
+
+    private Task HandleRowClick(DataGridRowClickEventArgs<DraftRankingDto> args)
+    {
+        return OnRowClick.HasDelegate ? OnRowClick.InvokeAsync(args.Item) : Task.CompletedTask;
+    }
+
+    private class FilterState
+    {
+        public bool ShowDrafted { get; set; }
+
+        public bool FavouritesOnly { get; set; }
+
+        public string Search { get; set; } = string.Empty;
+    }
+}
