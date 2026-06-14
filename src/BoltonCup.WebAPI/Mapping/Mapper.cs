@@ -357,6 +357,15 @@ public class Mapper : IMapper
         );
     }
 
+    public ReplaceDraftPickCommand ToCommand(int draftId, int overallPick, ReplaceDraftPickRequest request)
+    {
+        return new ReplaceDraftPickCommand(
+            DraftId: draftId,
+            OverallPick: overallPick,
+            NewPlayerId: request.NewPlayerId
+        );
+    }
+
     public SetPlayerPoolCommand ToCommand(SetPlayerPoolRequest request)
     {
         return new SetPlayerPoolCommand(
