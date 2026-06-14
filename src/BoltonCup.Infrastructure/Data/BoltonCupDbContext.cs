@@ -37,6 +37,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<PlayerFavourite> PlayerFavourites { get; set; }
     public DbSet<CustomRanking> CustomRankings { get; set; }
     public DbSet<CustomRankingPlayer> CustomRankingPlayers { get; set; }
+    public DbSet<SentEmail> SentEmails { get; set; }
+    public DbSet<EmailLog> EmailLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -772,8 +774,37 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.SortKey).HasColumnName("sort_key");
             entity.Property(e => e.IsActive).HasColumnName("is_active");
         });
-        
-        
+
+        modelBuilder.Entity<SentEmail>(entity =>
+        {
+            entity
+                .ToTable("sent_emails")
+                .HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.Subject).HasColumnName("subject");
+            entity.Property(e => e.Body).HasColumnName("body");
+            entity.Property(e => e.Audience).HasColumnName("audience");
+            entity.Property(e => e.RecipientCount).HasColumnName("recipient_count");
+            entity.Property(e => e.UseLayout).HasColumnName("use_layout");
+            entity.Property(e => e.BroadcastId).HasColumnName("broadcast_id");
+        });
+
+        modelBuilder.Entity<EmailLog>(entity =>
+        {
+            entity
+                .ToTable("email_logs")
+                .HasKey(e => e.Id);
+            entity.HasIndex(e => e.BroadcastId);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.Recipient).HasColumnName("recipient");
+            entity.Property(e => e.Subject).HasColumnName("subject");
+            entity.Property(e => e.TemplateName).HasColumnName("template_name");
+            entity.Property(e => e.Succeeded).HasColumnName("succeeded");
+            entity.Property(e => e.Error).HasColumnName("error");
+            entity.Property(e => e.BroadcastId).HasColumnName("broadcast_id");
+        });
+
+
         // entities deriving from EntityBase should have created_at = now() by default
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {

@@ -1,0 +1,422 @@
+@page "/emails"
+@using BoltonCup.Common
+@using BoltonCup.Infrastructure.Services
+@inject IDbContextFactory<BoltonCupDbContext> DbFactory
+@inject IEmailer Emailer
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<div class="d-flex justify-center pa-4">
+    <MudPaper Elevation="4" Class="rounded-lg" Style="width: 100%; max-width: 880px; overflow: hidden;">
+
+        <MudToolBar Class="mud-theme-dark" Dense>
+            <MudIcon Icon="@Icons.Material.Rounded.Email" Class="mr-2" Size="Size.Small" />
+            <MudText Typo="Typo.subtitle2">New Message</MudText>
+            <MudSpacer />
+            @if (_loading)
+            {
+                <MudProgressCircular Indeterminate Size="Size.Small" Color="Color.Inherit" />
+            }
+        </MudToolBar>
+
+        @* ---- To / audience row ---- *@
+        <div class="px-4 py-2" style="border-bottom: 1px solid var(--mud-palette-lines-default);">
+            <div class="d-flex align-center flex-wrap gap-2">
+                <MudText Typo="Typo.body2" Class="mud-text-secondary" Style="width: 32px;">To</MudText>
+
+                <MudSelect T="AudienceKind" Value="_kind" ValueChanged="OnKindChanged"
+                           Variant="Variant.Text" Margin="Margin.Dense" Dense Style="max-width: 220px;">
+                    <MudSelectItem T="AudienceKind" Value="AudienceKind.PlayerPool">Tournament player pool</MudSelectItem>
+                    <MudSelectItem T="AudienceKind" Value="AudienceKind.Unpaid">Signed up but not paid</MudSelectItem>
+                    <MudSelectItem T="AudienceKind" Value="AudienceKind.AllAccounts">All accounts</MudSelectItem>
+                </MudSelect>
+
+                @if (_kind != AudienceKind.AllAccounts)
+                {
+                    <MudSelect T="int?" Value="_tournamentId" ValueChanged="OnTournamentChanged" Placeholder="Select tournament"
+                               Variant="Variant.Text" Margin="Margin.Dense" Dense Style="max-width: 240px;">
+                        @foreach (var t in _tournaments)
+                        {
+                            <MudSelectItem T="int?" Value="@t.Id">@t.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+
+                <MudSpacer />
+
+                @if (_members.Count > 0)
+                {
+                    <MudButton Size="Size.Small" Variant="Variant.Text"
+                               EndIcon="@(_reviewOpen ? Icons.Material.Rounded.ExpandLess : Icons.Material.Rounded.ExpandMore)"
+                               OnClick="@(() => _reviewOpen = !_reviewOpen)">
+                        @_selected.Count of @_members.Count
+                    </MudButton>
+                }
+            </div>
+
+            @* recipient chips *@
+            @if (_selected.Count > 0)
+            {
+                <div class="d-flex flex-wrap gap-1 mt-2">
+                    @foreach (var r in _selected.Take(ChipLimit))
+                    {
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                                 OnClose="@(() => Deselect(r))" title="@r.Email">
+                            @DisplayName(r)
+                        </MudChip>
+                    }
+                    @if (_selected.Count > ChipLimit)
+                    {
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Primary"
+                                 OnClick="@(() => _reviewOpen = true)">
+                            +@(_selected.Count - ChipLimit) more
+                        </MudChip>
+                    }
+                </div>
+            }
+            else if (!_loading && _kind != AudienceKind.AllAccounts && _tournamentId is null)
+            {
+                <MudText Typo="Typo.caption" Class="mud-text-secondary mt-1">Choose a tournament to load recipients.</MudText>
+            }
+            else if (!_loading && _members.Count == 0)
+            {
+                <MudText Typo="Typo.caption" Class="mud-text-secondary mt-1">No recipients for this audience.</MudText>
+            }
+        </div>
+
+        @* ---- review / deselect panel ---- *@
+        <MudCollapse Expanded="_reviewOpen">
+            <div style="border-bottom: 1px solid var(--mud-palette-lines-default);">
+                <div class="d-flex align-center px-4 py-1" style="background: var(--mud-palette-background-gray);">
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary">Review recipients</MudText>
+                    <MudSpacer />
+                    <MudButton Size="Size.Small" OnClick="SelectAll" Disabled="@(_members.Count == 0)">Select all</MudButton>
+                    <MudButton Size="Size.Small" OnClick="SelectNone" Disabled="@(_selected.Count == 0)">Clear</MudButton>
+                </div>
+                <MudTable T="BroadcastRecipient" Items="_members" MultiSelection
+                          @bind-SelectedItems="_selected" Dense Hover FixedHeader Height="260px"
+                          Comparer="_comparer" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>Name</MudTh>
+                        <MudTh>Email</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Name">@context.FirstName @context.LastName</MudTd>
+                        <MudTd DataLabel="Email">@context.Email</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </div>
+        </MudCollapse>
+
+        @* ---- subject row ---- *@
+        <div class="px-4" style="border-bottom: 1px solid var(--mud-palette-lines-default);">
+            <MudTextField @bind-Value="_subject" Placeholder="Subject" Variant="Variant.Text"
+                          Underline="false" Margin="Margin.Dense" Immediate />
+        </div>
+
+        @* ---- body row ---- *@
+        <div class="px-4 pt-2">
+            <div class="d-flex align-center mb-1">
+                <MudToggleGroup T="bool" Value="_previewMode" ValueChanged="@(v => _previewMode = v)"
+                                Size="Size.Small" Color="Color.Primary" CheckMark="false" Dense>
+                    <MudToggleItem Value="false">
+                        <MudIcon Icon="@Icons.Material.Rounded.Edit" Size="Size.Small" Class="mr-1" /> Write
+                    </MudToggleItem>
+                    <MudToggleItem Value="true">
+                        <MudIcon Icon="@Icons.Material.Rounded.Visibility" Size="Size.Small" Class="mr-1" /> Preview
+                    </MudToggleItem>
+                </MudToggleGroup>
+                <MudSpacer />
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">Markdown · {{FirstName}} {{LastName}}</MudText>
+            </div>
+
+            @if (_previewMode)
+            {
+                <div class="pa-2" style="min-height: 280px;">
+                    @if (string.IsNullOrWhiteSpace(_body))
+                    {
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">Nothing to preview yet.</MudText>
+                    }
+                    else
+                    {
+                        <MudMarkdown Value="@_body" />
+                    }
+                </div>
+            }
+            else
+            {
+                <MudTextField @bind-Value="_body" Variant="Variant.Text" Underline="false"
+                              Lines="14" AutoGrow Immediate
+                              Placeholder="Write your message in Markdown…" />
+            }
+        </div>
+
+        @* ---- send bar ---- *@
+        <div class="d-flex align-center gap-3 px-4 py-3" style="border-top: 1px solid var(--mud-palette-lines-default);">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large"
+                       StartIcon="@Icons.Material.Rounded.Send" OnClick="SendAsync" Disabled="@(!CanSend)">
+                Send
+            </MudButton>
+            <MudSwitch T="bool" @bind-Value="_useLayout" Color="Color.Primary" Size="Size.Small">Bolton Cup layout</MudSwitch>
+            <MudSpacer />
+            <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                @_selected.Count recipient@(_selected.Count == 1 ? "" : "s")
+            </MudText>
+        </div>
+
+    </MudPaper>
+</div>
+
+@if (_recent.Count > 0)
+{
+    <div class="d-flex justify-center px-4 pb-8">
+        <div style="width: 100%; max-width: 880px;">
+            <div class="d-flex align-center mb-2">
+                <MudText Typo="Typo.subtitle1">Recently sent</MudText>
+                <MudIconButton Icon="@Icons.Material.Rounded.Refresh" Size="Size.Small"
+                               OnClick="LoadRecentAsync" title="Refresh delivery status" />
+            </div>
+            <MudPaper Elevation="1" Class="rounded-lg" Style="overflow: hidden;">
+                <MudExpansionPanels Elevation="0" Gutters="false">
+                    @foreach (var e in _recent)
+                    {
+                        var stat = _deliveryStats.TryGetValue(e.BroadcastId, out var s) ? s : (Sent: 0, Failed: 0);
+                        var pending = e.RecipientCount - stat.Sent - stat.Failed;
+                        <MudExpansionPanel>
+                            <TitleContent>
+                                <div class="d-flex align-center justify-space-between gap-2">
+                                    <div class="d-flex flex-column">
+                                        <MudText Typo="Typo.body1">@(string.IsNullOrWhiteSpace(e.Subject) ? "(no subject)" : e.Subject)</MudText>
+                                        <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                                            @e.Audience · @e.RecipientCount recipient@(e.RecipientCount == 1 ? "" : "s") · @e.CreatedAt.ToEstString("g")
+                                        </MudText>
+                                    </div>
+                                    <div class="d-flex gap-1">
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Success">@stat.Sent sent</MudChip>
+                                        @if (stat.Failed > 0)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Error">@stat.Failed failed</MudChip>
+                                        }
+                                        @if (pending > 0)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Default">@pending pending</MudChip>
+                                        }
+                                    </div>
+                                </div>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudMarkdown Value="@e.Body" />
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    }
+                </MudExpansionPanels>
+            </MudPaper>
+        </div>
+    </div>
+}
+
+@code {
+    private enum AudienceKind { PlayerPool, Unpaid, AllAccounts }
+    private sealed record TournamentOption(int Id, string Name);
+
+    private const int ChipLimit = 15;
+
+    private AudienceKind _kind = AudienceKind.PlayerPool;
+    private List<TournamentOption> _tournaments = [];
+    private int? _tournamentId;
+
+    private List<BroadcastRecipient> _members = [];
+    private HashSet<BroadcastRecipient> _selected = new(_comparer);
+
+    private List<SentEmail> _recent = [];
+    private Dictionary<Guid, (int Sent, int Failed)> _deliveryStats = [];
+
+    private string _subject = "";
+    private string _body = "";
+    private bool _useLayout = true;
+    private bool _previewMode;
+    private bool _reviewOpen;
+    private bool _loading;
+    private bool _sending;
+
+    private static readonly RecipientComparer _comparer = new();
+
+    private bool CanSend => !_sending
+        && _selected.Count > 0
+        && !string.IsNullOrWhiteSpace(_subject)
+        && !string.IsNullOrWhiteSpace(_body);
+
+    private static string DisplayName(BroadcastRecipient r)
+    {
+        var name = $"{r.FirstName} {r.LastName}".Trim();
+        return string.IsNullOrEmpty(name) ? r.Email : name;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        _tournaments = await db.Tournaments
+            .AsNoTracking()
+            .OrderByDescending(t => t.StartDate ?? DateTime.MinValue)
+            .ThenBy(t => t.Name)
+            .Select(t => new TournamentOption(t.Id, t.Name))
+            .ToListAsync();
+
+        await LoadRecentAsync();
+    }
+
+    private async Task LoadRecentAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        _recent = await db.SentEmails
+            .AsNoTracking()
+            .OrderByDescending(e => e.CreatedAt)
+            .Take(10)
+            .ToListAsync();
+
+        var ids = _recent.Select(e => e.BroadcastId).ToList();
+        _deliveryStats = (await db.EmailLogs
+                .AsNoTracking()
+                .Where(l => l.BroadcastId != null && ids.Contains(l.BroadcastId.Value))
+                .GroupBy(l => l.BroadcastId!.Value)
+                .Select(g => new
+                {
+                    BroadcastId = g.Key,
+                    Sent = g.Count(x => x.Succeeded),
+                    Failed = g.Count(x => !x.Succeeded),
+                })
+                .ToListAsync())
+            .ToDictionary(x => x.BroadcastId, x => (x.Sent, x.Failed));
+    }
+
+    private string BuildAudienceLabel()
+    {
+        var tournament = _tournaments.FirstOrDefault(t => t.Id == _tournamentId)?.Name ?? "tournament";
+        return _kind switch
+        {
+            AudienceKind.PlayerPool => $"Player pool · {tournament}",
+            AudienceKind.Unpaid => $"Signed up but not paid · {tournament}",
+            AudienceKind.AllAccounts => "All accounts",
+            _ => "",
+        };
+    }
+
+    private async Task OnKindChanged(AudienceKind kind)
+    {
+        _kind = kind;
+        await ResolveAudienceAsync();
+    }
+
+    private async Task OnTournamentChanged(int? tournamentId)
+    {
+        _tournamentId = tournamentId;
+        await ResolveAudienceAsync();
+    }
+
+    private async Task ResolveAudienceAsync()
+    {
+        _loading = true;
+        _members = [];
+        _selected = new HashSet<BroadcastRecipient>(_comparer);
+        StateHasChanged();
+
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+
+            IQueryable<Account>? accounts = _kind switch
+            {
+                AudienceKind.AllAccounts => db.Accounts,
+                AudienceKind.PlayerPool when _tournamentId is int id =>
+                    db.Players.Where(p => p.TournamentId == id).Select(p => p.Account),
+                AudienceKind.Unpaid when _tournamentId is int id =>
+                    db.TournamentRegistrations.Where(r => r.TournamentId == id && !r.IsComplete).Select(r => r.Account),
+                _ => null,
+            };
+
+            if (accounts is not null)
+            {
+                var members = await accounts
+                    .AsNoTracking()
+                    .Where(a => a.Email != null && a.Email != "")
+                    .Select(a => new BroadcastRecipient(a.Email, a.FirstName, a.LastName))
+                    .ToListAsync();
+
+                _members = members
+                    .DistinctBy(m => m.Email, StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(m => m.FirstName)
+                    .ThenBy(m => m.LastName)
+                    .ToList();
+                _selected = new HashSet<BroadcastRecipient>(_members, _comparer);
+            }
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void Deselect(BroadcastRecipient r) => _selected.Remove(r);
+
+    private void SelectAll() => _selected = new HashSet<BroadcastRecipient>(_members, _comparer);
+
+    private void SelectNone() => _selected = new HashSet<BroadcastRecipient>(_comparer);
+
+    private async Task SendAsync()
+    {
+        if (!CanSend)
+            return;
+
+        var count = _selected.Count;
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Send email",
+            $"Send this email to {count} recipient{(count == 1 ? "" : "s")}?",
+            yesText: "Send", noText: null, cancelText: "Cancel");
+
+        if (confirm != true)
+            return;
+
+        _sending = true;
+        StateHasChanged();
+        try
+        {
+            var broadcastId = await Emailer.SendBroadcastAsync(_selected.ToList(), _subject, _body, _useLayout);
+
+            await using (var db = await DbFactory.CreateDbContextAsync())
+            {
+                db.SentEmails.Add(new SentEmail
+                {
+                    Subject = _subject,
+                    Body = _body,
+                    Audience = BuildAudienceLabel(),
+                    RecipientCount = count,
+                    UseLayout = _useLayout,
+                    BroadcastId = broadcastId,
+                });
+                await db.SaveChangesAsync();
+            }
+
+            await LoadRecentAsync();
+            Snackbar.Add($"Queued email to {count} recipient{(count == 1 ? "" : "s")}.", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to queue email: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _sending = false;
+            StateHasChanged();
+        }
+    }
+
+    private sealed class RecipientComparer : IEqualityComparer<BroadcastRecipient>
+    {
+        public bool Equals(BroadcastRecipient? x, BroadcastRecipient? y) =>
+            string.Equals(x?.Email, y?.Email, StringComparison.OrdinalIgnoreCase);
+
+        public int GetHashCode(BroadcastRecipient obj) =>
+            obj.Email.ToLowerInvariant().GetHashCode();
+    }
+}

@@ -27,4 +27,4 @@ public class EmailQueue : IEmailQueue
         await _queue.Reader.ReadAsync(cancellationToken);
 }
 
-public sealed record EmailPayload(string Email, string Subject, string TemplateName, object Model);
+public sealed record EmailPayload(string Email, string Subject, string TemplateName, object Model, Guid? BroadcastId = null);

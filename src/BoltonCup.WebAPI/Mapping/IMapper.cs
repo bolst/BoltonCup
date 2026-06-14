@@ -37,6 +37,7 @@ public interface IMapper
     CreateDraftCommand ToCommand(CreateDraftRequest request, ClaimsPrincipal user);
     UpdateDraftCommand ToCommand(UpdateDraftRequest request);
     DraftPlayerCommand ToCommand(int id, DraftPlayerRequest request);
+    ReplaceDraftPickCommand ToCommand(int draftId, int overallPick, ReplaceDraftPickRequest request);
     SetPlayerPoolCommand ToCommand(SetPlayerPoolRequest request);
 
     // CustomRanking
@@ -97,4 +98,7 @@ public interface IMapper
 
     // TournamentRegistration
     TournamentRegistrationDto? ToDto(TournamentRegistration? registration);
+
+    // Standings
+    TournamentStandingsDto ToDto(TournamentStandings standings);
 }
