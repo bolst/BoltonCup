@@ -108,14 +108,27 @@ public partial class GameConsole : ComponentBase, IDisposable
         }
     }
 
+    private async Task<bool> ConfirmDeletionAsync(string title)
+    {
+        var result = await DialogService.ShowMessageBoxAsync(title, "Are you sure you want to delete this?",
+            yesText: "Delete", cancelText: "Cancel");
+        return result == true;
+    }
+
     private async Task DeleteGoalAsync(int goalId)
     {
-        await State.DeleteGoalAsync(goalId);
+        if (await ConfirmDeletionAsync("Delete Goal"))
+        {
+            await State.DeleteGoalAsync(goalId);
+        }
     }
 
     private async Task DeletePenaltyAsync(int penaltyId)
     {
-        await State.DeletePenaltyAsync(penaltyId);
+        if (await ConfirmDeletionAsync("Delete Penalty"))
+        {
+            await State.DeletePenaltyAsync(penaltyId);
+        }
     }
 
     private static Color GetStateColor(GameState state) => state switch
