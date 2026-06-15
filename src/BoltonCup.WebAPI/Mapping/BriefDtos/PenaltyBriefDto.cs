@@ -3,6 +3,8 @@ namespace BoltonCup.WebAPI.Mapping;
 /// <summary>Brief summary of a penalty event.</summary>
 public sealed record PenaltyBriefDto
 {
+    /// <summary>Gets or sets the penalty ID.</summary>
+    public required int Id { get; set; }
     /// <summary>Gets or sets the time remaining in the period when the penalty occurred.</summary>
     public required TimeSpan TimeRemaining { get; set; }
     /// <summary>Gets or sets the period in which the penalty occurred.</summary>

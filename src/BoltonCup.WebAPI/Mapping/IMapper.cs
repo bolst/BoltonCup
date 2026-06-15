@@ -50,6 +50,12 @@ public interface IMapper
     GetGamesQuery ToQuery(GetGamesRequest request);
     IPagedList<GameDto> ToDtoList(IPagedList<Game> games);
     GameSingleDto? ToDto(Game? game, IReadOnlyList<SkaterStat> homeStats, IReadOnlyList<SkaterStat> awayStats);
+    UpdateGameStateCommand ToCommand(int gameId, UpdateGameStateRequest request);
+    CreateGoalCommand ToCommand(int gameId, CreateGoalRequest request);
+    UpdateGoalCommand ToCommand(int gameId, int goalId, UpdateGoalRequest request);
+    CreatePenaltyCommand ToCommand(int gameId, CreatePenaltyRequest request);
+    UpdatePenaltyCommand ToCommand(int gameId, int penaltyId, UpdatePenaltyRequest request);
+    SetGameStarsCommand ToCommand(int gameId, SetGameStarsRequest request);
 
     // GoalieStat
     GetGoalieStatsQuery ToQuery(GetGoalieStatsRequest request);

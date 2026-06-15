@@ -1,0 +1,257 @@
+@page "/game/{GameId:int}"
+
+<PageTitle>Timekeeper</PageTitle>
+
+@if (State.IsLoading)
+{
+    <div class="d-flex justify-center align-center py-12">
+        <MudProgressCircular Indeterminate Size="Size.Large" />
+    </div>
+}
+else if (State.Game is not { } game)
+{
+    <MudContainer MaxWidth="MaxWidth.Small" Class="py-8">
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            Failed to load game. <MudLink Href="/">Return to games list.</MudLink>
+        </MudAlert>
+    </MudContainer>
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+        <MudStack Spacing="4">
+
+            @* Scoreboard *@
+            <MudPaper Elevation="0" Square Outlined Class="pa-4">
+                <div class="d-flex flex-row align-center justify-space-between">
+
+                    <div class="d-flex flex-column align-center" style="flex: 1">
+                        @if (game.HomeTeam?.Logo is not null)
+                        {
+                            <MudImage Src="@game.HomeTeam.Logo" Height="56" Class="mb-1" />
+                        }
+                        <MudText Typo="Typo.h6" Align="Align.Center">
+                            @(game.HomeTeam?.NameShort ?? game.HomeTeam?.Name ?? "Home")
+                        </MudText>
+                    </div>
+
+                    <div class="d-flex flex-column align-center px-4">
+                        <MudText Typo="Typo.h2" Class="font-weight-bold">
+                            @State.HomeScore – @State.AwayScore
+                        </MudText>
+                        <div class="d-flex flex-row align-center gap-2 mt-1">
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Filled" Label="true"
+                                     Color="@GetStateColor(game.GameState)">
+                                @game.GameState
+                            </MudChip>
+                            @if (game.GameState == Sdk.GameState.InProgress)
+                            {
+                                <MudText Typo="Typo.caption">@State.CurrentPeriodLabel period</MudText>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column align-center" style="flex: 1">
+                        @if (game.AwayTeam?.Logo is not null)
+                        {
+                            <MudImage Src="@game.AwayTeam.Logo" Height="56" Class="mb-1" />
+                        }
+                        <MudText Typo="Typo.h6" Align="Align.Center">
+                            @(game.AwayTeam?.NameShort ?? game.AwayTeam?.Name ?? "Away")
+                        </MudText>
+                    </div>
+
+                </div>
+            </MudPaper>
+
+            @* Game controls *@
+            <div class="d-flex flex-row align-center justify-space-between flex-wrap gap-2">
+                @if (game.GameState == Sdk.GameState.Pending)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Large"
+                               StartIcon="@Icons.Material.Rounded.PlayArrow"
+                               OnClick="@StartGameAsync">
+                        Start Game
+                    </MudButton>
+                }
+                else if (game.GameState == Sdk.GameState.InProgress)
+                {
+                    <div class="d-flex flex-row align-center gap-2 flex-wrap">
+                        <MudText Typo="Typo.body2">Period:</MudText>
+                        @foreach (var (val, label) in PeriodOptions)
+                        {
+                            <MudButton Size="Size.Small"
+                                       Variant="@(State.CurrentPeriod == val ? Variant.Filled : Variant.Outlined)"
+                                       Color="Color.Primary"
+                                       OnClick="@(() => State.SetCurrentPeriod(val))">
+                                @label
+                            </MudButton>
+                        }
+                    </div>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Medium"
+                               StartIcon="@Icons.Material.Rounded.Stop"
+                               OnClick="@EndGameAsync">
+                        End Game
+                    </MudButton>
+                }
+                else if (game.GameState == Sdk.GameState.Completed)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"
+                               StartIcon="@Icons.Material.Rounded.Star"
+                               OnClick="@OpenStarsDialogAsync">
+                        @(game.Stars.Count > 0 ? "Edit Stars" : "Set Stars")
+                    </MudButton>
+                }
+            </div>
+
+            @* Action buttons — only when game is in progress *@
+            @if (game.GameState == Sdk.GameState.InProgress)
+            {
+                <div class="d-flex flex-row gap-2">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                               FullWidth
+                               OnClick="@OpenGoalDialogAsync">
+                        + Goal
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Warning"
+                               FullWidth
+                               OnClick="@OpenPenaltyDialogAsync">
+                        + Penalty
+                    </MudButton>
+                </div>
+            }
+
+            @* Stars display *@
+            @if (game.Stars.Count > 0)
+            {
+                <MudPaper Elevation="0" Square Outlined Class="pa-3">
+                    <MudText Typo="Typo.overline" Class="mb-2">Game Stars</MudText>
+                    <div class="d-flex flex-row gap-4 flex-wrap">
+                        @foreach (var star in game.Stars.OrderBy(s => s.StarRank))
+                        {
+                            <div class="d-flex flex-row align-center gap-1">
+                                <MudIcon Icon="@Icons.Material.Rounded.Star" Size="Size.Small"
+                                         Color="@(star.StarRank == 1 ? Color.Warning : Color.Default)" />
+                                <MudText Typo="Typo.body2">
+                                    @(star.StarRank switch
+                                    {
+                                        1 => "1st",
+                                        2 => "2nd",
+                                        _ => "3rd"
+                                    }):
+                                    @star.Player.FirstName @star.Player.LastName
+                                </MudText>
+                            </div>
+                        }
+                    </div>
+                </MudPaper>
+            }
+
+            @* Goals *@
+            <div>
+                <MudText Typo="Typo.overline" Class="mb-1">Goals (@game.Goals.Count)</MudText>
+                @if (!game.Goals.Any())
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">No goals recorded yet.</MudText>
+                }
+                else
+                {
+                    <MudStack Spacing="1">
+                        @foreach (var goal in game.Goals.OrderBy(g => g.Period).ThenByDescending(g => g.TimeString))
+                        {
+                            var teamColor = goal.TeamId == game.HomeTeam?.Id
+                                ? game.HomeTeam.PrimaryColorHex
+                                : game.AwayTeam?.PrimaryColorHex;
+                            var teamAbbr = goal.TeamId == game.HomeTeam?.Id
+                                ? (game.HomeTeam?.Abbreviation ?? game.HomeTeam?.NameShort ?? "H")
+                                : (game.AwayTeam?.Abbreviation ?? game.AwayTeam?.NameShort ?? "A");
+
+                            <MudPaper Elevation="0" Square Outlined Class="pa-2">
+                                <div class="d-flex flex-row align-center justify-space-between">
+                                    <div class="d-flex flex-row align-center gap-2 flex-wrap">
+                                        <MudChip T="string" Size="Size.Small" Label="true"
+                                                 Style="@($"background-color: {teamColor ?? "#9e9e9e"}; color: white;")"
+                                                 Variant="Variant.Filled">
+                                            @teamAbbr
+                                        </MudChip>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @goal.PeriodLabel @goal.TimeString
+                                        </MudText>
+                                        <div>
+                                            <MudText Typo="Typo.body2" Class="d-inline">
+                                                @goal.Scorer.FirstName @goal.Scorer.LastName
+                                            </MudText>
+                                            @if (goal.PrimaryAssist is not null)
+                                            {
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary" Class="d-inline">
+                                                    &nbsp;(@goal.PrimaryAssist.FirstName @goal.PrimaryAssist.LastName@if (goal.SecondaryAssist is not null)
+                                                    {<text>, @goal.SecondaryAssist.FirstName @goal.SecondaryAssist.LastName</text>})
+                                                </MudText>
+                                            }
+                                        </div>
+                                    </div>
+                                    <MudIconButton Icon="@Icons.Material.Rounded.DeleteOutline"
+                                                   Size="Size.Small"
+                                                   Color="Color.Error"
+                                                   OnClick="@(() => DeleteGoalAsync(goal.Id))" />
+                                </div>
+                            </MudPaper>
+                        }
+                    </MudStack>
+                }
+            </div>
+
+            @* Penalties *@
+            <div>
+                <MudText Typo="Typo.overline" Class="mb-1">Penalties (@game.Penalties.Count)</MudText>
+                @if (!game.Penalties.Any())
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">No penalties recorded yet.</MudText>
+                }
+                else
+                {
+                    <MudStack Spacing="1">
+                        @foreach (var penalty in game.Penalties.OrderBy(p => p.Period).ThenByDescending(p => p.TimeString))
+                        {
+                            var teamColor = penalty.TeamId == game.HomeTeam?.Id
+                                ? game.HomeTeam.PrimaryColorHex
+                                : game.AwayTeam?.PrimaryColorHex;
+                            var teamAbbr = penalty.TeamId == game.HomeTeam?.Id
+                                ? (game.HomeTeam?.Abbreviation ?? game.HomeTeam?.NameShort ?? "H")
+                                : (game.AwayTeam?.Abbreviation ?? game.AwayTeam?.NameShort ?? "A");
+
+                            <MudPaper Elevation="0" Square Outlined Class="pa-2">
+                                <div class="d-flex flex-row align-center justify-space-between">
+                                    <div class="d-flex flex-row align-center gap-2 flex-wrap">
+                                        <MudChip T="string" Size="Size.Small" Label="true"
+                                                 Style="@($"background-color: {teamColor ?? "#9e9e9e"}; color: white;")"
+                                                 Variant="Variant.Filled">
+                                            @teamAbbr
+                                        </MudChip>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @penalty.PeriodLabel @penalty.TimeString
+                                        </MudText>
+                                        <div>
+                                            <MudText Typo="Typo.body2" Class="d-inline">
+                                                @penalty.Player.FirstName @penalty.Player.LastName
+                                            </MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="d-inline">
+                                                &nbsp;– @penalty.Infraction (@penalty.DurationMins min)
+                                            </MudText>
+                                        </div>
+                                    </div>
+                                    <MudIconButton Icon="@Icons.Material.Rounded.DeleteOutline"
+                                                   Size="Size.Small"
+                                                   Color="Color.Error"
+                                                   Title="Delete penalty"
+                                                   OnClick="@(() => DeletePenaltyAsync(penalty.Id))" />
+                                </div>
+                            </MudPaper>
+                        }
+                    </MudStack>
+                }
+            </div>
+
+        </MudStack>
+    </MudContainer>
+}

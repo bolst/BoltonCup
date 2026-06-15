@@ -3,6 +3,8 @@ namespace BoltonCup.WebAPI.Mapping;
 /// <summary>Brief summary of a goal event.</summary>
 public sealed record GoalBriefDto
 {
+    /// <summary>Gets or sets the goal ID.</summary>
+    public required int Id { get; set; }
     /// <summary>Gets or sets the time remaining in the period when the goal was scored.</summary>
     public required TimeSpan TimeRemaining { get; set; }
     /// <summary>Gets or sets the period in which the goal was scored.</summary>

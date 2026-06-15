@@ -1,0 +1,72 @@
+@page "/"
+@using BoltonCup.Sdk
+@* @attribute [Authorize(Roles = "Admin,Timekeeper")] *@
+
+<PageTitle>Timekeeper</PageTitle>
+
+<MudContainer Class="py-4" MaxWidth="MaxWidth.Medium">
+    <div class="d-flex flex-row align-center gap-3 mb-4">
+        <MudText Typo="Typo.h5">Games</MudText>
+        <MudSpacer />
+        <MudDatePicker Date="_selectedDate" DateChanged="OnDateChanged"
+                       Variant="Variant.Outlined" Margin="Margin.Dense" />
+    </div>
+
+    @if (_loading)
+    {
+        <div class="d-flex justify-center py-8">
+            <MudProgressCircular Indeterminate />
+        </div>
+    }
+    else if (_games.Count == 0)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+            No games scheduled for @(_selectedDate?.ToString("MMMM d") ?? "this date").
+        </MudAlert>
+    }
+    else
+    {
+        <MudStack Spacing="3">
+            @foreach (var game in _games)
+            {
+                <MudPaper Class="pa-4 cursor-pointer" @onclick="@(_ => SelectGame(game))"
+                          Elevation="0" Square Outlined>
+                    <div class="d-flex flex-row align-center justify-space-between mb-2">
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Filled" Label="true"
+                                 Color="@GetStateColor(game.GameState)">
+                            @game.GameState
+                        </MudChip>
+                        <MudText Typo="Typo.caption">@game.GameTime.ToString("h:mm tt")</MudText>
+                    </div>
+                    <div class="d-flex flex-row align-center justify-center gap-4 py-2">
+                        <div class="d-flex flex-column align-center" style="min-width: 100px;">
+                            @if (game.HomeTeam?.Logo is not null)
+                            {
+                                <MudImage Src="@game.HomeTeam.Logo" Height="48" Class="mb-1" />
+                            }
+                            <MudText Typo="Typo.subtitle2" Align="Align.Center">
+                                @(game.HomeTeam?.NameShort ?? game.HomeTeam?.Name ?? "TBD")
+                            </MudText>
+                        </div>
+                        <MudText Typo="Typo.h6" Color="Color.Default">vs</MudText>
+                        <div class="d-flex flex-column align-center" style="min-width: 100px;">
+                            @if (game.AwayTeam?.Logo is not null)
+                            {
+                                <MudImage Src="@game.AwayTeam.Logo" Height="48" Class="mb-1" />
+                            }
+                            <MudText Typo="Typo.subtitle2" Align="Align.Center">
+                                @(game.AwayTeam?.NameShort ?? game.AwayTeam?.Name ?? "TBD")
+                            </MudText>
+                        </div>
+                    </div>
+                    @if (game.Venue is not null || game.Rink is not null)
+                    {
+                        <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">
+                            @game.Venue @(game.Rink is not null ? $"- {game.Rink}" : "")
+                        </MudText>
+                    }
+                </MudPaper>
+            }
+        </MudStack>
+    }
+</MudContainer>

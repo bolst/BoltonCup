@@ -1,0 +1,23 @@
+@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@using Microsoft.Extensions.Options
+@using BoltonCup.Timekeeper
+
+@using BoltonCup.Common.Components
+@using BoltonCup.Shared
+@using IBoltonCupApi = BoltonCup.Sdk.IBoltonCupApi
+@using BoltonCup.Sdk
+@using BoltonCup.Timekeeper.Services
+@using BoltonCup.Timekeeper.Components.Shared
+
+@using MudBlazor
+
+@attribute [Authorize(Roles = "Admin,Timekeeper")]

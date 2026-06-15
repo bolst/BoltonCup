@@ -1,6 +1,7 @@
 @page "/access-denied"
+@inject AuthSessionStateService AuthSessionState
 
 <MudContainer Class="py-4 d-flex flex-column align-center gap-6" MaxWidth="MaxWidth.Medium">
     <MudAlert Severity="Severity.Error">You do not have access to the requested resource.</MudAlert>
-    <MudButton Href="/log-in-or-sign-up" Color="Color.Primary" Variant="Variant.Filled">Log in or sign up</MudButton>
+    <MudButton OnClick="@AuthSessionState.Reset" Color="Color.Primary" Variant="Variant.Filled">Log in or sign up</MudButton>
 </MudContainer>

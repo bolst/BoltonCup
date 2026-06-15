@@ -97,14 +97,17 @@ public static class ServiceCollectionExtensions
             {
                 policy.WithOrigins(
                         "http://localhost:5239",
+                        "http://localhost:5170",
                         "https://localhost:7244",
                         "https://localhost:7266",
                         "https://localhost:7269",
                         "https://localhost:7047",
+                        "https://localhost:7055",
                         "https://boltoncup.ca",
                         "https://www.boltoncup.ca",
                         "https://auth.boltoncup.ca",
-                        "https://draft.boltoncup.ca"
+                        "https://draft.boltoncup.ca",
+                        "https://timekeeper.boltoncup.ca"
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()

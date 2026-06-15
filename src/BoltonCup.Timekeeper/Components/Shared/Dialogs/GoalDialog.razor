@@ -1,0 +1,187 @@
+@namespace BoltonCup.Timekeeper.Components.Shared
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="3" Class="pt-1">
+
+            <MudText Typo="Typo.subtitle1" Class="mb-1">Which team scored?</MudText>
+            <div class="d-flex flex-row gap-2">
+                <MudButton Variant="@(_homeSelected ? Variant.Filled : Variant.Outlined)"
+                           Color="Color.Primary"
+                           FullWidth
+                           OnClick="@(() => SelectTeam(true))">
+                    @(HomeTeam?.NameShort ?? "Home")
+                </MudButton>
+                <MudButton Variant="@(!_homeSelected ? Variant.Filled : Variant.Outlined)"
+                           Color="Color.Secondary"
+                           FullWidth
+                           OnClick="@(() => SelectTeam(false))">
+                    @(AwayTeam?.NameShort ?? "Away")
+                </MudButton>
+            </div>
+
+            <MudAutocomplete T="PlayerDto"
+                             Label="Scorer"
+                             @bind-Value="_scorer"
+                             SearchFunc="@SearchScorer"
+                             ToStringFunc="@PlayerLabel"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             ResetValueOnEmptyText
+                             Required />
+
+            <MudAutocomplete T="PlayerDto"
+                             Label="Primary Assist (optional)"
+                             @bind-Value="_assist1"
+                             SearchFunc="@SearchAssist1"
+                             ToStringFunc="@PlayerLabel"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             Clearable
+                             ResetValueOnEmptyText />
+
+            <MudAutocomplete T="PlayerDto"
+                             Label="Secondary Assist (optional)"
+                             @bind-Value="_assist2"
+                             SearchFunc="@SearchAssist2"
+                             ToStringFunc="@PlayerLabel"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             Clearable
+                             ResetValueOnEmptyText />
+
+            <div class="d-flex flex-row gap-2">
+                <MudSelect T="int"
+                           Label="Period"
+                           @bind-Value="_period"
+                           Variant="Variant.Outlined"
+                           Margin="Margin.Dense"
+                           Class="flex-grow-0" Style="min-width: 100px">
+                    @foreach (var (val, label) in PeriodOptions)
+                    {
+                        <MudSelectItem Value="@val">@label</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudTextField Label="Time Remaining"
+                              @bind-Value="_timeRemaining"
+                              Placeholder="mm:ss"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              HelperText="e.g. 12:35"
+                              Class="flex-grow-1" />
+            </div>
+
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Dialog.Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Disabled="@(_scorer is null)"
+                   OnClick="@Submit">
+            Record Goal
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter] public TeamInGameDto? HomeTeam { get; set; }
+    [Parameter] public TeamInGameDto? AwayTeam { get; set; }
+    [Parameter] public List<PlayerDto> HomePlayers { get; set; } = [];
+    [Parameter] public List<PlayerDto> AwayPlayers { get; set; } = [];
+    [Parameter] public int CurrentPeriod { get; set; } = 1;
+
+    private static readonly (int Value, string Label)[] PeriodOptions =
+    [
+        (1, "1st"), (2, "2nd"), (3, "3rd"), (4, "OT"),
+    ];
+
+    private bool _homeSelected = true;
+    private PlayerDto? _scorer;
+    private PlayerDto? _assist1;
+    private PlayerDto? _assist2;
+    private int _period;
+    private string _timeRemaining = "00:00";
+
+    private List<PlayerDto> ActiveRoster => _homeSelected ? HomePlayers : AwayPlayers;
+
+    protected override void OnInitialized()
+    {
+        _period = CurrentPeriod;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        await Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick = false,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+        });
+    }
+
+    private void SelectTeam(bool home)
+    {
+        if (_homeSelected == home) return;
+        _homeSelected = home;
+        _scorer = null;
+        _assist1 = null;
+        _assist2 = null;
+    }
+
+    private static string PlayerLabel(PlayerDto? p) =>
+        p is null ? string.Empty : $"#{p.JerseyNumber?.ToString() ?? "-"} {p.FirstName} {p.LastName}".Trim();
+
+    private Task<IEnumerable<PlayerDto>> SearchScorer(string? value, CancellationToken ct)
+        => FilterRoster(value, exclude: null);
+
+    private Task<IEnumerable<PlayerDto>> SearchAssist1(string? value, CancellationToken ct)
+        => FilterRoster(value, exclude: _scorer);
+
+    private Task<IEnumerable<PlayerDto>> SearchAssist2(string? value, CancellationToken ct)
+        => FilterRoster(value, exclude: _scorer, exclude2: _assist1);
+
+    private Task<IEnumerable<PlayerDto>> FilterRoster(string? value, PlayerDto? exclude = null, PlayerDto? exclude2 = null)
+    {
+        var roster = ActiveRoster.Where(p => p != exclude && p != exclude2);
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            var lower = value.ToLowerInvariant();
+            roster = roster.Where(p => PlayerLabel(p).ToLowerInvariant().Contains(lower));
+        }
+        return Task.FromResult(roster);
+    }
+
+    private void Submit()
+    {
+        if (_scorer is null) return;
+        if (!TryParseTime(_timeRemaining, out var ts)) ts = TimeSpan.Zero;
+
+        var request = new CreateGoalRequest
+        {
+            TeamId = _homeSelected ? (HomeTeam?.Id ?? 0) : (AwayTeam?.Id ?? 0),
+            Period = _period,
+            PeriodLabel = TimekeeperStateService.PeriodLabel(_period),
+            PeriodTimeRemaining = ts.ToString("c"),
+            GoalPlayerId = _scorer.Id,
+            Assist1PlayerId = _assist1?.Id,
+            Assist2PlayerId = _assist2?.Id,
+        };
+        Dialog.Close(DialogResult.Ok(request));
+    }
+
+    private static bool TryParseTime(string input, out TimeSpan result)
+    {
+        if (TimeSpan.TryParseExact(input, @"mm\:ss", null, out result)) return true;
+        if (TimeSpan.TryParseExact(input, @"m\:ss", null, out result)) return true;
+        result = TimeSpan.Zero;
+        return false;
+    }
+
+}
