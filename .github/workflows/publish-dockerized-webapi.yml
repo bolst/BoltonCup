@@ -83,7 +83,7 @@ jobs:
         tags: bolst/boltoncup-webapi:latest
 
     - name: Ensure build succeeded
-      if: steps.build_push_attempt_1.outcome == 'failure' && steps.build_push_attempt_2.outcome == 'failure' && steps.build_push_attempt_3.outcome == 'failure'
+      if: steps.build_push_attempt_1.outcome != 'success' && steps.build_push_attempt_2.outcome != 'success' && steps.build_push_attempt_3.outcome != 'success'
       run: |
         echo "Docker build and push failed after 3 attempts."
         exit 1
