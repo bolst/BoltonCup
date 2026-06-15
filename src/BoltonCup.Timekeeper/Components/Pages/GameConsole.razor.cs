@@ -1,6 +1,6 @@
 using BoltonCup.Sdk;
-using BoltonCup.Timekeeper.Dialogs;
 using BoltonCup.Timekeeper.Services;
+using BoltonCup.Timekeeper.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
