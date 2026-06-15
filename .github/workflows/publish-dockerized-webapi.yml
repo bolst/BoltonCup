@@ -42,13 +42,51 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         
-    - name: Build and push
+    - name: Build and push (attempt 1)
+      id: build_push_attempt_1
+      continue-on-error: true
       uses: docker/build-push-action@v7
       with:
         context: ./src
         file: src/BoltonCup.WebAPI/Dockerfile
         push: true
         tags: bolst/boltoncup-webapi:latest
+
+    - name: Wait before retry
+      if: steps.build_push_attempt_1.outcome == 'failure'
+      run: sleep 20
+
+    - name: Build and push (attempt 2)
+      id: build_push_attempt_2
+      if: steps.build_push_attempt_1.outcome == 'failure'
+      continue-on-error: true
+      uses: docker/build-push-action@v7
+      with:
+        context: ./src
+        file: src/BoltonCup.WebAPI/Dockerfile
+        push: true
+        tags: bolst/boltoncup-webapi:latest
+
+    - name: Wait before final retry
+      if: steps.build_push_attempt_2.outcome == 'failure'
+      run: sleep 40
+
+    - name: Build and push (attempt 3)
+      id: build_push_attempt_3
+      if: steps.build_push_attempt_2.outcome == 'failure'
+      continue-on-error: true
+      uses: docker/build-push-action@v7
+      with:
+        context: ./src
+        file: src/BoltonCup.WebAPI/Dockerfile
+        push: true
+        tags: bolst/boltoncup-webapi:latest
+
+    - name: Ensure build succeeded
+      if: steps.build_push_attempt_1.outcome == 'failure' && steps.build_push_attempt_2.outcome == 'failure' && steps.build_push_attempt_3.outcome == 'failure'
+      run: |
+        echo "Docker build and push failed after 3 attempts."
+        exit 1
 
   deploy:
     needs: build
