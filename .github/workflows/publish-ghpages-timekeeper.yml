@@ -1,0 +1,33 @@
+name: Build and Publish BoltonCup.Timekeeper
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/BoltonCup.Timekeeper/**'
+  workflow_dispatch:
+
+jobs:
+  deploy-to-other-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Install .NET WASM Build Tools
+        run: dotnet workload install wasm-tools-net8
+      - name: Install dependencies
+        run: dotnet restore ./src/BoltonCup.Timekeeper/BoltonCup.Timekeeper.csproj
+      - name: Publish csproj
+        run: dotnet publish ./src/BoltonCup.Timekeeper/BoltonCup.Timekeeper.csproj -c:Release -p:GHPages=true -o out/BoltonCupTimekeeper --nologo --no-restore
+      - name: Commit wwwroot to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.BOLTON_CUP_EXT_BUILD_PAT }}
+          repository-name: bolst/bolton-cup-timekeeper-build
+          branch: gh-pages
+          folder: out/BoltonCupTimekeeper/wwwroot
