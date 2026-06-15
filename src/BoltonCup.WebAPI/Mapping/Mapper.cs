@@ -233,6 +233,7 @@ public class Mapper : IMapper
             IsDrafted = draft.IsDrafted,
             PointsPerGame = draft.PointsPerGame,
             IsFavourite = favouritePlayerIds.Contains(draft.PlayerId),
+            IsExcluded = draft.IsExcluded,
         });
     }
 
@@ -347,6 +348,14 @@ public class Mapper : IMapper
             PlayerId: request.PlayerId,
             TeamId: request.TeamId,
             OverallPick: request.OverallPick
+        );
+    }
+
+    public SetPlayerPoolCommand ToCommand(SetPlayerPoolRequest request)
+    {
+        return new SetPlayerPoolCommand(
+            OrderedPlayerIds: request.OrderedPlayerIds,
+            ExcludedPlayerIds: request.ExcludedPlayerIds
         );
     }
 

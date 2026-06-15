@@ -586,6 +586,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.IsChampion).HasColumnName("is_champion");
             entity.Property(e => e.DraftRanking).HasColumnName("draft_ranking");
             entity.Property(e => e.OverrideRanking).HasColumnName("override_ranking");
+            entity.Property(e => e.IsExcluded).HasColumnName("is_excluded").HasDefaultValue(false);
         });
 
         modelBuilder.Entity<SkaterStat>(entity =>

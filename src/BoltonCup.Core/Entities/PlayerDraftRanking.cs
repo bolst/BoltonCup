@@ -16,6 +16,7 @@ public sealed class PlayerDraftRanking : EntityBase
     public bool IsChampion { get; set; }
     public double DraftRanking { get; set; }
     public bool OverrideRanking { get; set; }
+    public bool IsExcluded { get; set; }
 
     public bool IsDrafted => DraftPick is not null;
     public string PlayerName => Player.Account.FirstName + " " + Player.Account.LastName;
