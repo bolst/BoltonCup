@@ -27,7 +27,7 @@
         </PropertyColumn>
         <BoolColumn Title="Completed?" Property="x => x.IsComplete" />
         <PropertyColumn Title="Status" Property="x => x.Tournament.Players.Any(p => p.AccountId == x.AccountId)" 
-                        Editable="false" CellStyle="text-align: center">
+                        Editable="false" CellStyle="text-align: center" Sortable="false">
             <CellTemplate>
                 @if (context.Item.Tournament.Players.Any(p => p.AccountId == context.Item.AccountId))
                 {
