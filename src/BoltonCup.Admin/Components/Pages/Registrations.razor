@@ -50,7 +50,7 @@
                 }
             </CellTemplate>
         </TemplateColumn>
-        <ForeignColumn Title="Tournament" Property="x => x.Tournament" Editable="false"/>
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" Editable="false" Sortable="false"/>
         <PropertyColumn Title="Created at" Property="x => x.CreatedAt" Editable="false" Format="g" InitialDirection="SortDirection.Descending">
             <CellTemplate>
                 <span>@context.Item.CreatedAt.ToEstString("g")</span>
