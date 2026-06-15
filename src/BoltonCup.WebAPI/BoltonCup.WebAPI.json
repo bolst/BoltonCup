@@ -11018,6 +11018,7 @@
       },
       "GoalBriefDto": {
         "required": [
+          "id",
           "period",
           "primaryAssist",
           "scorer",
@@ -11027,6 +11028,11 @@
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the goal ID.",
+            "format": "int32"
+          },
           "timeRemaining": {
             "type": "string",
             "description": "Gets or sets the time remaining in the period when the goal was scored.",
@@ -11421,6 +11427,7 @@
       "PenaltyBriefDto": {
         "required": [
           "durationMins",
+          "id",
           "infraction",
           "period",
           "player",
@@ -11429,6 +11436,11 @@
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the penalty ID.",
+            "format": "int32"
+          },
           "timeRemaining": {
             "type": "string",
             "description": "Gets or sets the time remaining in the period when the penalty occurred.",
@@ -12141,21 +12153,6 @@
         "additionalProperties": false,
         "description": "Represents the picks for a single draft round."
       },
-      "SetPlayerPoolRequest": {
-        "type": "object",
-        "properties": {
-          "excludedPlayerIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "description": "Gets or sets the player IDs excluded from the draft."
-          }
-        },
-        "additionalProperties": false,
-        "description": "Request to set a draft's player pool by listing the players excluded from the draft."
-      },
       "SetGameStarsRequest": {
         "type": "object",
         "properties": {
@@ -12180,6 +12177,21 @@
         },
         "additionalProperties": false,
         "description": "Request to set the 1st/2nd/3rd stars for a game. Replaces any existing stars."
+      },
+      "SetPlayerPoolRequest": {
+        "type": "object",
+        "properties": {
+          "excludedPlayerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Gets or sets the player IDs excluded from the draft."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to set a draft's player pool by listing the players excluded from the draft."
       },
       "SkaterStatDto": {
         "required": [
