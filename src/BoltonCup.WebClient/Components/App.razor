@@ -2,8 +2,15 @@
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="routeData" DefaultLayout="@typeof(Layout.MainLayout)">
-                <NotAuthorized>
-                    <RedirectToAuth />
+                <NotAuthorized Context="authState">
+                    @if (authState.User.Identity?.IsAuthenticated == true)
+                    {
+                        <RedirectToAccessDenied />
+                    }
+                    else
+                    {
+                        <RedirectToAuth />
+                    }
                 </NotAuthorized>
                 <Authorizing>
                     @* empty (I dont want to see "Authorizing...") *@
