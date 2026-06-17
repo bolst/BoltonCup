@@ -15,7 +15,7 @@ public class TournamentPlayerInfoController(
 ) : BoltonCupControllerBase
 {
     /// <summary>Gets the authenticated user's player info and the games of their assigned team.</summary>
-    [Authorize(Policy = RequireCompletedAccount)]
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<TournamentPlayerInfoDto>> GetMyTournamentPlayerInfo(int id)
     {
@@ -25,7 +25,7 @@ public class TournamentPlayerInfoController(
     }
 
     /// <summary>Creates or updates the authenticated user's player info for a tournament.</summary>
-    [Authorize(Policy = RequireCompletedAccount)]
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> UpdateMyTournamentPlayerInfo(int id, [FromBody] UpdateTournamentPlayerInfoRequest data)
     {

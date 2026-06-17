@@ -16,10 +16,13 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
 
         var player = await _dbContext.Players
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.AccountId == accountId && p.TournamentId == tournamentId, cancellationToken);
+            .FirstOrDefaultAsync(p => p.AccountId == accountId && p.TournamentId == tournamentId, cancellationToken)
+            ?? throw new AccountNotInTournamentException(accountId, tournamentId);
 
-        if (player?.TeamId is not int teamId)
+        if (player.TeamId is not { } teamId)
+        {
             return new TournamentPlayerInfoContext(info, []);
+        }
 
         var teamGames = await _dbContext.Games
             .AsNoTracking()
@@ -39,6 +42,11 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
         _ = await _dbContext.Tournaments.FindAsync([command.TournamentId], cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Tournament), command.TournamentId);
 
+        _ = await _dbContext.Players 
+                .AsNoTracking() 
+                .FirstOrDefaultAsync(p => p.AccountId == command.AccountId && p.TournamentId == command.TournamentId, cancellationToken) 
+            ?? throw new AccountNotInTournamentException(command.AccountId, command.TournamentId);
+
         var entry = await _dbContext.TournamentPlayerInfos
             .AsNoTracking()
             .SingleOrDefaultAsync(e => e.AccountId == command.AccountId && e.TournamentId == command.TournamentId,
@@ -52,9 +60,13 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
         entry.Payload = command.Payload;
 
         if (addNew)
+        {
             await _dbContext.TournamentPlayerInfos.AddAsync(entry, cancellationToken);
+        }
         else
+        {
             _dbContext.TournamentPlayerInfos.Update(entry);
+        }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }

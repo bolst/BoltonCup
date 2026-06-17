@@ -25,6 +25,7 @@ namespace BoltonCup.Shared
             private const string Base = ErrorTypes.Base + "/tournaments";
             
             public const string AccountAlreadyRegistered = Base + "/account-already-registered";
+            public const string AccountNotRegistered = Base + "/account-not-registered";
             public const string RegistrationClosed = Base + "/registration-closed";
         }
 

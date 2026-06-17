@@ -1,6 +1,6 @@
 @using System.Text.Json
 @namespace BoltonCup.WebClient.Components.Shared
-@inject IBoltonCupApi Api
+@inject IBoltonCupApi BoltonCupApi
 @inject ISnackbar Snackbar
 
 <AuthorizeView Context="_">
@@ -8,6 +8,10 @@
         @if (!_loaded)
         {
             <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="320px" Width="100%" />
+        }
+        else if (!_isInTournament)
+        {
+            <MudAlert Severity="Severity.Error">You are not registered for this tournament!</MudAlert>
         }
         else
         {
@@ -83,6 +87,7 @@
     public int TournamentId { get; set; }
 
     private int? _tournamentId;
+    private bool _isInTournament;
     private bool _loaded;
     private bool _saving;
     private IReadOnlyList<Sdk.GameDto> _games = [];
@@ -94,22 +99,38 @@
             return;
         _tournamentId = TournamentId;
 
-        var dto = await Api.GetMyTournamentPlayerInfoAsync(TournamentId);
-        _games = dto.Games is { } games ? games.ToList() : [];
-        _model = Deserialize(dto.Payload);
-        _loaded = true;
-        await InvokeAsync(StateHasChanged);
+        try
+        {
+            var dto = await BoltonCupApi.GetMyTournamentPlayerInfoAsync(TournamentId);
+            _games = dto.Games is { } games ? games.ToList() : [];
+            _model = Deserialize(dto.Payload);
+            _isInTournament = true;
+        }
+        catch (Sdk.ApiException<Sdk.BoltonCupProblemDetails> e)
+            when (e.Result.Type == ErrorTypes.Tournaments.AccountNotRegistered)
+        {
+            _isInTournament = false;
+        }
+        finally
+        {
+            _loaded = true;
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private string? GetAvailability(int gameId)
-        => _model.GameAvailability.TryGetValue(gameId, out var value) ? value : null;
+        => _model.GameAvailability.GetValueOrDefault(gameId);
 
     private void SetAvailability(int gameId, string? value)
     {
         if (string.IsNullOrEmpty(value))
+        {
             _model.GameAvailability.Remove(gameId);
+        }
         else
+        {
             _model.GameAvailability[gameId] = value;
+        }
     }
 
     private async Task Save()
@@ -117,7 +138,7 @@
         _saving = true;
         try
         {
-            await Api.UpdateMyTournamentPlayerInfoAsync(TournamentId, new Sdk.UpdateTournamentPlayerInfoRequest
+            await BoltonCupApi.UpdateMyTournamentPlayerInfoAsync(TournamentId, new Sdk.UpdateTournamentPlayerInfoRequest
             {
                 Payload = JsonSerializer.Serialize(_model),
             });

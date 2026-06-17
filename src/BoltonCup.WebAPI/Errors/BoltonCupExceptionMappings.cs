@@ -47,6 +47,12 @@ public static class BoltonCupExceptionMappings
             Title: "Account already registered for tournament."
         ),
         new( 
+            ExceptionType: typeof(AccountNotInTournamentException), 
+            StatusCode: StatusCodes.Status409Conflict, 
+            ErrorType: ErrorTypes.Tournaments.AccountNotRegistered,
+            Title: "Account not registered for tournament."
+        ),
+        new( 
             ExceptionType: typeof(TournamentRegistrationClosedException), 
             StatusCode: StatusCodes.Status409Conflict, 
             ErrorType: ErrorTypes.Tournaments.RegistrationClosed,
