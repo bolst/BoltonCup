@@ -8419,6 +8419,261 @@
         ]
       }
     },
+    "/api/tournaments/{id}/player-info": {
+      "get": {
+        "tags": [
+          "TournamentPlayerInfo"
+        ],
+        "description": "Gets the authenticated user's player info and the games of their assigned team.",
+        "operationId": "GetMyTournamentPlayerInfo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentPlayerInfoDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentPlayerInfoDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentPlayerInfoDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "TournamentPlayerInfo"
+        ],
+        "description": "Creates or updates the authenticated user's player info for a tournament.",
+        "operationId": "UpdateMyTournamentPlayerInfo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateTournamentPlayerInfoRequest"
+                  }
+                ],
+                "description": "Request to create or update the authenticated user's pre-tournament player info."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateTournamentPlayerInfoRequest"
+                  }
+                ],
+                "description": "Request to create or update the authenticated user's pre-tournament player info."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateTournamentPlayerInfoRequest"
+                  }
+                ],
+                "description": "Request to create or update the authenticated user's pre-tournament player info."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/tournaments/{id}/registrations": {
       "get": {
         "tags": [
@@ -12997,6 +13252,25 @@
         "additionalProperties": false,
         "description": "DTO representing a payment intent for a tournament registration fee."
       },
+      "TournamentPlayerInfoDto": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "string",
+            "description": "Gets or sets the serialized player-info payload (game availability and song request).",
+            "nullable": true
+          },
+          "games": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameDto"
+            },
+            "description": "Gets the games of the player's assigned team (empty if the player has no team yet)."
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a player's pre-tournament info and the games of their assigned team."
+      },
       "TournamentRegistrationDto": {
         "type": "object",
         "properties": {
@@ -13410,6 +13684,18 @@
         "additionalProperties": false,
         "description": "Request to update an existing penalty. All fields are replaced."
       },
+      "UpdateTournamentPlayerInfoRequest": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "string",
+            "description": "Gets or sets the serialized player-info payload (game availability and song request).",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to create or update the authenticated user's pre-tournament player info."
+      },
       "UploadCredentials": {
         "type": "object",
         "properties": {
@@ -13499,6 +13785,9 @@
     },
     {
       "name": "TournamentPayments"
+    },
+    {
+      "name": "TournamentPlayerInfo"
     },
     {
       "name": "TournamentRegistrations"

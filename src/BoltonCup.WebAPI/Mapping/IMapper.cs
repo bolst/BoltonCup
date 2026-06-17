@@ -99,6 +99,9 @@ public interface IMapper
     // TournamentRegistration
     TournamentRegistrationDto? ToDto(TournamentRegistration? registration);
 
+    // TournamentPlayerInfo
+    TournamentPlayerInfoDto ToDto(TournamentPlayerInfoContext context);
+
     // Standings
     TournamentStandingsDto ToDto(TournamentStandings standings);
 }

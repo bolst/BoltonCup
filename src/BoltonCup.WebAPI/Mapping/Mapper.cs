@@ -1101,6 +1101,29 @@ public class Mapper : IMapper
     }
 
 
+    // ---------- TournamentPlayerInfo ----------
+
+    public TournamentPlayerInfoDto ToDto(TournamentPlayerInfoContext context)
+    {
+        return new TournamentPlayerInfoDto
+        {
+            Payload = context.Info?.Payload,
+            Games = context.TeamGames.Select(game => new GameDto
+            {
+                Id = game.Id,
+                Tournament = ToTournamentBriefDto(game.Tournament),
+                GameTime = game.GameTime,
+                GameType = game.GameType,
+                GameState = game.GameState,
+                Venue = game.Venue,
+                Rink = game.Rink,
+                HomeTeam = ToTeamInGameDto(game, home: true),
+                AwayTeam = ToTeamInGameDto(game, home: false),
+            }).ToList(),
+        };
+    }
+
+
     // ---------- Brief helpers ----------
 
     private DraftPickBriefDto? ToDraftPickBriefDto(DraftPick? draftPick)

@@ -31,6 +31,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<Tournament> Tournaments { get; set; }
     public DbSet<TournamentBudgetItem> TournamentBudgetItems { get; set; }
     public DbSet<TournamentRegistration> TournamentRegistrations { get; set; }
+    public DbSet<TournamentPlayerInfo> TournamentPlayerInfos { get; set; }
     public DbSet<TournamentSponsor> TournamentSponsors { get; set; }
     
     public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
@@ -755,6 +756,28 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.CurrentStep).HasColumnName("current_step");
             entity.Property(e => e.Payload).HasColumnName("payload");
             entity.Property(e => e.IsComplete).HasColumnName("is_complete");
+        });
+
+        modelBuilder.Entity<TournamentPlayerInfo>(entity =>
+        {
+            entity
+                .ToTable("tournament_player_info")
+                .HasKey(e => e.Id);
+            entity
+                .HasIndex(e => new { e.AccountId, e.TournamentId })
+                .IsUnique();
+            entity
+                .HasOne(e => e.Tournament)
+                .WithMany(a => a.PlayerInfos)
+                .HasForeignKey(e => e.TournamentId);
+            entity
+                .HasOne(e => e.Account)
+                .WithMany(a => a.TournamentPlayerInfos)
+                .HasForeignKey(e => e.AccountId);
+            entity.Property(e => e.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.AccountId).HasColumnName("account_id");
+            entity.Property(e => e.Payload).HasColumnName("payload").HasColumnType("jsonb");
         });
 
         modelBuilder.Entity<TournamentSponsor>(entity =>

@@ -1,0 +1,46 @@
+@page "/tournaments/{TournamentId:int}/player-info"
+@attribute [Authorize]
+@inject IBoltonCupApi BoltonCupApi
+
+<PageTitle>Player Info | Bolton Cup</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
+    @if (_tournament is null)
+    {
+        <div class="mb-2 ml-2">
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="280px" Height="40px" />
+        </div>
+        <MudDivider Class="my-2" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="420px" Width="100%" />
+    }
+    else
+    {
+        <div class="mb-2 ml-2">
+            <MudText Typo="Typo.h6"><b>@_tournament.Name — Player Info</b></MudText>
+        </div>
+
+        <MudDivider Class="my-2" />
+
+        <TournamentPlayerInfoForm TournamentId="_tournament.Id" />
+    }
+</MudContainer>
+
+@code {
+
+    [Parameter]
+    public int TournamentId { get; set; }
+
+    private int? _tournamentId;
+    private Sdk.TournamentSingleDto? _tournament;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_tournamentId != TournamentId)
+        {
+            _tournamentId = TournamentId;
+            _tournament = await BoltonCupApi.GetTournamentByIdAsync(TournamentId);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+}
