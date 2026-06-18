@@ -15,6 +15,8 @@ public sealed class SpotifyMusicSearchService : IMusicSearchService
     private const string TokenEndpoint = "https://accounts.spotify.com/api/token";
     private const string SearchEndpoint = "https://api.spotify.com/v1/search";
 
+    private static readonly SemaphoreSlim _tokenLock = new(1, 1);
+
     private readonly HttpClient _httpClient;
     private readonly SpotifySettings _settings;
     private readonly IMemoryCache _cache;
@@ -62,6 +64,24 @@ public sealed class SpotifyMusicSearchService : IMusicSearchService
         if (_cache.TryGetValue(TokenCacheKey, out string? cached) && !string.IsNullOrEmpty(cached))
             return cached;
 
+        await _tokenLock.WaitAsync(cancellationToken);
+        try
+        {
+            // Re-check inside the lock: a concurrent caller may have populated the cache
+            // while we waited, so only one request actually hits Spotify on a cold cache.
+            if (_cache.TryGetValue(TokenCacheKey, out cached) && !string.IsNullOrEmpty(cached))
+                return cached;
+
+            return await FetchAndCacheTokenAsync(cancellationToken);
+        }
+        finally
+        {
+            _tokenLock.Release();
+        }
+    }
+
+    private async Task<string> FetchAndCacheTokenAsync(CancellationToken cancellationToken)
+    {
         var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{_settings.ClientId}:{_settings.ClientSecret}"));
 
         using var request = new HttpRequestMessage(HttpMethod.Post, TokenEndpoint)

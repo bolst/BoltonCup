@@ -22,5 +22,5 @@ public class TournamentPlayerInfoComparer : IEqualityComparer<TournamentPlayerIn
         return item1 is not null && item2 is not null && item1.Id == item2.Id;
     }
 
-    public int GetHashCode(TournamentPlayerInfo item) => item.GetHashCode();
+    public int GetHashCode(TournamentPlayerInfo item) => item.Id.GetHashCode();
 }

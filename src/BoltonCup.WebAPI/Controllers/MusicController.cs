@@ -1,4 +1,5 @@
 using BoltonCup.Core;
+using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ public class MusicController(
 ) : BoltonCupControllerBase
 {
     /// <summary>Searches for tracks matching the given query.</summary>
-    [Authorize]
+    [Authorize(Policy = RequireCompletedAccount)]
     [HttpGet("tracks")]
     public async Task<ActionResult<IReadOnlyList<MusicTrackDto>>> SearchTracks([FromQuery] string q, [FromQuery] int limit = 8)
     {
