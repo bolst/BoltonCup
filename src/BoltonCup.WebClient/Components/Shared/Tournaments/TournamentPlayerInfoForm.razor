@@ -56,13 +56,39 @@
             <MudDivider Class="my-4" />
 
             <MudText Typo="Typo.h6" Class="mb-1"><b>Song Request</b></MudText>
-            <MudText Typo="Typo.body2" Class="mb-3 mud-text-secondary">Pick one song you'd like played at the tournament.</MudText>
-            <MudTextField @bind-Value="_model.SongRequest"
-                          Label="Song request"
-                          Placeholder="Artist – Song title"
-                          Variant="Variant.Outlined"
-                          MaxLength="200"
-                          Class="mb-4" />
+            <MudText Typo="Typo.body2" Class="mb-3 mud-text-secondary">Search Spotify for one song you'd like played at the tournament.</MudText>
+            <MudAutocomplete T="Sdk.MusicTrackDto"
+                             Label="Song request"
+                             Placeholder="Search by artist or song title"
+                             Value="_selectedTrack"
+                             ValueChanged="OnTrackChanged"
+                             SearchFunc="SearchTracks"
+                             ToStringFunc="TrackLabel"
+                             Variant="Variant.Outlined"
+                             DebounceInterval="300"
+                             MinCharacters="2"
+                             ResetValueOnEmptyText
+                             Clearable
+                             Class="mb-4">
+                <ItemTemplate Context="track">
+                    <div class="d-flex align-center gap-3">
+                        <MudAvatar Square Size="Size.Medium">
+                            @if (!string.IsNullOrEmpty(track.AlbumArtUrl))
+                            {
+                                <MudImage Src="@track.AlbumArtUrl" Alt="@track.Name" />
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.MusicNote" />
+                            }
+                        </MudAvatar>
+                        <div>
+                            <MudText Typo="Typo.body2">@track.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@track.Artist</MudText>
+                        </div>
+                    </div>
+                </ItemTemplate>
+            </MudAutocomplete>
 
             <div class="d-flex justify-end">
                 <MudButton Variant="Variant.Filled"
@@ -92,6 +118,7 @@
     private bool _saving;
     private IReadOnlyList<Sdk.GameDto> _games = [];
     private PlayerInfoModel _model = new();
+    private Sdk.MusicTrackDto? _selectedTrack;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -104,6 +131,7 @@
             var dto = await BoltonCupApi.GetMyTournamentPlayerInfoAsync(TournamentId);
             _games = dto.Games is { } games ? games.ToList() : [];
             _model = Deserialize(dto.Payload);
+            _selectedTrack = ToTrackDto(_model.Song);
             _isInTournament = true;
         }
         catch (Sdk.ApiException<Sdk.BoltonCupProblemDetails> e)
@@ -132,6 +160,48 @@
             _model.GameAvailability[gameId] = value;
         }
     }
+
+    private async Task<IEnumerable<Sdk.MusicTrackDto>> SearchTracks(string? value, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return [];
+        try
+        {
+            return await BoltonCupApi.SearchTracksAsync(value, limit: 8, ct);
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
+    private static string TrackLabel(Sdk.MusicTrackDto? track)
+        => track is null ? string.Empty : $"{track.Artist} – {track.Name}";
+
+    private void OnTrackChanged(Sdk.MusicTrackDto? track)
+    {
+        _selectedTrack = track;
+        _model.Song = track is null
+            ? null
+            : new SongSelection
+            {
+                TrackId = track.Id,
+                Name = track.Name,
+                Artist = track.Artist,
+                AlbumArtUrl = track.AlbumArtUrl,
+            };
+    }
+
+    private static Sdk.MusicTrackDto? ToTrackDto(SongSelection? song)
+        => song is null
+            ? null
+            : new Sdk.MusicTrackDto
+            {
+                Id = song.TrackId,
+                Name = song.Name,
+                Artist = song.Artist,
+                AlbumArtUrl = song.AlbumArtUrl,
+            };
 
     private async Task Save()
     {
@@ -171,7 +241,15 @@
     private sealed class PlayerInfoModel
     {
         public Dictionary<int, string> GameAvailability { get; set; } = new();
-        public string? SongRequest { get; set; }
+        public SongSelection? Song { get; set; }
+    }
+
+    private sealed class SongSelection
+    {
+        public string TrackId { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Artist { get; set; } = string.Empty;
+        public string? AlbumArtUrl { get; set; }
     }
 
 }

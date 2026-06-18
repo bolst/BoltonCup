@@ -1124,6 +1124,20 @@ public class Mapper : IMapper
     }
 
 
+    // ---------- Music ----------
+
+    public IReadOnlyList<MusicTrackDto> ToDto(IReadOnlyList<MusicTrack> tracks)
+    {
+        return tracks.Select(track => new MusicTrackDto
+        {
+            Id = track.Id,
+            Name = track.Name,
+            Artist = track.Artist,
+            AlbumArtUrl = track.AlbumArtUrl,
+        }).ToList();
+    }
+
+
     // ---------- Brief helpers ----------
 
     private DraftPickBriefDto? ToDraftPickBriefDto(DraftPick? draftPick)

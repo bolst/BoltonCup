@@ -36,6 +36,7 @@ public static class ServiceCollectionExtensions
         builder.AddBoltonCupEmails();
         builder.AddBoltonCupS3();
         builder.AddBoltonCupPayments();
+        builder.AddBoltonCupMusic();
         
         var connectionString = builder.Configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
         builder.Services
@@ -122,10 +123,17 @@ public static class ServiceCollectionExtensions
     }
 
     private static IServiceCollection AddBoltonCupPayments(this WebApplicationBuilder builder)
-    { 
+    {
         Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetRequiredSection("Stripe").GetValue<string>(nameof(StripeSettings.ApiKey));
         builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
         return builder.Services.AddTransient<ITournamentPaymentService, TournamentPaymentService>();
+    }
+
+    private static IServiceCollection AddBoltonCupMusic(this WebApplicationBuilder builder)
+    {
+        builder.Services.Configure<SpotifySettings>(builder.Configuration.GetSection("Spotify"));
+        builder.Services.AddHttpClient<IMusicSearchService, SpotifyMusicSearchService>();
+        return builder.Services;
     }
 }
 
