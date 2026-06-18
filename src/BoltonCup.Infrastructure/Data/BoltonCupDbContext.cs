@@ -708,6 +708,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.IsRegistrationOpen).HasColumnName("is_registration_open");
             entity.Property(e => e.IsPaymentOpen).HasColumnName("is_payment_open");
+            entity.Property(e => e.IsPlayerInfoOpen).HasColumnName("is_player_info_open");
             entity.Property(e => e.SkaterPaymentLink).HasColumnName("skater_payment_link");
             entity.Property(e => e.GoaliePaymentLink).HasColumnName("goalie_payment_link");
             entity.Property(e => e.SkaterLimit).HasColumnName("skater_limit");

@@ -21,7 +21,14 @@
 
         <MudDivider Class="my-2" />
 
-        <TournamentPlayerInfoForm TournamentId="_tournament.Id" />
+        @if (_tournament.IsPlayerInfoOpen)
+        {
+            <TournamentPlayerInfoForm TournamentId="_tournament.Id" />
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Error">Player info is not currently available for this tournament.</MudAlert>
+        }
     }
 </MudContainer>
 

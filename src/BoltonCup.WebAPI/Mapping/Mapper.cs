@@ -946,6 +946,7 @@ public class Mapper : IMapper
             IsActive = tournament.IsActive,
             IsRegistrationOpen = tournament.IsRegistrationOpen,
             IsPaymentOpen = tournament.IsPaymentOpen,
+            IsPlayerInfoOpen = tournament.IsPlayerInfoOpen,
             SkaterLimit = tournament.SkaterLimit,
             GoalieLimit = tournament.GoalieLimit,
             Gallery = tournament.Gallery is null ? null : ToGalleryBriefDto(tournament.Gallery)
@@ -968,6 +969,7 @@ public class Mapper : IMapper
                 IsActive = tournament.IsActive,
                 IsRegistrationOpen = tournament.IsRegistrationOpen,
                 IsPaymentOpen = tournament.IsPaymentOpen,
+                IsPlayerInfoOpen = tournament.IsPlayerInfoOpen,
                 SkaterLimit = tournament.SkaterLimit,
                 GoalieLimit = tournament.GoalieLimit,
                 InfoGuide = tournament.InfoGuide is null ? null : ToInfoGuideBriefDto(tournament.InfoGuide),

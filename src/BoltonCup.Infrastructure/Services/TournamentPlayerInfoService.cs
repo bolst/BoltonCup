@@ -44,8 +44,11 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
     {
         ValidatePayload(command.Payload);
 
-        _ = await _dbContext.Tournaments.FindAsync([command.TournamentId], cancellationToken)
+        var tournament = await _dbContext.Tournaments.FindAsync([command.TournamentId], cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Tournament), command.TournamentId);
+
+        if (!tournament.IsPlayerInfoOpen)
+            throw new InvalidOperationException("Player info is not open for this tournament.");
 
         _ = await _dbContext.Players 
                 .AsNoTracking() 

@@ -12,6 +12,7 @@ public class Tournament : EntityBase
     public bool IsActive { get; set; }
     public bool IsRegistrationOpen { get; set; }
     public bool IsPaymentOpen { get; set; }
+    public bool IsPlayerInfoOpen { get; set; }
     public string? SkaterPaymentLink { get; set; }
     public string? GoaliePaymentLink { get; set; }
     public int? SkaterLimit { get; set; }

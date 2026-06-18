@@ -10,11 +10,7 @@
                 <MudText>You are already registered for this tournament.</MudText>
             </MudAlert>
             <div class="d-flex justify-center mt-4">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary"
-                           Href="@($"/tournaments/{TournamentId}/player-info")"
-                           StartIcon="@Icons.Material.Rounded.Edit">
-                    Complete your player info
-                </MudButton>
+                <TournamentPlayerInfoButton TournamentId="TournamentId" IsPlayerInfoOpen="IsPlayerInfoOpen" />
             </div>
         }
         else
@@ -46,11 +42,7 @@
                                 </div>
                             </MudAlert>
                             <div class="d-flex justify-center mt-4">
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary"
-                                           Href="@($"/tournaments/{TournamentId}/player-info")"
-                                           StartIcon="@Icons.Material.Rounded.Edit">
-                                    Complete your player info
-                                </MudButton>
+                                <TournamentPlayerInfoButton TournamentId="TournamentId" IsPlayerInfoOpen="IsPlayerInfoOpen" />
                             </div>
                         </MudStep>
                     </ChildContent>
@@ -75,6 +67,9 @@
     [Parameter]
     [EditorRequired]
     public int TournamentId { get; set; }
+
+    [Parameter]
+    public bool IsPlayerInfoOpen { get; set; }
 
     private int? _tournamentId;
 
