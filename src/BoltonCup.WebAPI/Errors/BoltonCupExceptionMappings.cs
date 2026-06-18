@@ -46,8 +46,20 @@ public static class BoltonCupExceptionMappings
             ErrorType: ErrorTypes.Tournaments.AccountAlreadyRegistered,
             Title: "Account already registered for tournament."
         ),
-        new( 
-            ExceptionType: typeof(TournamentRegistrationClosedException), 
+        new(
+            ExceptionType: typeof(AccountNotInTournamentException),
+            StatusCode: StatusCodes.Status409Conflict,
+            ErrorType: ErrorTypes.Tournaments.AccountNotRegistered,
+            Title: "Account not registered for tournament."
+        ),
+        new(
+            ExceptionType: typeof(InvalidPlayerInfoPayloadException),
+            StatusCode: StatusCodes.Status400BadRequest,
+            ErrorType: ErrorTypes.Validation,
+            Title: "Invalid player info."
+        ),
+        new(
+            ExceptionType: typeof(TournamentRegistrationClosedException),
             StatusCode: StatusCodes.Status409Conflict, 
             ErrorType: ErrorTypes.Tournaments.RegistrationClosed,
             Title: "Registration closed."

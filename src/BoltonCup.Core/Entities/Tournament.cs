@@ -12,6 +12,7 @@ public class Tournament : EntityBase
     public bool IsActive { get; set; }
     public bool IsRegistrationOpen { get; set; }
     public bool IsPaymentOpen { get; set; }
+    public bool IsPlayerInfoOpen { get; set; }
     public string? SkaterPaymentLink { get; set; }
     public string? GoaliePaymentLink { get; set; }
     public int? SkaterLimit { get; set; }
@@ -26,6 +27,7 @@ public class Tournament : EntityBase
     public ICollection<Team> Teams { get; set; } = [];
     public ICollection<Game> Games { get; set; } = [];
     public ICollection<TournamentRegistration> Registrations { get; set; } = [];
+    public ICollection<TournamentPlayerInfo> PlayerInfos { get; set; } = [];
     public ICollection<TournamentSponsor> Sponsors { get; set; } = [];
     public ICollection<TournamentBudgetItem> Expenses { get; set; } = [];
     public Team? WinningTeam { get; set; }

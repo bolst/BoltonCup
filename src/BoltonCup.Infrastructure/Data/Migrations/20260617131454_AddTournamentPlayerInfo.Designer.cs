@@ -3,17 +3,20 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BoltonCup.Infrastructure.Migrations
+namespace BoltonCup.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260617131454_AddTournamentPlayerInfo")]
+    partial class AddTournamentPlayerInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1743,10 +1746,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("tournament_id");
 
-                    b.Property<string>("WinSong")
-                        .HasColumnType("text")
-                        .HasColumnName("win_song");
-
                     b.HasKey("Id");
 
                     b.HasIndex("GmAccountId");
@@ -1810,10 +1809,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<bool>("IsPaymentOpen")
                         .HasColumnType("boolean")
                         .HasColumnName("is_payment_open");
-
-                    b.Property<bool>("IsPlayerInfoOpen")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_player_info_open");
 
                     b.Property<bool>("IsRegistrationOpen")
                         .HasColumnType("boolean")

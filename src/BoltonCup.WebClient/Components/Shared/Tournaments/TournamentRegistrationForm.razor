@@ -9,6 +9,9 @@
             <MudAlert Severity="Severity.Success">
                 <MudText>You are already registered for this tournament.</MudText>
             </MudAlert>
+            <div class="d-flex justify-center mt-4">
+                <TournamentPlayerInfoButton TournamentId="TournamentId" IsPlayerInfoOpen="IsPlayerInfoOpen" />
+            </div>
         }
         else
         {
@@ -38,6 +41,9 @@
                                     </div>
                                 </div>
                             </MudAlert>
+                            <div class="d-flex justify-center mt-4">
+                                <TournamentPlayerInfoButton TournamentId="TournamentId" IsPlayerInfoOpen="IsPlayerInfoOpen" />
+                            </div>
                         </MudStep>
                     </ChildContent>
                     <ConnectorTemplate>
@@ -61,6 +67,9 @@
     [Parameter]
     [EditorRequired]
     public int TournamentId { get; set; }
+
+    [Parameter]
+    public bool IsPlayerInfoOpen { get; set; }
 
     private int? _tournamentId;
 

@@ -946,6 +946,7 @@ public class Mapper : IMapper
             IsActive = tournament.IsActive,
             IsRegistrationOpen = tournament.IsRegistrationOpen,
             IsPaymentOpen = tournament.IsPaymentOpen,
+            IsPlayerInfoOpen = tournament.IsPlayerInfoOpen,
             SkaterLimit = tournament.SkaterLimit,
             GoalieLimit = tournament.GoalieLimit,
             Gallery = tournament.Gallery is null ? null : ToGalleryBriefDto(tournament.Gallery)
@@ -968,6 +969,7 @@ public class Mapper : IMapper
                 IsActive = tournament.IsActive,
                 IsRegistrationOpen = tournament.IsRegistrationOpen,
                 IsPaymentOpen = tournament.IsPaymentOpen,
+                IsPlayerInfoOpen = tournament.IsPlayerInfoOpen,
                 SkaterLimit = tournament.SkaterLimit,
                 GoalieLimit = tournament.GoalieLimit,
                 InfoGuide = tournament.InfoGuide is null ? null : ToInfoGuideBriefDto(tournament.InfoGuide),
@@ -1098,6 +1100,43 @@ public class Mapper : IMapper
                 Payload = registration.Payload,
                 IsComplete = registration.IsComplete,
             };
+    }
+
+
+    // ---------- TournamentPlayerInfo ----------
+
+    public TournamentPlayerInfoDto ToDto(TournamentPlayerInfoContext context)
+    {
+        return new TournamentPlayerInfoDto
+        {
+            Payload = context.Info?.Payload,
+            Games = context.TeamGames.Select(game => new GameDto
+            {
+                Id = game.Id,
+                Tournament = ToTournamentBriefDto(game.Tournament),
+                GameTime = game.GameTime,
+                GameType = game.GameType,
+                GameState = game.GameState,
+                Venue = game.Venue,
+                Rink = game.Rink,
+                HomeTeam = ToTeamInGameDto(game, home: true),
+                AwayTeam = ToTeamInGameDto(game, home: false),
+            }).ToList(),
+        };
+    }
+
+
+    // ---------- Music ----------
+
+    public IReadOnlyList<MusicTrackDto> ToDto(IReadOnlyList<MusicTrack> tracks)
+    {
+        return tracks.Select(track => new MusicTrackDto
+        {
+            Id = track.Id,
+            Name = track.Name,
+            Artist = track.Artist,
+            AlbumArtUrl = track.AlbumArtUrl,
+        }).ToList();
     }
 
 

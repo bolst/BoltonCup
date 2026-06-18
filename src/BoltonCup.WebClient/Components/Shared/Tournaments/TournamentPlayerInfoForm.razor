@@ -1,0 +1,210 @@
+@using System.Text.Json
+@namespace BoltonCup.WebClient.Components.Shared
+@inject IBoltonCupApi BoltonCupApi
+@inject ISnackbar Snackbar
+
+<AuthorizeView Context="_">
+    <Authorized>
+        @if (!_loaded)
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="320px" Width="100%" />
+        }
+        else if (!_isInTournament)
+        {
+            <MudAlert Severity="Severity.Error">You are not registered for this tournament!</MudAlert>
+        }
+        else
+        {
+            <MudText Typo="Typo.h6" Class="mb-1"><b>Game Availability</b></MudText>
+            @if (_games.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Class="mb-4">
+                    You'll be able to set your game availability once you've been placed on a team.
+                </MudAlert>
+            }
+            else
+            {
+                <MudText Typo="Typo.body2" Class="mb-3 mud-text-secondary">Let your team know whether you can make each game.</MudText>
+                <MudStack Spacing="2" Class="mb-4">
+                    @foreach (var game in _games)
+                    {
+                        <MudPaper Class="d-flex flex-wrap align-center justify-space-between gap-2 pa-3" Outlined>
+                            <div>
+                                <MudText Typo="Typo.subtitle2">
+                                    @(game.AwayTeam?.NameShort ?? "TBD") vs. @(game.HomeTeam?.NameShort ?? "TBD")
+                                </MudText>
+                                <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                                    @game.GameTime.ToLocalTime().ToString("ddd MMM d, h:mm tt")@(string.IsNullOrWhiteSpace(game.Venue) ? "" : $" · {game.Venue}")
+                                </MudText>
+                            </div>
+                            <MudToggleGroup T="string"
+                                            Value="@GetAvailability(game.Id)"
+                                            ValueChanged="@(v => SetAvailability(game.Id, v))"
+                                            Size="Size.Small"
+                                            Color="Color.Primary"
+                                            CheckMark
+                                            SelectionMode="SelectionMode.SingleSelection">
+                                <MudToggleItem Value="@("In")" Text="In" />
+                                <MudToggleItem Value="@("Maybe")" Text="Maybe" />
+                                <MudToggleItem Value="@("Out")" Text="Out" />
+                            </MudToggleGroup>
+                        </MudPaper>
+                    }
+                </MudStack>
+            }
+
+            <MudDivider Class="my-4" />
+
+            <MudText Typo="Typo.h6" Class="mb-1"><b>Song Request</b></MudText>
+            <MudText Typo="Typo.body2" Class="mb-3 mud-text-secondary">Search for one song you'd like played at the tournament.</MudText>
+            <SongPickerField Label="Song request"
+                             Value="_selectedTrack"
+                             ValueChanged="OnTrackChanged"
+                             Class="mb-4" />
+
+            <div class="d-flex justify-end">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           OnClick="Save"
+                           Disabled="_saving"
+                           StartIcon="@Icons.Material.Rounded.Save">
+                    @(_saving ? "Saving..." : "Save")
+                </MudButton>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <MudAlert Severity="Severity.Error">Sorry! You are not authorized to view this.</MudAlert>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public int TournamentId { get; set; }
+
+    private int? _tournamentId;
+    private bool _isInTournament;
+    private bool _loaded;
+    private bool _saving;
+    private IReadOnlyList<Sdk.GameDto> _games = [];
+    private PlayerInfoModel _model = new();
+    private Sdk.MusicTrackDto? _selectedTrack;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (TournamentId == _tournamentId)
+            return;
+        _tournamentId = TournamentId;
+
+        try
+        {
+            var dto = await BoltonCupApi.GetMyTournamentPlayerInfoAsync(TournamentId);
+            _games = dto.Games is { } games ? games.ToList() : [];
+            _model = Deserialize(dto.Payload);
+            _selectedTrack = ToTrackDto(_model.Song);
+            _isInTournament = true;
+        }
+        catch (Sdk.ApiException<Sdk.BoltonCupProblemDetails> e)
+            when (e.Result.Type == ErrorTypes.Tournaments.AccountNotRegistered)
+        {
+            _isInTournament = false;
+        }
+        finally
+        {
+            _loaded = true;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private string? GetAvailability(int gameId)
+        => _model.GameAvailability.GetValueOrDefault(gameId);
+
+    private void SetAvailability(int gameId, string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            _model.GameAvailability.Remove(gameId);
+        }
+        else
+        {
+            _model.GameAvailability[gameId] = value;
+        }
+    }
+
+    private void OnTrackChanged(Sdk.MusicTrackDto? track)
+    {
+        _selectedTrack = track;
+        _model.Song = track is null
+            ? null
+            : new SongSelection
+            {
+                TrackId = track.Id,
+                Name = track.Name,
+                Artist = track.Artist,
+                AlbumArtUrl = track.AlbumArtUrl,
+            };
+    }
+
+    private static Sdk.MusicTrackDto? ToTrackDto(SongSelection? song)
+        => song is null
+            ? null
+            : new Sdk.MusicTrackDto
+            {
+                Id = song.TrackId,
+                Name = song.Name,
+                Artist = song.Artist,
+                AlbumArtUrl = song.AlbumArtUrl,
+            };
+
+    private async Task Save()
+    {
+        _saving = true;
+        try
+        {
+            await BoltonCupApi.UpdateMyTournamentPlayerInfoAsync(TournamentId, new Sdk.UpdateTournamentPlayerInfoRequest
+            {
+                Payload = JsonSerializer.Serialize(_model),
+            });
+            Snackbar.Add("Your info has been saved.", Severity.Success);
+        }
+        catch
+        {
+            Snackbar.Add("Something went wrong saving your info.", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private static PlayerInfoModel Deserialize(string? payload)
+    {
+        if (string.IsNullOrEmpty(payload))
+            return new PlayerInfoModel();
+        try
+        {
+            return JsonSerializer.Deserialize<PlayerInfoModel>(payload) ?? new PlayerInfoModel();
+        }
+        catch
+        {
+            return new PlayerInfoModel();
+        }
+    }
+
+    private sealed class PlayerInfoModel
+    {
+        public Dictionary<int, string> GameAvailability { get; set; } = new();
+        public SongSelection? Song { get; set; }
+    }
+
+    private sealed class SongSelection
+    {
+        public string TrackId { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Artist { get; set; } = string.Empty;
+        public string? AlbumArtUrl { get; set; }
+    }
+
+}

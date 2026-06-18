@@ -24,7 +24,7 @@
             
         if (_tournament.IsRegistrationOpen)
         {
-            <TournamentRegistrationForm TournamentId="_tournament.Id" />
+            <TournamentRegistrationForm TournamentId="_tournament.Id" IsPlayerInfoOpen="_tournament.IsPlayerInfoOpen" />
         }
         else
         {

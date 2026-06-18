@@ -1,0 +1,26 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+@if (IsPlayerInfoOpen)
+{
+    <MudButton Href="@($"/tournaments/{TournamentId}/player-info")" Color="Color.Primary" Variant="Variant.Filled"
+               Size="Size" StartIcon="@Icons.Material.Rounded.Edit" FullWidth="FullWidth">
+        Edit my player info
+    </MudButton>
+}
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public int TournamentId { get; set; }
+
+    [Parameter]
+    public bool IsPlayerInfoOpen { get; set; }
+
+    [Parameter]
+    public bool FullWidth { get; set; }
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+}

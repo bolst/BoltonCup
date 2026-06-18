@@ -15,6 +15,7 @@ public class Team : EntityBase
     public string? TertiaryColorHex { get; set; }
     public string? GoalSong { get; set; }
     public string? PenaltySong { get; set; }
+    public string? WinSong { get; set; }
 
     public Tournament Tournament { get; set; } = null!;
     public Account? GeneralManager { get; set; }

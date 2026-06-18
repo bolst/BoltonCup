@@ -1,0 +1,77 @@
+@namespace BoltonCup.WebClient.Components.Shared
+@inject IBoltonCupApi BoltonCupApi
+
+<MudAutocomplete T="Sdk.MusicTrackDto"
+                 Label="@Label"
+                 Placeholder="@Placeholder"
+                 Value="Value"
+                 ValueChanged="OnValueChanged"
+                 SearchFunc="SearchTracks"
+                 ToStringFunc="TrackLabel"
+                 Variant="Variant.Outlined"
+                 DebounceInterval="300"
+                 MinCharacters="2"
+                 ResetValueOnEmptyText
+                 Clearable
+                 Class="@Class">
+    <ItemTemplate Context="track">
+        <div class="d-flex align-center gap-3">
+            <MudAvatar Square Size="Size.Medium">
+                @if (!string.IsNullOrEmpty(track.AlbumArtUrl))
+                {
+                    <MudImage Src="@track.AlbumArtUrl" Alt="@track.Name" />
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Rounded.MusicNote" />
+                }
+            </MudAvatar>
+            <div>
+                <MudText Typo="Typo.body2">@track.Name</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">@track.Artist</MudText>
+            </div>
+        </div>
+    </ItemTemplate>
+</MudAutocomplete>
+
+@code {
+
+    [Parameter]
+    public string Label { get; set; } = "Song";
+
+    [Parameter]
+    public string Placeholder { get; set; } = "Search by artist or song title";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public Sdk.MusicTrackDto? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<Sdk.MusicTrackDto?> ValueChanged { get; set; }
+
+    private Task OnValueChanged(Sdk.MusicTrackDto? track)
+    {
+        Value = track;
+        return ValueChanged.InvokeAsync(track);
+    }
+
+    private async Task<IEnumerable<Sdk.MusicTrackDto>> SearchTracks(string? value, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return [];
+        try
+        {
+            return await BoltonCupApi.SearchTracksAsync(value, limit: 8, ct);
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
+    private static string TrackLabel(Sdk.MusicTrackDto? track)
+        => track is null ? string.Empty : $"{track.Artist} – {track.Name}";
+
+}
