@@ -673,6 +673,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TertiaryColorHex).HasColumnName("tertiary_hex");
             entity.Property(e => e.GoalSong).HasColumnName("goal_song_key");
             entity.Property(e => e.PenaltySong).HasColumnName("penalty_song_key");
+            entity.Property(e => e.WinSong).HasColumnName("win_song");
         });
 
         modelBuilder.Entity<Tournament>(entity =>
