@@ -56,39 +56,11 @@
             <MudDivider Class="my-4" />
 
             <MudText Typo="Typo.h6" Class="mb-1"><b>Song Request</b></MudText>
-            <MudText Typo="Typo.body2" Class="mb-3 mud-text-secondary">Search Spotify for one song you'd like played at the tournament.</MudText>
-            <MudAutocomplete T="Sdk.MusicTrackDto"
-                             Label="Song request"
-                             Placeholder="Search by artist or song title"
+            <MudText Typo="Typo.body2" Class="mb-3 mud-text-secondary">Search for one song you'd like played at the tournament.</MudText>
+            <SongPickerField Label="Song request"
                              Value="_selectedTrack"
                              ValueChanged="OnTrackChanged"
-                             SearchFunc="SearchTracks"
-                             ToStringFunc="TrackLabel"
-                             Variant="Variant.Outlined"
-                             DebounceInterval="300"
-                             MinCharacters="2"
-                             ResetValueOnEmptyText
-                             Clearable
-                             Class="mb-4">
-                <ItemTemplate Context="track">
-                    <div class="d-flex align-center gap-3">
-                        <MudAvatar Square Size="Size.Medium">
-                            @if (!string.IsNullOrEmpty(track.AlbumArtUrl))
-                            {
-                                <MudImage Src="@track.AlbumArtUrl" Alt="@track.Name" />
-                            }
-                            else
-                            {
-                                <MudIcon Icon="@Icons.Material.Rounded.MusicNote" />
-                            }
-                        </MudAvatar>
-                        <div>
-                            <MudText Typo="Typo.body2">@track.Name</MudText>
-                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@track.Artist</MudText>
-                        </div>
-                    </div>
-                </ItemTemplate>
-            </MudAutocomplete>
+                             Class="mb-4" />
 
             <div class="d-flex justify-end">
                 <MudButton Variant="Variant.Filled"
@@ -160,23 +132,6 @@
             _model.GameAvailability[gameId] = value;
         }
     }
-
-    private async Task<IEnumerable<Sdk.MusicTrackDto>> SearchTracks(string? value, CancellationToken ct)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return [];
-        try
-        {
-            return await BoltonCupApi.SearchTracksAsync(value, limit: 8, ct);
-        }
-        catch
-        {
-            return [];
-        }
-    }
-
-    private static string TrackLabel(Sdk.MusicTrackDto? track)
-        => track is null ? string.Empty : $"{track.Artist} – {track.Name}";
 
     private void OnTrackChanged(Sdk.MusicTrackDto? track)
     {
