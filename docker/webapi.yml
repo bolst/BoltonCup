@@ -14,6 +14,7 @@ services:
       - "${WEBAPI_PORT:-8080}:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+      Logging__LogLevel__Microsoft.EntityFrameworkCore.Database.Command: Warning
       BoltonCup__ConnectionString: ${CONNECTION_STRING:?required}
       BoltonCup__AdminEmail: ${ADMIN_EMAIL:-}
       BoltonCup__Authentication__AdminApiKey: ${ADMIN_API_KEY:-}
