@@ -46,6 +46,8 @@ public static class ServiceCollectionExtensions
         RegisterByConvention(builder.Services, typeof(AccountRepository).Assembly, "Repository");
         RegisterByConvention(builder.Services, typeof(AccountRepository).Assembly, "Service");
 
+        builder.Services.AddSingleton<IRosterValidator, RosterValidator>();
+
         return builder;
     }
 
