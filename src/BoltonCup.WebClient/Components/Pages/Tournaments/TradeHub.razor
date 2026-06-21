@@ -1,0 +1,330 @@
+@page "/tournaments/{TournamentId:int}/trade-hub"
+@attribute [Authorize]
+@inject IBoltonCupApi BoltonCupApi
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<PageTitle>Trade Hub | Bolton Cup</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    @if (_tournament is null)
+    {
+        <MudSkeleton SkeletonType="SkeletonType.Text" Width="320px" Height="48px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="240px" Width="100%" Class="mt-4" />
+    }
+    else if (!_authorized)
+    {
+        <MudAlert Severity="Severity.Error">You are not authorized to view the Trade Hub for this tournament.</MudAlert>
+    }
+    else
+    {
+        <MudText Typo="Typo.h4" Class="mb-2"><b>@_tournament.Name — Trade Hub</b></MudText>
+
+        @if (!_tournament.IsTradingOpen)
+        {
+            <MudAlert Severity="Severity.Info" Class="mb-4">Trading is currently closed for this tournament. Existing accepted trades may still be resolved by an admin.</MudAlert>
+        }
+
+        @if (_myTeam is not null && _tournament.IsTradingOpen)
+        {
+            <MudPaper Class="pa-4 mb-6" Outlined Elevation="0">
+                <MudText Typo="Typo.h6" Class="mb-3">Propose a trade</MudText>
+                <MudGrid Spacing="3">
+                    <MudItem xs="12" md="6">
+                        <MudText Typo="Typo.subtitle2">@_myTeam.Name sends</MudText>
+                        <MudSelect T="Sdk.PlayerBriefDto" MultiSelection="true" @bind-SelectedValues="_selectedMyPlayers"
+                                   Label="Players to send" Variant="Variant.Outlined" Margin="Margin.Dense" Dense
+                                   ToStringFunc="@(p => p?.FullName ?? string.Empty)"
+                                   MultiSelectionTextFunc="@(s => $"{s.Count} selected")">
+                            @foreach (var p in SelectableMyPlayers)
+                            {
+                                <MudSelectItem T="Sdk.PlayerBriefDto" Value="p">@PlayerLabel(p)</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudText Typo="Typo.subtitle2">to</MudText>
+                        <MudSelect T="Sdk.TeamDto" Value="_counterpartyTeam" ValueChanged="OnCounterpartyChanged"
+                                   Label="Trade with" Variant="Variant.Outlined" Margin="Margin.Dense" Dense
+                                   ToStringFunc="@(t => t?.Name ?? string.Empty)">
+                            @foreach (var t in _teams.Where(t => t.Id != _myTeam.Id))
+                            {
+                                <MudSelectItem T="Sdk.TeamDto" Value="t">@t.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                        @if (_counterpartyTeam is not null)
+                        {
+                            <MudText Typo="Typo.subtitle2" Class="mt-2">@_counterpartyTeam.Name sends</MudText>
+                            <MudSelect T="Sdk.PlayerBriefDto" MultiSelection="true" @bind-SelectedValues="_selectedTheirPlayers"
+                                       Label="Players to receive" Variant="Variant.Outlined" Margin="Margin.Dense" Dense
+                                       ToStringFunc="@(p => p?.FullName ?? string.Empty)"
+                                       MultiSelectionTextFunc="@(s => $"{s.Count} selected")">
+                                @foreach (var p in SelectableTheirPlayers)
+                                {
+                                    <MudSelectItem T="Sdk.PlayerBriefDto" Value="p">@PlayerLabel(p)</MudSelectItem>
+                                }
+                            </MudSelect>
+                        }
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_note" Label="Note (optional)" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" Class="d-flex justify-end">
+                        <MudButton OnClick="@SubmitProposalAsync" Color="Color.Primary" Variant="Variant.Filled"
+                                   Disabled="@(_submitting || !CanSubmitProposal)">
+                            Propose trade
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        }
+
+        <MudText Typo="Typo.h6" Class="mb-2">Trades</MudText>
+        @if (_trades.Count == 0)
+        {
+            <MudText Typo="Typo.body2" Class="mud-text-secondary">No trades yet.</MudText>
+        }
+        else
+        {
+            <MudTable Items="_trades" Breakpoint="Breakpoint.Sm" Elevation="0" Outlined Dense Hover>
+                <HeaderContent>
+                    <MudTh>Status</MudTh>
+                    <MudTh>Teams</MudTh>
+                    <MudTh>Players</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Status">
+                        <MudChip T="string" Color="@StatusColor(context.Status)" Size="Size.Small" Variant="Variant.Filled">@context.Status</MudChip>
+                    </MudTd>
+                    <MudTd DataLabel="Teams">@context.ProposingTeam.Name &harr; @context.ReceivingTeam.Name</MudTd>
+                    <MudTd DataLabel="Players">
+                        <div class="d-flex flex-column">
+                            <MudText Typo="Typo.body2"><b>@context.ProposingTeam.Name:</b> @SidePlayers(context.PlayersFromProposing)</MudText>
+                            <MudText Typo="Typo.body2"><b>@context.ReceivingTeam.Name:</b> @SidePlayers(context.PlayersFromReceiving)</MudText>
+                            @if (!string.IsNullOrWhiteSpace(context.Note))
+                            {
+                                <MudText Typo="Typo.caption" Class="mud-text-secondary">"@context.Note"</MudText>
+                            }
+                        </div>
+                    </MudTd>
+                    <MudTd DataLabel="Actions">
+                        <div class="d-flex flex-row gap-2 flex-wrap">
+                            @if (context.CanAccept)
+                            {
+                                <MudButton Size="Size.Small" Color="Color.Success" Variant="Variant.Filled"
+                                           OnClick="@(() => AcceptAsync(context))">Accept</MudButton>
+                            }
+                            @if (context.CanDecline)
+                            {
+                                <MudButton Size="Size.Small" Color="Color.Error" Variant="Variant.Outlined"
+                                           OnClick="@(() => DeclineAsync(context))">Decline</MudButton>
+                            }
+                            @if (context.CanApprove)
+                            {
+                                <MudButton Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled"
+                                           OnClick="@(() => ApproveAsync(context))">Approve</MudButton>
+                            }
+                            @if (context.CanCancel)
+                            {
+                                <MudButton Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined"
+                                           OnClick="@(() => CancelAsync(context))">Cancel</MudButton>
+                            }
+                        </div>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public int TournamentId { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthState { get; set; }
+
+    private int _loadedTournamentId = -1;
+    private int? _accountId;
+    private bool _isAdmin;
+    private bool _authorized;
+
+    private Sdk.TournamentSingleDto? _tournament;
+    private List<Sdk.TeamDto> _teams = [];
+    private Sdk.TeamDto? _myTeam;
+    private List<Sdk.TradeDto> _trades = [];
+
+    private List<Sdk.PlayerBriefDto> _myRoster = [];
+    private List<Sdk.PlayerBriefDto> _theirRoster = [];
+    private Sdk.TeamDto? _counterpartyTeam;
+    private IReadOnlyCollection<Sdk.PlayerBriefDto> _selectedMyPlayers = new HashSet<Sdk.PlayerBriefDto>();
+    private IReadOnlyCollection<Sdk.PlayerBriefDto> _selectedTheirPlayers = new HashSet<Sdk.PlayerBriefDto>();
+    private string? _note;
+    private bool _submitting;
+
+    private HashSet<int> _lockedPlayerIds = [];
+    private HashSet<int> _gmAccountIds = [];
+
+    private IEnumerable<Sdk.PlayerBriefDto> SelectableMyPlayers =>
+        _myRoster.Where(p => !_lockedPlayerIds.Contains(p.Id) && !_gmAccountIds.Contains(p.AccountId));
+
+    private IEnumerable<Sdk.PlayerBriefDto> SelectableTheirPlayers =>
+        _theirRoster.Where(p => !_lockedPlayerIds.Contains(p.Id) && !_gmAccountIds.Contains(p.AccountId));
+
+    private bool CanSubmitProposal =>
+        _counterpartyTeam is not null
+        && (_selectedMyPlayers.Any() || _selectedTheirPlayers.Any());
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_loadedTournamentId == TournamentId)
+            return;
+        _loadedTournamentId = TournamentId;
+
+        if (AuthState is not null)
+        {
+            var user = (await AuthState).User;
+            _accountId = user.TryGetAccountId(out var aid) ? aid : null;
+            _isAdmin = user.IsInRole("Admin");
+        }
+
+        _tournament = await BoltonCupApi.GetTournamentByIdAsync(TournamentId);
+        _teams = (await BoltonCupApi.GetTeamsAsync(tournamentId: TournamentId, size: 100)).Items.ToList();
+        _gmAccountIds = _teams.Where(t => t.GmAccountId is not null).Select(t => t.GmAccountId!.Value).ToHashSet();
+        _myTeam = _accountId is { } myId ? _teams.FirstOrDefault(t => t.GmAccountId == myId) : null;
+        _authorized = _isAdmin || _myTeam is not null;
+
+        if (_authorized)
+            await ReloadTradesAsync();
+
+        if (_myTeam is not null)
+            _myRoster = (await BoltonCupApi.GetTeamByIdAsync(_myTeam.Id)).Players.ToList();
+    }
+
+    private async Task ReloadTradesAsync()
+    {
+        _trades = (await BoltonCupApi.GetTradesAsync(tournamentId: TournamentId)).ToList();
+        _lockedPlayerIds = _trades
+            .Where(t => t.Status is Sdk.TradeStatus.Pending or Sdk.TradeStatus.Accepted)
+            .SelectMany(t => t.PlayersFromProposing.Concat(t.PlayersFromReceiving))
+            .Select(tp => tp.Player.Id)
+            .ToHashSet();
+    }
+
+    private async Task OnCounterpartyChanged(Sdk.TeamDto? team)
+    {
+        _counterpartyTeam = team;
+        _selectedTheirPlayers = new HashSet<Sdk.PlayerBriefDto>();
+        _theirRoster = team is not null
+            ? (await BoltonCupApi.GetTeamByIdAsync(team.Id)).Players.ToList()
+            : [];
+    }
+
+    private async Task SubmitProposalAsync()
+    {
+        if (_myTeam is null || _counterpartyTeam is null)
+            return;
+
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Confirm Trade", GetTradeMarkupString(), yesText: "Yes", cancelText: "Cancel");
+        if (confirm != true)
+        {
+            return;
+        }
+
+        _submitting = true;
+        try
+        {
+            await BoltonCupApi.CreateTradeAsync(new Sdk.CreateTradeRequest
+            {
+                TournamentId = TournamentId,
+                ProposingTeamId = _myTeam.Id,
+                ReceivingTeamId = _counterpartyTeam.Id,
+                ProposingPlayerIds = _selectedMyPlayers.Select(p => p.Id).ToList(),
+                ReceivingPlayerIds = _selectedTheirPlayers.Select(p => p.Id).ToList(),
+                Note = _note,
+            });
+            Snackbar.Add("Trade proposed.", Severity.Success);
+            _selectedMyPlayers = new HashSet<Sdk.PlayerBriefDto>();
+            _selectedTheirPlayers = new HashSet<Sdk.PlayerBriefDto>();
+            _counterpartyTeam = null;
+            _theirRoster = [];
+            _note = null;
+            await ReloadTradesAsync();
+        }
+        catch (Sdk.ApiException<Sdk.BoltonCupProblemDetails> e)
+        {
+            Snackbar.Add(e.Result.Detail ?? "Failed to propose trade.", Severity.Error);
+        }
+        finally
+        {
+            _submitting = false;
+        }
+    }
+
+    private MarkupString GetTradeMarkupString()
+    {
+        static string Side(string? teamName, IReadOnlyCollection<Sdk.PlayerBriefDto> players) =>
+            $"<b>{teamName}</b>: " +
+            (players.Count == 0 ? "no players" : string.Join(", ", players.Select(p => p.FullName)));
+
+        var resultString = $"{Side(_myTeam?.Name, _selectedMyPlayers)}<br/>{Side(_counterpartyTeam?.Name, _selectedTheirPlayers)}";
+        if (!string.IsNullOrEmpty(_note))
+        {
+            resultString += "<br/><hr>";
+            resultString += "<br/><b>Note</b>: " + _note;
+        }
+        return (MarkupString)resultString;
+    }
+
+    private Task AcceptAsync(Sdk.TradeDto trade) =>
+        RunActionAsync(trade, "Accept trade", "Accept this trade? It will then await admin approval.",
+            id => BoltonCupApi.AcceptTradeAsync(id), "Trade accepted.");
+
+    private Task DeclineAsync(Sdk.TradeDto trade) =>
+        RunActionAsync(trade, "Decline trade", "Decline this trade?",
+            id => BoltonCupApi.DeclineTradeAsync(id), "Trade declined.");
+
+    private Task CancelAsync(Sdk.TradeDto trade) =>
+        RunActionAsync(trade, "Cancel trade", "Cancel this trade?",
+            id => BoltonCupApi.CancelTradeAsync(id), "Trade cancelled.");
+
+    private Task ApproveAsync(Sdk.TradeDto trade) =>
+        RunActionAsync(trade, "Approve trade", "Approve this trade and update both rosters? This cannot be undone.",
+            id => BoltonCupApi.ApproveTradeAsync(id), "Trade approved and processed.");
+
+    private async Task RunActionAsync(Sdk.TradeDto trade, string title, string message, Func<int, Task> action, string success)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(title, message, yesText: "Confirm", cancelText: "Cancel");
+        if (confirmed != true)
+            return;
+
+        try
+        {
+            await action(trade.Id);
+            Snackbar.Add(success, Severity.Success);
+            await ReloadTradesAsync();
+        }
+        catch (Sdk.ApiException<Sdk.BoltonCupProblemDetails> e)
+        {
+            Snackbar.Add(e.Result.Detail ?? "Action failed.", Severity.Error);
+        }
+    }
+
+    private static string PlayerLabel(Sdk.PlayerBriefDto p) =>
+        $"{p.FullName} ({p.Position})";
+
+    private static string SidePlayers(ICollection<Sdk.TradePlayerDto> players) =>
+        players.Count == 0 ? "—" : string.Join(", ", players.Select(tp => tp.Player.FullName));
+
+    private static Color StatusColor(Sdk.TradeStatus status) => status switch
+    {
+        Sdk.TradeStatus.Pending => Color.Warning,
+        Sdk.TradeStatus.Accepted => Color.Info,
+        Sdk.TradeStatus.Approved => Color.Success,
+        Sdk.TradeStatus.Declined => Color.Error,
+        Sdk.TradeStatus.Cancelled => Color.Default,
+        _ => Color.Default,
+    };
+}
