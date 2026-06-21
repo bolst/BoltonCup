@@ -17,6 +17,8 @@ public sealed record TournamentBriefDto
     public bool IsActive { get; set; }
     /// <summary>Gets or sets whether registration is currently open.</summary>
     public bool IsRegistrationOpen { get; set; }
+    /// <summary>Gets or sets whether player trading is currently open.</summary>
+    public bool IsTradingOpen { get; set; }
     /// <summary>Gets or sets the URL of the tournament logo.</summary>
     public string? Logo { get; set; }
 }

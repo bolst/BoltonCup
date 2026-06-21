@@ -40,6 +40,11 @@ public interface IMapper
     ReplaceDraftPickCommand ToCommand(int draftId, int overallPick, ReplaceDraftPickRequest request);
     SetPlayerPoolCommand ToCommand(SetPlayerPoolRequest request);
 
+    // Trade
+    IReadOnlyList<TradeDto> ToDtoList(IReadOnlyList<Trade> trades, TradeViewerContext viewer);
+    TradeDto ToDto(Trade trade, TradeViewerContext viewer);
+    CreateTradeCommand ToCommand(CreateTradeRequest request, ClaimsPrincipal user);
+
     // CustomRanking
     IReadOnlyList<CustomRankingDto> ToDtoList(IReadOnlyList<CustomRanking> rankings);
     CustomRankingSingleDto? ToDto(CustomRanking? ranking);

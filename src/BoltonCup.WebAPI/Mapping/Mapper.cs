@@ -947,6 +947,7 @@ public class Mapper : IMapper
             IsRegistrationOpen = tournament.IsRegistrationOpen,
             IsPaymentOpen = tournament.IsPaymentOpen,
             IsPlayerInfoOpen = tournament.IsPlayerInfoOpen,
+            IsTradingOpen = tournament.IsTradingOpen,
             SkaterLimit = tournament.SkaterLimit,
             GoalieLimit = tournament.GoalieLimit,
             Gallery = tournament.Gallery is null ? null : ToGalleryBriefDto(tournament.Gallery)
@@ -970,6 +971,7 @@ public class Mapper : IMapper
                 IsRegistrationOpen = tournament.IsRegistrationOpen,
                 IsPaymentOpen = tournament.IsPaymentOpen,
                 IsPlayerInfoOpen = tournament.IsPlayerInfoOpen,
+                IsTradingOpen = tournament.IsTradingOpen,
                 SkaterLimit = tournament.SkaterLimit,
                 GoalieLimit = tournament.GoalieLimit,
                 InfoGuide = tournament.InfoGuide is null ? null : ToInfoGuideBriefDto(tournament.InfoGuide),
@@ -1204,6 +1206,62 @@ public class Mapper : IMapper
         };
     }
 
+    // ---------- Trade ----------
+
+    public IReadOnlyList<TradeDto> ToDtoList(IReadOnlyList<Trade> trades, TradeViewerContext viewer)
+        => trades.Select(trade => ToDto(trade, viewer)).ToList();
+
+    public TradeDto ToDto(Trade trade, TradeViewerContext viewer)
+    {
+        var isProposingGm = viewer.AccountId is { } accountId && trade.ProposingTeam.GmAccountId == accountId;
+        var isReceivingGm = viewer.AccountId is { } accId && trade.ReceivingTeam.GmAccountId == accId;
+
+        return new TradeDto
+        {
+            Id = trade.Id,
+            TournamentId = trade.TournamentId,
+            ProposingTeam = ToTeamBriefDto(trade.ProposingTeam),
+            ReceivingTeam = ToTeamBriefDto(trade.ReceivingTeam),
+            Status = trade.Status,
+            Note = trade.Note,
+            CreatedAt = trade.CreatedAt,
+            RespondedAt = trade.RespondedAt,
+            ResolvedAt = trade.ResolvedAt,
+            PlayersFromProposing = trade.Players
+                .Where(tp => tp.FromTeamId == trade.ProposingTeamId)
+                .Select(ToTradePlayerDto)
+                .ToList(),
+            PlayersFromReceiving = trade.Players
+                .Where(tp => tp.FromTeamId == trade.ReceivingTeamId)
+                .Select(ToTradePlayerDto)
+                .ToList(),
+            CanAccept = isReceivingGm && trade.Status == TradeStatus.Pending,
+            CanDecline = isReceivingGm && trade.Status == TradeStatus.Pending,
+            CanCancel = (isProposingGm && trade.Status == TradeStatus.Pending)
+                || (viewer.IsAdmin && trade.Status is TradeStatus.Pending or TradeStatus.Accepted),
+            CanApprove = viewer.IsAdmin && trade.Status == TradeStatus.Accepted,
+        };
+    }
+
+    private TradePlayerDto ToTradePlayerDto(TradePlayer tradePlayer)
+        => new()
+        {
+            Player = ToPlayerBriefDto(tradePlayer.Player),
+            FromTeamId = tradePlayer.FromTeamId,
+            ToTeamId = tradePlayer.ToTeamId,
+        };
+
+    public CreateTradeCommand ToCommand(CreateTradeRequest request, ClaimsPrincipal user)
+        => new(
+            TournamentId: request.TournamentId,
+            ProposingTeamId: request.ProposingTeamId,
+            ReceivingTeamId: request.ReceivingTeamId,
+            ProposingPlayerIds: request.ProposingPlayerIds,
+            ReceivingPlayerIds: request.ReceivingPlayerIds,
+            Note: request.Note,
+            CreatedByAccountId: user.GetAccountId()
+        );
+
     private PlayerBriefDto ToPlayerBriefDto(Player player)
     {
         return new PlayerBriefDto
@@ -1371,6 +1429,7 @@ public class Mapper : IMapper
             WinningTeamId = tournament.WinningTeamId,
             IsActive = tournament.IsActive,
             IsRegistrationOpen = tournament.IsRegistrationOpen,
+            IsTradingOpen = tournament.IsTradingOpen,
             Logo = _urlResolver.GetFullUrl(tournament.Logo),
         };
     }
