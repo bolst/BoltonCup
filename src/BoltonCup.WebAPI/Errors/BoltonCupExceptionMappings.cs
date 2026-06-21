@@ -79,9 +79,41 @@ public static class BoltonCupExceptionMappings
             Title: "Registration is closed for this bracket challenge."
         ),
         
+        // Trades
+        new(
+            ExceptionType: typeof(TradingClosedException),
+            StatusCode: StatusCodes.Status409Conflict,
+            ErrorType: ErrorTypes.Trades.TradingClosed,
+            Title: "Trading is closed."
+        ),
+        new(
+            ExceptionType: typeof(InvalidTradeStateException),
+            StatusCode: StatusCodes.Status409Conflict,
+            ErrorType: ErrorTypes.Trades.InvalidState,
+            Title: "Invalid trade state."
+        ),
+        new(
+            ExceptionType: typeof(PlayerNotTradeableException),
+            StatusCode: StatusCodes.Status409Conflict,
+            ErrorType: ErrorTypes.Trades.PlayerNotTradeable,
+            Title: "Player cannot be traded."
+        ),
+        new(
+            ExceptionType: typeof(PlayerLockedException),
+            StatusCode: StatusCodes.Status409Conflict,
+            ErrorType: ErrorTypes.Trades.PlayerLocked,
+            Title: "Player is already part of a trade."
+        ),
+        new(
+            ExceptionType: typeof(InvalidRosterException),
+            StatusCode: StatusCodes.Status409Conflict,
+            ErrorType: ErrorTypes.Trades.InvalidRoster,
+            Title: "Trade would create an invalid roster."
+        ),
+
         // Base/Fallback exception
-        new( 
-            ExceptionType: typeof(BoltonCupException), 
+        new(
+            ExceptionType: typeof(BoltonCupException),
             StatusCode: StatusCodes.Status422UnprocessableEntity, 
             ErrorType: ErrorTypes.Unexpected,
             Title: "An error occurred while processing the request."
