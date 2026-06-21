@@ -9436,6 +9436,690 @@
         ]
       }
     },
+    "/api/trades": {
+      "get": {
+        "tags": [
+          "Trades"
+        ],
+        "description": "Gets all trades for a tournament. Accessible to the tournament's GMs and admins.",
+        "operationId": "GetTrades",
+        "parameters": [
+          {
+            "name": "tournamentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TradeDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TradeDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TradeDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Trades"
+        ],
+        "description": "Proposes a trade. The caller must be the proposing team's GM (or an admin).",
+        "operationId": "CreateTrade",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateTradeRequest"
+                  }
+                ],
+                "description": "Request to propose a player trade between two teams in a tournament."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateTradeRequest"
+                  }
+                ],
+                "description": "Request to propose a player trade between two teams in a tournament."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateTradeRequest"
+                  }
+                ],
+                "description": "Request to propose a player trade between two teams in a tournament."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/trades/{id}/accept": {
+      "post": {
+        "tags": [
+          "Trades"
+        ],
+        "description": "Accepts a pending trade. The caller must be the receiving team's GM.",
+        "operationId": "AcceptTrade",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/trades/{id}/decline": {
+      "post": {
+        "tags": [
+          "Trades"
+        ],
+        "description": "Declines a pending trade. The caller must be the receiving team's GM.",
+        "operationId": "DeclineTrade",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/trades/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Trades"
+        ],
+        "description": "Cancels a trade. The proposing team's GM may cancel while pending; an admin may cancel while pending or accepted.",
+        "operationId": "CancelTrade",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/trades/{id}/approve": {
+      "post": {
+        "tags": [
+          "Trades"
+        ],
+        "description": "Approves an accepted trade and processes the roster changes (admin only).",
+        "operationId": "ApproveTrade",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/webhooks/stripe": {
       "post": {
         "tags": [
@@ -10121,6 +10805,54 @@
         },
         "additionalProperties": false,
         "description": "Request to create a Stripe payment intent for tournament registration."
+      },
+      "CreateTradeRequest": {
+        "required": [
+          "proposingTeamId",
+          "receivingTeamId",
+          "tournamentId"
+        ],
+        "type": "object",
+        "properties": {
+          "tournamentId": {
+            "type": "integer",
+            "description": "Gets the tournament the trade takes place in.",
+            "format": "int32"
+          },
+          "proposingTeamId": {
+            "type": "integer",
+            "description": "Gets the proposing team's ID.",
+            "format": "int32"
+          },
+          "receivingTeamId": {
+            "type": "integer",
+            "description": "Gets the receiving team's ID.",
+            "format": "int32"
+          },
+          "proposingPlayerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Gets the IDs of players the proposing team is sending."
+          },
+          "receivingPlayerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Gets the IDs of players the receiving team is sending."
+          },
+          "note": {
+            "type": "string",
+            "description": "Gets an optional note attached to the proposal.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to propose a player trade between two teams in a tournament."
       },
       "CurrentUserDto": {
         "type": "object",
@@ -13264,6 +13996,10 @@
             "type": "boolean",
             "description": "Gets or sets whether registration is currently open."
           },
+          "isTradingOpen": {
+            "type": "boolean",
+            "description": "Gets or sets whether player trading is currently open."
+          },
           "logo": {
             "type": "string",
             "description": "Gets or sets the URL of the tournament logo.",
@@ -13280,6 +14016,7 @@
           "isPaymentOpen",
           "isPlayerInfoOpen",
           "isRegistrationOpen",
+          "isTradingOpen",
           "name"
         ],
         "type": "object",
@@ -13336,6 +14073,10 @@
           "isPlayerInfoOpen": {
             "type": "boolean",
             "description": "Gets or sets whether the player info form is currently open."
+          },
+          "isTradingOpen": {
+            "type": "boolean",
+            "description": "Gets or sets whether player trading is currently open."
           },
           "skaterLimit": {
             "type": "integer",
@@ -13464,6 +14205,7 @@
           "isPaymentOpen",
           "isPlayerInfoOpen",
           "isRegistrationOpen",
+          "isTradingOpen",
           "name"
         ],
         "type": "object",
@@ -13520,6 +14262,10 @@
           "isPlayerInfoOpen": {
             "type": "boolean",
             "description": "Gets or sets whether the player info form is currently open."
+          },
+          "isTradingOpen": {
+            "type": "boolean",
+            "description": "Gets or sets whether player trading is currently open."
           },
           "skaterLimit": {
             "type": "integer",
@@ -13635,6 +14381,148 @@
         },
         "additionalProperties": false,
         "description": "Contains stat leader information for a featured tournament."
+      },
+      "TradeDto": {
+        "required": [
+          "id",
+          "playersFromProposing",
+          "playersFromReceiving",
+          "proposingTeam",
+          "receivingTeam",
+          "status",
+          "tournamentId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets the trade ID.",
+            "format": "int32"
+          },
+          "tournamentId": {
+            "type": "integer",
+            "description": "Gets the tournament this trade belongs to.",
+            "format": "int32"
+          },
+          "proposingTeam": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ],
+            "description": "Gets the team that proposed the trade."
+          },
+          "receivingTeam": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ],
+            "description": "Gets the team that received the trade proposal."
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TradeStatus"
+              }
+            ],
+            "description": "Gets the current status of the trade."
+          },
+          "note": {
+            "type": "string",
+            "description": "Gets the optional note attached to the trade.",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Gets when the trade was created.",
+            "format": "date-time"
+          },
+          "respondedAt": {
+            "type": "string",
+            "description": "Gets when the receiving GM responded (accepted/declined).",
+            "format": "date-time",
+            "nullable": true
+          },
+          "resolvedAt": {
+            "type": "string",
+            "description": "Gets when an admin resolved the trade (approved/cancelled).",
+            "format": "date-time",
+            "nullable": true
+          },
+          "playersFromProposing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TradePlayerDto"
+            },
+            "description": "Gets the players the proposing team is sending to the receiving team."
+          },
+          "playersFromReceiving": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TradePlayerDto"
+            },
+            "description": "Gets the players the receiving team is sending to the proposing team."
+          },
+          "canAccept": {
+            "type": "boolean",
+            "description": "Gets whether the current viewer can accept this trade."
+          },
+          "canDecline": {
+            "type": "boolean",
+            "description": "Gets whether the current viewer can decline this trade."
+          },
+          "canCancel": {
+            "type": "boolean",
+            "description": "Gets whether the current viewer can cancel this trade."
+          },
+          "canApprove": {
+            "type": "boolean",
+            "description": "Gets whether the current viewer can approve this trade."
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a player trade between two teams in a tournament."
+      },
+      "TradePlayerDto": {
+        "required": [
+          "fromTeamId",
+          "player",
+          "toTeamId"
+        ],
+        "type": "object",
+        "properties": {
+          "player": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlayerBriefDto"
+              }
+            ],
+            "description": "Gets the player being moved."
+          },
+          "fromTeamId": {
+            "type": "integer",
+            "description": "Gets the team the player is moving from.",
+            "format": "int32"
+          },
+          "toTeamId": {
+            "type": "integer",
+            "description": "Gets the team the player is moving to.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A single player line item within a trade, including movement direction."
+      },
+      "TradeStatus": {
+        "enum": [
+          "Pending",
+          "Accepted",
+          "Approved",
+          "Declined",
+          "Cancelled"
+        ],
+        "type": "string"
       },
       "UpdateAccountRequest": {
         "type": "object",
@@ -13967,6 +14855,9 @@
     },
     {
       "name": "Tournaments"
+    },
+    {
+      "name": "Trades"
     },
     {
       "name": "Webhooks"
