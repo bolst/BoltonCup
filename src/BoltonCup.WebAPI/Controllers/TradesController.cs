@@ -4,6 +4,7 @@ using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
+using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
 
 namespace BoltonCup.WebAPI.Controllers;
 
@@ -14,7 +15,7 @@ public class TradesController(
 ) : BoltonCupControllerBase
 {
     /// <summary>Gets all trades for a tournament. Accessible to the tournament's GMs and admins.</summary>
-    [Authorize]
+    [Authorize(Policy = RequireCompletedAccount)]
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<TradeDto>>> GetTrades([FromQuery] int tournamentId)
     {
@@ -29,7 +30,7 @@ public class TradesController(
     }
 
     /// <summary>Proposes a trade. The caller must be the proposing team's GM (or an admin).</summary>
-    [Authorize]
+    [Authorize(Policy = RequireCompletedAccount)]
     [HttpPost]
     public async Task<ActionResult<int>> CreateTrade([FromBody] CreateTradeRequest request)
     {
@@ -44,7 +45,7 @@ public class TradesController(
     }
 
     /// <summary>Accepts a pending trade. The caller must be the receiving team's GM.</summary>
-    [Authorize]
+    [Authorize(Policy = RequireCompletedAccount)]
     [HttpPost("{id:int}/accept")]
     public async Task<IActionResult> AcceptTrade(int id)
     {
@@ -63,7 +64,7 @@ public class TradesController(
     }
 
     /// <summary>Declines a pending trade. The caller must be the receiving team's GM.</summary>
-    [Authorize]
+    [Authorize(Policy = RequireCompletedAccount)]
     [HttpPost("{id:int}/decline")]
     public async Task<IActionResult> DeclineTrade(int id)
     {
@@ -82,7 +83,7 @@ public class TradesController(
     }
 
     /// <summary>Cancels a trade. The proposing team's GM may cancel while pending; an admin may cancel while pending or accepted.</summary>
-    [Authorize]
+    [Authorize(Policy = RequireCompletedAccount)]
     [HttpPost("{id:int}/cancel")]
     public async Task<IActionResult> CancelTrade(int id)
     {
