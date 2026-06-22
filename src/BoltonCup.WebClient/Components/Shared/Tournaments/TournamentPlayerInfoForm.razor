@@ -1,4 +1,4 @@
-@using System.Text.Json
+@using System.ComponentModel.DataAnnotations
 @namespace BoltonCup.WebClient.Components.Shared
 @inject IBoltonCupApi BoltonCupApi
 @inject ISnackbar Snackbar
@@ -31,7 +31,7 @@
                         <MudPaper Class="d-flex flex-wrap align-center justify-space-between gap-2 pa-3" Outlined>
                             <div>
                                 <MudText Typo="Typo.subtitle2">
-                                    @(game.AwayTeam?.NameShort ?? "TBD") vs. @(game.HomeTeam?.NameShort ?? "TBD")
+                                    @GetGameTitle(game)
                                 </MudText>
                                 <MudText Typo="Typo.caption" Class="mud-text-secondary">
                                     @game.GameTime.ToLocalTime().ToString("ddd MMM d, h:mm tt")@(string.IsNullOrWhiteSpace(game.Venue) ? "" : $" · {game.Venue}")
@@ -43,6 +43,7 @@
                                             Size="Size.Small"
                                             Color="Color.Primary"
                                             CheckMark
+                                            FixedContent
                                             SelectionMode="SelectionMode.SingleSelection">
                                 <MudToggleItem Value="@("In")" Text="In" />
                                 <MudToggleItem Value="@("Maybe")" Text="Maybe" />
@@ -89,7 +90,7 @@
     private bool _loaded;
     private bool _saving;
     private IReadOnlyList<Sdk.GameDto> _games = [];
-    private PlayerInfoModel _model = new();
+    private readonly Dictionary<int, string> _availability = new();
     private Sdk.MusicTrackDto? _selectedTrack;
 
     protected override async Task OnParametersSetAsync()
@@ -102,8 +103,12 @@
         {
             var dto = await BoltonCupApi.GetMyTournamentPlayerInfoAsync(TournamentId);
             _games = dto.Games is { } games ? games.ToList() : [];
-            _model = Deserialize(dto.Payload);
-            _selectedTrack = ToTrackDto(_model.Song);
+            _availability.Clear();
+            foreach (var availability in dto.GameAvailability)
+            {
+                _availability[availability.GameId] = availability.Availability.ToString();
+            }
+            _selectedTrack = dto.Song;
             _isInTournament = true;
         }
         catch (Sdk.ApiException<Sdk.BoltonCupProblemDetails> e)
@@ -118,45 +123,39 @@
         }
     }
 
+    private static string GetGameTitle(Sdk.GameDto game)
+    {
+        var awayPlaceholder = string.IsNullOrWhiteSpace(game.AwayTeamPlaceholder) ? null : game.AwayTeamPlaceholder;
+        var homePlaceholder = string.IsNullOrWhiteSpace(game.HomeTeamPlaceholder) ? null : game.HomeTeamPlaceholder;
+        var awayName = game.AwayTeam?.NameShort ?? awayPlaceholder ?? "TBD";
+        var homeName = game.HomeTeam?.NameShort ?? homePlaceholder ?? "TBD";
+        if (game.AwayTeam is null || game.HomeTeam is null)
+        {
+            var gameType = game.GameType.ToString();
+            return $"{awayName} vs. {homeName} ({gameType})";
+        }
+        return $"{awayName} vs. {homeName}";
+    }
+
     private string? GetAvailability(int gameId)
-        => _model.GameAvailability.GetValueOrDefault(gameId);
+        => _availability.GetValueOrDefault(gameId);
 
     private void SetAvailability(int gameId, string? value)
     {
         if (string.IsNullOrEmpty(value))
         {
-            _model.GameAvailability.Remove(gameId);
+            _availability.Remove(gameId);
         }
         else
         {
-            _model.GameAvailability[gameId] = value;
+            _availability[gameId] = value;
         }
     }
 
     private void OnTrackChanged(Sdk.MusicTrackDto? track)
     {
         _selectedTrack = track;
-        _model.Song = track is null
-            ? null
-            : new SongSelection
-            {
-                TrackId = track.Id,
-                Name = track.Name,
-                Artist = track.Artist,
-                AlbumArtUrl = track.AlbumArtUrl,
-            };
     }
-
-    private static Sdk.MusicTrackDto? ToTrackDto(SongSelection? song)
-        => song is null
-            ? null
-            : new Sdk.MusicTrackDto
-            {
-                Id = song.TrackId,
-                Name = song.Name,
-                Artist = song.Artist,
-                AlbumArtUrl = song.AlbumArtUrl,
-            };
 
     private async Task Save()
     {
@@ -165,7 +164,14 @@
         {
             await BoltonCupApi.UpdateMyTournamentPlayerInfoAsync(TournamentId, new Sdk.UpdateTournamentPlayerInfoRequest
             {
-                Payload = JsonSerializer.Serialize(_model),
+                GameAvailability = _availability
+                    .Select(kvp => new Sdk.GameAvailabilityDto
+                    {
+                        GameId = kvp.Key,
+                        Availability = Enum.Parse<Sdk.GameAvailability>(kvp.Value),
+                    })
+                    .ToList(),
+                Song = _selectedTrack,
             });
             Snackbar.Add("Your info has been saved.", Severity.Success);
         }
@@ -177,34 +183,6 @@
         {
             _saving = false;
         }
-    }
-
-    private static PlayerInfoModel Deserialize(string? payload)
-    {
-        if (string.IsNullOrEmpty(payload))
-            return new PlayerInfoModel();
-        try
-        {
-            return JsonSerializer.Deserialize<PlayerInfoModel>(payload) ?? new PlayerInfoModel();
-        }
-        catch
-        {
-            return new PlayerInfoModel();
-        }
-    }
-
-    private sealed class PlayerInfoModel
-    {
-        public Dictionary<int, string> GameAvailability { get; set; } = new();
-        public SongSelection? Song { get; set; }
-    }
-
-    private sealed class SongSelection
-    {
-        public string TrackId { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public string Artist { get; set; } = string.Empty;
-        public string? AlbumArtUrl { get; set; }
     }
 
 }

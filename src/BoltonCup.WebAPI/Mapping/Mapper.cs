@@ -1113,7 +1113,18 @@ public class Mapper : IMapper
     {
         return new TournamentPlayerInfoDto
         {
-            Payload = context.Info?.Payload,
+            GameAvailability = context.Info?.GameAvailabilities
+                .Select(a => new GameAvailabilityDto { GameId = a.GameId, Availability = a.Availability })
+                .ToList() ?? [],
+            Song = context.Info?.SongTrackId is { } trackId
+                ? new MusicTrackDto
+                {
+                    Id = trackId,
+                    Name = context.Info.SongName ?? string.Empty,
+                    Artist = context.Info.SongArtist ?? string.Empty,
+                    AlbumArtUrl = context.Info.SongAlbumArtUrl,
+                }
+                : null,
             Games = context.TeamGames.Select(game => new GameDto
             {
                 Id = game.Id,
@@ -1125,6 +1136,8 @@ public class Mapper : IMapper
                 Rink = game.Rink,
                 HomeTeam = ToTeamInGameDto(game, home: true),
                 AwayTeam = ToTeamInGameDto(game, home: false),
+                HomeTeamPlaceholder = game.HomeTeamPlaceholder,
+                AwayTeamPlaceholder = game.AwayTeamPlaceholder,
             }).ToList(),
         };
     }

@@ -32,6 +32,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<TournamentBudgetItem> TournamentBudgetItems { get; set; }
     public DbSet<TournamentRegistration> TournamentRegistrations { get; set; }
     public DbSet<TournamentPlayerInfo> TournamentPlayerInfos { get; set; }
+    public DbSet<TournamentPlayerGameAvailability> TournamentPlayerGameAvailabilities { get; set; }
     public DbSet<TournamentSponsor> TournamentSponsors { get; set; }
     
     public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
@@ -846,10 +847,39 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Account)
                 .WithMany(a => a.TournamentPlayerInfos)
                 .HasForeignKey(e => e.AccountId);
+            entity
+                .HasMany(e => e.GameAvailabilities)
+                .WithOne(e => e.TournamentPlayerInfo)
+                .HasForeignKey(e => e.TournamentPlayerInfoId)
+                .OnDelete(DeleteBehavior.Cascade);
             entity.Property(e => e.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.AccountId).HasColumnName("account_id");
-            entity.Property(e => e.Payload).HasColumnName("payload").HasColumnType("jsonb");
+            entity.Property(e => e.SongTrackId).HasColumnName("song_track_id");
+            entity.Property(e => e.SongName).HasColumnName("song_name");
+            entity.Property(e => e.SongArtist).HasColumnName("song_artist");
+            entity.Property(e => e.SongAlbumArtUrl).HasColumnName("song_album_art_url");
+        });
+
+        modelBuilder.Entity<TournamentPlayerGameAvailability>(entity =>
+        {
+            entity
+                .ToTable("tournament_player_game_availability")
+                .HasKey(e => e.Id);
+            entity
+                .HasIndex(e => new { e.TournamentPlayerInfoId, e.GameId })
+                .IsUnique();
+            entity.HasIndex(e => e.GameId);
+            entity
+                .HasOne(e => e.Game)
+                .WithMany()
+                .HasForeignKey(e => e.GameId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.Property(e => e.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.TournamentPlayerInfoId).HasColumnName("tournament_player_info_id");
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.Availability).HasColumnName("availability")
+                .HasConversion(new EnumMemberConverter<GameAvailability>());
         });
 
         modelBuilder.Entity<TournamentSponsor>(entity =>

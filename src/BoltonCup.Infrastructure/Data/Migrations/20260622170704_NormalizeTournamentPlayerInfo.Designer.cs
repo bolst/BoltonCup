@@ -3,17 +3,20 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BoltonCup.Infrastructure.Migrations
+namespace BoltonCup.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260622170704_NormalizeTournamentPlayerInfo")]
+    partial class NormalizeTournamentPlayerInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -690,10 +693,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("away_team_id");
 
-                    b.Property<string>("AwayTeamPlaceholder")
-                        .HasColumnType("text")
-                        .HasColumnName("away_team_placeholder");
-
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -725,10 +724,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<int?>("HomeTeamId")
                         .HasColumnType("integer")
                         .HasColumnName("home_team_id");
-
-                    b.Property<string>("HomeTeamPlaceholder")
-                        .HasColumnType("text")
-                        .HasColumnName("home_team_placeholder");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone")

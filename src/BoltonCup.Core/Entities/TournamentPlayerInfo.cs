@@ -5,10 +5,15 @@ public class TournamentPlayerInfo : EntityBase
     public Guid Id { get; init; }
     public int TournamentId { get; set; }
     public int AccountId { get; set; }
-    public string? Payload { get; set; }
+
+    public string? SongTrackId { get; set; }
+    public string? SongName { get; set; }
+    public string? SongArtist { get; set; }
+    public string? SongAlbumArtUrl { get; set; }
 
     public Tournament Tournament { get; set; } = null!;
     public Account Account { get; set; } = null!;
+    public ICollection<TournamentPlayerGameAvailability> GameAvailabilities { get; set; } = [];
 
     public override string ToString() => $"{Account.FirstName} {Account.LastName} ({Tournament.Name})";
 }
