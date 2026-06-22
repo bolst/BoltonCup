@@ -7,7 +7,9 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <NavMenu />
+    <MudHidden Breakpoint="Breakpoint.Xs">
+        <NavMenu/>
+    </MudHidden>
     <MudMainContent Style="min-height: 100vh">
         <BoltonCupErrorBoundary>
             <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Gutters="false">
