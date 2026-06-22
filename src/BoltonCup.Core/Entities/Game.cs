@@ -7,6 +7,8 @@ public class Game : EntityBase
     public required DateTime GameTime { get; set; }
     public int? HomeTeamId { get; set; }
     public int? AwayTeamId { get; set; }
+    public string? HomeTeamPlaceholder { get; set; }
+    public string? AwayTeamPlaceholder { get; set; }
     public GameType GameType { get; set; }
     public GameState GameState { get; set; }
     public string? Venue  { get; set; }
