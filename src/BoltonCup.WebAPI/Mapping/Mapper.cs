@@ -458,6 +458,8 @@ public class Mapper : IMapper
             Rink = game.Rink,
             HomeTeam = ToTeamInGameDto(game, home: true),
             AwayTeam = ToTeamInGameDto(game, home: false),
+            HomeTeamPlaceholder = game.HomeTeamPlaceholder,
+            AwayTeamPlaceholder = game.AwayTeamPlaceholder,
         });
     }
 

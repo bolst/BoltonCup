@@ -23,4 +23,8 @@ public record GameDto
     public TeamInGameDto? HomeTeam { get; init; }
     /// <summary>Gets the away team with their goal count.</summary>
     public TeamInGameDto? AwayTeam { get; init; }
+    /// <summary>Gets the placeholder label for the home side when no team is assigned (e.g. "1st", "Winner of SF1").</summary>
+    public string? HomeTeamPlaceholder { get; init; }
+    /// <summary>Gets the placeholder label for the away side when no team is assigned (e.g. "4th", "Winner of SF2").</summary>
+    public string? AwayTeamPlaceholder { get; init; }
 }

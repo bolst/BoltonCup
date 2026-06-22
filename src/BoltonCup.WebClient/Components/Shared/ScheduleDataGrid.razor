@@ -157,16 +157,26 @@
 
     private RenderFragment MatchupCell(Sdk.GameDto context)
         => @<div class="mud-width-full d-flex flex-row align-center justify-center gap-4">
-            <div class="d-flex flex-row align-center justify-end gap-2" style="width: 100px">
-                <MudText Typo="Typo.body2"><b>@context.AwayTeam?.NameShort</b></MudText>
-                <MudImage Src="@context.AwayTeam?.Logo" Height="48" Alt="@context.AwayTeam?.Abbreviation"/>
-            </div>
+            @MatchupSide(context.AwayTeam, context.AwayTeamPlaceholder, reverse: false)
             @@
-            <div class="d-flex flex-row-reverse align-center justify-end gap-2" style="width: 100px">
-                <MudText Typo="Typo.body2"><b>@context.HomeTeam?.NameShort</b></MudText>
-                <MudImage Src="@context.HomeTeam?.Logo" Height="48" Alt="@context.HomeTeam?.Abbreviation"/>
-            </div>
+            @MatchupSide(context.HomeTeam, context.HomeTeamPlaceholder, reverse: true)
         </div>;
+
+    private RenderFragment MatchupSide(Sdk.TeamInGameDto? team, string? placeholder, bool reverse)
+    {
+        var direction = reverse ? "flex-row-reverse" : "flex-row";
+        return @<div class="d-flex @direction align-center justify-end gap-2" style="width: 100px">
+            @if (team is not null)
+            {
+                <MudText Typo="Typo.body2"><b>@team.NameShort</b></MudText>
+                <MudImage Src="@team.Logo" Height="48" Alt="@team.Abbreviation"/>
+            }
+            else if (!string.IsNullOrWhiteSpace(placeholder))
+            {
+                <MudText Typo="Typo.body2"><b>@placeholder</b></MudText>
+            }
+        </div>;
+    }
     
     private RenderFragment GameScoreText(Sdk.GameDto context)
     {
