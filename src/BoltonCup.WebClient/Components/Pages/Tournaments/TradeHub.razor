@@ -6,7 +6,7 @@
 
 <PageTitle>Trade Hub | Bolton Cup</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+<MudContainer MaxWidth="MaxWidth.Large" Class="my-8">
     @if (_tournament is null)
     {
         <MudSkeleton SkeletonType="SkeletonType.Text" Width="320px" Height="48px" />
@@ -27,15 +27,21 @@
 
         @if (_myTeam is not null && _tournament.IsTradingOpen)
         {
-            <MudPaper Class="pa-4 mb-6" Outlined Elevation="0">
+            <MudPaper Class="pa-4" Elevation="0">
                 <MudText Typo="Typo.h6" Class="mb-3">Propose a trade</MudText>
                 <MudGrid Spacing="3">
                     <MudItem xs="12" md="6">
-                        <MudText Typo="Typo.subtitle2">@_myTeam.Name sends</MudText>
+                        <MudSelect T="Sdk.TeamDto" Value="@_myTeam"
+                                   Label="Team" Variant="Variant.Filled" Margin="Margin.Dense" Underline="false"
+                                   ToStringFunc="@(t => t?.Name ?? string.Empty)" OpenIcon="@string.Empty" ReadOnly Dense>
+                            <MudSelectItem T="Sdk.TeamDto" Value="@_myTeam">@_myTeam.Name</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
                         <MudSelect T="Sdk.PlayerBriefDto" MultiSelection="true" @bind-SelectedValues="_selectedMyPlayers"
                                    Label="Players to send" Variant="Variant.Outlined" Margin="Margin.Dense" Dense
                                    ToStringFunc="@(p => p?.FullName ?? string.Empty)"
-                                   MultiSelectionTextFunc="@(s => $"{s.Count} selected")">
+                                   MultiSelectionTextFunc="@(s => $"{s?.Count} selected")">
                             @foreach (var p in SelectableMyPlayers)
                             {
                                 <MudSelectItem T="Sdk.PlayerBriefDto" Value="p">@PlayerLabel(p)</MudSelectItem>
@@ -43,7 +49,6 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" md="6">
-                        <MudText Typo="Typo.subtitle2">to</MudText>
                         <MudSelect T="Sdk.TeamDto" Value="_counterpartyTeam" ValueChanged="OnCounterpartyChanged"
                                    Label="Trade with" Variant="Variant.Outlined" Margin="Margin.Dense" Dense
                                    ToStringFunc="@(t => t?.Name ?? string.Empty)">
@@ -52,13 +57,14 @@
                                 <MudSelectItem T="Sdk.TeamDto" Value="t">@t.Name</MudSelectItem>
                             }
                         </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
                         @if (_counterpartyTeam is not null)
                         {
-                            <MudText Typo="Typo.subtitle2" Class="mt-2">@_counterpartyTeam.Name sends</MudText>
                             <MudSelect T="Sdk.PlayerBriefDto" MultiSelection="true" @bind-SelectedValues="_selectedTheirPlayers"
-                                       Label="Players to receive" Variant="Variant.Outlined" Margin="Margin.Dense" Dense
+                                       Label="@($"{_counterpartyTeam.Name} sends")" Variant="Variant.Outlined" Margin="Margin.Dense" Dense
                                        ToStringFunc="@(p => p?.FullName ?? string.Empty)"
-                                       MultiSelectionTextFunc="@(s => $"{s.Count} selected")">
+                                       MultiSelectionTextFunc="@(s => $"{s?.Count} selected")">
                                 @foreach (var p in SelectableTheirPlayers)
                                 {
                                     <MudSelectItem T="Sdk.PlayerBriefDto" Value="p">@PlayerLabel(p)</MudSelectItem>
@@ -78,6 +84,8 @@
                 </MudGrid>
             </MudPaper>
         }
+
+        <MudDivider Class="py-4" />
 
         <MudText Typo="Typo.h6" Class="mb-2">Trades</MudText>
         @if (_trades.Count == 0)
@@ -196,10 +204,14 @@
         _authorized = _isAdmin || _myTeam is not null;
 
         if (_authorized)
+        {
             await ReloadTradesAsync();
+        }
 
         if (_myTeam is not null)
+        {
             _myRoster = (await BoltonCupApi.GetTeamByIdAsync(_myTeam.Id)).Players.ToList();
+        }
     }
 
     private async Task ReloadTradesAsync()
