@@ -11669,6 +11669,38 @@
         "additionalProperties": false,
         "description": "Brief summary of a gallery item."
       },
+      "GameAvailability": {
+        "enum": [
+          "In",
+          "Maybe",
+          "Out"
+        ],
+        "type": "string"
+      },
+      "GameAvailabilityDto": {
+        "required": [
+          "availability",
+          "gameId"
+        ],
+        "type": "object",
+        "properties": {
+          "gameId": {
+            "type": "integer",
+            "description": "Gets the game the availability applies to.",
+            "format": "int32"
+          },
+          "availability": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameAvailability"
+              }
+            ],
+            "description": "Gets the player's availability for the game."
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a player's availability for a single game."
+      },
       "GameDto": {
         "required": [
           "gameState",
@@ -14181,9 +14213,20 @@
       "TournamentPlayerInfoDto": {
         "type": "object",
         "properties": {
-          "payload": {
-            "type": "string",
-            "description": "Gets or sets the serialized player-info payload (game availability and song request).",
+          "gameAvailability": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameAvailabilityDto"
+            },
+            "description": "Gets the player's availability for each of their team's games."
+          },
+          "song": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MusicTrackDto"
+              }
+            ],
+            "description": "Gets the player's song request, if one has been selected.",
             "nullable": true
           },
           "games": {
@@ -14765,9 +14808,20 @@
       "UpdateTournamentPlayerInfoRequest": {
         "type": "object",
         "properties": {
-          "payload": {
-            "type": "string",
-            "description": "Gets or sets the serialized player-info payload (game availability and song request).",
+          "gameAvailability": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameAvailabilityDto"
+            },
+            "description": "Gets or sets the player's availability for each of their team's games."
+          },
+          "song": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MusicTrackDto"
+              }
+            ],
+            "description": "Gets or sets the player's song request, if one has been selected.",
             "nullable": true
           }
         },

@@ -30,7 +30,13 @@ public class TournamentPlayerInfoController(
     public async Task<IActionResult> UpdateMyTournamentPlayerInfo(int id, [FromBody] UpdateTournamentPlayerInfoRequest data)
     {
         var accountId = User.GetAccountId();
-        var command = new UpsertTournamentPlayerInfoCommand(id, accountId, data.Payload);
+        var command = new UpsertTournamentPlayerInfoCommand(
+            id,
+            accountId,
+            data.GameAvailability.Select(a => new GameAvailabilitySelection(a.GameId, a.Availability)).ToList(),
+            data.Song is { } song
+                ? new SongRequestSelection(song.Id, song.Name, song.Artist, song.AlbumArtUrl)
+                : null);
         await _playerInfoService.UpsertAsync(command);
         return Ok();
     }
