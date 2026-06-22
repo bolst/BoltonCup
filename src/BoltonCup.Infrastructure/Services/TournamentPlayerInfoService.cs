@@ -30,7 +30,8 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
             .Include(g => g.Tournament)
             .Include(g => g.HomeTeam)
             .Include(g => g.AwayTeam)
-            .Where(g => g.TournamentId == tournamentId && (g.HomeTeamId == teamId || g.AwayTeamId == teamId))
+            .Where(g => g.TournamentId == tournamentId)
+            .Where(g => g.HomeTeamId == teamId || g.AwayTeamId == teamId || (g.HomeTeamId == null && g.AwayTeamId == null))
             .OrderBy(g => g.GameTime)
             .ToListAsync(cancellationToken);
 
