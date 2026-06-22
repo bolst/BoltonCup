@@ -23,6 +23,7 @@ services:
       CloudflareR2__AccessKey: ${R2_ACCESS_KEY:-}
       CloudflareR2__SecretKey: ${R2_SECRET_KEY:-}
       CloudflareR2__BaseUrl: ${R2_BASE_URL:-https://assets.boltoncup.ca/}
+      Resend__Enabled: ${RESEND_ENABLED:-false}
       Resend__ApiKey: ${RESEND_API_KEY:-}
       Resend__SenderName: ${RESEND_SENDER_NAME:-Bolton Cup}
       Resend__SenderEmail: ${RESEND_SENDER_EMAIL:-notifications@boltoncup.ca}
