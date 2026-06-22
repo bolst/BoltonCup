@@ -48,9 +48,11 @@
     {
         <MudButtonGroup OverrideStyles="false">
             <MudMenu Icon="@Icons.Material.Filled.DisplaySettings">
-                <MudMenuItem
-                    OnClick="@OpenDraftSettingsAsync"
-                    Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
+                <MudHidden Breakpoint="Breakpoint.Xs">
+                    <MudMenuItem
+                        OnClick="@OpenDraftSettingsAsync"
+                        Icon="@Icons.Material.Rounded.Settings">Draft Settings</MudMenuItem>
+                </MudHidden>
                 <MudMenuItem
                     OnClick="@EditPlayersAsync"
                     Icon="@Icons.Material.Rounded.Groups">Edit Players</MudMenuItem>
