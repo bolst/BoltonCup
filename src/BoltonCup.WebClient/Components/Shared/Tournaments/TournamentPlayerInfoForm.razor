@@ -1,3 +1,4 @@
+@using System.ComponentModel.DataAnnotations
 @namespace BoltonCup.WebClient.Components.Shared
 @inject IBoltonCupApi BoltonCupApi
 @inject ISnackbar Snackbar
@@ -30,7 +31,7 @@
                         <MudPaper Class="d-flex flex-wrap align-center justify-space-between gap-2 pa-3" Outlined>
                             <div>
                                 <MudText Typo="Typo.subtitle2">
-                                    @(game.AwayTeam?.NameShort ?? "TBD") vs. @(game.HomeTeam?.NameShort ?? "TBD")
+                                    @GetGameTitle(game)
                                 </MudText>
                                 <MudText Typo="Typo.caption" Class="mud-text-secondary">
                                     @game.GameTime.ToLocalTime().ToString("ddd MMM d, h:mm tt")@(string.IsNullOrWhiteSpace(game.Venue) ? "" : $" · {game.Venue}")
@@ -120,6 +121,20 @@
             _loaded = true;
             await InvokeAsync(StateHasChanged);
         }
+    }
+
+    private static string GetGameTitle(Sdk.GameDto game)
+    {
+        var awayPlaceholder = string.IsNullOrWhiteSpace(game.AwayTeamPlaceholder) ? null : game.AwayTeamPlaceholder;
+        var homePlaceholder = string.IsNullOrWhiteSpace(game.HomeTeamPlaceholder) ? null : game.HomeTeamPlaceholder;
+        var awayName = game.AwayTeam?.NameShort ?? awayPlaceholder ?? "TBD";
+        var homeName = game.HomeTeam?.NameShort ?? homePlaceholder ?? "TBD";
+        if (game.AwayTeam is null || game.HomeTeam is null)
+        {
+            var gameType = game.GameType.ToString();
+            return $"{awayName} vs. {homeName} ({gameType})";
+        }
+        return $"{awayName} vs. {homeName}";
     }
 
     private string? GetAvailability(int gameId)
