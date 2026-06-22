@@ -46,6 +46,8 @@ public static class ServiceCollectionExtensions
         RegisterByConvention(builder.Services, typeof(AccountRepository).Assembly, "Repository");
         RegisterByConvention(builder.Services, typeof(AccountRepository).Assembly, "Service");
 
+        builder.Services.AddSingleton<IRosterValidator, RosterValidator>();
+
         return builder;
     }
 
@@ -92,10 +94,19 @@ public static class ServiceCollectionExtensions
         builder.Services.AddSingleton<IRazorLightEngine>(razorEngine);
 
         builder.Services.Configure<ResendSettings>(builder.Configuration.GetSection("Resend"));
-        builder.Services.AddHttpClient<IEmailTransport, ResendEmailTransport>(client =>
+
+        // Set "Resend:Enabled": false (e.g. in appsettings.Development.json) to log emails instead of sending them.
+        if (builder.Configuration.GetValue("Resend:Enabled", true))
         {
-            client.BaseAddress = new Uri("https://api.resend.com/");
-        });
+            builder.Services.AddHttpClient<IEmailTransport, ResendEmailTransport>(client =>
+            {
+                client.BaseAddress = new Uri("https://api.resend.com/");
+            });
+        }
+        else
+        {
+            builder.Services.AddSingleton<IEmailTransport, LoggingEmailTransport>();
+        }
 
         return builder.Services
             .AddSingleton<IEmailQueue, EmailQueue>()

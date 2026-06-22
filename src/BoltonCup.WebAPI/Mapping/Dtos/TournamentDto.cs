@@ -25,6 +25,8 @@ public record TournamentDto
     public required bool IsPaymentOpen { get; set; }
     /// <summary>Gets or sets whether the player info form is currently open.</summary>
     public required bool IsPlayerInfoOpen { get; set; }
+    /// <summary>Gets or sets whether player trading is currently open.</summary>
+    public required bool IsTradingOpen { get; set; }
     /// <summary>Gets or sets the maximum number of skaters allowed to register.</summary>
     public int? SkaterLimit { get; set; }
     /// <summary>Gets or sets the maximum number of goalies allowed to register.</summary>

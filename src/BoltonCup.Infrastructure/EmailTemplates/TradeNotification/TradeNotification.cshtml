@@ -1,0 +1,42 @@
+@using BoltonCup.Infrastructure.EmailTemplates
+@model TradeNotificationViewModel
+@{
+    // ReSharper disable once Razor.LayoutNotResolved
+    Layout = EmailConstants.SharedLayout;
+}
+
+<h2 style="font-size: 18px; color: #353535; margin: 0 0 8px 0;">@Model.Heading</h2>
+
+<p style="font-size: 14px; color: #555555;">@Model.Intro</p>
+
+<div style="margin: 16px 0; padding: 12px 16px; background-color: #f4f4f4; border-radius: 6px;">
+    <p style="font-size: 14px; color: #353535; margin: 0 0 4px 0;"><b>@Model.ProposingTeamName</b> sends:</p>
+    @if (Model.PlayersFromProposing.Count == 0)
+    {
+        <p style="font-size: 14px; color: #888888; margin: 0 0 12px 0;">No players</p>
+    }
+    else
+    {
+        <ul style="font-size: 14px; color: #555555; margin: 0 0 12px 0;">
+            @foreach (var player in Model.PlayersFromProposing)
+            {
+                <li>@player</li>
+            }
+        </ul>
+    }
+
+    <p style="font-size: 14px; color: #353535; margin: 0 0 4px 0;"><b>@Model.ReceivingTeamName</b> sends:</p>
+    @if (Model.PlayersFromReceiving.Count == 0)
+    {
+        <p style="font-size: 14px; color: #888888; margin: 0;">No players</p>
+    }
+    else
+    {
+        <ul style="font-size: 14px; color: #555555; margin: 0;">
+            @foreach (var player in Model.PlayersFromReceiving)
+            {
+                <li>@player</li>
+            }
+        </ul>
+    }
+</div>

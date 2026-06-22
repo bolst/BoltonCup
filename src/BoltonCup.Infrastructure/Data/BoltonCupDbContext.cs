@@ -40,6 +40,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<CustomRankingPlayer> CustomRankingPlayers { get; set; }
     public DbSet<SentEmail> SentEmails { get; set; }
     public DbSet<EmailLog> EmailLogs { get; set; }
+    public DbSet<Trade> Trades { get; set; }
+    public DbSet<TradePlayer> TradePlayers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -554,7 +556,72 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasConversion(new EnumMemberConverter<Captaincy>())
                 .HasDefaultValue(Captaincy.None);
         });
-        
+
+        modelBuilder.Entity<Trade>(entity =>
+        {
+            entity
+                .ToTable("trades")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Tournament)
+                .WithMany()
+                .HasForeignKey(e => e.TournamentId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity
+                .HasOne(e => e.ProposingTeam)
+                .WithMany()
+                .HasForeignKey(e => e.ProposingTeamId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity
+                .HasOne(e => e.ReceivingTeam)
+                .WithMany()
+                .HasForeignKey(e => e.ReceivingTeamId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity
+                .HasIndex(e => new { e.TournamentId, e.Status });
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.ProposingTeamId).HasColumnName("proposing_team_id");
+            entity.Property(e => e.ReceivingTeamId).HasColumnName("receiving_team_id");
+            entity.Property(e => e.Status).HasColumnName("status")
+                .HasConversion(new EnumMemberConverter<TradeStatus>())
+                .HasDefaultValue(TradeStatus.Pending);
+            entity.Property(e => e.Note).HasColumnName("note");
+            entity.Property(e => e.CreatedByAccountId).HasColumnName("created_by_account_id");
+            entity.Property(e => e.RespondedByAccountId).HasColumnName("responded_by_account_id");
+            entity.Property(e => e.RespondedAt).HasColumnName("responded_at");
+            entity.Property(e => e.ResolvedByAccountId).HasColumnName("resolved_by_account_id");
+            entity.Property(e => e.ResolvedAt).HasColumnName("resolved_at");
+        });
+
+        modelBuilder.Entity<TradePlayer>(entity =>
+        {
+            entity
+                .ToTable("trade_players")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Trade)
+                .WithMany(t => t.Players)
+                .HasForeignKey(e => e.TradeId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity
+                .HasOne(e => e.Player)
+                .WithMany()
+                .HasForeignKey(e => e.PlayerId)
+                .OnDelete(DeleteBehavior.Restrict);
+            // A player may be in at most one open (Pending/Accepted) trade at a time.
+            entity
+                .HasIndex(e => e.PlayerId)
+                .IsUnique()
+                .HasFilter("is_locked");
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.TradeId).HasColumnName("trade_id");
+            entity.Property(e => e.PlayerId).HasColumnName("player_id");
+            entity.Property(e => e.FromTeamId).HasColumnName("from_team_id");
+            entity.Property(e => e.ToTeamId).HasColumnName("to_team_id");
+            entity.Property(e => e.IsLocked).HasColumnName("is_locked").HasDefaultValue(true);
+        });
+
         modelBuilder.Entity<PlayerDraftRanking>(entity =>
         {
             entity
@@ -709,6 +776,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.IsRegistrationOpen).HasColumnName("is_registration_open");
             entity.Property(e => e.IsPaymentOpen).HasColumnName("is_payment_open");
             entity.Property(e => e.IsPlayerInfoOpen).HasColumnName("is_player_info_open");
+            entity.Property(e => e.IsTradingOpen).HasColumnName("is_trading_open");
             entity.Property(e => e.SkaterPaymentLink).HasColumnName("skater_payment_link");
             entity.Property(e => e.GoaliePaymentLink).HasColumnName("goalie_payment_link");
             entity.Property(e => e.SkaterLimit).HasColumnName("skater_limit");
