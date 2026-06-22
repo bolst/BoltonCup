@@ -609,13 +609,17 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany()
                 .HasForeignKey(e => e.PlayerId)
                 .OnDelete(DeleteBehavior.Restrict);
+            // A player may be in at most one open (Pending/Accepted) trade at a time.
             entity
-                .HasIndex(e => e.PlayerId);
+                .HasIndex(e => e.PlayerId)
+                .IsUnique()
+                .HasFilter("is_locked");
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TradeId).HasColumnName("trade_id");
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.FromTeamId).HasColumnName("from_team_id");
             entity.Property(e => e.ToTeamId).HasColumnName("to_team_id");
+            entity.Property(e => e.IsLocked).HasColumnName("is_locked").HasDefaultValue(true);
         });
 
         modelBuilder.Entity<PlayerDraftRanking>(entity =>

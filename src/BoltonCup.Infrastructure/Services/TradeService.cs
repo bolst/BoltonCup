@@ -114,6 +114,7 @@ public class TradeService(
                 FromTeamId = command.ProposingTeamId,
                 ToTeamId = command.ReceivingTeamId,
                 Player = playerMap[id],
+                IsLocked = true,
             });
         }
         foreach (var id in receivingIds)
@@ -173,6 +174,7 @@ public class TradeService(
         trade.Status = TradeStatus.Declined;
         trade.RespondedByAccountId = accountId;
         trade.RespondedAt = DateTime.UtcNow;
+        ReleasePlayers(trade);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         await _emailer.SendTradeDeclinedAsync(await GetRecipientsAsync(trade, includePlayers: false), BuildEmailInfo(trade));
@@ -197,6 +199,7 @@ public class TradeService(
         trade.Status = TradeStatus.Cancelled;
         trade.ResolvedByAccountId = accountId;
         trade.ResolvedAt = DateTime.UtcNow;
+        ReleasePlayers(trade);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         await _emailer.SendTradeCancelledAsync(await GetRecipientsAsync(trade, includePlayers: false), BuildEmailInfo(trade));
@@ -216,11 +219,14 @@ public class TradeService(
         await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         foreach (var tp in trade.Players)
+        {
             tp.Player.TeamId = tp.ToTeamId;
+        }
 
         trade.Status = TradeStatus.Approved;
         trade.ResolvedByAccountId = accountId;
         trade.ResolvedAt = DateTime.UtcNow;
+        ReleasePlayers(trade);
         await _dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
@@ -250,6 +256,14 @@ public class TradeService(
             {
                 throw new PlayerNotTradeableException(player);
             }
+        }
+    }
+
+    private static void ReleasePlayers(Trade trade)
+    {
+        foreach (var tp in trade.Players)
+        {
+            tp.IsLocked = false;
         }
     }
 
@@ -299,7 +313,7 @@ public class TradeService(
         var lockedTp = await _dbContext.TradePlayers
             .Include(tp => tp.Player).ThenInclude(p => p.Account)
             .Where(tp => playerIds.Contains(tp.PlayerId))
-            .Where(tp => tp.Trade.Status == TradeStatus.Pending || tp.Trade.Status == TradeStatus.Accepted)
+            .Where(tp => tp.IsLocked)
             .FirstOrDefaultAsync(cancellationToken);
         if (lockedTp is not null)
         {

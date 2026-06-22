@@ -254,6 +254,50 @@ public class TradeServiceTests
     }
 
     [Fact]
+    public async Task Accept_KeepsPlayersLocked()
+    {
+        await using var db = await SeedAsync();
+        var service = NewService(db, out _);
+        var id = await service.CreateAsync(Trade([2], [7]));
+
+        await service.AcceptAsync(id, GmBAccountId);
+
+        var tradePlayers = await db.TradePlayers.Where(tp => tp.TradeId == id).ToListAsync();
+        tradePlayers.Should().OnlyContain(tp => tp.IsLocked);
+    }
+
+    [Fact]
+    public async Task Approve_ReleasesPlayerLocks()
+    {
+        await using var db = await SeedAsync();
+        var service = NewService(db, out _);
+        var id = await service.CreateAsync(Trade([2], [7]));
+        await service.AcceptAsync(id, GmBAccountId);
+
+        await service.ApproveAsync(id, AdminAccountId);
+
+        var tradePlayers = await db.TradePlayers.Where(tp => tp.TradeId == id).ToListAsync();
+        tradePlayers.Should().OnlyContain(tp => !tp.IsLocked);
+        // player 7 now sits on Team A and, being released, can be traded again
+        var id2 = await service.CreateAsync(Trade([7], []));
+        id2.Should().BePositive();
+    }
+
+    [Fact]
+    public async Task Cancel_ReleasesPlayerLocks()
+    {
+        await using var db = await SeedAsync();
+        var service = NewService(db, out _);
+        var id = await service.CreateAsync(Trade([2], [7]));
+        await service.AcceptAsync(id, GmBAccountId);
+
+        await service.CancelAsync(id, AdminAccountId, isAdmin: true);
+
+        var tradePlayers = await db.TradePlayers.Where(tp => tp.TradeId == id).ToListAsync();
+        tradePlayers.Should().OnlyContain(tp => !tp.IsLocked);
+    }
+
+    [Fact]
     public async Task Cancel_ByAdmin_FromAccepted_Succeeds()
     {
         await using var db = await SeedAsync();
