@@ -1,0 +1,179 @@
+@using BoltonCup.Core.Commands
+@using BoltonCup.Common
+@inject IMusicLibraryService MusicLibrary
+@inject IAssetFileUploader Uploader
+@inject IMusicSearchService MusicSearch
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="3" Style="min-width: 420px;">
+            @if (!IsEdit)
+            {
+                <MudFileUpload T="IBrowserFile" FilesChanged="OnFileChanged" Accept="audio/*">
+                    <CustomContent>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   OnClick="@context.OpenFilePickerAsync"
+                                   StartIcon="@Icons.Material.Rounded.UploadFile">
+                            @(_file is null ? "Choose audio file" : _file.Name)
+                        </MudButton>
+                    </CustomContent>
+                </MudFileUpload>
+            }
+
+            <MudAutocomplete T="MusicTrack"
+                             Label="Match to Spotify track (optional)"
+                             Placeholder="Search by artist or title to tag + autofill"
+                             SearchFunc="SearchTracks"
+                             ToStringFunc="@(t => t is null ? "" : $"{t.Artist} – {t.Name}")"
+                             ValueChanged="OnSpotifySelected"
+                             DebounceInterval="300"
+                             MinCharacters="2"
+                             ResetValueOnEmptyText
+                             Clearable
+                             Variant="Variant.Outlined">
+                <ItemTemplate Context="track">
+                    <div class="d-flex align-center gap-3">
+                        <MudAvatar Square Size="Size.Medium">
+                            @if (!string.IsNullOrEmpty(track.AlbumArtUrl))
+                            {
+                                <MudImage Src="@track.AlbumArtUrl" Alt="@track.Name" />
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.MusicNote" />
+                            }
+                        </MudAvatar>
+                        <div>
+                            <MudText Typo="Typo.body2">@track.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@track.Artist</MudText>
+                        </div>
+                    </div>
+                </ItemTemplate>
+            </MudAutocomplete>
+
+            <MudTextField @bind-Value="_title" Label="Title" Required Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="_artist" Label="Artist" Variant="Variant.Outlined" />
+
+            @if (!string.IsNullOrEmpty(_trackId))
+            {
+                <MudChip T="string" Color="Color.Success" Icon="@Icons.Material.Rounded.Link" Size="Size.Small">
+                    Tagged: @_trackId
+                </MudChip>
+            }
+
+            <MudSwitch @bind-Value="_isInBasePool" Color="Color.Primary" Label="Plays in every game (base pool)" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_saving">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save" Disabled="_saving">
+            @(_saving ? "Saving…" : "Save")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter] public int TournamentId { get; set; }
+
+    /// <summary>The track being edited, or null when adding a new one.</summary>
+    [Parameter] public TournamentMusicTrack? Track { get; set; }
+
+    private bool IsEdit => Track is not null;
+
+    private IBrowserFile? _file;
+    private string _title = string.Empty;
+    private string? _artist;
+    private string? _trackId;
+    private string? _albumArtUrl;
+    private int? _durationMs;
+    private bool _isInBasePool = true;
+    private bool _saving;
+
+    private const long AudioMaxBytes = 25L * 1024 * 1024;
+
+    protected override void OnInitialized()
+    {
+        if (Track is not null)
+        {
+            _title = Track.Title;
+            _artist = Track.Artist;
+            _trackId = Track.TrackId;
+            _albumArtUrl = Track.AlbumArtUrl;
+            _durationMs = Track.DurationMs;
+            _isInBasePool = Track.IsInBasePool;
+        }
+    }
+
+    private void OnFileChanged(IBrowserFile? file) => _file = file;
+
+    private async Task<IEnumerable<MusicTrack>> SearchTracks(string? value, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return [];
+        try
+        {
+            return await MusicSearch.SearchTracksAsync(value, 8, ct);
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
+    private void OnSpotifySelected(MusicTrack? track)
+    {
+        if (track is null)
+            return;
+        _trackId = track.Id;
+        _albumArtUrl = track.AlbumArtUrl;
+        if (string.IsNullOrWhiteSpace(_title)) _title = track.Name;
+        if (string.IsNullOrWhiteSpace(_artist)) _artist = track.Artist;
+    }
+
+    private async Task Save()
+    {
+        if (string.IsNullOrWhiteSpace(_title))
+        {
+            Snackbar.Add("Title is required.", Severity.Warning);
+            return;
+        }
+        if (!IsEdit && _file is null)
+        {
+            Snackbar.Add("Choose an audio file to upload.", Severity.Warning);
+            return;
+        }
+
+        _saving = true;
+        try
+        {
+            if (IsEdit)
+            {
+                await MusicLibrary.UpdateTrackAsync(new UpdateMusicTrackCommand(
+                    TournamentId, Track!.Id, _title.Trim(), _artist, _trackId, MusicProviderType.Spotify, _albumArtUrl, _durationMs, _isInBasePool));
+            }
+            else
+            {
+                var tempKey = await Uploader.UploadAsync(_file!, resize: false, maxFileSize: AudioMaxBytes);
+                await MusicLibrary.AddTrackAsync(new AddMusicTrackCommand(
+                    TournamentId, tempKey, _title.Trim(), _artist, _trackId, MusicProviderType.Spotify, _albumArtUrl, _durationMs, _isInBasePool));
+            }
+            Snackbar.Add("Saved.", Severity.Success);
+            Dialog.Close(DialogResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Save failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private void Cancel() => Dialog.Cancel();
+}
