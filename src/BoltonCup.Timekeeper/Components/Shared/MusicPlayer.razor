@@ -1,0 +1,172 @@
+@namespace BoltonCup.Timekeeper.Components.Shared
+@using BoltonCup.Sdk
+@using BoltonCup.Timekeeper.Services
+@using BoltonCup.Timekeeper.Services.Music
+@implements IDisposable
+@inject MusicPlayerService Player
+@inject MusicCacheService Cache
+@inject IBoltonCupApi Api
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<audio @ref="_audioEl" preload="auto" style="display:none"></audio>
+
+<MudPaper Elevation="0" Square Outlined Class="pa-3">
+    <div class="d-flex align-center justify-space-between mb-2">
+        <MudText Typo="Typo.overline">Music</MudText>
+        <div class="d-flex align-center gap-2">
+            @if (_trackCount > 0)
+            {
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Text"
+                         Color="@(_cachedCount >= _trackCount ? Color.Success : Color.Default)"
+                         Icon="@Icons.Material.Rounded.DownloadForOffline">
+                    @_cachedCount/@_trackCount cached
+                </MudChip>
+            }
+            <MudButton Size="Size.Small"
+                       Variant="Variant.Outlined"
+                       StartIcon="@Icons.Material.Rounded.CloudDownload"
+                       Disabled="@(_loading || _trackCount == 0)"
+                       OnClick="DownloadForOffline">
+                Download for offline
+            </MudButton>
+        </div>
+    </div>
+
+    @if (_loading)
+    {
+        <div class="d-flex justify-center py-4"><MudProgressCircular Indeterminate Size="Size.Small" /></div>
+    }
+    else if (_trackCount == 0)
+    {
+        <MudText Typo="Typo.body2" Color="Color.Secondary">No music for this game yet.</MudText>
+    }
+    else
+    {
+        <div class="d-flex align-center gap-3">
+            <MudAvatar Square Size="Size.Large">
+                @if (Player.CurrentTrack?.AlbumArtUrl is { Length: > 0 } art)
+                {
+                    <MudImage Src="@art" />
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Rounded.MusicNote" />
+                }
+            </MudAvatar>
+
+            <div class="flex-grow-1" style="min-width: 0;">
+                <MudText Typo="Typo.body1" Class="text-truncate">
+                    @(Player.CurrentTrack?.Title ?? "Ready to play")
+                </MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary" Class="text-truncate">
+                    @(Player.CurrentTrack?.Artist ?? $"{_trackCount} tracks")
+                </MudText>
+
+                <div class="d-flex align-center gap-2">
+                    <MudText Typo="Typo.caption">@Format(Player.PositionSec)</MudText>
+                    <MudSlider T="double" Min="0" Max="@SliderMax" Step="1"
+                               Value="Player.PositionSec" ValueChanged="OnSeek" Class="flex-grow-1" />
+                    <MudText Typo="Typo.caption">@Format(Player.DurationSec)</MudText>
+                </div>
+            </div>
+
+            <div class="d-flex align-center">
+                <MudIconButton Icon="@Icons.Material.Rounded.SkipPrevious" OnClick="@(() => Player.PrevAsync())" />
+                <MudIconButton Icon="@(Player.IsPlaying ? Icons.Material.Rounded.Pause : Icons.Material.Rounded.PlayArrow)"
+                               Color="Color.Primary" Size="Size.Large"
+                               OnClick="@(() => Player.TogglePlayPauseAsync())" />
+                <MudIconButton Icon="@Icons.Material.Rounded.SkipNext" OnClick="@(() => Player.NextAsync())" />
+            </div>
+        </div>
+    }
+</MudPaper>
+
+@code {
+    [Parameter] public int GameId { get; set; }
+
+    private ElementReference _audioEl;
+    private bool _initialized;
+    private bool _loading;
+    private int? _loadedGameId;
+    private int _trackCount;
+    private int _cachedCount;
+
+    private double SliderMax => Player.DurationSec > 0 ? Player.DurationSec : 1;
+
+    protected override void OnInitialized() => Player.OnStateChanged += OnPlayerChanged;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_loadedGameId == GameId)
+            return;
+        _loadedGameId = GameId;
+        await LoadPlaylistAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_initialized)
+        {
+            _initialized = true;
+            await Player.InitializeAsync(_audioEl);
+        }
+    }
+
+    private async Task LoadPlaylistAsync()
+    {
+        _loading = true;
+        try
+        {
+            var playlist = await Api.GetGamePlaylistAsync(GameId);
+            var tracks = playlist.Tracks.ToList();
+            Player.SetPlaylist(tracks);
+            _trackCount = tracks.Count;
+            await RefreshCachedCountAsync(tracks);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Couldn't load music: {ex.Message}", Severity.Warning);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task RefreshCachedCountAsync(IReadOnlyList<PlaylistTrackDto> tracks)
+    {
+        if (tracks.Count == 0)
+        {
+            _cachedCount = 0;
+            return;
+        }
+        var cached = await Cache.GetCachedKeysAsync(tracks.Select(t => t.FileKey));
+        _cachedCount = cached.Count;
+    }
+
+    private async Task DownloadForOffline()
+    {
+        var parameters = new DialogParameters<PreloadMusicDialog>
+        {
+            { x => x.Tracks, Player.Playlist },
+        };
+        var dialog = await DialogService.ShowAsync<PreloadMusicDialog>("Download Music", parameters);
+        await dialog.Result;
+        await RefreshCachedCountAsync(Player.Playlist);
+        StateHasChanged();
+    }
+
+    private Task OnSeek(double value) => Player.SeekAsync(value);
+
+    private static string Format(double seconds)
+    {
+        if (double.IsNaN(seconds) || seconds < 0) seconds = 0;
+        var ts = TimeSpan.FromSeconds(seconds);
+        return $"{(int)ts.TotalMinutes}:{ts.Seconds:00}";
+    }
+
+    private void OnPlayerChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Player.OnStateChanged -= OnPlayerChanged;
+}
