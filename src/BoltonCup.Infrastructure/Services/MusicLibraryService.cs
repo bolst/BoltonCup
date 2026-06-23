@@ -159,12 +159,11 @@ public class MusicLibraryService : IMusicLibraryService
             .ToDictionaryAsync(i => i.AccountId, i => new { i.SongTrackId, i.SongName }, cancellationToken);
 
         var ordered = new List<RequestRow>();
-        foreach (var teamId in teamIds)
+        foreach(var player in players.Where(p => p.TeamId is {} teamId && teamIds.Contains(teamId)))
         {
-            foreach (var player in players.Where(p => p.TeamId == teamId))
+            if (songByAccount.TryGetValue(player.AccountId, out var song))
             {
-                if (songByAccount.TryGetValue(player.AccountId, out var song))
-                    ordered.Add(new RequestRow(player.PlayerName.Trim(), song.SongName, song.SongTrackId));
+                ordered.Add(new RequestRow(player.PlayerName.Trim(), song.SongName, song.SongTrackId));
             }
         }
 
