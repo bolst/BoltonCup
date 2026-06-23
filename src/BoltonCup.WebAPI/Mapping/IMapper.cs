@@ -109,6 +109,12 @@ public interface IMapper
 
     // Music
     IReadOnlyList<MusicTrackDto> ToDto(IReadOnlyList<MusicTrack> tracks);
+    GamePlaylistDto ToDto(GamePlaylistResult result);
+    IReadOnlyList<MusicLibraryTrackDto> ToDtoList(IReadOnlyList<TournamentMusicTrack> tracks);
+    MusicLibraryTrackDto ToDto(TournamentMusicTrack track);
+    IReadOnlyList<MissingSongRequestDto> ToDtoList(IReadOnlyList<MissingSongRequest> missing);
+    AddMusicTrackCommand ToCommand(int tournamentId, AddMusicTrackRequest request);
+    UpdateMusicTrackCommand ToCommand(int tournamentId, int trackId, UpdateMusicTrackRequest request);
 
     // Standings
     TournamentStandingsDto ToDto(TournamentStandings standings);

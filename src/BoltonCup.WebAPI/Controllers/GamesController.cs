@@ -10,7 +10,8 @@ public class GamesController(
     IGameRepository _games,
     ISkaterStatRepository _skaterStats,
     IMapper _mapper,
-    IGameWriteService _gameWrites
+    IGameWriteService _gameWrites,
+    IMusicLibraryService _music
 ) : BoltonCupControllerBase
 {
     /// <remarks>
@@ -49,6 +50,18 @@ public class GamesController(
     {
         await _gameWrites.UpdateStateAsync(_mapper.ToCommand(id, request));
         return Ok();
+    }
+
+    /// <remarks>
+    /// Gets the computed music playlist for a game: matched player song requests first, then the tournament
+    /// base pool, plus any requests with no uploaded file (timekeeper or admin only).
+    /// </remarks>
+    [Authorize(Roles = $"{Admin},{Timekeeper}")]
+    [HttpGet("{id:int}/playlist")]
+    public async Task<ActionResult<GamePlaylistDto>> GetGamePlaylist(int id)
+    {
+        var result = await _music.GetGamePlaylistAsync(id);
+        return Ok(_mapper.ToDto(result));
     }
 
     /// <remarks>Records a goal in a game (timekeeper or admin only).</remarks>
