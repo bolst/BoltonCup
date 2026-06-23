@@ -1,0 +1,12 @@
+# Build the image, then schedule it from the host crontab (see README).
+#
+#   docker compose build
+#
+# Run once manually:  docker compose run --rm music-fetcher
+# Dry run:            docker compose run --rm music-fetcher --dry-run
+
+services:
+  music-fetcher:
+    build: .
+    image: boltoncup-music-fetcher:latest
+    env_file: .env
