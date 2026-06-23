@@ -4,5 +4,5 @@ namespace BoltonCup.Common;
 
 public interface IAssetFileUploader
 {
-    Task<string> UploadAsync(IBrowserFile file, bool resize = true, CancellationToken cancellationToken = default);
+    Task<string> UploadAsync(IBrowserFile file, bool resize = true, long? maxFileSize = null, CancellationToken cancellationToken = default);
 }
