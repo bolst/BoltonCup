@@ -33,6 +33,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<TournamentRegistration> TournamentRegistrations { get; set; }
     public DbSet<TournamentPlayerInfo> TournamentPlayerInfos { get; set; }
     public DbSet<TournamentPlayerGameAvailability> TournamentPlayerGameAvailabilities { get; set; }
+    public DbSet<TournamentMusicTrack> TournamentMusicTracks { get; set; }
     public DbSet<TournamentSponsor> TournamentSponsors { get; set; }
     
     public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
@@ -859,6 +860,31 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.SongName).HasColumnName("song_name");
             entity.Property(e => e.SongArtist).HasColumnName("song_artist");
             entity.Property(e => e.SongAlbumArtUrl).HasColumnName("song_album_art_url");
+        });
+
+        modelBuilder.Entity<TournamentMusicTrack>(entity =>
+        {
+            entity
+                .ToTable("tournament_music_tracks")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Tournament)
+                .WithMany(t => t.MusicTracks)
+                .HasForeignKey(e => e.TournamentId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => new { e.TournamentId, e.ProviderType, e.TrackId });
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.AudioFileKey).HasColumnName("audio_file_key");
+            entity.Property(e => e.TrackId).HasColumnName("track_id");
+            entity.Property(e => e.ProviderType).HasColumnName("provider_type")
+                .HasConversion(new EnumMemberConverter<MusicProviderType>())
+                .HasDefaultValue(MusicProviderType.Spotify);
+            entity.Property(e => e.Title).HasColumnName("title");
+            entity.Property(e => e.Artist).HasColumnName("artist");
+            entity.Property(e => e.AlbumArtUrl).HasColumnName("album_art_url");
+            entity.Property(e => e.DurationMs).HasColumnName("duration_ms");
+            entity.Property(e => e.IsInBasePool).HasColumnName("is_in_base_pool").HasDefaultValue(true);
         });
 
         modelBuilder.Entity<TournamentPlayerGameAvailability>(entity =>
