@@ -18,6 +18,9 @@ services:
       BoltonCup__ConnectionString: ${CONNECTION_STRING:?required}
       BoltonCup__AdminEmail: ${ADMIN_EMAIL:-}
       BoltonCup__Authentication__AdminApiKey: ${ADMIN_API_KEY:-}
+      BoltonCup__Authentication__AdminAccountId: ${ADMIN_ACCOUNT_ID:-}
+      # Admin key is rejected outside these networks. Defaults to the Tailscale tailnet only; override if needed.
+      # BoltonCup__Authentication__AdminApiKeyAllowedNetworks__0: 100.64.0.0/10
       Stripe__ApiKey: ${STRIPE_API_KEY:-}
       Stripe__WebhookSecret: ${STRIPE_WEBHOOK_SECRET:-}
       CloudflareR2__AccountId: ${R2_ACCOUNT_ID:-}
