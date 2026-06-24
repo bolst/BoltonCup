@@ -14,7 +14,7 @@
         </MudButton>
     </div>
 
-    <MudTable Items="_tracks" Loading="_loading" Hover Dense Breakpoint="Breakpoint.Sm">
+    <MudTable Items="_tracks" Loading="_loading" Breakpoint="Breakpoint.Sm" Height="40vh" FixedHeader FixedFooter Hover Dense Virtualize>
         <HeaderContent>
             <MudTh>Title</MudTh>
             <MudTh>Artist</MudTh>
@@ -49,6 +49,11 @@
         <NoRecordsContent>
             <MudText Typo="Typo.body2" Class="mud-text-secondary pa-4">No tracks uploaded yet.</MudText>
         </NoRecordsContent>
+        <FooterContent>
+            <MudTd colspan="5">
+                <MudChip T="string" Color="Color.Info" Variant="Variant.Text" Label="true">@_tracks.Count TOTAL</MudChip>
+            </MudTd>
+        </FooterContent>
     </MudTable>
 
     <MudExpansionPanels>
@@ -69,7 +74,7 @@
                     <MudText Typo="Typo.body2" Class="mud-text-secondary mb-2">
                         These players requested songs with no matching uploaded file. Upload a track and tag it with the matching Spotify search result to fix.
                     </MudText>
-                    <MudList T="string" Dense>
+                    <MudList T="string" ReadOnly Dense>
                         @foreach (var m in _missing)
                         {
                             <MudListItem T="string" Icon="@Icons.Material.Rounded.MusicOff">
