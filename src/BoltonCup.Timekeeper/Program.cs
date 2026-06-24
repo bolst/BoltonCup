@@ -1,5 +1,6 @@
 using BoltonCup.Common;
 using BoltonCup.Timekeeper.Services;
+using BoltonCup.Timekeeper.Services.Music;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using BoltonCup.Timekeeper.Components;
@@ -21,6 +22,8 @@ builder.Services.AddMudServices();
 builder.Services.AddSingleton<IOfflineStore, LocalStorageOfflineStore>();
 builder.Services.AddSingleton<SyncService>();
 builder.Services.AddScoped<TimekeeperStateService>();
+builder.Services.AddScoped<MusicCacheService>();
+builder.Services.AddScoped<MusicPlayerService>();
 
 var host = builder.Build();
 _ = host.Services.GetRequiredService<SyncService>().StartAsync();

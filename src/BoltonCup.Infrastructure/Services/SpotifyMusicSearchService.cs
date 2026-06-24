@@ -14,6 +14,7 @@ public sealed class SpotifyMusicSearchService : IMusicSearchService
     private const string TokenCacheKey = "spotify:token";
     private const string TokenEndpoint = "https://accounts.spotify.com/api/token";
     private const string SearchEndpoint = "https://api.spotify.com/v1/search";
+    private const string PlaylistEndpoint = "https://api.spotify.com/v1/playlists";
 
     private static readonly SemaphoreSlim _tokenLock = new(1, 1);
 
@@ -57,6 +58,72 @@ public sealed class SpotifyMusicSearchService : IMusicSearchService
             Artist: t.Artists is { Count: > 0 } ? t.Artists[0].Name : string.Empty,
             AlbumArtUrl: t.Album?.Images is { Count: > 0 } images ? images[^1].Url : null
         )).ToList();
+    }
+
+    public async Task<IReadOnlyList<MusicTrack>> GetPlaylistTracksAsync(string playlistUrlOrId, CancellationToken cancellationToken = default)
+    {
+        var playlistId = ParsePlaylistId(playlistUrlOrId);
+        if (string.IsNullOrWhiteSpace(playlistId))
+            throw new ArgumentException($"Could not parse a Spotify playlist id from '{playlistUrlOrId}'.", nameof(playlistUrlOrId));
+
+        var token = await GetAccessTokenAsync(cancellationToken);
+
+        // Trim the payload to just the fields we need; page through until 'next' is null.
+        var fields = Uri.EscapeDataString("items(track(id,name,artists(name),album(images))),next");
+        var url = $"{PlaylistEndpoint}/{playlistId}/tracks?limit=100&fields={fields}";
+
+        var tracks = new List<MusicTrack>();
+        while (!string.IsNullOrEmpty(url))
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            using var response = await _httpClient.SendAsync(request, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync(cancellationToken);
+                throw new HttpRequestException($"Spotify playlist fetch failed ({(int)response.StatusCode} {response.ReasonPhrase}): {body}");
+            }
+
+            var page = await response.Content.ReadFromJsonAsync<PlaylistTracksPage>(cancellationToken);
+            foreach (var item in page?.Items ?? [])
+            {
+                var t = item.Track;
+                if (t is null || string.IsNullOrEmpty(t.Id))
+                    continue; // local/removed tracks have no id and can't be matched
+
+                tracks.Add(new MusicTrack(
+                    Id: t.Id,
+                    Name: t.Name,
+                    Artist: t.Artists is { Count: > 0 } ? t.Artists[0].Name : string.Empty,
+                    AlbumArtUrl: t.Album?.Images is { Count: > 0 } images ? images[^1].Url : null));
+            }
+
+            url = page?.Next;
+        }
+
+        return tracks;
+    }
+
+    // Accepts a raw id, an open.spotify.com URL, or a spotify:playlist:<id> URI.
+    private static string? ParsePlaylistId(string input)
+    {
+        var value = input.Trim();
+        if (value.Length == 0)
+            return null;
+
+        if (value.StartsWith("spotify:playlist:", StringComparison.OrdinalIgnoreCase))
+            return value["spotify:playlist:".Length..].Split('?')[0];
+
+        if (Uri.TryCreate(value, UriKind.Absolute, out var uri))
+        {
+            var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            var idx = Array.FindIndex(segments, s => s.Equals("playlist", StringComparison.OrdinalIgnoreCase));
+            return idx >= 0 && idx + 1 < segments.Length ? segments[idx + 1] : null;
+        }
+
+        // Otherwise assume the caller passed a bare playlist id.
+        return value.Split('?')[0];
     }
 
     private async Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)
@@ -120,6 +187,12 @@ public sealed class SpotifyMusicSearchService : IMusicSearchService
         [property: JsonPropertyName("name")] string Name,
         [property: JsonPropertyName("artists")] List<Artist> Artists,
         [property: JsonPropertyName("album")] Album? Album);
+
+    private sealed record PlaylistTracksPage(
+        [property: JsonPropertyName("items")] List<PlaylistItem>? Items,
+        [property: JsonPropertyName("next")] string? Next);
+
+    private sealed record PlaylistItem([property: JsonPropertyName("track")] TrackItem? Track);
 
     private sealed record Artist([property: JsonPropertyName("name")] string Name);
 

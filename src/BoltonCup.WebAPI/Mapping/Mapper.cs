@@ -1156,6 +1156,74 @@ public class Mapper : IMapper
         }).ToList();
     }
 
+    public GamePlaylistDto ToDto(GamePlaylistResult result)
+    {
+        return new GamePlaylistDto
+        {
+            Tracks = result.Tracks.Select(t => new PlaylistTrackDto
+            {
+                FileKey = t.AudioFileKey,
+                Title = t.Title,
+                Artist = t.Artist,
+                AlbumArtUrl = t.AlbumArtUrl,
+                DurationMs = t.DurationMs,
+            }).ToList(),
+            Missing = result.Missing.Select(ToDto).ToList(),
+        };
+    }
+
+    public IReadOnlyList<MusicLibraryTrackDto> ToDtoList(IReadOnlyList<TournamentMusicTrack> tracks)
+        => tracks.Select(ToDto).ToList();
+
+    public MusicLibraryTrackDto ToDto(TournamentMusicTrack track) => new()
+    {
+        Id = track.Id,
+        TournamentId = track.TournamentId,
+        FileKey = track.AudioFileKey ?? string.Empty,
+        TrackId = track.TrackId,
+        ProviderType = track.ProviderType,
+        Title = track.Title,
+        Artist = track.Artist,
+        AlbumArtUrl = track.AlbumArtUrl,
+        DurationMs = track.DurationMs,
+        IsInBasePool = track.IsInBasePool,
+    };
+
+    public IReadOnlyList<MissingSongRequestDto> ToDtoList(IReadOnlyList<MissingSongRequest> missing)
+        => missing.Select(ToDto).ToList();
+
+    private static MissingSongRequestDto ToDto(MissingSongRequest m) => new()
+    {
+        PlayerName = m.PlayerName,
+        SongName = m.SongName,
+        SongTrackId = m.SongTrackId,
+        IsInBasePool = m.IsInBasePool,
+    };
+
+    public IReadOnlyList<MusicQueueItemDto> ToDtoList(IReadOnlyList<MusicQueueItemView> queue)
+        => queue.Select(ToDto).ToList();
+
+    private static MusicQueueItemDto ToDto(MusicQueueItemView q) => new()
+    {
+        Id = q.Id,
+        TrackId = q.TrackId,
+        Title = q.Title,
+        Artist = q.Artist,
+        AlbumArtUrl = q.AlbumArtUrl,
+        Status = q.Status,
+        Source = q.Source,
+        IsInBasePool = q.IsInBasePool,
+        RequestedByName = q.RequestedByName,
+    };
+
+    public AddMusicTrackCommand ToCommand(int tournamentId, AddMusicTrackRequest request)
+        => new(tournamentId, request.TempKey, request.Title, request.Artist, request.TrackId,
+            request.ProviderType, request.AlbumArtUrl, request.DurationMs, request.IsInBasePool);
+
+    public UpdateMusicTrackCommand ToCommand(int tournamentId, int trackId, UpdateMusicTrackRequest request)
+        => new(tournamentId, trackId, request.Title, request.Artist, request.TrackId,
+            request.ProviderType, request.AlbumArtUrl, request.DurationMs, request.IsInBasePool);
+
 
     // ---------- Brief helpers ----------
 

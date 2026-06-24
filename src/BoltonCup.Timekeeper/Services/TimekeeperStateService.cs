@@ -25,6 +25,7 @@ public class TimekeeperStateService : IDisposable
     public List<PlayerDto> AwayPlayers { get; private set; } = [];
     public int CurrentPeriod { get; private set; } = 1;
     public bool IsLoading { get; private set; }
+    public bool IsOnline => _syncService.IsOnline;
 
     public event Action? OnStateChanged;
 

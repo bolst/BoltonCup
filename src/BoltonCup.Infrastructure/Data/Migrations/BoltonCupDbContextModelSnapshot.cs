@@ -1939,6 +1939,94 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.ToTable("tournament_budget_items", "core");
                 });
 
+            modelBuilder.Entity("BoltonCup.Core.TournamentMusicTrack", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AlbumArtUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("album_art_url");
+
+                    b.Property<string>("Artist")
+                        .HasColumnType("text")
+                        .HasColumnName("artist");
+
+                    b.Property<string>("AudioFileKey")
+                        .HasColumnType("text")
+                        .HasColumnName("audio_file_key");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<int?>("DurationMs")
+                        .HasColumnType("integer")
+                        .HasColumnName("duration_ms");
+
+                    b.Property<bool>("IsInBasePool")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_in_base_pool");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("ProviderType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Spotify")
+                        .HasColumnName("provider_type");
+
+                    b.Property<string>("RequestedByName")
+                        .HasColumnType("text")
+                        .HasColumnName("requested_by_name");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("source");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<int>("TournamentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("tournament_id");
+
+                    b.Property<string>("TrackId")
+                        .HasColumnType("text")
+                        .HasColumnName("track_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TournamentId", "ProviderType", "TrackId")
+                        .IsUnique();
+
+                    b.ToTable("tournament_music_tracks", "core");
+                });
+
             modelBuilder.Entity("BoltonCup.Core.TournamentPlayerGameAvailability", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2750,6 +2838,17 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Navigation("Tournament");
                 });
 
+            modelBuilder.Entity("BoltonCup.Core.TournamentMusicTrack", b =>
+                {
+                    b.HasOne("BoltonCup.Core.Tournament", "Tournament")
+                        .WithMany("MusicTracks")
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tournament");
+                });
+
             modelBuilder.Entity("BoltonCup.Core.TournamentPlayerGameAvailability", b =>
                 {
                     b.HasOne("BoltonCup.Core.Game", "Game")
@@ -2955,6 +3054,8 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Navigation("Games");
 
                     b.Navigation("InfoGuide");
+
+                    b.Navigation("MusicTracks");
 
                     b.Navigation("PlayerInfos");
 

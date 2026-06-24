@@ -31,6 +31,7 @@ public class Tournament : EntityBase
     public ICollection<TournamentPlayerInfo> PlayerInfos { get; set; } = [];
     public ICollection<TournamentSponsor> Sponsors { get; set; } = [];
     public ICollection<TournamentBudgetItem> Expenses { get; set; } = [];
+    public ICollection<TournamentMusicTrack> MusicTracks { get; set; } = [];
     public Team? WinningTeam { get; set; }
     public InfoGuide? InfoGuide { get; set; }
     public Gallery? Gallery { get; set; }

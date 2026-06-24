@@ -32,7 +32,17 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddAuthServices(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddAuthentication()
+            // Override the default scheme (set to Identity.Bearer by AddIdentityApiEndpoints) with a
+            // forwarder: requests with the API key header use the API key scheme, everything else uses
+            // the cookie scheme browsers/WASM authenticate with. It's one or the other per request.
+            .AddAuthentication(options => options.DefaultScheme = ApiKeyConstants.ForwardingScheme)
+            .AddPolicyScheme(ApiKeyConstants.ForwardingScheme, ApiKeyConstants.ForwardingScheme, options =>
+            {
+                options.ForwardDefaultSelector = context =>
+                    context.Request.Headers.ContainsKey(ApiKeyConstants.Header)
+                        ? ApiKeyConstants.Scheme
+                        : IdentityConstants.ApplicationScheme;
+            })
             .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.Scheme, null);
 
         return builder.Services
@@ -177,18 +187,12 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection AddCacheServices(this IServiceCollection services)
-    {
-        return services.AddMemoryCache();
-    }
-
     /// <summary>Registers all BoltonCup WebAPI services including auth, validation, CORS, rate limiting, and controllers.</summary>
     public static IServiceCollection AddBoltonCupWebAPIServices(this WebApplicationBuilder builder)
     {
         builder
             .AddAuthServices()
             .AddFluentValidationServices()
-            .AddCacheServices()
             .AddCorsServices()
             .AddRateLimitingServices()
             .AddRouting(options => options.LowercaseUrls = true)

@@ -33,6 +33,7 @@ public static class ServiceCollectionExtensions
             .AddDefaultTokenProviders()
             .AddClaimsPrincipalFactory<BoltonCupClaimsPrincipalFactory>();
 
+        builder.Services.AddMemoryCache();
         builder.AddBoltonCupEmails();
         builder.AddBoltonCupS3();
         builder.AddBoltonCupPayments();
