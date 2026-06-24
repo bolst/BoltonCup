@@ -872,7 +872,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany(t => t.MusicTracks)
                 .HasForeignKey(e => e.TournamentId)
                 .OnDelete(DeleteBehavior.Cascade);
-            entity.HasIndex(e => new { e.TournamentId, e.ProviderType, e.TrackId });
+            // Unique on the match key; Postgres treats NULL track ids as distinct, so untagged uploads coexist.
+            entity.HasIndex(e => new { e.TournamentId, e.ProviderType, e.TrackId }).IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.AudioFileKey).HasColumnName("audio_file_key");
@@ -884,7 +885,14 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Artist).HasColumnName("artist");
             entity.Property(e => e.AlbumArtUrl).HasColumnName("album_art_url");
             entity.Property(e => e.DurationMs).HasColumnName("duration_ms");
-            entity.Property(e => e.IsInBasePool).HasColumnName("is_in_base_pool").HasDefaultValue(true);
+            // No HasDefaultValue on these value-type props: a DB-generated default would be applied
+            // whenever the CLR value equals its default (Pending / false), silently overriding inserts.
+            entity.Property(e => e.IsInBasePool).HasColumnName("is_in_base_pool");
+            entity.Property(e => e.Status).HasColumnName("status")
+                .HasConversion(new EnumMemberConverter<MusicTrackStatus>());
+            entity.Property(e => e.Source).HasColumnName("source")
+                .HasConversion(new EnumMemberConverter<MusicTrackSource>());
+            entity.Property(e => e.RequestedByName).HasColumnName("requested_by_name");
         });
 
         modelBuilder.Entity<TournamentPlayerGameAvailability>(entity =>
