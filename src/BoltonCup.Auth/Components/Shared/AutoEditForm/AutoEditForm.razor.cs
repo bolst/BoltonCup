@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
+using BoltonCup.Auth.Attributes;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
@@ -50,6 +51,7 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
                 Label = GetDisplayName(propertyInfo),
                 InputType = GetInputType(propertyInfo),
                 ReadOnly = GetReadOnly(propertyInfo),
+                AutoFocus = GetAutoFocus(propertyInfo)
             });
         }
     }
@@ -105,6 +107,12 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
         // only read-only if [ReadOnly(true)]
         var attr = prop.GetCustomAttribute<ReadOnlyAttribute>();
         return attr is not null && attr.IsReadOnly;
+    }
+
+    private static bool GetAutoFocus(PropertyInfo prop)
+    {
+        var attr = prop.GetCustomAttribute<AutoFocusAttribute>();
+        return attr is { AutoFocus: true };
     }
 
     private void OnValueChanged(FieldMetadata field, object? value)

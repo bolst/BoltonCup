@@ -10,4 +10,5 @@ public record FieldMetadata
     public required string Label { get; init; }
     public required InputType InputType { get; init; }
     public required bool ReadOnly { get; init; }
+    public required bool AutoFocus { get; init; }
 }
