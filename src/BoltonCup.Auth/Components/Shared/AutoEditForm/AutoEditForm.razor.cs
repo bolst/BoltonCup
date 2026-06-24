@@ -44,15 +44,7 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
         var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
         foreach (var propertyInfo in properties)
         {
-            _fields.Add(new FieldMetadata
-            {
-                PropertyInfo = propertyInfo,
-                Type = propertyInfo.PropertyType,
-                Label = GetDisplayName(propertyInfo),
-                InputType = GetInputType(propertyInfo),
-                ReadOnly = GetReadOnly(propertyInfo),
-                AutoFocus = GetAutoFocus(propertyInfo)
-            });
+            _fields.Add(new FieldMetadata(propertyInfo));
         }
     }
 
@@ -79,40 +71,6 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
             _isSubmitting = false;
             await InvokeAsync(StateHasChanged);
         }
-    }
-
-    private static string GetDisplayName(PropertyInfo prop)
-    {
-        var attr = prop.GetCustomAttribute<DisplayAttribute>();
-        return attr?.Name ?? prop.Name;
-    }
-
-    private static InputType GetInputType(PropertyInfo prop)
-    {
-        // first check for [EmailAddress]
-        if (prop.GetCustomAttribute<EmailAddressAttribute>() != null) 
-            return InputType.Email;
-
-        var dataType = prop.GetCustomAttribute<DataTypeAttribute>();
-        return dataType?.DataType switch
-        {
-            DataType.EmailAddress => InputType.Email,
-            DataType.Password => InputType.Password,
-            _ => InputType.Text
-        };
-    }
-
-    private static bool GetReadOnly(PropertyInfo prop)
-    {
-        // only read-only if [ReadOnly(true)]
-        var attr = prop.GetCustomAttribute<ReadOnlyAttribute>();
-        return attr is not null && attr.IsReadOnly;
-    }
-
-    private static bool GetAutoFocus(PropertyInfo prop)
-    {
-        var attr = prop.GetCustomAttribute<AutoFocusAttribute>();
-        return attr is { AutoFocus: true };
     }
 
     private void OnValueChanged(FieldMetadata field, object? value)
