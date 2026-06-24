@@ -21,8 +21,9 @@ public class MusicLibraryService : IMusicLibraryService
 
     public async Task<IReadOnlyList<TournamentMusicTrack>> GetLibraryAsync(int tournamentId, CancellationToken cancellationToken = default)
     {
+        // The library is the playable catalog: downloaded rows only (pending/cancelled live in the queue view).
         return await _db.TournamentMusicTracks
-            .Where(t => t.TournamentId == tournamentId)
+            .Where(t => t.TournamentId == tournamentId && t.Status == MusicTrackStatus.Downloaded)
             .OrderBy(t => t.Title)
             .ToListAsync(cancellationToken);
     }
