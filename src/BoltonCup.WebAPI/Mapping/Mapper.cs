@@ -1179,7 +1179,7 @@ public class Mapper : IMapper
     {
         Id = track.Id,
         TournamentId = track.TournamentId,
-        FileKey = track.AudioFileKey,
+        FileKey = track.AudioFileKey ?? string.Empty,
         TrackId = track.TrackId,
         ProviderType = track.ProviderType,
         Title = track.Title,
@@ -1197,6 +1197,23 @@ public class Mapper : IMapper
         PlayerName = m.PlayerName,
         SongName = m.SongName,
         SongTrackId = m.SongTrackId,
+        IsInBasePool = m.IsInBasePool,
+    };
+
+    public IReadOnlyList<MusicQueueItemDto> ToDtoList(IReadOnlyList<MusicQueueItemView> queue)
+        => queue.Select(ToDto).ToList();
+
+    private static MusicQueueItemDto ToDto(MusicQueueItemView q) => new()
+    {
+        Id = q.Id,
+        TrackId = q.TrackId,
+        Title = q.Title,
+        Artist = q.Artist,
+        AlbumArtUrl = q.AlbumArtUrl,
+        Status = q.Status,
+        Source = q.Source,
+        IsInBasePool = q.IsInBasePool,
+        RequestedByName = q.RequestedByName,
     };
 
     public AddMusicTrackCommand ToCommand(int tournamentId, AddMusicTrackRequest request)

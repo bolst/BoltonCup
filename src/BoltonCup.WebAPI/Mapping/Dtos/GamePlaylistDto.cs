@@ -40,4 +40,7 @@ public record MissingSongRequestDto
 
     /// <summary>Gets the requested Spotify track id, if known.</summary>
     public string? SongTrackId { get; init; }
+
+    /// <summary>Gets whether the downloaded file should be registered as a base-pool track.</summary>
+    public bool IsInBasePool { get; init; }
 }

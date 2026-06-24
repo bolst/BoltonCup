@@ -6,12 +6,20 @@
 <MudStack Spacing="4" Class="pa-4">
     <div class="d-flex align-center justify-space-between">
         <MudText Typo="Typo.h5">Music Library</MudText>
-        <MudButton Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   StartIcon="@Icons.Material.Rounded.Add"
-                   OnClick="@AddTrack">
-            Add Track
-        </MudButton>
+        <div class="d-flex align-center gap-2">
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Rounded.PlaylistAdd"
+                       OnClick="@ImportPlaylist">
+                Import playlist
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Rounded.Add"
+                       OnClick="@AddTrack">
+                Add Track
+            </MudButton>
+        </div>
     </div>
 
     <MudTable Items="_tracks" Loading="_loading" Breakpoint="Breakpoint.Sm" Height="40vh" FixedHeader FixedFooter Hover Dense Virtualize>
@@ -57,32 +65,78 @@
     </MudTable>
 
     <MudExpansionPanels>
-        <MudExpansionPanel>
+        <MudExpansionPanel Expanded="@(_pendingCount > 0)">
             <TitleContent>
                 <div class="d-flex align-center gap-2">
-                    <MudIcon Icon="@Icons.Material.Rounded.ReportProblem" Color="@(_missing.Count > 0 ? Color.Warning : Color.Default)" />
-                    <MudText>Requested but missing (@_missing.Count)</MudText>
+                    <MudIcon Icon="@Icons.Material.Rounded.CloudDownload" Color="@(_pendingCount > 0 ? Color.Warning : Color.Default)" />
+                    <MudText>Download queue (@_pendingCount pending)</MudText>
                 </div>
             </TitleContent>
             <ChildContent>
-                @if (_missing.Count == 0)
-                {
-                    <MudText Typo="Typo.body2" Class="mud-text-secondary">Every player song request has a matching uploaded file.</MudText>
-                }
-                else
-                {
-                    <MudText Typo="Typo.body2" Class="mud-text-secondary mb-2">
-                        These players requested songs with no matching uploaded file. Upload a track and tag it with the matching Spotify search result to fix.
-                    </MudText>
-                    <MudList T="string" ReadOnly Dense>
-                        @foreach (var m in _missing)
-                        {
-                            <MudListItem T="string" Icon="@Icons.Material.Rounded.MusicOff">
-                                <strong>@m.SongName</strong> — requested by @m.PlayerName
-                            </MudListItem>
-                        }
-                    </MudList>
-                }
+                <MudTable Items="_queue" Breakpoint="Breakpoint.Sm" Hover Dense>
+                    <HeaderContent>
+                        <MudTh>Song</MudTh>
+                        <MudTh>Source</MudTh>
+                        <MudTh>Base pool</MudTh>
+                        <MudTh>Status</MudTh>
+                        <MudTh Style="text-align:right">Actions</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Song">
+                            <div class="d-flex align-center gap-2">
+                                <MudAvatar Square Size="Size.Small">
+                                    @if (!string.IsNullOrEmpty(context.AlbumArtUrl))
+                                    {
+                                        <MudImage Src="@context.AlbumArtUrl" Alt="@context.Title" />
+                                    }
+                                    else
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Rounded.MusicNote" Size="Size.Small" />
+                                    }
+                                </MudAvatar>
+                                <div>
+                                    <MudText Typo="Typo.body2">@(context.Title ?? context.TrackId)</MudText>
+                                    @if (!string.IsNullOrEmpty(context.Artist))
+                                    {
+                                        <MudText Typo="Typo.caption" Class="mud-text-secondary">@context.Artist</MudText>
+                                    }
+                                </div>
+                            </div>
+                        </MudTd>
+                        <MudTd DataLabel="Source">
+                            @if (context.Source == MusicTrackSource.PlaylistImport)
+                            {
+                                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Text">Import</MudChip>
+                            }
+                            else
+                            {
+                                <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Text"
+                                         Title="@($"Requested by {context.RequestedByName}")">Player</MudChip>
+                            }
+                        </MudTd>
+                        <MudTd DataLabel="Base pool">
+                            @if (context.IsInBasePool)
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.CheckCircle" Color="Color.Success" Size="Size.Small" />
+                            }
+                        </MudTd>
+                        <MudTd DataLabel="Status">
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="@StatusColor(context.Status)">
+                                @context.Status
+                            </MudChip>
+                        </MudTd>
+                        <MudTd Style="text-align:right">
+                            @if (context.Status != MusicTrackStatus.Cancelled)
+                            {
+                                <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Small"
+                                               Title="Remove from queue" OnClick="@(() => CancelQueueItem(context))" />
+                            }
+                        </MudTd>
+                    </RowTemplate>
+                    <NoRecordsContent>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary pa-4">The download queue is empty.</MudText>
+                    </NoRecordsContent>
+                </MudTable>
             </ChildContent>
         </MudExpansionPanel>
     </MudExpansionPanels>
@@ -94,9 +148,18 @@
     public int TournamentId { get; set; }
 
     private IReadOnlyList<TournamentMusicTrack> _tracks = [];
-    private IReadOnlyList<MissingSongRequest> _missing = [];
+    private IReadOnlyList<MusicQueueItemView> _queue = [];
     private bool _loading = true;
     private int? _loadedId;
+
+    private int _pendingCount => _queue.Count(q => q.Status == MusicTrackStatus.Pending);
+
+    private static Color StatusColor(MusicTrackStatus status) => status switch
+    {
+        MusicTrackStatus.Downloaded => Color.Success,
+        MusicTrackStatus.Pending => Color.Warning,
+        _ => Color.Default,
+    };
 
     protected override async Task OnParametersSetAsync()
     {
@@ -110,7 +173,7 @@
     {
         _loading = true;
         _tracks = await MusicLibrary.GetLibraryAsync(TournamentId);
-        _missing = await MusicLibrary.GetMissingRequestsAsync(TournamentId);
+        _queue = await MusicLibrary.GetQueueAsync(TournamentId);
         _loading = false;
     }
 
@@ -159,6 +222,39 @@
         catch (Exception ex)
         {
             Snackbar.Add($"Delete failed: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ImportPlaylist()
+    {
+        var parameters = new DialogParameters { [nameof(ImportPlaylistDialog.TournamentId)] = TournamentId };
+        var dialog = await DialogService.ShowAsync<ImportPlaylistDialog>("Import Spotify Playlist", parameters);
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+        {
+            await ReloadAsync();
+        }
+    }
+
+    private async Task CancelQueueItem(MusicQueueItemView item)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Remove from queue",
+            $"Remove \"{item.Title ?? item.TrackId}\" from the download queue?",
+            yesText: "Remove", cancelText: "Cancel");
+        if (confirmed != true)
+        {
+            return;
+        }
+
+        try
+        {
+            await MusicLibrary.CancelQueueItemAsync(TournamentId, item.Id);
+            await ReloadAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Remove failed: {ex.Message}", Severity.Error);
         }
     }
 }

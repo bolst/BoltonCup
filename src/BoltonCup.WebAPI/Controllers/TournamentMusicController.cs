@@ -31,6 +31,15 @@ public class TournamentMusicController(
         return Ok(_mapper.ToDtoList(missing));
     }
 
+    /// <summary>The tournament's music download queue (pending, downloaded, and cancelled items).</summary>
+    [Authorize(Roles = Admin)]
+    [HttpGet("queue")]
+    public async Task<ActionResult<IReadOnlyList<MusicQueueItemDto>>> GetQueue(int id)
+    {
+        var queue = await _music.GetQueueAsync(id);
+        return Ok(_mapper.ToDtoList(queue));
+    }
+
     /// <summary>Adds an uploaded audio file to the library.</summary>
     [Authorize(Roles = Admin)]
     [HttpPost]

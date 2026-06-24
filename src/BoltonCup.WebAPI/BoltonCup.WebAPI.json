@@ -8931,6 +8931,135 @@
         ]
       }
     },
+    "/api/tournaments/{id}/music/queue": {
+      "get": {
+        "tags": [
+          "TournamentMusic"
+        ],
+        "description": "The tournament's music download queue (pending, downloaded, and cancelled items).",
+        "operationId": "GetQueue",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MusicQueueItemDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MusicQueueItemDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MusicQueueItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/tournaments/{id}/music/{trackId}": {
       "put": {
         "tags": [
@@ -13453,6 +13582,10 @@
             "type": "string",
             "description": "Gets the requested Spotify track id, if known.",
             "nullable": true
+          },
+          "isInBasePool": {
+            "type": "boolean",
+            "description": "Gets whether the downloaded file should be registered as a base-pool track."
           }
         },
         "additionalProperties": false,
@@ -13522,6 +13655,63 @@
         ],
         "type": "string"
       },
+      "MusicQueueItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets the queue item id.",
+            "format": "int32"
+          },
+          "trackId": {
+            "type": "string",
+            "description": "Gets the Spotify track id (the match/dedupe key).",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "description": "Gets the song title, if known.",
+            "nullable": true
+          },
+          "artist": {
+            "type": "string",
+            "description": "Gets the artist name, if known.",
+            "nullable": true
+          },
+          "albumArtUrl": {
+            "type": "string",
+            "description": "Gets the album art URL, if known.",
+            "nullable": true
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MusicTrackStatus"
+              }
+            ],
+            "description": "Gets the download status."
+          },
+          "source": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MusicTrackSource"
+              }
+            ],
+            "description": "Gets where this item originated."
+          },
+          "isInBasePool": {
+            "type": "boolean",
+            "description": "Gets whether the downloaded file becomes a base-pool track."
+          },
+          "requestedByName": {
+            "type": "string",
+            "description": "Gets the requesting player's name, for player-sourced items.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "An item in a tournament's music download queue."
+      },
       "MusicTrackDto": {
         "type": "object",
         "properties": {
@@ -13545,6 +13735,22 @@
         },
         "additionalProperties": false,
         "description": "DTO representing a single music track that can be selected as a song request."
+      },
+      "MusicTrackSource": {
+        "enum": [
+          "ManualUpload",
+          "PlayerRequest",
+          "PlaylistImport"
+        ],
+        "type": "string"
+      },
+      "MusicTrackStatus": {
+        "enum": [
+          "Pending",
+          "Downloaded",
+          "Cancelled"
+        ],
+        "type": "string"
       },
       "PaymentBreakdown": {
         "type": "object",

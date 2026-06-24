@@ -129,7 +129,7 @@ def upload_to_r2(session: requests.Session, cfg: Config, mp3_path: str) -> str:
 
 
 def register_track(
-    session: requests.Session, cfg: Config, temp_key: str, track_id: str, meta: dict
+    session: requests.Session, cfg: Config, temp_key: str, track_id: str, meta: dict, is_in_base_pool: bool
 ) -> None:
     resp = session.post(
         f"{cfg.api_base}/api/tournaments/{cfg.tournament_id}/music",
@@ -141,7 +141,8 @@ def register_track(
             "providerType": "Spotify",
             "albumArtUrl": meta["albumArtUrl"],
             "durationMs": meta["durationMs"],
-            "isInBasePool": False,  # a player request, not an every-game track
+            # The queue decides base-pool: playlist imports play every game, player requests don't.
+            "isInBasePool": is_in_base_pool,
         },
         timeout=30,
     )
@@ -215,7 +216,7 @@ def main() -> int:
                 continue
             try:
                 temp_key = upload_to_r2(session, cfg, mp3_path)
-                register_track(session, cfg, temp_key, track_id, meta)
+                register_track(session, cfg, temp_key, track_id, meta, bool(item.get("isInBasePool")))
             except requests.HTTPError as exc:
                 log(f"    upload/register failed: {exc}")
                 failed.append(item)

@@ -22,10 +22,33 @@ public interface IMusicLibraryService
     /// </summary>
     Task<GamePlaylistResult> GetGamePlaylistAsync(int gameId, CancellationToken cancellationToken = default);
 
-    /// <summary>Tournament-wide player song requests that have no matching uploaded file yet.</summary>
+    /// <summary>
+    /// Tournament-wide download queue items still pending (no matching library file yet). Backs the
+    /// homelab fetcher's "missing" list. Player requests are reconciled into the queue on read.
+    /// </summary>
     Task<IReadOnlyList<MissingSongRequest>> GetMissingRequestsAsync(int tournamentId, CancellationToken cancellationToken = default);
+
+    /// <summary>The full download queue (pending, downloaded, and cancelled) after reconciling player requests.</summary>
+    Task<IReadOnlyList<MusicQueueItemView>> GetQueueAsync(int tournamentId, CancellationToken cancellationToken = default);
+
+    /// <summary>Adds a public Spotify playlist's tracks to the queue as base-pool items. Returns the count added or reactivated.</summary>
+    Task<int> ImportPlaylistAsync(int tournamentId, string playlistUrlOrId, CancellationToken cancellationToken = default);
+
+    /// <summary>Soft-deletes a queue item (sets it cancelled); player request rows on their entity are untouched.</summary>
+    Task CancelQueueItemAsync(int tournamentId, int queueItemId, CancellationToken cancellationToken = default);
 }
 
 public record GamePlaylistResult(IReadOnlyList<TournamentMusicTrack> Tracks, IReadOnlyList<MissingSongRequest> Missing);
 
-public record MissingSongRequest(string PlayerName, string? SongName, string? SongTrackId);
+public record MusicQueueItemView(
+    int Id,
+    string? TrackId,
+    string? Title,
+    string? Artist,
+    string? AlbumArtUrl,
+    MusicTrackStatus Status,
+    MusicTrackSource Source,
+    bool IsInBasePool,
+    string? RequestedByName);
+
+public record MissingSongRequest(string PlayerName, string? SongName, string? SongTrackId, bool IsInBasePool);
