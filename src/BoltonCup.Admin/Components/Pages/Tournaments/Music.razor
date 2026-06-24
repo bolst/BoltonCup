@@ -1,5 +1,6 @@
 @page "/tournaments/{TournamentId:int}/music"
 @inject IMusicLibraryService MusicLibrary
+@inject IAssetUrlResolver AssetUrls
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
@@ -50,6 +51,9 @@
                 }
             </MudTd>
             <MudTd Style="text-align:right">
+                <MudIconButton Icon="@Icons.Material.Rounded.PlayArrow" Size="Size.Small" Color="Color.Primary"
+                               Href="@AssetUrls.GetFullUrl(context.AudioFileKey)" Target="_blank"
+                               Disabled="@string.IsNullOrEmpty(context.AudioFileKey)" Title="Play in new tab" />
                 <MudIconButton Icon="@Icons.Material.Rounded.Edit" Size="Size.Small" OnClick="@(() => EditTrack(context))" />
                 <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Small" OnClick="@(() => DeleteTrack(context))" />
             </MudTd>
