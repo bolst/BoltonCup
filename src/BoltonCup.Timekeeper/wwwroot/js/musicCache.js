@@ -33,7 +33,7 @@ export async function hasMany(keys) {
         const req = db.transaction(STORE, 'readonly').objectStore(STORE).getKey(key);
         req.onsuccess = () => { if (req.result !== undefined) found.push(key); resolve(); };
         req.onerror = () => resolve();
-    }));
+    })));
     return found;
 }
 
