@@ -76,30 +76,34 @@ def spotify_metadata(spotify: spotipy.Spotify, track_id: str) -> dict:
 
 
 def download_track(track_id: str, dest_dir: str) -> str | None:
-    """Download one Spotify track to dest_dir as <track_id>.mp3 via spotDL. Returns path or None."""
-    out_path = os.path.join(dest_dir, f"{track_id}.mp3")
+    """Download one Spotify track into dest_dir via spotDL. Returns the mp3 path or None."""
     url = f"https://open.spotify.com/track/{track_id}"
+    # --output is a name *template*, not a literal path: a literal "<id>.mp3" makes spotDL create a
+    # directory of that name. Use placeholders so it writes <dest_dir>/<track_id>.mp3.
+    output_template = os.path.join(dest_dir, "{track-id}.{output-ext}")
     try:
         subprocess.run(
-            ["spotdl", "download", url, "--format", "mp3", "--output", out_path],
+            ["spotdl", "download", url, "--format", "mp3", "--output", output_template],
             check=True,
             capture_output=True,
             text=True,
             timeout=600,
         )
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError) as exc:
         detail = getattr(exc, "stderr", "") or str(exc)
         log(f"    spotdl failed: {detail.strip().splitlines()[-1] if detail.strip() else exc}")
         return None
-    # spotDL may append the resolved extension; accept whatever single file landed.
-    if os.path.exists(out_path) and os.path.getsize(out_path) > 0:
-        return out_path
-    candidates = [
-        os.path.join(dest_dir, f)
-        for f in os.listdir(dest_dir)
-        if f.startswith(track_id) and os.path.getsize(os.path.join(dest_dir, f)) > 0
+    # Return the largest .mp3 file spotDL actually wrote (recursive, so it survives layout quirks).
+    mp3s = [
+        os.path.join(root, name)
+        for root, _dirs, files in os.walk(dest_dir)
+        for name in files
+        if name.lower().endswith(".mp3") and os.path.getsize(os.path.join(root, name)) > 0
     ]
-    return candidates[0] if candidates else None
+    if not mp3s:
+        log("    spotdl produced no mp3 file")
+        return None
+    return max(mp3s, key=os.path.getsize)
 
 
 def upload_to_r2(session: requests.Session, cfg: Config, mp3_path: str) -> str:
