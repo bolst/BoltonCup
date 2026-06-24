@@ -6,6 +6,12 @@ public static class ApiKeyConstants
     /// <summary>The name of the API key authentication scheme.</summary>
     public const string Scheme = "APIKey";
 
+    /// <summary>
+    /// Default scheme: forwards to <see cref="Scheme"/> when the API key header is present,
+    /// otherwise to the Identity application cookie. Lets endpoints accept either credential.
+    /// </summary>
+    public const string ForwardingScheme = "BoltonCupAuth";
+
     /// <summary>The HTTP header name that carries the API key.</summary>
     public const string Header = "BoltonCup-Api-Key";
 
