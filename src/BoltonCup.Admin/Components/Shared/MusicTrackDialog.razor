@@ -78,10 +78,12 @@
     [CascadingParameter]
     public IMudDialogInstance Dialog { get; set; } = null!;
 
-    [Parameter] public int TournamentId { get; set; }
+    [Parameter] 
+    public int TournamentId { get; set; }
 
     /// <summary>The track being edited, or null when adding a new one.</summary>
-    [Parameter] public TournamentMusicTrack? Track { get; set; }
+    [Parameter] 
+    public TournamentMusicTrack? Track { get; set; }
 
     private bool IsEdit => Track is not null;
 
@@ -115,6 +117,7 @@
     {
         if (string.IsNullOrWhiteSpace(value))
             return [];
+
         try
         {
             return await MusicSearch.SearchTracksAsync(value, 8, ct);
@@ -129,10 +132,17 @@
     {
         if (track is null)
             return;
+
         _trackId = track.Id;
         _albumArtUrl = track.AlbumArtUrl;
-        if (string.IsNullOrWhiteSpace(_title)) _title = track.Name;
-        if (string.IsNullOrWhiteSpace(_artist)) _artist = track.Artist;
+        if (string.IsNullOrWhiteSpace(_title))
+        {
+            _title = track.Name;
+        }
+        if (string.IsNullOrWhiteSpace(_artist))
+        {
+            _artist = track.Artist;
+        }
     }
 
     private async Task Save()
