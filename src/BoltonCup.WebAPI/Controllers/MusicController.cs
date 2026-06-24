@@ -13,12 +13,14 @@ public class MusicController(
     IMapper _mapper
 ) : BoltonCupControllerBase
 {
+    const int MinSearchLength = 3;
+
     /// <summary>Searches for tracks matching the given query.</summary>
     [Authorize(Policy = RequireCompletedAccount)]
     [HttpGet("tracks")]
     public async Task<ActionResult<IReadOnlyList<MusicTrackDto>>> SearchTracks([FromQuery] string q, [FromQuery] int limit = 8)
     {
-        if (string.IsNullOrWhiteSpace(q))
+        if (string.IsNullOrWhiteSpace(q) || q.Length < MinSearchLength)
         {
             return Ok(Array.Empty<MusicTrackDto>());
         }
