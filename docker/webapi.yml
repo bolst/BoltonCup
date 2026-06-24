@@ -29,3 +29,5 @@ services:
       Resend__SenderName: ${RESEND_SENDER_NAME:-Bolton Cup}
       Resend__SenderEmail: ${RESEND_SENDER_EMAIL:-notifications@boltoncup.ca}
       Sentry__Dsn: ${SENTRY_DSN:-}
+      Spotify__ClientId: ${SPOTIFY_CLIENT_ID:-}
+      Spotify__ClientSecret: ${SPOTIFY_CLIENT_SECRET:-}
