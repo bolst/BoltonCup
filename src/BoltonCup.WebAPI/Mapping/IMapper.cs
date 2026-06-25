@@ -28,7 +28,7 @@ public interface IMapper
 
     // Draft
     IPagedList<DraftDto> ToDtoList(IPagedList<Draft> drafts);
-    IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings, IReadOnlySet<int> favouritePlayerIds);
+    IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings, IReadOnlySet<int> favouritePlayerIds, TournamentAvailability availability);
     DraftSingleDto? ToDto(Draft? draft, bool isAuthorized, bool canManage);
     DraftPickSingleDto? ToDto(DraftPick? draftPick);
     DraftUpdateEventDto ToDto(CurrentDraftState draftState, bool isAuthorized, bool canManage);
@@ -75,6 +75,7 @@ public interface IMapper
     GetPlayersQuery ToQuery(GetPlayersRequest request);
     IPagedList<PlayerDto> ToDtoList(IPagedList<Player> players);
     PlayerSingleDto? ToDto(Player? player);
+    DraftPlayerSingleDto? ToDraftPlayerDto(Player? player, TournamentAvailability availability);
 
     // SkaterStat
     GetSkaterStatsQuery ToQuery(GetSkaterStatsRequest request);

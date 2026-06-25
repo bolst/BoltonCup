@@ -5085,6 +5085,127 @@
         ]
       }
     },
+    "/api/drafts/{id}/players/{playerId}": {
+      "get": {
+        "tags": [
+          "Drafts"
+        ],
+        "description": "Gets a detailed player card (profile, career stats, and per-game availability) for the draft.",
+        "operationId": "GetDraftPlayer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftPlayerSingleDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftPlayerSingleDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftPlayerSingleDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/drafts/{id}/players/{playerId}/favourite": {
       "put": {
         "tags": [
@@ -12346,6 +12467,134 @@
         "additionalProperties": false,
         "description": "Request to record a draft pick selection."
       },
+      "DraftPlayerSingleDto": {
+        "required": [
+          "id",
+          "tournament"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets the player ID.",
+            "format": "int32"
+          },
+          "accountId": {
+            "type": "integer",
+            "description": "Gets the account ID associated with this player.",
+            "format": "int32",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "description": "Gets the player's position.",
+            "nullable": true
+          },
+          "jerseyNumber": {
+            "type": "integer",
+            "description": "Gets the player's jersey number.",
+            "format": "int32",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Gets the player's first name.",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Gets the player's last name.",
+            "nullable": true
+          },
+          "birthday": {
+            "type": "string",
+            "description": "Gets the player's date of birth.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "profilePicture": {
+            "type": "string",
+            "description": "Gets the URL of the player's profile picture.",
+            "nullable": true
+          },
+          "bannerPicture": {
+            "type": "string",
+            "description": "Gets the URL of the player's banner picture.",
+            "nullable": true
+          },
+          "preferredBeer": {
+            "type": "string",
+            "description": "Gets the player's preferred beer.",
+            "nullable": true
+          },
+          "tournament": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ],
+            "description": "Gets the tournament this player is registered in."
+          },
+          "team": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ],
+            "description": "Gets the team this player belongs to, if assigned.",
+            "nullable": true
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Gets the player's full name.",
+            "readOnly": true
+          },
+          "jerseyNumberLabel": {
+            "type": "string",
+            "description": "Gets the formatted jersey number label.",
+            "readOnly": true
+          },
+          "isGoalie": {
+            "type": "boolean",
+            "description": "Gets whether the player is a goalie.",
+            "readOnly": true
+          },
+          "height": {
+            "type": "string",
+            "description": "Gets or sets the player's formatted height (e.g. \"6'1\").",
+            "nullable": true
+          },
+          "weight": {
+            "type": "integer",
+            "description": "Gets or sets the player's weight.",
+            "format": "int32",
+            "nullable": true
+          },
+          "gameByGame": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerGameByGame"
+            },
+            "description": "Gets the player's game-by-game stat history."
+          },
+          "tournamentStats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerTournamentStats"
+            },
+            "description": "Gets the player's aggregated stats per tournament."
+          },
+          "gameAvailabilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerGameAvailabilityDto"
+            },
+            "description": "Gets the player's availability for each game in their tournament, ordered by game time."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Detailed player DTO for the draft, extending the single-player view with per-game availability."
+      },
       "DraftRankingDto": {
         "required": [
           "player",
@@ -12425,6 +12674,13 @@
           "isExcluded": {
             "type": "boolean",
             "description": "Gets or sets whether the player is excluded from this draft's pool."
+          },
+          "gameAvailabilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerGameAvailabilityDto"
+            },
+            "description": "Gets or sets the player's availability for each tournament game, ordered by game time."
           }
         },
         "additionalProperties": false,
@@ -14032,6 +14288,36 @@
           }
         },
         "additionalProperties": false
+      },
+      "PlayerGameAvailabilityDto": {
+        "required": [
+          "gameId",
+          "gameTime"
+        ],
+        "type": "object",
+        "properties": {
+          "gameId": {
+            "type": "integer",
+            "description": "Gets the game the availability applies to.",
+            "format": "int32"
+          },
+          "gameTime": {
+            "type": "string",
+            "description": "Gets the scheduled time of the game.",
+            "format": "date-time"
+          },
+          "availability": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameAvailability"
+              }
+            ],
+            "description": "Gets the player's availability for the game, or null if they have not responded.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a player's availability for a single game, including the game time. A null availability means the player has not responded."
       },
       "PlayerGameByGame": {
         "required": [

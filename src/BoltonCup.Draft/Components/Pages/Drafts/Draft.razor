@@ -1,5 +1,6 @@
 @page "/drafts/{DraftId:int}"
 @using BoltonCup.Draft.Services
+@using NavigationContext = MudBlazor.NavigationContext
 @layout Layout.DraftLayout
 @implements IDisposable
 @inject DraftStateService DraftState
@@ -38,6 +39,15 @@ else if (DraftState.Draft is not null)
             <DraftDataGrid/>
         </div>
     }
+}
+else if (DraftState.Draft is null)
+{
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            We were unable to find that draft...
+            <MudLink Href="/" Color="Color.Info"><b>Go back</b></MudLink>
+        </MudAlert>
+    </MudContainer>
 }
 
 @code {

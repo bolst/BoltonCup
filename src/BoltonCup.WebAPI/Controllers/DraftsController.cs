@@ -13,6 +13,7 @@ namespace BoltonCup.WebAPI.Controllers;
 /// <summary>Manages draft creation, state transitions, pick submissions, and player rankings.</summary>
 public class DraftsController(
     IDraftService _draftService,
+    IPlayerRepository _players,
     IMapper _mapper,
     IAuthorizationService _authService
 ) : BoltonCupControllerBase
@@ -297,7 +298,23 @@ public class DraftsController(
         var favouritePlayerIds = User.GetAccountIdOrDefault() is { } accountId
             ? await _draftService.GetFavouritePlayerIdsAsync(id, accountId)
             : new HashSet<int>();
-        return Ok(_mapper.ToDtoList(rankings, favouritePlayerIds));
+        var availability = rankings.Items.FirstOrDefault()?.TournamentId is { } tournamentId
+            ? await _draftService.GetTournamentAvailabilityAsync(tournamentId)
+            : new TournamentAvailability([], new Dictionary<int, IReadOnlyDictionary<int, GameAvailability>>());
+        return Ok(_mapper.ToDtoList(rankings, favouritePlayerIds, availability));
+    }
+
+    /// <summary>Gets a detailed player card (profile, career stats, and per-game availability) for the draft.</summary>
+    [AllowAnonymous]
+    [HttpGet("{id:int}/players/{playerId:int}")]
+    public async Task<ActionResult<DraftPlayerSingleDto>> GetDraftPlayer(int id, int playerId)
+    {
+        var player = await _players.GetByIdAsync(playerId);
+        if (player is null)
+            return OkOrNoContent<DraftPlayerSingleDto>(null);
+
+        var availability = await _draftService.GetTournamentAvailabilityAsync(player.TournamentId);
+        return OkOrNoContent(_mapper.ToDraftPlayerDto(player, availability));
     }
 
     /// <summary>Sets the draft's player pool (ordering + exclusions) before it starts and broadcasts it (admin or draft owner).</summary>

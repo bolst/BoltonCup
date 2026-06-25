@@ -211,7 +211,7 @@ public class Mapper : IMapper
         });
     }
 
-    public IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings, IReadOnlySet<int> favouritePlayerIds)
+    public IPagedList<DraftRankingDto> ToDtoList(IPagedList<PlayerDraftRanking> rankings, IReadOnlySet<int> favouritePlayerIds, TournamentAvailability availability)
     {
         return rankings.ProjectTo(draft => new DraftRankingDto
         {
@@ -229,7 +229,24 @@ public class Mapper : IMapper
             PointsPerGame = draft.PointsPerGame,
             IsFavourite = favouritePlayerIds.Contains(draft.PlayerId),
             IsExcluded = draft.IsExcluded,
+            GameAvailabilities = BuildAvailability(availability, draft.Player.AccountId),
         });
+    }
+
+    private static IReadOnlyList<PlayerGameAvailabilityDto> BuildAvailability(TournamentAvailability? availability, int accountId)
+    {
+        if (availability is null)
+            return [];
+
+        availability.ByAccount.TryGetValue(accountId, out var responses);
+        return availability.Games
+            .Select(game => new PlayerGameAvailabilityDto
+            {
+                GameId = game.GameId,
+                GameTime = game.GameTime,
+                Availability = responses is not null && responses.TryGetValue(game.GameId, out var a) ? a : null,
+            })
+            .ToList();
     }
 
     public DraftSingleDto? ToDto(Draft? draft, bool isAuthorized, bool canManage)
@@ -763,6 +780,33 @@ public class Mapper : IMapper
             Team = player.Team == null ? null : ToTeamBriefDto(player.Team),
             TournamentStats = ToPlayerTournamentStatsDto(player),
             GameByGame = ToPlayerGameByGameDtos(player),
+        };
+    }
+
+    public DraftPlayerSingleDto? ToDraftPlayerDto(Player? player, TournamentAvailability availability)
+    {
+        if (ToDto(player) is not { } basePlayer)
+            return null;
+
+        return new DraftPlayerSingleDto
+        {
+            Id = basePlayer.Id,
+            AccountId = basePlayer.AccountId,
+            Position = basePlayer.Position,
+            JerseyNumber = basePlayer.JerseyNumber,
+            FirstName = basePlayer.FirstName,
+            LastName = basePlayer.LastName,
+            Birthday = basePlayer.Birthday,
+            ProfilePicture = basePlayer.ProfilePicture,
+            BannerPicture = basePlayer.BannerPicture,
+            PreferredBeer = basePlayer.PreferredBeer,
+            Height = basePlayer.Height,
+            Weight = basePlayer.Weight,
+            Tournament = basePlayer.Tournament,
+            Team = basePlayer.Team,
+            TournamentStats = basePlayer.TournamentStats,
+            GameByGame = basePlayer.GameByGame,
+            GameAvailabilities = BuildAvailability(availability, player!.AccountId),
         };
     }
 

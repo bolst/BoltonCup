@@ -1,27 +1,114 @@
 @namespace BoltonCup.Draft.Components.Shared
+@using BoltonCup.Draft.Services
 @inject IBoltonCupApi BoltonCupApi
+@inject DraftStateService DraftState
 
 
-<MudDialog Style="height: 500px">
+<MudDialog>
     <DialogContent>
         @if (_loading)
         {
-            <MudSkeleton Height="100%" Width="100%" SkeletonType="SkeletonType.Rectangle" />
+            <MudSkeleton Height="240px" Width="100%" SkeletonType="SkeletonType.Rectangle" />
         }
         else if (_player is not null)
         {
-            <MudStack AlignItems="AlignItems.Center" Spacing="6" Row>
-                <MudImage Src="@_player.ProfilePicture" Height="128" />
-                <div class="d-flex flex-column justify-space-between">
-                    <MudText Typo="Typo.h4"><b>@_player.FullName</b></MudText>
-                    <PositionChip Position="@_player.Position" />
-                    @if (_player.Team is null)
+            <MudStack Spacing="4">
+                <MudStack AlignItems="AlignItems.Center" Spacing="6" Row>
+                    <MudImage Src="@_player.ProfilePicture" Height="128" />
+                    <div class="d-flex flex-column justify-space-between gap-2">
+                        <MudText Typo="Typo.h4"><b>@_player.FullName</b></MudText>
+                        <div class="d-flex flex-row align-center gap-2">
+                            <PositionChip Position="@_player.Position" />
+                            @if (_draftPick is { } draftPick)
+                            {
+                                <MudImage Src="@draftPick.Team.Logo" Width="36" />
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.body2">FREE AGENT</MudText>
+                            }
+                        </div>
+                        <div class="d-flex flex-row align-center gap-4">
+                            @if (_player.Birthday is { } birthday)
+                            {
+                                <MudText Typo="Typo.body2"><b>Born</b> @birthday.Year</MudText>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(_player.Height))
+                            {
+                                <MudText Typo="Typo.body2"><b>Height</b> @_player.Height</MudText>
+                            }
+                            @if (_player.Weight is { } weight)
+                            {
+                                <MudText Typo="Typo.body2"><b>Weight</b> @weight lbs</MudText>
+                            }
+                        </div>
+                    </div>
+                </MudStack>
+
+                <div>
+                    <MudText Typo="Typo.subtitle2" Class="mb-1"><b>Career stats</b></MudText>
+                    <MudSimpleTable Dense Bordered Striped Style="overflow-x: auto">
+                        <thead>
+                            <tr>
+                                <th>GP</th>
+                                @if (_player.IsGoalie)
+                                {
+                                    <th>W</th>
+                                    <th>SO</th>
+                                    <th>GAA</th>
+                                }
+                                else
+                                {
+                                    <th>G</th>
+                                    <th>A</th>
+                                    <th>P</th>
+                                    <th>PIM</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@_gamesPlayed</td>
+                                @if (_player.IsGoalie)
+                                {
+                                    <td>@_wins</td>
+                                    <td>@_shutouts</td>
+                                    <td>@(_gaa?.ToString("F2") ?? "-")</td>
+                                }
+                                else
+                                {
+                                    <td>@_goals</td>
+                                    <td>@_assists</td>
+                                    <td>@_points</td>
+                                    <td>@_penaltyMinutes</td>
+                                }
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </div>
+
+                <div>
+                    <div class="d-flex flex-row align-center gap-2 mb-1">
+                        <MudText Typo="Typo.subtitle2"><b>Game availability</b></MudText>
+                        <AvailabilityIndicator Availabilities="@_player.GameAvailabilities" Size="Size.Small" />
+                    </div>
+                    @if (_games.Count == 0)
                     {
-                        <MudText>FREE AGENT</MudText>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">No games scheduled.</MudText>
                     }
                     else
                     {
-                        <MudImage Src="@_player.Team.Logo" Width="36" />
+                        <MudStack Spacing="1">
+                            @foreach (var game in _games)
+                            {
+                                <div class="d-flex flex-row align-center gap-2">
+                                    <MudIcon Icon="@AvailabilityIcon(game.Availability)" Color="@AvailabilityColor(game.Availability)" Size="Size.Small" />
+                                    <MudText Typo="Typo.body2">
+                                        @game.GameTime.ToLocalTime().ToString("ddd MMM d, h:mm tt") - @AvailabilityText(game.Availability)
+                                    </MudText>
+                                </div>
+                            }
+                        </MudStack>
                     }
                 </div>
             </MudStack>
@@ -36,22 +123,29 @@
     public IMudDialogInstance Dialog { get; set; } = null!;
 
     [Parameter]
+    public required int DraftId { get; set; }
+
+    [Parameter]
     public required int PlayerId { get; set; }
 
-    private int? _playerId;
+    private (int DraftId, int PlayerId)? _loadedKey;
 
     private bool _loading;
-    
-    private Sdk.PlayerSingleDto? _player;
+
+    private Sdk.DraftPlayerSingleDto? _player;
+    private Sdk.DraftPickBriefDto? _draftPick;
+    private List<Sdk.PlayerGameAvailabilityDto> _games = [];
+
+    private int _gamesPlayed, _goals, _assists, _points, _penaltyMinutes, _wins, _shutouts;
+    private double? _gaa;
 
     protected override Task OnInitializedAsync()
     {
         return Dialog.SetOptionsAsync(Dialog.Options with
         {
-            NoHeader = true,
             BackdropClick = true,
             CloseOnEscapeKey = true,
-            CloseButton = false,
+            CloseButton = true,
             MaxWidth = MaxWidth.Medium,
             FullWidth = true,
         });
@@ -59,18 +153,64 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (_playerId == PlayerId)
+        if (_loadedKey == (DraftId, PlayerId))
             return;
-        _playerId = PlayerId;
+        _loadedKey = (DraftId, PlayerId);
 
         _loading = true;
-        
-        _player = await BoltonCupApi.GetPlayerByIdAsync(PlayerId);
+
+        _player = await BoltonCupApi.GetDraftPlayerAsync(DraftId, PlayerId);
         if (_player is null)
+        {
             Dialog.Close();
-        
+        }
+        else
+        {
+            _draftPick = DraftState.PlayerRankings.FirstOrDefault(r => r.Player.Id == PlayerId)?.DraftPick;
+            _games = _player.GameAvailabilities.OrderBy(g => g.GameTime).ToList();
+            ComputeCareerTotals(_player.TournamentStats);
+        }
+
         _loading = false;
         await InvokeAsync(StateHasChanged);
     }
+
+    private void ComputeCareerTotals(IEnumerable<Sdk.PlayerTournamentStats> stats)
+    {
+        var list = stats.ToList();
+        _gamesPlayed = list.Sum(s => s.GamesPlayed);
+        _goals = list.Sum(s => s.Goals);
+        _assists = list.Sum(s => s.Assists);
+        _points = list.Sum(s => s.Points);
+        _penaltyMinutes = list.Sum(s => s.PenaltyMinutes);
+        _wins = list.Sum(s => s.Wins);
+        _shutouts = list.Sum(s => s.Shutouts);
+        var gaas = list.Where(s => s.GoalsAgainstAverage is not null).Select(s => s.GoalsAgainstAverage!.Value).ToList();
+        _gaa = gaas.Count > 0 ? gaas.Average() : null;
+    }
+
+    private static string AvailabilityIcon(Sdk.GameAvailability? availability) => availability switch
+    {
+        Sdk.GameAvailability.In => Icons.Material.Rounded.CheckCircle,
+        Sdk.GameAvailability.Maybe => Icons.Material.Rounded.Help,
+        Sdk.GameAvailability.Out => Icons.Material.Rounded.Cancel,
+        _ => Icons.Material.Rounded.RadioButtonUnchecked,
+    };
+
+    private static Color AvailabilityColor(Sdk.GameAvailability? availability) => availability switch
+    {
+        Sdk.GameAvailability.In => Color.Success,
+        Sdk.GameAvailability.Maybe => Color.Warning,
+        Sdk.GameAvailability.Out => Color.Error,
+        _ => Color.Default,
+    };
+
+    private static string AvailabilityText(Sdk.GameAvailability? availability) => availability switch
+    {
+        Sdk.GameAvailability.In => "In",
+        Sdk.GameAvailability.Maybe => "Maybe",
+        Sdk.GameAvailability.Out => "Out",
+        _ => "No response",
+    };
 
 }
