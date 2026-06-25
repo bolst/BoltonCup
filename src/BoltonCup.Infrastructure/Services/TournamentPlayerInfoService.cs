@@ -55,7 +55,8 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
         var teamGameIds = player.TeamId is { } teamId
             ? await _dbContext.Games
                 .AsNoTracking()
-                .Where(g => g.TournamentId == command.TournamentId && (g.HomeTeamId == teamId || g.AwayTeamId == teamId))
+                .Where(g => g.TournamentId == command.TournamentId)
+                .Where(g => g.HomeTeamId == teamId || g.AwayTeamId == teamId || g.HomeTeamId == null || g.AwayTeamId == null)
                 .Select(g => g.Id)
                 .ToListAsync(cancellationToken)
             : [];
