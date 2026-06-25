@@ -1,3 +1,4 @@
+@using System.Security.Claims
 @using BoltonCup.Draft.Services
 @using BoltonCup.Sdk
 @namespace BoltonCup.Draft.Components.Shared
@@ -6,6 +7,7 @@
 @inject IBoltonCupApi BoltonCupApi
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthStateProvider
 
 <div class="mud-height-full mud-width-full">
     <PlayerRankingsDataGrid
@@ -14,7 +16,7 @@
         ActionIcon="@Icons.Material.Rounded.Add"
         OnAction="@DraftPlayerAsync"
         ActionVisible="@(r => !r.IsDrafted)"
-        ActionDisabled="@(_ => DraftState.Draft?.Status != DraftStatus.InProgress || DraftState.IsAutoPicking)">
+        ActionDisabled="@(_ => !CanDraftCurrentPick())">
         <ToolbarExtras>
             @if (DraftState.CanManageDraft && DraftState.AvailableCustomRankings.Count > 0)
             {
@@ -53,12 +55,25 @@
 
 @code {
 
-    protected override void OnInitialized()
+    private ClaimsPrincipal? _user;
+
+    protected override async Task OnInitializedAsync()
     {
         DraftState.OnStateChanged += HandleStateChanged;
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        _user = authState.User;
     }
 
     private void HandleStateChanged() => InvokeAsync(StateHasChanged);
+
+    private bool CanDraftCurrentPick()
+    {
+        if (DraftState.Draft?.Status != DraftStatus.InProgress || DraftState.IsAutoPicking)
+            return false;
+        if (DraftState.CurrentPick is not { } pick)
+            return false;
+        return DraftState.CanManageDraft || (_user?.IsGmForTeam(pick.Team.Id) ?? false);
+    }
 
     private async Task DraftPlayerAsync(DraftRankingDto ranking)
     {
