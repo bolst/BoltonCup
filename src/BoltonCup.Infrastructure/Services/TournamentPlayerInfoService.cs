@@ -20,22 +20,25 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
             .FirstOrDefaultAsync(p => p.AccountId == accountId && p.TournamentId == tournamentId, cancellationToken)
             ?? throw new AccountNotInTournamentException(accountId, tournamentId);
 
-        if (player.TeamId is not { } teamId)
-        {
-            return new TournamentPlayerInfoContext(info, []);
-        }
-
-        var teamGames = await _dbContext.Games
+        var gamesQuery = _dbContext.Games
             .AsNoTracking()
             .Include(g => g.Tournament)
             .Include(g => g.HomeTeam)
             .Include(g => g.AwayTeam)
-            .Where(g => g.TournamentId == tournamentId)
-            .Where(g => g.HomeTeamId == teamId || g.AwayTeamId == teamId || (g.HomeTeamId == null && g.AwayTeamId == null))
+            .Where(g => g.TournamentId == tournamentId);
+
+        // Filter to the player's games only once they have a team; undrafted players see every game.
+        if (player.TeamId is { } teamId)
+        {
+            gamesQuery = gamesQuery.Where(g =>
+                g.HomeTeamId == teamId || g.AwayTeamId == teamId || (g.HomeTeamId == null && g.AwayTeamId == null));
+        }
+
+        var games = await gamesQuery
             .OrderBy(g => g.GameTime)
             .ToListAsync(cancellationToken);
 
-        return new TournamentPlayerInfoContext(info, teamGames);
+        return new TournamentPlayerInfoContext(info, games);
     }
 
     public async Task UpsertAsync(UpsertTournamentPlayerInfoCommand command,
@@ -52,17 +55,23 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
                 .FirstOrDefaultAsync(p => p.AccountId == command.AccountId && p.TournamentId == command.TournamentId, cancellationToken)
             ?? throw new AccountNotInTournamentException(command.AccountId, command.TournamentId);
 
-        var teamGameIds = player.TeamId is { } teamId
-            ? await _dbContext.Games
-                .AsNoTracking()
-                .Where(g => g.TournamentId == command.TournamentId)
-                .Where(g => g.HomeTeamId == teamId || g.AwayTeamId == teamId || g.HomeTeamId == null || g.AwayTeamId == null)
-                .Select(g => g.Id)
-                .ToListAsync(cancellationToken)
-            : [];
+        var validGameIdsQuery = _dbContext.Games
+            .AsNoTracking()
+            .Where(g => g.TournamentId == command.TournamentId);
+
+        // Filter to the player's games only once they have a team; undrafted players can set every game.
+        if (player.TeamId is { } teamId)
+        {
+            validGameIdsQuery = validGameIdsQuery.Where(g =>
+                g.HomeTeamId == teamId || g.AwayTeamId == teamId || g.HomeTeamId == null || g.AwayTeamId == null);
+        }
+
+        var validGameIds = await validGameIdsQuery
+            .Select(g => g.Id)
+            .ToListAsync(cancellationToken);
 
         var availabilities = command.GameAvailability
-            .Where(a => teamGameIds.Contains(a.GameId))
+            .Where(a => validGameIds.Contains(a.GameId))
             .GroupBy(a => a.GameId)
             .ToDictionary(g => g.Key, g => g.Last().Availability);
 
