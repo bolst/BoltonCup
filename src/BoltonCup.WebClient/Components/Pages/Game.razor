@@ -104,6 +104,33 @@
                         </MudSimpleTable>
                     }
                 </MudPaper>
+                @if (_game is not null)
+                {
+                    <MudPaper Class="pa-4 mt-3" Elevation="0" Square Outlined>
+                        <MudText Typo="Typo.h6"><b>Game Info</b></MudText>
+                        <MudDivider Class="my-2"/>
+                        <MudSimpleTable Class="game-info-table" Elevation="0" Square Dense>
+                            <tbody>
+                            <tr>
+                                <td>LOCATION</td>
+                                <td><b>@_game.Venue (@_game.Rink)</b></td>
+                            </tr>
+                            @if (_game.Officials.Count > 0 || true)
+                            {
+                                <tr>
+                                    <td class="d-flex">OFFICIALS</td>
+                                    <td>
+                                        @foreach (var official in _game.Officials)
+                                        {
+                                            <div><b>@official.FullName</b></div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </MudSimpleTable>
+                    </MudPaper>
+                }
             </MudItem>
         </MudGrid>
     </MudContainer>
@@ -112,6 +139,11 @@
 <style>
     .line-score-table * tr td, .line-score-table * tr th {
         padding: 6px 6px !important;
+    }
+
+    .game-info-table * tr td, .game-info-table * tr th {
+        padding-bottom: 20px !important;
+        border-bottom: 0 !important;
     }
 </style>
 

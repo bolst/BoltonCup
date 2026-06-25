@@ -509,6 +509,11 @@ public class Mapper : IMapper
                 Highlights = game.Highlights
                     .Select(ToGameHighlightDto)
                     .ToList(),
+                Officials = game.Referees
+                    .OrderBy(r => r.LastName)
+                    .ThenBy(r => r.FirstName)
+                    .Select(ToRefereeDto)
+                    .ToList(),
                 PlayersToWatch = homeStats.Count == 0 || awayStats.Count == 0 ? [] :
                 [
                     ToGameStatLeaderDto("Points",  homeStats.MaxBy(x => x.Points),  awayStats.MaxBy(x => x.Points),  x => x.Points),
@@ -517,6 +522,13 @@ public class Mapper : IMapper
                 ],
             };
     }
+
+    private static RefereeDto ToRefereeDto(Referee referee) => new()
+    {
+        Id = referee.Id,
+        FirstName = referee.FirstName,
+        LastName = referee.LastName,
+    };
 
     private List<GameStarDto> GetGameStarDtos(Game game)
     {

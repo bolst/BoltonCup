@@ -44,6 +44,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<EmailLog> EmailLogs { get; set; }
     public DbSet<Trade> Trades { get; set; }
     public DbSet<TradePlayer> TradePlayers { get; set; }
+    public DbSet<Referee> Referees { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -237,6 +238,14 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.AwayTeam)
                 .WithMany(e => e.AwayGames)
                 .HasForeignKey(e => e.AwayTeamId);
+            entity
+                .HasMany(g => g.Referees)
+                .WithMany(r => r.Games)
+                .UsingEntity(
+                    "game_referees",
+                    l => l.HasOne(typeof(Referee)).WithMany().HasForeignKey("referee_id"),
+                    r => r.HasOne(typeof(Game)).WithMany().HasForeignKey("game_id"),
+                    j => j.ToTable("game_referees"));
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.GameTime).HasColumnName("game_time");
@@ -963,6 +972,16 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.BroadcastId).HasColumnName("broadcast_id");
         });
 
+        modelBuilder.Entity<Referee>(entity =>
+        {
+            entity
+                .ToTable("referees")
+                .HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.FirstName).HasColumnName("first_name");
+            entity.Property(e => e.LastName).HasColumnName("last_name");
+            entity.Ignore(e => e.FullName);
+        });
 
         // entities deriving from EntityBase should have created_at = now() by default
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())

@@ -13176,6 +13176,7 @@
           "goals",
           "highlights",
           "id",
+          "officials",
           "penalties",
           "stars",
           "tournament"
@@ -13281,6 +13282,13 @@
               "$ref": "#/components/schemas/GameHighlightDto"
             },
             "description": "Gets the list of highlight videos for the game."
+          },
+          "officials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RefereeDto"
+            },
+            "description": "Gets the officials (referees) assigned to the game."
           },
           "playersToWatch": {
             "type": "array",
@@ -14735,6 +14743,36 @@
         },
         "additionalProperties": false,
         "description": "A single playable track in a game playlist."
+      },
+      "RefereeDto": {
+        "required": [
+          "firstName",
+          "id",
+          "lastName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets the referee's ID.",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Gets the referee's first name."
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Gets the referee's last name."
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Gets the referee's full name.",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO for a referee officiating a game."
       },
       "RegisterRequest": {
         "required": [

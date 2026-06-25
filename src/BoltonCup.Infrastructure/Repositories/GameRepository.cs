@@ -54,6 +54,7 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
             .Include(p => p.Highlights.Take(3))
                 .ThenInclude(h => h.Player)
                 .ThenInclude(p => p!.Account)
+            .Include(p => p.Referees)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken: cancellationToken);
     }
 }

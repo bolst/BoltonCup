@@ -1,0 +1,103 @@
+@namespace BoltonCup.Admin.Components.Shared
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Assign officials</MudText>
+        @if (!string.IsNullOrEmpty(GameLabel))
+        {
+            <MudText Typo="Typo.body2" Class="mud-text-secondary">@GameLabel</MudText>
+        }
+
+        <MudDivider Class="my-2" />
+
+        <MudSelect T="Referee"
+                   Label="Referees"
+                   MultiSelection="true"
+                   @bind-SelectedValues="_selected"
+                   Comparer="_comparer"
+                   ToStringFunc="r => r?.FullName"
+                   Dense
+                   AnchorOrigin="Origin.BottomCenter">
+            @foreach (var referee in _allReferees)
+            {
+                <MudSelectItem T="Referee" Value="referee">@referee.FullName</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Dialog.Cancel">Cancel</MudButton>
+        <MudButton OnClick="@Save" Color="Color.Primary" Disabled="@_saving">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter]
+    public int GameId { get; set; }
+
+    [Parameter]
+    public string? GameLabel { get; set; }
+
+    private static readonly RefereeComparer _comparer = new();
+
+    private List<Referee> _allReferees = [];
+    private IReadOnlyCollection<Referee> _selected = new HashSet<Referee>();
+    private bool _saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            NoHeader = true,
+            BackdropClick = false,
+            MaxWidth = MaxWidth.ExtraSmall,
+            FullWidth = true
+        });
+
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        _allReferees = await dbContext.Referees
+            .OrderBy(r => r.LastName)
+            .ThenBy(r => r.FirstName)
+            .ToListAsync();
+
+        var assignedIds = await dbContext.Games
+            .Where(g => g.Id == GameId)
+            .SelectMany(g => g.Referees.Select(r => r.Id))
+            .ToListAsync();
+
+        _selected = _allReferees.Where(r => assignedIds.Contains(r.Id)).ToHashSet();
+    }
+
+    private async Task Save()
+    {
+        _saving = true;
+
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        var game = await dbContext.Games
+            .Include(g => g.Referees)
+            .FirstOrDefaultAsync(g => g.Id == GameId);
+
+        if (game is null)
+        {
+            Dialog.Close(DialogResult.Ok(false));
+            return;
+        }
+
+        var selectedIds = _selected.Select(r => r.Id).ToHashSet();
+        var referees = await dbContext.Referees
+            .Where(r => selectedIds.Contains(r.Id))
+            .ToListAsync();
+
+        game.Referees = referees;
+        await dbContext.SaveChangesAsync();
+
+        Dialog.Close(DialogResult.Ok(true));
+    }
+
+}

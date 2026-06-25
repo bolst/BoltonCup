@@ -1,0 +1,24 @@
+@page "/referees"
+
+<EntityDataGrid
+    @ref="_dataGrid"
+    T="Referee"
+    SearchBy="x => x.FirstName + ' ' + x.LastName"
+    NewItemFunc="NewItemFunc"
+    ColumnResizeMode="ResizeMode.Column"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="First Name" Property="x => x.FirstName" Editable="true"/>
+        <PropertyColumn Title="Last Name" Property="x => x.LastName" Editable="true" InitialDirection="SortDirection.Ascending"/>
+    </Columns>
+</EntityDataGrid>
+
+@code {
+
+    private EntityDataGrid<Referee>? _dataGrid;
+    private static readonly RefereeComparer _comparer = new();
+
+    private static Task<Referee?> NewItemFunc()
+        => Task.FromResult<Referee?>(new Referee { FirstName = string.Empty, LastName = string.Empty });
+
+}
