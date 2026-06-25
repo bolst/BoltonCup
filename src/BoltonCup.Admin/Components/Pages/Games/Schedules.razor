@@ -1,10 +1,11 @@
 @page "/games/schedules"
+@inject IDialogService DialogService
 
 <EntityDataGrid
     T="Game"
     @ref="@_dataGrid"
     NewItemFunc="NewItemFunc"
-    Include="x => x.Include(p => p.Goals).Include(p => p.Penalties)"
+    Include="x => x.Include(p => p.Goals).Include(p => p.Penalties).Include(p => p.Referees)"
     Comparer="_comparer">
     <Columns>
         <ForeignColumn Title="Home" Property="x => x.HomeTeam" PropertySetter="(game, team) => game.HomeTeam = team" 
@@ -22,6 +23,14 @@
         <PropertyColumn Title="Rink" Property="x => x.Rink"/>
         <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament!"
                        EqualityComparer="new TournamentComparer()!" ImageSrcFunc="t => t.Logo" />
+        <TemplateColumn Title="Officials" Sortable="false" Editable="false">
+            <CellTemplate>
+                <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Info"
+                           OnClick="@(() => EditReferees(context.Item))">
+                    Edit (@context.Item.Referees.Count)
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
     </Columns>
     <ChildRowContent>
         @{
@@ -49,6 +58,23 @@
             TournamentId = 1,
             GameTime = DateTime.Now,
         };
+    }
+
+    private async Task EditReferees(Game game)
+    {
+        var dialog = await DialogService.ShowAsync<AssignRefereesDialog>(
+            "Assign officials",
+            new DialogParameters<AssignRefereesDialog>
+            {
+                { x => x.GameId, game.Id },
+                { x => x.GameLabel, game.ToString() },
+            });
+
+        var result = await dialog.Result;
+        if (result?.Data is true)
+        {
+            await _dataGrid.ReloadAsync();
+        }
     }
     
     protected override async Task OnAfterRenderAsync(bool firstRender)

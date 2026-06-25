@@ -23,6 +23,7 @@ public class Game : EntityBase
     public ICollection<GoalieStat> GoalieGameLogs { get; set; } = [];
     public ICollection<GameHighlight> Highlights { get; set; } = [];
     public ICollection<GameStar> Stars { get; set; } = [];
+    public ICollection<Referee> Referees { get; set; } = [];
 
     public override string ToString()
     {
