@@ -52,9 +52,15 @@
     </MudTable>
     
     <MudMenu @ref="@_contextMenu" id="_contextMenu" Modal="true" Style="position:fixed;top:0;left:0;width:1px;height:1px" PositionAtCursor>
-        <MudMenuItem Icon="@Icons.Material.Rounded.SwapHoriz" OnClick="@OpenReplacePickDialog">
-            Change pick
+        <MudMenuItem Icon="@Icons.Material.Rounded.Visibility" OnClick="@OpenPlayerCardDialog">
+            Show Player Card
         </MudMenuItem>
+        @if (DraftState.CanManageDraft)
+        {
+            <MudMenuItem Icon="@Icons.Material.Rounded.SwapHoriz" OnClick="@OpenReplacePickDialog">
+                Change pick
+            </MudMenuItem>
+        }
     </MudMenu>
 }
 
@@ -73,12 +79,26 @@
 
     private Task OnCellClick(MouseEventArgs args, Sdk.DraftPickDto draftPick)
     {
-        // Only the draft owner/admin can change a pick, and only filled picks can be replaced.
-        if (!DraftState.CanManageDraft || draftPick.Player is null)
+        // The context menu (player card, and pick management for owners/admins) only applies to filled picks.
+        if (draftPick.Player is null)
             return Task.CompletedTask;
 
         _contextDraftPick = draftPick;
         return _contextMenu.OpenMenuAsync(args);
+    }
+
+    private Task OpenPlayerCardDialog()
+    {
+        if (_contextDraftPick?.Player is not { } player)
+            return Task.CompletedTask;
+
+        return DialogService.ShowAsync<PlayerDialog>(
+            null,
+            new DialogParameters<PlayerDialog>
+            {
+                { x => x.DraftId, DraftState.Draft!.Id },
+                { x => x.PlayerId, player.Id }
+            });
     }
 
     private Task OpenReplacePickDialog()

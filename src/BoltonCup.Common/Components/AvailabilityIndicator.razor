@@ -1,0 +1,92 @@
+@namespace BoltonCup.Common.Components
+@using BoltonCup.Sdk
+
+<MudTooltip Arrow Placement="Placement.Top">
+    <ChildContent>
+        <MudIcon Icon="@_icon" Color="@_color" Size="@Size" />
+    </ChildContent>
+    <TooltipContent>
+        @if (_games.Count == 0)
+        {
+            <MudText Typo="Typo.caption">No games scheduled</MudText>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-1 pa-1">
+                @foreach (var game in _games)
+                {
+                    <div class="d-flex flex-row align-center gap-2">
+                        <MudIcon Icon="@IconFor(game.Availability)" Color="@ColorFor(game.Availability)" Size="Size.Small" />
+                        <MudText Typo="Typo.caption">
+                            @game.GameTime.ToLocalTime().ToString("ddd MMM d") - @TextFor(game.Availability)
+                        </MudText>
+                    </div>
+                }
+            </div>
+        }
+    </TooltipContent>
+</MudTooltip>
+
+@code {
+
+    [Parameter]
+    public IEnumerable<PlayerGameAvailabilityDto>? Availabilities { get; set; }
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+    private List<PlayerGameAvailabilityDto> _games = [];
+    private string _icon = IconFor(null);
+    private Color _color = ColorFor(null);
+
+    protected override void OnParametersSet()
+    {
+        _games = (Availabilities ?? []).OrderBy(g => g.GameTime).ToList();
+
+        // Quadstate precedence: Out > Maybe > Unanswered > In.
+        GameAvailability? overall;
+        if (_games.Any(g => g.Availability == GameAvailability.Out))
+        {
+            overall = GameAvailability.Out;
+        }
+        else if (_games.Any(g => g.Availability == GameAvailability.Maybe))
+        {
+            overall = GameAvailability.Maybe;
+        }
+        else if (_games.Count == 0 || _games.Any(g => g.Availability is null))
+        {
+            overall = null; // unanswered
+        }
+        else
+        {
+            overall = GameAvailability.In;
+        }
+
+        _icon = IconFor(overall);
+        _color = ColorFor(overall);
+    }
+
+    private static string IconFor(GameAvailability? availability) => availability switch
+    {
+        GameAvailability.In => Icons.Material.Rounded.CheckCircle,
+        GameAvailability.Maybe => Icons.Material.Rounded.Help,
+        GameAvailability.Out => Icons.Material.Rounded.Cancel,
+        _ => Icons.Material.Rounded.RadioButtonUnchecked,
+    };
+
+    private static Color ColorFor(GameAvailability? availability) => availability switch
+    {
+        GameAvailability.In => Color.Success,
+        GameAvailability.Maybe => Color.Warning,
+        GameAvailability.Out => Color.Error,
+        _ => Color.Default,
+    };
+
+    private static string TextFor(GameAvailability? availability) => availability switch
+    {
+        GameAvailability.In => "In",
+        GameAvailability.Maybe => "Maybe",
+        GameAvailability.Out => "Out",
+        _ => "No response",
+    };
+}

@@ -14,13 +14,14 @@ namespace BoltonCup.WebAPI.Tests.Controllers;
 public class DraftsControllerTests
 {
     private readonly Mock<IDraftService> _draftService = new();
+    private readonly Mock<IPlayerRepository> _players = new();
     private readonly Mock<IMapper> _mapper = new();
     private readonly Mock<IAuthorizationService> _authService = new();
     private readonly DraftsController _controller;
 
     public DraftsControllerTests()
     {
-        _controller = new DraftsController(_draftService.Object, _mapper.Object, _authService.Object);
+        _controller = new DraftsController(_draftService.Object, _players.Object, _mapper.Object, _authService.Object);
     }
 
     private void SetupAuthSuccess()
@@ -152,8 +153,10 @@ public class DraftsControllerTests
         var query = new GetDraftRankingsQuery();
 
         _controller.ControllerContext = ClaimsHelper.WithAdminRole();
-        _draftService.Setup(s => s.GetDraftRankingsAsync(5, It.IsAny<GetDraftRankingsQuery>())).ReturnsAsync(Mock.Of<IPagedList<PlayerDraftRanking>>());
-        _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<PlayerDraftRanking>>(), It.IsAny<IReadOnlySet<int>>())).Returns(Mock.Of<IPagedList<DraftRankingDto>>());
+        var rankings = new Mock<IPagedList<PlayerDraftRanking>>();
+        rankings.Setup(r => r.Items).Returns([]);
+        _draftService.Setup(s => s.GetDraftRankingsAsync(5, It.IsAny<GetDraftRankingsQuery>())).ReturnsAsync(rankings.Object);
+        _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<PlayerDraftRanking>>(), It.IsAny<IReadOnlySet<int>>(), It.IsAny<TournamentAvailability>())).Returns(Mock.Of<IPagedList<DraftRankingDto>>());
 
         var result = await _controller.GetDraftPlayerRankings(5, query);
 

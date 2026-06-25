@@ -31,4 +31,6 @@ public sealed record DraftRankingDto
     public bool IsFavourite { get; set; }
     /// <summary>Gets or sets whether the player is excluded from this draft's pool.</summary>
     public bool IsExcluded { get; set; }
+    /// <summary>Gets or sets the player's availability for each tournament game, ordered by game time.</summary>
+    public IReadOnlyList<PlayerGameAvailabilityDto> GameAvailabilities { get; set; } = [];
 }

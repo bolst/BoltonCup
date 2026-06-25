@@ -407,6 +407,33 @@ public class DraftService(
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }
 
+    public async Task<TournamentAvailability> GetTournamentAvailabilityAsync(int tournamentId,
+        CancellationToken cancellationToken = default)
+    {
+        var games = await _dbContext.Games
+            .AsNoTracking()
+            .Where(g => g.TournamentId == tournamentId)
+            .OrderBy(g => g.GameTime)
+            .Select(g => new TournamentGameRef(g.Id, g.GameTime))
+            .ToListAsync(cancellationToken);
+
+        var responses = await _dbContext.TournamentPlayerInfos
+            .AsNoTracking()
+            .Where(t => t.TournamentId == tournamentId)
+            .SelectMany(t => t.GameAvailabilities, (t, a) => new { t.AccountId, a.GameId, a.Availability })
+            .ToListAsync(cancellationToken);
+
+        var byAccount = responses
+            .GroupBy(r => r.AccountId)
+            .ToDictionary(
+                g => g.Key,
+                g => (IReadOnlyDictionary<int, GameAvailability>)g
+                    .GroupBy(r => r.GameId)
+                    .ToDictionary(x => x.Key, x => x.Last().Availability));
+
+        return new TournamentAvailability(games, byAccount);
+    }
+
     public async Task<IReadOnlySet<int>> GetFavouritePlayerIdsAsync(int draftId, int accountId,
         CancellationToken cancellationToken = default)
     {

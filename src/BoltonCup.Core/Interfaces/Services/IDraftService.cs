@@ -23,12 +23,23 @@ public interface IDraftService
     Task<CurrentDraftState> UndoLastPickAsync(int draftId, CancellationToken cancellationToken = default);
     Task<CurrentDraftState> ResetDraftAsync(int draftId, CancellationToken cancellationToken = default);
 
+    Task<TournamentAvailability> GetTournamentAvailabilityAsync(int tournamentId, CancellationToken cancellationToken = default);
+
     Task<IReadOnlySet<int>> GetFavouritePlayerIdsAsync(int draftId, int accountId, CancellationToken cancellationToken = default);
     Task<bool> ToggleFavouriteAsync(int draftId, int playerId, int accountId, CancellationToken cancellationToken = default);
 
     Task<int> AssignPlayersToTeamsFromDraftAsync(int draftId, bool overwriteExisting, CancellationToken cancellationToken = default);
 }
 
+
+/// <summary>A tournament's games plus each account's per-game availability responses.</summary>
+public sealed record TournamentAvailability(
+    IReadOnlyList<TournamentGameRef> Games,
+    IReadOnlyDictionary<int, IReadOnlyDictionary<int, GameAvailability>> ByAccount
+);
+
+/// <summary>A lightweight reference to a tournament game and its scheduled time.</summary>
+public sealed record TournamentGameRef(int GameId, DateTime GameTime);
 
 public record CurrentDraftState(
     Draft Draft,
