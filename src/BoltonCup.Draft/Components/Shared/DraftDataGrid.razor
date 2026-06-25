@@ -51,7 +51,7 @@
         </RowTemplate>
     </MudTable>
     
-    <MudMenu @ref="@_contextMenu" id="_contextMenu" Modal="true" PositionAtCursor>
+    <MudMenu @ref="@_contextMenu" id="_contextMenu" Modal="true" Style="position:fixed;top:0;left:0;width:1px;height:1px" PositionAtCursor>
         <MudMenuItem Icon="@Icons.Material.Rounded.SwapHoriz" OnClick="@OpenReplacePickDialog">
             Change pick
         </MudMenuItem>
