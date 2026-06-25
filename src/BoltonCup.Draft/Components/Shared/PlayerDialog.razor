@@ -1,5 +1,7 @@
 @namespace BoltonCup.Draft.Components.Shared
+@using BoltonCup.Draft.Services
 @inject IBoltonCupApi BoltonCupApi
+@inject DraftStateService DraftState
 
 
 <MudDialog>
@@ -17,13 +19,13 @@
                         <MudText Typo="Typo.h4"><b>@_player.FullName</b></MudText>
                         <div class="d-flex flex-row align-center gap-2">
                             <PositionChip Position="@_player.Position" />
-                            @if (_player.Team is null)
+                            @if (_draftPick is { } draftPick)
                             {
-                                <MudText Typo="Typo.body2">FREE AGENT</MudText>
+                                <MudImage Src="@draftPick.Team.Logo" Width="36" />
                             }
                             else
                             {
-                                <MudImage Src="@_player.Team.Logo" Width="36" />
+                                <MudText Typo="Typo.body2">FREE AGENT</MudText>
                             }
                         </div>
                         <div class="d-flex flex-row align-center gap-4">
@@ -131,6 +133,7 @@
     private bool _loading;
 
     private Sdk.DraftPlayerSingleDto? _player;
+    private Sdk.DraftPickBriefDto? _draftPick;
     private List<Sdk.PlayerGameAvailabilityDto> _games = [];
 
     private int _gamesPlayed, _goals, _assists, _points, _penaltyMinutes, _wins, _shutouts;
@@ -163,6 +166,7 @@
         }
         else
         {
+            _draftPick = DraftState.PlayerRankings.FirstOrDefault(r => r.Player.Id == PlayerId)?.DraftPick;
             _games = _player.GameAvailabilities.OrderBy(g => g.GameTime).ToList();
             ComputeCareerTotals(_player.TournamentStats);
         }
