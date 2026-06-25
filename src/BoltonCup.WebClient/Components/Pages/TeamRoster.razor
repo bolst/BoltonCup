@@ -39,7 +39,7 @@ else
                 <MudTh Class="align-center">Player</MudTh>
                 <MudTh>#</MudTh>
                 <MudTh>Pos</MudTh>
-                <MudTh>Born</MudTh>
+                <MudTh>Year</MudTh>
             </HeaderContent>
             <GroupHeaderTemplate>
                 <MudTh colspan="4"><MudText Typo="Typo.h6">@context.Key</MudText></MudTh>
@@ -62,7 +62,7 @@ else
                 </MudTd>
                 <MudTd DataLabel="#">@context.JerseyNumber</MudTd>
                 <MudTd DataLabel="Pos">@context.Position</MudTd>
-                <MudTd DataLabel="Born">@context.Birthday.ToString("d")</MudTd>
+                <MudTd DataLabel="Year">@context.Birthday.ToString("yyyy")</MudTd>
             </RowTemplate>
         </MudTable>
     </MudContainer>
