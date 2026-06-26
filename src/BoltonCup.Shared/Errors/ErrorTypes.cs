@@ -16,6 +16,7 @@ namespace BoltonCup.Shared
             public const string AccountNotConfirmed = Base + "/account-not-confirmed";
             public const string InvalidCredentials = Base + "/invalid-credentials";
             public const string UserRegistrationFailed = Base + "/user-registration-failed";
+            public const string PasswordResetFailed = Base + "/password-reset-failed";
         }
         
         

@@ -38,6 +38,12 @@ public static class BoltonCupExceptionMappings
             ErrorType: ErrorTypes.Auth.UserRegistrationFailed,
             Title: "Unable to register."
         ),
+        new(
+            ExceptionType: typeof(PasswordResetFailedException),
+            StatusCode: StatusCodes.Status400BadRequest,
+            ErrorType: ErrorTypes.Auth.PasswordResetFailed,
+            Title: "Unable to reset password."
+        ),
         
         // Tournaments
         new( 

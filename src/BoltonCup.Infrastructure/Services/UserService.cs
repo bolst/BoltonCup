@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Authentication;
 using System.Security.Claims;
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
@@ -11,6 +10,7 @@ using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BoltonCup.Infrastructure.Services;
 
@@ -32,7 +32,8 @@ public class UserService(
     UserManager<BoltonCupUser> _userManager,
     SignInManager<BoltonCupUser> _signInManager,
     IAccountService _accountService,
-    IEmailer _emailer) : IUserService
+    IEmailer _emailer,
+    ILogger<UserService> _logger) : IUserService
 {
 
     public async Task<Account?> GetMyAccountAsync(ClaimsPrincipal claimsPrincipal)
@@ -112,8 +113,14 @@ public class UserService(
         if (await _userManager.FindByEmailAsync(email) is not { } user)
             throw new InvalidCredentialsException();
 
-        if (await _userManager.ResetPasswordAsync(user, code, newPassword) is { Succeeded: false })
-            throw new InvalidCredentialException();
+        if (await _userManager.ResetPasswordAsync(user, code, newPassword) is { Succeeded: false } result)
+        {
+            _logger.LogWarning(
+                "Password reset failed for user {UserId}: {Errors}",
+                user.Id,
+                string.Join("; ", result.Errors.Select(e => $"{e.Code}: {e.Description}")));
+            throw new PasswordResetFailedException(result);
+        }
 
         // a user could only get here if they got the code via email
         // thus, confirm their account if needed
