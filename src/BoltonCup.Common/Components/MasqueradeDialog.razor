@@ -1,0 +1,90 @@
+@namespace BoltonCup.Common.Components
+@inject IBoltonCupApi Api
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Masquerade as user</MudText>
+        <MudText Typo="Typo.body2" Class="mud-text-secondary">Search by name or email, then select an account to act as.</MudText>
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Dense Class="my-2">@_errorMessage</MudAlert>
+        }
+
+        <MudDivider Class="my-2" />
+
+        <MudAutocomplete T="BoltonCup.Sdk.MasqueradeUserDto"
+                         Label="User"
+                         @bind-Value="_selected"
+                         SearchFunc="@SearchUsers"
+                         ToStringFunc="@UserLabel"
+                         Variant="Variant.Outlined"
+                         Margin="Margin.Dense"
+                         ResetValueOnEmptyText
+                         Clearable
+                         Immediate
+                         MinCharacters="1" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Dialog.Cancel">Cancel</MudButton>
+        <MudButton OnClick="@Confirm" Color="Color.Primary" Disabled="@(_selected is null || _submitting)">Masquerade</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    private BoltonCup.Sdk.MasqueradeUserDto? _selected;
+    private string? _errorMessage;
+    private bool _submitting;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            NoHeader = true,
+            BackdropClick = false,
+            MaxWidth = MaxWidth.ExtraSmall,
+            FullWidth = true
+        });
+    }
+
+    private static string UserLabel(BoltonCup.Sdk.MasqueradeUserDto? user)
+        => user is null
+            ? string.Empty
+            : string.IsNullOrWhiteSpace(user.Name) || user.Name == user.Email
+                ? user.Email
+                : $"{user.Name} ({user.Email})";
+
+    private async Task<IEnumerable<BoltonCup.Sdk.MasqueradeUserDto>> SearchUsers(string? value, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await Api.SearchMasqueradeUsersAsync(value, cancellationToken);
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            return [];
+        }
+    }
+
+    private async Task Confirm()
+    {
+        if (_selected is null)
+            return;
+
+        _errorMessage = null;
+        _submitting = true;
+        try
+        {
+            await Api.MasqueradeAsync(new BoltonCup.Sdk.MasqueradeRequest { UserId = _selected.UserId });
+            Dialog.Close(DialogResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Could not start masquerade: {ex.Message}";
+            _submitting = false;
+        }
+    }
+}

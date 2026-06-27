@@ -1,31 +1,55 @@
 @namespace BoltonCup.Common.Components
+@using BoltonCup.Shared
 @inject NavigationManager Navigation
 @inject IBoltonCupApi Api
+@inject IDialogService DialogService
 @inject IOptions<BoltonCupConfiguration> Config
 
 <AuthorizeView>
     <Authorized>
-        <MudMenu Label="@context.User.Identity?.Name"
-                 Variant="@Variant"
-                 Color="@Color"
-                 EndIcon="@EndIcon"
-                 Icon="@(Mini ? Icons.Material.Rounded.AccountCircle : null)"
-                 RelativeWidth="DropdownWidth.Adaptive"
-                 FullWidth>
-            @if (Mini)
-            {
-                <span class="pa-2">@context.User.Identity?.Name</span>
-            }
-            <MudMenuItem Href="@($"{Config.Value.WebBaseUrl}profile")" Icon="@Icons.Material.Rounded.AccountCircle" IconColor="@IconColor" OnClick="@OnItemClick">My Profile</MudMenuItem>
-            @if (LogOutTemplate is null)
-            {
-                <MudMenuItem OnClick="LogOut" Icon="@Icons.Material.Rounded.Logout" IconColor="Color.Error">Log Out</MudMenuItem>
-            }
-            else
-            {
-                @LogOutTemplate(context)
-            }
-        </MudMenu>
+        @{
+            var isMasquerading = context.User.HasClaim(c => c.Type == BoltonCupClaimTypes.OriginalUserName);
+            var originalName = context.User.FindFirst(BoltonCupClaimTypes.OriginalUserName)?.Value;
+        }
+        <div class="pa-2 pa-md-0 d-flex justify-center">
+            <MudMenu Label="@context.User.Identity?.Name"
+                     Variant="@Variant"
+                     Color="@Color"
+                     EndIcon="@EndIcon"
+                     Icon="@(Mini ? Icons.Material.Rounded.AccountCircle : null)"
+                     Class="@(isMasquerading ? "orange-text" : string.Empty)"
+                     RelativeWidth="DropdownWidth.Adaptive"
+                     FullWidth>
+                @if (Mini)
+                {
+                    <span class="pa-2">@context.User.Identity?.Name</span>
+                }
+                <MudMenuItem Href="@($"{Config.Value.WebBaseUrl}profile")" Icon="@Icons.Material.Rounded.AccountCircle" IconColor="@IconColor" OnClick="@OnItemClick">My Profile</MudMenuItem>
+                @if (isMasquerading)
+                {
+                    <MudMenuItem OnClick="@StopMasquerade" Icon="@Icons.Material.Rounded.TheaterComedy" IconColor="Color.Warning">
+                        <MudText>Stop masquerading</MudText>
+                        @if (!string.IsNullOrEmpty(originalName))
+                        {
+                            <MudText Typo="Typo.caption">@originalName</MudText>
+                        }
+                    </MudMenuItem>
+                }
+                else if (context.User.IsInRole("Admin"))
+                {
+                    <MudMenuItem OnClick="@OpenMasqueradeDialog" Icon="@Icons.Material.Rounded.TheaterComedy" IconColor="@IconColor">Masquerade</MudMenuItem>
+                }
+                @if (LogOutTemplate is null)
+                {
+                    <MudMenuItem OnClick="LogOut" Icon="@Icons.Material.Rounded.Logout" IconColor="Color.Error">Log Out</MudMenuItem>
+                }
+                else
+                {
+                    @LogOutTemplate(context)
+                }
+            </MudMenu>
+        </div>
+        
     </Authorized>
     <NotAuthorized>
         <MudButton Variant="@Variant" Color="@Color" OnClick="@GoToLogin">Log In</MudButton>
@@ -65,6 +89,20 @@
     {
         await Api.LogoutAsync();
         // force refresh to clear state and update UI
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+
+    private async Task OpenMasqueradeDialog()
+    {
+        var dialog = await DialogService.ShowAsync<MasqueradeDialog>("Masquerade");
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+
+    private async Task StopMasquerade()
+    {
+        await Api.StopMasqueradeAsync();
         Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
     }
 }
