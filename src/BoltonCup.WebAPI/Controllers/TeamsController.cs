@@ -1,5 +1,6 @@
 using BoltonCup.Core;
 using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
+using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace BoltonCup.WebAPI.Controllers;
 
 /// <summary>Manages team queries and team asset uploads.</summary>
-public class TeamsController(ITeamRepository _teams, ITeamService _teamService, IMapper _mapper) : BoltonCupControllerBase
+public class TeamsController(
+    ITeamRepository _teams,
+    ITeamService _teamService,
+    IAuthorizationService _authorizationService,
+    IMapper _mapper
+) : BoltonCupControllerBase
 {
     /// <summary>Gets a paginated list of teams.</summary>
     /// <remarks>
@@ -64,4 +70,22 @@ public class TeamsController(ITeamRepository _teams, ITeamService _teamService, 
         await _teamService.UpdateBannerAsync(id, key);
         return Ok();
     }
+
+    /// <summary>Sets the team's goal and win songs (admin or the team's GM). A null song clears that selection.</summary>
+    [Authorize]
+    [HttpPut("{id:int}/songs")]
+    public async Task<ActionResult> UpdateTeamSongs(int id, [FromBody] UpdateTeamSongsRequest request)
+    {
+        var authorization = await _authorizationService.AuthorizeAsync(User, id, CanManageTeam);
+        if (!authorization.Succeeded)
+        {
+            return Forbid();
+        }
+
+        await _teamService.UpdateSongsAsync(id, ToTrack(request.GoalSong), ToTrack(request.WinSong));
+        return Ok();
+    }
+
+    private static MusicTrack? ToTrack(MusicTrackDto? dto)
+        => dto is null ? null : new MusicTrack(dto.Id, dto.Name, dto.Artist, dto.AlbumArtUrl);
 }

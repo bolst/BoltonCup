@@ -23,10 +23,10 @@ public record TeamDto
     public required string SecondaryColorHex { get; init; }
     /// <summary>Gets the tertiary color hex code.</summary>
     public string? TertiaryColorHex { get; init; }
-    /// <summary>Gets the URL of the team's goal celebration song.</summary>
+    /// <summary>Gets the URL of the team's goal celebration song, once its track has been downloaded.</summary>
     public string? GoalSongUrl { get; init; }
-    /// <summary>Gets the URL of the team's penalty song.</summary>
-    public string? PenaltySongUrl { get; init; }
+    /// <summary>Gets the URL of the team's win song, once its track has been downloaded.</summary>
+    public string? WinSongUrl { get; init; }
     /// <summary>Gets the account ID of the general manager.</summary>
     public int? GmAccountId { get; init; }
     /// <summary>Gets the first name of the general manager.</summary>

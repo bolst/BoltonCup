@@ -38,7 +38,17 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
             .OrderBy(g => g.GameTime)
             .ToListAsync(cancellationToken);
 
-        return new TournamentPlayerInfoContext(info, games);
+        // If the requester is the GM of a team in this tournament, surface that team's song selections so the
+        // same form can offer GM-only goal/win song controls.
+        var managedTeam = await _dbContext.Teams
+            .AsNoTracking()
+            .Include(t => t.GoalSongTrack)
+            .Include(t => t.WinSongTrack)
+            .Where(t => t.TournamentId == tournamentId && t.GmAccountId == accountId)
+            .Select(t => new ManagedTeamSongs(t.Id, t.Name, t.GoalSongTrack, t.WinSongTrack))
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return new TournamentPlayerInfoContext(info, games, managedTeam);
     }
 
     public async Task UpsertAsync(UpsertTournamentPlayerInfoCommand command,

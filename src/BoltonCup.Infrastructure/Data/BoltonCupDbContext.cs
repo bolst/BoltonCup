@@ -740,6 +740,17 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.GeneralManager)
                 .WithMany(e => e.ManagedTeams)
                 .HasForeignKey(e => e.GmAccountId);
+            // Team songs reference library tracks; deleting a track just clears the reference.
+            entity
+                .HasOne(e => e.GoalSongTrack)
+                .WithMany()
+                .HasForeignKey(e => e.GoalSongTrackId)
+                .OnDelete(DeleteBehavior.SetNull);
+            entity
+                .HasOne(e => e.WinSongTrack)
+                .WithMany()
+                .HasForeignKey(e => e.WinSongTrackId)
+                .OnDelete(DeleteBehavior.SetNull);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.NameShort).HasColumnName("name_short");
@@ -751,9 +762,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.PrimaryColorHex).HasColumnName("primary_hex");
             entity.Property(e => e.SecondaryColorHex).HasColumnName("secondary_hex");
             entity.Property(e => e.TertiaryColorHex).HasColumnName("tertiary_hex");
-            entity.Property(e => e.GoalSong).HasColumnName("goal_song_key");
-            entity.Property(e => e.PenaltySong).HasColumnName("penalty_song_key");
-            entity.Property(e => e.WinSong).HasColumnName("win_song");
+            entity.Property(e => e.GoalSongTrackId).HasColumnName("goal_song_track_id");
+            entity.Property(e => e.WinSongTrackId).HasColumnName("win_song_track_id");
         });
 
         modelBuilder.Entity<Tournament>(entity =>

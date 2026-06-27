@@ -938,8 +938,8 @@ public class Mapper : IMapper
             PrimaryColorHex = team.PrimaryColorHex,
             SecondaryColorHex = team.SecondaryColorHex,
             TertiaryColorHex = team.TertiaryColorHex,
-            GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSong),
-            PenaltySongUrl = _urlResolver.GetFullUrl(team.PenaltySong),
+            GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack != null ? team.GoalSongTrack.AudioFileKey : null),
+            WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack != null ? team.WinSongTrack.AudioFileKey : null),
             GmAccountId = team.GmAccountId,
             GmFirstName = team.GeneralManager?.FirstName,
             GmLastName = team.GeneralManager?.LastName,
@@ -963,8 +963,8 @@ public class Mapper : IMapper
                 PrimaryColorHex = team.PrimaryColorHex,
                 SecondaryColorHex = team.SecondaryColorHex,
                 TertiaryColorHex = team.TertiaryColorHex,
-                GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSong),
-                PenaltySongUrl = _urlResolver.GetFullUrl(team.PenaltySong),
+                GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack?.AudioFileKey),
+                WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack?.AudioFileKey),
                 GmAccountId = team.GmAccountId,
                 GmFirstName = team.GeneralManager?.FirstName,
                 GmLastName = team.GeneralManager?.LastName,
@@ -1195,8 +1195,28 @@ public class Mapper : IMapper
                 HomeTeamPlaceholder = game.HomeTeamPlaceholder,
                 AwayTeamPlaceholder = game.AwayTeamPlaceholder,
             }).ToList(),
+            ManagedTeam = context.ManagedTeam is { } team
+                ? new ManagedTeamDto
+                {
+                    TeamId = team.TeamId,
+                    TeamName = team.TeamName,
+                    GoalSong = ToMusicTrackDto(team.GoalSongTrack),
+                    WinSong = ToMusicTrackDto(team.WinSongTrack),
+                }
+                : null,
         };
     }
+
+    private static MusicTrackDto? ToMusicTrackDto(TournamentMusicTrack? track)
+        => track?.TrackId is { } trackId
+            ? new MusicTrackDto
+            {
+                Id = trackId,
+                Name = track.Title ?? string.Empty,
+                Artist = track.Artist ?? string.Empty,
+                AlbumArtUrl = track.AlbumArtUrl,
+            }
+            : null;
 
 
     // ---------- Music ----------
