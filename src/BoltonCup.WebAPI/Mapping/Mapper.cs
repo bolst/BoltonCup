@@ -113,6 +113,7 @@ public class Mapper : IMapper
     public CurrentUserDto? ToDto(ClaimsPrincipal claims)
     {
         var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
+        var originalUserId = claims.FindFirstValue(BoltonCupClaimTypes.OriginalUserId);
         return string.IsNullOrEmpty(userId)
             ? null
             : new CurrentUserDto(
@@ -123,7 +124,9 @@ public class Mapper : IMapper
                 IsAuthenticated: claims.Identity?.IsAuthenticated ?? false,
                 AccountId: claims.GetAccountIdOrDefault(),
                 TeamGmIds: claims.GetTeamGmIds(),
-                TournamentGmIds: claims.GetTournamentGmIds()
+                TournamentGmIds: claims.GetTournamentGmIds(),
+                IsMasquerading: !string.IsNullOrEmpty(originalUserId),
+                OriginalUserName: claims.FindFirstValue(BoltonCupClaimTypes.OriginalUserName)
             );
     }
 
