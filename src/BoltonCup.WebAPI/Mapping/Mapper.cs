@@ -1207,6 +1207,7 @@ public class Mapper : IMapper
                 HomeTeamPlaceholder = game.HomeTeamPlaceholder,
                 AwayTeamPlaceholder = game.AwayTeamPlaceholder,
             }).ToList(),
+            CurrentTeam = context.CurrentTeam is { } currentTeam ? ToTeamBriefDto(currentTeam) : null,
             ManagedTeam = context.ManagedTeam is { } team
                 ? new ManagedTeamDto
                 {

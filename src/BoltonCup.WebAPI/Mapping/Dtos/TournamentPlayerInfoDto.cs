@@ -12,6 +12,9 @@ public record TournamentPlayerInfoDto
     /// <summary>Gets the games of the player's assigned team (empty if the player has no team yet).</summary>
     public IReadOnlyList<GameDto> Games { get; init; } = [];
 
+    /// <summary>Gets the player's assigned team, if exists.</summary>
+    public TeamBriefDto? CurrentTeam { get; init; }
+
     /// <summary>Gets the team the requester GMs in this tournament, if any (enables GM-only song controls).</summary>
     public ManagedTeamDto? ManagedTeam { get; init; }
 }

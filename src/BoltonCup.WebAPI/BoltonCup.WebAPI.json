@@ -16448,6 +16448,15 @@
             },
             "description": "Gets the games of the player's assigned team (empty if the player has no team yet)."
           },
+          "currentTeam": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamBriefDto"
+              }
+            ],
+            "description": "Gets the player's assigned team, if exists.",
+            "nullable": true
+          },
           "managedTeam": {
             "allOf": [
               {
