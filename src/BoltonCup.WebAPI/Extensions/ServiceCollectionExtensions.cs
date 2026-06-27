@@ -72,6 +72,28 @@ public static class ServiceCollectionExtensions
                     return Task.CompletedTask;
                 };
             })
+            .Configure<SecurityStampValidatorOptions>(options =>
+            {
+                // The security-stamp validator periodically rebuilds the principal from the user, which
+                // would drop the masquerade marker claims. Carry them forward so a masquerade survives.
+                options.OnRefreshingPrincipal = context =>
+                {
+                    if (context.NewPrincipal?.Identities.FirstOrDefault() is not { } identity)
+                    {
+                        return Task.CompletedTask;
+                    }
+
+                    foreach (var claimType in new[] { BoltonCupClaimTypes.OriginalUserId, BoltonCupClaimTypes.OriginalUserName })
+                    {
+                        if (context.CurrentPrincipal?.FindFirst(claimType) is { } claim && !identity.HasClaim(claim.Type, claim.Value))
+                        {
+                            identity.AddClaim(claim);
+                        }
+                    }
+
+                    return Task.CompletedTask;
+                };
+            })
             .AddScoped<IAuthorizationHandler, DraftAccessHandler>()
             .AddScoped<IAuthorizationHandler, DraftManagerHandler>()
             .AddScoped<IAuthorizationHandler, TeamManagerHandler>()
