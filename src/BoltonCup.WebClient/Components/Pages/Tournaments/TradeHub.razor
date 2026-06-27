@@ -41,7 +41,7 @@
                         <MudSelect T="Sdk.PlayerBriefDto" MultiSelection="true" @bind-SelectedValues="_selectedMyPlayers"
                                    Label="Players to send" Variant="Variant.Outlined" Dense
                                    ToStringFunc="@(p => p?.FullName ?? string.Empty)"
-                                   MultiSelectionTextFunc="@(s => $"{s?.Count} selected")">
+                                   MultiSelectionTextFunc="@SelectedPlayersStringFunc">
                             @foreach (var p in SelectableMyPlayers)
                             {
                                 <MudSelectItem T="Sdk.PlayerBriefDto" Value="p">
@@ -68,7 +68,7 @@
                             <MudSelect T="Sdk.PlayerBriefDto" MultiSelection="true" @bind-SelectedValues="_selectedTheirPlayers"
                                        Label="@($"{_counterpartyTeam.Name} sends")" Variant="Variant.Outlined" Dense
                                        ToStringFunc="@(p => p?.FullName ?? string.Empty)"
-                                       MultiSelectionTextFunc="@(s => $"{s?.Count} selected")">
+                                       MultiSelectionTextFunc="@SelectedPlayersStringFunc">
                                 @foreach (var p in SelectableTheirPlayers)
                                 {
                                     <MudSelectItem T="Sdk.PlayerBriefDto" Value="p">
@@ -297,6 +297,21 @@
         {
             _submitting = false;
         }
+    }
+
+    private string SelectedPlayersStringFunc(IReadOnlyList<string?>? playerNames)
+    {
+        if (playerNames is null)
+        {
+            return string.Empty;
+        }
+        var count = playerNames.Count;
+        return count switch
+        {
+            1 or 2 => string.Join(", ", playerNames),
+            >= 3 => playerNames[0] + $" + {count - 1} others",
+            _ => string.Empty
+        } ?? string.Empty;
     }
 
     private MarkupString GetTradeMarkupString()
