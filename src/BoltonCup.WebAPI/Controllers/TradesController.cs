@@ -11,6 +11,7 @@ namespace BoltonCup.WebAPI.Controllers;
 /// <summary>Manages player trades between teams: proposal, acceptance, decline, cancellation, and admin approval.</summary>
 public class TradesController(
     ITradeService _tradeService,
+    IDraftService _draftService,
     IMapper _mapper
 ) : BoltonCupControllerBase
 {
@@ -27,6 +28,20 @@ public class TradesController(
         var trades = await _tradeService.GetByTournamentAsync(tournamentId);
         var viewer = new TradeViewerContext(User.GetAccountIdOrDefault(), User.IsInRole(Admin));
         return Ok(_mapper.ToDtoList(trades, viewer));
+    }
+
+    /// <summary>Gets per-player game availability for a tournament, used to inform trade decisions. Accessible to the tournament's GMs and admins.</summary>
+    [Authorize(Policy = RequireCompletedAccount)]
+    [HttpGet("player-availability")]
+    public async Task<ActionResult<IReadOnlyList<PlayerAvailabilityDto>>> GetPlayerAvailability([FromQuery] int tournamentId)
+    {
+        if (!User.IsInRole(Admin) && !User.IsGmForTournament(tournamentId))
+        {
+            return Forbid();
+        }
+
+        var availability = await _draftService.GetTournamentAvailabilityAsync(tournamentId);
+        return Ok(_mapper.ToPlayerAvailabilityList(availability));
     }
 
     /// <summary>Proposes a trade. The caller must be the proposing team's GM (or an admin).</summary>

@@ -43,6 +43,7 @@ public interface IMapper
     // Trade
     IReadOnlyList<TradeDto> ToDtoList(IReadOnlyList<Trade> trades, TradeViewerContext viewer);
     TradeDto ToDto(Trade trade, TradeViewerContext viewer);
+    IReadOnlyList<PlayerAvailabilityDto> ToPlayerAvailabilityList(TournamentAvailability availability);
     CreateTradeCommand ToCommand(CreateTradeRequest request, ClaimsPrincipal user);
 
     // CustomRanking
