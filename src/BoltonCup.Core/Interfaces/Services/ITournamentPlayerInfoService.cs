@@ -19,6 +19,7 @@ public record SongRequestSelection(string TrackId, string Name, string Artist, s
 public record TournamentPlayerInfoContext(
     TournamentPlayerInfo? Info,
     IReadOnlyList<Game> TeamGames,
+    Team? CurrentTeam,
     ManagedTeamSongs? ManagedTeam = null);
 
 /// <summary>The team the requesting user is GM of in this tournament, with its current song selections.</summary>

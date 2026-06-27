@@ -17,6 +17,7 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
 
         var player = await _dbContext.Players
             .AsNoTracking()
+            .Include(p => p.Team)
             .FirstOrDefaultAsync(p => p.AccountId == accountId && p.TournamentId == tournamentId, cancellationToken)
             ?? throw new AccountNotInTournamentException(accountId, tournamentId);
 
@@ -48,7 +49,7 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
             .Select(t => new ManagedTeamSongs(t.Id, t.Name, t.GoalSongTrack, t.WinSongTrack))
             .FirstOrDefaultAsync(cancellationToken);
 
-        return new TournamentPlayerInfoContext(info, games, managedTeam);
+        return new TournamentPlayerInfoContext(info, games, player.Team, managedTeam);
     }
 
     public async Task UpsertAsync(UpsertTournamentPlayerInfoCommand command,

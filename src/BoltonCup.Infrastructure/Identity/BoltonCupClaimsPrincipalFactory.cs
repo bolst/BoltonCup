@@ -28,7 +28,6 @@ public class BoltonCupClaimsPrincipalFactory(
                 .Where(t => t.GmAccountId == user.AccountId)
                 .GroupBy(t => t.TournamentId)
                 .ToListAsync();
-
             foreach (var tournament in gmTournaments)
             {
                 if (tournament.Key is { } tournamentId)

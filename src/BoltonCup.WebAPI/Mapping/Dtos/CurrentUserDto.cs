@@ -9,6 +9,8 @@ namespace BoltonCup.WebAPI.Mapping;
 /// <param name="AccountId">The Bolton Cup account ID linked to this user, if any.</param>
 /// <param name="TeamGmIds">The IDs of teams for which the user is a general manager.</param>
 /// <param name="TournamentGmIds">The IDs of tournaments for which the user is a general manager.</param>
+/// <param name="IsMasquerading">Whether an admin is currently masquerading as this user.</param>
+/// <param name="OriginalUserName">The display name of the admin to return to when masquerading, if any.</param>
 public record CurrentUserDto(
     string UserId,
     string Email,
@@ -17,5 +19,7 @@ public record CurrentUserDto(
     bool IsAuthenticated,
     int? AccountId,
     IEnumerable<int> TeamGmIds,
-    IEnumerable<int> TournamentGmIds
+    IEnumerable<int> TournamentGmIds,
+    bool IsMasquerading,
+    string? OriginalUserName
 );

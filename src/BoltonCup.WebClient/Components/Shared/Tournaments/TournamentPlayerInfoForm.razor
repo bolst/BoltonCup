@@ -15,7 +15,13 @@
         }
         else
         {
-            <MudText Typo="Typo.h6" Class="mb-1"><b>Game Availability</b></MudText>
+            <div class="d-flex flex-row align-center gap-3">
+                <MudText Typo="Typo.h6" Class="mb-1"><b>Game Availability</b></MudText>
+                @if (_currentTeam is not null)
+                {
+                    <MudImage Src="@_currentTeam.Logo" Height="36" />
+                }
+            </div>
             @if (_games.Count == 0)
             {
                 <MudAlert Severity="Severity.Info" Class="mb-4">
@@ -107,6 +113,7 @@
     private IReadOnlyList<Sdk.GameDto> _games = [];
     private readonly Dictionary<int, string> _availability = new();
     private Sdk.MusicTrackDto? _selectedTrack;
+    private Sdk.TeamBriefDto? _currentTeam;
     private Sdk.ManagedTeamDto? _managedTeam;
     private Sdk.MusicTrackDto? _goalSong;
     private Sdk.MusicTrackDto? _winSong;
@@ -127,6 +134,7 @@
                 _availability[availability.GameId] = availability.Availability.ToString();
             }
             _selectedTrack = dto.Song;
+            _currentTeam = dto.CurrentTeam;
             _managedTeam = dto.ManagedTeam;
             _goalSong = dto.ManagedTeam?.GoalSong;
             _winSong = dto.ManagedTeam?.WinSong;

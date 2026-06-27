@@ -14,9 +14,10 @@ public class CookieAuthenticationStateProvider(IBoltonCupApi _api, ILogger<Cooki
     {
         try
         {
-            var currentUser = await _api.GetCurrentUserAsync();
-            if (currentUser is not { IsAuthenticated: true })
+            if (await _api.GetCurrentUserAsync() is not { IsAuthenticated: true } currentUser)
+            {
                 return AnonymousUser;
+            }
 
             var claims = new List<Claim>
             {
@@ -37,6 +38,13 @@ public class CookieAuthenticationStateProvider(IBoltonCupApi _api, ILogger<Cooki
                 currentUser.TournamentGmIds
                     .Select(id => new Claim(BoltonCupClaimTypes.TournamentGm, id.ToString()))
             );
+
+            // Presence of the OriginalUserName claim signals that an admin is masquerading.
+            if (currentUser.IsMasquerading)
+            {
+                var originalUserName = string.IsNullOrEmpty(currentUser.OriginalUserName) ? "admin" : currentUser.OriginalUserName;
+                claims.Add(new Claim(BoltonCupClaimTypes.OriginalUserName, originalUserName));
+            }
 
             var identity = new ClaimsIdentity(claims, "ServerCookie");
             return new AuthenticationState(new ClaimsPrincipal(identity));
