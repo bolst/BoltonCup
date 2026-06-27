@@ -41,7 +41,7 @@ public class MasqueradeService(
 
         // Identity users linked to the matched accounts (only users can be masqueraded as).
         var usersByAccount = await _userManager.Users
-            .Where(u => u.AccountId != null && accountById.ContainsKey(u.AccountId.Value))
+            .Where(u => u.AccountId != null && accountById.Keys.Contains(u.AccountId.Value))
             .Select(u => new { u.Id, u.AccountId, u.Email })
             .ToListAsync(cancellationToken);
 
