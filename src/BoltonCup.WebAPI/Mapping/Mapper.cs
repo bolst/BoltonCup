@@ -233,6 +233,15 @@ public class Mapper : IMapper
         });
     }
 
+    public IReadOnlyList<PlayerAvailabilityDto> ToPlayerAvailabilityList(TournamentAvailability availability)
+        => availability.ByAccount.Keys
+            .Select(accountId => new PlayerAvailabilityDto
+            {
+                AccountId = accountId,
+                GameAvailabilities = BuildAvailability(availability, accountId),
+            })
+            .ToList();
+
     private static IReadOnlyList<PlayerGameAvailabilityDto> BuildAvailability(TournamentAvailability? availability, int accountId)
     {
         if (availability is null)

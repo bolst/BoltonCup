@@ -31,30 +31,34 @@
                 <MudText Typo="Typo.h6" Class="mb-3">Propose a trade</MudText>
                 <MudGrid Spacing="3">
                     <MudItem xs="12" md="6">
-                        <MudSelect T="Sdk.TeamDto" Value="@_myTeam"
-                                   Label="Team" Variant="Variant.Filled" Margin="Margin.Dense" Underline="false"
-                                   ToStringFunc="@(t => t?.Name ?? string.Empty)" OpenIcon="@string.Empty" ReadOnly Dense>
-                            <MudSelectItem T="Sdk.TeamDto" Value="@_myTeam">@_myTeam.Name</MudSelectItem>
+                        <MudSelect T="Sdk.TeamDto" Value="@_myTeam" Class="mt-2"
+                                   Label="Team" Variant="Variant.Filled" Underline="false"
+                                   OpenIcon="@string.Empty" ReadOnly Dense>
+                            <MudSelectItem T="Sdk.TeamDto" Value="@_myTeam">@TeamOption(_myTeam)</MudSelectItem>
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" md="6">
                         <MudSelect T="Sdk.PlayerBriefDto" MultiSelection="true" @bind-SelectedValues="_selectedMyPlayers"
-                                   Label="Players to send" Variant="Variant.Outlined" Margin="Margin.Dense" Dense
+                                   Label="Players to send" Variant="Variant.Outlined" Dense
                                    ToStringFunc="@(p => p?.FullName ?? string.Empty)"
-                                   MultiSelectionTextFunc="@(s => $"{s?.Count} selected")">
+                                   MultiSelectionTextFunc="@SelectedPlayersStringFunc">
                             @foreach (var p in SelectableMyPlayers)
                             {
-                                <MudSelectItem T="Sdk.PlayerBriefDto" Value="p">@PlayerLabel(p)</MudSelectItem>
+                                <MudSelectItem T="Sdk.PlayerBriefDto" Value="p">
+                                    <div class="d-flex align-center gap-2">
+                                        <AvailabilityIndicator Availabilities="@AvailabilityFor(p.AccountId)" Size="Size.Small" />
+                                        <span>@PlayerLabel(p)</span>
+                                    </div>
+                                </MudSelectItem>
                             }
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" md="6">
                         <MudSelect T="Sdk.TeamDto" Value="_counterpartyTeam" ValueChanged="OnCounterpartyChanged"
-                                   Label="Trade with" Variant="Variant.Outlined" Margin="Margin.Dense" Dense
-                                   ToStringFunc="@(t => t?.Name ?? string.Empty)">
+                                   Label="Trade with" Variant="Variant.Outlined" Dense>
                             @foreach (var t in _teams.Where(t => t.Id != _myTeam.Id))
                             {
-                                <MudSelectItem T="Sdk.TeamDto" Value="t">@t.Name</MudSelectItem>
+                                <MudSelectItem T="Sdk.TeamDto" Value="t">@TeamOption(t)</MudSelectItem>
                             }
                         </MudSelect>
                     </MudItem>
@@ -62,18 +66,23 @@
                         @if (_counterpartyTeam is not null)
                         {
                             <MudSelect T="Sdk.PlayerBriefDto" MultiSelection="true" @bind-SelectedValues="_selectedTheirPlayers"
-                                       Label="@($"{_counterpartyTeam.Name} sends")" Variant="Variant.Outlined" Margin="Margin.Dense" Dense
+                                       Label="@($"{_counterpartyTeam.Name} sends")" Variant="Variant.Outlined" Dense
                                        ToStringFunc="@(p => p?.FullName ?? string.Empty)"
-                                       MultiSelectionTextFunc="@(s => $"{s?.Count} selected")">
+                                       MultiSelectionTextFunc="@SelectedPlayersStringFunc">
                                 @foreach (var p in SelectableTheirPlayers)
                                 {
-                                    <MudSelectItem T="Sdk.PlayerBriefDto" Value="p">@PlayerLabel(p)</MudSelectItem>
+                                    <MudSelectItem T="Sdk.PlayerBriefDto" Value="p">
+                                        <div class="d-flex align-center gap-2">
+                                            <AvailabilityIndicator Availabilities="@AvailabilityFor(p.AccountId)" Size="Size.Small" />
+                                            <span>@PlayerLabel(p)</span>
+                                        </div>
+                                    </MudSelectItem>
                                 }
                             </MudSelect>
                         }
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_note" Label="Note (optional)" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        <MudTextField @bind-Value="_note" Label="Note (optional)" Variant="Variant.Outlined" />
                     </MudItem>
                     <MudItem xs="12" Class="d-flex justify-end">
                         <MudButton OnClick="@SubmitProposalAsync" Color="Color.Primary" Variant="Variant.Filled"
@@ -105,11 +114,23 @@
                     <MudTd DataLabel="Status">
                         <MudChip T="string" Color="@StatusColor(context.Status)" Size="Size.Small" Variant="Variant.Filled">@context.Status</MudChip>
                     </MudTd>
-                    <MudTd DataLabel="Teams">@context.ProposingTeam.Name &harr; @context.ReceivingTeam.Name</MudTd>
+                    <MudTd DataLabel="Teams">
+                        <div class="d-flex align-center flex-wrap gap-2">
+                            @TeamBriefChip(context.ProposingTeam)
+                            <span>&harr;</span>
+                            @TeamBriefChip(context.ReceivingTeam)
+                        </div>
+                    </MudTd>
                     <MudTd DataLabel="Players">
                         <div class="d-flex flex-column">
-                            <MudText Typo="Typo.body2"><b>@context.ProposingTeam.Name:</b> @SidePlayers(context.PlayersFromProposing)</MudText>
-                            <MudText Typo="Typo.body2"><b>@context.ReceivingTeam.Name:</b> @SidePlayers(context.PlayersFromReceiving)</MudText>
+                            <div class="d-flex align-center flex-wrap gap-2">
+                                <MudText Typo="Typo.body2"><b>@context.ProposingTeam.Name:</b></MudText>
+                                @SidePlayers(context.PlayersFromProposing)
+                            </div>
+                            <div class="d-flex align-center flex-wrap gap-2">
+                                <MudText Typo="Typo.body2"><b>@context.ReceivingTeam.Name:</b></MudText>
+                                @SidePlayers(context.PlayersFromReceiving)
+                            </div>
                             @if (!string.IsNullOrWhiteSpace(context.Note))
                             {
                                 <MudText Typo="Typo.caption" Class="mud-text-secondary">"@context.Note"</MudText>
@@ -173,6 +194,7 @@
 
     private HashSet<int> _lockedPlayerIds = [];
     private HashSet<int> _gmAccountIds = [];
+    private Dictionary<int, ICollection<Sdk.PlayerGameAvailabilityDto>> _availabilityByAccount = [];
 
     private IEnumerable<Sdk.PlayerBriefDto> SelectableMyPlayers =>
         _myRoster.Where(p => !_lockedPlayerIds.Contains(p.Id) && !_gmAccountIds.Contains(p.AccountId));
@@ -206,6 +228,8 @@
         if (_authorized)
         {
             await ReloadTradesAsync();
+            _availabilityByAccount = (await BoltonCupApi.GetPlayerAvailabilityAsync(tournamentId: TournamentId))
+                .ToDictionary(x => x.AccountId, x => x.GameAvailabilities);
         }
 
         if (_myTeam is not null)
@@ -275,6 +299,21 @@
         }
     }
 
+    private string SelectedPlayersStringFunc(IReadOnlyList<string?>? playerNames)
+    {
+        if (playerNames is null)
+        {
+            return string.Empty;
+        }
+        var count = playerNames.Count;
+        return count switch
+        {
+            1 or 2 => string.Join(", ", playerNames),
+            >= 3 => playerNames[0] + $" + {count - 1} others",
+            _ => string.Empty
+        } ?? string.Empty;
+    }
+
     private MarkupString GetTradeMarkupString()
     {
         static string Side(string? teamName, IReadOnlyCollection<Sdk.PlayerBriefDto> players) =>
@@ -327,8 +366,44 @@
     private static string PlayerLabel(Sdk.PlayerBriefDto p) =>
         $"{p.FullName} ({p.Position})";
 
-    private static string SidePlayers(ICollection<Sdk.TradePlayerDto> players) =>
-        players.Count == 0 ? "—" : string.Join(", ", players.Select(tp => tp.Player.FullName));
+    private RenderFragment<Sdk.TeamDto> TeamOption => team =>
+        @<div class="d-flex align-center gap-2">
+            @if (!string.IsNullOrWhiteSpace(team.LogoUrl))
+            {
+                <MudImage Src="@team.LogoUrl" Alt="@team.Abbreviation" Height="24" Width="24" />
+            }
+            <span>@team.Name</span>
+        </div>;
+
+    private RenderFragment<Sdk.TeamBriefDto> TeamBriefChip => team =>@<text>
+        <span class="d-flex align-center gap-1">
+            @if (!string.IsNullOrWhiteSpace(team.Logo))
+            {
+                <MudImage Src="@team.Logo" Alt="@team.Abbreviation" Height="20" Width="20" />
+            }
+            <b>@team.Name</b>
+        </span>
+    </text>;
+
+    private RenderFragment<ICollection<Sdk.TradePlayerDto>> SidePlayers => players =>@<text>
+        @if (players.Count == 0)
+        {
+            <span>—</span>
+        }
+        else
+        {
+            @foreach (var tp in players)
+            {
+                <span class="d-flex align-center gap-1">
+                    <AvailabilityIndicator Availabilities="@AvailabilityFor(tp.Player.AccountId)" Size="Size.Small" />
+                    @tp.Player.FullName
+                </span>
+            }
+        }
+    </text>;
+
+    private ICollection<Sdk.PlayerGameAvailabilityDto>? AvailabilityFor(int accountId) =>
+        _availabilityByAccount.GetValueOrDefault(accountId);
 
     private static Color StatusColor(Sdk.TradeStatus status) => status switch
     {
