@@ -14,9 +14,10 @@ public class CookieAuthenticationStateProvider(IBoltonCupApi _api, ILogger<Cooki
     {
         try
         {
-            var currentUser = await _api.GetCurrentUserAsync();
-            if (currentUser is not { IsAuthenticated: true })
+            if (await _api.GetCurrentUserAsync() is not { IsAuthenticated: true } currentUser)
+            {
                 return AnonymousUser;
+            }
 
             var claims = new List<Claim>
             {

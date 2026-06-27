@@ -42,9 +42,13 @@ public class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITou
         entry.IsComplete = command.IsComplete;
 
         if (addNew)
+        {
             await _dbContext.TournamentRegistrations.AddAsync(entry, cancellationToken);
+        }
         else
+        {
             _dbContext.TournamentRegistrations.Update(entry);
+        }
         
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
@@ -103,11 +107,15 @@ public static class TournamentRegistrationExtensions
         try
         {
             if (string.IsNullOrEmpty(registration.Payload))
+            {
                 return false;
+            }
 
             var parsedData = JsonSerializer.Deserialize<UserRegistration>(registration.Payload);
             if (parsedData is null)
+            {
                 return false;
+            }
             
             data = parsedData;
             return true;
