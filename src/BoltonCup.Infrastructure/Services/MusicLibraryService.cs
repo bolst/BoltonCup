@@ -74,6 +74,37 @@ public class MusicLibraryService : IMusicLibraryService
         return track;
     }
 
+    public async Task<int> EnsureTrackAsync(int tournamentId, MusicTrack track, MusicTrackSource sourceIfNew, CancellationToken cancellationToken = default)
+    {
+        var existing = await _db.TournamentMusicTracks.FirstOrDefaultAsync(
+            t => t.TournamentId == tournamentId
+                && t.ProviderType == MusicProviderType.Spotify
+                && t.TrackId == track.Id,
+            cancellationToken);
+
+        if (existing is null)
+        {
+            existing = new TournamentMusicTrack
+            {
+                TournamentId = tournamentId,
+                ProviderType = MusicProviderType.Spotify,
+                TrackId = track.Id,
+                Status = MusicTrackStatus.Pending,
+                Source = sourceIfNew,
+                IsInBasePool = false,
+            };
+            _db.TournamentMusicTracks.Add(existing);
+        }
+
+        // Refresh display metadata whether the row is new or pre-existing.
+        existing.Title = track.Name;
+        existing.Artist = string.IsNullOrWhiteSpace(track.Artist) ? null : track.Artist;
+        existing.AlbumArtUrl = track.AlbumArtUrl;
+
+        await _db.SaveChangesAsync(cancellationToken);
+        return existing.Id;
+    }
+
     public async Task UpdateTrackAsync(UpdateMusicTrackCommand command, CancellationToken cancellationToken = default)
     {
         var track = await _db.TournamentMusicTracks

@@ -10,6 +10,13 @@ public interface IMusicLibraryService
     /// <summary>Commits an uploaded temp file to its final location and persists a new library track.</summary>
     Task<TournamentMusicTrack> AddTrackAsync(AddMusicTrackCommand command, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Ensures a track exists for the given (tournament, provider, track id), returning its id. An existing row
+    /// (player request, import, or upload) has its metadata refreshed; a new row is inserted as a pending,
+    /// non-base-pool request so the fetcher downloads it. Used to register team goal/win song selections.
+    /// </summary>
+    Task<int> EnsureTrackAsync(int tournamentId, MusicTrack track, MusicTrackSource sourceIfNew, CancellationToken cancellationToken = default);
+
     /// <summary>Updates a track's metadata / base-pool flag.</summary>
     Task UpdateTrackAsync(UpdateMusicTrackCommand command, CancellationToken cancellationToken = default);
 

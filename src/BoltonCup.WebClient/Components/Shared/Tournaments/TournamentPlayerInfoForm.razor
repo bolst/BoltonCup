@@ -63,6 +63,21 @@
                              ValueChanged="OnTrackChanged"
                              Class="mb-4" />
 
+            @if (_managedTeam is { } managedTeam)
+            {
+                <MudDivider Class="my-4" />
+                <MudText Typo="Typo.h6" Class="mb-1"><b>Team Music — @managedTeam.TeamName</b></MudText>
+                <MudText Typo="Typo.body2" Class="mb-3 mud-text-secondary">As GM, pick the songs that play when your team scores and wins.</MudText>
+                <SongPickerField Label="Goal song"
+                                 Value="_goalSong"
+                                 ValueChanged="@(track => _goalSong = track)"
+                                 Class="mb-3" />
+                <SongPickerField Label="Win song"
+                                 Value="_winSong"
+                                 ValueChanged="@(track => _winSong = track)"
+                                 Class="mb-4" />
+            }
+
             <div class="d-flex justify-end">
                 <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
@@ -92,6 +107,9 @@
     private IReadOnlyList<Sdk.GameDto> _games = [];
     private readonly Dictionary<int, string> _availability = new();
     private Sdk.MusicTrackDto? _selectedTrack;
+    private Sdk.ManagedTeamDto? _managedTeam;
+    private Sdk.MusicTrackDto? _goalSong;
+    private Sdk.MusicTrackDto? _winSong;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -109,6 +127,9 @@
                 _availability[availability.GameId] = availability.Availability.ToString();
             }
             _selectedTrack = dto.Song;
+            _managedTeam = dto.ManagedTeam;
+            _goalSong = dto.ManagedTeam?.GoalSong;
+            _winSong = dto.ManagedTeam?.WinSong;
             _isInTournament = true;
         }
         catch (Sdk.ApiException<Sdk.BoltonCupProblemDetails> e)
@@ -173,6 +194,16 @@
                     .ToList(),
                 Song = _selectedTrack,
             });
+
+            if (_managedTeam is { } managedTeam)
+            {
+                await BoltonCupApi.UpdateTeamSongsAsync(managedTeam.TeamId, new Sdk.UpdateTeamSongsRequest
+                {
+                    GoalSong = _goalSong,
+                    WinSong = _winSong,
+                });
+            }
+
             Snackbar.Add("Your info has been saved.", Severity.Success);
         }
         catch

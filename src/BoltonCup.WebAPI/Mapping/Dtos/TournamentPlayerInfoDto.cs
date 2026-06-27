@@ -11,4 +11,23 @@ public record TournamentPlayerInfoDto
 
     /// <summary>Gets the games of the player's assigned team (empty if the player has no team yet).</summary>
     public IReadOnlyList<GameDto> Games { get; init; } = [];
+
+    /// <summary>Gets the team the requester GMs in this tournament, if any (enables GM-only song controls).</summary>
+    public ManagedTeamDto? ManagedTeam { get; init; }
+}
+
+/// <summary>The team a GM manages in a tournament, with its current goal/win song selections.</summary>
+public record ManagedTeamDto
+{
+    /// <summary>Gets the managed team's id.</summary>
+    public int TeamId { get; init; }
+
+    /// <summary>Gets the managed team's name.</summary>
+    public string TeamName { get; init; } = string.Empty;
+
+    /// <summary>Gets the team's currently selected goal song, if any.</summary>
+    public MusicTrackDto? GoalSong { get; init; }
+
+    /// <summary>Gets the team's currently selected win song, if any.</summary>
+    public MusicTrackDto? WinSong { get; init; }
 }

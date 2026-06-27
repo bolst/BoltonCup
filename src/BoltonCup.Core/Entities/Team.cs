@@ -13,12 +13,17 @@ public class Team : EntityBase
     public required string PrimaryColorHex { get; set; }
     public required string SecondaryColorHex { get; set; }
     public string? TertiaryColorHex { get; set; }
-    public string? GoalSong { get; set; }
-    public string? PenaltySong { get; set; }
-    public string? WinSong { get; set; }
+
+    /// <summary>The library track played when this team scores. Null until a GM picks one.</summary>
+    public int? GoalSongTrackId { get; set; }
+
+    /// <summary>The library track played when this team wins. Null until a GM picks one.</summary>
+    public int? WinSongTrackId { get; set; }
 
     public Tournament Tournament { get; set; } = null!;
     public Account? GeneralManager { get; set; }
+    public TournamentMusicTrack? GoalSongTrack { get; set; }
+    public TournamentMusicTrack? WinSongTrack { get; set; }
     public ICollection<Player> Players { get; set; } = [];
     public ICollection<Game> HomeGames { get; set; } = [];
     public ICollection<Game> AwayGames { get; set; } = [];

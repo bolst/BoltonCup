@@ -16,4 +16,10 @@ public record GameAvailabilitySelection(int GameId, GameAvailability Availabilit
 
 public record SongRequestSelection(string TrackId, string Name, string Artist, string? AlbumArtUrl);
 
-public record TournamentPlayerInfoContext(TournamentPlayerInfo? Info, IReadOnlyList<Game> TeamGames);
+public record TournamentPlayerInfoContext(
+    TournamentPlayerInfo? Info,
+    IReadOnlyList<Game> TeamGames,
+    ManagedTeamSongs? ManagedTeam = null);
+
+/// <summary>The team the requesting user is GM of in this tournament, with its current song selections.</summary>
+public record ManagedTeamSongs(int TeamId, string TeamName, TournamentMusicTrack? GoalSongTrack, TournamentMusicTrack? WinSongTrack);

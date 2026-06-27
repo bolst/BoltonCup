@@ -8642,6 +8642,143 @@
         ]
       }
     },
+    "/api/teams/{id}/songs": {
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "description": "Sets the team's goal and win songs (admin or the team's GM). A null song clears that selection.",
+        "operationId": "UpdateTeamSongs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateTeamSongsRequest"
+                  }
+                ],
+                "description": "Request to set a team's goal and win songs. A null song clears that selection."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateTeamSongsRequest"
+                  }
+                ],
+                "description": "Request to set a team's goal and win songs. A null song clears that selection."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateTeamSongsRequest"
+                  }
+                ],
+                "description": "Request to set a team's goal and win songs. A null song clears that selection."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/tournaments/{id}/music": {
       "get": {
         "tags": [
@@ -13830,6 +13967,40 @@
         "additionalProperties": false,
         "description": "Request payload for authenticating a user."
       },
+      "ManagedTeamDto": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "description": "Gets the managed team's id.",
+            "format": "int32"
+          },
+          "teamName": {
+            "type": "string",
+            "description": "Gets the managed team's name."
+          },
+          "goalSong": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MusicTrackDto"
+              }
+            ],
+            "description": "Gets the team's currently selected goal song, if any.",
+            "nullable": true
+          },
+          "winSong": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MusicTrackDto"
+              }
+            ],
+            "description": "Gets the team's currently selected win song, if any.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The team a GM manages in a tournament, with its current goal/win song selections."
+      },
       "MissingSongRequestDto": {
         "type": "object",
         "properties": {
@@ -15289,12 +15460,12 @@
           },
           "goalSongUrl": {
             "type": "string",
-            "description": "Gets the URL of the team's goal celebration song.",
+            "description": "Gets the URL of the team's goal celebration song, once its track has been downloaded.",
             "nullable": true
           },
-          "penaltySongUrl": {
+          "winSongUrl": {
             "type": "string",
-            "description": "Gets the URL of the team's penalty song.",
+            "description": "Gets the URL of the team's win song, once its track has been downloaded.",
             "nullable": true
           },
           "gmAccountId": {
@@ -15470,12 +15641,12 @@
           },
           "goalSongUrl": {
             "type": "string",
-            "description": "Gets the URL of the team's goal celebration song.",
+            "description": "Gets the URL of the team's goal celebration song, once its track has been downloaded.",
             "nullable": true
           },
-          "penaltySongUrl": {
+          "winSongUrl": {
             "type": "string",
-            "description": "Gets the URL of the team's penalty song.",
+            "description": "Gets the URL of the team's win song, once its track has been downloaded.",
             "nullable": true
           },
           "gmAccountId": {
@@ -15736,6 +15907,15 @@
               "$ref": "#/components/schemas/GameDto"
             },
             "description": "Gets the games of the player's assigned team (empty if the player has no team yet)."
+          },
+          "managedTeam": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ManagedTeamDto"
+              }
+            ],
+            "description": "Gets the team the requester GMs in this tournament, if any (enables GM-only song controls).",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -16349,6 +16529,31 @@
         },
         "additionalProperties": false,
         "description": "Request to update an existing penalty. All fields are replaced."
+      },
+      "UpdateTeamSongsRequest": {
+        "type": "object",
+        "properties": {
+          "goalSong": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MusicTrackDto"
+              }
+            ],
+            "description": "Gets the picked goal song, or null to clear it.",
+            "nullable": true
+          },
+          "winSong": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MusicTrackDto"
+              }
+            ],
+            "description": "Gets the picked win song, or null to clear it.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request to set a team's goal and win songs. A null song clears that selection."
       },
       "UpdateTournamentPlayerInfoRequest": {
         "type": "object",
