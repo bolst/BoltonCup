@@ -36,7 +36,7 @@
         <PropertyColumn Title="Friends" Property="x => x.Friends" />
         <PropertyColumn Title="#" Property="x => x.JerseyNumber" Required="false" />
         <EnumColumn Title="Captaincy" Property="x => x.Captaincy" Required="false" />
-        <ForeignColumn Title="Team" Property="x => x.Team" PropertySetter="(game, team) => game.Team = team"
+        <ForeignColumn Title="Team" Property="x => x.Team" PropertySetter="(game, team) => { game.Team = team; game.TeamId = team?.Id; }"
                        EqualityComparer="new TeamComparer()!" ImageSrcFunc="x => x.Logo" Filter="_ => team => team.TournamentId == TournamentId"
                        Required="false" />
         <ForeignColumn Title="Tournament" Property="x => x.Tournament" Editable="false" ImageSrcFunc="x => x.Logo" />
