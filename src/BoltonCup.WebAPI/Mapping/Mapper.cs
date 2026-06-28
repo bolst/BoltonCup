@@ -1601,6 +1601,7 @@ public class Mapper : IMapper
             WinningTeamId = tournament.WinningTeamId,
             IsActive = tournament.IsActive,
             IsRegistrationOpen = tournament.IsRegistrationOpen,
+            IsPlayerInfoOpen = tournament.IsPlayerInfoOpen,
             IsTradingOpen = tournament.IsTradingOpen,
             Logo = _urlResolver.GetFullUrl(tournament.Logo),
         };

@@ -16260,6 +16260,10 @@
             "type": "boolean",
             "description": "Gets or sets whether registration is currently open."
           },
+          "isPlayerInfoOpen": {
+            "type": "boolean",
+            "description": "Gets or sets whether player info is currently open."
+          },
           "isTradingOpen": {
             "type": "boolean",
             "description": "Gets or sets whether player trading is currently open."

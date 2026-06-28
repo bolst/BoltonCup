@@ -40,6 +40,9 @@
                             <MudText Typo="Typo.body2" Class="mud-text-secondary">@(player.Team?.Name ?? "Free agent")</MudText>
                         </div>
                     </div>
+
+                    <TournamentPlayerInfoButton TournamentId="player.Tournament.Id" IsPlayerInfoOpen="player.Tournament.IsRegistrationOpen" FullWidth Size="Size.Large" />
+
                     @if (player.Tournament.IsTradingOpen)
                     {
                         <MudButton Href="@($"/tournaments/{player.Tournament.Id}/trade-hub")"
