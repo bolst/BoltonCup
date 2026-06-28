@@ -30,7 +30,7 @@
             var color = index % 2 != 0 ? string.Empty : "gray lighten-3";
             var listImage = !string.IsNullOrWhiteSpace(player.Team?.Logo) ? player.Team.Logo : player.Tournament.Logo;
             <MudListItem T="string" Class="@color">
-                <div class="d-flex flex-row align-center justify-space-between gap-3" style="width: 100%">
+                <div class="d-flex flex-row align-center justify-space-between gap-3 flex-wrap" style="width: 100%">
                     <div class="d-flex flex-row align-center gap-3">
                         <div class="d-flex flex-column align-center" style="width: 64px">
                             <MudImage Src="@listImage" Height="48"/>
