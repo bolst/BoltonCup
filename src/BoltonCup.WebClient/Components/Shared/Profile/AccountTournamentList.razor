@@ -41,7 +41,13 @@
                         </div>
                     </div>
 
-                    <TournamentPlayerInfoButton TournamentId="player.Tournament.Id" IsPlayerInfoOpen="player.Tournament.IsRegistrationOpen" FullWidth Size="Size.Large" />
+                    @if (player.Tournament.IsPlayerInfoOpen)
+                    {
+                        <MudButton Href="@($"/tournaments/{player.Tournament.Id}/player-info")"
+                                   Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
+                            Edit Player Info
+                        </MudButton>
+                    }
 
                     @if (player.Tournament.IsTradingOpen)
                     {
