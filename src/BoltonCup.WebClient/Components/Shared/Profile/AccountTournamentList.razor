@@ -49,7 +49,7 @@
                         </MudButton>
                     }
 
-                    @if (player.Tournament.IsTradingOpen)
+                    @if (player.Tournament.IsTradingOpen && (_isAdmin || _gmTournamentIds.Contains(player.Tournament.Id)))
                     {
                         <MudButton Href="@($"/tournaments/{player.Tournament.Id}/trade-hub")"
                                    Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
@@ -66,12 +66,24 @@
 
 @code {
 
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthState { get; set; }
+
     private ICollection<Sdk.TournamentDto> _openTournaments = [];
     private ICollection<Sdk.AccountTournamentDto> _userTournaments = [];
-    
-    protected override Task OnInitializedAsync()
+    private HashSet<int> _gmTournamentIds = [];
+    private bool _isAdmin;
+
+    protected override async Task OnInitializedAsync()
     {
-        return Task.WhenAll(
+        if (AuthState is not null)
+        {
+            var user = (await AuthState).User;
+            _isAdmin = user.IsInRole("Admin");
+            _gmTournamentIds = user.GetTournamentGmIds().ToHashSet();
+        }
+
+        await Task.WhenAll(
             GetOpenTournaments(),
             GetMyTournaments()
         );
