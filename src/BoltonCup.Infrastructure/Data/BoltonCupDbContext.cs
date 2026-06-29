@@ -42,6 +42,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<CustomRankingShare> CustomRankingShares { get; set; }
     public DbSet<SentEmail> SentEmails { get; set; }
     public DbSet<EmailLog> EmailLogs { get; set; }
+    public DbSet<SmsLog> SmsLogs { get; set; }
     public DbSet<EmailDraft> EmailDrafts { get; set; }
     public DbSet<Trade> Trades { get; set; }
     public DbSet<TradePlayer> TradePlayers { get; set; }
@@ -1080,6 +1081,18 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Succeeded).HasColumnName("succeeded");
             entity.Property(e => e.Error).HasColumnName("error");
             entity.Property(e => e.BroadcastId).HasColumnName("broadcast_id");
+        });
+
+        modelBuilder.Entity<SmsLog>(entity =>
+        {
+            entity
+                .ToTable("sms_logs")
+                .HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.Recipient).HasColumnName("recipient");
+            entity.Property(e => e.Body).HasColumnName("body");
+            entity.Property(e => e.Succeeded).HasColumnName("succeeded");
+            entity.Property(e => e.Error).HasColumnName("error");
         });
 
         modelBuilder.Entity<EmailDraft>(entity =>

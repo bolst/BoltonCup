@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
 
         builder.Services.AddMemoryCache();
         builder.AddBoltonCupEmails();
+        builder.AddBoltonCupSms();
         builder.AddBoltonCupS3();
         builder.AddBoltonCupPayments();
         builder.AddBoltonCupMusic();
@@ -115,6 +116,26 @@ public static class ServiceCollectionExtensions
             .AddTransient<IEmailer, EmailSender>();
     }
     
+    private static IServiceCollection AddBoltonCupSms(this WebApplicationBuilder builder)
+    {
+        builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twilio"));
+
+        // Set "Twilio:Enabled": false (e.g. in appsettings.Development.json) to log texts instead of sending them.
+        if (builder.Configuration.GetValue("Twilio:Enabled", true))
+        {
+            builder.Services.AddSingleton<ISmsTransport, TwilioSmsTransport>();
+        }
+        else
+        {
+            builder.Services.AddSingleton<ISmsTransport, LoggingSmsTransport>();
+        }
+
+        return builder.Services
+            .AddSingleton<ISmsQueue, SmsQueue>()
+            .AddHostedService<SmsBackgroundService>()
+            .AddTransient<ISmsSender, SmsSender>();
+    }
+
     private static IServiceCollection AddBoltonCupS3(this WebApplicationBuilder builder)
     {
         var r2Config = builder.Configuration.GetRequiredSection("CloudflareR2");
