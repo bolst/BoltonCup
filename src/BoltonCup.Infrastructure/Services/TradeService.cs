@@ -23,8 +23,8 @@ public class TradeService(
         return await _dbContext.Trades
             .AsNoTracking()
             .AsSplitQuery()
-            .Include(t => t.ProposingTeam)
-            .Include(t => t.ReceivingTeam)
+            .Include(t => t.ProposingTeam).ThenInclude(t => t.GeneralManagers)
+            .Include(t => t.ReceivingTeam).ThenInclude(t => t.GeneralManagers)
             .Include(t => t.Players)
             .ThenInclude(tp => tp.Player)
             .ThenInclude(p => p.Account)
