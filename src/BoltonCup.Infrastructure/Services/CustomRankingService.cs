@@ -70,6 +70,36 @@ public class CustomRankingService(
         return ranking.Id;
     }
 
+    public async Task<int> CloneAsync(int sourceRankingId, int ownerAccountId, string? title = null, CancellationToken cancellationToken = default)
+    {
+        var source = await _dbContext.CustomRankings
+                         .AsNoTracking()
+                         .Include(r => r.Players)
+                         .FirstOrDefaultAsync(r => r.Id == sourceRankingId, cancellationToken)
+                     ?? throw new EntityNotFoundException(nameof(CustomRanking), sourceRankingId);
+
+        var clone = new CustomRanking
+        {
+            AccountId = ownerAccountId,
+            TournamentId = source.TournamentId,
+            Title = string.IsNullOrWhiteSpace(title) ? $"Copy of {source.Title}" : title.Trim(),
+            Players = source.Players
+                .Select(p => new CustomRankingPlayer
+                {
+                    PlayerId = p.PlayerId,
+                    Rank = p.Rank,
+                    GamesPlayed = p.GamesPlayed,
+                    TotalPoints = p.TotalPoints,
+                })
+                .ToList(),
+        };
+
+        _dbContext.CustomRankings.Add(clone);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return clone.Id;
+    }
+
     public async Task UpdateAsync(int id, UpdateCustomRankingCommand command, CancellationToken cancellationToken = default)
     {
         var ranking = await _dbContext.CustomRankings

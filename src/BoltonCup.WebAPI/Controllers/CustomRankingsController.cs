@@ -115,6 +115,28 @@ public class CustomRankingsController(
         return Ok(newId);
     }
 
+    /// <summary>Clones a ranking the user can access (owner, admin, or shared viewer) into a new ranking they own.</summary>
+    [HttpPost("{id:int}/clone")]
+    public async Task<ActionResult<int>> CloneCustomRanking(int id, [FromBody] CloneCustomRankingRequest request)
+    {
+        var ranking = await _customRankingService.GetByIdAsync(id);
+        if (ranking is null)
+            return NotFound();
+
+        var accountId = User.GetAccountId();
+        var canView = ranking.AccountId == accountId
+                      || User.IsInRole(Admin)
+                      || ranking.SharedWith.Any(s => s.SharedWithAccountId == accountId);
+        if (!canView)
+            return Forbid();
+
+        if (!User.IsInRole(Admin) && !User.IsGmForTournament(ranking.TournamentId))
+            return Forbid();
+
+        var newId = await _customRankingService.CloneAsync(id, accountId, request.Title);
+        return Ok(newId);
+    }
+
     /// <summary>Updates a custom ranking's title and/or player order (owner or admin only).</summary>
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateCustomRanking(int id, [FromBody] UpdateCustomRankingRequest request)

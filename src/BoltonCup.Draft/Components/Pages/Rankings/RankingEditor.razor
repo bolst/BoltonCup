@@ -51,6 +51,9 @@
                     </MudToggleItem>
                 </MudToggleGroup>
 
+                <MudButton Variant="Variant.Outlined" Color="Color.Default"
+                           StartIcon="@Icons.Material.Rounded.ContentCopy"
+                           OnClick="@CloneAsync">Make a copy</MudButton>
                 @if (_ranking.CanEdit)
                 {
                     <MudButton Variant="Variant.Outlined" Color="Color.Primary"
@@ -212,6 +215,21 @@
         });
         _dirty = false;
         Snackbar.Add("Ranking saved", Severity.Success);
+    }
+
+    private async Task CloneAsync()
+    {
+        if (_ranking is null)
+            return;
+
+        var parameters = new DialogParameters<CloneRankingDialog> { { x => x.SourceTitle, _ranking.Title } };
+        var dialog = await DialogService.ShowAsync<CloneRankingDialog>("Make a copy", parameters);
+        var result = await dialog.Result;
+        if (result?.Data is string { Length: > 0 } title)
+        {
+            var newId = await BoltonCupApi.CloneCustomRankingAsync(Id, new Sdk.CloneCustomRankingRequest { Title = title });
+            Navigation.NavigateTo($"/rankings/{newId}", true);
+        }
     }
 
     private async Task ShareAsync()

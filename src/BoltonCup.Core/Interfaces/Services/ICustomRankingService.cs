@@ -14,6 +14,7 @@ public interface ICustomRankingService
     Task<IReadOnlyList<CustomRanking>> GetSharedWithAccountAsync(int accountId, int? tournamentId = null, CancellationToken cancellationToken = default);
     Task<CustomRanking?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<int> CreateAsync(CreateCustomRankingCommand command, CancellationToken cancellationToken = default);
+    Task<int> CloneAsync(int sourceRankingId, int ownerAccountId, string? title = null, CancellationToken cancellationToken = default);
     Task UpdateAsync(int id, UpdateCustomRankingCommand command, CancellationToken cancellationToken = default);
     Task DeleteAsync(int id, CancellationToken cancellationToken = default);
 

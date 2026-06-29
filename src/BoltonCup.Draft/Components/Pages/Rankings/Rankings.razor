@@ -63,13 +63,15 @@
                     </MudText>
                 </div>
             </div>
-            @if (owned)
-            {
-                <div @onclick:stopPropagation="true">
+            <div @onclick:stopPropagation="true" class="d-flex flex-row align-center">
+                <MudIconButton Icon="@Icons.Material.Rounded.ContentCopy" Color="Color.Default"
+                               OnClick="@(() => CloneRankingAsync(ranking))"/>
+                @if (owned)
+                {
                     <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error"
                                    OnClick="@(() => DeleteRankingAsync(ranking.Id))"/>
-                </div>
-            }
+                }
+            </div>
         </MudPaper>;
 }
 
@@ -112,6 +114,18 @@
         {
             NavigateToRanking(newId);
         }
+    }
+
+    private async Task CloneRankingAsync(Sdk.CustomRankingDto ranking)
+    {
+        var parameters = new DialogParameters<CloneRankingDialog> { { x => x.SourceTitle, ranking.Title } };
+        var dialog = await DialogService.ShowAsync<CloneRankingDialog>("Make a copy", parameters);
+        var result = await dialog.Result;
+        if (result?.Data is not string title)
+            return;
+
+        var newId = await BoltonCupApi.CloneCustomRankingAsync(ranking.Id, new Sdk.CloneCustomRankingRequest { Title = title });
+        NavigateToRanking(newId);
     }
 
     private async Task DeleteRankingAsync(int id)

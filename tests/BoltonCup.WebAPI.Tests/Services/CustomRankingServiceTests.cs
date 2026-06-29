@@ -141,6 +141,73 @@ public class CustomRankingServiceTests
     }
 
     [Fact]
+    public async Task CloneAsync_CopiesPlayers_WithNewOwnerAndCopyTitle()
+    {
+        await using var db = await SeedAsync();
+        db.CustomRankingPlayers.AddRange(
+            new CustomRankingPlayer { CustomRankingId = RankingId, PlayerId = 10, Rank = 1, GamesPlayed = 5, TotalPoints = 12 },
+            new CustomRankingPlayer { CustomRankingId = RankingId, PlayerId = 11, Rank = 2, GamesPlayed = 4, TotalPoints = 8 },
+            new CustomRankingPlayer { CustomRankingId = RankingId, PlayerId = 12, Rank = 3, GamesPlayed = 3, TotalPoints = 3 });
+        await db.SaveChangesAsync();
+        var service = new CustomRankingService(db);
+
+        var newId = await service.CloneAsync(RankingId, Gm1Id);
+
+        newId.Should().NotBe(RankingId);
+        var clone = await db.CustomRankings
+            .Include(r => r.Players)
+            .FirstAsync(r => r.Id == newId);
+
+        clone.AccountId.Should().Be(Gm1Id);
+        clone.TournamentId.Should().Be(TournamentId);
+        clone.Title.Should().Be("Copy of My Board");
+        clone.Players.Select(p => new { p.PlayerId, p.Rank, p.GamesPlayed, p.TotalPoints })
+            .Should().BeEquivalentTo(new[]
+            {
+                new { PlayerId = 10, Rank = 1, GamesPlayed = 5, TotalPoints = 12 },
+                new { PlayerId = 11, Rank = 2, GamesPlayed = 4, TotalPoints = 8 },
+                new { PlayerId = 12, Rank = 3, GamesPlayed = 3, TotalPoints = 3 },
+            });
+        clone.Players.Select(p => p.Id).Should().NotContain(0);
+    }
+
+    [Fact]
+    public async Task CloneAsync_UsesProvidedTitle_WhenGiven()
+    {
+        await using var db = await SeedAsync();
+        var service = new CustomRankingService(db);
+
+        var newId = await service.CloneAsync(RankingId, Gm1Id, "My Draft Plan");
+
+        var clone = await db.CustomRankings.FirstAsync(r => r.Id == newId);
+        clone.Title.Should().Be("My Draft Plan");
+    }
+
+    [Fact]
+    public async Task CloneAsync_FallsBackToCopyTitle_WhenBlank()
+    {
+        await using var db = await SeedAsync();
+        var service = new CustomRankingService(db);
+
+        var newId = await service.CloneAsync(RankingId, Gm1Id, "   ");
+
+        var clone = await db.CustomRankings.FirstAsync(r => r.Id == newId);
+        clone.Title.Should().Be("Copy of My Board");
+    }
+
+    [Fact]
+    public async Task CloneAsync_DoesNotCopyShares()
+    {
+        await using var db = await SeedAsync();
+        var service = new CustomRankingService(db);
+        await service.AddShareAsync(RankingId, Gm2Id);
+
+        var newId = await service.CloneAsync(RankingId, Gm1Id);
+
+        (await db.CustomRankingShares.AnyAsync(s => s.CustomRankingId == newId)).Should().BeFalse();
+    }
+
+    [Fact]
     public async Task GetByIdAsync_IncludesSharedWith()
     {
         await using var db = await SeedAsync();
