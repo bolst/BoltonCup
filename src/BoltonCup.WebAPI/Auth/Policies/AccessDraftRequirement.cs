@@ -38,7 +38,7 @@ public class DraftAccessHandler(BoltonCupDbContext _dbContext)
 
         var isTournamentGm = await _dbContext.Drafts
             .Where(d => d.Id == draftId)
-            .Where(d => d.Tournament.Teams.Any(t => t.GmAccountId == accountId))
+            .Where(d => d.Tournament.Teams.Any(t => t.GeneralManagers.Any(g => g.Id == accountId)))
             .AnyAsync();
 
         if (isTournamentGm)

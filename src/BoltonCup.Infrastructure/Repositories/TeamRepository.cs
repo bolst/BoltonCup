@@ -11,7 +11,7 @@ public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
     {
         return await _context.Teams
             .AsNoTracking()
-            .Include(e => e.GeneralManager)
+            .Include(e => e.GeneralManagers)
             .Include(e => e.Tournament)
             .Include(e => e.GoalSongTrack)
             .Include(e => e.WinSongTrack)
@@ -28,7 +28,7 @@ public class TeamRepository(BoltonCupDbContext _context) : ITeamRepository
     {
         return await _context.Teams
             .AsNoTracking()
-            .Include(e => e.GeneralManager)
+            .Include(e => e.GeneralManagers)
             .Include(e => e.Tournament)
             .Include(e => e.GoalSongTrack)
             .Include(e => e.WinSongTrack)

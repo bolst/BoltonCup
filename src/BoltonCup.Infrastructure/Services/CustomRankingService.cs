@@ -177,9 +177,11 @@ public class CustomRankingService(
             throw new InvalidOperationException("Cannot share a ranking with its owner.");
 
         var isGm = await _dbContext.Teams
-            .AnyAsync(t => t.TournamentId == ranking.TournamentId && t.GmAccountId == accountId, cancellationToken);
+            .AnyAsync(t => t.TournamentId == ranking.TournamentId && t.GeneralManagers.Any(g => g.Id == accountId), cancellationToken);
         if (!isGm)
+        {
             throw new InvalidOperationException("Rankings can only be shared with a GM of the tournament.");
+        }
 
         var exists = await _dbContext.CustomRankingShares
             .AnyAsync(s => s.CustomRankingId == rankingId && s.SharedWithAccountId == accountId, cancellationToken);
@@ -214,8 +216,8 @@ public class CustomRankingService(
         var pattern = $"%{query}%";
 
         var gmAccountIds = _dbContext.Teams
-            .Where(t => t.TournamentId == ranking.TournamentId && t.GmAccountId != null)
-            .Select(t => t.GmAccountId!.Value);
+            .Where(t => t.TournamentId == ranking.TournamentId)
+            .SelectMany(t => t.GeneralManagers.Select(g => g.Id));
 
         var alreadyShared = _dbContext.CustomRankingShares
             .Where(s => s.CustomRankingId == rankingId)

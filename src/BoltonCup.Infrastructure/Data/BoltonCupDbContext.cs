@@ -44,6 +44,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<EmailLog> EmailLogs { get; set; }
     public DbSet<Trade> Trades { get; set; }
     public DbSet<TradePlayer> TradePlayers { get; set; }
+    public DbSet<TeamGeneralManager> TeamGeneralManagers { get; set; }
     public DbSet<Referee> Referees { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -811,9 +812,22 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany(e => e.Teams)
                 .HasForeignKey(e => e.TournamentId);
             entity
-                .HasOne(e => e.GeneralManager)
-                .WithMany(e => e.ManagedTeams)
-                .HasForeignKey(e => e.GmAccountId);
+                .HasMany(e => e.GeneralManagers)
+                .WithMany(a => a.ManagedTeams)
+                .UsingEntity<TeamGeneralManager>(
+                    j => j.HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId),
+                    j => j.HasOne(x => x.Team).WithMany().HasForeignKey(x => x.TeamId),
+                    j =>
+                    {
+                        j.ToTable("team_general_managers");
+                        j.HasKey(x => new { x.TeamId, x.AccountId });
+                        j.Property(x => x.TeamId).HasColumnName("team_id");
+                        j.Property(x => x.AccountId).HasColumnName("account_id");
+                        j.Property(x => x.TournamentId).HasColumnName("tournament_id");
+                        j.HasOne<Tournament>().WithMany().HasForeignKey(x => x.TournamentId);
+                        // Enforce that an account can be GM of at most one team per tournament.
+                        j.HasIndex(x => new { x.TournamentId, x.AccountId }).IsUnique();
+                    });
             // Team songs reference library tracks; deleting a track just clears the reference.
             entity
                 .HasOne(e => e.GoalSongTrack)
@@ -830,7 +844,6 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.NameShort).HasColumnName("name_short");
             entity.Property(e => e.Abbreviation).HasColumnName("abbreviation");
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
-            entity.Property(e => e.GmAccountId).HasColumnName("gm_account_id");
             entity.Property(e => e.Logo).HasColumnName("logo_key");
             entity.Property(e => e.Banner).HasColumnName("banner_key");
             entity.Property(e => e.PrimaryColorHex).HasColumnName("primary_hex");

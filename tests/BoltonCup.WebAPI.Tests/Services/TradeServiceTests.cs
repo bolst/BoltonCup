@@ -60,12 +60,12 @@ public class TradeServiceTests
             GoalieLimit = goalieLimit,
         });
 
-        db.Accounts.AddRange(
-            Account(GmAAccountId), Account(GmBAccountId),
-            Account(AdminAccountId));
+        var gmA = Account(GmAAccountId);
+        var gmB = Account(GmBAccountId);
+        db.Accounts.AddRange(gmA, gmB, Account(AdminAccountId));
 
-        db.Teams.Add(Team(TeamAId, GmAAccountId));
-        db.Teams.Add(Team(TeamBId, GmBAccountId));
+        db.Teams.Add(Team(TeamAId, gmA));
+        db.Teams.Add(Team(TeamBId, gmB));
 
         var pid = 1;
         foreach (var (teamId, _) in new[] { (TeamAId, GmAAccountId), (TeamBId, GmBAccountId) })
@@ -99,7 +99,7 @@ public class TradeServiceTests
         Birthday = new DateTime(1990, 1, 1),
     };
 
-    private static Team Team(int id, int gmAccountId) => new()
+    private static Team Team(int id, Account gm) => new()
     {
         Id = id,
         Name = $"Team {id}",
@@ -108,7 +108,7 @@ public class TradeServiceTests
         PrimaryColorHex = "#000000",
         SecondaryColorHex = "#ffffff",
         TournamentId = TournamentId,
-        GmAccountId = gmAccountId,
+        GeneralManagers = [gm],
     };
 
     // Team A forwards are player ids 2..5 (id 1 is a goalie); Team B forwards are 7..10 (id 6 goalie).
@@ -164,10 +164,11 @@ public class TradeServiceTests
     public async Task Create_GmPlayerIneligible_Throws()
     {
         await using var db = await SeedAsync();
-        // Make player 2's account the GM of team A
+        // Make player 2's account a GM of team A
         var player2 = await db.Players.FirstAsync(p => p.Id == 2);
-        var teamA = await db.Teams.FirstAsync(t => t.Id == TeamAId);
-        teamA.GmAccountId = player2.AccountId;
+        var teamA = await db.Teams.Include(t => t.GeneralManagers).FirstAsync(t => t.Id == TeamAId);
+        var player2Account = await db.Accounts.FirstAsync(a => a.Id == player2.AccountId);
+        teamA.GeneralManagers.Add(player2Account);
         await db.SaveChangesAsync();
 
         var service = NewService(db, out _);

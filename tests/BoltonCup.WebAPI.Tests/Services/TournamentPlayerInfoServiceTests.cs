@@ -45,8 +45,9 @@ public class TournamentPlayerInfoServiceTests
     {
         var db = NewContext();
         db.Tournaments.Add(new Tournament { Id = TournamentId, Name = "Test Cup" });
+        var gm = Account(GmId, "Gina", "Manager");
         db.Accounts.AddRange(
-            Account(GmId, "Gina", "Manager"),
+            gm,
             Account(PlayerId, "Pat", "Player"));
 
         db.TournamentMusicTracks.Add(new TournamentMusicTrack
@@ -64,7 +65,7 @@ public class TournamentPlayerInfoServiceTests
         {
             Id = TeamId,
             TournamentId = TournamentId,
-            GmAccountId = GmId,
+            GeneralManagers = [gm],
             Name = "Test Team",
             NameShort = "Test",
             Abbreviation = "TST",

@@ -57,12 +57,12 @@ public class TradeService(
         }
 
         var proposingTeam = await _dbContext.Teams
-                                .Include(t => t.GeneralManager) 
-                                .FirstOrDefaultAsync(t => t.Id == command.ProposingTeamId, cancellationToken) 
+                                .Include(t => t.GeneralManagers)
+                                .FirstOrDefaultAsync(t => t.Id == command.ProposingTeamId, cancellationToken)
                             ?? throw new EntityNotFoundException(nameof(Team), command.ProposingTeamId);
         var receivingTeam = await _dbContext.Teams
-                                .Include(t => t.GeneralManager) 
-                                .FirstOrDefaultAsync(t => t.Id == command.ReceivingTeamId, cancellationToken) 
+                                .Include(t => t.GeneralManagers)
+                                .FirstOrDefaultAsync(t => t.Id == command.ReceivingTeamId, cancellationToken)
                             ?? throw new EntityNotFoundException(nameof(Team), command.ReceivingTeamId);
 
         if (proposingTeam.TournamentId != command.TournamentId || receivingTeam.TournamentId != command.TournamentId)
@@ -237,8 +237,8 @@ public class TradeService(
     {
         return await _dbContext.Trades
             .Include(t => t.Tournament)
-            .Include(t => t.ProposingTeam).ThenInclude(team => team.GeneralManager)
-            .Include(t => t.ReceivingTeam).ThenInclude(team => team.GeneralManager)
+            .Include(t => t.ProposingTeam).ThenInclude(team => team.GeneralManagers)
+            .Include(t => t.ReceivingTeam).ThenInclude(team => team.GeneralManagers)
             .Include(t => t.Players).ThenInclude(tp => tp.Player).ThenInclude(p => p.Account)
             .FirstOrDefaultAsync(t => t.Id == tradeId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Trade), tradeId);
@@ -303,8 +303,8 @@ public class TradeService(
     private async Task<HashSet<int>> GetGmAccountIdsAsync(int tournamentId, CancellationToken cancellationToken)
     {
         return (await _dbContext.Teams
-            .Where(t => t.TournamentId == tournamentId && t.GmAccountId != null)
-            .Select(t => t.GmAccountId!.Value)
+            .Where(t => t.TournamentId == tournamentId)
+            .SelectMany(t => t.GeneralManagers.Select(g => g.Id))
             .ToListAsync(cancellationToken)).ToHashSet();
     }
 
@@ -324,14 +324,10 @@ public class TradeService(
     private async Task<List<string>> GetRecipientsAsync(Trade trade, bool includePlayers)
     {
         var emails = new List<string>();
-        if (!string.IsNullOrWhiteSpace(trade.ProposingTeam.GeneralManager?.Email))
-        {
-            emails.Add(trade.ProposingTeam.GeneralManager!.Email);
-        }
-        if (!string.IsNullOrWhiteSpace(trade.ReceivingTeam.GeneralManager?.Email))
-        {
-            emails.Add(trade.ReceivingTeam.GeneralManager!.Email);
-        }
+        emails.AddRange(trade.ProposingTeam.GeneralManagers
+            .Concat(trade.ReceivingTeam.GeneralManagers)
+            .Select(gm => gm.Email)
+            .Where(e => !string.IsNullOrWhiteSpace(e)));
 
         var admins = await _userManager.GetUsersInRoleAsync(BoltonCupRole.Admin);
         emails.AddRange(admins.Select(u => u.Email).Where(e => !string.IsNullOrWhiteSpace(e))!);

@@ -17248,26 +17248,12 @@
             "description": "Gets the URL of the team's win song, once its track has been downloaded.",
             "nullable": true
           },
-          "gmAccountId": {
-            "type": "integer",
-            "description": "Gets the account ID of the general manager.",
-            "format": "int32",
-            "nullable": true
-          },
-          "gmFirstName": {
-            "type": "string",
-            "description": "Gets the first name of the general manager.",
-            "nullable": true
-          },
-          "gmLastName": {
-            "type": "string",
-            "description": "Gets the last name of the general manager.",
-            "nullable": true
-          },
-          "gmProfilePicture": {
-            "type": "string",
-            "description": "Gets the URL of the general manager's profile picture.",
-            "nullable": true
+          "generalManagers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamGmDto"
+            },
+            "description": "Gets the team's general managers."
           }
         },
         "additionalProperties": false,
@@ -17300,6 +17286,36 @@
           }
         },
         "additionalProperties": false
+      },
+      "TeamGmDto": {
+        "required": [
+          "accountId"
+        ],
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "description": "Gets the account ID of the general manager.",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Gets the first name of the general manager.",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Gets the last name of the general manager.",
+            "nullable": true
+          },
+          "profilePictureUrl": {
+            "type": "string",
+            "description": "Gets the URL of the general manager's profile picture.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a general manager of a team."
       },
       "TeamInGameDto": {
         "type": "object",
@@ -17429,26 +17445,12 @@
             "description": "Gets the URL of the team's win song, once its track has been downloaded.",
             "nullable": true
           },
-          "gmAccountId": {
-            "type": "integer",
-            "description": "Gets the account ID of the general manager.",
-            "format": "int32",
-            "nullable": true
-          },
-          "gmFirstName": {
-            "type": "string",
-            "description": "Gets the first name of the general manager.",
-            "nullable": true
-          },
-          "gmLastName": {
-            "type": "string",
-            "description": "Gets the last name of the general manager.",
-            "nullable": true
-          },
-          "gmProfilePicture": {
-            "type": "string",
-            "description": "Gets the URL of the general manager's profile picture.",
-            "nullable": true
+          "generalManagers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamGmDto"
+            },
+            "description": "Gets the team's general managers."
           },
           "players": {
             "type": "array",

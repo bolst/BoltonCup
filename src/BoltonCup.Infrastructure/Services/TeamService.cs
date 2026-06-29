@@ -58,6 +58,33 @@ public class TeamService : ITeamService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task SetGeneralManagersAsync(int teamId, IReadOnlyCollection<int> accountIds, CancellationToken cancellationToken = default)
+    {
+        var team = await _dbContext.Teams.FirstOrDefaultAsync(t => t.Id == teamId, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(Team), teamId);
+
+        var existing = await _dbContext.TeamGeneralManagers
+            .Where(gm => gm.TeamId == teamId)
+            .ToListAsync(cancellationToken);
+
+        var desired = accountIds.ToHashSet();
+        var currentIds = existing.Select(gm => gm.AccountId).ToHashSet();
+
+        _dbContext.TeamGeneralManagers.RemoveRange(existing.Where(gm => !desired.Contains(gm.AccountId)));
+
+        foreach (var accountId in desired.Where(id => !currentIds.Contains(id)))
+        {
+            _dbContext.TeamGeneralManagers.Add(new TeamGeneralManager
+            {
+                TeamId = teamId,
+                AccountId = accountId,
+                TournamentId = team.TournamentId,
+            });
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     // A picked track is registered in the tournament's music library (so the fetcher downloads it) and the
     // team points at it; clearing the pick returns null and leaves any existing track row untouched.
     private async Task<int?> ResolveTrackIdAsync(Team team, MusicTrack? song, CancellationToken cancellationToken)

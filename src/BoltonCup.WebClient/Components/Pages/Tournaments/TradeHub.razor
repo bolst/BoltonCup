@@ -221,8 +221,8 @@
 
         _tournament = await BoltonCupApi.GetTournamentByIdAsync(TournamentId);
         _teams = (await BoltonCupApi.GetTeamsAsync(tournamentId: TournamentId, size: 100)).Items.ToList();
-        _gmAccountIds = _teams.Where(t => t.GmAccountId is not null).Select(t => t.GmAccountId!.Value).ToHashSet();
-        _myTeam = _accountId is { } myId ? _teams.FirstOrDefault(t => t.GmAccountId == myId) : null;
+        _gmAccountIds = _teams.SelectMany(t => t.GeneralManagers.Select(g => g.AccountId)).ToHashSet();
+        _myTeam = _accountId is { } myId ? _teams.FirstOrDefault(t => t.GeneralManagers.Any(g => g.AccountId == myId)) : null;
         _authorized = _isAdmin || _myTeam is not null;
 
         if (_authorized)
