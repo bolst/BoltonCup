@@ -114,20 +114,30 @@ public class CustomRankingService(
 
         if (command.OrderedPlayerIds is { } orderedPlayerIds)
         {
-            var existingPlayerIds = ranking.Players.Select(p => p.PlayerId).ToHashSet();
-            if (orderedPlayerIds.Count != existingPlayerIds.Count ||
-                !orderedPlayerIds.ToHashSet().SetEquals(existingPlayerIds))
+            // OrderedPlayerIds is the caller's ordering of (a subset of) the ranking's players. Listed
+            // players take ranks in the given order; any players not listed — e.g. a registrant added by
+            // reconciliation after the editor loaded — keep their place after them, then all are renumbered.
+            var existingByPlayerId = ranking.Players.ToDictionary(p => p.PlayerId);
+            if (orderedPlayerIds.Count != orderedPlayerIds.Distinct().Count())
             {
-                throw new InvalidOperationException("Ordered players must match the ranking's existing player set exactly.");
+                throw new InvalidOperationException("Ordered players must not contain duplicates.");
+            }
+            if (!orderedPlayerIds.All(existingByPlayerId.ContainsKey))
+            {
+                throw new InvalidOperationException("Ordered players must all belong to the ranking.");
             }
 
-            var rankByPlayerId = orderedPlayerIds
-                .Select((playerId, index) => (playerId, rank: index + 1))
-                .ToDictionary(x => x.playerId, x => x.rank);
+            var listed = new HashSet<int>(orderedPlayerIds);
+            var ordered = orderedPlayerIds
+                .Select(x => existingByPlayerId[x])
+                .Concat(ranking.Players
+                    .Where(p => !listed.Contains(p.PlayerId))
+                    .OrderBy(p => p.Rank))
+                .ToList();
 
-            foreach (var player in ranking.Players)
+            for (var i = 0; i < ordered.Count; i++)
             {
-                player.Rank = rankByPlayerId[player.PlayerId];
+                ordered[i].Rank = i + 1;
             }
         }
 
@@ -232,33 +242,87 @@ public class CustomRankingService(
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlySet<int>> ReconcileAsync(int rankingId, CancellationToken cancellationToken = default)
+    {
+        var ranking = await _dbContext.CustomRankings
+                          .Include(r => r.Players)
+                          .FirstOrDefaultAsync(r => r.Id == rankingId, cancellationToken)
+                      ?? throw new EntityNotFoundException(nameof(CustomRanking), rankingId);
+
+        var poolPlayers = await LoadPoolWithStatsAsync(ranking.TournamentId, cancellationToken);
+        var poolIds = poolPlayers.Select(p => p.Id).ToHashSet();
+        var existingIds = ranking.Players.Select(p => p.PlayerId).ToHashSet();
+
+        // Newly-registered players are auto-ranked into their default position: each is inserted ahead of
+        // the first existing entry with a lower points-per-game (mirroring how the ranking is first seeded).
+        var newPlayers = poolPlayers.Where(p => !existingIds.Contains(p.Id)).ToList();
+        if (newPlayers.Count > 0)
+        {
+            var ordered = ranking.Players.OrderBy(p => p.Rank).ToList();
+
+            foreach (var player in newPlayers.OrderByDescending(ComputePointsPerGame))
+            {
+                var (gamesPlayed, totalPoints) = ComputeStats(player);
+                var entry = new CustomRankingPlayer
+                {
+                    CustomRankingId = ranking.Id,
+                    PlayerId = player.Id,
+                    GamesPlayed = gamesPlayed,
+                    TotalPoints = totalPoints,
+                };
+
+                var index = ordered.FindIndex(e => e.PointsPerGame < entry.PointsPerGame);
+                if (index < 0)
+                {
+                    ordered.Add(entry);
+                }
+                else
+                {
+                    ordered.Insert(index, entry);
+                }
+
+                ranking.Players.Add(entry);
+            }
+
+            for (var i = 0; i < ordered.Count; i++)
+            {
+                ordered[i].Rank = i + 1;
+            }
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        // Stale = ranking entries whose player is no longer in the tournament pool. Dormant today
+        // (Player rows are never deleted, and the FK cascades), but surfaced so the GM can remove them.
+        return existingIds.Where(id => !poolIds.Contains(id)).ToHashSet();
+    }
+
+    public async Task RemovePlayerAsync(int rankingId, int playerId, CancellationToken cancellationToken = default)
+    {
+        var player = await _dbContext.CustomRankingPlayers
+            .FirstOrDefaultAsync(p => p.CustomRankingId == rankingId && p.PlayerId == playerId, cancellationToken);
+        if (player is null)
+        {
+            return;
+        }
+
+        _dbContext.CustomRankingPlayers.Remove(player);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     private async Task<List<CustomRankingPlayer>> BuildSeededPlayersAsync(int tournamentId, CancellationToken cancellationToken)
     {
-        var players = await _dbContext.Players
-            .Include(p => p.Account)
-            .ThenInclude(account => account.Players)
-            .ThenInclude(player => player.SkaterGameLogs)
-            .Include(player => player.Account)
-            .ThenInclude(account => account.Players)
-            .ThenInclude(player => player.GoalieGameLogs)
-            .Where(p => p.TournamentId == tournamentId)
-            .ToListAsync(cancellationToken);
+        var players = await LoadPoolWithStatsAsync(tournamentId, cancellationToken);
 
         return players
             .Select(player =>
             {
-                var skaterLogs = player.Account.Players
-                    .SelectMany(p => p.SkaterGameLogs)
-                    .ToList();
-                var goalieLogs = player.Account.Players
-                    .SelectMany(p => p.GoalieGameLogs)
-                    .ToList();
-
+                var (gamesPlayed, totalPoints) = ComputeStats(player);
                 return new CustomRankingPlayer
                 {
                     PlayerId = player.Id,
-                    GamesPlayed = skaterLogs.Count + goalieLogs.Count,
-                    TotalPoints = skaterLogs.Sum(x => x.Points),
+                    GamesPlayed = gamesPlayed,
+                    TotalPoints = totalPoints,
                 };
             })
             .OrderByDescending(p => p.PointsPerGame)
@@ -268,5 +332,36 @@ public class CustomRankingService(
                 return player;
             })
             .ToList();
+    }
+
+    private Task<List<Player>> LoadPoolWithStatsAsync(int tournamentId, CancellationToken cancellationToken)
+    {
+        return _dbContext.Players
+            .Include(p => p.Account)
+            .ThenInclude(account => account.Players)
+            .ThenInclude(player => player.SkaterGameLogs)
+            .Include(player => player.Account)
+            .ThenInclude(account => account.Players)
+            .ThenInclude(player => player.GoalieGameLogs)
+            .Where(p => p.TournamentId == tournamentId)
+            .ToListAsync(cancellationToken);
+    }
+
+    private static (int GamesPlayed, int TotalPoints) ComputeStats(Player player)
+    {
+        var skaterLogs = player.Account.Players
+            .SelectMany(p => p.SkaterGameLogs)
+            .ToList();
+        var goalieLogs = player.Account.Players
+            .SelectMany(p => p.GoalieGameLogs)
+            .ToList();
+
+        return (skaterLogs.Count + goalieLogs.Count, skaterLogs.Sum(x => x.Points));
+    }
+
+    private static double ComputePointsPerGame(Player player)
+    {
+        var (gamesPlayed, totalPoints) = ComputeStats(player);
+        return gamesPlayed == 0 ? 0 : (double)totalPoints / gamesPlayed;
     }
 }

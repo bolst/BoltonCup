@@ -422,7 +422,7 @@ public class Mapper : IMapper
             .ToList();
     }
 
-    public CustomRankingSingleDto? ToDto(CustomRanking? ranking, bool canEdit)
+    public CustomRankingSingleDto? ToDto(CustomRanking? ranking, bool canEdit, IReadOnlySet<int>? stalePlayerIds = null)
     {
         if (ranking is null)
             return null;
@@ -437,6 +437,7 @@ public class Mapper : IMapper
                 .Select(p => new CustomRankingPlayerDto
                 {
                     Rank = p.Rank,
+                    IsStale = stalePlayerIds?.Contains(p.PlayerId) ?? false,
                     Player = ToPlayerBriefDto(p.Player),
                     GamesPlayed = p.GamesPlayed,
                     TotalPoints = p.TotalPoints,

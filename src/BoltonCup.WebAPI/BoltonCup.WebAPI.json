@@ -3215,6 +3215,238 @@
         ]
       }
     },
+    "/api/customrankings/{id}/reconcile": {
+      "post": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Reconciles a ranking against the current tournament pool — auto-ranks new players (owner or admin only).",
+        "operationId": "ReconcileCustomRanking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRankingSingleDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRankingSingleDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRankingSingleDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/customrankings/{id}/players/{playerId}": {
+      "delete": {
+        "tags": [
+          "CustomRankings"
+        ],
+        "description": "Removes a single player from a ranking — used to drop a stale entry (owner or admin only).",
+        "operationId": "RemoveCustomRankingPlayer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/customrankings/{id}/shares": {
       "get": {
         "tags": [
@@ -3732,7 +3964,7 @@
         "tags": [
           "CustomRankings"
         ],
-        "description": "Clones a ranking the user can access (owner, admin, or shared viewer) into a new ranking they own.",
+        "description": "Clones a ranking the user can access into a new ranking they own (must be a GM of its tournament).",
         "operationId": "CloneCustomRanking",
         "parameters": [
           {
@@ -4442,6 +4674,109 @@
         ],
         "description": "Deletes a draft (admin or draft owner).",
         "operationId": "DeleteDraft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/drafts/{id}/reconcile": {
+      "post": {
+        "tags": [
+          "Drafts"
+        ],
+        "description": "Reconciles the draft pool against the current tournament players — adds late registrants (admin or draft owner).",
+        "operationId": "ReconcileDraft",
         "parameters": [
           {
             "name": "id",
@@ -13471,6 +13806,10 @@
             "type": "integer",
             "description": "Gets or sets the player's rank (1-based).",
             "format": "int32"
+          },
+          "isStale": {
+            "type": "boolean",
+            "description": "Gets or sets whether the player is no longer in the tournament pool and should be removed."
           },
           "player": {
             "allOf": [

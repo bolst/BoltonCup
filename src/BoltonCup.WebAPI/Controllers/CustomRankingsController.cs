@@ -4,6 +4,7 @@ using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
+using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
 
 namespace BoltonCup.WebAPI.Controllers;
 
@@ -11,6 +12,7 @@ namespace BoltonCup.WebAPI.Controllers;
 [Authorize]
 public class CustomRankingsController(
     ICustomRankingService _customRankingService,
+    IAuthorizationService _authService,
     IMapper _mapper
 ) : BoltonCupControllerBase
 {
@@ -32,73 +34,77 @@ public class CustomRankingsController(
 
     /// <summary>Gets a single custom ranking by its ID (owner, admin, or a shared viewer).</summary>
     [HttpGet("{id:int}")]
+    [Authorize(Policy = CanAccessRanking)]
     public async Task<ActionResult<CustomRankingSingleDto>> GetCustomRankingById(int id)
     {
         var ranking = await _customRankingService.GetByIdAsync(id);
         if (ranking is null)
             return NoContent();
 
-        var accountId = User.GetAccountId();
-        var canEdit = ranking.AccountId == accountId || User.IsInRole(Admin);
-        var isSharedWith = ranking.SharedWith.Any(s => s.SharedWithAccountId == accountId);
-        if (!canEdit && !isSharedWith)
-            return Forbid();
+        var canEdit = (await _authService.AuthorizeAsync(User, id, CanManageRanking)).Succeeded;
 
-        return Ok(_mapper.ToDto(ranking, canEdit));
+        // Auto-sync the pool on open for editors; read-only viewers see the ranking as-is.
+        IReadOnlySet<int> stalePlayerIds = new HashSet<int>();
+        if (canEdit)
+        {
+            stalePlayerIds = await _customRankingService.ReconcileAsync(id);
+            ranking = await _customRankingService.GetByIdAsync(id);
+        }
+
+        return Ok(_mapper.ToDto(ranking, canEdit, stalePlayerIds));
+    }
+
+    /// <summary>Reconciles a ranking against the current tournament pool — auto-ranks new players (owner or admin only).</summary>
+    [HttpPost("{id:int}/reconcile")]
+    [Authorize(Policy = CanManageRanking)]
+    public async Task<ActionResult<CustomRankingSingleDto>> ReconcileCustomRanking(int id)
+    {
+        var stalePlayerIds = await _customRankingService.ReconcileAsync(id);
+        var ranking = await _customRankingService.GetByIdAsync(id);
+        return Ok(_mapper.ToDto(ranking, canEdit: true, stalePlayerIds));
+    }
+
+    /// <summary>Removes a single player from a ranking — used to drop a stale entry (owner or admin only).</summary>
+    [HttpDelete("{id:int}/players/{playerId:int}")]
+    [Authorize(Policy = CanManageRanking)]
+    public async Task<IActionResult> RemoveCustomRankingPlayer(int id, int playerId)
+    {
+        await _customRankingService.RemovePlayerAsync(id, playerId);
+        return Ok();
     }
 
     /// <summary>Gets the accounts a ranking is shared with (owner or admin only).</summary>
     [HttpGet("{id:int}/shares")]
+    [Authorize(Policy = CanManageRanking)]
     public async Task<ActionResult<IReadOnlyList<CustomRankingShareDto>>> GetCustomRankingShares(int id)
     {
-        var ranking = await _customRankingService.GetByIdAsync(id);
-        if (ranking is null)
-            return NotFound();
-        if (ranking.AccountId != User.GetAccountId() && !User.IsInRole(Admin))
-            return Forbid();
-
         var shares = await _customRankingService.GetSharesAsync(id);
         return Ok(_mapper.ToShareDtoList(shares));
     }
 
     /// <summary>Shares a ranking (view-only) with another account — must be a GM of the tournament (owner or admin only).</summary>
     [HttpPost("{id:int}/shares")]
+    [Authorize(Policy = CanManageRanking)]
     public async Task<IActionResult> ShareCustomRanking(int id, [FromBody] ShareCustomRankingRequest request)
     {
-        var ranking = await _customRankingService.GetByIdAsync(id);
-        if (ranking is null)
-            return NotFound();
-        if (ranking.AccountId != User.GetAccountId() && !User.IsInRole(Admin))
-            return Forbid();
-
         await _customRankingService.AddShareAsync(id, request.AccountId);
         return Ok();
     }
 
     /// <summary>Removes a shared account from a ranking (owner or admin only).</summary>
     [HttpDelete("{id:int}/shares/{accountId:int}")]
+    [Authorize(Policy = CanManageRanking)]
     public async Task<IActionResult> RemoveCustomRankingShare(int id, int accountId)
     {
-        var ranking = await _customRankingService.GetByIdAsync(id);
-        if (ranking is null)
-            return NotFound();
-        if (ranking.AccountId != User.GetAccountId() && !User.IsInRole(Admin))
-            return Forbid();
-
         await _customRankingService.RemoveShareAsync(id, accountId);
         return Ok();
     }
 
     /// <summary>Searches accounts that can be invited to view a ranking — GMs of its tournament (owner or admin only).</summary>
     [HttpGet("{id:int}/invitable")]
+    [Authorize(Policy = CanManageRanking)]
     public async Task<ActionResult<IReadOnlyList<RankingInviteUserDto>>> SearchInvitableAccounts(int id, [FromQuery] string? query = null)
     {
-        var ranking = await _customRankingService.GetByIdAsync(id);
-        if (ranking is null)
-            return NotFound();
-        if (ranking.AccountId != User.GetAccountId() && !User.IsInRole(Admin))
-            return Forbid();
-
         var candidates = await _customRankingService.SearchInvitableGmsAsync(id, query);
         return Ok(_mapper.ToInviteDtoList(candidates));
     }
@@ -115,38 +121,27 @@ public class CustomRankingsController(
         return Ok(newId);
     }
 
-    /// <summary>Clones a ranking the user can access (owner, admin, or shared viewer) into a new ranking they own.</summary>
+    /// <summary>Clones a ranking the user can access into a new ranking they own (must be a GM of its tournament).</summary>
     [HttpPost("{id:int}/clone")]
+    [Authorize(Policy = CanAccessRanking)]
     public async Task<ActionResult<int>> CloneCustomRanking(int id, [FromBody] CloneCustomRankingRequest request)
     {
         var ranking = await _customRankingService.GetByIdAsync(id);
         if (ranking is null)
             return NotFound();
 
-        var accountId = User.GetAccountId();
-        var canView = ranking.AccountId == accountId
-                      || User.IsInRole(Admin)
-                      || ranking.SharedWith.Any(s => s.SharedWithAccountId == accountId);
-        if (!canView)
-            return Forbid();
-
         if (!User.IsInRole(Admin) && !User.IsGmForTournament(ranking.TournamentId))
             return Forbid();
 
-        var newId = await _customRankingService.CloneAsync(id, accountId, request.Title);
+        var newId = await _customRankingService.CloneAsync(id, User.GetAccountId(), request.Title);
         return Ok(newId);
     }
 
     /// <summary>Updates a custom ranking's title and/or player order (owner or admin only).</summary>
     [HttpPut("{id:int}")]
+    [Authorize(Policy = CanManageRanking)]
     public async Task<IActionResult> UpdateCustomRanking(int id, [FromBody] UpdateCustomRankingRequest request)
     {
-        var ranking = await _customRankingService.GetByIdAsync(id);
-        if (ranking is null)
-            return NotFound();
-        if (ranking.AccountId != User.GetAccountId() && !User.IsInRole(Admin))
-            return Forbid();
-
         var command = _mapper.ToCommand(request);
         await _customRankingService.UpdateAsync(id, command);
         return Ok();
@@ -154,14 +149,9 @@ public class CustomRankingsController(
 
     /// <summary>Deletes a custom ranking (owner or admin only).</summary>
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = CanManageRanking)]
     public async Task<IActionResult> DeleteCustomRanking(int id)
     {
-        var ranking = await _customRankingService.GetByIdAsync(id);
-        if (ranking is null)
-            return NotFound();
-        if (ranking.AccountId != User.GetAccountId() && !User.IsInRole(Admin))
-            return Forbid();
-
         await _customRankingService.DeleteAsync(id);
         return Ok();
     }

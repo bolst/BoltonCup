@@ -18,6 +18,16 @@ public interface ICustomRankingService
     Task UpdateAsync(int id, UpdateCustomRankingCommand command, CancellationToken cancellationToken = default);
     Task DeleteAsync(int id, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Merges the tournament's current player pool into the ranking: newly-registered players are added
+    /// to the "needs ranking" tray. Returns the set of player ids that are in the ranking but no longer
+    /// in the pool (stale entries to flag for removal).
+    /// </summary>
+    Task<IReadOnlySet<int>> ReconcileAsync(int rankingId, CancellationToken cancellationToken = default);
+
+    /// <summary>Removes a single player from a ranking (used to drop a stale entry).</summary>
+    Task RemovePlayerAsync(int rankingId, int playerId, CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<CustomRankingShareInfo>> GetSharesAsync(int rankingId, CancellationToken cancellationToken = default);
     Task AddShareAsync(int rankingId, int accountId, CancellationToken cancellationToken = default);
     Task RemoveShareAsync(int rankingId, int accountId, CancellationToken cancellationToken = default);

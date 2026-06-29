@@ -338,6 +338,58 @@ public class DraftServiceTests
         await act.Should().ThrowAsync<InvalidOperationException>();
     }
 
+    [Fact]
+    public async Task ReconcileDraftPoolAsync_WhenPending_AddsLateRegistrantAndWidensBoard()
+    {
+        var (db, draft, _, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.Pending);
+        AddLateRegistrant(db, playerId: 5, accountId: 5);
+        await db.SaveChangesAsync();
+        var service = new DraftService(db);
+
+        await service.ReconcileDraftPoolAsync(draft.Id);
+
+        var rankings = await db.PlayerDraftRankings.Where(r => r.DraftId == draft.Id).ToListAsync();
+        rankings.Should().HaveCount(5);
+        rankings.Single(r => r.PlayerId == 5).DraftRanking.Should().Be(5); // appended after existing ranks
+
+        var picks = await db.DraftPicks.Where(p => p.DraftId == draft.Id).ToListAsync();
+        picks.Should().HaveCount(5);
+    }
+
+    [Fact]
+    public async Task ReconcileDraftPoolAsync_WhenInProgress_AddsRankingButLeavesPicks()
+    {
+        var (db, draft, _, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.InProgress);
+        AddLateRegistrant(db, playerId: 5, accountId: 5);
+        await db.SaveChangesAsync();
+        var service = new DraftService(db);
+
+        await service.ReconcileDraftPoolAsync(draft.Id);
+
+        (await db.PlayerDraftRankings.CountAsync(r => r.DraftId == draft.Id)).Should().Be(5);
+        // Picks are not regenerated mid-draft.
+        (await db.DraftPicks.CountAsync(p => p.DraftId == draft.Id)).Should().Be(4);
+    }
+
+    private static void AddLateRegistrant(BoltonCupDbContext db, int playerId, int accountId)
+    {
+        db.Accounts.Add(new Account
+        {
+            Id = accountId,
+            FirstName = $"First{accountId}",
+            LastName = $"Last{accountId}",
+            Email = $"p{accountId}@test.com",
+            Birthday = new DateTime(1990, 1, 1),
+        });
+        db.Players.Add(new Player
+        {
+            Id = playerId,
+            AccountId = accountId,
+            TournamentId = 1,
+            Position = Position.Forward,
+        });
+    }
+
     private static async Task MakePickAsync(BoltonCupDbContext db, DraftPick pick, int playerId, bool isAuto)
     {
         pick.PlayerId = playerId;

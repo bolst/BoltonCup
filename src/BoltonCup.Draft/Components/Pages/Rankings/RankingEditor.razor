@@ -56,6 +56,9 @@
                            OnClick="@CloneAsync">Make a copy</MudButton>
                 @if (_ranking.CanEdit)
                 {
+                    <MudButton Variant="Variant.Outlined" Color="Color.Default"
+                               StartIcon="@Icons.Material.Rounded.Sync"
+                               OnClick="@SyncAsync">Sync players</MudButton>
                     <MudButton Variant="Variant.Outlined" Color="Color.Primary"
                                StartIcon="@Icons.Material.Rounded.Share"
                                OnClick="@ShareAsync">Share</MudButton>
@@ -118,6 +121,28 @@
             </ItemRenderer>
         </MudDropContainer>
         }
+
+        @if (_ranking.CanEdit && StaleVisible.Any())
+        {
+            <MudPaper Class="pa-3 mt-4" Elevation="0" Outlined>
+                <div class="d-flex flex-row align-center gap-2 mb-2">
+                    <MudIcon Icon="@Icons.Material.Rounded.WarningAmber" Color="Color.Warning"/>
+                    <MudText Typo="Typo.subtitle1"><b>No longer in pool (@StaleVisible.Count())</b></MudText>
+                </div>
+                @foreach (var p in StaleVisible)
+                {
+                    <div class="d-flex flex-row align-center justify-space-between py-1" style="opacity: 0.6;">
+                        <div class="d-flex flex-row align-center gap-3">
+                            <PositionChip Position="@(p.Player.Position ?? string.Empty)" Variant="Variant.Text" Size="Size.Small"/>
+                            <MudText Typo="Typo.body1">@p.Player.FullName</MudText>
+                            <MudChip T="string" Size="Size.Small" Color="Color.Default">Removed</MudChip>
+                        </div>
+                        <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Small"
+                                       OnClick="@(() => RemoveStale(p))"/>
+                    </div>
+                }
+            </MudPaper>
+        }
     }
 </MudContainer>
 
@@ -135,17 +160,21 @@
 
     private Sdk.CustomRankingSingleDto? _ranking;
     private List<Sdk.CustomRankingPlayerDto> _players = [];
+    private List<Sdk.CustomRankingPlayerDto> _stale = [];
     private MudDropContainer<Sdk.CustomRankingPlayerDto> _dropContainer = null!;
     private RankingGridView? _gridView;
 
     private enum ViewMode { List, Grid }
+
+    private IEnumerable<Sdk.CustomRankingPlayerDto> StaleVisible =>
+        _positionFilter is null ? _stale : _stale.Where(p => p.Player.Position == _positionFilter);
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             _ranking = await BoltonCupApi.GetCustomRankingByIdAsync(Id);
-            _players = _ranking?.Players.OrderBy(p => p.Rank).ToList() ?? [];
+            Partition();
         }
         catch (Sdk.ApiException)
         {
@@ -155,6 +184,57 @@
         {
             _loading = false;
         }
+    }
+
+    private void Partition()
+    {
+        var all = _ranking?.Players ?? new List<Sdk.CustomRankingPlayerDto>();
+        _players = all.Where(p => !p.IsStale).OrderBy(p => p.Rank).ToList();
+        _stale = all.Where(p => p.IsStale).ToList();
+    }
+
+    private async Task RemoveStale(Sdk.CustomRankingPlayerDto player)
+    {
+        await BoltonCupApi.RemoveCustomRankingPlayerAsync(Id, player.Player.Id);
+        _stale.Remove(player);
+        Snackbar.Add($"Removed {player.Player.FullName}", Severity.Success);
+    }
+
+    private async Task SyncAsync()
+    {
+        var refreshed = await BoltonCupApi.ReconcileCustomRankingAsync(Id);
+        var known = _players.Concat(_stale).Select(p => p.Player.Id).ToHashSet();
+
+        // Merge in only the newcomers so any unsaved manual ordering is preserved. New players slot into
+        // their default points-per-game position, matching the server-side reconcile.
+        var added = 0;
+        foreach (var p in refreshed.Players.OrderByDescending(p => p.PointsPerGame))
+        {
+            if (!known.Add(p.Player.Id))
+                continue;
+            if (p.IsStale)
+            {
+                _stale.Add(p);
+            }
+            else
+            {
+                var index = _players.FindIndex(e => e.PointsPerGame < p.PointsPerGame);
+                if (index < 0)
+                    _players.Add(p);
+                else
+                    _players.Insert(index, p);
+            }
+            added++;
+        }
+
+        if (added > 0)
+        {
+            RankingReorder.Renumber(_players);
+            _dirty = true;
+            RefreshActiveView();
+        }
+
+        Snackbar.Add(added == 0 ? "No new players" : $"Added {added} new player(s)", Severity.Info);
     }
 
     private void PositionFilterChanged(string? position)
