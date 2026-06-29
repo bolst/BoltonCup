@@ -82,6 +82,8 @@
         _tournamentOptions = user.IsInRole("Admin")
             ? allTournaments
             : allTournaments.Where(t => user.IsGmForTournament(t.Id)).ToList();
+
+        _model.Tournament = _tournamentOptions.FirstOrDefault(x => x.IsActive);
         
         _editContext = new EditContext(_model);
         _messageStore = new ValidationMessageStore(_editContext);
