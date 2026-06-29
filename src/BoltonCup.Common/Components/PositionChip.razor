@@ -8,7 +8,7 @@
         Size="@Size"
         Variant="@Variant"
         Label="true">
-        @_positionStyle.Position
+        @(Abbreviated ? _positionStyle.Position[..1] : _positionStyle.Position)
     </MudChip>
 }
 
@@ -23,6 +23,9 @@
 
     [Parameter]
     public Variant Variant { get; set; } = Variant.Text;
+
+    [Parameter]
+    public bool Abbreviated { get; set; }
 
     private PositionStyle? _positionStyle;
 

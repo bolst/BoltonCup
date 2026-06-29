@@ -1,0 +1,29 @@
+.ranking-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    align-items: start;
+}
+
+.ranking-grid ::deep .ranking-grid__col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.ranking-grid ::deep .ranking-card {
+    min-width: 0;
+}
+
+.ranking-grid ::deep .ranking-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 960px) {
+    .ranking-grid {
+        grid-template-columns: 1fr;
+    }
+}

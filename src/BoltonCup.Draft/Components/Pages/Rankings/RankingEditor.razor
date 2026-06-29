@@ -1,6 +1,7 @@
 @page "/rankings/{Id:int}"
 @attribute [Authorize]
 @using BoltonCup.Sdk
+@using BoltonCup.Draft.Services
 @using Position = BoltonCup.Core.Values.Position
 @inject IBoltonCupApi BoltonCupApi
 @inject NavigationManager Navigation
@@ -10,7 +11,7 @@
 
 <PageTitle>@(_ranking?.Title ?? "Ranking")</PageTitle>
 
-<MudContainer Class="py-2" MaxWidth="MaxWidth.Medium">
+<MudContainer Class="py-2" MaxWidth="@(_viewMode == ViewMode.Grid ? MaxWidth.ExtraLarge : MaxWidth.Medium)">
     @if (_loading)
     {
         <MudProgressLinear Indeterminate Color="Color.Primary"/>
@@ -40,6 +41,16 @@
                     <MudToggleItem T="string?" Value="@Position.Goalie" Text="G"/>
                 </MudToggleGroup>
 
+                <MudToggleGroup T="ViewMode" Value="@_viewMode" ValueChanged="@ViewModeChanged"
+                                Size="Size.Small" Color="Color.Primary">
+                    <MudToggleItem T="ViewMode" Value="ViewMode.Grid">
+                        <MudIcon Icon="@Icons.Material.Rounded.GridView" Size="Size.Small"/>
+                    </MudToggleItem>
+                    <MudToggleItem T="ViewMode" Value="ViewMode.List">
+                        <MudIcon Icon="@Icons.Material.Rounded.ViewList" Size="Size.Small"/>
+                    </MudToggleItem>
+                </MudToggleGroup>
+
                 @if (_ranking.CanEdit)
                 {
                     <MudButton Variant="Variant.Outlined" Color="Color.Primary"
@@ -56,6 +67,13 @@
             </div>
         </div>
 
+        @if (_viewMode == ViewMode.Grid)
+        {
+            <RankingGridView @ref="_gridView" Players="_players" CanEdit="@_ranking.CanEdit"
+                             PositionFilter="@_positionFilter" OnChanged="@(() => _dirty = true)"/>
+        }
+        else
+        {
         <MudDropContainer T="Sdk.CustomRankingPlayerDto" @ref="_dropContainer"
                           Items="_players"
                           ItemsSelector="@((item, zone) => _positionFilter is null || item.Player.Position == _positionFilter)"
@@ -96,6 +114,7 @@
                 </MudPaper>
             </ItemRenderer>
         </MudDropContainer>
+        }
     }
 </MudContainer>
 
@@ -109,10 +128,14 @@
     private bool _loading = true;
     private bool _dirty;
     private string? _positionFilter;
+    private ViewMode _viewMode = ViewMode.Grid;
 
     private Sdk.CustomRankingSingleDto? _ranking;
     private List<Sdk.CustomRankingPlayerDto> _players = [];
     private MudDropContainer<Sdk.CustomRankingPlayerDto> _dropContainer = null!;
+    private RankingGridView? _gridView;
+
+    private enum ViewMode { List, Grid }
 
     protected override async Task OnInitializedAsync()
     {
@@ -134,110 +157,51 @@
     private void PositionFilterChanged(string? position)
     {
         _positionFilter = position;
-        _dropContainer.Refresh();
+        RefreshActiveView();
     }
 
-    private IReadOnlyList<Sdk.CustomRankingPlayerDto> VisiblePlayers()
-        => _positionFilter is null
-            ? _players
-            : _players.Where(p => p.Player.Position == _positionFilter).ToList();
+    private void ViewModeChanged(ViewMode mode)
+    {
+        _viewMode = mode;
+    }
 
-    private bool IsFirstVisible(Sdk.CustomRankingPlayerDto player) => VisiblePlayers().FirstOrDefault() == player;
+    private void RefreshActiveView()
+    {
+        if (_viewMode == ViewMode.Grid)
+            _gridView?.Refresh();
+        else
+            _dropContainer?.Refresh();
+    }
 
-    private bool IsLastVisible(Sdk.CustomRankingPlayerDto player) => VisiblePlayers().LastOrDefault() == player;
+    private bool IsFirstVisible(Sdk.CustomRankingPlayerDto player) => RankingReorder.IsFirstVisible(_players, player, _positionFilter);
+
+    private bool IsLastVisible(Sdk.CustomRankingPlayerDto player) => RankingReorder.IsLastVisible(_players, player, _positionFilter);
 
     private void ItemDropped(MudItemDropInfo<Sdk.CustomRankingPlayerDto> info)
     {
-        if (_ranking is not { CanEdit: true })
+        if (_ranking is not { CanEdit: true } || info.Item is null)
             return;
 
-        var item = info.Item;
-        if (item is null)
-            return;
-
-        var visible = VisiblePlayers().Where(p => p != item).ToList();
-        var target = Math.Clamp(info.IndexInZone, 0, visible.Count);
-
-        _players.Remove(item);
-        if (target >= visible.Count)
-        {
-            if (visible.Count == 0)
-                _players.Add(item);
-            else
-                _players.Insert(_players.IndexOf(visible[^1]) + 1, item);
-        }
-        else
-        {
-            _players.Insert(_players.IndexOf(visible[target]), item);
-        }
-
-        Renumber();
+        RankingReorder.ReorderToVisibleIndex(_players, info.Item, info.IndexInZone, _positionFilter);
         _dirty = true;
         _dropContainer.Refresh();
     }
 
-    private void MoveUp(Sdk.CustomRankingPlayerDto player)
-    {
-        var visible = VisiblePlayers();
-        var vi = visible.ToList().IndexOf(player);
-        if (vi <= 0)
-            return;
+    private void MoveUp(Sdk.CustomRankingPlayerDto player) => ApplyMove(RankingReorder.MoveUp, player);
 
-        var prev = visible[vi - 1];
-        _players.Remove(player);
-        _players.Insert(_players.IndexOf(prev), player);
-        Renumber();
+    private void MoveDown(Sdk.CustomRankingPlayerDto player) => ApplyMove(RankingReorder.MoveDown, player);
+
+    private void MoveToTop(Sdk.CustomRankingPlayerDto player) => ApplyMove(RankingReorder.MoveToTop, player);
+
+    private void MoveToBottom(Sdk.CustomRankingPlayerDto player) => ApplyMove(RankingReorder.MoveToBottom, player);
+
+    private void ApplyMove(
+        Action<List<Sdk.CustomRankingPlayerDto>, Sdk.CustomRankingPlayerDto, string?> move,
+        Sdk.CustomRankingPlayerDto player)
+    {
+        move(_players, player, _positionFilter);
         _dirty = true;
         _dropContainer.Refresh();
-    }
-
-    private void MoveDown(Sdk.CustomRankingPlayerDto player)
-    {
-        var visible = VisiblePlayers();
-        var vi = visible.ToList().IndexOf(player);
-        if (vi < 0 || vi >= visible.Count - 1)
-            return;
-
-        var next = visible[vi + 1];
-        _players.Remove(player);
-        _players.Insert(_players.IndexOf(next) + 1, player);
-        Renumber();
-        _dirty = true;
-        _dropContainer.Refresh();
-    }
-
-    private void MoveToTop(Sdk.CustomRankingPlayerDto player)
-    {
-        var visible = VisiblePlayers();
-        var first = visible.FirstOrDefault();
-        if (first is null || first == player)
-            return;
-
-        _players.Remove(player);
-        _players.Insert(_players.IndexOf(first), player);
-        Renumber();
-        _dirty = true;
-        _dropContainer.Refresh();
-    }
-
-    private void MoveToBottom(Sdk.CustomRankingPlayerDto player)
-    {
-        var visible = VisiblePlayers();
-        var last = visible.LastOrDefault();
-        if (last is null || last == player)
-            return;
-
-        _players.Remove(player);
-        _players.Insert(_players.IndexOf(last) + 1, player);
-        Renumber();
-        _dirty = true;
-        _dropContainer.Refresh();
-    }
-
-    private void Renumber()
-    {
-        for (var i = 0; i < _players.Count; i++)
-            _players[i].Rank = i + 1;
     }
 
     private async Task SaveAsync()
