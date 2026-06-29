@@ -38,9 +38,13 @@ public class TradeServiceTests
     }
 
     private static TradeService NewService(BoltonCupDbContext db, out Mock<IEmailer> emailer)
+        => NewService(db, out emailer, out _);
+
+    private static TradeService NewService(BoltonCupDbContext db, out Mock<IEmailer> emailer, out Mock<ISmsSender> sms)
     {
         emailer = new Mock<IEmailer>();
-        return new TradeService(db, new RosterValidator(), emailer.Object, EmptyAdminUserManager());
+        sms = new Mock<ISmsSender>();
+        return new TradeService(db, new RosterValidator(), emailer.Object, sms.Object, EmptyAdminUserManager());
     }
 
     /// <summary>Seeds a tournament with two teams (each with a GM) and N players per team.</summary>
@@ -127,6 +131,143 @@ public class TradeServiceTests
         trade.Status.Should().Be(TradeStatus.Pending);
         trade.Players.Should().HaveCount(2);
         emailer.Verify(e => e.SendTradeCreatedAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<TradeEmailInfo>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Create_TextsReceivingGm_WithTradeDetailsAndHubLink()
+    {
+        await using var db = await SeedAsync();
+        var gmB = await db.Accounts.FirstAsync(a => a.Id == GmBAccountId);
+        gmB.Phone = "+15555550199";
+        await db.SaveChangesAsync();
+
+        var service = NewService(db, out _, out var sms);
+
+        // Team A (proposing) sends player 2; Team B (receiving) sends player 7.
+        await service.CreateAsync(Trade([2], [7]));
+
+        var expected = string.Join("\n",
+            "TEAM 10 has sent you a trade.",
+            "Your team receives:",
+            "- First1002 Last1002",
+            "TEAM 10 receives:",
+            "- First1007 Last1007",
+            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+
+        sms.Verify(s => s.SendAsync("+15555550199", expected, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Create_DoesNotText_WhenReceivingGmHasNoPhone()
+    {
+        await using var db = await SeedAsync();
+        var service = NewService(db, out _, out var sms);
+
+        await service.CreateAsync(Trade([2], [7]));
+
+        sms.Verify(s => s.SendAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Accept_TextsProposingGm()
+    {
+        await using var db = await SeedAsync();
+        var gmA = await db.Accounts.FirstAsync(a => a.Id == GmAAccountId);
+        gmA.Phone = "+15555550100";
+        await db.SaveChangesAsync();
+
+        var service = NewService(db, out _, out var sms);
+        var id = await service.CreateAsync(Trade([2], [7]));
+
+        await service.AcceptAsync(id, GmBAccountId);
+
+        var expected = string.Join("\n",
+            "TEAM 20 accepted your trade. It now awaits admin approval.",
+            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+        sms.Verify(s => s.SendAsync("+15555550100", expected, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Decline_TextsProposingGm()
+    {
+        await using var db = await SeedAsync();
+        var gmA = await db.Accounts.FirstAsync(a => a.Id == GmAAccountId);
+        gmA.Phone = "+15555550100";
+        await db.SaveChangesAsync();
+
+        var service = NewService(db, out _, out var sms);
+        var id = await service.CreateAsync(Trade([2], [7]));
+
+        await service.DeclineAsync(id, GmBAccountId);
+
+        var expected = string.Join("\n",
+            "TEAM 20 declined your trade.",
+            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+        sms.Verify(s => s.SendAsync("+15555550100", expected, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Cancel_ByProposingGm_TextsReceivingGm()
+    {
+        await using var db = await SeedAsync();
+        var gmB = await db.Accounts.FirstAsync(a => a.Id == GmBAccountId);
+        gmB.Phone = "+15555550200";
+        await db.SaveChangesAsync();
+
+        var service = NewService(db, out _, out var sms);
+        var id = await service.CreateAsync(Trade([2], [7]));
+
+        await service.CancelAsync(id, GmAAccountId, isAdmin: false);
+
+        var expected = string.Join("\n",
+            "The trade between TEAM 10 and TEAM 20 was cancelled.",
+            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+        sms.Verify(s => s.SendAsync("+15555550200", expected, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Cancel_ByAdmin_TextsBothGms()
+    {
+        await using var db = await SeedAsync();
+        var gmA = await db.Accounts.FirstAsync(a => a.Id == GmAAccountId);
+        var gmB = await db.Accounts.FirstAsync(a => a.Id == GmBAccountId);
+        gmA.Phone = "+15555550100";
+        gmB.Phone = "+15555550200";
+        await db.SaveChangesAsync();
+
+        var service = NewService(db, out _, out var sms);
+        var id = await service.CreateAsync(Trade([2], [7]));
+
+        await service.CancelAsync(id, AdminAccountId, isAdmin: true);
+
+        var expected = string.Join("\n",
+            "The trade between TEAM 10 and TEAM 20 was cancelled.",
+            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+        sms.Verify(s => s.SendAsync("+15555550100", expected, It.IsAny<CancellationToken>()), Times.Once);
+        sms.Verify(s => s.SendAsync("+15555550200", expected, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Approve_TextsBothGms()
+    {
+        await using var db = await SeedAsync();
+        var gmA = await db.Accounts.FirstAsync(a => a.Id == GmAAccountId);
+        var gmB = await db.Accounts.FirstAsync(a => a.Id == GmBAccountId);
+        gmA.Phone = "+15555550100";
+        gmB.Phone = "+15555550200";
+        await db.SaveChangesAsync();
+
+        var service = NewService(db, out _, out var sms);
+        var id = await service.CreateAsync(Trade([2], [7]));
+        await service.AcceptAsync(id, GmBAccountId);
+
+        await service.ApproveAsync(id, AdminAccountId);
+
+        var expected = string.Join("\n",
+            "The trade between TEAM 10 and TEAM 20 was approved. Rosters have been updated.",
+            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+        sms.Verify(s => s.SendAsync("+15555550100", expected, It.IsAny<CancellationToken>()), Times.Once);
+        sms.Verify(s => s.SendAsync("+15555550200", expected, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
