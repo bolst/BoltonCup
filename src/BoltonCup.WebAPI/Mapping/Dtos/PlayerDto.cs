@@ -27,6 +27,8 @@ public record PlayerDto
     public required TournamentBriefDto Tournament { get; init; }
     /// <summary>Gets the team this player belongs to, if assigned.</summary>
     public TeamBriefDto? Team { get; init; }
+    /// <summary>Gets whether the player can play both forward and defense.</summary>
+    public bool CanPlayEitherPosition { get; init; }
 
     /// <summary>Gets the player's full name.</summary>
     public string FullName => FirstName + " " + LastName;

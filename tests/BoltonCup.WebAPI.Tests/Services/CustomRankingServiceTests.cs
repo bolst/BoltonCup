@@ -335,6 +335,23 @@ public class CustomRankingServiceTests
         players.Select(p => p.PlayerId).Should().BeEquivalentTo(new[] { 11 });
     }
 
+    [Fact]
+    public async Task CreateAsync_SeedsGmsLast()
+    {
+        await using var db = await SeedAsync();
+        // A non-GM player and a player whose account is a tournament GM (account Gm1Id).
+        AddPoolPlayer(db, playerId: 10, accountId: 10);
+        db.Players.Add(new Player { Id = 20, AccountId = Gm1Id, TournamentId = TournamentId });
+        await db.SaveChangesAsync();
+        var service = new CustomRankingService(db);
+
+        var newId = await service.CreateAsync(new CreateCustomRankingCommand(TournamentId, "Board", OwnerId));
+
+        var ranking = await db.CustomRankings.Include(r => r.Players).FirstAsync(r => r.Id == newId);
+        ranking.Players.Single(p => p.PlayerId == 20).Rank.Should().Be(ranking.Players.Count); // GM ranked last
+        ranking.Players.Single(p => p.PlayerId == 10).Rank.Should().Be(1);
+    }
+
     private static void AddPoolPlayer(BoltonCupDbContext db, int playerId, int accountId)
     {
         db.Accounts.Add(new Account

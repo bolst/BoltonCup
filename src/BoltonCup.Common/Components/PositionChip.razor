@@ -2,17 +2,23 @@
 
 @if (_positionStyle is not null)
 {
-    <MudChip
-        T="string"
-        Color="@_positionStyle.Color"
-        Size="@Size"
-        Variant="@Variant"
-        Label="true">
-        @(Abbreviated ? _positionStyle.Position[..1] : _positionStyle.Position)
-    </MudChip>
+    @if (CanPlayBoth)
+    {
+        <MudTooltip Text="Can play both forward and defense" Arrow Placement="Placement.Top">
+            <MudBadge Content="@_fdBadge" Color="Color.Info" Overlap="true">
+                @PositionChipFragment
+            </MudBadge>
+        </MudTooltip>
+    }
+    else
+    {
+        @PositionChipFragment
+    }
 }
 
 @code {
+
+    private const string _fdBadge = "F/D";
 
     [Parameter]
     [EditorRequired]
@@ -27,7 +33,20 @@
     [Parameter]
     public bool Abbreviated { get; set; }
 
+    /// <summary>When true, renders an "F/D" badge indicating the player can play both forward and defense.</summary>
+    [Parameter]
+    public bool CanPlayBoth { get; set; }
+
     private PositionStyle? _positionStyle;
+
+    private RenderFragment PositionChipFragment => @<MudChip
+                                                        T="string"
+                                                        Color="@_positionStyle!.Color"
+                                                        Size="@Size"
+                                                        Variant="@Variant"
+                                                        Label="true">
+                                                       @(Abbreviated ? _positionStyle.Position[..1] : _positionStyle.Position)
+                                                   </MudChip>;
 
     protected override void OnParametersSet()
     {
@@ -40,7 +59,7 @@
     {
         public string Position { get; }
         public Color Color { get; }
-        
+
         public PositionStyle(string position)
         {
             Position = position.ToUpper();

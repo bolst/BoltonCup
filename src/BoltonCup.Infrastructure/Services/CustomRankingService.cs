@@ -316,24 +316,40 @@ public class CustomRankingService(
     {
         var players = await LoadPoolWithStatsAsync(tournamentId, cancellationToken);
 
+        // GMs run teams rather than being drafted, so they seed to the bottom of the board by default.
+        var gmAccountIds = await GetGmAccountIdsAsync(tournamentId, cancellationToken);
+
         return players
             .Select(player =>
             {
                 var (gamesPlayed, totalPoints) = ComputeStats(player);
-                return new CustomRankingPlayer
+                return new
                 {
-                    PlayerId = player.Id,
-                    GamesPlayed = gamesPlayed,
-                    TotalPoints = totalPoints,
+                    IsGm = gmAccountIds.Contains(player.AccountId),
+                    Player = new CustomRankingPlayer
+                    {
+                        PlayerId = player.Id,
+                        GamesPlayed = gamesPlayed,
+                        TotalPoints = totalPoints,
+                    },
                 };
             })
-            .OrderByDescending(p => p.PointsPerGame)
-            .Select((player, index) =>
+            .OrderBy(x => x.IsGm)
+            .ThenByDescending(x => x.Player.PointsPerGame)
+            .Select((x, index) =>
             {
-                player.Rank = index + 1;
-                return player;
+                x.Player.Rank = index + 1;
+                return x.Player;
             })
             .ToList();
+    }
+
+    private async Task<HashSet<int>> GetGmAccountIdsAsync(int tournamentId, CancellationToken cancellationToken)
+    {
+        return (await _dbContext.Teams
+            .Where(t => t.TournamentId == tournamentId)
+            .SelectMany(t => t.GeneralManagers.Select(g => g.Id))
+            .ToListAsync(cancellationToken)).ToHashSet();
     }
 
     private Task<List<Player>> LoadPoolWithStatsAsync(int tournamentId, CancellationToken cancellationToken)

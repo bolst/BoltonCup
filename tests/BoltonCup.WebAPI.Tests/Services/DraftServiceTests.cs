@@ -371,6 +371,57 @@ public class DraftServiceTests
         (await db.DraftPicks.CountAsync(p => p.DraftId == draft.Id)).Should().Be(4);
     }
 
+    [Fact]
+    public async Task CreateAsync_ExcludesGmsAndRanksThemLast()
+    {
+        const int gmAccountId = 100;
+        var db = NewContext();
+        db.Tournaments.Add(new Tournament { Id = 1, Name = "Test Cup" });
+
+        var gmAccount = new Account
+        {
+            Id = gmAccountId, FirstName = "Gina", LastName = "Manager",
+            Email = "gm@test.com", Birthday = new DateTime(1990, 1, 1),
+        };
+        db.Accounts.Add(gmAccount);
+        db.Teams.Add(new Team
+        {
+            Id = 1, Name = "Team 1", NameShort = "T1", Abbreviation = "T1",
+            PrimaryColorHex = "#000000", SecondaryColorHex = "#ffffff",
+            TournamentId = 1, GeneralManagers = [gmAccount],
+        });
+        db.Teams.Add(new Team
+        {
+            Id = 2, Name = "Team 2", NameShort = "T2", Abbreviation = "T2",
+            PrimaryColorHex = "#000000", SecondaryColorHex = "#ffffff",
+            TournamentId = 1,
+        });
+
+        // Two regular players plus one player whose account is a GM.
+        foreach (var (playerId, accountId) in new[] { (1, 1), (2, 2), (3, gmAccountId) })
+        {
+            if (accountId != gmAccountId)
+            {
+                db.Accounts.Add(new Account
+                {
+                    Id = accountId, FirstName = $"First{accountId}", LastName = $"Last{accountId}",
+                    Email = $"p{accountId}@test.com", Birthday = new DateTime(1990, 1, 1),
+                });
+            }
+            db.Players.Add(new Player { Id = playerId, AccountId = accountId, TournamentId = 1, Position = Position.Forward });
+        }
+        await db.SaveChangesAsync();
+
+        var service = new DraftService(db);
+        var draftId = await service.CreateAsync(new CreateDraftCommand(1, "Test Draft", null));
+
+        var rankings = await db.PlayerDraftRankings.Where(r => r.DraftId == draftId).ToListAsync();
+        var gmRanking = rankings.Single(r => r.PlayerId == 3);
+        gmRanking.IsExcluded.Should().BeTrue();
+        gmRanking.DraftRanking.Should().Be(rankings.Count); // GM sorted last
+        rankings.Where(r => r.PlayerId != 3).Should().OnlyContain(r => !r.IsExcluded);
+    }
+
     private static void AddLateRegistrant(BoltonCupDbContext db, int playerId, int accountId)
     {
         db.Accounts.Add(new Account

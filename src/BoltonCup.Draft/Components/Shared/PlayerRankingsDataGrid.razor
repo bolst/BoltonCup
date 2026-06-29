@@ -61,7 +61,7 @@
         </PropertyColumn>
         <PropertyColumn Title="Pos" Property="x => x.Player.Position">
             <CellTemplate>
-                <PositionChip Position="@context.Item.Player.Position" Size="Size.Small"/>
+                <PositionChip Position="@context.Item.Player.Position" CanPlayBoth="@context.Item.Player.CanPlayEitherPosition" Size="Size.Small"/>
             </CellTemplate>
         </PropertyColumn>
         <TemplateColumn Title="Avail" CellStyle="width: 40px" Sortable="false">

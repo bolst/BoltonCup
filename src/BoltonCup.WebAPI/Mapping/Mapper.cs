@@ -675,6 +675,7 @@ public class Mapper : IMapper
             FirstName = player.Account!.FirstName, LastName = player.Account.LastName, Birthday = player.Account.Birthday, ProfilePicture = _urlResolver.GetFullUrl(player.Account.Avatar),
             BannerPicture = _urlResolver.GetFullUrl(player.Account.Banner), PreferredBeer = player.Account.PreferredBeer, Height = player.Account.HeightFeet is null ? null : $"{player.Account.HeightFeet}'{player.Account.HeightInches}", Weight = player.Account.Weight,
             Tournament = ToTournamentBriefDto(player.Tournament), Team = player.Team == null ? null : ToTeamBriefDto(player.Team), TournamentStats = ToPlayerTournamentStatsDto(player), GameByGame = ToPlayerGameByGameDtos(player),
+            CanPlayEitherPosition = player.CanPlayEitherPosition,
         };
     }
 
@@ -689,6 +690,7 @@ public class Mapper : IMapper
             FirstName = basePlayer.FirstName, LastName = basePlayer.LastName, Birthday = basePlayer.Birthday, ProfilePicture = basePlayer.ProfilePicture,
             BannerPicture = basePlayer.BannerPicture, PreferredBeer = basePlayer.PreferredBeer, Height = basePlayer.Height, Weight = basePlayer.Weight,
             Tournament = basePlayer.Tournament, Team = basePlayer.Team, TournamentStats = basePlayer.TournamentStats, GameByGame = basePlayer.GameByGame,
+            CanPlayEitherPosition = basePlayer.CanPlayEitherPosition,
             GameAvailabilities = BuildAvailability(availability, player!.AccountId),
         };
     }
@@ -1145,7 +1147,8 @@ public class Mapper : IMapper
                 Captaincy.Captain => 'C',
                 Captaincy.Alternate => 'A',
                 _ => null
-            }
+            },
+            CanPlayEitherPosition = player.CanPlayEitherPosition,
         };
     }
 
