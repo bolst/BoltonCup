@@ -1103,9 +1103,16 @@ public class Mapper : IMapper
 
         return new TradeDto
         {
-            Id = trade.Id, TournamentId = trade.TournamentId, ProposingTeam = ToTeamBriefDto(trade.ProposingTeam), ReceivingTeam = ToTeamBriefDto(trade.ReceivingTeam),
-            Status = trade.Status, Note = trade.Note, CreatedAt = trade.CreatedAt, RespondedAt = trade.RespondedAt,
-            ResolvedAt = trade.ResolvedAt, PlayersFromProposing = trade.Players
+            Id = trade.Id,
+            TournamentId = trade.TournamentId,
+            ProposingTeam = ToTeamBriefDto(trade.ProposingTeam),
+            ReceivingTeam = ToTeamBriefDto(trade.ReceivingTeam),
+            Status = trade.Status,
+            Note = trade.Note,
+            CreatedAt = trade.CreatedAt,
+            RespondedAt = trade.RespondedAt,
+            ResolvedAt = trade.ResolvedAt,
+            PlayersFromProposing = trade.Players
                 .Where(tp => tp.FromTeamId == trade.ProposingTeamId)
                 .Select(ToTradePlayerDto)
                 .ToList(),
@@ -1113,8 +1120,9 @@ public class Mapper : IMapper
                 .Where(tp => tp.FromTeamId == trade.ReceivingTeamId)
                 .Select(ToTradePlayerDto)
                 .ToList(),
-            CanAccept = isReceivingGm && trade.Status == TradeStatus.Pending, CanDecline = isReceivingGm && trade.Status == TradeStatus.Pending, CanCancel = (isProposingGm && trade.Status == TradeStatus.Pending)
-                                                                                                                                                             || (viewer.IsAdmin && trade.Status is TradeStatus.Pending or TradeStatus.Accepted),
+            CanAccept = isReceivingGm && trade.Status == TradeStatus.Pending,
+            CanDecline = isReceivingGm && trade.Status == TradeStatus.Pending,
+            CanCancel = (isProposingGm && trade.Status == TradeStatus.Pending) || (viewer.IsAdmin && trade.Status is TradeStatus.Pending or TradeStatus.Accepted),
             CanApprove = viewer.IsAdmin && trade.Status == TradeStatus.Accepted,
         };
     }
