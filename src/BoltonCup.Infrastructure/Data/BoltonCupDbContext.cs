@@ -42,6 +42,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<CustomRankingShare> CustomRankingShares { get; set; }
     public DbSet<SentEmail> SentEmails { get; set; }
     public DbSet<EmailLog> EmailLogs { get; set; }
+    public DbSet<EmailDraft> EmailDrafts { get; set; }
     public DbSet<Trade> Trades { get; set; }
     public DbSet<TradePlayer> TradePlayers { get; set; }
     public DbSet<TeamGeneralManager> TeamGeneralManagers { get; set; }
@@ -1079,6 +1080,19 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Succeeded).HasColumnName("succeeded");
             entity.Property(e => e.Error).HasColumnName("error");
             entity.Property(e => e.BroadcastId).HasColumnName("broadcast_id");
+        });
+
+        modelBuilder.Entity<EmailDraft>(entity =>
+        {
+            entity
+                .ToTable("email_drafts")
+                .HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.Subject).HasColumnName("subject");
+            entity.Property(e => e.Body).HasColumnName("body");
+            entity.Property(e => e.UseLayout).HasColumnName("use_layout");
+            entity.Property(e => e.AudienceKind).HasColumnName("audience_kind");
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
         });
 
         modelBuilder.Entity<Referee>(entity =>

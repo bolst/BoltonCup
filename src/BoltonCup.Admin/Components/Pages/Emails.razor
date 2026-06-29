@@ -11,12 +11,16 @@
 
         <MudToolBar Class="mud-theme-dark" Dense>
             <MudIcon Icon="@Icons.Material.Rounded.Email" Class="mr-2" Size="Size.Small" />
-            <MudText Typo="Typo.subtitle2">New Message</MudText>
+            <MudText Typo="Typo.subtitle2">@(_draftId is null ? "New Message" : "Editing draft")</MudText>
             <MudSpacer />
             @if (_loading)
             {
                 <MudProgressCircular Indeterminate Size="Size.Small" Color="Color.Inherit" />
             }
+            <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Inherit"
+                       StartIcon="@Icons.Material.Rounded.Add" OnClick="NewMessage">
+                New
+            </MudButton>
         </MudToolBar>
 
         @* ---- To / audience row ---- *@
@@ -157,6 +161,10 @@
                        StartIcon="@Icons.Material.Rounded.Send" OnClick="SendAsync" Disabled="@(!CanSend)">
                 Send
             </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Default" Size="Size.Large"
+                       StartIcon="@Icons.Material.Rounded.Save" OnClick="SaveDraftAsync" Disabled="@(!CanSaveDraft)">
+                @(_draftId is null ? "Save draft" : "Update draft")
+            </MudButton>
             <MudSwitch T="bool" @bind-Value="_useLayout" Color="Color.Primary" Size="Size.Small">Bolton Cup layout</MudSwitch>
             <MudSpacer />
             <MudText Typo="Typo.caption" Class="mud-text-secondary">
@@ -166,6 +174,40 @@
 
     </MudPaper>
 </div>
+
+@if (_drafts.Count > 0)
+{
+    <div class="d-flex justify-center px-4 pb-4">
+        <div style="width: 100%; max-width: 880px;">
+            <div class="d-flex align-center mb-2">
+                <MudText Typo="Typo.subtitle1">Drafts</MudText>
+            </div>
+            <MudPaper Elevation="1" Class="rounded-lg" Style="overflow: hidden;">
+                @foreach (var d in _drafts)
+                {
+                    var isCurrent = _draftId == d.Id;
+                    <div class="d-flex align-center justify-space-between gap-2 px-4 py-2"
+                         style="border-bottom: 1px solid var(--mud-palette-lines-default); @(isCurrent ? "background: var(--mud-palette-action-default-hover);" : "")">
+                        <div class="d-flex flex-column" style="min-width: 0;">
+                            <MudText Typo="Typo.body1">@(string.IsNullOrWhiteSpace(d.Subject) ? "(no subject)" : d.Subject)</MudText>
+                            <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                                @DraftAudienceLabel(d) · @((d.LastModified ?? d.CreatedAt).ToEstString("g"))
+                            </MudText>
+                        </div>
+                        <div class="d-flex align-center gap-1">
+                            <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Rounded.Edit" OnClick="@(() => LoadDraftAsync(d))">
+                                Edit
+                            </MudButton>
+                            <MudIconButton Icon="@Icons.Material.Rounded.Delete" Size="Size.Small" Color="Color.Error"
+                                           OnClick="@(() => DeleteDraftAsync(d))" title="Delete draft" />
+                        </div>
+                    </div>
+                }
+            </MudPaper>
+        </div>
+    </div>
+}
 
 @if (_recent.Count > 0)
 {
@@ -231,6 +273,9 @@
     private List<SentEmail> _recent = [];
     private Dictionary<Guid, (int Sent, int Failed)> _deliveryStats = [];
 
+    private List<EmailDraft> _drafts = [];
+    private int? _draftId;
+
     private string _subject = "";
     private string _body = "";
     private bool _useLayout = true;
@@ -245,6 +290,9 @@
         && _selected.Count > 0
         && !string.IsNullOrWhiteSpace(_subject)
         && !string.IsNullOrWhiteSpace(_body);
+
+    private bool CanSaveDraft => !_sending
+        && (!string.IsNullOrWhiteSpace(_subject) || !string.IsNullOrWhiteSpace(_body));
 
     private static string DisplayName(BroadcastRecipient r)
     {
@@ -262,7 +310,18 @@
             .Select(t => new TournamentOption(t.Id, t.Name))
             .ToListAsync();
 
+        await LoadDraftsAsync();
         await LoadRecentAsync();
+    }
+
+    private async Task LoadDraftsAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        _drafts = await db.EmailDrafts
+            .AsNoTracking()
+            .OrderByDescending(d => d.LastModified ?? d.CreatedAt)
+            .Take(10)
+            .ToListAsync();
     }
 
     private async Task LoadRecentAsync()
@@ -289,10 +348,17 @@
             .ToDictionary(x => x.BroadcastId, x => (x.Sent, x.Failed));
     }
 
-    private string BuildAudienceLabel()
+    private string BuildAudienceLabel() => AudienceLabel(_kind, _tournamentId);
+
+    private string DraftAudienceLabel(EmailDraft d) =>
+        Enum.TryParse<AudienceKind>(d.AudienceKind, out var kind)
+            ? AudienceLabel(kind, d.TournamentId)
+            : d.AudienceKind;
+
+    private string AudienceLabel(AudienceKind kind, int? tournamentId)
     {
-        var tournament = _tournaments.FirstOrDefault(t => t.Id == _tournamentId)?.Name ?? "tournament";
-        return _kind switch
+        var tournament = _tournaments.FirstOrDefault(t => t.Id == tournamentId)?.Name ?? "tournament";
+        return kind switch
         {
             AudienceKind.PlayerPool => $"Player pool · {tournament}",
             AudienceKind.Unpaid => $"Signed up but not paid · {tournament}",
@@ -394,9 +460,16 @@
                     UseLayout = _useLayout,
                     BroadcastId = broadcastId,
                 });
+                if (_draftId is int draftId)
+                {
+                    await db.EmailDrafts.Where(d => d.Id == draftId).ExecuteDeleteAsync();
+                    _draftId = null;
+                }
+
                 await db.SaveChangesAsync();
             }
 
+            await LoadDraftsAsync();
             await LoadRecentAsync();
             Snackbar.Add($"Queued email to {count} recipient{(count == 1 ? "" : "s")}.", Severity.Success);
         }
@@ -409,6 +482,105 @@
             _sending = false;
             StateHasChanged();
         }
+    }
+
+    private async Task SaveDraftAsync()
+    {
+        if (!CanSaveDraft)
+            return;
+
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+
+            if (_draftId is int id)
+            {
+                var draft = await db.EmailDrafts.FirstOrDefaultAsync(d => d.Id == id);
+                if (draft is null)
+                {
+                    _draftId = null;
+                }
+                else
+                {
+                    draft.Subject = _subject;
+                    draft.Body = _body;
+                    draft.UseLayout = _useLayout;
+                    draft.AudienceKind = _kind.ToString();
+                    draft.TournamentId = _tournamentId;
+                    draft.LastModified = DateTime.UtcNow;
+                    await db.SaveChangesAsync();
+                }
+            }
+
+            if (_draftId is null)
+            {
+                var draft = new EmailDraft
+                {
+                    Subject = _subject,
+                    Body = _body,
+                    UseLayout = _useLayout,
+                    AudienceKind = _kind.ToString(),
+                    TournamentId = _tournamentId,
+                };
+                db.EmailDrafts.Add(draft);
+                await db.SaveChangesAsync();
+                _draftId = draft.Id;
+            }
+
+            await LoadDraftsAsync();
+            Snackbar.Add("Draft saved.", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to save draft: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadDraftAsync(EmailDraft draft)
+    {
+        _draftId = draft.Id;
+        _subject = draft.Subject;
+        _body = draft.Body;
+        _useLayout = draft.UseLayout;
+        _previewMode = false;
+        _kind = Enum.TryParse<AudienceKind>(draft.AudienceKind, out var kind) ? kind : AudienceKind.PlayerPool;
+        _tournamentId = draft.TournamentId;
+        await ResolveAudienceAsync();
+    }
+
+    private async Task DeleteDraftAsync(EmailDraft draft)
+    {
+        var confirm = await DialogService.ShowMessageBoxAsync(
+            "Delete draft",
+            $"Delete \"{(string.IsNullOrWhiteSpace(draft.Subject) ? "(no subject)" : draft.Subject)}\"?",
+            yesText: "Delete", noText: null, cancelText: "Cancel");
+
+        if (confirm != true)
+            return;
+
+        try
+        {
+            await using var db = await DbFactory.CreateDbContextAsync();
+            await db.EmailDrafts.Where(d => d.Id == draft.Id).ExecuteDeleteAsync();
+
+            if (_draftId == draft.Id)
+                _draftId = null;
+
+            await LoadDraftsAsync();
+            Snackbar.Add("Draft deleted.", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to delete draft: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void NewMessage()
+    {
+        _draftId = null;
+        _subject = "";
+        _body = "";
+        _previewMode = false;
     }
 
     private sealed class RecipientComparer : IEqualityComparer<BroadcastRecipient>
