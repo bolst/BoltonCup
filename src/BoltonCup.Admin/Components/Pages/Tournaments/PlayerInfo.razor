@@ -1,0 +1,105 @@
+@page "/tournaments/{TournamentId:int}/player-info"
+@using BoltonCup.Common
+@using BoltonCup.Common.Components
+@using BoltonCup.Sdk
+@{
+#nullable enable
+}
+
+<EntityDataGrid
+    @ref="_dataGrid"
+    T="TournamentPlayerInfo"
+    ReadOnly
+    Selectable="false"
+    Include="@_includes"
+    Filter="@_filter"
+    SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"
+    Comparer="_comparer">
+    <Columns>
+        <TemplateColumn Title="Player" Editable="false">
+            <CellTemplate>
+                <span>@context.Item.Account?.FirstName @context.Item.Account?.LastName</span>
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Song Request" Editable="false" Sortable="false">
+            <CellTemplate>
+                @if (string.IsNullOrWhiteSpace(context.Item.SongName))
+                {
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">—</MudText>
+                }
+                else
+                {
+                    <div class="d-flex align-center gap-2">
+                        @if (!string.IsNullOrWhiteSpace(context.Item.SongAlbumArtUrl))
+                        {
+                            <MudImage Src="@context.Item.SongAlbumArtUrl" Height="32" Width="32" Class="rounded" />
+                        }
+                        <div class="d-flex flex-column">
+                            <MudText Typo="Typo.body2">@context.Item.SongName</MudText>
+                            @if (!string.IsNullOrWhiteSpace(context.Item.SongArtist))
+                            {
+                                <MudText Typo="Typo.caption" Class="mud-text-secondary">@context.Item.SongArtist</MudText>
+                            }
+                        </div>
+                    </div>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Availability" Editable="false" Sortable="false">
+            <CellTemplate>
+                <AvailabilityIndicator Availabilities="@BuildAvailabilities(context.Item)" />
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Title="Last Updated" Property="x => x.LastModified" Editable="false">
+            <CellTemplate>
+                <span>@((context.Item.LastModified ?? context.Item.CreatedAt).ToEstString("g"))</span>
+            </CellTemplate>
+        </PropertyColumn>
+    </Columns>
+</EntityDataGrid>
+
+@code {
+
+    [Parameter]
+    public int TournamentId { get; set; }
+
+    private int? _tournamentId;
+    private EntityDataGrid<TournamentPlayerInfo>? _dataGrid;
+    private static readonly TournamentPlayerInfoComparer _comparer = new();
+
+    private System.Linq.Expressions.Expression<Func<TournamentPlayerInfo, bool>>? _filter;
+
+    private static readonly Func<IQueryable<TournamentPlayerInfo>, IQueryable<TournamentPlayerInfo>> _includes =
+        x => x
+            .Include(e => e.Account)
+            .Include(e => e.GameAvailabilities)
+            .ThenInclude(a => a.Game);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_tournamentId == TournamentId)
+            return;
+        _tournamentId = TournamentId;
+
+        // Built once; EF re-reads the captured field on each query execution.
+        _filter = x => x.TournamentId == _tournamentId;
+
+        if (_dataGrid is not null)
+        {
+            await _dataGrid.ReloadAsync();
+            StateHasChanged();
+        }
+    }
+
+    private static List<PlayerGameAvailabilityDto> BuildAvailabilities(TournamentPlayerInfo info)
+        => info.GameAvailabilities
+            .Select(a => new PlayerGameAvailabilityDto
+            {
+                GameId = a.GameId,
+                GameTime = a.Game.GameTime,
+                Availability = (BoltonCup.Sdk.GameAvailability?)(int)a.Availability,
+            })
+            .OrderBy(a => a.GameTime)
+            .ToList();
+
+}
