@@ -57,7 +57,7 @@ public class TeamsController(
         await _teamService.UpdateLogoAsync(id, key);
         return Ok();
     }
-    
+
     /// <summary>Updates a team's banner using a pre-signed S3 key (admin only).</summary>
     /// <remarks>
     /// Updates a team's banner by accepting a pre-signed S3 key.

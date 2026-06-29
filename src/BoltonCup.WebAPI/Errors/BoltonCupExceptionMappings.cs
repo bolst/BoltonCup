@@ -5,20 +5,19 @@ using BoltonCup.Shared;
 namespace BoltonCup.WebAPI.Errors;
 
 // Let there be a defined list of exceptions with associated status codes.
-
 /// <summary>Maps known BoltonCup exception types to HTTP status codes and problem-detail types.</summary>
 public static class BoltonCupExceptionMappings
 {
     /// <summary>The ordered list of exception-to-status-code mappings evaluated at runtime.</summary>
     public static readonly IReadOnlyList<ExceptionMappingConfig> Values =
     [
-        new( 
-            ExceptionType: typeof(EntityNotFoundException), 
-            StatusCode: StatusCodes.Status404NotFound, 
+        new(
+            ExceptionType: typeof(EntityNotFoundException),
+            StatusCode: StatusCodes.Status404NotFound,
             ErrorType: ErrorTypes.NotFound,
             Title: "Entity not found."
         ),
-        
+
         // Auth
         new(
             ExceptionType: typeof(AccountNotConfirmedException),
@@ -44,11 +43,11 @@ public static class BoltonCupExceptionMappings
             ErrorType: ErrorTypes.Auth.PasswordResetFailed,
             Title: "Unable to reset password."
         ),
-        
+
         // Tournaments
-        new( 
-            ExceptionType: typeof(AccountAlreadyInTournamentException), 
-            StatusCode: StatusCodes.Status409Conflict, 
+        new(
+            ExceptionType: typeof(AccountAlreadyInTournamentException),
+            StatusCode: StatusCodes.Status409Conflict,
             ErrorType: ErrorTypes.Tournaments.AccountAlreadyRegistered,
             Title: "Account already registered for tournament."
         ),
@@ -60,11 +59,11 @@ public static class BoltonCupExceptionMappings
         ),
         new(
             ExceptionType: typeof(TournamentRegistrationClosedException),
-            StatusCode: StatusCodes.Status409Conflict, 
+            StatusCode: StatusCodes.Status409Conflict,
             ErrorType: ErrorTypes.Tournaments.RegistrationClosed,
             Title: "Registration closed."
         ),
-        
+
         // Bracket Challenges
         new(
             ExceptionType: typeof(EmailAlreadyInBracketChallengeException),
@@ -78,7 +77,7 @@ public static class BoltonCupExceptionMappings
             ErrorType: ErrorTypes.BracketChallenges.RegistrationClosed,
             Title: "Registration is closed for this bracket challenge."
         ),
-        
+
         // Trades
         new(
             ExceptionType: typeof(TradingClosedException),
@@ -114,16 +113,16 @@ public static class BoltonCupExceptionMappings
         // Base/Fallback exception
         new(
             ExceptionType: typeof(BoltonCupException),
-            StatusCode: StatusCodes.Status422UnprocessableEntity, 
+            StatusCode: StatusCodes.Status422UnprocessableEntity,
             ErrorType: ErrorTypes.Unexpected,
             Title: "An error occurred while processing the request."
         )
     ];
-    
+
     /// <summary>Returns a <see cref="BoltonCupProblemDetails"/> for the given exception, or <c>null</c> if no mapping exists.</summary>
     public static BoltonCupProblemDetails? GetProblemDetails(Exception exception)
     {
-        var mapping = Values.FirstOrDefault(m => 
+        var mapping = Values.FirstOrDefault(m =>
             m.ExceptionType.IsAssignableFrom(exception.GetType()));
 
         if (mapping is null)
@@ -131,15 +130,12 @@ public static class BoltonCupExceptionMappings
 
         return new BoltonCupProblemDetails
         {
-            Type = mapping.ErrorType,
-            Title = mapping.Title,
-            Status = mapping.StatusCode,
-            Detail = exception.Message
+            Type = mapping.ErrorType, Title = mapping.Title, Status = mapping.StatusCode, Detail = exception.Message
         };
     }
 
-    
+
     /// <summary>Defines the mapping between an exception type and its HTTP response metadata.</summary>
     public record ExceptionMappingConfig(Type ExceptionType, int StatusCode, string ErrorType, string Title);
-    
+
 }

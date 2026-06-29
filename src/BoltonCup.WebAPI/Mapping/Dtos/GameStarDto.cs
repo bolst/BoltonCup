@@ -9,7 +9,6 @@ public sealed record GameStarDto(
     PlayerBriefDto Player,
     List<StatItem> Stats
 );
-
 /// <summary>Represents a single displayed statistic.</summary>
 /// <param name="tag">The label or category of the statistic.</param>
 /// <param name="value">The formatted value of the statistic.</param>

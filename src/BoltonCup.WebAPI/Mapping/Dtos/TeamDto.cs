@@ -34,6 +34,5 @@ public record TeamDto
     /// <summary>Gets the last name of the general manager.</summary>
     public string? GmLastName { get; init; }
     /// <summary>Gets the URL of the general manager's profile picture.</summary>
-    public string? GmProfilePicture  { get; init; }
+    public string? GmProfilePicture { get; init; }
 }
-

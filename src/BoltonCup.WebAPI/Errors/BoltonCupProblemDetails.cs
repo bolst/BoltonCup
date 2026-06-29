@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 namespace BoltonCup.WebAPI.Errors;
 
 // Stolen from: https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http.Abstractions/src/ProblemDetails/ProblemDetails.cs
-
 /// <summary>Represents structured problem details returned by the API for errors.</summary>
 public class BoltonCupProblemDetails
 {

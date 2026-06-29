@@ -44,5 +44,5 @@ public class InfoGuidesController(IInfoGuideRepository _infoGuides, IMapper _map
         var guide = await _infoGuides.GetByTournamentIdAsync(tournamentId);
         return OkOrNoContent(_mapper.ToDto(guide));
     }
-    
+
 }

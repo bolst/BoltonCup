@@ -12,7 +12,7 @@ public sealed record PenaltyBriefDto
     /// <summary>Gets or sets the ID of the team that received the penalty.</summary>
     public required int TeamId { get; set; }
     /// <summary>Gets or sets the player who received the penalty.</summary>
-    public required PlayerBriefDto Player  { get; set; }
+    public required PlayerBriefDto Player { get; set; }
     /// <summary>Gets or sets the name of the infraction.</summary>
     public required string Infraction { get; set; }
     /// <summary>Gets or sets the duration of the penalty in minutes.</summary>

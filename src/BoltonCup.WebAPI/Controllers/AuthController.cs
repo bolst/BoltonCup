@@ -18,7 +18,7 @@ public class AuthController(
     IMapper _mapper,
     UserManager<BoltonCupUser> _userManager,
     SignInManager<BoltonCupUser> _signInManager
-    ) : BoltonCupControllerBase
+) : BoltonCupControllerBase
 {
     /// <summary>Returns the currently authenticated user's identity information.</summary>
     [Authorize]
@@ -30,7 +30,7 @@ public class AuthController(
             ? Ok(user)
             : Unauthorized();
     }
-    
+
     /// <summary>Authenticates a user with email and password.</summary>
     [AllowAnonymous]
     [HttpPost("login")]
@@ -57,7 +57,7 @@ public class AuthController(
         await _userService.ResendConfirmationEmailAsync(request.Email);
         return Ok();
     }
-    
+
     /// <summary>Verifies a password reset code without applying the reset.</summary>
     [AllowAnonymous]
     [HttpPost("verifyPasswordResetCode")]
@@ -93,18 +93,18 @@ public class AuthController(
         await _userService.ConfirmEmailAsync(request.Email, request.Code);
         return Ok();
     }
-    
+
     /// <summary>Signs the current user out and optionally redirects to a return URL.</summary>
     [Authorize]
     [HttpPost("logout")]
     public async Task<IResult> Logout([FromQuery] string? returnUrl = null)
     {
         await _signInManager.SignOutAsync();
-        return !string.IsNullOrWhiteSpace(returnUrl) 
-            ? Results.Redirect(returnUrl) 
+        return !string.IsNullOrWhiteSpace(returnUrl)
+            ? Results.Redirect(returnUrl)
             : Results.Ok();
     }
-    
+
     /// <summary>Checks whether a user account exists for the given email address.</summary>
     [AllowAnonymous]
     [HttpPost("continue")]
@@ -114,18 +114,13 @@ public class AuthController(
         return await _userManager.FindByEmailAsync(request.Email) is not null;
     }
 }
-
 /// <summary>Request payload for verifying a password reset code.</summary>
 public record VerifyPasswordResetCodeRequest(string Email, string Code);
-
 /// <summary>Request payload for initiating a forgot-password flow.</summary>
 public record ForgotPasswordRequest(string Email);
-
 /// <summary>Request payload for confirming an email address.</summary>
 public record ConfirmEmailRequest(string Email, string Code);
-
 /// <summary>Request payload for authenticating a user.</summary>
 public record LoginRequest(string Email, string Password, bool Persist = true);
-
 /// <summary>Request payload for checking whether an account exists for an email.</summary>
 public record CheckUserRequest(string Email);

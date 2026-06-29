@@ -12,7 +12,6 @@ namespace BoltonCup.WebAPI.Extensions;
  * For example, we would do something like:
  * new BoltonCupValidationProblems(modelState.ToErrorDictionary()) { ... }
  */
-
 /// <summary>Extension methods for <see cref="ModelStateDictionary"/>.</summary>
 public static class ModelStateDictionaryExtensions
 {
@@ -51,8 +50,8 @@ public static class ModelStateDictionaryExtensions
 
         static string GetErrorMessage(ModelError error)
         {
-            return string.IsNullOrEmpty(error.ErrorMessage) 
-                ? "unknown error" 
+            return string.IsNullOrEmpty(error.ErrorMessage)
+                ? "unknown error"
                 : error.ErrorMessage;
         }
     }

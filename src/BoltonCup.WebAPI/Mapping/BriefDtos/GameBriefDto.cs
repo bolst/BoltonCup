@@ -16,12 +16,10 @@ public record GameBriefDto
     /// <summary>Gets or sets the type of game (e.g. regular season, playoff).</summary>
     public required GameType? GameType { get; set; }
     /// <summary>Gets or sets the venue where the game is played.</summary>
-    public required string? Venue  { get; set; }
+    public required string? Venue { get; set; }
     /// <summary>Gets or sets the rink where the game is played.</summary>
     public required string? Rink { get; set; }
 }
-
-
 /// <summary>Brief summary of a game from a specific team's perspective.</summary>
 public record GameOfTeamDto : GameBriefDto
 {

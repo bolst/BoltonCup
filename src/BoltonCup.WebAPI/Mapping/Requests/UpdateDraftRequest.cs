@@ -23,12 +23,10 @@ public record UpdateDraftRequest
     /// <summary>Gets or sets the per-team auto-pick settings to apply.</summary>
     public List<DraftAutoPickRequestEntry>? AutoPickSettings { get; set; }
 }
-
 /// <summary>Specifies a team's pick position in the draft order.</summary>
 /// <param name="TeamId">The team ID.</param>
 /// <param name="Pick">The pick number assigned to the team.</param>
 public sealed record DraftOrderingRequestEntry(int TeamId, int Pick);
-
 /// <summary>Specifies whether a team auto-picks when on the clock.</summary>
 /// <param name="TeamId">The team ID.</param>
 /// <param name="AutoPick">Whether the team auto-picks the best available player on its turn.</param>

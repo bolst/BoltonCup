@@ -39,7 +39,7 @@ public class ApiKeyAuthenticationHandler(
             allowedNetworks = AdminApiKeyNetworkPolicy.DefaultAllowedNetworks;
         }
         var peerIp = Context.Items[ApiKeyConstants.TrueRemoteIpItemKey] as IPAddress
-            ?? Context.Connection.RemoteIpAddress;
+                     ?? Context.Connection.RemoteIpAddress;
         if (!AdminApiKeyNetworkPolicy.IsAllowed(peerIp, allowedNetworks))
         {
             // Logs the observed source so a blocked-but-legit caller (e.g. Docker masking the IP) is diagnosable.
@@ -50,9 +50,7 @@ public class ApiKeyAuthenticationHandler(
         // create identity
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, "bc-admin"),
-            new(ClaimTypes.Name, "BC Admin"),
-            new(ClaimTypes.Role, "Admin")
+            new(ClaimTypes.NameIdentifier, "bc-admin"), new(ClaimTypes.Name, "BC Admin"), new(ClaimTypes.Role, "Admin")
         };
 
         // Acts as a real account so completed-account-gated endpoints (e.g. asset uploads) accept the key.

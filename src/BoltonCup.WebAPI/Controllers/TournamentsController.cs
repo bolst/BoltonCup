@@ -41,7 +41,7 @@ public class TournamentsController(
         var tournament = await _tournaments.GetByIdAsync(id);
         return OkOrNoContent(_mapper.ToDto(tournament));
     }
-    
+
     /// <summary>Updates a tournament's logo using a pre-signed S3 key (admin only).</summary>
     /// <remarks>
     /// Updates a tournament's logo by accepting a pre-signed S3 key.

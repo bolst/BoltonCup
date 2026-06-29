@@ -18,7 +18,7 @@ public class MasqueradeController(
     SignInManager<BoltonCupUser> _signInManager,
     IMasqueradeService _masqueradeService,
     ILogger<MasqueradeController> _logger
-    ) : BoltonCupControllerBase
+) : BoltonCupControllerBase
 {
     /// <summary>Searches users an admin can masquerade as, by name or email.</summary>
     [Authorize(Roles = Admin)]
@@ -46,8 +46,7 @@ public class MasqueradeController(
 
         var markerClaims = new[]
         {
-            new Claim(BoltonCupClaimTypes.OriginalUserId, adminUserId),
-            new Claim(BoltonCupClaimTypes.OriginalUserName, adminUserName),
+            new Claim(BoltonCupClaimTypes.OriginalUserId, adminUserId), new Claim(BoltonCupClaimTypes.OriginalUserName, adminUserName),
         };
 
         await _signInManager.SignInWithClaimsAsync(target, isPersistent: false, markerClaims);
@@ -78,6 +77,5 @@ public class MasqueradeController(
         return Ok();
     }
 }
-
 /// <summary>Request payload for starting a masquerade session.</summary>
 public record MasqueradeRequest(string UserId);

@@ -12,8 +12,8 @@ public static class AdminApiKeyNetworkPolicy
     /// </summary>
     public static readonly string[] DefaultAllowedNetworks =
     [
-        "100.64.0.0/10",        // Tailscale IPv4 (CGNAT)
-        "fd7a:115c:a1e0::/48",  // Tailscale IPv6 (ULA)
+        "100.64.0.0/10", // Tailscale IPv4 (CGNAT)
+        "fd7a:115c:a1e0::/48", // Tailscale IPv6 (ULA)
     ];
 
     /// <summary>True if <paramref name="address"/> falls within any of the allowed CIDR ranges.</summary>

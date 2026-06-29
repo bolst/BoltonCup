@@ -12,7 +12,6 @@ public record PlayerSingleDto : PlayerDto
     /// <summary>Gets the player's aggregated stats per tournament.</summary>
     public List<PlayerTournamentStats> TournamentStats { get; init; } = [];
 }
-
 /// <summary>DTO representing a player's aggregated stats for a single tournament.</summary>
 public sealed record PlayerTournamentStats
 {
@@ -37,16 +36,15 @@ public sealed record PlayerTournamentStats
     /// <summary>Gets or sets the team the player was on during this tournament.</summary>
     public required TeamBriefDto? Team { get; set; }
 }
-
 /// <summary>DTO representing a player's stats for a single game.</summary>
 public sealed record PlayerGameByGame
 {
     /// <summary>Gets or sets the number of goals scored in the game.</summary>
-    public required int Goals  { get; set; }
+    public required int Goals { get; set; }
     /// <summary>Gets or sets the number of assists in the game.</summary>
-    public required int Assists  { get; set; }
+    public required int Assists { get; set; }
     /// <summary>Gets the total points (goals plus assists) for the game.</summary>
-    public  int Points => Goals + Assists;
+    public int Points => Goals + Assists;
     /// <summary>Gets or sets the penalty minutes accumulated in the game.</summary>
     public required int PenaltyMinutes { get; set; }
     /// <summary>Gets or sets whether the player's team won the game.</summary>

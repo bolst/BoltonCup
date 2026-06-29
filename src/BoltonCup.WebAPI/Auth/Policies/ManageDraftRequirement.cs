@@ -12,12 +12,10 @@ public static partial class BoltonCupPolicy
     /// <summary>Policy that requires the user to be authorized to manage a specific draft.</summary>
     public const string CanManageDraft = "CanManageDraft";
 }
-
 /// <summary>Authorization requirement for managing a draft.</summary>
 public class ManageDraftRequirement : IAuthorizationRequirement
 {
 }
-
 /// <summary>Handles authorization for <see cref="ManageDraftRequirement"/> by verifying the user is an admin or the draft owner.</summary>
 public class DraftManagerHandler(BoltonCupDbContext _dbContext)
     : AuthorizationHandler<ManageDraftRequirement, int>
@@ -27,7 +25,7 @@ public class DraftManagerHandler(BoltonCupDbContext _dbContext)
         AuthorizationHandlerContext context,
         ManageDraftRequirement requirement,
         int draftId
-    )
+        )
     {
         if (context.User.IsInRole(Admin))
         {

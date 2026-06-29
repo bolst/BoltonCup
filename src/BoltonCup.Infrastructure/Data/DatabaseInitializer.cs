@@ -25,12 +25,11 @@ public static class DatabaseInitializer
         }
     }
 }
-
 internal static class RoleSeeder
 {
     internal static async Task SeedAdminUserAsync(
-        RoleManager<IdentityRole> roleManager, 
-        UserManager<BoltonCupUser> userManager, 
+        RoleManager<IdentityRole> roleManager,
+        UserManager<BoltonCupUser> userManager,
         IConfiguration configuration)
     {
         foreach (var roleName in BoltonCupRole.All)
@@ -39,9 +38,9 @@ internal static class RoleSeeder
                 await roleManager.CreateAsync(new IdentityRole(roleName));
         }
 
-        var adminEmail = configuration["BoltonCup:AdminEmail"]; 
-        if (string.IsNullOrEmpty(adminEmail)) 
-            return; 
+        var adminEmail = configuration["BoltonCup:AdminEmail"];
+        if (string.IsNullOrEmpty(adminEmail))
+            return;
 
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, "Admin"))

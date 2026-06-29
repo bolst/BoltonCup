@@ -31,7 +31,7 @@ public class BracketChallengesController(
         var bracketChallenge = await _bracketChallengeService.GetByIdAsync(id);
         return OkOrNoContent(_mapper.ToDto(bracketChallenge));
     }
-    
+
     /// <summary>Creates a Stripe payment intent for a bracket challenge registration.</summary>
     [AllowAnonymous]
     [HttpPost("{id:int}")]

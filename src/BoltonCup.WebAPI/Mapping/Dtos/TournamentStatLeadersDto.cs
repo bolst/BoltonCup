@@ -1,6 +1,5 @@
 namespace BoltonCup.WebAPI.Mapping;
 
-
 /// <summary>DTO representing a leaderboard category with its top players.</summary>
 public record PlayerStatLeadersDto
 {
@@ -9,7 +8,6 @@ public record PlayerStatLeadersDto
     /// <summary>Gets the ranked list of players for this category.</summary>
     public IEnumerable<PlayerStatDto> Leaders { get; init; } = [];
 }
-
 /// <summary>DTO representing a player's entry in a stat leaderboard.</summary>
 public record PlayerStatDto
 {

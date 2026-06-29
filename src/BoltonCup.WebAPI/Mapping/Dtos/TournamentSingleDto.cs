@@ -8,7 +8,6 @@ public sealed record TournamentSingleDto : TournamentDto
     /// <summary>Gets the list of sponsors for this tournament.</summary>
     public List<TournamentSponsorDto> Sponsors { get; init; } = [];
 }
-
 /// <summary>DTO representing a tournament sponsor.</summary>
 public record TournamentSponsorDto
 {

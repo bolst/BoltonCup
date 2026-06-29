@@ -16,7 +16,7 @@ public record GameDto
     /// <summary>Gets the current state of the game.</summary>
     public required GameState GameState { get; init; }
     /// <summary>Gets the venue where the game is played.</summary>
-    public string? Venue  { get; init; }
+    public string? Venue { get; init; }
     /// <summary>Gets the rink where the game is played.</summary>
     public string? Rink { get; init; }
     /// <summary>Gets the home team with their goal count.</summary>

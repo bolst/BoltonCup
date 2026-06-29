@@ -35,7 +35,7 @@ public class SystemController(
                 FeaturedStats: featuredStats
             );
         });
-        
+
         return Ok(context);
     }
 
@@ -44,38 +44,55 @@ public class SystemController(
     {
         if (await _dbContext.Tournaments.FirstOrDefaultAsync(t => t.IsStatsFeatured) is not { } featuredStatsTournament)
             return null;
-        var baseSkaterQuery = new GetSkaterStatsQuery { TournamentId = featuredStatsTournament.Id, Size = 5, Descending = true };
-        var baseGoalieQuery = new GetGoalieStatsQuery { TournamentId = featuredStatsTournament.Id, Size = 5 };
-            
-        var points = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with { SortBy = nameof(SkaterStat.Points)});
-        var goals = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with { SortBy = nameof(SkaterStat.Goals)});
-        var pims = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with { SortBy = nameof(SkaterStat.PenaltyMinutes)});
-        var gaa = await _goalieStatRepo.GetAllAsync(baseGoalieQuery with { SortBy = nameof(GoalieStat.GoalsAgainstAverage)});
+
+        var baseSkaterQuery = new GetSkaterStatsQuery
+        {
+            TournamentId = featuredStatsTournament.Id, Size = 5, Descending = true
+        };
+        var baseGoalieQuery = new GetGoalieStatsQuery
+        {
+            TournamentId = featuredStatsTournament.Id, Size = 5
+        };
+
+        var points = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with
+        {
+            SortBy = nameof(SkaterStat.Points)
+        });
+        var goals = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with
+        {
+            SortBy = nameof(SkaterStat.Goals)
+        });
+        var pims = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with
+        {
+            SortBy = nameof(SkaterStat.PenaltyMinutes)
+        });
+        var gaa = await _goalieStatRepo.GetAllAsync(baseGoalieQuery with
+        {
+            SortBy = nameof(GoalieStat.GoalsAgainstAverage)
+        });
 
         return new TournamentStatLeadersDto
         {
-            TournamentId = featuredStatsTournament.Id,
-            Title = featuredStatsTournament.FeaturedStatsLabel ?? featuredStatsTournament.Name,
-            StatLeaders =
+            TournamentId = featuredStatsTournament.Id, Title = featuredStatsTournament.FeaturedStatsLabel ?? featuredStatsTournament.Name, StatLeaders =
             [
                 _mapper.ToDto(
-                    "Points", 
+                    "Points",
                     points.Items,
                     x => x.Points
                 ),
                 _mapper.ToDto(
-                    "Goals", 
+                    "Goals",
                     goals.Items,
                     x => x.Goals
                 ),
                 _mapper.ToDto(
-                    "PIM", 
+                    "PIM",
                     pims.Items,
                     x => x.PenaltyMinutes,
                     "N0"
                 ),
                 _mapper.ToDto(
-                    "GAA", 
+                    "GAA",
                     gaa.Items,
                     x => x.GoalsAgainstAverage,
                     "F2"
@@ -84,13 +101,11 @@ public class SystemController(
         };
     }
 }
-
 /// <summary>Contains the system-wide contextual data returned by the context endpoint.</summary>
 public record SystemContextDto(
     TournamentSingleDto? ActiveTournament,
     TournamentStatLeadersDto? FeaturedStats
 );
-
 /// <summary>Contains stat leader information for a featured tournament.</summary>
 public record TournamentStatLeadersDto
 {

@@ -13,7 +13,6 @@ public static partial class BoltonCupPolicy
     /// <summary>Policy that requires the user to be able to view a custom ranking (owner, admin, or shared viewer).</summary>
     public const string CanAccessRanking = "CanAccessRanking";
 }
-
 /// <summary>Resolves the ranking id under authorization from the request route or an explicit int resource.</summary>
 internal static class RankingAuthorizationResource
 {
@@ -35,12 +34,10 @@ internal static class RankingAuthorizationResource
         }
     }
 }
-
 /// <summary>Authorization requirement for viewing a custom ranking.</summary>
 public class AccessRankingRequirement : IAuthorizationRequirement
 {
 }
-
 /// <summary>Handles <see cref="AccessRankingRequirement"/> by verifying the user is an admin, the owner, or a shared viewer.</summary>
 public class RankingAccessHandler(BoltonCupDbContext _dbContext)
     : AuthorizationHandler<AccessRankingRequirement>

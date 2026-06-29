@@ -14,7 +14,6 @@ public record DraftSingleDto : DraftDto
     /// <summary>Gets or sets the custom ranking applied as this draft's default player ordering, if any.</summary>
     public int? DefaultCustomRankingId { get; set; }
 }
-
 /// <summary>Represents the picks for a single draft round.</summary>
 /// <param name="Round">The round number.</param>
 /// <param name="Picks">The picks made in this round.</param>

@@ -6,4 +6,3 @@ public record InfoGuideSingleDto : InfoGuideDto
     /// <summary>Gets or sets the Markdown content of the info guide.</summary>
     public string? MarkdownContent { get; set; }
 }
-

@@ -10,9 +10,9 @@ public static class RateLimitResponder
 {
     /// <summary>Writes a 429 Too Many Requests response with a <see cref="BoltonCupProblemDetails"/> body.</summary>
     public static async ValueTask WriteResponseAsync(
-        OnRejectedContext context, 
-        string title = "Too Many Requests.", 
-        string detail = "Rate limit exceeded, please try again later.", 
+        OnRejectedContext context,
+        string title = "Too Many Requests.",
+        string detail = "Rate limit exceeded, please try again later.",
         string errorType = ErrorTypes.TooManyRequests,
         CancellationToken cancellationToken = default)
     {
@@ -20,10 +20,7 @@ public static class RateLimitResponder
 
         var problem = new BoltonCupProblemDetails
         {
-            Type = errorType,
-            Title = title,
-            Status = StatusCodes.Status429TooManyRequests,
-            Detail = detail,
+            Type = errorType, Title = title, Status = StatusCodes.Status429TooManyRequests, Detail = detail,
             Instance = context.HttpContext.Request.Path
         };
 

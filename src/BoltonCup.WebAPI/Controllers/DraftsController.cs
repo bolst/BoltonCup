@@ -87,7 +87,7 @@ public class DraftsController(
         int id,
         [FromBody] UpdateDraftRequest request,
         [FromServices] IHubContext<Hubs.DraftHub> hubContext
-    )
+        )
     {
         var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
         if (!canManage)
@@ -114,7 +114,7 @@ public class DraftsController(
         int id,
         [FromBody] ApplyDefaultRankingRequest request,
         [FromServices] IHubContext<Hubs.DraftHub> hubContext
-    )
+        )
     {
         var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
         if (!canManage)
@@ -200,7 +200,7 @@ public class DraftsController(
         var result = await _draftService.GetCurrentPickAsync(id);
         return OkOrNoContent(_mapper.ToDto(result));
     }
-    
+
     /// <summary>Submits a player pick for the current draft slot.</summary>
     [Authorize]
     [HttpPut("{id:int}/currentPick")]
@@ -208,7 +208,7 @@ public class DraftsController(
         int id,
         [FromBody] DraftPlayerRequest request,
         [FromServices] IHubContext<Hubs.DraftHub> hubContext
-    )
+        )
     {
         // admin and draft owners can pick for any team; others must be the team's GM
         var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
@@ -235,7 +235,7 @@ public class DraftsController(
         int overallPick,
         [FromBody] ReplaceDraftPickRequest request,
         [FromServices] IHubContext<Hubs.DraftHub> hubContext
-    )
+        )
     {
         var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
         if (!canManage)
@@ -352,7 +352,7 @@ public class DraftsController(
         int id,
         [FromBody] SetPlayerPoolRequest request,
         [FromServices] IHubContext<Hubs.DraftHub> hubContext
-    )
+        )
     {
         var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
         if (!canManage)

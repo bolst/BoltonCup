@@ -35,4 +35,3 @@ public record PlayerDto
     /// <summary>Gets whether the player is a goalie.</summary>
     public bool IsGoalie => Position == "goalie";
 }
-

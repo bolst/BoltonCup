@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 namespace BoltonCup.WebAPI.Errors;
 
 // Stolen from: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ValidationProblemDetails.cs
-
 /// <summary>Represents structured validation problem details with field-level errors.</summary>
 public class BoltonCupValidationProblemDetails : BoltonCupProblemDetails
 {

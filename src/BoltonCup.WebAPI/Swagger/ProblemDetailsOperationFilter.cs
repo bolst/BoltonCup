@@ -5,7 +5,6 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace BoltonCup.WebAPI.Swagger;
 
 // Let there be exception response schemas in the OpenAPI spec.
-
 /// <summary>Adds standardised problem-details response schemas (400, 429, and domain error codes) to every OpenAPI operation.</summary>
 public sealed class ProblemDetailsOperationFilter : IOperationFilter
 {
@@ -13,7 +12,7 @@ public sealed class ProblemDetailsOperationFilter : IOperationFilter
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         operation.Responses ??= new OpenApiResponses();
-        
+
         // Let there be a schema for validation errors
         var validationSchema = context.SchemaGenerator
             .GenerateSchema(typeof(BoltonCupValidationProblemDetails), context.SchemaRepository);
@@ -21,10 +20,12 @@ public sealed class ProblemDetailsOperationFilter : IOperationFilter
         {
             operation.Responses["400"] = new OpenApiResponse
             {
-                Description = "Validation Error",
-                Content = new Dictionary<string, OpenApiMediaType>
+                Description = "Validation Error", Content = new Dictionary<string, OpenApiMediaType>
                 {
-                    ["application/problem+json"] = new() { Schema = validationSchema }
+                    ["application/problem+json"] = new()
+                    {
+                        Schema = validationSchema
+                    }
                 }
             };
         }
@@ -37,14 +38,16 @@ public sealed class ProblemDetailsOperationFilter : IOperationFilter
         {
             operation.Responses["429"] = new OpenApiResponse
             {
-                Description = "Too Many Requests",
-                Content = new Dictionary<string, OpenApiMediaType>
+                Description = "Too Many Requests", Content = new Dictionary<string, OpenApiMediaType>
                 {
-                    ["application/json"] = new() { Schema = problemSchema }
+                    ["application/json"] = new()
+                    {
+                        Schema = problemSchema
+                    }
                 }
             };
         }
-        
+
         BoltonCupExceptionMappings.Values
             .Select(m => m.StatusCode.ToString())
             .Distinct()
@@ -54,10 +57,12 @@ public sealed class ProblemDetailsOperationFilter : IOperationFilter
             {
                 operation.Responses?[statusCode] = new OpenApiResponse
                 {
-                    Description = "Error",
-                    Content = new Dictionary<string, OpenApiMediaType>
+                    Description = "Error", Content = new Dictionary<string, OpenApiMediaType>
                     {
-                        ["application/problem+json"] = new() { Schema = problemSchema }
+                        ["application/problem+json"] = new()
+                        {
+                            Schema = problemSchema
+                        }
                     }
                 };
             });

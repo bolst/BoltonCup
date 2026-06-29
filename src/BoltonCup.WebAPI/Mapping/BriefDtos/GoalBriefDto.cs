@@ -12,7 +12,7 @@ public sealed record GoalBriefDto
     /// <summary>Gets or sets the ID of the team that scored the goal.</summary>
     public required int TeamId { get; set; }
     /// <summary>Gets or sets the player who scored the goal.</summary>
-    public required PlayerBriefDto Scorer  { get; set; }
+    public required PlayerBriefDto Scorer { get; set; }
     /// <summary>Gets or sets the player credited with the primary assist.</summary>
     public required PlayerBriefDto? PrimaryAssist { get; set; }
     /// <summary>Gets or sets the player credited with the secondary assist.</summary>

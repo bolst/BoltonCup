@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BoltonCup.Infrastructure.Data;
 
-
 public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     : DbContext(options)
 {
@@ -35,7 +34,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<TournamentPlayerGameAvailability> TournamentPlayerGameAvailabilities { get; set; }
     public DbSet<TournamentMusicTrack> TournamentMusicTracks { get; set; }
     public DbSet<TournamentSponsor> TournamentSponsors { get; set; }
-    
+
     public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
     public DbSet<PlayerFavourite> PlayerFavourites { get; set; }
     public DbSet<CustomRanking> CustomRankings { get; set; }
@@ -50,7 +49,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("core");
-        
+
         modelBuilder.Entity<Account>(entity =>
         {
             entity
@@ -97,7 +96,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany(e => e.Registrations)
                 .HasForeignKey(e => e.EventId);
             entity
-                .HasIndex(e => new { e.EventId, e.Email })
+                .HasIndex(e => new
+                {
+                    e.EventId, e.Email
+                })
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.EventId).HasColumnName("event_id");
@@ -161,10 +163,16 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany()
                 .HasForeignKey(e => e.TeamId);
             entity
-                .HasIndex(e => new { e.DraftId, e.TeamId })
+                .HasIndex(e => new
+                {
+                    e.DraftId, e.TeamId
+                })
                 .IsUnique();
             entity
-                .HasIndex(e => new { e.DraftId, e.Pick })
+                .HasIndex(e => new
+                {
+                    e.DraftId, e.Pick
+                })
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.DraftId).HasColumnName("draft_id");
@@ -191,10 +199,16 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany()
                 .HasForeignKey(e => e.PlayerId);
             entity
-                .HasIndex(e => new { e.DraftId, e.OverallPick })
+                .HasIndex(e => new
+                {
+                    e.DraftId, e.OverallPick
+                })
                 .IsUnique();
             entity
-                .HasIndex(e => new { e.DraftId, e.PlayerId })
+                .HasIndex(e => new
+                {
+                    e.DraftId, e.PlayerId
+                })
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.DraftId).HasColumnName("draft_id");
@@ -304,10 +318,16 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany(p => p.Stars)
                 .HasForeignKey(e => e.PlayerId);
             entity
-                .HasIndex(e => new { e.PlayerId, e.GameId })
+                .HasIndex(e => new
+                {
+                    e.PlayerId, e.GameId
+                })
                 .IsUnique();
             entity
-                .HasIndex(e => new { e.StarRank, e.GameId })
+                .HasIndex(e => new
+                {
+                    e.StarRank, e.GameId
+                })
                 .IsUnique();
             entity.HasIndex(e => e.GameId);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
@@ -333,9 +353,15 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany()
                 .HasForeignKey(e => e.PlayerId);
             entity
-                .HasIndex(e => new { e.AccountId, e.DraftId, e.PlayerId })
+                .HasIndex(e => new
+                {
+                    e.AccountId, e.DraftId, e.PlayerId
+                })
                 .IsUnique();
-            entity.HasIndex(e => new { e.AccountId, e.DraftId });
+            entity.HasIndex(e => new
+            {
+                e.AccountId, e.DraftId
+            });
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.AccountId).HasColumnName("account_id");
             entity.Property(e => e.DraftId).HasColumnName("draft_id");
@@ -360,7 +386,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithOne(e => e.CustomRanking)
                 .HasForeignKey(e => e.CustomRankingId)
                 .OnDelete(DeleteBehavior.Cascade);
-            entity.HasIndex(e => new { e.AccountId, e.TournamentId });
+            entity.HasIndex(e => new
+            {
+                e.AccountId, e.TournamentId
+            });
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.AccountId).HasColumnName("account_id");
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
@@ -377,7 +406,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany()
                 .HasForeignKey(e => e.PlayerId);
             entity
-                .HasIndex(e => new { e.CustomRankingId, e.PlayerId })
+                .HasIndex(e => new
+                {
+                    e.CustomRankingId, e.PlayerId
+                })
                 .IsUnique();
             entity.HasIndex(e => e.CustomRankingId);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
@@ -404,7 +436,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasForeignKey(e => e.SharedWithAccountId)
                 .OnDelete(DeleteBehavior.Cascade);
             entity
-                .HasIndex(e => new { e.CustomRankingId, e.SharedWithAccountId })
+                .HasIndex(e => new
+                {
+                    e.CustomRankingId, e.SharedWithAccountId
+                })
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.CustomRankingId).HasColumnName("custom_ranking_id");
@@ -447,12 +482,15 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Assist2PlayerId).HasColumnName("assist2_player_id");
             entity.Property(e => e.Notes).HasColumnName("notes");
         });
-        
+
         modelBuilder.Entity<GoalieStat>(entity =>
         {
             entity
                 .ToView("mv_goalie_game_logs")
-                .HasKey(e => new { e.GameId, e.PlayerId });
+                .HasKey(e => new
+                {
+                    e.GameId, e.PlayerId
+                });
             entity
                 .HasOne(e => e.Player)
                 .WithMany(e => e.GoalieGameLogs)
@@ -556,7 +594,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.DurationMinutes).HasColumnName("duration_mins");
             entity.Property(e => e.Notes).HasColumnName("notes");
         });
-        
+
         modelBuilder.Entity<Player>(entity =>
         {
             entity.ToTable("players")
@@ -574,7 +612,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany(e => e.Players)
                 .HasForeignKey(e => e.TeamId);
             entity
-                .HasIndex(e => new { e.AccountId, e.TournamentId })
+                .HasIndex(e => new
+                {
+                    e.AccountId, e.TournamentId
+                })
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.AccountId).HasColumnName("account_id");
@@ -615,7 +656,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasForeignKey(e => e.ReceivingTeamId)
                 .OnDelete(DeleteBehavior.Restrict);
             entity
-                .HasIndex(e => new { e.TournamentId, e.Status });
+                .HasIndex(e => new
+                {
+                    e.TournamentId, e.Status
+                });
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.ProposingTeamId).HasColumnName("proposing_team_id");
@@ -665,7 +709,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .ToTable("draft_rankings")
                 .HasKey(e => e.Id);
             entity
-                .HasIndex(e => new { e.PlayerId, e.DraftId })
+                .HasIndex(e => new
+                {
+                    e.PlayerId, e.DraftId
+                })
                 .IsUnique();
             entity
                 .HasIndex(e => e.DraftId);
@@ -701,7 +748,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
         {
             entity
                 .ToView("mv_skater_game_logs")
-                .HasKey(e => new { e.GameId, e.PlayerId });
+                .HasKey(e => new
+                {
+                    e.GameId, e.PlayerId
+                });
             entity
                 .HasOne(e => e.Player)
                 .WithMany(e => e.SkaterGameLogs)
@@ -750,7 +800,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TournamentName).HasColumnName("tournament_name");
             entity.Property(e => e.TournamentActive).HasColumnName("tournament_active");
         });
-        
+
         modelBuilder.Entity<Team>(entity =>
         {
             entity
@@ -855,9 +905,12 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
         {
             entity
                 .ToTable("tournament_registrations")
-                .HasKey(e => e.Id) ;
+                .HasKey(e => e.Id);
             entity
-                .HasIndex(e => new { e.AccountId, e.TournamentId })
+                .HasIndex(e => new
+                {
+                    e.AccountId, e.TournamentId
+                })
                 .IsUnique();
             entity
                 .HasOne(e => e.Tournament)
@@ -881,7 +934,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .ToTable("tournament_player_info")
                 .HasKey(e => e.Id);
             entity
-                .HasIndex(e => new { e.AccountId, e.TournamentId })
+                .HasIndex(e => new
+                {
+                    e.AccountId, e.TournamentId
+                })
                 .IsUnique();
             entity
                 .HasOne(e => e.Tournament)
@@ -916,7 +972,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasForeignKey(e => e.TournamentId)
                 .OnDelete(DeleteBehavior.Cascade);
             // Unique on the match key; Postgres treats NULL track ids as distinct, so untagged uploads coexist.
-            entity.HasIndex(e => new { e.TournamentId, e.ProviderType, e.TrackId }).IsUnique();
+            entity.HasIndex(e => new
+            {
+                e.TournamentId, e.ProviderType, e.TrackId
+            }).IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
             entity.Property(e => e.AudioFileKey).HasColumnName("audio_file_key");
@@ -944,7 +1003,10 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .ToTable("tournament_player_game_availability")
                 .HasKey(e => e.Id);
             entity
-                .HasIndex(e => new { e.TournamentPlayerInfoId, e.GameId })
+                .HasIndex(e => new
+                {
+                    e.TournamentPlayerInfoId, e.GameId
+                })
                 .IsUnique();
             entity.HasIndex(e => e.GameId);
             entity
@@ -1028,9 +1090,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             }
         }
     }
-    
-    
-    
+
+
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder
@@ -1042,29 +1103,25 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             .HaveConversion<NullableDateTimeWithKindConverter>();
     }
 }
-
-
 public class DateTimeWithKindConverter() : ValueConverter<DateTime, DateTime>(
     v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc),
     v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
 );
-
 public class NullableDateTimeWithKindConverter() : ValueConverter<DateTime?, DateTime?>(
     v => v.HasValue ? (v.Value.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)) : v,
     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v
 );
-
 public class EnumMemberConverter<TEnum>()
     : ValueConverter<TEnum, string>(
         s => GetEnumMemberValue(s),
         s => GetEnumFromValue(s)
-) where TEnum : Enum
+    ) where TEnum : Enum
 {
     public static string GetEnumMemberValue(TEnum value)
     {
         return typeof(TEnum)
-            .GetField(value.ToString())?
-            .GetCustomAttribute<EnumMemberAttribute>()?.Value 
+                   .GetField(value.ToString())?
+                   .GetCustomAttribute<EnumMemberAttribute>()?.Value
                ?? value.ToString();
     }
 
@@ -1076,10 +1133,10 @@ public class EnumMemberConverter<TEnum>()
             if (attribute?.Value == value || field.Name == value)
             {
                 return (TEnum?)field.GetValue(null)
-                    ?? throw new ArgumentException($"Unknown value: {value}");
+                       ?? throw new ArgumentException($"Unknown value: {value}");
             }
         }
-        
+
         throw new ArgumentException($"Unknown value: {value}");
     }
 }

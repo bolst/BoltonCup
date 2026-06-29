@@ -27,7 +27,6 @@ public record UpdateAccountRequest
     /// <summary>Gets or sets the user's weight in pounds.</summary>
     public int? Weight { get; set; }
 }
-
 /// <summary>Validates an <see cref="UpdateAccountRequest"/>.</summary>
 public class UpdateAccountRequestValidator : AbstractValidator<UpdateAccountRequest>
 {
@@ -62,9 +61,11 @@ public class UpdateAccountRequestValidator : AbstractValidator<UpdateAccountRequ
                     {
                         if (string.IsNullOrEmpty(h))
                             return true;
+
                         var parts = h.Split("'");
                         if (parts.Length == 2 && int.TryParse(parts[1].Trim(), out var inches))
                             return inches is >= 0 and < 12;
+
                         return false;
                     })
                     .WithMessage("Invalid height.");

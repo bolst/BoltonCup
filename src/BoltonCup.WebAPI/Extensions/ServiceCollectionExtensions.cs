@@ -83,7 +83,10 @@ public static class ServiceCollectionExtensions
                         return Task.CompletedTask;
                     }
 
-                    foreach (var claimType in new[] { BoltonCupClaimTypes.OriginalUserId, BoltonCupClaimTypes.OriginalUserName })
+                    foreach (var claimType in new[]
+                             {
+                                 BoltonCupClaimTypes.OriginalUserId, BoltonCupClaimTypes.OriginalUserName
+                             })
                     {
                         if (context.CurrentPrincipal?.FindFirst(claimType) is { } claim && !identity.HasClaim(claim.Type, claim.Value))
                         {
@@ -128,7 +131,7 @@ public static class ServiceCollectionExtensions
                     policy.Requirements.Add(new ManageRankingRequirement()));
             });
     }
-    
+
     private static IServiceCollection AddCorsServices(this IServiceCollection services)
     {
         services.AddCors(options =>
@@ -168,7 +171,7 @@ public static class ServiceCollectionExtensions
                 options.KnownIPNetworks.Clear();
                 options.KnownProxies.Clear();
             })
-            .AddRateLimiter(options => 
+            .AddRateLimiter(options =>
             {
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
                 options.GlobalLimiter = GlobalRateLimiter.Create();
@@ -195,15 +198,15 @@ public static class ServiceCollectionExtensions
                 {
                     var problem = new BoltonCupValidationProblemDetails(context.ModelState.ToErrorDictionary())
                     {
-                        Type = ErrorTypes.Validation,
-                        Title = "One or more validation errors occurred",
-                        Status = StatusCodes.Status400BadRequest,
-                        Instance = context.HttpContext.Request.Path,
+                        Type = ErrorTypes.Validation, Title = "One or more validation errors occurred", Status = StatusCodes.Status400BadRequest, Instance = context.HttpContext.Request.Path,
                     };
 
                     return new BadRequestObjectResult(problem)
                     {
-                        ContentTypes = { "application/problem+json" }
+                        ContentTypes =
+                        {
+                            "application/problem+json"
+                        }
                     };
                 };
             })
@@ -235,7 +238,7 @@ public static class ServiceCollectionExtensions
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
-        
+
         return builder.Services;
     }
 }

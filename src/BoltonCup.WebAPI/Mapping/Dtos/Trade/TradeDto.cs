@@ -37,10 +37,8 @@ public record TradeDto
     /// <summary>Gets whether the current viewer can approve this trade.</summary>
     public bool CanApprove { get; init; }
 }
-
 /// <summary>The viewing user's identity used to compute which actions they may take on a trade.</summary>
 public sealed record TradeViewerContext(int? AccountId, bool IsAdmin);
-
 /// <summary>A single player line item within a trade, including movement direction.</summary>
 public record TradePlayerDto
 {

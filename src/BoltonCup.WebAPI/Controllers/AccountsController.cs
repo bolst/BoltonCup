@@ -29,12 +29,13 @@ public class AccountsController(
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
             return Unauthorized("ID claim is missing.");
+
         var command = _mapper.ToCommand(request, User);
         var user = await _userService.CompleteUserAccountAsync(userId, command);
         await _signInManager.RefreshSignInAsync(user);
         return Ok();
     }
-    
+
     /// <summary>Gets the currently logged-in user's account.</summary>
     /// <remarks>
     /// Gets the currently logged-in user
@@ -65,7 +66,7 @@ public class AccountsController(
         var account = await _accounts.GetByIdAsync(accountId);
         return Ok(_mapper.ToAccountTournamentDtoList(account));
     }
-    
+
     /// <summary>Updates the authenticated user's avatar using a pre-signed S3 key.</summary>
     /// <remarks>
     /// Updates an account's avatar by accepting a pre-signed S3 key.

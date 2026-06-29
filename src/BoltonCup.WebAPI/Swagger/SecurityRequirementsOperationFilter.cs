@@ -11,16 +11,16 @@ public class SecurityRequirementsOperationFilter : IOperationFilter
     /// <summary>Applies the filter, attaching security schemes to operations that require authentication.</summary>
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        var hasAllowAnonymous = 
+        var hasAllowAnonymous =
             context.MethodInfo.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any() ||
             (context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any() ?? false);
 
         // if it is anonymous, don't add security
         if (hasAllowAnonymous)
-            return; 
-        
+            return;
+
         // assume everything else requires the API Key or "Bearer" scheme.
-        operation.Security = 
+        operation.Security =
         [
             new OpenApiSecurityRequirement()
             {
@@ -33,7 +33,7 @@ public class SecurityRequirementsOperationFilter : IOperationFilter
                 {
                     new OpenApiSecuritySchemeReference("Bearer", context.Document), []
                 }
-            },            
+            },
         ];
     }
 }

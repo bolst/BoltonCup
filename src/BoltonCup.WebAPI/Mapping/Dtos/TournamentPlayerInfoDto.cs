@@ -18,7 +18,6 @@ public record TournamentPlayerInfoDto
     /// <summary>Gets the team the requester GMs in this tournament, if any (enables GM-only song controls).</summary>
     public ManagedTeamDto? ManagedTeam { get; init; }
 }
-
 /// <summary>The team a GM manages in a tournament, with its current goal/win song selections.</summary>
 public record ManagedTeamDto
 {

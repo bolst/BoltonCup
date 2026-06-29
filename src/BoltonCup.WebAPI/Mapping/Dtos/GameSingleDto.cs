@@ -16,5 +16,3 @@ public sealed record GameSingleDto : GameDto
     /// <summary>Gets the top point, goal, and assist leader from each team.</summary>
     public List<GameStatLeaderDto> PlayersToWatch { get; init; } = [];
 }
-
-

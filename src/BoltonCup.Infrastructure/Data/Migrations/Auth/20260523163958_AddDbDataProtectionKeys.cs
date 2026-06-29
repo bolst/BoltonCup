@@ -18,8 +18,7 @@ namespace BoltonCup.Infrastructure.Migrations.Auth
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FriendlyName = table.Column<string>(type: "text", nullable: true),
-                    Xml = table.Column<string>(type: "text", nullable: true)
+                    FriendlyName = table.Column<string>(type: "text", nullable: true), Xml = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

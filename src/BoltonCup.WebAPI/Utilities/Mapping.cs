@@ -2,7 +2,6 @@ namespace BoltonCup.WebAPI.Utilities;
 
 // temporary solution
 // when I decide to be more pragmatic I will delete this
-
 /// <summary>Utility helpers for converting raw domain values to display strings.</summary>
 public static class Mapping
 {

@@ -34,4 +34,3 @@ public record TournamentDto
     /// <summary>Gets or sets the gallery associated with this tournament.</summary>
     public GalleryBriefDto? Gallery { get; set; }
 }
-

@@ -36,7 +36,7 @@ public class WebhooksController(
             var signature = Request.Headers["Stripe-Signature"].ToString();
             var stripeEvent = _eventConstructor.ConstructEvent(json, signature, _stripeWebhookSecret);
 
-            if (stripeEvent.Type == EventTypes.PaymentIntentSucceeded 
+            if (stripeEvent.Type == EventTypes.PaymentIntentSucceeded
                 && stripeEvent.Data.Object is PaymentIntent paymentIntent)
             {
                 if (!paymentIntent.Metadata.TryGetValue(nameof(PurchaseType), out var purchaseType))
@@ -44,7 +44,7 @@ public class WebhooksController(
                     _logger.LogWarning("No purchase type metadata in stripe webhook");
                     return Ok();
                 }
-                
+
                 switch (purchaseType)
                 {
                     case PurchaseType.TournamentRegistration:

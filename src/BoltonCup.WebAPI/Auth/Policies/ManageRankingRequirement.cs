@@ -13,12 +13,10 @@ public static partial class BoltonCupPolicy
     /// <summary>Policy that requires the user to own (or be an admin over) a specific custom ranking.</summary>
     public const string CanManageRanking = "CanManageRanking";
 }
-
 /// <summary>Authorization requirement for managing a custom ranking.</summary>
 public class ManageRankingRequirement : IAuthorizationRequirement
 {
 }
-
 /// <summary>Handles <see cref="ManageRankingRequirement"/> by verifying the user is an admin or the ranking's owner.</summary>
 public class RankingManagerHandler(BoltonCupDbContext _dbContext)
     : AuthorizationHandler<ManageRankingRequirement>

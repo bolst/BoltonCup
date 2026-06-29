@@ -5,7 +5,6 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace BoltonCup.WebAPI.Swagger;
 
 // let there be SignalR models in the OpenAPI spec
-
 /// <summary>Registers SignalR hub event DTOs in the OpenAPI schema so they appear in the generated spec.</summary>
 public sealed class SignalRSchemaFilter : IDocumentFilter
 {

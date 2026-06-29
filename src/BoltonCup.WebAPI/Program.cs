@@ -36,31 +36,22 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SupportNonNullableReferenceTypes();
     options.UseAllOfToExtendReferenceSchemas();
-    
+
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Bolton Cup",
-        Version = "v1",
-        Description = "Bolton Cup API"
+        Title = "Bolton Cup", Version = "v1", Description = "Bolton Cup API"
     });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter access token below."
+        Name = "Authorization", Type = SecuritySchemeType.Http, Scheme = "Bearer", BearerFormat = "JWT",
+        In = ParameterLocation.Header, Description = "Enter access token below."
     });
     options.AddSecurityDefinition(ApiKeyConstants.Scheme, new OpenApiSecurityScheme
     {
-        Name = ApiKeyConstants.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = ApiKeyConstants.Scheme,
-        In = ParameterLocation.Header,
+        Name = ApiKeyConstants.Header, Type = SecuritySchemeType.ApiKey, Scheme = ApiKeyConstants.Scheme, In = ParameterLocation.Header,
         Description = "Enter your API key below."
     });
-    
+
     options.OperationFilter<ProblemDetailsOperationFilter>();
     options.OperationFilter<SecurityRequirementsOperationFilter>();
     options.DocumentFilter<SignalRSchemaFilter>();
@@ -137,7 +128,10 @@ app.MapGet("/", context =>
 
 app.MapHub<DraftHub>(Hubs.Draft);
 
-app.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
+app.MapGet("/health", () => Results.Ok(new
+    {
+        status = "healthy"
+    }))
     .AllowAnonymous();
 
 // Sentry

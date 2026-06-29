@@ -15,34 +15,25 @@ namespace BoltonCup.WebAPI.Mapping;
 public class Mapper : IMapper
 {
     private readonly IAssetUrlResolver _urlResolver;
-    
+
     public Mapper(IAssetUrlResolver urlResolver)
     {
         _urlResolver = urlResolver;
     }
-    
+
     // ---------- Account ----------
 
     public AccountDto? ToDto(Account? account, ClaimsPrincipal claims)
     {
         if (account?.Id is null)
             return null;
+
         return new AccountDto
         {
-            Id = account.Id,
-            Email = account.Email,
-            FirstName = account.FirstName,
-            LastName = account.LastName,
-            Name = (account.FirstName + " " + account.LastName).Trim(),
-            Phone = account.Phone ?? claims.FindFirstValue(ClaimTypes.MobilePhone),
-            Birthday = account.Birthday,
-            HighestLevel = account.HighestLevel,
-            Avatar = account.Avatar,
-            Banner = account.Banner,
-            PreferredBeer = account.PreferredBeer,
-            HeightFeet = account.HeightFeet,
-            HeightInches = account.HeightInches,
-            Weight = account.Weight
+            Id = account.Id, Email = account.Email, FirstName = account.FirstName, LastName = account.LastName,
+            Name = (account.FirstName + " " + account.LastName).Trim(), Phone = account.Phone ?? claims.FindFirstValue(ClaimTypes.MobilePhone), Birthday = account.Birthday, HighestLevel = account.HighestLevel,
+            Avatar = account.Avatar, Banner = account.Banner, PreferredBeer = account.PreferredBeer, HeightFeet = account.HeightFeet,
+            HeightInches = account.HeightInches, Weight = account.Weight
         };
     }
 
@@ -50,11 +41,11 @@ public class Mapper : IMapper
     {
         if (account is null)
             return [];
+
         return account.Players
             .Select(player => new AccountTournamentDto
             {
-                Tournament = ToTournamentBriefDto(player.Tournament),
-                Team = player.Team == null ? null : ToTeamBriefDto(player.Team)
+                Tournament = ToTournamentBriefDto(player.Tournament), Team = player.Team == null ? null : ToTeamBriefDto(player.Team)
             })
             .OrderByDescending(x => x.Tournament.StartDate)
             .ToList();
@@ -137,10 +128,7 @@ public class Mapper : IMapper
     {
         return new GetBracketChallengesQuery
         {
-            Page = request.Page,
-            Size = request.Size,
-            SortBy = request.SortBy,
-            Descending = request.Descending,
+            Page = request.Page, Size = request.Size, SortBy = request.SortBy, Descending = request.Descending,
         };
     }
 
@@ -148,13 +136,8 @@ public class Mapper : IMapper
     {
         return bracketChallenges.ProjectTo(challenge => new BracketChallengeDto
         {
-            Id = challenge.Id,
-            Title = challenge.Title,
-            Link = challenge.Link,
-            Fee = challenge.Fee,
-            IsOpen = challenge.IsOpen,
-            Logo = _urlResolver.GetFullUrl(challenge.Logo),
-            CloseDate = challenge.RegistrationCloseDate
+            Id = challenge.Id, Title = challenge.Title, Link = challenge.Link, Fee = challenge.Fee,
+            IsOpen = challenge.IsOpen, Logo = _urlResolver.GetFullUrl(challenge.Logo), CloseDate = challenge.RegistrationCloseDate
         });
     }
 
@@ -162,16 +145,11 @@ public class Mapper : IMapper
     {
         if (challenge is null)
             return null;
+
         return new BracketChallengeSingleDto
         {
-            Id = challenge.Id,
-            Title = challenge.Title,
-            Link = challenge.Link,
-            Fee = challenge.Fee,
-            IsOpen = challenge.IsOpen,
-            Logo = _urlResolver.GetFullUrl(challenge.Logo),
-            CloseDate = challenge.RegistrationCloseDate,
-            TOSMarkdown = challenge.TermsOfServiceMarkdownContent
+            Id = challenge.Id, Title = challenge.Title, Link = challenge.Link, Fee = challenge.Fee,
+            IsOpen = challenge.IsOpen, Logo = _urlResolver.GetFullUrl(challenge.Logo), CloseDate = challenge.RegistrationCloseDate, TOSMarkdown = challenge.TermsOfServiceMarkdownContent
         };
     }
 
@@ -202,16 +180,9 @@ public class Mapper : IMapper
     {
         return drafts.ProjectTo(draft => new DraftDto
         {
-            Id = draft.Id,
-            Title = draft.Title,
-            Type = draft.Type,
-            Status = draft.Status,
-            Tournament = ToTournamentBriefDto(draft.Tournament),
-            CreatedByName = AccountName(draft.DraftOwner),
-            IsVisible = draft.IsVisible,
-            Rounds = draft.Rounds,
-            Teams = draft.Teams,
-            SecondsPerPick = draft.SecondsPerPick,
+            Id = draft.Id, Title = draft.Title, Type = draft.Type, Status = draft.Status,
+            Tournament = ToTournamentBriefDto(draft.Tournament), CreatedByName = AccountName(draft.DraftOwner), IsVisible = draft.IsVisible, Rounds = draft.Rounds,
+            Teams = draft.Teams, SecondsPerPick = draft.SecondsPerPick,
         });
     }
 
@@ -219,21 +190,10 @@ public class Mapper : IMapper
     {
         return rankings.ProjectTo(draft => new DraftRankingDto
         {
-            Id = draft.Id,
-            DraftId = draft.DraftId,
-            TournamentId = draft.TournamentId,
-            PlayerPhone = draft.Player.Account.Phone,
-            Player = ToPlayerBriefDto(draft.Player),
-            DraftPick = ToDraftPickBriefDto(draft.DraftPick),
-            GamesPlayed = draft.GamesPlayed,
-            TotalPoints = draft.TotalPoints,
-            DraftRanking = draft.DraftRanking,
-            OverrideRanking = draft.OverrideRanking,
-            IsDrafted = draft.IsDrafted,
-            PointsPerGame = draft.PointsPerGame,
-            IsFavourite = favouritePlayerIds.Contains(draft.PlayerId),
-            IsExcluded = draft.IsExcluded,
-            GameAvailabilities = BuildAvailability(availability, draft.Player.AccountId),
+            Id = draft.Id, DraftId = draft.DraftId, TournamentId = draft.TournamentId, PlayerPhone = draft.Player.Account.Phone,
+            Player = ToPlayerBriefDto(draft.Player), DraftPick = ToDraftPickBriefDto(draft.DraftPick), GamesPlayed = draft.GamesPlayed, TotalPoints = draft.TotalPoints,
+            DraftRanking = draft.DraftRanking, OverrideRanking = draft.OverrideRanking, IsDrafted = draft.IsDrafted, PointsPerGame = draft.PointsPerGame,
+            IsFavourite = favouritePlayerIds.Contains(draft.PlayerId), IsExcluded = draft.IsExcluded, GameAvailabilities = BuildAvailability(availability, draft.Player.AccountId),
         });
     }
 
@@ -241,8 +201,7 @@ public class Mapper : IMapper
         => availability.ByAccount.Keys
             .Select(accountId => new PlayerAvailabilityDto
             {
-                AccountId = accountId,
-                GameAvailabilities = BuildAvailability(availability, accountId),
+                AccountId = accountId, GameAvailabilities = BuildAvailability(availability, accountId),
             })
             .ToList();
 
@@ -255,9 +214,7 @@ public class Mapper : IMapper
         return availability.Games
             .Select(game => new PlayerGameAvailabilityDto
             {
-                GameId = game.GameId,
-                GameTime = game.GameTime,
-                Availability = responses is not null && responses.TryGetValue(game.GameId, out var a) ? a : null,
+                GameId = game.GameId, GameTime = game.GameTime, Availability = responses is not null && responses.TryGetValue(game.GameId, out var a) ? a : null,
             })
             .ToList();
     }
@@ -266,24 +223,15 @@ public class Mapper : IMapper
     {
         if (draft is null)
             return null;
+
         return new DraftSingleDto
         {
-            Id = draft.Id,
-            Title = draft.Title,
-            Type = draft.Type,
-            Status = draft.Status,
-            IsVisible = draft.IsVisible,
-            Rounds = draft.Rounds,
-            Teams = draft.Teams,
-            SecondsPerPick = draft.SecondsPerPick,
-            Tournament = ToTournamentBriefDto(draft.Tournament),
-            CreatedByName = AccountName(draft.DraftOwner),
-            PickOrder = draft.DraftOrders
+            Id = draft.Id, Title = draft.Title, Type = draft.Type, Status = draft.Status,
+            IsVisible = draft.IsVisible, Rounds = draft.Rounds, Teams = draft.Teams, SecondsPerPick = draft.SecondsPerPick,
+            Tournament = ToTournamentBriefDto(draft.Tournament), CreatedByName = AccountName(draft.DraftOwner), PickOrder = draft.DraftOrders
                 .Select(order => new DraftPickOrderDto
                 {
-                    Pick = order.Pick,
-                    Team = ToTeamBriefDto(order.Team),
-                    AutoPick = order.AutoPick
+                    Pick = order.Pick, Team = ToTeamBriefDto(order.Team), AutoPick = order.AutoPick
                 })
                 .OrderBy(d => d.Pick),
             DraftPicksByRound = draft.DraftPicks
@@ -292,18 +240,11 @@ public class Mapper : IMapper
                     group.Key,
                     group.Select(dp => new DraftPickDto
                     {
-                        DraftId = dp.DraftId,
-                        OverallPick = dp.OverallPick,
-                        Round = dp.Round,
-                        RoundPick = dp.RoundPick,
-                        Team = ToTeamBriefDto(dp.Team),
-                        Player = dp.Player is null ? null : ToPlayerBriefDto(dp.Player),
-                        ClockStartedAt = dp.ClockStartedAt,
+                        DraftId = dp.DraftId, OverallPick = dp.OverallPick, Round = dp.Round, RoundPick = dp.RoundPick,
+                        Team = ToTeamBriefDto(dp.Team), Player = dp.Player is null ? null : ToPlayerBriefDto(dp.Player), ClockStartedAt = dp.ClockStartedAt,
                     }).ToList()))
                 .OrderBy(group => group.Round),
-            CanEditDraft = isAuthorized && draft.Status != DraftStatus.Completed,
-            CanManageDraft = canManage,
-            DefaultCustomRankingId = draft.DefaultCustomRankingId,
+            CanEditDraft = isAuthorized && draft.Status != DraftStatus.Completed, CanManageDraft = canManage, DefaultCustomRankingId = draft.DefaultCustomRankingId,
         };
     }
 
@@ -311,15 +252,11 @@ public class Mapper : IMapper
     {
         if (draftPick is null)
             return null;
+
         return new DraftPickSingleDto
         {
-            DraftId = draftPick.DraftId,
-            OverallPick = draftPick.OverallPick,
-            Round = draftPick.Round,
-            RoundPick = draftPick.RoundPick,
-            Team = ToTeamBriefDto(draftPick.Team),
-            Player = draftPick.Player is null ? null : ToPlayerBriefDto(draftPick.Player),
-            ClockStartedAt = draftPick.ClockStartedAt,
+            DraftId = draftPick.DraftId, OverallPick = draftPick.OverallPick, Round = draftPick.Round, RoundPick = draftPick.RoundPick,
+            Team = ToTeamBriefDto(draftPick.Team), Player = draftPick.Player is null ? null : ToPlayerBriefDto(draftPick.Player), ClockStartedAt = draftPick.ClockStartedAt,
         };
     }
 
@@ -345,10 +282,7 @@ public class Mapper : IMapper
     {
         return new GetDraftsQuery
         {
-            TournamentId = request.TournamentId,
-            Status = request.Status,
-            AccountId = user.GetAccountIdOrDefault(),
-            IsAdmin = user.IsInRole(BoltonCupRole.Admin),
+            TournamentId = request.TournamentId, Status = request.Status, AccountId = user.GetAccountIdOrDefault(), IsAdmin = user.IsInRole(BoltonCupRole.Admin),
         };
     }
 
@@ -365,14 +299,10 @@ public class Mapper : IMapper
     {
         return new UpdateDraftCommand
         {
-            Title = request.Title,
-            DraftType = request.DraftType,
-            Ordering = request.Ordering?
+            Title = request.Title, DraftType = request.DraftType, Ordering = request.Ordering?
                 .Select(x => new DraftOrderCommandEntry(x.TeamId, x.Pick))
                 .ToList(),
-            IsVisible = request.IsVisible,
-            SecondsPerPick = request.SecondsPerPick,
-            AutoPickSettings = request.AutoPickSettings?
+            IsVisible = request.IsVisible, SecondsPerPick = request.SecondsPerPick, AutoPickSettings = request.AutoPickSettings?
                 .Select(x => new DraftAutoPickEntry(x.TeamId, x.AutoPick))
                 .ToList(),
         };
@@ -414,12 +344,8 @@ public class Mapper : IMapper
         return rankings
             .Select(ranking => new CustomRankingDto
             {
-                Id = ranking.Id,
-                Title = ranking.Title,
-                Tournament = ToTournamentBriefDto(ranking.Tournament),
-                PlayerCount = ranking.Players.Count,
-                CreatedByName = AccountName(ranking.Account),
-                CreatedAt = ranking.CreatedAt,
+                Id = ranking.Id, Title = ranking.Title, Tournament = ToTournamentBriefDto(ranking.Tournament), PlayerCount = ranking.Players.Count,
+                CreatedByName = AccountName(ranking.Account), CreatedAt = ranking.CreatedAt,
             })
             .ToList();
     }
@@ -428,22 +354,16 @@ public class Mapper : IMapper
     {
         if (ranking is null)
             return null;
+
         return new CustomRankingSingleDto
         {
-            Id = ranking.Id,
-            Title = ranking.Title,
-            Tournament = ToTournamentBriefDto(ranking.Tournament),
-            CreatedByName = AccountName(ranking.Account),
+            Id = ranking.Id, Title = ranking.Title, Tournament = ToTournamentBriefDto(ranking.Tournament), CreatedByName = AccountName(ranking.Account),
             Players = ranking.Players
                 .OrderBy(p => p.Rank)
                 .Select(p => new CustomRankingPlayerDto
                 {
-                    Rank = p.Rank,
-                    IsStale = stalePlayerIds?.Contains(p.PlayerId) ?? false,
-                    Player = ToPlayerBriefDto(p.Player),
-                    GamesPlayed = p.GamesPlayed,
-                    TotalPoints = p.TotalPoints,
-                    PointsPerGame = p.PointsPerGame,
+                    Rank = p.Rank, IsStale = stalePlayerIds?.Contains(p.PlayerId) ?? false, Player = ToPlayerBriefDto(p.Player), GamesPlayed = p.GamesPlayed,
+                    TotalPoints = p.TotalPoints, PointsPerGame = p.PointsPerGame,
                 })
                 .ToList(),
             CanEdit = canEdit,
@@ -455,10 +375,7 @@ public class Mapper : IMapper
         return shares
             .Select(s => new CustomRankingShareDto
             {
-                AccountId = s.AccountId,
-                Name = s.Name,
-                Email = s.Email,
-                Avatar = s.Avatar,
+                AccountId = s.AccountId, Name = s.Name, Email = s.Email, Avatar = s.Avatar,
             })
             .ToList();
     }
@@ -468,9 +385,7 @@ public class Mapper : IMapper
         return candidates
             .Select(c => new RankingInviteUserDto
             {
-                AccountId = c.AccountId,
-                Name = c.Name,
-                Email = c.Email,
+                AccountId = c.AccountId, Name = c.Name, Email = c.Email,
             })
             .ToList();
     }
@@ -499,12 +414,8 @@ public class Mapper : IMapper
     {
         return new GetGamesQuery
         {
-            TournamentId = request.TournamentId,
-            TeamId = request.TeamId,
-            Page = request.Page,
-            Size = request.Size,
-            SortBy = request.SortBy,
-            Descending = request.Descending,
+            TournamentId = request.TournamentId, TeamId = request.TeamId, Page = request.Page, Size = request.Size,
+            SortBy = request.SortBy, Descending = request.Descending,
         };
     }
 
@@ -512,17 +423,9 @@ public class Mapper : IMapper
     {
         return games.ProjectTo(game => new GameDto
         {
-            Id = game.Id,
-            Tournament = ToTournamentBriefDto(game.Tournament),
-            GameTime = game.GameTime,
-            GameType = game.GameType,
-            GameState = game.GameState,
-            Venue = game.Venue,
-            Rink = game.Rink,
-            HomeTeam = ToTeamInGameDto(game, home: true),
-            AwayTeam = ToTeamInGameDto(game, home: false),
-            HomeTeamPlaceholder = game.HomeTeamPlaceholder,
-            AwayTeamPlaceholder = game.AwayTeamPlaceholder,
+            Id = game.Id, Tournament = ToTournamentBriefDto(game.Tournament), GameTime = game.GameTime, GameType = game.GameType,
+            GameState = game.GameState, Venue = game.Venue, Rink = game.Rink, HomeTeam = ToTeamInGameDto(game, home: true),
+            AwayTeam = ToTeamInGameDto(game, home: false), HomeTeamPlaceholder = game.HomeTeamPlaceholder, AwayTeamPlaceholder = game.AwayTeamPlaceholder,
         });
     }
 
@@ -532,16 +435,9 @@ public class Mapper : IMapper
             ? null
             : new GameSingleDto
             {
-                Id = game.Id,
-                Tournament = ToTournamentBriefDto(game.Tournament),
-                GameTime = game.GameTime,
-                GameType = game.GameType,
-                GameState = game.GameState,
-                Venue = game.Venue,
-                Rink = game.Rink,
-                HomeTeam = ToTeamInGameDto(game, home: true),
-                AwayTeam = ToTeamInGameDto(game, home: false),
-                Goals = game.Goals
+                Id = game.Id, Tournament = ToTournamentBriefDto(game.Tournament), GameTime = game.GameTime, GameType = game.GameType,
+                GameState = game.GameState, Venue = game.Venue, Rink = game.Rink, HomeTeam = ToTeamInGameDto(game, home: true),
+                AwayTeam = ToTeamInGameDto(game, home: false), Goals = game.Goals
                     .Select(ToGoalBriefDto)
                     .OrderBy(g => g.Period)
                     .ThenByDescending(g => g.TimeRemaining)
@@ -551,8 +447,7 @@ public class Mapper : IMapper
                     .OrderBy(penalty => penalty.Period)
                     .ThenByDescending(penalty => penalty.TimeRemaining)
                     .ToList(),
-                Stars = GetGameStarDtos(game),
-                Highlights = game.Highlights
+                Stars = GetGameStarDtos(game), Highlights = game.Highlights
                     .Select(ToGameHighlightDto)
                     .ToList(),
                 Officials = game.Referees
@@ -562,8 +457,8 @@ public class Mapper : IMapper
                     .ToList(),
                 PlayersToWatch = homeStats.Count == 0 || awayStats.Count == 0 ? [] :
                 [
-                    ToGameStatLeaderDto("Points",  homeStats.MaxBy(x => x.Points),  awayStats.MaxBy(x => x.Points),  x => x.Points),
-                    ToGameStatLeaderDto("Goals",   homeStats.MaxBy(x => x.Goals),   awayStats.MaxBy(x => x.Goals),   x => x.Goals),
+                    ToGameStatLeaderDto("Points", homeStats.MaxBy(x => x.Points), awayStats.MaxBy(x => x.Points), x => x.Points),
+                    ToGameStatLeaderDto("Goals", homeStats.MaxBy(x => x.Goals), awayStats.MaxBy(x => x.Goals), x => x.Goals),
                     ToGameStatLeaderDto("Assists", homeStats.MaxBy(x => x.Assists), awayStats.MaxBy(x => x.Assists), x => x.Assists),
                 ],
             };
@@ -571,9 +466,7 @@ public class Mapper : IMapper
 
     private static RefereeDto ToRefereeDto(Referee referee) => new()
     {
-        Id = referee.Id,
-        FirstName = referee.FirstName,
-        LastName = referee.LastName,
+        Id = referee.Id, FirstName = referee.FirstName, LastName = referee.LastName,
     };
 
     private List<GameStarDto> GetGameStarDtos(Game game)
@@ -701,13 +594,8 @@ public class Mapper : IMapper
     {
         return new GetGoalieStatsQuery
         {
-            TournamentId = request.TournamentId,
-            TeamIds = request.TeamIds,
-            GameId = request.GameId,
-            Page = request.Page,
-            Size = request.Size,
-            SortBy = request.SortBy,
-            Descending = request.Descending,
+            TournamentId = request.TournamentId, TeamIds = request.TeamIds, GameId = request.GameId, Page = request.Page,
+            Size = request.Size, SortBy = request.SortBy, Descending = request.Descending,
         };
     }
 
@@ -715,29 +603,12 @@ public class Mapper : IMapper
     {
         return goalies.ProjectTo(goalie => new GoalieStatDto
         {
-            PlayerId = goalie.PlayerId,
-            AccountId = goalie.AccountId,
-            FirstName = goalie.FirstName,
-            LastName = goalie.LastName,
-            Position = goalie.Position,
-            JerseyNumber = goalie.JerseyNumber,
-            Birthday = goalie.Birthday,
-            ProfilePicture = _urlResolver.GetFullUrl(goalie.ProfilePicture),
-            TeamId = goalie.TeamId,
-            TeamName = goalie.TeamName,
-            TeamLogoUrl = _urlResolver.GetFullUrl(goalie.TeamLogoUrl),
-            TeamAbbreviation = goalie.TeamAbbreviation,
-            GamesPlayed = goalie.GamesPlayed,
-            Goals = goalie.Goals,
-            Assists = goalie.Assists,
-            PenaltyMinutes = goalie.PenaltyMinutes,
-            GoalsAgainst = goalie.GoalsAgainst,
-            GoalsAgainstAverage = goalie.GoalsAgainstAverage,
-            ShotsAgainst = goalie.ShotsAgainst,
-            Saves = goalie.Saves,
-            SavePercentage = goalie.SavePercentage,
-            Shutouts = goalie.Shutouts,
-            Wins = goalie.Wins
+            PlayerId = goalie.PlayerId, AccountId = goalie.AccountId, FirstName = goalie.FirstName, LastName = goalie.LastName,
+            Position = goalie.Position, JerseyNumber = goalie.JerseyNumber, Birthday = goalie.Birthday, ProfilePicture = _urlResolver.GetFullUrl(goalie.ProfilePicture),
+            TeamId = goalie.TeamId, TeamName = goalie.TeamName, TeamLogoUrl = _urlResolver.GetFullUrl(goalie.TeamLogoUrl), TeamAbbreviation = goalie.TeamAbbreviation,
+            GamesPlayed = goalie.GamesPlayed, Goals = goalie.Goals, Assists = goalie.Assists, PenaltyMinutes = goalie.PenaltyMinutes,
+            GoalsAgainst = goalie.GoalsAgainst, GoalsAgainstAverage = goalie.GoalsAgainstAverage, ShotsAgainst = goalie.ShotsAgainst, Saves = goalie.Saves,
+            SavePercentage = goalie.SavePercentage, Shutouts = goalie.Shutouts, Wins = goalie.Wins
         });
     }
 
@@ -748,10 +619,7 @@ public class Mapper : IMapper
     {
         return new GetInfoGuidesQuery
         {
-            Page = request.Page,
-            Size = request.Size,
-            SortBy = request.SortBy,
-            Descending = request.Descending,
+            Page = request.Page, Size = request.Size, SortBy = request.SortBy, Descending = request.Descending,
         };
     }
 
@@ -759,10 +627,7 @@ public class Mapper : IMapper
     {
         return guides.ProjectTo(guide => new InfoGuideDto
         {
-            Id = guide.Id,
-            Title = guide.Title,
-            TournamentId = guide.TournamentId,
-            Tournament = guide.Tournament == null ? null : ToTournamentBriefDto(guide.Tournament),
+            Id = guide.Id, Title = guide.Title, TournamentId = guide.TournamentId, Tournament = guide.Tournament == null ? null : ToTournamentBriefDto(guide.Tournament),
         });
     }
 
@@ -772,10 +637,7 @@ public class Mapper : IMapper
             ? null
             : new InfoGuideSingleDto
             {
-                Id = guide.Id,
-                Title = guide.Title,
-                TournamentId = guide.TournamentId,
-                Tournament = guide.Tournament == null ? null : ToTournamentBriefDto(guide.Tournament),
+                Id = guide.Id, Title = guide.Title, TournamentId = guide.TournamentId, Tournament = guide.Tournament == null ? null : ToTournamentBriefDto(guide.Tournament),
                 MarkdownContent = guide.MarkdownContent
             };
     }
@@ -787,12 +649,8 @@ public class Mapper : IMapper
     {
         return new GetPlayersQuery
         {
-            TournamentId = request.TournamentId,
-            TeamId = request.TeamId,
-            Page = request.Page,
-            Size = request.Size,
-            SortBy = request.SortBy,
-            Descending = request.Descending,
+            TournamentId = request.TournamentId, TeamId = request.TeamId, Page = request.Page, Size = request.Size,
+            SortBy = request.SortBy, Descending = request.Descending,
         };
     }
 
@@ -800,18 +658,9 @@ public class Mapper : IMapper
     {
         return players.ProjectTo(player => new PlayerDto
         {
-            Id = player.Id,
-            AccountId = player.AccountId,
-            Position = player.Position,
-            JerseyNumber = player.JerseyNumber,
-            FirstName = player.Account!.FirstName,
-            LastName = player.Account.LastName,
-            Birthday = player.Account.Birthday,
-            ProfilePicture = _urlResolver.GetFullUrl(player.Account.Avatar),
-            BannerPicture = _urlResolver.GetFullUrl(player.Account.Banner),
-            PreferredBeer = player.Account.PreferredBeer,
-            Tournament = ToTournamentBriefDto(player.Tournament),
-            Team = player.Team == null ? null : ToTeamBriefDto(player.Team),
+            Id = player.Id, AccountId = player.AccountId, Position = player.Position, JerseyNumber = player.JerseyNumber,
+            FirstName = player.Account!.FirstName, LastName = player.Account.LastName, Birthday = player.Account.Birthday, ProfilePicture = _urlResolver.GetFullUrl(player.Account.Avatar),
+            BannerPicture = _urlResolver.GetFullUrl(player.Account.Banner), PreferredBeer = player.Account.PreferredBeer, Tournament = ToTournamentBriefDto(player.Tournament), Team = player.Team == null ? null : ToTeamBriefDto(player.Team),
         });
     }
 
@@ -822,22 +671,10 @@ public class Mapper : IMapper
 
         return new PlayerSingleDto
         {
-            Id = player.Id,
-            AccountId = player.AccountId,
-            Position = player.Position,
-            JerseyNumber = player.JerseyNumber,
-            FirstName = player.Account!.FirstName,
-            LastName = player.Account.LastName,
-            Birthday = player.Account.Birthday,
-            ProfilePicture = _urlResolver.GetFullUrl(player.Account.Avatar),
-            BannerPicture = _urlResolver.GetFullUrl(player.Account.Banner),
-            PreferredBeer = player.Account.PreferredBeer,
-            Height = player.Account.HeightFeet is null ? null : $"{player.Account.HeightFeet}'{player.Account.HeightInches}",
-            Weight = player.Account.Weight,
-            Tournament = ToTournamentBriefDto(player.Tournament),
-            Team = player.Team == null ? null : ToTeamBriefDto(player.Team),
-            TournamentStats = ToPlayerTournamentStatsDto(player),
-            GameByGame = ToPlayerGameByGameDtos(player),
+            Id = player.Id, AccountId = player.AccountId, Position = player.Position, JerseyNumber = player.JerseyNumber,
+            FirstName = player.Account!.FirstName, LastName = player.Account.LastName, Birthday = player.Account.Birthday, ProfilePicture = _urlResolver.GetFullUrl(player.Account.Avatar),
+            BannerPicture = _urlResolver.GetFullUrl(player.Account.Banner), PreferredBeer = player.Account.PreferredBeer, Height = player.Account.HeightFeet is null ? null : $"{player.Account.HeightFeet}'{player.Account.HeightInches}", Weight = player.Account.Weight,
+            Tournament = ToTournamentBriefDto(player.Tournament), Team = player.Team == null ? null : ToTeamBriefDto(player.Team), TournamentStats = ToPlayerTournamentStatsDto(player), GameByGame = ToPlayerGameByGameDtos(player),
         };
     }
 
@@ -848,22 +685,10 @@ public class Mapper : IMapper
 
         return new DraftPlayerSingleDto
         {
-            Id = basePlayer.Id,
-            AccountId = basePlayer.AccountId,
-            Position = basePlayer.Position,
-            JerseyNumber = basePlayer.JerseyNumber,
-            FirstName = basePlayer.FirstName,
-            LastName = basePlayer.LastName,
-            Birthday = basePlayer.Birthday,
-            ProfilePicture = basePlayer.ProfilePicture,
-            BannerPicture = basePlayer.BannerPicture,
-            PreferredBeer = basePlayer.PreferredBeer,
-            Height = basePlayer.Height,
-            Weight = basePlayer.Weight,
-            Tournament = basePlayer.Tournament,
-            Team = basePlayer.Team,
-            TournamentStats = basePlayer.TournamentStats,
-            GameByGame = basePlayer.GameByGame,
+            Id = basePlayer.Id, AccountId = basePlayer.AccountId, Position = basePlayer.Position, JerseyNumber = basePlayer.JerseyNumber,
+            FirstName = basePlayer.FirstName, LastName = basePlayer.LastName, Birthday = basePlayer.Birthday, ProfilePicture = basePlayer.ProfilePicture,
+            BannerPicture = basePlayer.BannerPicture, PreferredBeer = basePlayer.PreferredBeer, Height = basePlayer.Height, Weight = basePlayer.Weight,
+            Tournament = basePlayer.Tournament, Team = basePlayer.Team, TournamentStats = basePlayer.TournamentStats, GameByGame = basePlayer.GameByGame,
             GameAvailabilities = BuildAvailability(availability, player!.AccountId),
         };
     }
@@ -875,14 +700,8 @@ public class Mapper : IMapper
     {
         return new GetSkaterStatsQuery
         {
-            TournamentId = request.TournamentId,
-            Position = request.Position,
-            TeamIds = request.TeamIds,
-            GameId = request.GameId,
-            Page = request.Page,
-            Size = request.Size,
-            SortBy = request.SortBy,
-            Descending = request.Descending
+            TournamentId = request.TournamentId, Position = request.Position, TeamIds = request.TeamIds, GameId = request.GameId,
+            Page = request.Page, Size = request.Size, SortBy = request.SortBy, Descending = request.Descending
         };
     }
 
@@ -890,22 +709,10 @@ public class Mapper : IMapper
     {
         return skaters.ProjectTo(skater => new SkaterStatDto
         {
-            PlayerId = skater.PlayerId,
-            AccountId = skater.AccountId,
-            FirstName = skater.FirstName,
-            LastName = skater.LastName,
-            Position = skater.Position,
-            JerseyNumber = skater.JerseyNumber,
-            Birthday = skater.Birthday,
-            ProfilePicture = _urlResolver.GetFullUrl(skater.ProfilePicture),
-            TeamId = skater.TeamId,
-            TeamName = skater.TeamName,
-            TeamLogoUrl = _urlResolver.GetFullUrl(skater.TeamLogoUrl),
-            TeamAbbreviation = skater.TeamAbbreviation,
-            GamesPlayed = skater.GamesPlayed,
-            Goals = skater.Goals,
-            Assists = skater.Assists,
-            Points = skater.Points,
+            PlayerId = skater.PlayerId, AccountId = skater.AccountId, FirstName = skater.FirstName, LastName = skater.LastName,
+            Position = skater.Position, JerseyNumber = skater.JerseyNumber, Birthday = skater.Birthday, ProfilePicture = _urlResolver.GetFullUrl(skater.ProfilePicture),
+            TeamId = skater.TeamId, TeamName = skater.TeamName, TeamLogoUrl = _urlResolver.GetFullUrl(skater.TeamLogoUrl), TeamAbbreviation = skater.TeamAbbreviation,
+            GamesPlayed = skater.GamesPlayed, Goals = skater.Goals, Assists = skater.Assists, Points = skater.Points,
             PenaltyMinutes = skater.PenaltyMinutes
         });
     }
@@ -932,7 +739,8 @@ public class Mapper : IMapper
         return false;
     }
 
-    public bool TryParseBracketChallengePaymentCommand(PaymentIntent paymentIntent,
+    public bool TryParseBracketChallengePaymentCommand(
+        PaymentIntent paymentIntent,
         out ProcessBracketChallengePaymentIntentCommand command)
     {
         command = null!;
@@ -962,10 +770,7 @@ public class Mapper : IMapper
     {
         return new GetTeamsQuery
         {
-            TournamentId = request.TournamentId,
-            Page = request.Page,
-            Size = request.Size,
-            SortBy = request.SortBy,
+            TournamentId = request.TournamentId, Page = request.Page, Size = request.Size, SortBy = request.SortBy,
             Descending = request.Descending,
         };
     }
@@ -974,22 +779,10 @@ public class Mapper : IMapper
     {
         return teams.ProjectTo(team => new TeamDto
         {
-            Id = team.Id,
-            Name = team.Name,
-            NameShort = team.NameShort,
-            Abbreviation = team.Abbreviation,
-            Tournament = ToTournamentBriefDto(team.Tournament),
-            LogoUrl = _urlResolver.GetFullUrl(team.Logo),
-            BannerUrl = _urlResolver.GetFullUrl(team.Banner),
-            PrimaryColorHex = team.PrimaryColorHex,
-            SecondaryColorHex = team.SecondaryColorHex,
-            TertiaryColorHex = team.TertiaryColorHex,
-            GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack != null ? team.GoalSongTrack.AudioFileKey : null),
-            WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack != null ? team.WinSongTrack.AudioFileKey : null),
-            GmAccountId = team.GmAccountId,
-            GmFirstName = team.GeneralManager?.FirstName,
-            GmLastName = team.GeneralManager?.LastName,
-            GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager?.Avatar),
+            Id = team.Id, Name = team.Name, NameShort = team.NameShort, Abbreviation = team.Abbreviation,
+            Tournament = ToTournamentBriefDto(team.Tournament), LogoUrl = _urlResolver.GetFullUrl(team.Logo), BannerUrl = _urlResolver.GetFullUrl(team.Banner), PrimaryColorHex = team.PrimaryColorHex,
+            SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex, GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack != null ? team.GoalSongTrack.AudioFileKey : null), WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack != null ? team.WinSongTrack.AudioFileKey : null),
+            GmAccountId = team.GmAccountId, GmFirstName = team.GeneralManager?.FirstName, GmLastName = team.GeneralManager?.LastName, GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager?.Avatar),
         });
     }
 
@@ -999,22 +792,10 @@ public class Mapper : IMapper
             ? null
             : new TeamSingleDto
             {
-                Id = team.Id,
-                Name = team.Name,
-                NameShort = team.NameShort,
-                Abbreviation = team.Abbreviation,
-                Tournament = ToTournamentBriefDto(team.Tournament),
-                LogoUrl = _urlResolver.GetFullUrl(team.Logo),
-                BannerUrl = _urlResolver.GetFullUrl(team.Banner),
-                PrimaryColorHex = team.PrimaryColorHex,
-                SecondaryColorHex = team.SecondaryColorHex,
-                TertiaryColorHex = team.TertiaryColorHex,
-                GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack?.AudioFileKey),
-                WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack?.AudioFileKey),
-                GmAccountId = team.GmAccountId,
-                GmFirstName = team.GeneralManager?.FirstName,
-                GmLastName = team.GeneralManager?.LastName,
-                GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager?.Avatar),
+                Id = team.Id, Name = team.Name, NameShort = team.NameShort, Abbreviation = team.Abbreviation,
+                Tournament = ToTournamentBriefDto(team.Tournament), LogoUrl = _urlResolver.GetFullUrl(team.Logo), BannerUrl = _urlResolver.GetFullUrl(team.Banner), PrimaryColorHex = team.PrimaryColorHex,
+                SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex, GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack?.AudioFileKey), WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack?.AudioFileKey),
+                GmAccountId = team.GmAccountId, GmFirstName = team.GeneralManager?.FirstName, GmLastName = team.GeneralManager?.LastName, GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager?.Avatar),
                 Players = team.Players
                     .Select(ToPlayerBriefDto)
                     .ToList(),
@@ -1028,10 +809,7 @@ public class Mapper : IMapper
     {
         return new GetTournamentsQuery
         {
-            RegistrationOpen = request.RegistrationOpen,
-            Page = request.Page,
-            Size = request.Size,
-            SortBy = request.SortBy,
+            RegistrationOpen = request.RegistrationOpen, Page = request.Page, Size = request.Size, SortBy = request.SortBy,
             Descending = request.Descending,
         };
     }
@@ -1040,21 +818,10 @@ public class Mapper : IMapper
     {
         return tournaments.ProjectTo(tournament => new TournamentDto
         {
-            Id = tournament.Id,
-            Name = tournament.Name,
-            Logo = _urlResolver.GetFullUrl(tournament.Logo),
-            BackgroundImage = _urlResolver.GetFullUrl(tournament.BackgroundImage),
-            StartDate = tournament.StartDate,
-            EndDate = tournament.EndDate,
-            WinningTeamId = tournament.WinningTeamId,
-            IsActive = tournament.IsActive,
-            IsRegistrationOpen = tournament.IsRegistrationOpen,
-            IsPaymentOpen = tournament.IsPaymentOpen,
-            IsPlayerInfoOpen = tournament.IsPlayerInfoOpen,
-            IsTradingOpen = tournament.IsTradingOpen,
-            SkaterLimit = tournament.SkaterLimit,
-            GoalieLimit = tournament.GoalieLimit,
-            Gallery = tournament.Gallery is null ? null : ToGalleryBriefDto(tournament.Gallery)
+            Id = tournament.Id, Name = tournament.Name, Logo = _urlResolver.GetFullUrl(tournament.Logo), BackgroundImage = _urlResolver.GetFullUrl(tournament.BackgroundImage),
+            StartDate = tournament.StartDate, EndDate = tournament.EndDate, WinningTeamId = tournament.WinningTeamId, IsActive = tournament.IsActive,
+            IsRegistrationOpen = tournament.IsRegistrationOpen, IsPaymentOpen = tournament.IsPaymentOpen, IsPlayerInfoOpen = tournament.IsPlayerInfoOpen, IsTradingOpen = tournament.IsTradingOpen,
+            SkaterLimit = tournament.SkaterLimit, GoalieLimit = tournament.GoalieLimit, Gallery = tournament.Gallery is null ? null : ToGalleryBriefDto(tournament.Gallery)
         });
     }
 
@@ -1064,28 +831,14 @@ public class Mapper : IMapper
             ? null
             : new TournamentSingleDto
             {
-                Id = tournament.Id,
-                Name = tournament.Name,
-                Logo = _urlResolver.GetFullUrl(tournament.Logo),
-                BackgroundImage = _urlResolver.GetFullUrl(tournament.BackgroundImage),
-                StartDate = tournament.StartDate,
-                EndDate = tournament.EndDate,
-                WinningTeamId = tournament.WinningTeamId,
-                IsActive = tournament.IsActive,
-                IsRegistrationOpen = tournament.IsRegistrationOpen,
-                IsPaymentOpen = tournament.IsPaymentOpen,
-                IsPlayerInfoOpen = tournament.IsPlayerInfoOpen,
-                IsTradingOpen = tournament.IsTradingOpen,
-                SkaterLimit = tournament.SkaterLimit,
-                GoalieLimit = tournament.GoalieLimit,
-                InfoGuide = tournament.InfoGuide is null ? null : ToInfoGuideBriefDto(tournament.InfoGuide),
-                Gallery = tournament.Gallery is null ? null : ToGalleryBriefDto(tournament.Gallery),
+                Id = tournament.Id, Name = tournament.Name, Logo = _urlResolver.GetFullUrl(tournament.Logo), BackgroundImage = _urlResolver.GetFullUrl(tournament.BackgroundImage),
+                StartDate = tournament.StartDate, EndDate = tournament.EndDate, WinningTeamId = tournament.WinningTeamId, IsActive = tournament.IsActive,
+                IsRegistrationOpen = tournament.IsRegistrationOpen, IsPaymentOpen = tournament.IsPaymentOpen, IsPlayerInfoOpen = tournament.IsPlayerInfoOpen, IsTradingOpen = tournament.IsTradingOpen,
+                SkaterLimit = tournament.SkaterLimit, GoalieLimit = tournament.GoalieLimit, InfoGuide = tournament.InfoGuide is null ? null : ToInfoGuideBriefDto(tournament.InfoGuide), Gallery = tournament.Gallery is null ? null : ToGalleryBriefDto(tournament.Gallery),
                 Sponsors = tournament.Sponsors
                     .Select(sponsor => new TournamentSponsorDto
                     {
-                        Name = sponsor.Name,
-                        LogoUrl = _urlResolver.GetFullUrl(sponsor.Logo),
-                        WebsiteUrl = sponsor.WebsiteUrl,
+                        Name = sponsor.Name, LogoUrl = _urlResolver.GetFullUrl(sponsor.Logo), WebsiteUrl = sponsor.WebsiteUrl,
                     })
                     .ToList()
             };
@@ -1095,8 +848,7 @@ public class Mapper : IMapper
     {
         return new PlayerStatLeadersDto
         {
-            Title = title,
-            Leaders = stats.Select(stat => ToPlayerStatDto(stat, selector, format))
+            Title = title, Leaders = stats.Select(stat => ToPlayerStatDto(stat, selector, format))
         };
     }
 
@@ -1113,14 +865,8 @@ public class Mapper : IMapper
     {
         return new GameStatLeaderPlayerDto
         {
-            PlayerId = stat.PlayerId,
-            AccountId = stat.AccountId,
-            FirstName = stat.FirstName,
-            LastName = stat.LastName,
-            Position = stat.Position,
-            JerseyNumber = stat.JerseyNumber,
-            ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture),
-            StatValue = selector(stat),
+            PlayerId = stat.PlayerId, AccountId = stat.AccountId, FirstName = stat.FirstName, LastName = stat.LastName,
+            Position = stat.Position, JerseyNumber = stat.JerseyNumber, ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture), StatValue = selector(stat),
             StatString = selector(stat).ToString(format)
         };
     }
@@ -1129,20 +875,10 @@ public class Mapper : IMapper
     {
         return new PlayerStatDto
         {
-            PlayerId = stat.PlayerId,
-            AccountId = stat.AccountId,
-            FirstName = stat.FirstName,
-            LastName = stat.LastName,
-            Position = stat.Position,
-            JerseyNumber = stat.JerseyNumber,
-            Birthday = stat.Birthday,
-            ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture),
-            TeamId = stat.TeamId,
-            TeamName = stat.TeamName,
-            TeamLogoUrl = _urlResolver.GetFullUrl(stat.TeamLogoUrl),
-            TeamAbbreviation = stat.TeamAbbreviation,
-            StatValue = selector(stat),
-            StatString = selector(stat).ToString(format)
+            PlayerId = stat.PlayerId, AccountId = stat.AccountId, FirstName = stat.FirstName, LastName = stat.LastName,
+            Position = stat.Position, JerseyNumber = stat.JerseyNumber, Birthday = stat.Birthday, ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture),
+            TeamId = stat.TeamId, TeamName = stat.TeamName, TeamLogoUrl = _urlResolver.GetFullUrl(stat.TeamLogoUrl), TeamAbbreviation = stat.TeamAbbreviation,
+            StatValue = selector(stat), StatString = selector(stat).ToString(format)
         };
     }
 
@@ -1150,23 +886,12 @@ public class Mapper : IMapper
     {
         return new PlayerStatLeadersDto
         {
-            Title = title,
-            Leaders = stats.Select(stat => new PlayerStatDto
+            Title = title, Leaders = stats.Select(stat => new PlayerStatDto
             {
-                PlayerId = stat.PlayerId,
-                AccountId = stat.AccountId,
-                FirstName = stat.FirstName,
-                LastName = stat.LastName,
-                Position = stat.Position,
-                JerseyNumber = stat.JerseyNumber,
-                Birthday = stat.Birthday,
-                ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture),
-                TeamId = stat.TeamId,
-                TeamName = stat.TeamName,
-                TeamLogoUrl = _urlResolver.GetFullUrl(stat.TeamLogoUrl),
-                TeamAbbreviation = stat.TeamAbbreviation,
-                StatValue = selector(stat),
-                StatString = selector(stat).ToString(format)
+                PlayerId = stat.PlayerId, AccountId = stat.AccountId, FirstName = stat.FirstName, LastName = stat.LastName,
+                Position = stat.Position, JerseyNumber = stat.JerseyNumber, Birthday = stat.Birthday, ProfilePicture = _urlResolver.GetFullUrl(stat.ProfilePicture),
+                TeamId = stat.TeamId, TeamName = stat.TeamName, TeamLogoUrl = _urlResolver.GetFullUrl(stat.TeamLogoUrl), TeamAbbreviation = stat.TeamAbbreviation,
+                StatValue = selector(stat), StatString = selector(stat).ToString(format)
             })
         };
     }
@@ -1202,9 +927,7 @@ public class Mapper : IMapper
             ? null
             : new TournamentRegistrationDto
             {
-                CurrentStep = registration.CurrentStep,
-                Payload = registration.Payload,
-                IsComplete = registration.IsComplete,
+                CurrentStep = registration.CurrentStep, Payload = registration.Payload, IsComplete = registration.IsComplete,
             };
     }
 
@@ -1216,39 +939,27 @@ public class Mapper : IMapper
         return new TournamentPlayerInfoDto
         {
             GameAvailability = context.Info?.GameAvailabilities
-                .Select(a => new GameAvailabilityDto { GameId = a.GameId, Availability = a.Availability })
+                .Select(a => new GameAvailabilityDto
+                {
+                    GameId = a.GameId, Availability = a.Availability
+                })
                 .ToList() ?? [],
             Song = context.Info?.SongTrackId is { } trackId
                 ? new MusicTrackDto
                 {
-                    Id = trackId,
-                    Name = context.Info.SongName ?? string.Empty,
-                    Artist = context.Info.SongArtist ?? string.Empty,
-                    AlbumArtUrl = context.Info.SongAlbumArtUrl,
+                    Id = trackId, Name = context.Info.SongName ?? string.Empty, Artist = context.Info.SongArtist ?? string.Empty, AlbumArtUrl = context.Info.SongAlbumArtUrl,
                 }
                 : null,
             Games = context.TeamGames.Select(game => new GameDto
             {
-                Id = game.Id,
-                Tournament = ToTournamentBriefDto(game.Tournament),
-                GameTime = game.GameTime,
-                GameType = game.GameType,
-                GameState = game.GameState,
-                Venue = game.Venue,
-                Rink = game.Rink,
-                HomeTeam = ToTeamInGameDto(game, home: true),
-                AwayTeam = ToTeamInGameDto(game, home: false),
-                HomeTeamPlaceholder = game.HomeTeamPlaceholder,
-                AwayTeamPlaceholder = game.AwayTeamPlaceholder,
+                Id = game.Id, Tournament = ToTournamentBriefDto(game.Tournament), GameTime = game.GameTime, GameType = game.GameType,
+                GameState = game.GameState, Venue = game.Venue, Rink = game.Rink, HomeTeam = ToTeamInGameDto(game, home: true),
+                AwayTeam = ToTeamInGameDto(game, home: false), HomeTeamPlaceholder = game.HomeTeamPlaceholder, AwayTeamPlaceholder = game.AwayTeamPlaceholder,
             }).ToList(),
-            CurrentTeam = context.CurrentTeam is { } currentTeam ? ToTeamBriefDto(currentTeam) : null,
-            ManagedTeam = context.ManagedTeam is { } team
+            CurrentTeam = context.CurrentTeam is { } currentTeam ? ToTeamBriefDto(currentTeam) : null, ManagedTeam = context.ManagedTeam is { } team
                 ? new ManagedTeamDto
                 {
-                    TeamId = team.TeamId,
-                    TeamName = team.TeamName,
-                    GoalSong = ToMusicTrackDto(team.GoalSongTrack),
-                    WinSong = ToMusicTrackDto(team.WinSongTrack),
+                    TeamId = team.TeamId, TeamName = team.TeamName, GoalSong = ToMusicTrackDto(team.GoalSongTrack), WinSong = ToMusicTrackDto(team.WinSongTrack),
                 }
                 : null,
         };
@@ -1258,10 +969,7 @@ public class Mapper : IMapper
         => track?.TrackId is { } trackId
             ? new MusicTrackDto
             {
-                Id = trackId,
-                Name = track.Title ?? string.Empty,
-                Artist = track.Artist ?? string.Empty,
-                AlbumArtUrl = track.AlbumArtUrl,
+                Id = trackId, Name = track.Title ?? string.Empty, Artist = track.Artist ?? string.Empty, AlbumArtUrl = track.AlbumArtUrl,
             }
             : null;
 
@@ -1272,10 +980,7 @@ public class Mapper : IMapper
     {
         return tracks.Select(track => new MusicTrackDto
         {
-            Id = track.Id,
-            Name = track.Name,
-            Artist = track.Artist,
-            AlbumArtUrl = track.AlbumArtUrl,
+            Id = track.Id, Name = track.Name, Artist = track.Artist, AlbumArtUrl = track.AlbumArtUrl,
         }).ToList();
     }
 
@@ -1285,10 +990,7 @@ public class Mapper : IMapper
         {
             Tracks = result.Tracks.Select(t => new PlaylistTrackDto
             {
-                FileKey = t.AudioFileKey,
-                Title = t.Title,
-                Artist = t.Artist,
-                AlbumArtUrl = t.AlbumArtUrl,
+                FileKey = t.AudioFileKey, Title = t.Title, Artist = t.Artist, AlbumArtUrl = t.AlbumArtUrl,
                 DurationMs = t.DurationMs,
             }).ToList(),
             Missing = result.Missing.Select(ToDto).ToList(),
@@ -1300,16 +1002,9 @@ public class Mapper : IMapper
 
     public MusicLibraryTrackDto ToDto(TournamentMusicTrack track) => new()
     {
-        Id = track.Id,
-        TournamentId = track.TournamentId,
-        FileKey = track.AudioFileKey ?? string.Empty,
-        TrackId = track.TrackId,
-        ProviderType = track.ProviderType,
-        Title = track.Title,
-        Artist = track.Artist,
-        AlbumArtUrl = track.AlbumArtUrl,
-        DurationMs = track.DurationMs,
-        IsInBasePool = track.IsInBasePool,
+        Id = track.Id, TournamentId = track.TournamentId, FileKey = track.AudioFileKey ?? string.Empty, TrackId = track.TrackId,
+        ProviderType = track.ProviderType, Title = track.Title, Artist = track.Artist, AlbumArtUrl = track.AlbumArtUrl,
+        DurationMs = track.DurationMs, IsInBasePool = track.IsInBasePool,
     };
 
     public IReadOnlyList<MissingSongRequestDto> ToDtoList(IReadOnlyList<MissingSongRequest> missing)
@@ -1317,10 +1012,7 @@ public class Mapper : IMapper
 
     private static MissingSongRequestDto ToDto(MissingSongRequest m) => new()
     {
-        PlayerName = m.PlayerName,
-        SongName = m.SongName,
-        SongTrackId = m.SongTrackId,
-        IsInBasePool = m.IsInBasePool,
+        PlayerName = m.PlayerName, SongName = m.SongName, SongTrackId = m.SongTrackId, IsInBasePool = m.IsInBasePool,
     };
 
     public IReadOnlyList<MusicQueueItemDto> ToDtoList(IReadOnlyList<MusicQueueItemView> queue)
@@ -1328,14 +1020,8 @@ public class Mapper : IMapper
 
     private static MusicQueueItemDto ToDto(MusicQueueItemView q) => new()
     {
-        Id = q.Id,
-        TrackId = q.TrackId,
-        Title = q.Title,
-        Artist = q.Artist,
-        AlbumArtUrl = q.AlbumArtUrl,
-        Status = q.Status,
-        Source = q.Source,
-        IsInBasePool = q.IsInBasePool,
+        Id = q.Id, TrackId = q.TrackId, Title = q.Title, Artist = q.Artist,
+        AlbumArtUrl = q.AlbumArtUrl, Status = q.Status, Source = q.Source, IsInBasePool = q.IsInBasePool,
         RequestedByName = q.RequestedByName,
     };
 
@@ -1356,10 +1042,7 @@ public class Mapper : IMapper
             ? null
             : new DraftPickBriefDto
             {
-                DraftId = draftPick.DraftId,
-                OverallPick = draftPick.OverallPick,
-                Round = draftPick.Round,
-                RoundPick = draftPick.RoundPick,
+                DraftId = draftPick.DraftId, OverallPick = draftPick.OverallPick, Round = draftPick.Round, RoundPick = draftPick.RoundPick,
                 Team = ToTeamBriefDto(draftPick.Team),
             };
     }
@@ -1368,10 +1051,7 @@ public class Mapper : IMapper
     {
         return new GalleryBriefDto
         {
-            Id = gallery.Id,
-            Title = gallery.Title,
-            Description = gallery.Description,
-            Url = gallery.Source,
+            Id = gallery.Id, Title = gallery.Title, Description = gallery.Description, Url = gallery.Source,
         };
     }
 
@@ -1379,13 +1059,8 @@ public class Mapper : IMapper
     {
         return new GoalBriefDto
         {
-            Id = goal.Id,
-            TimeRemaining = goal.PeriodTimeRemaining,
-            Period = goal.Period,
-            TeamId = goal.TeamId,
-            Scorer = ToPlayerBriefDto(goal.Scorer),
-            PrimaryAssist = goal.Assist1Player == null ? null : ToPlayerBriefDto(goal.Assist1Player),
-            SecondaryAssist = goal.Assist2Player == null ? null : ToPlayerBriefDto(goal.Assist2Player),
+            Id = goal.Id, TimeRemaining = goal.PeriodTimeRemaining, Period = goal.Period, TeamId = goal.TeamId,
+            Scorer = ToPlayerBriefDto(goal.Scorer), PrimaryAssist = goal.Assist1Player == null ? null : ToPlayerBriefDto(goal.Assist1Player), SecondaryAssist = goal.Assist2Player == null ? null : ToPlayerBriefDto(goal.Assist2Player),
         };
     }
 
@@ -1393,8 +1068,7 @@ public class Mapper : IMapper
     {
         return new InfoGuideBriefDto
         {
-            Title = infoGuide.Title,
-            MarkdownContent = infoGuide.MarkdownContent,
+            Title = infoGuide.Title, MarkdownContent = infoGuide.MarkdownContent,
         };
     }
 
@@ -1402,13 +1076,8 @@ public class Mapper : IMapper
     {
         return new PenaltyBriefDto
         {
-            Id = penalty.Id,
-            TimeRemaining = penalty.PeriodTimeRemaining,
-            Period = penalty.Period,
-            TeamId = penalty.TeamId,
-            Player = ToPlayerBriefDto(penalty.Player),
-            Infraction = penalty.InfractionName,
-            DurationMins = penalty.DurationMinutes
+            Id = penalty.Id, TimeRemaining = penalty.PeriodTimeRemaining, Period = penalty.Period, TeamId = penalty.TeamId,
+            Player = ToPlayerBriefDto(penalty.Player), Infraction = penalty.InfractionName, DurationMins = penalty.DurationMinutes
         };
     }
 
@@ -1424,16 +1093,9 @@ public class Mapper : IMapper
 
         return new TradeDto
         {
-            Id = trade.Id,
-            TournamentId = trade.TournamentId,
-            ProposingTeam = ToTeamBriefDto(trade.ProposingTeam),
-            ReceivingTeam = ToTeamBriefDto(trade.ReceivingTeam),
-            Status = trade.Status,
-            Note = trade.Note,
-            CreatedAt = trade.CreatedAt,
-            RespondedAt = trade.RespondedAt,
-            ResolvedAt = trade.ResolvedAt,
-            PlayersFromProposing = trade.Players
+            Id = trade.Id, TournamentId = trade.TournamentId, ProposingTeam = ToTeamBriefDto(trade.ProposingTeam), ReceivingTeam = ToTeamBriefDto(trade.ReceivingTeam),
+            Status = trade.Status, Note = trade.Note, CreatedAt = trade.CreatedAt, RespondedAt = trade.RespondedAt,
+            ResolvedAt = trade.ResolvedAt, PlayersFromProposing = trade.Players
                 .Where(tp => tp.FromTeamId == trade.ProposingTeamId)
                 .Select(ToTradePlayerDto)
                 .ToList(),
@@ -1441,10 +1103,8 @@ public class Mapper : IMapper
                 .Where(tp => tp.FromTeamId == trade.ReceivingTeamId)
                 .Select(ToTradePlayerDto)
                 .ToList(),
-            CanAccept = isReceivingGm && trade.Status == TradeStatus.Pending,
-            CanDecline = isReceivingGm && trade.Status == TradeStatus.Pending,
-            CanCancel = (isProposingGm && trade.Status == TradeStatus.Pending)
-                || (viewer.IsAdmin && trade.Status is TradeStatus.Pending or TradeStatus.Accepted),
+            CanAccept = isReceivingGm && trade.Status == TradeStatus.Pending, CanDecline = isReceivingGm && trade.Status == TradeStatus.Pending, CanCancel = (isProposingGm && trade.Status == TradeStatus.Pending)
+                                                                                                                                                             || (viewer.IsAdmin && trade.Status is TradeStatus.Pending or TradeStatus.Accepted),
             CanApprove = viewer.IsAdmin && trade.Status == TradeStatus.Accepted,
         };
     }
@@ -1452,9 +1112,7 @@ public class Mapper : IMapper
     private TradePlayerDto ToTradePlayerDto(TradePlayer tradePlayer)
         => new()
         {
-            Player = ToPlayerBriefDto(tradePlayer.Player),
-            FromTeamId = tradePlayer.FromTeamId,
-            ToTeamId = tradePlayer.ToTeamId,
+            Player = ToPlayerBriefDto(tradePlayer.Player), FromTeamId = tradePlayer.FromTeamId, ToTeamId = tradePlayer.ToTeamId,
         };
 
     public CreateTradeCommand ToCommand(CreateTradeRequest request, ClaimsPrincipal user)
@@ -1472,14 +1130,8 @@ public class Mapper : IMapper
     {
         return new PlayerBriefDto
         {
-            Id = player.Id,
-            AccountId = player.AccountId,
-            Position = player.Position,
-            JerseyNumber = player.JerseyNumber,
-            FirstName = player.Account.FirstName,
-            LastName = player.Account.LastName,
-            Birthday = player.Account.Birthday,
-            ProfilePicture = _urlResolver.GetFullUrl(player.Account.Avatar),
+            Id = player.Id, AccountId = player.AccountId, Position = player.Position, JerseyNumber = player.JerseyNumber,
+            FirstName = player.Account.FirstName, LastName = player.Account.LastName, Birthday = player.Account.Birthday, ProfilePicture = _urlResolver.GetFullUrl(player.Account.Avatar),
             CaptaincyTag = player.Captaincy switch
             {
                 Captaincy.Captain => 'C',
@@ -1493,10 +1145,16 @@ public class Mapper : IMapper
     {
         var gameByGames = player.Account.Players
             .SelectMany(p => (
-                    (p.Team?.HomeGames ?? []).Select(g => new { Player = p, Game = g, IsHome = true, Opponent = g.AwayTeam })
+                    (p.Team?.HomeGames ?? []).Select(g => new
+                    {
+                        Player = p, Game = g, IsHome = true, Opponent = g.AwayTeam
+                    })
                 )
                 .Concat(
-                    (p.Team?.AwayGames ?? []).Select(g => new { Player = p, Game = g, IsHome = false, Opponent = g.HomeTeam })
+                    (p.Team?.AwayGames ?? []).Select(g => new
+                    {
+                        Player = p, Game = g, IsHome = false, Opponent = g.HomeTeam
+                    })
                 )
             );
 
@@ -1504,28 +1162,15 @@ public class Mapper : IMapper
             .Where(pg => pg.Game.GameState != GameState.Pending)
             .Select(pg => new PlayerGameByGame
             {
-                Goals = pg.Game.Goals.Count(x => x.GoalPlayerId == pg.Player.Id),
-                Assists = pg.Game.Goals.Count(x =>
+                Goals = pg.Game.Goals.Count(x => x.GoalPlayerId == pg.Player.Id), Assists = pg.Game.Goals.Count(x =>
                     x.Assist1PlayerId == pg.Player.Id || x.Assist2PlayerId == pg.Player.Id),
-                PenaltyMinutes = pg.Game.Penalties.Where(x => x.PlayerId == pg.Player.Id).Sum(x => x.DurationMinutes),
-                Win = pg.Game.Goals.Count(x => x.TeamId == pg.Player.TeamId) >
-                      pg.Game.Goals.Count(x => x.TeamId != pg.Player.TeamId),
-                Shutouts = pg.Game.Goals.All(x => x.TeamId == pg.Player.TeamId) ? 1 : 0,
-                GoalsAgainst = pg.Game.Goals.Count(x => x.TeamId != pg.Player.TeamId),
-                Tournament = ToTournamentBriefDto(pg.Game.Tournament),
-                Game = new GameOfTeamDto
+                PenaltyMinutes = pg.Game.Penalties.Where(x => x.PlayerId == pg.Player.Id).Sum(x => x.DurationMinutes), Win = pg.Game.Goals.Count(x => x.TeamId == pg.Player.TeamId) >
+                                                                                                                             pg.Game.Goals.Count(x => x.TeamId != pg.Player.TeamId),
+                Shutouts = pg.Game.Goals.All(x => x.TeamId == pg.Player.TeamId) ? 1 : 0, GoalsAgainst = pg.Game.Goals.Count(x => x.TeamId != pg.Player.TeamId), Tournament = ToTournamentBriefDto(pg.Game.Tournament), Game = new GameOfTeamDto
                 {
-                    Id = pg.Game.Id,
-                    TournamentId = pg.Game.TournamentId,
-                    TournamentName = pg.Game.Tournament.Name,
-                    GameTime = pg.Game.GameTime,
-                    GameType = pg.Game.GameType,
-                    Venue = pg.Game.Venue,
-                    Rink = pg.Game.Rink,
-                    IsHome = pg.IsHome,
-                    GoalsFor = pg.Game.Goals.Count(x => x.TeamId == pg.Player.TeamId),
-                    GoalsAgainst = pg.Game.Goals.Count(x => x.TeamId != pg.Player.TeamId),
-                    Opponent = pg.Opponent == null ? null : ToTeamBriefDto(pg.Opponent),
+                    Id = pg.Game.Id, TournamentId = pg.Game.TournamentId, TournamentName = pg.Game.Tournament.Name, GameTime = pg.Game.GameTime,
+                    GameType = pg.Game.GameType, Venue = pg.Game.Venue, Rink = pg.Game.Rink, IsHome = pg.IsHome,
+                    GoalsFor = pg.Game.Goals.Count(x => x.TeamId == pg.Player.TeamId), GoalsAgainst = pg.Game.Goals.Count(x => x.TeamId != pg.Player.TeamId), Opponent = pg.Opponent == null ? null : ToTeamBriefDto(pg.Opponent),
                 },
                 Team = pg.Player.Team == null ? null : ToTeamBriefDto(pg.Player.Team)
             })
@@ -1537,19 +1182,13 @@ public class Mapper : IMapper
         return player.Account.Players.GroupBy(p => p.Tournament)
             .Select(g => new PlayerTournamentStats
             {
-                GamesPlayed = g.Sum(x => x.SkaterGameLogs.Count + x.GoalieGameLogs.Count),
-                Goals = g.Sum(x => x.Goals.Count),
-                Assists = g.Sum(x => x.PrimaryAssists.Count + x.SecondaryAssists.Count),
-                PenaltyMinutes = g.Sum(x => x.Penalties.Sum(p => p.DurationMinutes)),
-                Wins = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Wins)),
-                Shutouts = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Shutouts)),
-                GoalsAgainstAverage = g
+                GamesPlayed = g.Sum(x => x.SkaterGameLogs.Count + x.GoalieGameLogs.Count), Goals = g.Sum(x => x.Goals.Count), Assists = g.Sum(x => x.PrimaryAssists.Count + x.SecondaryAssists.Count), PenaltyMinutes = g.Sum(x => x.Penalties.Sum(p => p.DurationMinutes)),
+                Wins = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Wins)), Shutouts = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Shutouts)), GoalsAgainstAverage = g
                     .SelectMany(x => x.GoalieGameLogs)
                     .Select(x => x.GoalsAgainst)
                     .DefaultIfEmpty(0)
                     .Average(),
-                Tournament = ToTournamentBriefDto(g.Key),
-                Team = g.First().Team == null ? null : ToTeamBriefDto(g.First().Team!),
+                Tournament = ToTournamentBriefDto(g.Key), Team = g.First().Team == null ? null : ToTeamBriefDto(g.First().Team!),
             })
             .ToList();
     }
@@ -1558,14 +1197,8 @@ public class Mapper : IMapper
     {
         return new TeamBriefDto
         {
-            Id = team.Id,
-            Name = team.Name,
-            NameShort = team.NameShort,
-            Abbreviation = team.Abbreviation,
-            Logo = _urlResolver.GetFullUrl(team.Logo),
-            Banner = _urlResolver.GetFullUrl(team.Banner),
-            PrimaryColorHex = team.PrimaryColorHex,
-            SecondaryColorHex = team.SecondaryColorHex,
+            Id = team.Id, Name = team.Name, NameShort = team.NameShort, Abbreviation = team.Abbreviation,
+            Logo = _urlResolver.GetFullUrl(team.Logo), Banner = _urlResolver.GetFullUrl(team.Banner), PrimaryColorHex = team.PrimaryColorHex, SecondaryColorHex = team.SecondaryColorHex,
             TertiaryColorHex = team.TertiaryColorHex
         };
     }
@@ -1574,20 +1207,13 @@ public class Mapper : IMapper
     {
         var team = home ? game.HomeTeam : game.AwayTeam;
         return team is null
-        ? null
-        : new TeamInGameDto
-        {
-            Id = team.Id,
-            Name = team.Name,
-            NameShort = team.NameShort,
-            Abbreviation = team.Abbreviation,
-            Logo = _urlResolver.GetFullUrl(team.Logo),
-            Banner = _urlResolver.GetFullUrl(team.Banner),
-            Goals = game.Goals.Count(g => g.TeamId == team.Id),
-            PrimaryColorHex = team.PrimaryColorHex,
-            SecondaryColorHex = team.SecondaryColorHex,
-            TertiaryColorHex = team.TertiaryColorHex
-        };
+            ? null
+            : new TeamInGameDto
+            {
+                Id = team.Id, Name = team.Name, NameShort = team.NameShort, Abbreviation = team.Abbreviation,
+                Logo = _urlResolver.GetFullUrl(team.Logo), Banner = _urlResolver.GetFullUrl(team.Banner), Goals = game.Goals.Count(g => g.TeamId == team.Id), PrimaryColorHex = team.PrimaryColorHex,
+                SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex
+            };
     }
 
     // ---------- Standings ----------
@@ -1596,48 +1222,26 @@ public class Mapper : IMapper
     {
         return new TournamentStandingsDto
         {
-            RoundRobin = standings.RoundRobin.Select(ToStandingRowDto).ToList(),
-            Playoffs = standings.Playoffs.Select(ToStandingRowDto).ToList(),
+            RoundRobin = standings.RoundRobin.Select(ToStandingRowDto).ToList(), Playoffs = standings.Playoffs.Select(ToStandingRowDto).ToList(),
         };
     }
 
     private StandingRowDto ToStandingRowDto(StandingRow row) => new()
     {
-        Rank = row.Rank,
-        TeamId = row.Team.Id,
-        Name = row.Team.Name,
-        NameShort = row.Team.NameShort,
-        Abbreviation = row.Team.Abbreviation,
-        Logo = _urlResolver.GetFullUrl(row.Team.Logo),
-        PrimaryColorHex = row.Team.PrimaryColorHex,
-        SecondaryColorHex = row.Team.SecondaryColorHex,
-        TertiaryColorHex = row.Team.TertiaryColorHex,
-        GamesPlayed = row.GamesPlayed,
-        Wins = row.Wins,
-        RegulationWins = row.RegulationWins,
-        Losses = row.Losses,
-        Ties = row.Ties,
-        OtSoLosses = row.OtSoLosses,
-        GoalsFor = row.GoalsFor,
-        GoalsAgainst = row.GoalsAgainst,
-        GoalDifferential = row.GoalDifferential,
-        Points = row.Points,
+        Rank = row.Rank, TeamId = row.Team.Id, Name = row.Team.Name, NameShort = row.Team.NameShort,
+        Abbreviation = row.Team.Abbreviation, Logo = _urlResolver.GetFullUrl(row.Team.Logo), PrimaryColorHex = row.Team.PrimaryColorHex, SecondaryColorHex = row.Team.SecondaryColorHex,
+        TertiaryColorHex = row.Team.TertiaryColorHex, GamesPlayed = row.GamesPlayed, Wins = row.Wins, RegulationWins = row.RegulationWins,
+        Losses = row.Losses, Ties = row.Ties, OtSoLosses = row.OtSoLosses, GoalsFor = row.GoalsFor,
+        GoalsAgainst = row.GoalsAgainst, GoalDifferential = row.GoalDifferential, Points = row.Points,
     };
 
     private TournamentBriefDto ToTournamentBriefDto(Tournament tournament)
     {
         return new TournamentBriefDto
         {
-            Id = tournament.Id,
-            Name = tournament.Name,
-            StartDate = tournament.StartDate,
-            EndDate = tournament.EndDate,
-            WinningTeamId = tournament.WinningTeamId,
-            IsActive = tournament.IsActive,
-            IsRegistrationOpen = tournament.IsRegistrationOpen,
-            IsPlayerInfoOpen = tournament.IsPlayerInfoOpen,
-            IsTradingOpen = tournament.IsTradingOpen,
-            Logo = _urlResolver.GetFullUrl(tournament.Logo),
+            Id = tournament.Id, Name = tournament.Name, StartDate = tournament.StartDate, EndDate = tournament.EndDate,
+            WinningTeamId = tournament.WinningTeamId, IsActive = tournament.IsActive, IsRegistrationOpen = tournament.IsRegistrationOpen, IsPlayerInfoOpen = tournament.IsPlayerInfoOpen,
+            IsTradingOpen = tournament.IsTradingOpen, Logo = _urlResolver.GetFullUrl(tournament.Logo),
         };
     }
 }

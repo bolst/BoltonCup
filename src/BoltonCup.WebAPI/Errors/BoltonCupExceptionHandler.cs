@@ -18,7 +18,7 @@ public sealed class BoltonCupExceptionHandler(
             return false;
 
         _logger.LogWarning(exception, "Bolton Cup exception: {Type}", exception.GetType().Name);
-        
+
         // log to sentry
         _sentryHub.CaptureException(exception, scope =>
         {

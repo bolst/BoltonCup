@@ -22,7 +22,6 @@ public record TeamBriefDto
     /// <summary>Gets or sets the tertiary color hex code.</summary>
     public string? TertiaryColorHex { get; set; }
 }
-
 /// <summary>Brief summary of a team with their goal count for a specific game.</summary>
 public record TeamInGameDto : TeamBriefDto
 {
