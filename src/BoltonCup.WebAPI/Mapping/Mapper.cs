@@ -207,6 +207,7 @@ public class Mapper : IMapper
             Type = draft.Type,
             Status = draft.Status,
             Tournament = ToTournamentBriefDto(draft.Tournament),
+            CreatedByName = AccountName(draft.DraftOwner),
             IsVisible = draft.IsVisible,
             Rounds = draft.Rounds,
             Teams = draft.Teams,
@@ -276,6 +277,7 @@ public class Mapper : IMapper
             Teams = draft.Teams,
             SecondsPerPick = draft.SecondsPerPick,
             Tournament = ToTournamentBriefDto(draft.Tournament),
+            CreatedByName = AccountName(draft.DraftOwner),
             PickOrder = draft.DraftOrders
                 .Select(order => new DraftPickOrderDto
                 {

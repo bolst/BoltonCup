@@ -20,6 +20,7 @@ public class DraftService(
     {
         return await _dbContext.Drafts
             .Include(d => d.Tournament)
+            .Include(d => d.DraftOwner)
             .ConditionalWhere(d => d.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(d => d.Status == query.Status, query.Status.HasValue)
             // non-admins can only see visible drafts or drafts they own
@@ -35,6 +36,7 @@ public class DraftService(
     {
         return await _dbContext.Drafts
             .Include(d => d.Tournament)
+            .Include(d => d.DraftOwner)
             .Include(d => d.DraftOrders)
                 .ThenInclude(d => d.Team)
             .Include(d => d.DraftPicks)
@@ -99,6 +101,7 @@ public class DraftService(
     {
         var draft = await _dbContext.Drafts
                         .Include(draft => draft.Tournament)
+                        .Include(draft => draft.DraftOwner)
                         .Include(draft => draft.DraftOrders)
                         .Include(draft => draft.DraftPicks)
                         .ThenInclude(dp => dp.Team)
@@ -194,6 +197,7 @@ public class DraftService(
     {
         var draft = await _dbContext.Drafts
                         .Include(d => d.Tournament)
+                        .Include(d => d.DraftOwner)
                         .Include(d => d.DraftOrders)
                         .ThenInclude(o => o.Team)
                         .Include(d => d.DraftPicks)
@@ -258,6 +262,7 @@ public class DraftService(
     {
         var draft = await _dbContext.Drafts
                         .Include(d => d.Tournament)
+                        .Include(d => d.DraftOwner)
                         .Include(d => d.DraftOrders)
                         .ThenInclude(o => o.Team)
                         .Include(d => d.DraftPicks)
@@ -645,6 +650,7 @@ public class DraftService(
     {
         var draft = await _dbContext.Drafts
                         .Include(d => d.Tournament)
+                        .Include(d => d.DraftOwner)
                         .Include(d => d.DraftOrders)
                         .ThenInclude(o => o.Team)
                         .Include(d => d.DraftPicks)
@@ -744,6 +750,7 @@ public class DraftService(
     {
         var draft = await _dbContext.Drafts
                         .Include(d => d.Tournament)
+                        .Include(d => d.DraftOwner)
                         .Include(d => d.DraftOrders)
                         .ThenInclude(o => o.Team)
                         .Include(d => d.DraftPicks)
@@ -821,6 +828,7 @@ public class DraftService(
     {
         var draft = await _dbContext.Drafts
                         .Include(d => d.Tournament)
+                        .Include(d => d.DraftOwner)
                         .Include(d => d.DraftOrders) .ThenInclude(o => o.Team)
                         .Include(d => d.DraftPicks) .ThenInclude(dp => dp.Team)
                         .Include(d => d.DraftPicks) .ThenInclude(dp => dp.Player) .ThenInclude(p => p!.Account)
@@ -986,6 +994,7 @@ public class DraftService(
     {
         var draft = await _dbContext.Drafts
                         .Include(d => d.Tournament)
+                        .Include(d => d.DraftOwner)
                         .Include(d => d.DraftOrders).ThenInclude(o => o.Team)
                         .Include(d => d.DraftPicks).ThenInclude(dp => dp.Team)
                         .Include(d => d.DraftPicks).ThenInclude(dp => dp.Player).ThenInclude(p => p!.Account)

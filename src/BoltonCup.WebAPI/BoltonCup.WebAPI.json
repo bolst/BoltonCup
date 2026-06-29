@@ -13972,6 +13972,11 @@
             ],
             "description": "Gets or sets the tournament this draft belongs to."
           },
+          "createdByName": {
+            "type": "string",
+            "description": "Gets or sets the display name of the account that created (owns) the draft.",
+            "nullable": true
+          },
           "isVisible": {
             "type": "boolean",
             "description": "Gets or sets whether this draft is publicly visible."
@@ -14569,6 +14574,11 @@
               }
             ],
             "description": "Gets or sets the tournament this draft belongs to."
+          },
+          "createdByName": {
+            "type": "string",
+            "description": "Gets or sets the display name of the account that created (owns) the draft.",
+            "nullable": true
           },
           "isVisible": {
             "type": "boolean",
