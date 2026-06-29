@@ -9,5 +9,6 @@ public sealed record UpdateMusicTrackCommand(
     MusicProviderType ProviderType,
     string? AlbumArtUrl,
     int? DurationMs,
+    int? OffsetSeconds,
     bool IsInBasePool
 );

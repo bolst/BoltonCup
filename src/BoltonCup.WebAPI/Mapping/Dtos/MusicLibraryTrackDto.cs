@@ -32,6 +32,9 @@ public record MusicLibraryTrackDto
     /// <summary>Gets the track duration in milliseconds, if known.</summary>
     public int? DurationMs { get; init; }
 
+    /// <summary>Gets the seconds into the track where playback should start; null/0 plays from the beginning.</summary>
+    public int? OffsetSeconds { get; init; }
+
     /// <summary>Gets whether this track plays in every game as part of the base pool.</summary>
     public bool IsInBasePool { get; init; }
 }

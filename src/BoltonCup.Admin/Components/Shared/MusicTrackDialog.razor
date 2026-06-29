@@ -63,6 +63,10 @@
                 </MudChip>
             }
 
+            <MudTextField @bind-Value="_offsetSeconds" Label="Start offset (seconds)" InputType="InputType.Number"
+                          HelperText="Skip the intro: playback starts this many seconds in. Leave empty to play from the start."
+                          Variant="Variant.Outlined" Min="0" />
+
             <MudSwitch @bind-Value="_isInBasePool" Color="Color.Primary" Label="Plays in every game (base pool)" />
         </MudStack>
     </DialogContent>
@@ -93,6 +97,7 @@
     private string? _trackId;
     private string? _albumArtUrl;
     private int? _durationMs;
+    private int? _offsetSeconds;
     private bool _isInBasePool = true;
     private bool _saving;
 
@@ -107,6 +112,7 @@
             _trackId = Track.TrackId;
             _albumArtUrl = Track.AlbumArtUrl;
             _durationMs = Track.DurationMs;
+            _offsetSeconds = Track.OffsetSeconds;
             _isInBasePool = Track.IsInBasePool;
         }
     }
@@ -164,13 +170,13 @@
             if (IsEdit)
             {
                 await MusicLibrary.UpdateTrackAsync(new UpdateMusicTrackCommand(
-                    TournamentId, Track!.Id, _title.Trim(), _artist, _trackId, MusicProviderType.Spotify, _albumArtUrl, _durationMs, _isInBasePool));
+                    TournamentId, Track!.Id, _title.Trim(), _artist, _trackId, MusicProviderType.Spotify, _albumArtUrl, _durationMs, _offsetSeconds, _isInBasePool));
             }
             else
             {
                 var tempKey = await Uploader.UploadAsync(_file!, resize: false, maxFileSize: AudioMaxBytes);
                 await MusicLibrary.AddTrackAsync(new AddMusicTrackCommand(
-                    TournamentId, tempKey, _title.Trim(), _artist, _trackId, MusicProviderType.Spotify, _albumArtUrl, _durationMs, _isInBasePool));
+                    TournamentId, tempKey, _title.Trim(), _artist, _trackId, MusicProviderType.Spotify, _albumArtUrl, _durationMs, _offsetSeconds, _isInBasePool));
             }
             Snackbar.Add("Saved.", Severity.Success);
             Dialog.Close(DialogResult.Ok(true));

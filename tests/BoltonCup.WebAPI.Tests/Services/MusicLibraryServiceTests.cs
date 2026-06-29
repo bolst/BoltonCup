@@ -161,7 +161,7 @@ public class MusicLibraryServiceTests
         // Materialize the pending SB request, then "download" it via an upload tagged with the same track id.
         await service.GetQueueAsync(TournamentId);
         var cmd = new AddMusicTrackCommand(
-            TournamentId, "temp.mp3", "SongB", "B", "SB", MusicProviderType.Spotify, null, null, IsInBasePool: false);
+            TournamentId, "temp.mp3", "SongB", "B", "SB", MusicProviderType.Spotify, null, null, OffsetSeconds: null, IsInBasePool: false);
 
         var track = await service.AddTrackAsync(cmd);
 

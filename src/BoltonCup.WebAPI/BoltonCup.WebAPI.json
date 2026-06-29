@@ -15798,6 +15798,12 @@
             "format": "int32",
             "nullable": true
           },
+          "offsetSeconds": {
+            "type": "integer",
+            "description": "Gets the seconds into the track where playback should start; null/0 plays from the beginning.",
+            "format": "int32",
+            "nullable": true
+          },
           "isInBasePool": {
             "type": "boolean",
             "description": "Gets whether this track plays in every game as part of the base pool."
@@ -16665,6 +16671,12 @@
           "durationMs": {
             "type": "integer",
             "description": "Gets the track duration in milliseconds, if known.",
+            "format": "int32",
+            "nullable": true
+          },
+          "offsetSeconds": {
+            "type": "integer",
+            "description": "Gets the seconds into the track where playback should start; null/0 plays from the beginning.",
             "format": "int32",
             "nullable": true
           }
