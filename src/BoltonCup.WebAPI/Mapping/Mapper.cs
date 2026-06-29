@@ -782,7 +782,7 @@ public class Mapper : IMapper
             Id = team.Id, Name = team.Name, NameShort = team.NameShort, Abbreviation = team.Abbreviation,
             Tournament = ToTournamentBriefDto(team.Tournament), LogoUrl = _urlResolver.GetFullUrl(team.Logo), BannerUrl = _urlResolver.GetFullUrl(team.Banner), PrimaryColorHex = team.PrimaryColorHex,
             SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex, GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack != null ? team.GoalSongTrack.AudioFileKey : null), WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack != null ? team.WinSongTrack.AudioFileKey : null),
-            GmAccountId = team.GmAccountId, GmFirstName = team.GeneralManager?.FirstName, GmLastName = team.GeneralManager?.LastName, GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager?.Avatar),
+            GeneralManagers = ToTeamGmDtos(team),
         });
     }
 
@@ -795,12 +795,20 @@ public class Mapper : IMapper
                 Id = team.Id, Name = team.Name, NameShort = team.NameShort, Abbreviation = team.Abbreviation,
                 Tournament = ToTournamentBriefDto(team.Tournament), LogoUrl = _urlResolver.GetFullUrl(team.Logo), BannerUrl = _urlResolver.GetFullUrl(team.Banner), PrimaryColorHex = team.PrimaryColorHex,
                 SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex, GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack?.AudioFileKey), WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack?.AudioFileKey),
-                GmAccountId = team.GmAccountId, GmFirstName = team.GeneralManager?.FirstName, GmLastName = team.GeneralManager?.LastName, GmProfilePicture = _urlResolver.GetFullUrl(team.GeneralManager?.Avatar),
+                GeneralManagers = ToTeamGmDtos(team),
                 Players = team.Players
                     .Select(ToPlayerBriefDto)
                     .ToList(),
             };
     }
+
+    private List<TeamGmDto> ToTeamGmDtos(Team team)
+        => team.GeneralManagers
+            .Select(a => new TeamGmDto
+            {
+                AccountId = a.Id, FirstName = a.FirstName, LastName = a.LastName, ProfilePictureUrl = _urlResolver.GetFullUrl(a.Avatar),
+            })
+            .ToList();
 
 
     // ---------- Tournament ----------
@@ -1088,8 +1096,8 @@ public class Mapper : IMapper
 
     public TradeDto ToDto(Trade trade, TradeViewerContext viewer)
     {
-        var isProposingGm = viewer.AccountId is { } accountId && trade.ProposingTeam.GmAccountId == accountId;
-        var isReceivingGm = viewer.AccountId is { } accId && trade.ReceivingTeam.GmAccountId == accId;
+        var isProposingGm = viewer.AccountId is { } accountId && trade.ProposingTeam.GeneralManagers.Any(g => g.Id == accountId);
+        var isReceivingGm = viewer.AccountId is { } accId && trade.ReceivingTeam.GeneralManagers.Any(g => g.Id == accId);
 
         return new TradeDto
         {

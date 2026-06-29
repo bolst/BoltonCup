@@ -25,7 +25,7 @@ public class BoltonCupClaimsPrincipalFactory(
             
             // add team GM claim(s)
             var gmTournaments = await dbContext.Teams
-                .Where(t => t.GmAccountId == user.AccountId)
+                .Where(t => t.GeneralManagers.Any(g => g.Id == user.AccountId))
                 .GroupBy(t => t.TournamentId)
                 .ToListAsync();
             foreach (var tournament in gmTournaments)

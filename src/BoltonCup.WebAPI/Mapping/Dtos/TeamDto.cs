@@ -27,12 +27,6 @@ public record TeamDto
     public string? GoalSongUrl { get; init; }
     /// <summary>Gets the URL of the team's win song, once its track has been downloaded.</summary>
     public string? WinSongUrl { get; init; }
-    /// <summary>Gets the account ID of the general manager.</summary>
-    public int? GmAccountId { get; init; }
-    /// <summary>Gets the first name of the general manager.</summary>
-    public string? GmFirstName { get; init; }
-    /// <summary>Gets the last name of the general manager.</summary>
-    public string? GmLastName { get; init; }
-    /// <summary>Gets the URL of the general manager's profile picture.</summary>
-    public string? GmProfilePicture { get; init; }
+    /// <summary>Gets the team's general managers.</summary>
+    public IReadOnlyList<TeamGmDto> GeneralManagers { get; init; } = [];
 }

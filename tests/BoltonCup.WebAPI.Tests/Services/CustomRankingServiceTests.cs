@@ -37,30 +37,33 @@ public class CustomRankingServiceTests
 
         db.Tournaments.Add(new Tournament { Id = TournamentId, Name = "Test Cup" });
 
+        var accountsById = new Dictionary<int, Account>();
         foreach (var (id, name) in new[] { (OwnerId, "Owner Account"), (Gm1Id, "Gm One"), (Gm2Id, "Gm Two"), (NonGmId, "Non Gm") })
         {
             var parts = name.Split(' ');
-            db.Accounts.Add(new Account
+            var account = new Account
             {
                 Id = id,
                 FirstName = parts[0],
                 LastName = parts[1],
                 Email = $"user{id}@test.com",
                 Birthday = new DateTime(1990, 1, 1),
-            });
+            };
+            accountsById[id] = account;
+            db.Accounts.Add(account);
         }
 
         db.Teams.Add(new Team
         {
             Id = 1, Name = "Team 1", NameShort = "T1", Abbreviation = "T1",
             PrimaryColorHex = "#000000", SecondaryColorHex = "#ffffff",
-            TournamentId = TournamentId, GmAccountId = Gm1Id,
+            TournamentId = TournamentId, GeneralManagers = [accountsById[Gm1Id]],
         });
         db.Teams.Add(new Team
         {
             Id = 2, Name = "Team 2", NameShort = "T2", Abbreviation = "T2",
             PrimaryColorHex = "#000000", SecondaryColorHex = "#ffffff",
-            TournamentId = TournamentId, GmAccountId = Gm2Id,
+            TournamentId = TournamentId, GeneralManagers = [accountsById[Gm2Id]],
         });
 
         db.CustomRankings.Add(new CustomRanking

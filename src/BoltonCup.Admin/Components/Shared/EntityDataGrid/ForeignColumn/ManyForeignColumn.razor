@@ -1,0 +1,45 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam T
+@typeparam TEntity
+@inherits Column<T>
+
+@code {
+
+    protected virtual RenderFragment EntityEditTemplate(CellContext<T> context)
+    {
+        var selected = GetCollection(context.Item).ToList();
+
+        return @<div class="d-flex flex-column gap-1">
+                   <MudAutocomplete T="TEntity"
+                                    Value="_pendingAdd"
+                                    ValueChanged="@(val => AddAsync(context.Item, val))"
+                                    SearchFunc="@((s, ct) => SearchOptionsAsync(s, context, ct))"
+                                    ToStringFunc="@(e => e?.ToString())"
+                                    Placeholder="Add..."
+                                    Margin="Margin.Dense"
+                                    ReadOnly="!Editable"
+                                    ResetValueOnEmptyText
+                                    Clearable
+                                    Immediate
+                                    Dense />
+                   @if (selected.Count > 0)
+                   {
+                       <div class="d-flex flex-wrap gap-1">
+                           @foreach (var entity in selected)
+                           {
+                               <MudChip T="TEntity" Size="Size.Small" Variant="Variant.Outlined"
+                                        OnClose="@(() => RemoveAsync(context.Item, entity))">
+                                   <div class="d-flex flex-row align-center gap-1">
+                                       @if (ImageSrcFunc is not null)
+                                       {
+                                           <BoltonCupImage Src="@ImageSrcFunc(entity)" Height="20" Editable="false"/>
+                                       }
+                                       <span>@entity.ToString()</span>
+                                   </div>
+                               </MudChip>
+                           }
+                       </div>
+                   }
+                </div>;
+    }
+}

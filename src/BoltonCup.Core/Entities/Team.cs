@@ -7,7 +7,6 @@ public class Team : EntityBase
     public required string NameShort { get; set; }
     public required string Abbreviation { get; set; }
     public int? TournamentId { get; set; }
-    public int? GmAccountId { get; set; }
     public string? Logo { get; set; }
     public string? Banner { get; set; }
     public required string PrimaryColorHex { get; set; }
@@ -21,7 +20,7 @@ public class Team : EntityBase
     public int? WinSongTrackId { get; set; }
 
     public Tournament Tournament { get; set; } = null!;
-    public Account? GeneralManager { get; set; }
+    public ICollection<Account> GeneralManagers { get; set; } = [];
     public TournamentMusicTrack? GoalSongTrack { get; set; }
     public TournamentMusicTrack? WinSongTrack { get; set; }
     public ICollection<Player> Players { get; set; } = [];
