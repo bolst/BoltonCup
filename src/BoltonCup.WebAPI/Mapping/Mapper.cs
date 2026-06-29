@@ -1001,7 +1001,7 @@ public class Mapper : IMapper
             Tracks = result.Tracks.Select(t => new PlaylistTrackDto
             {
                 FileKey = t.AudioFileKey, Title = t.Title, Artist = t.Artist, AlbumArtUrl = t.AlbumArtUrl,
-                DurationMs = t.DurationMs,
+                DurationMs = t.DurationMs, OffsetSeconds = t.OffsetSeconds,
             }).ToList(),
             Missing = result.Missing.Select(ToDto).ToList(),
         };
@@ -1014,7 +1014,7 @@ public class Mapper : IMapper
     {
         Id = track.Id, TournamentId = track.TournamentId, FileKey = track.AudioFileKey ?? string.Empty, TrackId = track.TrackId,
         ProviderType = track.ProviderType, Title = track.Title, Artist = track.Artist, AlbumArtUrl = track.AlbumArtUrl,
-        DurationMs = track.DurationMs, IsInBasePool = track.IsInBasePool,
+        DurationMs = track.DurationMs, OffsetSeconds = track.OffsetSeconds, IsInBasePool = track.IsInBasePool,
     };
 
     public IReadOnlyList<MissingSongRequestDto> ToDtoList(IReadOnlyList<MissingSongRequest> missing)
@@ -1035,13 +1035,29 @@ public class Mapper : IMapper
         RequestedByName = q.RequestedByName,
     };
 
-    public AddMusicTrackCommand ToCommand(int tournamentId, AddMusicTrackRequest request)
-        => new(tournamentId, request.TempKey, request.Title, request.Artist, request.TrackId,
-            request.ProviderType, request.AlbumArtUrl, request.DurationMs, request.IsInBasePool);
+    public AddMusicTrackCommand ToCommand(int tournamentId, AddMusicTrackRequest request) 
+        => new AddMusicTrackCommand(tournamentId,
+            request.TempKey,
+            request.Title,
+            request.Artist,
+            request.TrackId,
+            request.ProviderType,
+            request.AlbumArtUrl,
+            request.DurationMs,
+            null,
+            request.IsInBasePool);
 
-    public UpdateMusicTrackCommand ToCommand(int tournamentId, int trackId, UpdateMusicTrackRequest request)
-        => new(tournamentId, trackId, request.Title, request.Artist, request.TrackId,
-            request.ProviderType, request.AlbumArtUrl, request.DurationMs, request.IsInBasePool);
+    public UpdateMusicTrackCommand ToCommand(int tournamentId, int trackId, UpdateMusicTrackRequest request) 
+        => new UpdateMusicTrackCommand(tournamentId,
+            trackId,
+            request.Title,
+            request.Artist,
+            request.TrackId,
+            request.ProviderType,
+            request.AlbumArtUrl,
+            request.DurationMs,
+            null,
+            request.IsInBasePool);
 
 
     // ---------- Brief helpers ----------
@@ -1103,9 +1119,16 @@ public class Mapper : IMapper
 
         return new TradeDto
         {
-            Id = trade.Id, TournamentId = trade.TournamentId, ProposingTeam = ToTeamBriefDto(trade.ProposingTeam), ReceivingTeam = ToTeamBriefDto(trade.ReceivingTeam),
-            Status = trade.Status, Note = trade.Note, CreatedAt = trade.CreatedAt, RespondedAt = trade.RespondedAt,
-            ResolvedAt = trade.ResolvedAt, PlayersFromProposing = trade.Players
+            Id = trade.Id,
+            TournamentId = trade.TournamentId,
+            ProposingTeam = ToTeamBriefDto(trade.ProposingTeam),
+            ReceivingTeam = ToTeamBriefDto(trade.ReceivingTeam),
+            Status = trade.Status,
+            Note = trade.Note,
+            CreatedAt = trade.CreatedAt,
+            RespondedAt = trade.RespondedAt,
+            ResolvedAt = trade.ResolvedAt,
+            PlayersFromProposing = trade.Players
                 .Where(tp => tp.FromTeamId == trade.ProposingTeamId)
                 .Select(ToTradePlayerDto)
                 .ToList(),
@@ -1113,8 +1136,9 @@ public class Mapper : IMapper
                 .Where(tp => tp.FromTeamId == trade.ReceivingTeamId)
                 .Select(ToTradePlayerDto)
                 .ToList(),
-            CanAccept = isReceivingGm && trade.Status == TradeStatus.Pending, CanDecline = isReceivingGm && trade.Status == TradeStatus.Pending, CanCancel = (isProposingGm && trade.Status == TradeStatus.Pending)
-                                                                                                                                                             || (viewer.IsAdmin && trade.Status is TradeStatus.Pending or TradeStatus.Accepted),
+            CanAccept = isReceivingGm && trade.Status == TradeStatus.Pending,
+            CanDecline = isReceivingGm && trade.Status == TradeStatus.Pending,
+            CanCancel = (isProposingGm && trade.Status == TradeStatus.Pending) || (viewer.IsAdmin && trade.Status is TradeStatus.Pending or TradeStatus.Accepted),
             CanApprove = viewer.IsAdmin && trade.Status == TradeStatus.Accepted,
         };
     }

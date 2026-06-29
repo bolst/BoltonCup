@@ -27,21 +27,24 @@
         <HeaderContent>
             <MudTh>Title</MudTh>
             <MudTh>Artist</MudTh>
-            <MudTh>Spotify tag</MudTh>
+            <MudTh>Track ID</MudTh>
             <MudTh>Base pool</MudTh>
+            <MudTh>Offset (s)</MudTh>
             <MudTh Style="text-align:right">Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Title">@context.Title</MudTd>
             <MudTd DataLabel="Artist">@context.Artist</MudTd>
-            <MudTd DataLabel="Track tag">
+            <MudTd DataLabel="Track ID">
                 @if (string.IsNullOrEmpty(context.TrackId))
                 {
-                    <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Text">untagged</MudChip>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Text">-</MudChip>
                 }
                 else
                 {
-                    <MudIcon Icon="@Icons.Material.Rounded.Link" Color="Color.Success" Size="Size.Small" Title="@($"{context.ProviderType}: {context.TrackId}")" />
+                    <MudTooltip Text="@($"{context.ProviderType}: {context.TrackId}")">
+                        <MudIcon Icon="@Icons.Material.Rounded.Link" Color="Color.Success" Size="Size.Small" />
+                    </MudTooltip>
                 }
             </MudTd>
             <MudTd DataLabel="Base pool">
@@ -50,10 +53,14 @@
                     <MudIcon Icon="@Icons.Material.Rounded.CheckCircle" Color="Color.Success" Size="Size.Small" />
                 }
             </MudTd>
+            <MudTd DataLabel="Offset (s)" Style="text-align: right">
+                @(context.OffsetSeconds?.ToString() ?? "-")
+            </MudTd>
             <MudTd Style="text-align:right">
                 <MudIconButton Icon="@Icons.Material.Rounded.PlayArrow" Size="Size.Small" Color="Color.Primary"
-                               Href="@AssetUrls.GetFullUrl(context.AudioFileKey)" Target="_blank"
-                               Disabled="@string.IsNullOrEmpty(context.AudioFileKey)" Title="Play in new tab" />
+                               Href="@PreviewUrl(context)" Target="_blank"
+                               Disabled="@string.IsNullOrEmpty(context.AudioFileKey)"
+                               Title="@(context.OffsetSeconds > 0 ? $"Play in new tab (from {context.OffsetSeconds}s)" : "Play in new tab")" />
                 <MudIconButton Icon="@Icons.Material.Rounded.Edit" Size="Size.Small" OnClick="@(() => EditTrack(context))" />
                 <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Small" OnClick="@(() => DeleteTrack(context))" />
             </MudTd>
@@ -62,7 +69,7 @@
             <MudText Typo="Typo.body2" Class="mud-text-secondary pa-4">No tracks uploaded yet.</MudText>
         </NoRecordsContent>
         <FooterContent>
-            <MudTd colspan="5">
+            <MudTd colspan="6">
                 <MudChip T="string" Color="Color.Info" Variant="Variant.Text" Label="true">@_tracks.Count TOTAL</MudChip>
             </MudTd>
         </FooterContent>
@@ -157,6 +164,15 @@
     private int? _loadedId;
 
     private int _pendingCount => _queue.Count(q => q.Status == MusicTrackStatus.Pending);
+
+    // Append an HTML media fragment so the browser tab starts playback at the track's offset.
+    private string? PreviewUrl(TournamentMusicTrack track)
+    {
+        var url = AssetUrls.GetFullUrl(track.AudioFileKey);
+        if (url is null)
+            return null;
+        return track.OffsetSeconds is > 0 and var offset ? $"{url}#t={offset}" : url;
+    }
 
     private static Color StatusColor(MusicTrackStatus status) => status switch
     {

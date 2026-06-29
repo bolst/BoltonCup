@@ -67,6 +67,7 @@ public class MusicLibraryService : IMusicLibraryService
         track.Artist = command.Artist;
         track.AlbumArtUrl = command.AlbumArtUrl;
         track.DurationMs = command.DurationMs;
+        track.OffsetSeconds = command.OffsetSeconds;
         track.IsInBasePool = command.IsInBasePool;
         track.Status = MusicTrackStatus.Downloaded;
 
@@ -117,6 +118,7 @@ public class MusicLibraryService : IMusicLibraryService
         track.ProviderType = command.ProviderType;
         track.AlbumArtUrl = command.AlbumArtUrl;
         track.DurationMs = command.DurationMs;
+        track.OffsetSeconds = command.OffsetSeconds;
         track.IsInBasePool = command.IsInBasePool;
 
         await _db.SaveChangesAsync(cancellationToken);

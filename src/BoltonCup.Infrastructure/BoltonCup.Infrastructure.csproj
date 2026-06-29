@@ -26,6 +26,7 @@
       <PackageReference Include="RazorLight" Version="2.3.1" />
       <PackageReference Include="Stripe.net" Version="51.0.0" />
       <PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.1" />
+      <PackageReference Include="Twilio" Version="7.14.9" />
     </ItemGroup>
 
     <ItemGroup>

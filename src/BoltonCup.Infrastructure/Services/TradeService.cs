@@ -12,16 +12,19 @@ public class TradeService(
     BoltonCupDbContext _dbContext,
     IRosterValidator _rosterValidator,
     IEmailer _emailer,
+    ISmsSender _smsSender,
     UserManager<BoltonCupUser> _userManager
 ) : ITradeService
 {
+    private const string SiteBaseUrl = "https://boltoncup.ca";
+
     public async Task<IReadOnlyList<Trade>> GetByTournamentAsync(int tournamentId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Trades
             .AsNoTracking()
             .AsSplitQuery()
-            .Include(t => t.ProposingTeam)
-            .Include(t => t.ReceivingTeam)
+            .Include(t => t.ProposingTeam).ThenInclude(t => t.GeneralManagers)
+            .Include(t => t.ReceivingTeam).ThenInclude(t => t.GeneralManagers)
             .Include(t => t.Players)
             .ThenInclude(tp => tp.Player)
             .ThenInclude(p => p.Account)
@@ -137,9 +140,56 @@ public class TradeService(
         var info = BuildEmailInfo(trade);
         var recipients = await GetRecipientsAsync(trade, includePlayers: false);
         await _emailer.SendTradeCreatedAsync(recipients, info);
+        await SendSmsAsync(trade.ReceivingTeam.GeneralManagers, BuildTradeProposalSms(trade.TournamentId, info));
 
         return trade.Id;
     }
+
+    private async Task SendSmsAsync(IEnumerable<Account> gms, string message)
+    {
+        var phones = gms
+            .Select(gm => gm.Phone)
+            .Where(p => !string.IsNullOrWhiteSpace(p))
+            .Distinct()
+            .ToList();
+        foreach (var phone in phones)
+        {
+            await _smsSender.SendAsync(phone!, message);
+        }
+    }
+
+    private static string TradeHubLink(int tournamentId) =>
+        $"Click the link to go to the trade hub: {SiteBaseUrl}/tournaments/{tournamentId}/trade-hub";
+
+    private static string BuildTradeProposalSms(int tournamentId, TradeEmailInfo info)
+    {
+        var proposingTeam = info.ProposingTeamName.ToUpperInvariant();
+        var lines = new List<string> { $"{proposingTeam} has sent you a trade.", "Your team receives:" };
+        lines.AddRange(PlayerLines(info.PlayersFromProposing));
+        lines.Add($"{proposingTeam} receives:");
+        lines.AddRange(PlayerLines(info.PlayersFromReceiving));
+        lines.Add(TradeHubLink(tournamentId));
+        return string.Join("\n", lines);
+
+        static IEnumerable<string> PlayerLines(IReadOnlyList<string> players) =>
+            players.Count == 0 ? ["- none"] : players.Select(p => $"- {p}");
+    }
+
+    private static string BuildTradeAcceptedSms(Trade trade) => string.Join("\n",
+        $"{trade.ReceivingTeam.Name.ToUpperInvariant()} accepted your trade. It now awaits admin approval.",
+        TradeHubLink(trade.TournamentId));
+
+    private static string BuildTradeDeclinedSms(Trade trade) => string.Join("\n",
+        $"{trade.ReceivingTeam.Name.ToUpperInvariant()} declined your trade.",
+        TradeHubLink(trade.TournamentId));
+
+    private static string BuildTradeCancelledSms(Trade trade) => string.Join("\n",
+        $"The trade between {trade.ProposingTeam.Name.ToUpperInvariant()} and {trade.ReceivingTeam.Name.ToUpperInvariant()} was cancelled.",
+        TradeHubLink(trade.TournamentId));
+
+    private static string BuildTradeApprovedSms(Trade trade) => string.Join("\n",
+        $"The trade between {trade.ProposingTeam.Name.ToUpperInvariant()} and {trade.ReceivingTeam.Name.ToUpperInvariant()} was approved. Rosters have been updated.",
+        TradeHubLink(trade.TournamentId));
 
     public async Task AcceptAsync(int tradeId, int accountId, CancellationToken cancellationToken = default)
     {
@@ -161,6 +211,7 @@ public class TradeService(
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         await _emailer.SendTradeAcceptedAsync(await GetRecipientsAsync(trade, includePlayers: false), BuildEmailInfo(trade));
+        await SendSmsAsync(trade.ProposingTeam.GeneralManagers, BuildTradeAcceptedSms(trade));
     }
 
     public async Task DeclineAsync(int tradeId, int accountId, CancellationToken cancellationToken = default)
@@ -178,6 +229,7 @@ public class TradeService(
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         await _emailer.SendTradeDeclinedAsync(await GetRecipientsAsync(trade, includePlayers: false), BuildEmailInfo(trade));
+        await SendSmsAsync(trade.ProposingTeam.GeneralManagers, BuildTradeDeclinedSms(trade));
     }
 
     public async Task CancelAsync(int tradeId, int accountId, bool isAdmin, CancellationToken cancellationToken = default)
@@ -203,6 +255,10 @@ public class TradeService(
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         await _emailer.SendTradeCancelledAsync(await GetRecipientsAsync(trade, includePlayers: false), BuildEmailInfo(trade));
+        var cancelRecipients = isAdmin
+            ? trade.ProposingTeam.GeneralManagers.Concat(trade.ReceivingTeam.GeneralManagers)
+            : trade.ReceivingTeam.GeneralManagers;
+        await SendSmsAsync(cancelRecipients, BuildTradeCancelledSms(trade));
     }
 
     public async Task ApproveAsync(int tradeId, int accountId, CancellationToken cancellationToken = default)
@@ -231,6 +287,7 @@ public class TradeService(
         await transaction.CommitAsync(cancellationToken);
 
         await _emailer.SendTradeApprovedAsync(await GetRecipientsAsync(trade, includePlayers: true), BuildEmailInfo(trade));
+        await SendSmsAsync(trade.ProposingTeam.GeneralManagers.Concat(trade.ReceivingTeam.GeneralManagers), BuildTradeApprovedSms(trade));
     }
 
     private async Task<Trade> LoadTradeAsync(int tradeId, CancellationToken cancellationToken)

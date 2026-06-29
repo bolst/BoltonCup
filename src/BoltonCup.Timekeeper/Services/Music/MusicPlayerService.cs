@@ -67,7 +67,8 @@ public sealed class MusicPlayerService : IAsyncDisposable
         CurrentIndex = index;
         var track = Playlist[index];
         DurationSec = (track.DurationMs ?? 0) / 1000.0;
-        PositionSec = 0;
+        var offsetSec = track.OffsetSeconds ?? 0;
+        PositionSec = offsetSec;
 
         var url = await _cache.GetPlayableUrlAsync(track.FileKey);
         if (url is null)
@@ -83,7 +84,7 @@ public sealed class MusicPlayerService : IAsyncDisposable
             _currentObjectUrl = url;
         }
 
-        await _module.InvokeVoidAsync("load", url);
+        await _module.InvokeVoidAsync("load", url, offsetSec);
         IsPlaying = await _module.InvokeAsync<bool>("play");
         Notify();
     }

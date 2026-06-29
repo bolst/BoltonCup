@@ -2,6 +2,7 @@
 let audio = null;
 let dotnet = null;
 let lastWholeSecond = -1;
+let pendingStartSec = 0;
 
 export function init(audioEl, dotnetRef) {
     audio = audioEl;
@@ -28,6 +29,11 @@ function onTimeUpdate() {
 
 function onLoadedMetadata() {
     if (!audio) return;
+    // Apply the start offset once metadata (and the seekable range) is known.
+    if (pendingStartSec > 0) {
+        try { audio.currentTime = pendingStartSec; } catch { }
+        pendingStartSec = 0;
+    }
     const dur = isFinite(audio.duration) ? audio.duration : 0;
     dotnet && dotnet.invokeMethodAsync('OnLoadedMetadata', dur);
 }
@@ -37,11 +43,16 @@ function onError() {
     dotnet && dotnet.invokeMethodAsync('OnPlaybackError', msg);
 }
 
-export function load(objectUrl) {
+export function load(objectUrl, startSec) {
     if (!audio) return;
     lastWholeSecond = -1;
+    pendingStartSec = startSec > 0 ? startSec : 0;
     audio.src = objectUrl;
     audio.load();
+    // Best-effort immediate seek; onLoadedMetadata applies it reliably once seekable.
+    if (pendingStartSec > 0) {
+        try { audio.currentTime = pendingStartSec; } catch { }
+    }
 }
 
 export async function play() {

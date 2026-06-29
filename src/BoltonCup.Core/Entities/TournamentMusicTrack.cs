@@ -26,6 +26,9 @@ public class TournamentMusicTrack : EntityBase
     public string? AlbumArtUrl { get; set; }
     public int? DurationMs { get; set; }
 
+    /// <summary>Seconds into the track where playback should start; null/0 plays from the beginning.</summary>
+    public int? OffsetSeconds { get; set; }
+
     /// <summary>When true, this track plays in every game of the tournament as part of the base pool.</summary>
     public bool IsInBasePool { get; set; } = true;
 
