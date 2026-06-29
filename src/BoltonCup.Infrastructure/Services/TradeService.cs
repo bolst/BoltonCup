@@ -159,14 +159,14 @@ public class TradeService(
     }
 
     private static string TradeHubLink(int tournamentId) =>
-        $"Click the link to go to the trade hub: {SiteBaseUrl}/tournaments/{tournamentId}/trade-hub";
+        $"\nTrade hub: {SiteBaseUrl}/tournaments/{tournamentId}/trade-hub";
 
     private static string BuildTradeProposalSms(int tournamentId, TradeEmailInfo info)
     {
         var proposingTeam = info.ProposingTeamName.ToUpperInvariant();
-        var lines = new List<string> { $"{proposingTeam} has sent you a trade.", "Your team receives:" };
+        var lines = new List<string> { $"{proposingTeam} has sent you a trade.", "\nYour team receives:" };
         lines.AddRange(PlayerLines(info.PlayersFromProposing));
-        lines.Add($"{proposingTeam} receives:");
+        lines.Add($"\n{proposingTeam} receives:");
         lines.AddRange(PlayerLines(info.PlayersFromReceiving));
         lines.Add(TradeHubLink(tournamentId));
         return string.Join("\n", lines);
