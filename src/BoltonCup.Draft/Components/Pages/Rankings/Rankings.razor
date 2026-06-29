@@ -10,43 +10,76 @@
 <PageTitle>Player Rankings</PageTitle>
 
 <MudContainer Class="py-2" MaxWidth="MaxWidth.Medium">
-    <div class="mud-width-full d-flex align-center justify-space-between py-2 gap-3">
-        <MudText Typo="Typo.h5">Player Rankings</MudText>
-        <MudButton OnClick="@CreateNewRankingAsync" Color="Color.Primary" StartIcon="@Icons.Material.Rounded.Add">New</MudButton>
-    </div>
+    <MudText Typo="Typo.h5" Class="py-2">Player Rankings</MudText>
 
-    @if (_rankings.Count == 0)
-    {
-        <MudAlert Severity="Severity.Info" Class="my-4">You haven't created any rankings yet.</MudAlert>
-    }
-    else
-    {
-        <MudStack Class="mud-width-full" AlignItems="AlignItems.Center">
-            @foreach (var ranking in _rankings)
+    <MudTabs Rounded ApplyEffectsToContainer>
+        <MudTabPanel Text="@($"My Rankings ({_rankings.Count})")">
+            <div class="mud-width-full d-flex justify-end pb-2">
+                <MudButton OnClick="@CreateNewRankingAsync" Color="Color.Primary" StartIcon="@Icons.Material.Rounded.Add">New</MudButton>
+            </div>
+            @if (_rankings.Count == 0)
             {
-                <MudPaper Class="pa-4 d-flex flex-row align-center justify-space-between cursor-pointer"
-                          @onclick="@(_ => NavigateToRanking(ranking.Id))" Width="100%" Elevation="0" Square Outlined>
-                    <div class="d-flex flex-row align-center gap-3">
-                        <MudImage Src="@ranking.Tournament.Logo" Height="32"/>
-                        <div>
-                            <MudText Typo="Typo.h6">@ranking.Title</MudText>
-                            <MudText Typo="Typo.caption">@ranking.Tournament.Name · @ranking.PlayerCount players</MudText>
-                        </div>
-                    </div>
-                    <div @onclick:stopPropagation="true">
-                        <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error"
-                                       OnClick="@(() => DeleteRankingAsync(ranking.Id))"/>
-                    </div>
-                </MudPaper>
+                <MudAlert Severity="Severity.Info" Class="my-4">You haven't created any rankings yet.</MudAlert>
             }
-        </MudStack>
-    }
+            else
+            {
+                <MudStack Class="mud-width-full" AlignItems="AlignItems.Center">
+                    @foreach (var ranking in _rankings)
+                    {
+                        @RankingRow(ranking, owned: true)
+                    }
+                </MudStack>
+            }
+        </MudTabPanel>
+
+        <MudTabPanel Text="@($"Shared with me ({_shared.Count})")">
+            @if (_shared.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Class="my-4">No rankings have been shared with you.</MudAlert>
+            }
+            else
+            {
+                <MudStack Class="mud-width-full" AlignItems="AlignItems.Center">
+                    @foreach (var ranking in _shared)
+                    {
+                        @RankingRow(ranking, owned: false)
+                    }
+                </MudStack>
+            }
+        </MudTabPanel>
+    </MudTabs>
 </MudContainer>
+
+@code {
+    private RenderFragment RankingRow(Sdk.CustomRankingDto ranking, bool owned) =>
+        @<MudPaper Class="pa-4 d-flex flex-row align-center justify-space-between cursor-pointer"
+                   @onclick="@(_ => NavigateToRanking(ranking.Id))" Width="100%" Elevation="0" Square Outlined>
+            <div class="d-flex flex-row align-center gap-3">
+                <MudImage Src="@ranking.Tournament.Logo" Height="32"/>
+                <div>
+                    <MudText Typo="Typo.h6">@ranking.Title</MudText>
+                    <MudText Typo="Typo.caption">
+                        @ranking.Tournament.Name · @ranking.PlayerCount players@(owned ? string.Empty : $" · Created by {ranking.CreatedByName}")
+                    </MudText>
+                </div>
+            </div>
+            <div @onclick:stopPropagation="true" class="d-flex flex-row align-center">
+                <MudIconButton Icon="@Icons.Material.Rounded.ContentCopy" Color="Color.Default"
+                               OnClick="@(() => CloneRankingAsync(ranking))"/>
+                @if (owned)
+                {
+                    <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error"
+                                   OnClick="@(() => DeleteRankingAsync(ranking.Id))"/>
+                }
+            </div>
+        </MudPaper>;
+}
 
 
 @code {
 
     private ICollection<Sdk.CustomRankingDto> _rankings = [];
+    private ICollection<Sdk.CustomRankingDto> _shared = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,6 +97,7 @@
     private async Task LoadRankingsAsync()
     {
         _rankings = await BoltonCupApi.GetCustomRankingsAsync();
+        _shared = await BoltonCupApi.GetSharedCustomRankingsAsync();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -80,6 +114,18 @@
         {
             NavigateToRanking(newId);
         }
+    }
+
+    private async Task CloneRankingAsync(Sdk.CustomRankingDto ranking)
+    {
+        var parameters = new DialogParameters<CloneRankingDialog> { { x => x.SourceTitle, ranking.Title } };
+        var dialog = await DialogService.ShowAsync<CloneRankingDialog>("Make a copy", parameters);
+        var result = await dialog.Result;
+        if (result?.Data is not string title)
+            return;
+
+        var newId = await BoltonCupApi.CloneCustomRankingAsync(ranking.Id, new Sdk.CloneCustomRankingRequest { Title = title });
+        NavigateToRanking(newId);
     }
 
     private async Task DeleteRankingAsync(int id)

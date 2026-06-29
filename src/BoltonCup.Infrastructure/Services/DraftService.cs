@@ -982,6 +982,37 @@ public class DraftService(
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
     
+    public async Task<CurrentDraftState> ReconcileDraftPoolAsync(int draftId, CancellationToken cancellationToken = default)
+    {
+        var draft = await _dbContext.Drafts
+                        .Include(d => d.Tournament)
+                        .Include(d => d.DraftOrders).ThenInclude(o => o.Team)
+                        .Include(d => d.DraftPicks).ThenInclude(dp => dp.Team)
+                        .Include(d => d.DraftPicks).ThenInclude(dp => dp.Player).ThenInclude(p => p!.Account)
+                        .SingleOrDefaultAsync(d => d.Id == draftId, cancellationToken)
+                    ?? throw new EntityNotFoundException(nameof(Draft), draftId);
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var before = await _dbContext.PlayerDraftRankings.CountAsync(r => r.DraftId == draftId, cancellationToken);
+        // Incremental: only inserts players who lack a ranking row, appended after existing ranks.
+        await GenerateDraftRankingsAsync(draft, cancellationToken);
+        var after = await _dbContext.PlayerDraftRankings.CountAsync(r => r.DraftId == draftId, cancellationToken);
+
+        // Widen the board for new players only before the draft starts; regenerating picks mid-draft
+        // would clear picks already made.
+        if (after != before && draft.Status == DraftStatus.Pending)
+        {
+            await GenerateDraftPicksAsync(draft, cancellationToken);
+        }
+
+        var nextPick = await GetNextOpenPickAsync(draft.Id, cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
+
+        return new CurrentDraftState(Draft: draft, NextPick: nextPick);
+    }
+
     private async Task GenerateDraftRankingsAsync(Draft draft, CancellationToken cancellationToken = default)
     {
         var players = await _dbContext.Players
@@ -994,6 +1025,12 @@ public class DraftService(
             .Where(p => p.TournamentId == draft.TournamentId)
             .Where(p => !_dbContext.PlayerDraftRankings.Any(pdr => pdr.PlayerId == p.Id && pdr.DraftId == draft.Id))
             .ToListAsync(cancellationToken: cancellationToken);
+
+        // Append new players after any existing ranks so reconciliation doesn't collide with prior rankings.
+        var startRank = await _dbContext.PlayerDraftRankings
+            .Where(r => r.DraftId == draft.Id)
+            .Select(r => (int?)r.DraftRanking)
+            .MaxAsync(cancellationToken) ?? 0;
 
         var rankings = players
             .Select(player =>
@@ -1021,7 +1058,7 @@ public class DraftService(
             .OrderByDescending(r => r.PointsPerGame)
             .Select((player, index) =>
             {
-                player.DraftRanking = index + 1;
+                player.DraftRanking = startRank + index + 1;
                 return player;
             });
 

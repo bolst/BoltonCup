@@ -41,6 +41,11 @@
                     }
                 </MudSelect>
             }
+            @if (DraftState.CanManageDraft && DraftState.Draft?.Status is DraftStatus.Pending)
+            {
+                <MudButton StartIcon="@Icons.Material.Rounded.Sync" Variant="Variant.Outlined" Size="Size.Small"
+                           Color="Color.Default" OnClick="@SyncPlayersAsync">Sync players</MudButton>
+            }
             @if (DraftState.CanManageDraft && DraftState.Draft?.Status is not DraftStatus.Pending)
             {
                 <MudMenu Icon="@Icons.Material.Rounded.MoreVert" Size="Size.Small"
@@ -127,6 +132,21 @@
         catch (ApiException e)
         {
             Snackbar.Add($"Unable to reset draft: {e.Message}", Severity.Error);
+        }
+    }
+
+    private async Task SyncPlayersAsync()
+    {
+        if (DraftState.Draft is not { } draft)
+            return;
+        try
+        {
+            await BoltonCupApi.ReconcileDraftAsync(draft.Id);
+            Snackbar.Add("Player pool synced", Severity.Success);
+        }
+        catch (ApiException e)
+        {
+            Snackbar.Add($"Unable to sync players: {e.Message}", Severity.Error);
         }
     }
 

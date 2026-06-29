@@ -1,0 +1,183 @@
+@using BoltonCup.Sdk
+@inject IBoltonCupApi BoltonCupApi
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Share ranking</MudText>
+        <MudText Typo="Typo.body2" Class="mud-text-secondary">Shared GMs can view this ranking, but not edit it. Search GMs in this tournament by name or email.</MudText>
+
+        <MudDivider Class="my-2"/>
+
+        <div class="d-flex flex-row align-end gap-2">
+            <MudAutocomplete T="Sdk.RankingInviteUserDto"
+                             Label="Add a GM"
+                             @bind-Value="_selected"
+                             SearchFunc="@SearchUsers"
+                             ToStringFunc="@UserLabel"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             Class="flex-grow-1"
+                             ResetValueOnEmptyText
+                             Clearable
+                             Immediate
+                             MinCharacters="1"/>
+            <MudButton OnClick="@AddAsync" Color="Color.Primary" Variant="Variant.Filled"
+                       Disabled="@(_selected is null || _busy)">Add</MudButton>
+        </div>
+
+        <MudDivider Class="my-3"/>
+
+        @if (_loading)
+        {
+            <MudProgressLinear Indeterminate Color="Color.Primary"/>
+        }
+        else if (_shares.Count == 0)
+        {
+            <MudText Typo="Typo.body2" Class="mud-text-secondary">Not shared with anyone yet.</MudText>
+        }
+        else
+        {
+            <MudList T="Sdk.CustomRankingShareDto" Dense>
+                @foreach (var share in _shares)
+                {
+                    <MudListItem T="Sdk.CustomRankingShareDto">
+                        <div class="d-flex flex-row align-center justify-space-between">
+                            <div class="d-flex flex-row align-center gap-3">
+                                <MudAvatar Size="Size.Small">
+                                    @if (!string.IsNullOrEmpty(share.Avatar))
+                                    {
+                                        <MudImage Src="@share.Avatar"/>
+                                    }
+                                    else
+                                    {
+                                        @Initials(share.Name)
+                                    }
+                                </MudAvatar>
+                                <div>
+                                    <MudText Typo="Typo.body2"><b>@share.Name</b></MudText>
+                                    <MudText Typo="Typo.caption">@share.Email</MudText>
+                                </div>
+                            </div>
+                            <MudIconButton Icon="@Icons.Material.Rounded.Close" Size="Size.Small" Color="Color.Error"
+                                           Disabled="@_busy" OnClick="@(() => RemoveAsync(share.AccountId))"/>
+                        </div>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Dialog.Cancel">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter]
+    [EditorRequired]
+    public required int RankingId { get; set; }
+
+    private Sdk.RankingInviteUserDto? _selected;
+    private List<Sdk.CustomRankingShareDto> _shares = [];
+    private bool _loading = true;
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            MaxWidth = MaxWidth.ExtraSmall,
+            FullWidth = true,
+        });
+        await LoadSharesAsync();
+    }
+
+    private async Task LoadSharesAsync()
+    {
+        try
+        {
+            _shares = (await BoltonCupApi.GetCustomRankingSharesAsync(RankingId)).ToList();
+        }
+        catch (Sdk.ApiException)
+        {
+            _shares = [];
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task<IEnumerable<Sdk.RankingInviteUserDto>> SearchUsers(string? value, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await BoltonCupApi.SearchInvitableAccountsAsync(RankingId, value, cancellationToken);
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            return [];
+        }
+    }
+
+    private static string UserLabel(Sdk.RankingInviteUserDto? user)
+        => user is null
+            ? string.Empty
+            : string.IsNullOrWhiteSpace(user.Name) || user.Name == user.Email
+                ? user.Email
+                : $"{user.Name} ({user.Email})";
+
+    private async Task AddAsync()
+    {
+        if (_selected is null)
+            return;
+
+        _busy = true;
+        try
+        {
+            await BoltonCupApi.ShareCustomRankingAsync(RankingId, new Sdk.ShareCustomRankingRequest { AccountId = _selected.AccountId });
+            _selected = null;
+            await LoadSharesAsync();
+        }
+        catch (Sdk.ApiException e)
+        {
+            Snackbar.Add($"Unable to share: {e.Message}", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task RemoveAsync(int accountId)
+    {
+        _busy = true;
+        try
+        {
+            await BoltonCupApi.RemoveCustomRankingShareAsync(RankingId, accountId);
+            await LoadSharesAsync();
+        }
+        catch (Sdk.ApiException e)
+        {
+            Snackbar.Add($"Unable to remove: {e.Message}", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private static string Initials(string name)
+    {
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length switch
+        {
+            0 => "?",
+            1 => parts[0][..1].ToUpperInvariant(),
+            _ => (parts[0][..1] + parts[^1][..1]).ToUpperInvariant(),
+        };
+    }
+}

@@ -1,0 +1,59 @@
+@namespace BoltonCup.Draft.Components.Shared
+
+<MudDialog>
+    <DialogContent>
+        <div class="mud-width-full my-2">
+            <MudText Typo="Typo.h6">Make a copy</MudText>
+        </div>
+
+        <MudStack Spacing="6">
+            <MudTextField @bind-Value="@_title"
+                          Label="Title"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Immediate
+                          Required/>
+
+            <div class="d-flex flex-row align-center justify-end gap-1">
+                <MudButton OnClick="@Dialog.Cancel">Cancel</MudButton>
+                <MudButton OnClick="@Submit" Variant="Variant.Filled" Color="Color.Primary"
+                           Disabled="@string.IsNullOrWhiteSpace(_title)">Create copy</MudButton>
+            </div>
+        </MudStack>
+    </DialogContent>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter]
+    [EditorRequired]
+    public required string SourceTitle { get; set; }
+
+    private string _title = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Dialog.SetOptionsAsync(Dialog.Options with
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick = true,
+            NoHeader = true,
+            CloseButton = false,
+            MaxWidth = MaxWidth.ExtraSmall,
+            FullWidth = true,
+        });
+
+        _title = $"Copy of {SourceTitle}";
+    }
+
+    private void Submit()
+    {
+        if (string.IsNullOrWhiteSpace(_title))
+            return;
+
+        Dialog.Close(DialogResult.Ok(_title.Trim()));
+    }
+}

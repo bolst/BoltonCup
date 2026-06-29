@@ -48,9 +48,11 @@ public interface IMapper
 
     // CustomRanking
     IReadOnlyList<CustomRankingDto> ToDtoList(IReadOnlyList<CustomRanking> rankings);
-    CustomRankingSingleDto? ToDto(CustomRanking? ranking);
+    CustomRankingSingleDto? ToDto(CustomRanking? ranking, bool canEdit, IReadOnlySet<int>? stalePlayerIds = null);
     CreateCustomRankingCommand ToCommand(CreateCustomRankingRequest request, ClaimsPrincipal user);
     UpdateCustomRankingCommand ToCommand(UpdateCustomRankingRequest request);
+    IReadOnlyList<CustomRankingShareDto> ToShareDtoList(IReadOnlyList<CustomRankingShareInfo> shares);
+    IReadOnlyList<RankingInviteUserDto> ToInviteDtoList(IReadOnlyList<RankingInviteCandidate> candidates);
 
     // Game
     GetGamesQuery ToQuery(GetGamesRequest request);

@@ -36,7 +36,35 @@ public class DraftsController(
         var result = await _draftService.GetByIdAsync(id);
         var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
         var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
+
+        // Auto-sync the pool on open for managers of a not-yet-started draft so late registrants become draftable.
+        if (result is { Status: DraftStatus.Pending } && canManage)
+        {
+            await _draftService.ReconcileDraftPoolAsync(id);
+            result = await _draftService.GetByIdAsync(id);
+        }
+
         return OkOrNoContent(_mapper.ToDto(result, authorized, canManage));
+    }
+
+    /// <summary>Reconciles the draft pool against the current tournament players — adds late registrants (admin or draft owner).</summary>
+    [Authorize]
+    [HttpPost("{id:int}/reconcile")]
+    public async Task<IActionResult> ReconcileDraft(int id, [FromServices] IHubContext<Hubs.DraftHub> hubContext)
+    {
+        var canManage = await _authService.AuthorizeAsync(User, id, CanManageDraft) is { Succeeded: true };
+        if (!canManage)
+        {
+            return Forbid();
+        }
+
+        var draftState = await _draftService.ReconcileDraftPoolAsync(id);
+
+        var authorized = await _authService.AuthorizeAsync(User, id, CanAccessDraft) is { Succeeded: true };
+        var payloadDto = _mapper.ToDto(draftState, authorized, canManage);
+        await hubContext.Clients.Group($"Draft_{id}").SendAsync(OnDraftUpdate, payloadDto);
+
+        return Ok();
     }
 
     /// <summary>Creates a new draft (admin or tournament GM for their tournament).</summary>

@@ -97,6 +97,8 @@ public static class ServiceCollectionExtensions
             .AddScoped<IAuthorizationHandler, DraftAccessHandler>()
             .AddScoped<IAuthorizationHandler, DraftManagerHandler>()
             .AddScoped<IAuthorizationHandler, TeamManagerHandler>()
+            .AddScoped<IAuthorizationHandler, RankingManagerHandler>()
+            .AddScoped<IAuthorizationHandler, RankingAccessHandler>()
             .AddAuthorization(options =>
             {
                 options.DefaultPolicy = new AuthorizationPolicyBuilder()
@@ -118,6 +120,12 @@ public static class ServiceCollectionExtensions
 
                 options.AddPolicy(BoltonCupPolicy.CanManageDraft, policy =>
                     policy.Requirements.Add(new ManageDraftRequirement()));
+
+                options.AddPolicy(BoltonCupPolicy.CanAccessRanking, policy =>
+                    policy.Requirements.Add(new AccessRankingRequirement()));
+
+                options.AddPolicy(BoltonCupPolicy.CanManageRanking, policy =>
+                    policy.Requirements.Add(new ManageRankingRequirement()));
             });
     }
     

@@ -10,4 +10,5 @@ public sealed class CustomRanking : EntityBase
     public string Title { get; set; } = null!;
 
     public ICollection<CustomRankingPlayer> Players { get; set; } = [];
+    public ICollection<CustomRankingShare> SharedWith { get; set; } = [];
 }

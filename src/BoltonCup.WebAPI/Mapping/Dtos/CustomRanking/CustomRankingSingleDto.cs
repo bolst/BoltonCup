@@ -9,6 +9,10 @@ public sealed record CustomRankingSingleDto
     public required string Title { get; set; }
     /// <summary>Gets or sets the tournament this ranking belongs to.</summary>
     public required TournamentBriefDto Tournament { get; set; }
+    /// <summary>Gets or sets the display name of the account that created the ranking.</summary>
+    public required string CreatedByName { get; set; }
     /// <summary>Gets or sets the ranked players ordered by rank.</summary>
     public required List<CustomRankingPlayerDto> Players { get; set; }
+    /// <summary>Gets or sets whether the current caller can edit the ranking (owner or admin). Shared viewers see false.</summary>
+    public bool CanEdit { get; set; }
 }

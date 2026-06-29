@@ -404,6 +404,9 @@ public class Mapper : IMapper
 
     // ---------- CustomRanking ----------
 
+    private static string AccountName(Account? account)
+        => account is null ? string.Empty : $"{account.FirstName} {account.LastName}".Trim();
+
     public IReadOnlyList<CustomRankingDto> ToDtoList(IReadOnlyList<CustomRanking> rankings)
     {
         return rankings
@@ -413,12 +416,13 @@ public class Mapper : IMapper
                 Title = ranking.Title,
                 Tournament = ToTournamentBriefDto(ranking.Tournament),
                 PlayerCount = ranking.Players.Count,
+                CreatedByName = AccountName(ranking.Account),
                 CreatedAt = ranking.CreatedAt,
             })
             .ToList();
     }
 
-    public CustomRankingSingleDto? ToDto(CustomRanking? ranking)
+    public CustomRankingSingleDto? ToDto(CustomRanking? ranking, bool canEdit, IReadOnlySet<int>? stalePlayerIds = null)
     {
         if (ranking is null)
             return null;
@@ -427,18 +431,46 @@ public class Mapper : IMapper
             Id = ranking.Id,
             Title = ranking.Title,
             Tournament = ToTournamentBriefDto(ranking.Tournament),
+            CreatedByName = AccountName(ranking.Account),
             Players = ranking.Players
                 .OrderBy(p => p.Rank)
                 .Select(p => new CustomRankingPlayerDto
                 {
                     Rank = p.Rank,
+                    IsStale = stalePlayerIds?.Contains(p.PlayerId) ?? false,
                     Player = ToPlayerBriefDto(p.Player),
                     GamesPlayed = p.GamesPlayed,
                     TotalPoints = p.TotalPoints,
                     PointsPerGame = p.PointsPerGame,
                 })
                 .ToList(),
+            CanEdit = canEdit,
         };
+    }
+
+    public IReadOnlyList<CustomRankingShareDto> ToShareDtoList(IReadOnlyList<CustomRankingShareInfo> shares)
+    {
+        return shares
+            .Select(s => new CustomRankingShareDto
+            {
+                AccountId = s.AccountId,
+                Name = s.Name,
+                Email = s.Email,
+                Avatar = s.Avatar,
+            })
+            .ToList();
+    }
+
+    public IReadOnlyList<RankingInviteUserDto> ToInviteDtoList(IReadOnlyList<RankingInviteCandidate> candidates)
+    {
+        return candidates
+            .Select(c => new RankingInviteUserDto
+            {
+                AccountId = c.AccountId,
+                Name = c.Name,
+                Email = c.Email,
+            })
+            .ToList();
     }
 
     public CreateCustomRankingCommand ToCommand(CreateCustomRankingRequest request, ClaimsPrincipal user)

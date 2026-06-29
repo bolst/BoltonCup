@@ -1,0 +1,124 @@
+@using BoltonCup.Draft.Services
+@using Position = BoltonCup.Core.Values.Position
+
+@* Dense, multi-column ranking view: 8 cards per column, filled column-major and wrapped
+   into block-rows of three. Each column is its own drop zone (MudBlazor kanban pattern)
+   so drag-and-drop works within and across columns. *@
+
+<MudDropContainer T="Sdk.CustomRankingPlayerDto" @ref="_dropContainer"
+                  Items="Players"
+                  ItemsSelector="@ItemsSelector"
+                  ItemDropped="@ItemDropped"
+                  Class="mud-width-full">
+    <ChildContent>
+        @{ var columns = ColumnCount(); }
+        @for (var b = 0; b * ColumnsPerBlock < columns; b++)
+        {
+            <div class="ranking-grid">
+                @for (var i = 0; i < ColumnsPerBlock; i++)
+                {
+                    var c = b * ColumnsPerBlock + i;
+                    if (c < columns)
+                    {
+                        <MudDropZone T="Sdk.CustomRankingPlayerDto" Identifier="@($"col-{c}")"
+                                     Class="ranking-grid__col" AllowReorder="@CanEdit"/>
+                    }
+                }
+            </div>
+            @if ((b + 1) * ColumnsPerBlock < columns)
+            {
+                <MudDivider Class="my-8" />
+            }
+        }
+    </ChildContent>
+    <ItemRenderer>
+        <MudPaper Class="@($"ranking-card pa-1 d-flex flex-row align-center justify-space-between {(CanEdit ? "cursor-grab" : string.Empty)}")"
+                  Elevation="0" Square Outlined>
+            <div class="d-flex flex-row align-center gap-1" style="min-width: 0;">
+                @if (CanEdit)
+                {
+                    <MudIcon Icon="@Icons.Material.Rounded.DragIndicator" Color="Color.Default" Size="Size.Small"/>
+                }
+                <MudText Typo="Typo.body2" Style="min-width: 1.6rem;"><b>@context.Rank</b></MudText>
+                <PositionChip Position="@context.Player.Position" Abbreviated Variant="Variant.Text" Size="Size.Small"/>
+                <MudText Typo="Typo.body2" Class="ranking-name"><b>@AbbreviatedName(context.Player)</b></MudText>
+            </div>
+            <div class="d-flex flex-row align-center gap-2 flex-none">
+                @StatLabel(context.PointsPerGame.ToString("F2"), "PPG")
+                @StatLabel(context.TotalPoints.ToString(), "P")
+                @StatLabel(context.GamesPlayed.ToString(), "GP")
+            </div>
+        </MudPaper>
+    </ItemRenderer>
+</MudDropContainer>
+
+@code {
+    private const int CardsPerColumn = 8;
+    private const int ColumnsPerBlock = 3;
+
+    [Parameter]
+    [EditorRequired]
+    public required List<Sdk.CustomRankingPlayerDto> Players { get; set; }
+
+    [Parameter]
+    public bool CanEdit { get; set; }
+
+    [Parameter]
+    public string? PositionFilter { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private MudDropContainer<Sdk.CustomRankingPlayerDto> _dropContainer = null!;
+    private string? _lastFilter;
+
+    protected override void OnParametersSet()
+    {
+        if (_lastFilter == PositionFilter)
+            return;
+
+        _lastFilter = PositionFilter;
+        _dropContainer?.Refresh();
+    }
+
+    /// <summary>Refreshes the drop container so external changes re-chunk the columns.</summary>
+    public void Refresh() => _dropContainer?.Refresh();
+
+    private int ColumnCount()
+    {
+        var count = RankingReorder.Visible(Players, PositionFilter).Count;
+        return (int)Math.Ceiling(count / (double)CardsPerColumn);
+    }
+
+    private bool ItemsSelector(Sdk.CustomRankingPlayerDto item, string zoneIdentifier)
+    {
+        var visible = RankingReorder.Visible(Players, PositionFilter);
+        var index = visible.ToList().IndexOf(item);
+        if (index < 0)
+            return false;
+
+        return zoneIdentifier == $"col-{index / CardsPerColumn}";
+    }
+
+    private async Task ItemDropped(MudItemDropInfo<Sdk.CustomRankingPlayerDto> info)
+    {
+        if (!CanEdit || info.Item is null)
+            return;
+
+        var column = int.Parse(info.DropzoneIdentifier["col-".Length..]);
+        var visibleTarget = column * CardsPerColumn + info.IndexInZone;
+
+        RankingReorder.ReorderToVisibleIndex(Players, info.Item, visibleTarget, PositionFilter);
+        await OnChanged.InvokeAsync();
+        _dropContainer.Refresh();
+    }
+
+    private static string AbbreviatedName(Sdk.PlayerBriefDto player)
+        => string.IsNullOrEmpty(player.FirstName) ? player.LastName : $"{player.FirstName[..1]}. {player.LastName}";
+
+    private RenderFragment StatLabel(string value, string label) =>
+        @<div class="flex-none">
+            <MudText Typo="Typo.caption" Align="Align.Center"><b>@value</b></MudText>
+            <MudText Typo="Typo.caption" Align="Align.Center" Style="font-size: 0.6rem; line-height: 1;">@label</MudText>
+        </div>;
+}

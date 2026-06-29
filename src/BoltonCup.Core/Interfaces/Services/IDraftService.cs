@@ -10,6 +10,7 @@ public interface IDraftService
     Task<CurrentDraftState> UpdateAsync(int draftId, UpdateDraftCommand command, CancellationToken cancellationToken = default);
     Task<CurrentDraftState> ApplyDefaultRankingAsync(int draftId, int? rankingId, int callerAccountId, bool isAdmin, CancellationToken cancellationToken = default);
     Task<CurrentDraftState> SetPlayerPoolAsync(int draftId, SetPlayerPoolCommand command, CancellationToken cancellationToken = default);
+    Task<CurrentDraftState> ReconcileDraftPoolAsync(int draftId, CancellationToken cancellationToken = default);
     Task StartAsync(int draftId, CancellationToken cancellationToken = default);
     Task PauseAsync(int draftId, CancellationToken cancellationToken = default);
     Task EndAsync(int draftId, CancellationToken cancellationToken = default);
