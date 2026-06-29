@@ -16,8 +16,23 @@ public class CustomRankingService(
         return await _dbContext.CustomRankings
             .AsNoTracking()
             .Include(r => r.Tournament)
+            .Include(r => r.Account)
             .Include(r => r.Players)
             .Where(r => r.AccountId == accountId)
+            .Where(r => !tournamentId.HasValue || r.TournamentId == tournamentId.Value)
+            .OrderByDescending(r => r.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<CustomRanking>> GetSharedWithAccountAsync(int accountId, int? tournamentId = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.CustomRankings
+            .AsNoTracking()
+            .Include(r => r.Tournament)
+            .Include(r => r.Account)
+            .Include(r => r.Players)
+            .Where(r => r.SharedWith.Any(s => s.SharedWithAccountId == accountId))
             .Where(r => !tournamentId.HasValue || r.TournamentId == tournamentId.Value)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync(cancellationToken);
@@ -28,6 +43,8 @@ public class CustomRankingService(
         return await _dbContext.CustomRankings
             .AsNoTracking()
             .Include(r => r.Tournament)
+            .Include(r => r.Account)
+            .Include(r => r.SharedWith)
             .Include(r => r.Players.OrderBy(p => p.Rank))
                 .ThenInclude(p => p.Player)
                 .ThenInclude(p => p.Account)
@@ -92,6 +109,97 @@ public class CustomRankingService(
         return _dbContext.CustomRankings
             .Where(r => r.Id == id)
             .ExecuteDeleteAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<CustomRankingShareInfo>> GetSharesAsync(int rankingId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.CustomRankingShares
+            .AsNoTracking()
+            .Where(s => s.CustomRankingId == rankingId)
+            .OrderBy(s => s.SharedWithAccount.FirstName)
+            .ThenBy(s => s.SharedWithAccount.LastName)
+            .Select(s => new CustomRankingShareInfo(
+                s.SharedWithAccountId,
+                s.SharedWithAccount.FirstName + " " + s.SharedWithAccount.LastName,
+                s.SharedWithAccount.Email,
+                s.SharedWithAccount.Avatar))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task AddShareAsync(int rankingId, int accountId, CancellationToken cancellationToken = default)
+    {
+        var ranking = await _dbContext.CustomRankings
+                          .FirstOrDefaultAsync(r => r.Id == rankingId, cancellationToken)
+                      ?? throw new EntityNotFoundException(nameof(CustomRanking), rankingId);
+
+        if (accountId == ranking.AccountId)
+            throw new InvalidOperationException("Cannot share a ranking with its owner.");
+
+        var isGm = await _dbContext.Teams
+            .AnyAsync(t => t.TournamentId == ranking.TournamentId && t.GmAccountId == accountId, cancellationToken);
+        if (!isGm)
+            throw new InvalidOperationException("Rankings can only be shared with a GM of the tournament.");
+
+        var exists = await _dbContext.CustomRankingShares
+            .AnyAsync(s => s.CustomRankingId == rankingId && s.SharedWithAccountId == accountId, cancellationToken);
+        if (exists)
+            return;
+
+        _dbContext.CustomRankingShares.Add(new CustomRankingShare
+        {
+            CustomRankingId = rankingId,
+            SharedWithAccountId = accountId,
+        });
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public Task RemoveShareAsync(int rankingId, int accountId, CancellationToken cancellationToken = default)
+    {
+        return _dbContext.CustomRankingShares
+            .Where(s => s.CustomRankingId == rankingId && s.SharedWithAccountId == accountId)
+            .ExecuteDeleteAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<RankingInviteCandidate>> SearchInvitableGmsAsync(int rankingId, string? query,
+        int limit = 5, CancellationToken cancellationToken = default)
+    {
+        var ranking = await _dbContext.CustomRankings
+                          .AsNoTracking()
+                          .FirstOrDefaultAsync(r => r.Id == rankingId, cancellationToken)
+                      ?? throw new EntityNotFoundException(nameof(CustomRanking), rankingId);
+
+        query = query?.Trim();
+        var hasQuery = !string.IsNullOrEmpty(query);
+        var pattern = $"%{query}%";
+
+        var gmAccountIds = _dbContext.Teams
+            .Where(t => t.TournamentId == ranking.TournamentId && t.GmAccountId != null)
+            .Select(t => t.GmAccountId!.Value);
+
+        var alreadyShared = _dbContext.CustomRankingShares
+            .Where(s => s.CustomRankingId == rankingId)
+            .Select(s => s.SharedWithAccountId);
+
+        var accounts = _dbContext.Accounts
+            .AsNoTracking()
+            .Where(a => gmAccountIds.Contains(a.Id))
+            .Where(a => a.Id != ranking.AccountId)
+            .Where(a => !alreadyShared.Contains(a.Id));
+
+        if (hasQuery)
+        {
+            accounts = accounts.Where(a =>
+                EF.Functions.ILike(a.FirstName + " " + a.LastName, pattern)
+                || EF.Functions.ILike(a.Email, pattern));
+        }
+
+        return await accounts
+            .OrderBy(a => a.FirstName)
+            .ThenBy(a => a.LastName)
+            .Take(limit)
+            .Select(a => new RankingInviteCandidate(a.Id, a.FirstName + " " + a.LastName, a.Email))
+            .ToListAsync(cancellationToken);
     }
 
     private async Task<List<CustomRankingPlayer>> BuildSeededPlayersAsync(int tournamentId, CancellationToken cancellationToken)

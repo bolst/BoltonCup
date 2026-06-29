@@ -40,6 +40,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<PlayerFavourite> PlayerFavourites { get; set; }
     public DbSet<CustomRanking> CustomRankings { get; set; }
     public DbSet<CustomRankingPlayer> CustomRankingPlayers { get; set; }
+    public DbSet<CustomRankingShare> CustomRankingShares { get; set; }
     public DbSet<SentEmail> SentEmails { get; set; }
     public DbSet<EmailLog> EmailLogs { get; set; }
     public DbSet<Trade> Trades { get; set; }
@@ -385,6 +386,29 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Rank).HasColumnName("rank");
             entity.Property(e => e.GamesPlayed).HasColumnName("games_played");
             entity.Property(e => e.TotalPoints).HasColumnName("total_points");
+        });
+
+        modelBuilder.Entity<CustomRankingShare>(entity =>
+        {
+            entity
+                .ToTable("custom_ranking_shares")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.CustomRanking)
+                .WithMany(e => e.SharedWith)
+                .HasForeignKey(e => e.CustomRankingId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity
+                .HasOne(e => e.SharedWithAccount)
+                .WithMany()
+                .HasForeignKey(e => e.SharedWithAccountId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity
+                .HasIndex(e => new { e.CustomRankingId, e.SharedWithAccountId })
+                .IsUnique();
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.CustomRankingId).HasColumnName("custom_ranking_id");
+            entity.Property(e => e.SharedWithAccountId).HasColumnName("shared_with_account_id");
         });
 
         modelBuilder.Entity<Goal>(entity =>

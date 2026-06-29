@@ -5,6 +5,7 @@
 @inject IBoltonCupApi BoltonCupApi
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 
 <PageTitle>@(_ranking?.Title ?? "Ranking")</PageTitle>
@@ -26,7 +27,7 @@
                 <MudImage Src="@_ranking.Tournament.Logo" Height="32"/>
                 <div>
                     <MudText Typo="Typo.h6">@_ranking.Title</MudText>
-                    <MudText Typo="Typo.caption">@_ranking.Tournament.Name</MudText>
+                    <MudText Typo="Typo.caption">@_ranking.Tournament.Name@(_ranking.CanEdit ? string.Empty : $" · Created by {_ranking.CreatedByName}")</MudText>
                 </div>
             </div>
 
@@ -39,9 +40,19 @@
                     <MudToggleItem T="string?" Value="@Position.Goalie" Text="G"/>
                 </MudToggleGroup>
 
-                <MudButton Variant="Variant.Filled" Color="Color.Primary"
-                           StartIcon="@Icons.Material.Rounded.Save" Disabled="@(!_dirty)"
-                           OnClick="@SaveAsync">Save</MudButton>
+                @if (_ranking.CanEdit)
+                {
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary"
+                               StartIcon="@Icons.Material.Rounded.Share"
+                               OnClick="@ShareAsync">Share</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                               StartIcon="@Icons.Material.Rounded.Save" Disabled="@(!_dirty)"
+                               OnClick="@SaveAsync">Save</MudButton>
+                }
+                else
+                {
+                    <MudChip T="string" Icon="@Icons.Material.Rounded.Visibility" Size="Size.Small" Color="Color.Default">View only</MudChip>
+                }
             </div>
         </div>
 
@@ -52,13 +63,16 @@
                           Class="mud-width-full">
             <ChildContent>
                 <MudDropZone T="Sdk.CustomRankingPlayerDto" Identifier="ranking" Class="mud-width-full"
-                             AllowReorder="true"/>
+                             AllowReorder="@_ranking.CanEdit"/>
             </ChildContent>
             <ItemRenderer>
-                <MudPaper Class="pa-3 my-1 d-flex flex-row align-center justify-space-between cursor-grab"
+                <MudPaper Class="@($"pa-3 my-1 d-flex flex-row align-center justify-space-between {(_ranking.CanEdit ? "cursor-grab" : string.Empty)}")"
                           Elevation="0" Square Outlined>
                     <div class="d-flex flex-row align-center gap-3">
-                        <MudIcon Icon="@Icons.Material.Rounded.DragIndicator" Color="Color.Default"/>
+                        @if (_ranking.CanEdit)
+                        {
+                            <MudIcon Icon="@Icons.Material.Rounded.DragIndicator" Color="Color.Default"/>
+                        }
                         <MudText Typo="Typo.h6" Style="min-width: 2.5rem;">@context.Rank</MudText>
                         <PositionChip Position="@context.Player.Position" Variant="Variant.Text" Size="Size.Small"/>
                         <MudText Typo="Typo.body1"><b>@context.Player.FullName</b></MudText>
@@ -69,12 +83,15 @@
                             @StatLabel(context.TotalPoints.ToString(), "P")
                             @StatLabel(context.GamesPlayed.ToString(), "GP")
                         </div>
-                        <MudButtonGroup OverrideStyles="false" Size="Size.Small">
-                            <MudIconButton OnClick="@(_ => MoveToTop(context))" Icon="@Icons.Material.Rounded.KeyboardDoubleArrowUp" Disabled="@IsFirstVisible(context)"/>
-                            <MudIconButton OnClick="@(_ => MoveUp(context))" Icon="@Icons.Material.Rounded.KeyboardArrowUp" Disabled="@IsFirstVisible(context)"/>
-                            <MudIconButton OnClick="@(_ => MoveDown(context))" Icon="@Icons.Material.Rounded.KeyboardArrowDown" Disabled="@IsLastVisible(context)"/>
-                            <MudIconButton OnClick="@(_ => MoveToBottom(context))" Icon="@Icons.Material.Rounded.KeyboardDoubleArrowDown" Disabled="@IsLastVisible(context)"/>
-                        </MudButtonGroup>
+                        @if (_ranking.CanEdit)
+                        {
+                            <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                                <MudIconButton OnClick="@(_ => MoveToTop(context))" Icon="@Icons.Material.Rounded.KeyboardDoubleArrowUp" Disabled="@IsFirstVisible(context)"/>
+                                <MudIconButton OnClick="@(_ => MoveUp(context))" Icon="@Icons.Material.Rounded.KeyboardArrowUp" Disabled="@IsFirstVisible(context)"/>
+                                <MudIconButton OnClick="@(_ => MoveDown(context))" Icon="@Icons.Material.Rounded.KeyboardArrowDown" Disabled="@IsLastVisible(context)"/>
+                                <MudIconButton OnClick="@(_ => MoveToBottom(context))" Icon="@Icons.Material.Rounded.KeyboardDoubleArrowDown" Disabled="@IsLastVisible(context)"/>
+                            </MudButtonGroup>
+                        }
                     </div>
                 </MudPaper>
             </ItemRenderer>
@@ -131,6 +148,9 @@
 
     private void ItemDropped(MudItemDropInfo<Sdk.CustomRankingPlayerDto> info)
     {
+        if (_ranking is not { CanEdit: true })
+            return;
+
         var item = info.Item;
         if (item is null)
             return;
@@ -228,6 +248,12 @@
         });
         _dirty = false;
         Snackbar.Add("Ranking saved", Severity.Success);
+    }
+
+    private async Task ShareAsync()
+    {
+        var parameters = new DialogParameters<ShareRankingDialog> { { x => x.RankingId, Id } };
+        await DialogService.ShowAsync<ShareRankingDialog>("Share ranking", parameters);
     }
 
     private RenderFragment StatLabel(string value, string label) =>
