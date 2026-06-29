@@ -11,9 +11,7 @@
         <NavMenu/>
     </MudHidden>
     <MudHidden Breakpoint="Breakpoint.Xs" Invert>
-        <div class="pa-4">
-            <BoltonCupLogo Height="48"/>
-        </div>
+        <MobileNavBar/>
     </MudHidden>
     <MudMainContent Style="min-height: 100vh">
         <BoltonCupErrorBoundary>
@@ -32,6 +30,8 @@
         var theme = Theme.MudTheme;
         theme.PaletteLight.DrawerBackground = theme.PaletteLight.Tertiary;
         theme.PaletteLight.DrawerText = theme.PaletteLight.Primary;
+        theme.PaletteLight.AppbarBackground = theme.PaletteLight.Tertiary;
+        theme.PaletteLight.AppbarText = theme.PaletteLight.Primary;
         return theme;
     }
     
