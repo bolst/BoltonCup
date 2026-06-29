@@ -133,7 +133,7 @@
                 {
                     <div class="d-flex flex-row align-center justify-space-between py-1" style="opacity: 0.6;">
                         <div class="d-flex flex-row align-center gap-3">
-                            <PositionChip Position="@(p.Player.Position ?? string.Empty)" Variant="Variant.Text" Size="Size.Small"/>
+                            <PositionChip Position="@(p.Player.Position ?? string.Empty)" CanPlayBoth="@p.Player.CanPlayEitherPosition" Variant="Variant.Text" Size="Size.Small"/>
                             <MudText Typo="Typo.body1">@p.Player.FullName</MudText>
                             <MudChip T="string" Size="Size.Small" Color="Color.Default">Removed</MudChip>
                         </div>

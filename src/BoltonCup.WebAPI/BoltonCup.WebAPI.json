@@ -14359,6 +14359,10 @@
             "description": "Gets the team this player belongs to, if assigned.",
             "nullable": true
           },
+          "canPlayEitherPosition": {
+            "type": "boolean",
+            "description": "Gets whether the player can play both forward and defense."
+          },
           "fullName": {
             "type": "string",
             "description": "Gets the player's full name.",
@@ -16066,6 +16070,10 @@
             "description": "Gets or sets the captaincy designation character (C or A).",
             "nullable": true
           },
+          "canPlayEitherPosition": {
+            "type": "boolean",
+            "description": "Gets or sets whether the player can play both forward and defense."
+          },
           "isGoalie": {
             "type": "boolean",
             "description": "Gets whether the player is a goalie.",
@@ -16161,6 +16169,10 @@
             ],
             "description": "Gets the team this player belongs to, if assigned.",
             "nullable": true
+          },
+          "canPlayEitherPosition": {
+            "type": "boolean",
+            "description": "Gets whether the player can play both forward and defense."
           },
           "fullName": {
             "type": "string",
@@ -16393,6 +16405,10 @@
             ],
             "description": "Gets the team this player belongs to, if assigned.",
             "nullable": true
+          },
+          "canPlayEitherPosition": {
+            "type": "boolean",
+            "description": "Gets whether the player can play both forward and defense."
           },
           "fullName": {
             "type": "string",

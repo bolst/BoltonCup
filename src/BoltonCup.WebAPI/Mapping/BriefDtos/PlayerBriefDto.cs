@@ -21,6 +21,8 @@ public record PlayerBriefDto
     public string? ProfilePicture { get; set; }
     /// <summary>Gets or sets the captaincy designation character (C or A).</summary>
     public char? CaptaincyTag { get; set; }
+    /// <summary>Gets or sets whether the player can play both forward and defense.</summary>
+    public bool CanPlayEitherPosition { get; set; }
     /// <summary>Gets whether the player is a goalie.</summary>
     public bool IsGoalie => Position == BoltonCup.Core.Values.Position.Goalie;
     /// <summary>Gets the player's full name.</summary>

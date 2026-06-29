@@ -216,7 +216,8 @@ public class DraftService(
 
         if (rankingId is null)
         {
-            ResetDraftRankingsToDefault(rankings);
+            var gmPlayerIds = await GetGmPlayerIdsAsync(draft.TournamentId, cancellationToken);
+            ResetDraftRankingsToDefault(rankings, gmPlayerIds);
             draft.DefaultCustomRankingId = null;
         }
         else
@@ -312,15 +313,34 @@ public class DraftService(
         return new CurrentDraftState(Draft: draft, NextPick: nextPick);
     }
 
-    private static void ResetDraftRankingsToDefault(List<PlayerDraftRanking> rankings)
+    private static void ResetDraftRankingsToDefault(List<PlayerDraftRanking> rankings, IReadOnlySet<int> gmPlayerIds)
     {
         var ordered = rankings
-            .OrderByDescending(r => r.PointsPerGame)
+            .OrderBy(r => gmPlayerIds.Contains(r.PlayerId))
+            .ThenByDescending(r => r.PointsPerGame)
             .ToList();
         for (var i = 0; i < ordered.Count; i++)
         {
             ordered[i].DraftRanking = i + 1;
         }
+    }
+
+    // GMs of teams in the tournament; reused to exclude them from the pool and sort them last in default rankings.
+    private async Task<HashSet<int>> GetGmAccountIdsAsync(int tournamentId, CancellationToken cancellationToken)
+    {
+        return (await _dbContext.Teams
+            .Where(t => t.TournamentId == tournamentId)
+            .SelectMany(t => t.GeneralManagers.Select(g => g.Id))
+            .ToListAsync(cancellationToken)).ToHashSet();
+    }
+
+    private async Task<HashSet<int>> GetGmPlayerIdsAsync(int tournamentId, CancellationToken cancellationToken)
+    {
+        var gmAccountIds = await GetGmAccountIdsAsync(tournamentId, cancellationToken);
+        return (await _dbContext.Players
+            .Where(p => p.TournamentId == tournamentId && gmAccountIds.Contains(p.AccountId))
+            .Select(p => p.Id)
+            .ToListAsync(cancellationToken)).ToHashSet();
     }
 
     public async Task StartAsync(int draftId, CancellationToken cancellationToken = default)
@@ -1041,6 +1061,9 @@ public class DraftService(
             .Select(r => (int?)r.DraftRanking)
             .MaxAsync(cancellationToken) ?? 0;
 
+        // GMs run teams rather than being drafted, so they're excluded from the pool and sorted last by default.
+        var gmAccountIds = await GetGmAccountIdsAsync(draft.TournamentId, cancellationToken);
+
         var rankings = players
             .Select(player =>
             {
@@ -1062,9 +1085,11 @@ public class DraftService(
                     IsChampion = false, // TODO
                     DraftRanking = 0,
                     OverrideRanking = false,
+                    IsExcluded = gmAccountIds.Contains(player.AccountId),
                 };
             })
-            .OrderByDescending(r => r.PointsPerGame)
+            .OrderBy(r => r.IsExcluded)
+            .ThenByDescending(r => r.PointsPerGame)
             .Select((player, index) =>
             {
                 player.DraftRanking = startRank + index + 1;

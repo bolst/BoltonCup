@@ -18,7 +18,7 @@
                     <div class="d-flex flex-column justify-space-between gap-2">
                         <MudText Typo="Typo.h4"><b>@_player.FullName</b></MudText>
                         <div class="d-flex flex-row align-center gap-2">
-                            <PositionChip Position="@_player.Position" />
+                            <PositionChip Position="@_player.Position" CanPlayBoth="@_player.CanPlayEitherPosition" />
                             @if (_draftPick is { } draftPick)
                             {
                                 <MudImage Src="@draftPick.Team.Logo" Width="36" />
