@@ -33,18 +33,24 @@ public static class SmartAutoPickSelector
             return null;
         }
 
-        var goalies = roster.Count(IsGoalie);
-        var dedicatedForwards = roster.Count(r => !r.CanPlayEither && IsForward(r.Position));
-        var dedicatedDefense = roster.Count(r => !r.CanPlayEither && IsDefense(r.Position));
-        var flex = roster.Count(r => r.CanPlayEither && !IsGoalie(r));
+        var hasGoalie = roster.Any(IsGoalie);
 
-        var hasGoalie = goalies >= 1;
+        // A team carries exactly one goalie, so once it has one no further goalie is ever eligible.
+        var candidates = hasGoalie
+            ? available.Where(c => !IsGoalie(c.Position)).ToList()
+            : available.ToList();
+        if (candidates.Count == 0)
+        {
+            // Only goalies remain but the team already has one; nothing valid to pick.
+            return null;
+        }
 
         // The team must end with exactly one goalie: if this is the last slot and none is rostered,
-        // the pick is forced to a goalie.
+        // force a goalie over any skater so the roster can't finish goalie-less. This is the case
+        // where the team holding the final available goalie naturally takes it with its last pick.
         if (!hasGoalie && remainingPicks <= 1)
         {
-            var forcedGoalie = BestRanked(available.Where(c => IsGoalie(c.Position)), random, noiseMag);
+            var forcedGoalie = BestRanked(candidates.Where(c => IsGoalie(c.Position)), random, noiseMag);
             if (forcedGoalie is not null)
             {
                 return forcedGoalie;
@@ -52,12 +58,9 @@ public static class SmartAutoPickSelector
             // No goalie available — fall through and pick the best skater rather than return nothing.
         }
 
-        // Never draft a second goalie, and reserve the final slot for a still-needed goalie.
-        var skaters = available.Where(c => !IsGoalie(c.Position)).ToList();
-        if (skaters.Count == 0)
-        {
-            return BestRanked(available, random, noiseMag);
-        }
+        var dedicatedForwards = roster.Count(r => !r.CanPlayEither && IsForward(r.Position));
+        var dedicatedDefense = roster.Count(r => !r.CanPlayEither && IsDefense(r.Position));
+        var flex = roster.Count(r => r.CanPlayEither && !IsGoalie(r));
 
         // Allocate fluid players to the side with the larger remaining deficit.
         var effForwards = dedicatedForwards;
@@ -78,13 +81,18 @@ public static class SmartAutoPickSelector
         var needDefense = Math.Max(0, TargetDefense - effDefense);
         var bonusForwards = needForwards * posWeight;
         var bonusDefense = needDefense * posWeight;
+        // Goalie is a position need (target one) like any other, so a goalie is drafted by value
+        // across the draft instead of always being deferred to the final pick. The deficit is at
+        // most one, so the goalie need is weak relative to deep skater needs and only wins once a
+        // team's forward/defense slots are largely filled.
+        var bonusGoalie = hasGoalie ? 0 : posWeight;
 
         AutoPickCandidate? best = null;
         var bestEffectiveRank = double.MaxValue;
-        foreach (var candidate in skaters)
+        foreach (var candidate in candidates)
         {
-            var bonus = candidate.CanPlayEither
-                ? Math.Max(bonusForwards, bonusDefense)
+            var bonus = IsGoalie(candidate.Position) ? bonusGoalie
+                : candidate.CanPlayEither ? Math.Max(bonusForwards, bonusDefense)
                 : IsDefense(candidate.Position) ? bonusDefense
                 : IsForward(candidate.Position) ? bonusForwards
                 : 0;

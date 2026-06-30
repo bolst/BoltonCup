@@ -91,8 +91,10 @@ public class SmartAutoPickSelectorTests
     }
 
     [Fact]
-    public void Select_WhenNoGoalieButSlotsRemain_NeverPicksGoalie()
+    public void Select_WhenDeepSkaterNeedRemains_DefersGoalie()
     {
+        // 5F/5D leaves a deep forward need (bonus 8) that outweighs the single-slot goalie need
+        // (bonus 2), so even a top-ranked goalie is passed over for now.
         var available = new[]
         {
             Goalie(1, 1),
@@ -103,6 +105,36 @@ public class SmartAutoPickSelectorTests
         var chosen = SmartAutoPickSelector.Select(available, Roster(forwards: 5, defense: 5), remainingPicks: 5);
 
         chosen!.Value.Position.Should().NotBe(Position.Goalie);
+    }
+
+    [Fact]
+    public void Select_WhenSkaterNeedsMostlyMet_PicksGoalieBeforeFinalSlot()
+    {
+        // 9F/5D: only one defense slot and the goalie slot remain (both bonus 2). A goalie ranked
+        // better than the best available defenseman is taken now, not deferred to the last pick.
+        var available = new[]
+        {
+            Goalie(1, 3),
+            Defense(2, 8),
+        };
+
+        var chosen = SmartAutoPickSelector.Select(available, Roster(forwards: 9, defense: 5), remainingPicks: 2);
+
+        chosen!.Value.PlayerId.Should().Be(1);
+    }
+
+    [Fact]
+    public void Select_WhenTeamHasGoalieAndOnlyGoaliesRemain_ReturnsNull()
+    {
+        var available = new[]
+        {
+            Goalie(1, 1),
+            Goalie(2, 2),
+        };
+
+        var chosen = SmartAutoPickSelector.Select(available, Roster(forwards: 9, defense: 6, goalies: 1), remainingPicks: 1);
+
+        chosen.Should().BeNull();
     }
 
     [Fact]
