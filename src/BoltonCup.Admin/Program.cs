@@ -1,5 +1,7 @@
 using BoltonCup.Admin.Components;
+using BoltonCup.Admin.Imaging;
 using BoltonCup.Common;
+using BoltonCup.Common.Imaging;
 using BoltonCup.Infrastructure;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Sdk;
@@ -25,6 +27,11 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
 builder.AddBoltonCupInfrastructure();
+
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<IRosterImageRenderer, RosterImageRenderer>();
+builder.Services.AddScoped<IImageTemplate, TeamRosterTemplate>();
+builder.Services.AddScoped<ITeamRosterImageGenerator, TeamRosterImageGenerator>();
 
 var configSection = builder.Configuration.GetSection(BoltonCupConfiguration.SectionName);
 var bcConfig = configSection.Get<BoltonCupConfiguration>() 

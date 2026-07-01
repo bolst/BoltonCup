@@ -1,0 +1,286 @@
+@page "/image-generation"
+@using BoltonCup.Admin.Imaging
+@using BoltonCup.Common.Imaging
+@implements IDisposable
+@inject IEnumerable<IImageTemplate> Templates
+@inject ITeamRosterImageGenerator RosterImageGenerator
+@inject IGeneratedImageService GeneratedImageService
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject IAssetUrlResolver AssetUrlResolver
+@inject ISnackbar Snackbar
+@inject IJSRuntime JS
+
+<MudText Typo="Typo.h5" Class="mb-4">Image Generation</MudText>
+
+<MudGrid>
+    <MudItem xs="12" md="5">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudSelect T="string" Label="Template" @bind-Value="_templateKey" Variant="Variant.Outlined" Class="mb-4">
+                @foreach (var template in Templates)
+                {
+                    <MudSelectItem Value="@template.Key">@template.DisplayName</MudSelectItem>
+                }
+            </MudSelect>
+
+            @if (_templateKey == TeamRosterTemplate.TemplateKey)
+            {
+                <MudSelect T="int?" Label="Team" Value="_teamId" ValueChanged="OnTeamChanged"
+                           Variant="Variant.Outlined" Class="mb-4">
+                    @foreach (var team in _teams)
+                    {
+                        <MudSelectItem T="int?" Value="@team.Id">@team.Label</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudExpansionPanels Class="mb-4" Elevation="0">
+                    <MudExpansionPanel Text="Colours" Disabled="@(SelectedTeam is null)">
+                        @foreach (var field in _colorFields)
+                        {
+                            <div class="d-flex align-center gap-2 mb-2">
+                                <MudSelect T="RosterColor" Label="@field.Label" Value="field.Get()"
+                                           ValueChanged="@(v => OnColorChanged(field, v))" Dense="true" Class="flex-grow-1">
+                                    @foreach (var c in ColorOptions)
+                                    {
+                                        <MudSelectItem T="RosterColor" Value="c">
+                                            <div class="d-flex align-center gap-2">
+                                                <span style="@SwatchStyle(c)"></span>
+                                                <span>@c</span>
+                                            </div>
+                                        </MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </div>
+                        }
+                    </MudExpansionPanel>
+                </MudExpansionPanels>
+            }
+
+            <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                       Disabled="@(_generating || !CanGenerate)"
+                       OnClick="Generate">
+                @if (_generating)
+                {
+                    <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true" />
+                    <span>Saving…</span>
+                }
+                else
+                {
+                    <span>Generate &amp; Save</span>
+                }
+            </MudButton>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" md="7">
+        <MudPaper Class="pa-4 d-flex flex-column align-center" Elevation="1" Style="min-height: 200px;">
+            @if (_rendering)
+            {
+                <MudProgressCircular Indeterminate="true" Class="ma-8" />
+            }
+            else if (_previewDataUrl is not null)
+            {
+                <MudImage Src="@_previewDataUrl" Alt="Roster preview" Fluid="true" Class="rounded" />
+            }
+            else
+            {
+                <MudText Class="ma-8" Color="Color.Tertiary">Select a team to preview.</MudText>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+<MudText Typo="Typo.h6" Class="mt-8 mb-4">Generated Images</MudText>
+
+<MudTable Items="_images" Hover="true" Dense="true" Loading="_loadingImages">
+    <HeaderContent>
+        <MudTh>Preview</MudTh>
+        <MudTh>Template</MudTh>
+        <MudTh>Label</MudTh>
+        <MudTh>Created</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Preview">
+            <MudImage Src="@AssetUrlResolver.GetFullUrl(context.StorageKey)" Height="80" Class="rounded" />
+        </MudTd>
+        <MudTd DataLabel="Template">@context.TemplateKey</MudTd>
+        <MudTd DataLabel="Label">@context.Label</MudTd>
+        <MudTd DataLabel="Created">@context.CreatedAt.ToLocalTime().ToString("g")</MudTd>
+        <MudTd>
+            <MudIconButton Icon="@Icons.Material.Rounded.Download" Size="Size.Small"
+                           OnClick="() => DownloadSaved(context)" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No images generated yet.</MudText>
+    </NoRecordsContent>
+</MudTable>
+
+@code {
+    private string _templateKey = TeamRosterTemplate.TemplateKey;
+    private int? _teamId;
+    private bool _generating;
+    private bool _rendering;
+    private string? _previewDataUrl;
+
+    private List<TeamOption> _teams = [];
+    private TeamOption? SelectedTeam => _teams.FirstOrDefault(t => t.Id == _teamId);
+
+    private IReadOnlyList<GeneratedImage> _images = [];
+    private bool _loadingImages = true;
+
+    private readonly RosterColorway _colorway = new();
+    private static readonly RosterColor[] ColorOptions = Enum.GetValues<RosterColor>();
+    private List<ColorField> _colorFields = [];
+
+    private CancellationTokenSource? _renderCts;
+
+    private bool CanGenerate => _templateKey == TeamRosterTemplate.TemplateKey && _teamId is not null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _colorFields =
+        [
+            new("Background", () => _colorway.Background, v => _colorway.Background = v),
+            new("Title outline", () => _colorway.TitleOutline, v => _colorway.TitleOutline = v),
+            new("Title bar fill", () => _colorway.BarFill, v => _colorway.BarFill = v),
+            new("Title bar outline", () => _colorway.BarOutline, v => _colorway.BarOutline = v),
+            new("Title bar text", () => _colorway.BarText, v => _colorway.BarText = v),
+            new("Jersey number", () => _colorway.JerseyNumber, v => _colorway.JerseyNumber = v),
+            new("Jersey number outline", () => _colorway.JerseyNumberOutline, v => _colorway.JerseyNumberOutline = v),
+            new("Player detail text", () => _colorway.PlayerDetailText, v => _colorway.PlayerDetailText = v),
+            new("Captaincy fill", () => _colorway.CaptaincyFill, v => _colorway.CaptaincyFill = v),
+            new("Captaincy outline", () => _colorway.CaptaincyOutline, v => _colorway.CaptaincyOutline = v),
+        ];
+
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        _teams = await dbContext.Teams
+            .AsNoTracking()
+            .Include(t => t.Tournament)
+            .OrderByDescending(t => t.Tournament.StartDate)
+            .ThenBy(t => t.Name)
+            .Select(t => new TeamOption(t.Id, t.Tournament.Name + " — " + t.Name,
+                t.PrimaryColorHex, t.SecondaryColorHex, t.TertiaryColorHex))
+            .ToListAsync();
+
+        await RefreshImagesAsync();
+    }
+
+    private async Task RefreshImagesAsync()
+    {
+        _loadingImages = true;
+        _images = await GeneratedImageService.GetRecentAsync();
+        _loadingImages = false;
+    }
+
+    private async Task OnTeamChanged(int? teamId)
+    {
+        _teamId = teamId;
+        await UpdatePreviewAsync();
+    }
+
+    private async Task OnColorChanged(ColorField field, RosterColor value)
+    {
+        field.Set(value);
+        await UpdatePreviewAsync();
+    }
+
+    private async Task UpdatePreviewAsync()
+    {
+        if (_teamId is null)
+        {
+            _previewDataUrl = null;
+            return;
+        }
+
+        _renderCts?.Cancel();
+        _renderCts = new CancellationTokenSource();
+        var token = _renderCts.Token;
+
+        _rendering = true;
+        StateHasChanged();
+        try
+        {
+            var png = await RosterImageGenerator.RenderAsync(_teamId.Value, _colorway, token);
+            if (token.IsCancellationRequested)
+                return;
+            _previewDataUrl = $"data:image/png;base64,{Convert.ToBase64String(png)}";
+        }
+        catch (OperationCanceledException)
+        {
+            // Superseded by a newer render.
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Preview failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            if (!token.IsCancellationRequested)
+                _rendering = false;
+        }
+    }
+
+    private async Task Generate()
+    {
+        if (!CanGenerate)
+            return;
+        _generating = true;
+        try
+        {
+            var result = await RosterImageGenerator.GenerateAsync(_teamId!.Value, _colorway);
+            _previewDataUrl = $"data:{result.ContentType};base64,{Convert.ToBase64String(result.Png)}";
+            var url = AssetUrlResolver.GetFullUrl(result.StorageKey) ?? _previewDataUrl;
+            await JS.InvokeVoidAsync("boltonCupDownload.downloadUrl", url, Slug(SelectedTeam?.Label ?? "roster") + ".png");
+            Snackbar.Add("Image saved.", Severity.Success);
+            await RefreshImagesAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Generation failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _generating = false;
+        }
+    }
+
+    private async Task DownloadSaved(GeneratedImage image)
+    {
+        var url = AssetUrlResolver.GetFullUrl(image.StorageKey);
+        if (url is null)
+            return;
+        await JS.InvokeVoidAsync("boltonCupDownload.downloadUrl", url, Slug(image.Label) + ".png");
+    }
+
+    private string SwatchStyle(RosterColor color)
+    {
+        var css = ResolveCss(color);
+        return $"width:18px;height:18px;border-radius:3px;flex:0 0 auto;" +
+               $"border:1px solid var(--mud-palette-lines-default);background:{css};";
+    }
+
+    private string ResolveCss(RosterColor color) => color switch
+    {
+        RosterColor.Primary => SelectedTeam?.PrimaryHex ?? "#888888",
+        RosterColor.Secondary => SelectedTeam?.SecondaryHex ?? "#888888",
+        RosterColor.Tertiary => SelectedTeam?.TertiaryHex ?? "#888888",
+        RosterColor.White => "#FFFFFF",
+        RosterColor.Black => "#000000",
+        _ => "#888888",
+    };
+
+    private static string Slug(string value)
+    {
+        var chars = value.ToLowerInvariant()
+            .Select(c => char.IsLetterOrDigit(c) ? c : '-')
+            .ToArray();
+        return new string(chars).Trim('-');
+    }
+
+    public void Dispose() => _renderCts?.Cancel();
+
+    private sealed record TeamOption(int Id, string Label, string PrimaryHex, string SecondaryHex, string? TertiaryHex);
+
+    private sealed record ColorField(string Label, Func<RosterColor> Get, Action<RosterColor> Set);
+}

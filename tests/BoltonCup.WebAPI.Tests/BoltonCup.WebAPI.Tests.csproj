@@ -21,6 +21,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\BoltonCup.WebAPI\BoltonCup.WebAPI.csproj" />
+        <ProjectReference Include="..\..\src\BoltonCup.Common\BoltonCup.Common.csproj" />
     </ItemGroup>
 
 </Project>

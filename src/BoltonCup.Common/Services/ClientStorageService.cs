@@ -17,4 +17,10 @@ public class ClientStorageService(IBoltonCupApi _boltonCupApi)
     {
         throw new NotImplementedException("ClientStorageService does not support copying assets. This method should not be called on the client.");
     }
+
+    public Task PutAssetAsync(Stream content, string key, string contentType,
+        CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException("ClientStorageService does not support uploading assets. This method should not be called on the client.");
+    }
 }

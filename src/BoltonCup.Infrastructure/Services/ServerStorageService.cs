@@ -34,7 +34,20 @@ public class ServerStorageService(IAmazonS3 _s3Client, IAssetKeyGenerator _keyGe
             SourceKey = sourceKey,
             SourceBucket = _bucketName,
             DestinationKey = destinationKey,
-            DestinationBucket = _bucketName, 
+            DestinationBucket = _bucketName,
+        }, cancellationToken);
+    }
+
+    public Task PutAssetAsync(Stream content, string key, string contentType,
+        CancellationToken cancellationToken = default)
+    {
+        return _s3Client.PutObjectAsync(new PutObjectRequest
+        {
+            BucketName = _bucketName,
+            Key = key,
+            InputStream = content,
+            ContentType = contentType,
+            DisablePayloadSigning = true,
         }, cancellationToken);
     }
 }
