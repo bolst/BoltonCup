@@ -71,9 +71,14 @@
     private ICollection<Sdk.DraftDto>? _draftsSource;
     private ICollection<Sdk.DraftDto> _drafts = [];
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        return LoadDraftsAsync();
+        await LoadDraftsAsync();
+        if (_drafts.All(x => x.Status == DraftStatus.Completed))
+        {
+            await SetShowInProgress(false);
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task LoadDraftsAsync()
