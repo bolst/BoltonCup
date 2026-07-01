@@ -25,9 +25,11 @@
                     var homeStatPctg = 1 - awayStatPctg;
                     <MudItem xs="4">
                         <div class="d-flex flex-row align-center gap-3">
-                            <MudAvatar>
-                                <MudImage Src="@context.AwayLeader.ProfilePicture" Alt="@context.AwayLeader.FullName"/>
-                            </MudAvatar>
+                            <MudHidden Breakpoint="Breakpoint.Xs">
+                                <MudAvatar>
+                                    <MudImage Src="@context.AwayLeader.ProfilePicture" Alt="@context.AwayLeader.FullName"/>
+                                </MudAvatar>
+                            </MudHidden>
                             <MudLink Href="@($"/players/{context.AwayLeader.PlayerId}")" Underline="Underline.None">
                                 <div class="d-flex flex-column align-start">
                                     <MudText Typo="Typo.caption">@context.AwayLeader.FirstName</MudText>
@@ -46,9 +48,11 @@
                     </MudItem>
                     <MudItem xs="4">
                         <div class="d-flex flex-row-reverse align-center gap-3">
-                            <MudAvatar>
-                                <MudImage Src="@context.HomeLeader.ProfilePicture" Alt="@context.HomeLeader.FullName"/>
-                            </MudAvatar>
+                            <MudHidden Breakpoint="Breakpoint.Xs">
+                                <MudAvatar>
+                                    <MudImage Src="@context.HomeLeader.ProfilePicture" Alt="@context.HomeLeader.FullName"/>
+                                </MudAvatar>
+                            </MudHidden>
                             <MudLink Href="@($"/players/{context.HomeLeader.PlayerId}")" Underline="Underline.None">
                                 <div class="d-flex flex-column align-end">
                                     <MudText Typo="Typo.caption">@context.HomeLeader.FirstName</MudText>
