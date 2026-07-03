@@ -3,17 +3,20 @@ using System;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BoltonCup.Infrastructure.Migrations
+namespace BoltonCup.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260629234724_AddGeneratedImages")]
+    partial class AddGeneratedImages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,10 +83,6 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("highest_level");
 
-                    b.Property<string>("Hometown")
-                        .HasColumnType("text")
-                        .HasColumnName("hometown");
-
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_modified");
@@ -104,10 +103,6 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.Property<string>("PreferredBeer")
                         .HasColumnType("text")
                         .HasColumnName("preferred_beer");
-
-                    b.Property<string>("PreviousTeamLogo")
-                        .HasColumnType("text")
-                        .HasColumnName("previous_team_logo_key");
 
                     b.Property<int?>("Weight")
                         .HasColumnType("integer")

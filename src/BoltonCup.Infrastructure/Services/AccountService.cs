@@ -80,4 +80,17 @@ public class AccountService : IAccountService
             cancellationToken
         );
     }
+
+    public Task UpdatePreviousTeamLogoAsync(int accountId, string tempKey, CancellationToken cancellationToken = default)
+    {
+        return _storageService.UpdateAssetAsync<Account>(
+            _dbContext,
+            _assetKeyGenerator,
+            a => a.Id == accountId,
+            a => a.PreviousTeamLogo,
+            tempKey,
+            accountId.ToString(),
+            cancellationToken
+        );
+    }
 }

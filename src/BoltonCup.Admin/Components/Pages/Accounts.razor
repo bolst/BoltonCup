@@ -23,6 +23,8 @@
             </EditTemplate>
         </PropertyColumn>
         <PropertyColumn Title="Beer" Property="x => x.PreferredBeer" />
+        <PropertyColumn Title="Hometown" Property="x => x.Hometown" Required="false" Editable="true" />
+        <ImageColumn T="Account" Title="Prev. Team Logo" Property="x => x.PreviousTeamLogo" OnImageUploaded="UpdatePreviousTeamLogo" />
     </Columns>
 </EntityDataGrid>
 
@@ -50,8 +52,15 @@
     
     private async Task UpdateBanner(ImageUploadResult<Account> result)
     {
-        if (string.IsNullOrEmpty(result.NewKey)) 
+        if (string.IsNullOrEmpty(result.NewKey))
             return;
         await AccountService.UpdateBannerAsync(result.Item.Id, result.NewKey);
+    }
+
+    private async Task UpdatePreviousTeamLogo(ImageUploadResult<Account> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey))
+            return;
+        await AccountService.UpdatePreviousTeamLogoAsync(result.Item.Id, result.NewKey);
     }
 }

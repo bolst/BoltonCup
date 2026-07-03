@@ -48,6 +48,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<TradePlayer> TradePlayers { get; set; }
     public DbSet<TeamGeneralManager> TeamGeneralManagers { get; set; }
     public DbSet<Referee> Referees { get; set; }
+    public DbSet<GeneratedImage> GeneratedImages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -71,6 +72,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.HeightFeet).HasColumnName("height_feet");
             entity.Property(e => e.HeightInches).HasColumnName("height_inches");
             entity.Property(e => e.Weight).HasColumnName("weight");
+            entity.Property(e => e.Hometown).HasColumnName("hometown");
+            entity.Property(e => e.PreviousTeamLogo).HasColumnName("previous_team_logo_key");
         });
 
         modelBuilder.Entity<Core.BracketChallenge.Event>(entity =>
@@ -1117,6 +1120,18 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.FirstName).HasColumnName("first_name");
             entity.Property(e => e.LastName).HasColumnName("last_name");
             entity.Ignore(e => e.FullName);
+        });
+
+        modelBuilder.Entity<GeneratedImage>(entity =>
+        {
+            entity
+                .ToTable("generated_images")
+                .HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.StorageKey).HasColumnName("storage_key");
+            entity.Property(e => e.TemplateKey).HasColumnName("template_key");
+            entity.Property(e => e.Label).HasColumnName("label");
+            entity.Property(e => e.ContentType).HasColumnName("content_type");
         });
 
         // entities deriving from EntityBase should have created_at = now() by default
