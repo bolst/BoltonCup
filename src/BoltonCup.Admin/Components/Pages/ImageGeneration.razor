@@ -32,7 +32,7 @@
                     }
                 </MudSelect>
 
-                <MudExpansionPanels Class="mb-4" Elevation="0">
+                <MudExpansionPanels Class="mb-4" Elevation="0" MultiExpansion="true">
                     <MudExpansionPanel Text="Colours" Disabled="@(SelectedTeam is null)">
                         @foreach (var field in _colorFields)
                         {
@@ -51,6 +51,13 @@
                                 </MudSelect>
                             </div>
                         }
+                    </MudExpansionPanel>
+
+                    <MudExpansionPanel Text="Player order" Disabled="@(SelectedTeam is null)">
+                        <MudText Typo="Typo.caption" Class="mb-2">Drag players to reorder how they fill each grid.</MudText>
+                        @RosterList("Forwards", _forwards, 0)
+                        @RosterList("Defense", _defense, 1)
+                        @RosterList("Goalies", _goalies, 2)
                     </MudExpansionPanel>
                 </MudExpansionPanels>
             }
@@ -126,6 +133,12 @@
     private List<TeamOption> _teams = [];
     private TeamOption? SelectedTeam => _teams.FirstOrDefault(t => t.Id == _teamId);
 
+    // Ephemeral per-position order, mutated in place by drag-and-drop. Reset on team change.
+    private List<RosterPlayerOption> _forwards = [];
+    private List<RosterPlayerOption> _defense = [];
+    private List<RosterPlayerOption> _goalies = [];
+    private readonly MudDropContainer<RosterPlayerOption>?[] _dropRefs = new MudDropContainer<RosterPlayerOption>?[3];
+
     private IReadOnlyList<GeneratedImage> _images = [];
     private bool _loadingImages = true;
 
@@ -176,8 +189,64 @@
     private async Task OnTeamChanged(int? teamId)
     {
         _teamId = teamId;
+        if (teamId is null)
+        {
+            _forwards = [];
+            _defense = [];
+            _goalies = [];
+        }
+        else
+        {
+            var roster = await RosterImageGenerator.GetRosterAsync(teamId.Value);
+            _forwards = [.. roster.Forwards];
+            _defense = [.. roster.Defense];
+            _goalies = [.. roster.Goalies];
+            foreach (var container in _dropRefs)
+                container?.Refresh();
+        }
         await UpdatePreviewAsync();
     }
+
+    private RosterOrdering CurrentOrdering() => new(
+        _forwards.Select(p => p.PlayerId).ToList(),
+        _defense.Select(p => p.PlayerId).ToList(),
+        _goalies.Select(p => p.PlayerId).ToList());
+
+    private async Task OnReordered(List<RosterPlayerOption> list, int refIndex,
+        MudItemDropInfo<RosterPlayerOption> info)
+    {
+        list.Remove(info.Item);
+        list.Insert(Math.Clamp(info.IndexInZone, 0, list.Count), info.Item);
+        _dropRefs[refIndex]?.Refresh();
+        await UpdatePreviewAsync();
+    }
+
+    private RenderFragment RosterList(string title, List<RosterPlayerOption> list, int refIndex) => __builder =>
+    {
+        <MudText Typo="Typo.subtitle2" Class="mt-3 mb-1">@title</MudText>
+        <MudDropContainer T="RosterPlayerOption" @ref="_dropRefs[refIndex]" Items="list"
+                          ItemsSelector="@((item, zone) => true)"
+                          ItemDropped="@(info => OnReordered(list, refIndex, info))">
+            <ChildContent>
+                <MudDropZone T="RosterPlayerOption" Identifier="@title" AllowReorder="true" Class="d-flex flex-column gap-1">
+                    @if (list.Count == 0)
+                    {
+                        <MudText Typo="Typo.caption" Color="Color.Tertiary">No players.</MudText>
+                    }
+                </MudDropZone>
+            </ChildContent>
+            <ItemRenderer>
+                <MudPaper Class="pa-2 d-flex align-center gap-2" Elevation="1" Style="cursor: grab;">
+                    <MudIcon Icon="@Icons.Material.Rounded.DragIndicator" Size="Size.Small" Color="Color.Tertiary" />
+                    <span class="flex-grow-1">@context.Name</span>
+                    @if (context.JerseyNumber is { } number)
+                    {
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Text">#@number</MudChip>
+                    }
+                </MudPaper>
+            </ItemRenderer>
+        </MudDropContainer>
+    };
 
     private async Task OnColorChanged(ColorField field, RosterColor value)
     {
@@ -201,7 +270,7 @@
         StateHasChanged();
         try
         {
-            var png = await RosterImageGenerator.RenderAsync(_teamId.Value, _colorway, token);
+            var png = await RosterImageGenerator.RenderAsync(_teamId.Value, _colorway, CurrentOrdering(), token);
             if (token.IsCancellationRequested)
                 return;
             _previewDataUrl = $"data:image/png;base64,{Convert.ToBase64String(png)}";
@@ -228,7 +297,7 @@
         _generating = true;
         try
         {
-            var result = await RosterImageGenerator.GenerateAsync(_teamId!.Value, _colorway);
+            var result = await RosterImageGenerator.GenerateAsync(_teamId!.Value, _colorway, CurrentOrdering());
             _previewDataUrl = $"data:{result.ContentType};base64,{Convert.ToBase64String(result.Png)}";
             var url = AssetUrlResolver.GetFullUrl(result.StorageKey) ?? _previewDataUrl;
             await JS.InvokeVoidAsync("boltonCupDownload.downloadUrl", url, Slug(SelectedTeam?.Label ?? "roster") + ".png");

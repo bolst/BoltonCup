@@ -26,17 +26,32 @@ public sealed class TeamRosterImageGenerator(
     private const float PreviewScale = 1f;
     private const float SaveScale = 3f;
 
-    public async Task<byte[]> RenderAsync(int teamId, RosterColorway colorway,
+    public async Task<TeamRosterOptions> GetRosterAsync(int teamId, CancellationToken cancellationToken = default)
+    {
+        var team = await LoadTeamAsync(teamId, cancellationToken);
+
+        static IReadOnlyList<RosterPlayerOption> Options(IReadOnlyList<Player> players) => players
+            .Select(p => new RosterPlayerOption(p.Id,
+                $"{p.Account.FirstName} {p.Account.LastName}".Trim(), p.JerseyNumber))
+            .ToList();
+
+        return new TeamRosterOptions(
+            Options(OrderRoster(team.Players, Position.Forward, null)),
+            Options(OrderRoster(team.Players, Position.Defense, null)),
+            Options(OrderRoster(team.Players, Position.Goalie, null)));
+    }
+
+    public async Task<byte[]> RenderAsync(int teamId, RosterColorway colorway, RosterOrdering? ordering = null,
         CancellationToken cancellationToken = default)
     {
-        var model = await BuildModelAsync(teamId, colorway, cancellationToken);
+        var model = await BuildModelAsync(teamId, colorway, ordering, cancellationToken);
         return _renderer.Render(model, PreviewScale);
     }
 
     public async Task<GeneratedImageResult> GenerateAsync(int teamId, RosterColorway colorway,
-        CancellationToken cancellationToken = default)
+        RosterOrdering? ordering = null, CancellationToken cancellationToken = default)
     {
-        var model = await BuildModelAsync(teamId, colorway, cancellationToken);
+        var model = await BuildModelAsync(teamId, colorway, ordering, cancellationToken);
         var png = _renderer.Render(model, SaveScale);
 
         var storageKey = $"media/generated/{Guid.NewGuid():N}.png";
@@ -51,15 +66,20 @@ public sealed class TeamRosterImageGenerator(
         return new GeneratedImageResult(png, storageKey, ContentType);
     }
 
-    private async Task<RosterImageModel> BuildModelAsync(int teamId, RosterColorway colorway,
-        CancellationToken cancellationToken)
+    private async Task<Team> LoadTeamAsync(int teamId, CancellationToken cancellationToken)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-        var team = await dbContext.Teams
-            .AsNoTracking()
-            .Include(t => t.Players).ThenInclude(p => p.Account)
-            .FirstOrDefaultAsync(t => t.Id == teamId, cancellationToken)
-                   ?? throw new EntityNotFoundException(nameof(Team), teamId);
+        return await dbContext.Teams
+                   .AsNoTracking()
+                   .Include(t => t.Players).ThenInclude(p => p.Account)
+                   .FirstOrDefaultAsync(t => t.Id == teamId, cancellationToken)
+               ?? throw new EntityNotFoundException(nameof(Team), teamId);
+    }
+
+    private async Task<RosterImageModel> BuildModelAsync(int teamId, RosterColorway colorway,
+        RosterOrdering? ordering, CancellationToken cancellationToken)
+    {
+        var team = await LoadTeamAsync(teamId, cancellationToken);
 
         var fontBytes = await GetFontAsync(cancellationToken);
         var logoBytes = await GetLogoAsync(team.Logo, cancellationToken);
@@ -73,23 +93,48 @@ public sealed class TeamRosterImageGenerator(
             LogoPng = logoBytes,
             FontTtf = fontBytes,
             Colorway = colorway,
-            Forwards = await MapCellsAsync(team.Players, Position.Forward, logoBytes, cancellationToken),
-            Defense = await MapCellsAsync(team.Players, Position.Defense, logoBytes, cancellationToken),
-            Goalies = await MapCellsAsync(team.Players, Position.Goalie, logoBytes, cancellationToken),
+            Forwards = await MapCellsAsync(team.Players, Position.Forward, ordering?.Forwards, logoBytes, cancellationToken),
+            Defense = await MapCellsAsync(team.Players, Position.Defense, ordering?.Defense, logoBytes, cancellationToken),
+            Goalies = await MapCellsAsync(team.Players, Position.Goalie, ordering?.Goalies, logoBytes, cancellationToken),
         };
+    }
+
+    // Filters players to one position and applies the desired order. When an explicit order is
+    // given, listed players lead in that order and any unlisted players follow in the default sort.
+    private static IReadOnlyList<Player> OrderRoster(IEnumerable<Player> players, string position,
+        IReadOnlyList<int>? order)
+    {
+        var filtered = players
+            .Where(p => string.Equals(p.Position, position, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (order is { Count: > 0 })
+        {
+            var rank = new Dictionary<int, int>();
+            for (var i = 0; i < order.Count; i++)
+            {
+                rank[order[i]] = i;
+            }
+            return filtered
+                .OrderBy(p => rank.TryGetValue(p.Id, out var r) ? r : int.MaxValue)
+                .ThenBy(p => p.JerseyNumber ?? int.MaxValue)
+                .ThenBy(p => p.Account.LastName)
+                .ToList();
+        }
+
+        return filtered
+            .OrderBy(p => p.JerseyNumber ?? int.MaxValue)
+            .ThenBy(p => p.Account.LastName)
+            .ToList();
     }
 
     // Default hometown when a player has none set, matching the original static template value.
     private const string DefaultHometown = "WINDSOR, ON";
 
     private async Task<IReadOnlyList<RosterPlayerCell>> MapCellsAsync(IEnumerable<Player> players, string position,
-        byte[]? teamLogo, CancellationToken cancellationToken)
+        IReadOnlyList<int>? order, byte[]? teamLogo, CancellationToken cancellationToken)
     {
-        var roster = players
-            .Where(p => string.Equals(p.Position, position, StringComparison.OrdinalIgnoreCase))
-            .OrderBy(p => p.JerseyNumber ?? int.MaxValue)
-            .ThenBy(p => p.Account.LastName)
-            .ToList();
+        var roster = OrderRoster(players, position, order);
 
         var cells = new List<RosterPlayerCell>(roster.Count);
         foreach (var p in roster)
