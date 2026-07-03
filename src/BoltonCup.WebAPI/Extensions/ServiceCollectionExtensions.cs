@@ -150,7 +150,7 @@ public static class ServiceCollectionExtensions
                         "https://www.boltoncup.ca",
                         "https://auth.boltoncup.ca",
                         "https://draft.boltoncup.ca",
-                        "https://timekeeper.boltoncup.ca"
+                        "https://score.boltoncup.ca"
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
