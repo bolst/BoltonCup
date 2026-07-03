@@ -5,10 +5,12 @@ using BoltonCup.Core.Values;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Services;
+using BoltonCup.Infrastructure.Settings;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -40,11 +42,12 @@ public class TradeServiceTests
     private static TradeService NewService(BoltonCupDbContext db, out Mock<IEmailer> emailer)
         => NewService(db, out emailer, out _);
 
-    private static TradeService NewService(BoltonCupDbContext db, out Mock<IEmailer> emailer, out Mock<ISmsSender> sms)
+    private static TradeService NewService(BoltonCupDbContext db, out Mock<IEmailer> emailer, out Mock<ISmsSender> sms, bool emailEnabled = true)
     {
         emailer = new Mock<IEmailer>();
         sms = new Mock<ISmsSender>();
-        return new TradeService(db, new RosterValidator(), emailer.Object, sms.Object, EmptyAdminUserManager());
+        var options = Options.Create(new TradeNotificationSettings { EmailEnabled = emailEnabled });
+        return new TradeService(db, new RosterValidator(), emailer.Object, sms.Object, EmptyAdminUserManager(), options);
     }
 
     /// <summary>Seeds a tournament with two teams (each with a GM) and N players per team.</summary>
@@ -148,11 +151,14 @@ public class TradeServiceTests
 
         var expected = string.Join("\n",
             "TEAM 10 has sent you a trade.",
+            "",
             "Your team receives:",
             "- First1002 Last1002",
+            "",
             "TEAM 10 receives:",
             "- First1007 Last1007",
-            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+            "",
+            "Trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
 
         sms.Verify(s => s.SendAsync("+15555550199", expected, It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -166,6 +172,24 @@ public class TradeServiceTests
         await service.CreateAsync(Trade([2], [7]));
 
         sms.Verify(s => s.SendAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Create_WhenEmailNotificationsDisabled_StillTextsButSendsNoEmail()
+    {
+        await using var db = await SeedAsync();
+        var gmB = await db.Accounts.FirstAsync(a => a.Id == GmBAccountId);
+        gmB.Phone = "+15555550199";
+        await db.SaveChangesAsync();
+
+        var service = NewService(db, out var emailer, out var sms, emailEnabled: false);
+
+        var id = await service.CreateAsync(Trade([2], [7]));
+
+        // The trade is still created and SMS still goes out; only the email is suppressed.
+        id.Should().BePositive();
+        sms.Verify(s => s.SendAsync("+15555550199", It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+        emailer.Verify(e => e.SendTradeCreatedAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<TradeEmailInfo>()), Times.Never);
     }
 
     [Fact]
@@ -183,7 +207,8 @@ public class TradeServiceTests
 
         var expected = string.Join("\n",
             "TEAM 20 accepted your trade. It now awaits admin approval.",
-            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+            "",
+            "Trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
         sms.Verify(s => s.SendAsync("+15555550100", expected, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -202,7 +227,8 @@ public class TradeServiceTests
 
         var expected = string.Join("\n",
             "TEAM 20 declined your trade.",
-            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+            "",
+            "Trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
         sms.Verify(s => s.SendAsync("+15555550100", expected, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -221,7 +247,8 @@ public class TradeServiceTests
 
         var expected = string.Join("\n",
             "The trade between TEAM 10 and TEAM 20 was cancelled.",
-            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+            "",
+            "Trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
         sms.Verify(s => s.SendAsync("+15555550200", expected, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -242,7 +269,8 @@ public class TradeServiceTests
 
         var expected = string.Join("\n",
             "The trade between TEAM 10 and TEAM 20 was cancelled.",
-            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+            "",
+            "Trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
         sms.Verify(s => s.SendAsync("+15555550100", expected, It.IsAny<CancellationToken>()), Times.Once);
         sms.Verify(s => s.SendAsync("+15555550200", expected, It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -265,7 +293,8 @@ public class TradeServiceTests
 
         var expected = string.Join("\n",
             "The trade between TEAM 10 and TEAM 20 was approved. Rosters have been updated.",
-            "Click the link to go to the trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
+            "",
+            "Trade hub: https://boltoncup.ca/tournaments/1/trade-hub");
         sms.Verify(s => s.SendAsync("+15555550100", expected, It.IsAny<CancellationToken>()), Times.Once);
         sms.Verify(s => s.SendAsync("+15555550200", expected, It.IsAny<CancellationToken>()), Times.Once);
     }
