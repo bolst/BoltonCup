@@ -50,6 +50,8 @@ public static class ServiceCollectionExtensions
 
         builder.Services.AddSingleton<IRosterValidator, RosterValidator>();
 
+        builder.Services.Configure<TradeNotificationSettings>(builder.Configuration.GetSection("TradeNotifications"));
+
         return builder;
     }
 

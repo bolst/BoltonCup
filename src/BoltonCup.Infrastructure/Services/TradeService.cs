@@ -3,8 +3,10 @@ using BoltonCup.Core.Commands;
 using BoltonCup.Core.Exceptions;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace BoltonCup.Infrastructure.Services;
 
@@ -13,10 +15,13 @@ public class TradeService(
     IRosterValidator _rosterValidator,
     IEmailer _emailer,
     ISmsSender _smsSender,
-    UserManager<BoltonCupUser> _userManager
+    UserManager<BoltonCupUser> _userManager,
+    IOptions<TradeNotificationSettings> _notificationOptions
 ) : ITradeService
 {
     private const string SiteBaseUrl = "https://boltoncup.ca";
+
+    private bool EmailEnabled => _notificationOptions.Value.EmailEnabled;
 
     public async Task<IReadOnlyList<Trade>> GetByTournamentAsync(int tournamentId, int? viewerAccountId, bool isAdmin, CancellationToken cancellationToken = default)
     {
@@ -149,8 +154,10 @@ public class TradeService(
         trade.ProposingTeam = proposingTeam;
         trade.ReceivingTeam = receivingTeam;
         var info = BuildEmailInfo(trade);
-        var recipients = await GetRecipientsAsync(trade, includePlayers: false);
-        await _emailer.SendTradeCreatedAsync(recipients, info);
+        if (EmailEnabled)
+        {
+            await _emailer.SendTradeCreatedAsync(await GetRecipientsAsync(trade, includePlayers: false), info);
+        }
         await SendSmsAsync(trade.ReceivingTeam.GeneralManagers, BuildTradeProposalSms(trade.TournamentId, info));
 
         return trade.Id;
@@ -221,7 +228,10 @@ public class TradeService(
         trade.RespondedAt = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await _emailer.SendTradeAcceptedAsync(await GetRecipientsAsync(trade, includePlayers: false), BuildEmailInfo(trade));
+        if (EmailEnabled)
+        {
+            await _emailer.SendTradeAcceptedAsync(await GetRecipientsAsync(trade, includePlayers: false), BuildEmailInfo(trade));
+        }
         await SendSmsAsync(trade.ProposingTeam.GeneralManagers, BuildTradeAcceptedSms(trade));
     }
 
@@ -239,7 +249,10 @@ public class TradeService(
         ReleasePlayers(trade);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await _emailer.SendTradeDeclinedAsync(await GetRecipientsAsync(trade, includePlayers: false), BuildEmailInfo(trade));
+        if (EmailEnabled)
+        {
+            await _emailer.SendTradeDeclinedAsync(await GetRecipientsAsync(trade, includePlayers: false), BuildEmailInfo(trade));
+        }
         await SendSmsAsync(trade.ProposingTeam.GeneralManagers, BuildTradeDeclinedSms(trade));
     }
 
@@ -265,7 +278,10 @@ public class TradeService(
         ReleasePlayers(trade);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await _emailer.SendTradeCancelledAsync(await GetRecipientsAsync(trade, includePlayers: false), BuildEmailInfo(trade));
+        if (EmailEnabled)
+        {
+            await _emailer.SendTradeCancelledAsync(await GetRecipientsAsync(trade, includePlayers: false), BuildEmailInfo(trade));
+        }
         var cancelRecipients = isAdmin
             ? trade.ProposingTeam.GeneralManagers.Concat(trade.ReceivingTeam.GeneralManagers)
             : trade.ReceivingTeam.GeneralManagers;
@@ -297,7 +313,10 @@ public class TradeService(
         await _dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
-        await _emailer.SendTradeApprovedAsync(await GetRecipientsAsync(trade, includePlayers: true), BuildEmailInfo(trade));
+        if (EmailEnabled)
+        {
+            await _emailer.SendTradeApprovedAsync(await GetRecipientsAsync(trade, includePlayers: true), BuildEmailInfo(trade));
+        }
         await SendSmsAsync(trade.ProposingTeam.GeneralManagers.Concat(trade.ReceivingTeam.GeneralManagers), BuildTradeApprovedSms(trade));
     }
 

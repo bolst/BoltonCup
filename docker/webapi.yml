@@ -35,6 +35,7 @@ services:
       Twilio__AccountSid: ${TWILIO_ACCOUNT_SID:-}
       Twilio__AuthToken: ${TWILIO_AUTH_TOKEN:-}
       Twilio__FromPhoneNumber: ${TWILIO_FROM_PHONE_NUMBER:-}
+      TradeNotifications__EmailEnabled: ${TRADE_NOTIFICATION_EMAILS_ENABLED:-false}
       Sentry__Dsn: ${SENTRY_DSN:-}
       Spotify__ClientId: ${SPOTIFY_CLIENT_ID:-}
       Spotify__ClientSecret: ${SPOTIFY_CLIENT_SECRET:-}
