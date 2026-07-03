@@ -73,18 +73,30 @@ public sealed class TeamRosterImageGenerator(
             LogoPng = logoBytes,
             FontTtf = fontBytes,
             Colorway = colorway,
-            Forwards = MapCells(team.Players, Position.Forward),
-            Defense = MapCells(team.Players, Position.Defense),
-            Goalies = MapCells(team.Players, Position.Goalie),
+            Forwards = await MapCellsAsync(team.Players, Position.Forward, logoBytes, cancellationToken),
+            Defense = await MapCellsAsync(team.Players, Position.Defense, logoBytes, cancellationToken),
+            Goalies = await MapCellsAsync(team.Players, Position.Goalie, logoBytes, cancellationToken),
         };
     }
 
-    private static IReadOnlyList<RosterPlayerCell> MapCells(IEnumerable<Player> players, string position)
-        => players
+    // Default hometown when a player has none set, matching the original static template value.
+    private const string DefaultHometown = "WINDSOR, ON";
+
+    private async Task<IReadOnlyList<RosterPlayerCell>> MapCellsAsync(IEnumerable<Player> players, string position,
+        byte[]? teamLogo, CancellationToken cancellationToken)
+    {
+        var roster = players
             .Where(p => string.Equals(p.Position, position, StringComparison.OrdinalIgnoreCase))
             .OrderBy(p => p.JerseyNumber ?? int.MaxValue)
             .ThenBy(p => p.Account.LastName)
-            .Select(p => new RosterPlayerCell
+            .ToList();
+
+        var cells = new List<RosterPlayerCell>(roster.Count);
+        foreach (var p in roster)
+        {
+            // Fall back to the current team logo when the player has no previous-team logo set.
+            var previousTeamLogo = await GetLogoAsync(p.Account.PreviousTeamLogo, cancellationToken) ?? teamLogo;
+            cells.Add(new RosterPlayerCell
             {
                 JerseyNumber = p.JerseyNumber,
                 FirstName = p.Account.FirstName,
@@ -96,8 +108,12 @@ public sealed class TeamRosterImageGenerator(
                     Core.Captaincy.Alternate => 'A',
                     _ => null,
                 },
-            })
-            .ToList();
+                Hometown = string.IsNullOrWhiteSpace(p.Account.Hometown) ? DefaultHometown : p.Account.Hometown,
+                PreviousTeamLogoPng = previousTeamLogo,
+            });
+        }
+        return cells;
+    }
 
     private async Task<byte[]> GetFontAsync(CancellationToken cancellationToken)
     {

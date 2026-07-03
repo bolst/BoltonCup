@@ -33,6 +33,12 @@ public sealed record RosterPlayerCell
 
     public string Hometown { get; init; } = "WINDSOR, ON";
 
+    /// <summary>
+    /// The player's previous-team logo bytes (any format SkiaSharp can read), shown in the block's
+    /// mid column. Null renders no logo — the generator supplies the current team logo as a fallback.
+    /// </summary>
+    public byte[]? PreviousTeamLogoPng { get; init; }
+
     /// <summary>An empty padding slot (team under-rostered). Renders the frame but no player text.</summary>
     public bool IsEmpty { get; init; }
 }

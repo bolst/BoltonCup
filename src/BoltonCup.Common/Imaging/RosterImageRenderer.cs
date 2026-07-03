@@ -119,7 +119,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         var minBlockW = Math.Min(forwardColW, Math.Min(defenseColW, goalieRegionW));
         var jerseyFontSize = ComputeJerseyFontSize(typeface, minBlockW);
 
-        DrawGrid(canvas, typeface, palette, logo, model.Forwards,
+        DrawGrid(canvas, typeface, palette, model.Forwards,
             Margin, cursorY, forwardColW, RowH, ForwardCols, ForwardRows, jerseyFontSize);
 
         cursorY += forwardGridHeight + SectionGapY;
@@ -131,12 +131,12 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
             new SKRect(goalieRegionX, cursorY, goalieRegionX + goalieRegionW, cursorY + BarHeight));
         cursorY += BarHeight + SectionGapY;
 
-        DrawGrid(canvas, typeface, palette, logo, model.Defense,
+        DrawGrid(canvas, typeface, palette, model.Defense,
             Margin, cursorY, defenseColW, RowH, DefenseCols, DefenseRows, jerseyFontSize);
 
         // Single goalie block, kept the same height as one defense row so it isn't oversized.
         var goalie = model.Goalies.Count > 0 ? model.Goalies[0] : EmptyCell();
-        DrawPlayerBlock(canvas, typeface, palette, logo, goalie,
+        DrawPlayerBlock(canvas, typeface, palette, goalie,
             new SKRect(goalieRegionX, cursorY, goalieRegionX + goalieRegionW, cursorY + RowH), jerseyFontSize);
 
         using var image = surface.Snapshot();
@@ -215,7 +215,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         canvas.DrawText(label, rect.MidX, baseline, SKTextAlign.Center, font, text);
     }
 
-    private void DrawGrid(SKCanvas canvas, SKTypeface typeface, Palette palette, SKBitmap? logo,
+    private void DrawGrid(SKCanvas canvas, SKTypeface typeface, Palette palette,
         IReadOnlyList<RosterPlayerCell> cells, float originX, float originY,
         float colW, float rowH, int cols, int rows, float jerseyFontSize)
     {
@@ -226,12 +226,12 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
             var row = i / cols;
             var x = originX + col * (colW + RegionGap);
             var y = originY + row * (rowH + GapY);
-            DrawPlayerBlock(canvas, typeface, palette, logo, cell, new SKRect(x, y, x + colW, y + rowH), jerseyFontSize);
+            DrawPlayerBlock(canvas, typeface, palette, cell, new SKRect(x, y, x + colW, y + rowH), jerseyFontSize);
         }
     }
 
     private void DrawPlayerBlock(SKCanvas canvas, SKTypeface typeface, Palette palette,
-        SKBitmap? logo, RosterPlayerCell cell, SKRect rect, float jerseyFontSize)
+        RosterPlayerCell cell, SKRect rect, float jerseyFontSize)
     {
         using var detail = new SKPaint();
         detail.IsAntialias = true;
@@ -272,7 +272,8 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
                 SKTextAlign.Center, capFont, palette.CaptaincyFill, palette.CaptaincyOutline, Math.Max(1.5f, capSize * 0.05f));
         }
 
-        // Sub-col 2 rows 3-4: team logo (bottom half), centered in the mid column.
+        // Sub-col 2 rows 3-4: the player's previous-team logo (bottom half), centered in the mid column.
+        using var logo = DecodeLogo(cell.PreviousTeamLogoPng);
         if (logo is not null)
         {
             var logoBox = new SKRect(rect.Left + jerseyW + 2f, rect.Top + rowH * 2f, rect.Left + jerseyW + midW - 2f, rect.Bottom - 4f);

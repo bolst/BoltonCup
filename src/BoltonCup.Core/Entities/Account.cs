@@ -15,6 +15,8 @@ public class Account : EntityBase
     public int? HeightFeet { get; set; }
     public int? HeightInches { get; set; }
     public int? Weight { get; set; }
+    public string? Hometown { get; set; }
+    public string? PreviousTeamLogo { get; set; }
     
     public ICollection<Player> Players { get; set; } = [];
     public ICollection<Team> ManagedTeams { get; set; } = [];
