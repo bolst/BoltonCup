@@ -23,9 +23,9 @@ public class TradeService(
 
     private bool EmailEnabled => _notificationOptions.Value.EmailEnabled;
 
-    public async Task<IReadOnlyList<Trade>> GetByTournamentAsync(int tournamentId, int? viewerAccountId, bool isAdmin, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Trade>> GetByTournamentAsync(int tournamentId, CancellationToken cancellationToken = default)
     {
-        var query = _dbContext.Trades
+        return await _dbContext.Trades
             .AsNoTracking()
             .AsSplitQuery()
             .Include(t => t.ProposingTeam).ThenInclude(t => t.GeneralManagers)
@@ -33,18 +33,7 @@ public class TradeService(
             .Include(t => t.Players)
             .ThenInclude(tp => tp.Player)
             .ThenInclude(p => p.Account)
-            .Where(t => t.TournamentId == tournamentId);
-
-        if (!isAdmin)
-        {
-            // A GM only sees trades involving their own team, plus any admin-approved trade.
-            // Other teams' in-flight (pending/accepted) proposals stay private.
-            query = query.Where(t => t.Status == TradeStatus.Approved
-                || t.ProposingTeam.GeneralManagers.Any(g => g.Id == viewerAccountId)
-                || t.ReceivingTeam.GeneralManagers.Any(g => g.Id == viewerAccountId));
-        }
-
-        return await query
+            .Where(t => t.TournamentId == tournamentId)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync(cancellationToken);
     }

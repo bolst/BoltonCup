@@ -12091,7 +12091,7 @@
         "tags": [
           "Trades"
         ],
-        "description": "Gets trades for a tournament. Admins see all trades; a GM sees trades involving their own team plus any approved trade.",
+        "description": "Gets all trades for a tournament. Accessible to the tournament's GMs and admins.",
         "operationId": "GetTrades",
         "parameters": [
           {
