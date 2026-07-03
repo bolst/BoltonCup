@@ -15,7 +15,7 @@ public class TradesController(
     IMapper _mapper
 ) : BoltonCupControllerBase
 {
-    /// <summary>Gets all trades for a tournament. Accessible to the tournament's GMs and admins.</summary>
+    /// <summary>Gets trades for a tournament. Admins see all trades; a GM sees trades involving their own team plus any approved trade.</summary>
     [Authorize(Policy = RequireCompletedAccount)]
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<TradeDto>>> GetTrades([FromQuery] int tournamentId)
@@ -25,8 +25,11 @@ public class TradesController(
             return Forbid();
         }
 
-        var trades = await _tradeService.GetByTournamentAsync(tournamentId);
-        var viewer = new TradeViewerContext(User.GetAccountIdOrDefault(), User.IsInRole(Admin));
+        var accountId = User.GetAccountIdOrDefault();
+        var isAdmin = User.IsInRole(Admin);
+
+        var trades = await _tradeService.GetByTournamentAsync(tournamentId, accountId, isAdmin);
+        var viewer = new TradeViewerContext(accountId, isAdmin);
         return Ok(_mapper.ToDtoList(trades, viewer));
     }
 

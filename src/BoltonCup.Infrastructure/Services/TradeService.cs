@@ -18,9 +18,9 @@ public class TradeService(
 {
     private const string SiteBaseUrl = "https://boltoncup.ca";
 
-    public async Task<IReadOnlyList<Trade>> GetByTournamentAsync(int tournamentId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Trade>> GetByTournamentAsync(int tournamentId, int? viewerAccountId, bool isAdmin, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Trades
+        var query = _dbContext.Trades
             .AsNoTracking()
             .AsSplitQuery()
             .Include(t => t.ProposingTeam).ThenInclude(t => t.GeneralManagers)
@@ -28,7 +28,18 @@ public class TradeService(
             .Include(t => t.Players)
             .ThenInclude(tp => tp.Player)
             .ThenInclude(p => p.Account)
-            .Where(t => t.TournamentId == tournamentId)
+            .Where(t => t.TournamentId == tournamentId);
+
+        if (!isAdmin)
+        {
+            // A GM only sees trades involving their own team, plus any admin-approved trade.
+            // Other teams' in-flight (pending/accepted) proposals stay private.
+            query = query.Where(t => t.Status == TradeStatus.Approved
+                || t.ProposingTeam.GeneralManagers.Any(g => g.Id == viewerAccountId)
+                || t.ReceivingTeam.GeneralManagers.Any(g => g.Id == viewerAccountId));
+        }
+
+        return await query
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync(cancellationToken);
     }
