@@ -12,8 +12,9 @@ public partial class MainLayout : LayoutComponentBase
     private MudTheme GetTheme()
     {
         var theme = Theme.MudTheme;
-        theme.PaletteLight.DrawerBackground = theme.PaletteLight.Tertiary;
-        theme.PaletteLight.DrawerText = theme.PaletteLight.Primary;
+        theme.PaletteLight.DrawerBackground = theme.PaletteDark.DrawerBackground;
+        theme.PaletteLight.DrawerIcon = theme.PaletteDark.DrawerIcon;
+        theme.PaletteLight.DrawerText = theme.PaletteDark.DrawerText;
         return theme;
     }
 }
