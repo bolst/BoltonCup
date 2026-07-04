@@ -51,7 +51,7 @@
                         <MudText Typo="Typo.caption" Color="Color.Tertiary">@Format(Player.PositionSec)</MudText>
                         <MudSlider T="double" Min="0" Max="@SliderMax" Step="1" Size="Size.Small" Color="Color.Tertiary"
                                    Value="Player.PositionSec" ValueChanged="OnSeek" Class="flex-grow-1" />
-                        <MudText Typo="Typo.caption" Color="Color.Tertiary">@Format(Player.DurationSec)</MudText>
+                        <MudText Typo="Typo.caption">@Format(Player.DurationSec)</MudText>
                     </div>
                 </div>
 
@@ -91,9 +91,9 @@
                 }
                 
                 <MudTooltip Text="Queue">
-                    <MudIconButton Icon="@Icons.Material.Rounded.Menu"
+                    <MudIconButton Icon="@Icons.Material.Rounded.QueueMusic"
                                    OnClick="@ToggleQueueDrawer"
-                                   Color="(_queueDrawerOpen ? Color.Success : Color.Tertiary)"
+                                   Color="@(_queueDrawerOpen ? Color.Success : Color.Tertiary)"
                                    Size="Size.Small"/>
                 </MudTooltip>
             </div>
@@ -101,8 +101,73 @@
     </MudContainer>
 </div>
 
-<MudDrawer @bind-Open="@_queueDrawerOpen" Anchor="Anchor.End" Height="100%" Variant="DrawerVariant.Persistent" Fixed="false">
-    <MudText>I am a queue</MudText>
+<MudDrawer @bind-Open="@_queueDrawerOpen" Anchor="Anchor.End" Variant="DrawerVariant.Temporary"
+           Overlay="true" Fixed="true" Elevation="8" Width="360px" Class="bc-queue-drawer">
+    <div class="d-flex align-center justify-space-between pa-3">
+        <div>
+            <MudText Typo="Typo.h6">Queue</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Tertiary">@Player.Playlist.Count tracks</MudText>
+        </div>
+        <MudIconButton Icon="@Icons.Material.Rounded.Close" Size="Size.Small"
+                       OnClick="@(() => _queueDrawerOpen = false)" Class="white-text" />
+    </div>
+
+    <MudDivider />
+
+    @if (Player.Playlist.Count == 0)
+    {
+        <div class="pa-4">
+            <MudText Typo="Typo.body2" Color="Color.Tertiary">The queue is empty.</MudText>
+        </div>
+    }
+    else
+    {
+        <MudList T="int" Class="pa-0 overflow-y-auto flex-grow-1">
+            @for (var i = 0; i < Player.Playlist.Count; i++)
+            {
+                var index = i;
+                var track = Player.Playlist[index];
+                var isCurrent = index == Player.CurrentIndex;
+
+                <MudListItem T="int" OnClick="@(() => PlayQueueItemAsync(index))"
+                             Class="@(isCurrent ? "bc-queue-current" : null)">
+                    <div class="d-flex align-center gap-3">
+                        <MudAvatar Square Size="Size.Small">
+                            @if (track.AlbumArtUrl is { Length: > 0 } art)
+                            {
+                                <MudImage Src="@art" />
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.MusicNote" Size="Size.Small" />
+                            }
+                        </MudAvatar>
+
+                        <div class="flex-grow-1" style="min-width: 0;">
+                            <MudText Typo="Typo.body2" Class="text-truncate"
+                                     Color="@(isCurrent ? Color.Error : Color.Tertiary)"
+                                     Style="@(isCurrent ? "font-weight:600;" : null)">
+                                @track.Title
+                            </MudText>
+                            <MudText Typo="Typo.caption" Class="text-truncate white-text">
+                                @(string.IsNullOrWhiteSpace(track.Artist) ? " " : track.Artist)
+                            </MudText>
+                        </div>
+
+                        @if (isCurrent)
+                        {
+                            <MudIcon Icon="@(Player.IsPlaying ? Icons.Material.Rounded.VolumeUp : Icons.Material.Rounded.Pause)"
+                                     Size="Size.Small" Color="Color.Error" />
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.caption" Class="white-text">@FormatMs(track.DurationMs)</MudText>
+                        }
+                    </div>
+                </MudListItem>
+            }
+        </MudList>
+    }
 </MudDrawer>
 
 @code {
@@ -218,12 +283,19 @@
 
     private Task OnSeek(double value) => Player.SeekAsync(value);
 
+    private async Task PlayQueueItemAsync(int index)
+    {
+        await Player.PlayIndexAsync(index);
+    }
+
     private static string Format(double seconds)
     {
         if (double.IsNaN(seconds) || seconds < 0) seconds = 0;
         var ts = TimeSpan.FromSeconds(seconds);
         return $"{(int)ts.TotalMinutes}:{ts.Seconds:00}";
     }
+
+    private static string FormatMs(int? milliseconds) => Format((milliseconds ?? 0) / 1000.0);
 
     private void OnPlayerChanged() => InvokeAsync(StateHasChanged);
 
