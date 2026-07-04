@@ -24,6 +24,7 @@ builder.Services.AddSingleton<SyncService>();
 builder.Services.AddScoped<TimekeeperStateService>();
 builder.Services.AddScoped<MusicCacheService>();
 builder.Services.AddScoped<MusicPlayerService>();
+builder.Services.AddScoped<MusicDownloadService>();
 
 var host = builder.Build();
 _ = host.Services.GetRequiredService<SyncService>().StartAsync();

@@ -57,7 +57,7 @@ public partial class GameConsole : ComponentBase, IDisposable
         }
     }
 
-    private async Task OpenGoalDialogAsync()
+    private async Task OpenGoalDialogAsync(bool isHome)
     {
         var parameters = new DialogParameters<GoalDialog>
         {
@@ -66,6 +66,7 @@ public partial class GameConsole : ComponentBase, IDisposable
             { x => x.HomePlayers, State.HomePlayers },
             { x => x.AwayPlayers, State.AwayPlayers },
             { x => x.CurrentPeriod, State.CurrentPeriod },
+            { x => x.IsHome, isHome },
         };
         var dialog = await DialogService.ShowAsync<GoalDialog>("Record Goal", parameters);
         var result = await dialog.Result;
@@ -75,7 +76,7 @@ public partial class GameConsole : ComponentBase, IDisposable
         }
     }
 
-    private async Task OpenPenaltyDialogAsync()
+    private async Task OpenPenaltyDialogAsync(bool isHome)
     {
         var parameters = new DialogParameters<PenaltyDialog>
         {
@@ -84,6 +85,7 @@ public partial class GameConsole : ComponentBase, IDisposable
             { x => x.HomePlayers, State.HomePlayers },
             { x => x.AwayPlayers, State.AwayPlayers },
             { x => x.CurrentPeriod, State.CurrentPeriod },
+            { x => x.IsHome, isHome },
         };
         var dialog = await DialogService.ShowAsync<PenaltyDialog>("Record Penalty", parameters);
         var result = await dialog.Result;

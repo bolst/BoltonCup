@@ -3,3 +3,15 @@
     padding-inline-start: 1px !important;
     padding-inline-end: 1px !important;
 }
+
+/* Spotify-style fixed music player, pinned to the bottom of the viewport. */
+.bc-music-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1200; /* above page content, below dialogs (1400) and popovers (1500) */
+    background: var(--mud-palette-appbar-background);
+    border-top: 1px solid var(--mud-palette-appbar-text);
+    padding-bottom: env(safe-area-inset-bottom); /* iOS PWA home indicator */
+}

@@ -5,82 +5,93 @@
 @implements IDisposable
 @inject MusicPlayerService Player
 @inject MusicCacheService Cache
+@inject MusicDownloadService Download
 @inject IBoltonCupApi Api
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
+@* Hidden audio element must always be rendered so Player.InitializeAsync can bind it. *@
 <audio @ref="_audioEl" preload="auto" style="display:none"></audio>
 
-<MudPaper Elevation="0" Square Outlined Class="pa-3">
-    <div class="d-flex align-center justify-space-between mb-2">
-        <MudText Typo="Typo.overline">Music</MudText>
-        <div class="d-flex align-center gap-2">
-            @if (_trackCount > 0)
-            {
-                <MudChip T="string" Size="Size.Small" Variant="Variant.Text"
-                         Color="@(_cachedCount >= _trackCount ? Color.Success : Color.Default)"
-                         Icon="@Icons.Material.Rounded.DownloadForOffline">
-                    @_cachedCount/@_trackCount cached
-                </MudChip>
-            }
-            <MudButton Size="Size.Small"
-                       Variant="Variant.Outlined"
-                       StartIcon="@Icons.Material.Rounded.CloudDownload"
-                       Disabled="@(_loading || _trackCount == 0)"
-                       OnClick="DownloadForOffline">
-                Download for offline
-            </MudButton>
-        </div>
-    </div>
+<div class="bc-music-bar">
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="pa-0">
+        @if (_loading)
+        {
+            <div class="d-flex justify-center pa-4">
+                <MudProgressCircular Indeterminate Size="Size.Small" />
+            </div>
+        }
+        else if (_trackCount == 0)
+        {
+            <div class="d-flex align-center gap-2 pa-4">
+                <MudIcon Icon="@Icons.Material.Rounded.MusicOff" Size="Size.Small" Color="Color.Secondary" />
+                <MudText Typo="Typo.body2" Color="Color.Tertiary">No music for this game.</MudText>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex align-center gap-2 pa-4">
+                <MudAvatar Square Size="Size.Medium">
+                    @if (Player.CurrentTrack?.AlbumArtUrl is { Length: > 0 } art)
+                    {
+                        <MudImage Src="@art" />
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Rounded.MusicNote" />
+                    }
+                </MudAvatar>
 
-    @if (_loading)
-    {
-        <div class="d-flex justify-center py-4"><MudProgressCircular Indeterminate Size="Size.Small" /></div>
-    }
-    else if (_trackCount == 0)
-    {
-        <MudText Typo="Typo.body2" Color="Color.Secondary">No music for this game yet.</MudText>
-    }
-    else
-    {
-        <div class="d-flex align-center gap-3">
-            <MudAvatar Square Size="Size.Large">
-                @if (Player.CurrentTrack?.AlbumArtUrl is { Length: > 0 } art)
+                <div class="flex-grow-1" style="min-width: 0;">
+                    <MudText Typo="Typo.body2" Class="text-truncate" Color="Color.Tertiary">
+                        @(Player.CurrentTrack?.Title ?? "Ready to play")
+                    </MudText>
+                    <div class="d-flex align-center gap-2">
+                        <MudText Typo="Typo.caption" Color="Color.Tertiary">@Format(Player.PositionSec)</MudText>
+                        <MudSlider T="double" Min="0" Max="@SliderMax" Step="1" Size="Size.Small" Color="Color.Tertiary"
+                                   Value="Player.PositionSec" ValueChanged="OnSeek" Class="flex-grow-1" />
+                        <MudText Typo="Typo.caption" Color="Color.Tertiary">@Format(Player.DurationSec)</MudText>
+                    </div>
+                </div>
+
+                <MudButtonGroup OverrideStyles="false" Size="Size.Small">
+                    <MudIconButton Icon="@Icons.Material.Rounded.SkipPrevious" OnClick="@(() => Player.PrevAsync())" Color="Color.Tertiary" />
+                    <MudIconButton Icon="@(Player.IsPlaying ? Icons.Material.Rounded.Pause : Icons.Material.Rounded.PlayArrow)"
+                                   Color="@(Player.IsPlaying ? Color.Error : Color.Tertiary)"
+                                   OnClick="@(() => Player.TogglePlayPauseAsync())" />
+                    <MudIconButton Icon="@Icons.Material.Rounded.SkipNext" OnClick="@(() => Player.NextAsync())" Color="Color.Tertiary" />
+                </MudButtonGroup>
+
+                @if (Download.IsRunning)
                 {
-                    <MudImage Src="@art" />
+                    <MudTooltip Text="Downloading music for offline — tap to view">
+                        <MudButton Size="Size.Small" Variant="Variant.Text"
+                                   StartIcon="@Icons.Material.Rounded.Downloading"
+                                   OnClick="@DownloadForOffline"
+                                   Color="Color.Warning">
+                            @(Download.Done + Download.Skipped)/@Download.Total
+                        </MudButton>
+                    </MudTooltip>
+                }
+                else if (_cachedCount >= _trackCount)
+                {
+                    <MudTooltip Text="@($"{_cachedCount}/{_trackCount} tracks available offline")">
+                        <MudIcon Icon="@Icons.Material.Rounded.DownloadForOffline" Color="Color.Success" Size="Size.Small" />
+                    </MudTooltip>
                 }
                 else
                 {
-                    <MudIcon Icon="@Icons.Material.Rounded.MusicNote" />
+                    <MudTooltip Text="@($"Download for offline ({_cachedCount}/{_trackCount} cached)")">
+                        <MudIconButton Icon="@Icons.Material.Rounded.CloudDownload"
+                                       Size="Size.Small"
+                                       OnClick="@DownloadForOffline"
+                                       Color="Color.Secondary"/>
+                    </MudTooltip>
                 }
-            </MudAvatar>
-
-            <div class="flex-grow-1" style="min-width: 0;">
-                <MudText Typo="Typo.body1" Class="text-truncate">
-                    @(Player.CurrentTrack?.Title ?? "Ready to play")
-                </MudText>
-                <MudText Typo="Typo.caption" Color="Color.Secondary" Class="text-truncate">
-                    @(Player.CurrentTrack?.Artist ?? $"{_trackCount} tracks")
-                </MudText>
-
-                <div class="d-flex align-center gap-2">
-                    <MudText Typo="Typo.caption">@Format(Player.PositionSec)</MudText>
-                    <MudSlider T="double" Min="0" Max="@SliderMax" Step="1"
-                               Value="Player.PositionSec" ValueChanged="OnSeek" Class="flex-grow-1" />
-                    <MudText Typo="Typo.caption">@Format(Player.DurationSec)</MudText>
-                </div>
             </div>
-
-            <div class="d-flex align-center">
-                <MudIconButton Icon="@Icons.Material.Rounded.SkipPrevious" OnClick="@(() => Player.PrevAsync())" />
-                <MudIconButton Icon="@(Player.IsPlaying ? Icons.Material.Rounded.Pause : Icons.Material.Rounded.PlayArrow)"
-                               Color="Color.Primary" Size="Size.Large"
-                               OnClick="@(() => Player.TogglePlayPauseAsync())" />
-                <MudIconButton Icon="@Icons.Material.Rounded.SkipNext" OnClick="@(() => Player.NextAsync())" />
-            </div>
-        </div>
-    }
-</MudPaper>
+        }
+    </MudContainer>
+</div>
 
 @code {
     [Parameter] public int GameId { get; set; }
@@ -91,10 +102,15 @@
     private int? _loadedGameId;
     private int _trackCount;
     private int _cachedCount;
+    private bool _wasDownloading;
 
     private double SliderMax => Player.DurationSec > 0 ? Player.DurationSec : 1;
 
-    protected override void OnInitialized() => Player.OnStateChanged += OnPlayerChanged;
+    protected override void OnInitialized()
+    {
+        Player.OnStateChanged += OnPlayerChanged;
+        Download.OnProgressChanged += OnDownloadChanged;
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -147,14 +163,13 @@
 
     private async Task DownloadForOffline()
     {
+        // The download runs in MusicDownloadService, so the dialog can be closed and reopened
+        // while it continues. Progress + completion are handled via OnDownloadChanged.
         var parameters = new DialogParameters<PreloadMusicDialog>
         {
             { x => x.Tracks, Player.Playlist },
         };
-        var dialog = await DialogService.ShowAsync<PreloadMusicDialog>("Download Music", parameters);
-        await dialog.Result;
-        await RefreshCachedCountAsync(Player.Playlist);
-        StateHasChanged();
+        await DialogService.ShowAsync<PreloadMusicDialog>("Download Music", parameters);
     }
 
     private Task OnSeek(double value) => Player.SeekAsync(value);
@@ -168,5 +183,28 @@
 
     private void OnPlayerChanged() => InvokeAsync(StateHasChanged);
 
-    public void Dispose() => Player.OnStateChanged -= OnPlayerChanged;
+    private void OnDownloadChanged() => InvokeAsync(async () =>
+    {
+        // Detect the running→finished transition to refresh the cached count and notify.
+        if (_wasDownloading && !Download.IsRunning)
+        {
+            await RefreshCachedCountAsync(Player.Playlist);
+            if (Download.Failed == 0)
+            {
+                Snackbar.Add("Music ready for offline", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Music download finished with {Download.Failed} failed", Severity.Warning);
+            }
+        }
+        _wasDownloading = Download.IsRunning;
+        StateHasChanged();
+    });
+
+    public void Dispose()
+    {
+        Player.OnStateChanged -= OnPlayerChanged;
+        Download.OnProgressChanged -= OnDownloadChanged;
+    }
 }

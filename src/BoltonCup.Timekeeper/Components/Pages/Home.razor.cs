@@ -1,3 +1,4 @@
+using System.Globalization;
 using BoltonCup.Sdk;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -6,29 +7,41 @@ namespace BoltonCup.Timekeeper.Components.Pages;
 
 public partial class Home : ComponentBase
 {
-    [Inject] 
+    [Inject]
     private IBoltonCupApi BoltonCupApi { get; set; } = null!;
-    
-    [Inject] 
+
+    [Inject]
     private NavigationManager Navigation { get; set; } = null!;
-    
-    [Inject] 
+
+    [Inject]
     private ISnackbar Snackbar { get; set; } = null!;
+
+    [SupplyParameterFromQuery(Name = "date")]
+    private string? DateParam { get; set; }
 
     private bool _loading = true;
     private GameDtoIPagedList? _gamesResult;
     private List<GameDto> _games = [];
     private DateTime? _selectedDate = DateTime.Today;
+    private DateTime? _lastFiltered;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        var date = DateTime.TryParseExact(DateParam, "yyyy-MM-dd", CultureInfo.InvariantCulture,
+            DateTimeStyles.None, out var parsed) ? parsed.Date : DateTime.Today;
+        _selectedDate = date;
+        if (_lastFiltered == date) return; // guard: replace:true re-enters this method
+        _lastFiltered = date;
         await LoadGamesAsync();
     }
 
-    private async Task OnDateChanged(DateTime? date)
+    private void OnDateChanged(DateTime? date)
     {
-        _selectedDate = date;
-        await LoadGamesAsync();
+        var day = (date ?? DateTime.Today).Date;
+        // null removes ?date= → bare "/" for today (clean URL)
+        var value = day == DateTime.Today ? null : day.ToString("yyyy-MM-dd");
+        Navigation.NavigateTo(
+            Navigation.GetUriWithQueryParameter("date", value), replace: true);
     }
 
     private async Task LoadGamesAsync()
