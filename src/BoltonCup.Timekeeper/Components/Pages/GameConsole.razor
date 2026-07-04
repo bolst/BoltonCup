@@ -66,41 +66,43 @@ else
 
             @* Game controls *@
             <div class="d-flex flex-row align-center justify-space-between flex-wrap gap-2">
-                @if (game.GameState == Sdk.GameState.Pending)
+                @switch (game.GameState)
                 {
-                    <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Large"
-                               StartIcon="@Icons.Material.Rounded.PlayArrow"
-                               OnClick="@StartGameAsync">
-                        Start Game
-                    </MudButton>
-                }
-                else if (game.GameState == Sdk.GameState.InProgress)
-                {
-                    <div class="d-flex flex-row align-center gap-2 flex-wrap">
-                        <MudText Typo="Typo.body2">Period:</MudText>
-                        @foreach (var (val, label) in PeriodOptions)
-                        {
-                            <MudButton Size="Size.Small"
-                                       Variant="@(State.CurrentPeriod == val ? Variant.Filled : Variant.Outlined)"
-                                       Color="Color.Primary"
-                                       OnClick="@(() => State.SetCurrentPeriod(val))">
-                                @label
-                            </MudButton>
-                        }
-                    </div>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Medium"
-                               StartIcon="@Icons.Material.Rounded.Stop"
-                               OnClick="@EndGameAsync">
-                        End Game
-                    </MudButton>
-                }
-                else if (game.GameState == Sdk.GameState.Completed)
-                {
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"
-                               StartIcon="@Icons.Material.Rounded.Star"
-                               OnClick="@OpenStarsDialogAsync">
-                        @(game.Stars.Count > 0 ? "Edit Stars" : "Set Stars")
-                    </MudButton>
+                    case Sdk.GameState.Pending:
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Large"
+                                   StartIcon="@Icons.Material.Rounded.PlayArrow"
+                                   OnClick="@StartGameAsync">
+                            Start Game
+                        </MudButton>
+                        break;
+                    case Sdk.GameState.InProgress:
+                    {
+                        <div class="d-flex flex-row align-center gap-2 flex-wrap">
+                            <MudText Typo="Typo.body2">Period:</MudText>
+                            @foreach (var (val, label) in PeriodOptions)
+                            {
+                                <MudButton Size="Size.Small"
+                                           Variant="@(State.CurrentPeriod == val ? Variant.Filled : Variant.Outlined)"
+                                           Color="Color.Primary"
+                                           OnClick="@(() => State.SetCurrentPeriod(val))">
+                                    @label
+                                </MudButton>
+                            }
+                        </div>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Medium"
+                                   StartIcon="@Icons.Material.Rounded.Stop"
+                                   OnClick="@EndGameAsync">
+                            End Game
+                        </MudButton>
+                        break;
+                    }
+                    case Sdk.GameState.Completed:
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"
+                                   StartIcon="@Icons.Material.Rounded.Star"
+                                   OnClick="@OpenStarsDialogAsync">
+                            @(game.Stars.Count > 0 ? "Edit Stars" : "Set Stars")
+                        </MudButton>
+                        break;
                 }
             </div>
 
