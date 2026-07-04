@@ -44,7 +44,10 @@
                                         <MudIcon Icon="@Icons.Material.Rounded.Schedule" Color="Color.Default" Size="Size.Small" />
                                         break;
                                 }
-                                <MudText Typo="Typo.body2">@item.Track.Title</MudText>
+                                <div class="d-flex flex-column">
+                                    <MudText Typo="Typo.body2"><b>@item.Track.Title</b></MudText>
+                                    <MudText Typo="Typo.caption">@item.Track.Artist</MudText>
+                                </div>
                             </div>
                         </MudListItem>
                     }
