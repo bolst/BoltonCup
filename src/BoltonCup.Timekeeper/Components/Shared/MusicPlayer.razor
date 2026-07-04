@@ -12,6 +12,10 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
+@* Warn before leaving while audio is playing or a download is running (both would be interrupted). *@
+<NavigationLock ConfirmExternalNavigation="@GuardActive"
+                OnBeforeInternalNavigation="OnBeforeInternalNavigationAsync" />
+
 @* Hidden audio element must always be rendered so Player.InitializeAsync can bind it. *@
 <audio @ref="_audioEl" preload="auto" style="display:none"></audio>
 
@@ -46,7 +50,14 @@
 
                 <div class="flex-grow-1" style="min-width: 0;">
                     <MudText Typo="Typo.body2" Class="text-truncate white-text">
-                        @(Player.CurrentTrack?.Title ?? "Ready to play")
+                        @if (Player.CurrentTrack is { Title.Length: > 0 } currentTrack)
+                        {
+                            @($"{currentTrack.Title} | {currentTrack.Artist}")
+                        }
+                        else
+                        {
+                            @:Ready to play
+                        }
                     </MudText>
                     <div class="d-flex align-center gap-2">
                         <MudText Typo="Typo.caption" Color="Color.Tertiary">@Format(Player.PositionSec)</MudText>
@@ -288,6 +299,26 @@
     }
 
     private Task OnSeek(double value) => Player.SeekAsync(value);
+
+    // Guard is active whenever leaving would interrupt something the operator cares about.
+    private bool GuardActive => Player.IsPlaying || Download.IsRunning;
+
+    private async Task OnBeforeInternalNavigationAsync(LocationChangingContext context)
+    {
+        if (!GuardActive) return;
+
+        var message = Download.IsRunning
+            ? "A music download is still in progress and playback will stop if you leave. Leave anyway?"
+            : "Music is still playing and will stop if you leave. Leave anyway?";
+
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Leave this game?", message, yesText: "Leave", cancelText: "Stay");
+
+        if (confirmed != true)
+        {
+            context.PreventNavigation();
+        }
+    }
 
     private async Task PlayQueueItemAsync(int index)
     {
