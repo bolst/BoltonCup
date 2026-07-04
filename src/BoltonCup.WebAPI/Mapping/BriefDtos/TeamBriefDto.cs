@@ -27,4 +27,10 @@ public record TeamInGameDto : TeamBriefDto
 {
     /// <summary>Gets or sets the number of goals scored by the team in the game.</summary>
     public int Goals { get; set; }
+    /// <summary>Raw R2 object key of this team's goal song (not a resolved URL). Null if unset.</summary>
+    public string? GoalSongFileKey { get; set; }
+    /// <summary>Seconds into the goal song where playback should start.</summary>
+    public int? GoalSongOffsetSeconds { get; set; }
+    /// <summary>Title of the goal song, for display.</summary>
+    public string? GoalSongTitle { get; set; }
 }

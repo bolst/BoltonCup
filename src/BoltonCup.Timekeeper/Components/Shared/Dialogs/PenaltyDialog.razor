@@ -4,21 +4,21 @@
     <DialogContent>
         <MudStack Spacing="3" Class="pt-1">
 
-            <MudText Typo="Typo.subtitle1" Class="mb-1">Which team took the penalty?</MudText>
-            <div class="d-flex flex-row gap-2">
-                <MudButton Variant="@(_homeSelected ? Variant.Filled : Variant.Outlined)"
-                           Color="Color.Primary"
-                           FullWidth
-                           OnClick="@(() => SelectTeam(true))">
-                    @(HomeTeam?.NameShort ?? "Home")
-                </MudButton>
-                <MudButton Variant="@(!_homeSelected ? Variant.Filled : Variant.Outlined)"
-                           Color="Color.Secondary"
-                           FullWidth
-                           OnClick="@(() => SelectTeam(false))">
-                    @(AwayTeam?.NameShort ?? "Away")
-                </MudButton>
-            </div>
+            @{
+                var team = _homeSelected ? HomeTeam : AwayTeam;
+                var teamColor = team?.PrimaryColorHex ?? "#616161";
+            }
+            <MudPaper Elevation="0" Outlined Class="d-flex align-center gap-3 pa-2"
+                      Style="@($"border-left: 4px solid {teamColor};")">
+                @if (team?.Logo is not null)
+                {
+                    <MudImage Src="@team.Logo" Height="36" />
+                }
+                <div>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">Penalized team</MudText>
+                    <MudText Typo="Typo.h6">@(team?.Name ?? team?.NameShort ?? "Team")</MudText>
+                </div>
+            </MudPaper>
 
             <MudAutocomplete T="PlayerDto"
                              Label="Player"
@@ -27,6 +27,8 @@
                              ToStringFunc="@PlayerLabel"
                              Variant="Variant.Outlined"
                              Margin="Margin.Dense"
+                             Strict="false"
+                             MaxItems="null"
                              ResetValueOnEmptyText
                              Required />
 
@@ -70,7 +72,7 @@
                               Placeholder="mm:ss"
                               Variant="Variant.Outlined"
                               Margin="Margin.Dense"
-                              HelperText="e.g. 12:35"
+                              HelperText="e.g. 08:35"
                               Class="flex-grow-1" />
             </div>
 
@@ -97,6 +99,7 @@
     [Parameter] public List<PlayerDto> HomePlayers { get; set; } = [];
     [Parameter] public List<PlayerDto> AwayPlayers { get; set; } = [];
     [Parameter] public int CurrentPeriod { get; set; } = 1;
+    [Parameter] public bool IsHome { get; set; } = true;
 
     private static readonly (int Value, string Label)[] PeriodOptions =
     [
@@ -139,6 +142,7 @@
 
     protected override void OnInitialized()
     {
+        _homeSelected = IsHome;
         _period = CurrentPeriod;
     }
 
@@ -152,13 +156,6 @@
             MaxWidth = MaxWidth.Small,
             FullWidth = true,
         });
-    }
-
-    private void SelectTeam(bool home)
-    {
-        if (_homeSelected == home) return;
-        _homeSelected = home;
-        _player = null;
     }
 
     private static string PlayerLabel(PlayerDto? p) =>

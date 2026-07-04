@@ -15,6 +15,8 @@ public partial class MainLayout : LayoutComponentBase
         theme.PaletteLight.DrawerBackground = theme.PaletteDark.DrawerBackground;
         theme.PaletteLight.DrawerIcon = theme.PaletteDark.DrawerIcon;
         theme.PaletteLight.DrawerText = theme.PaletteDark.DrawerText;
+        theme.PaletteLight.AppbarBackground = theme.PaletteDark.DrawerBackground;
+        theme.PaletteLight.AppbarText = theme.PaletteDark.DrawerText;
         return theme;
     }
 }

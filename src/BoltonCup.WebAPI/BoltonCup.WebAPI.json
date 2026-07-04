@@ -17397,6 +17397,22 @@
             "type": "integer",
             "description": "Gets or sets the number of goals scored by the team in the game.",
             "format": "int32"
+          },
+          "goalSongFileKey": {
+            "type": "string",
+            "description": "Raw R2 object key of this team's goal song (not a resolved URL). Null if unset.",
+            "nullable": true
+          },
+          "goalSongOffsetSeconds": {
+            "type": "integer",
+            "description": "Seconds into the goal song where playback should start.",
+            "format": "int32",
+            "nullable": true
+          },
+          "goalSongTitle": {
+            "type": "string",
+            "description": "Title of the goal song, for display.",
+            "nullable": true
           }
         },
         "additionalProperties": false,

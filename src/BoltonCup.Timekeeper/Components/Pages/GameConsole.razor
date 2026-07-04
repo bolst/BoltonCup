@@ -18,7 +18,7 @@ else if (State.Game is not { } game)
 }
 else
 {
-    <MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="py-4" Style="padding-bottom: 104px">
         <MudStack Spacing="4">
 
             @* Scoreboard *@
@@ -36,7 +36,7 @@ else
                     </div>
 
                     <div class="d-flex flex-column align-center px-4">
-                        <MudText Typo="Typo.h2" Class="font-weight-bold">
+                        <MudText Typo="Typo.h3" Class="font-weight-bold">
                             @State.HomeScore – @State.AwayScore
                         </MudText>
                         <div class="d-flex flex-row align-center gap-2 mt-1">
@@ -66,62 +66,85 @@ else
 
             @* Game controls *@
             <div class="d-flex flex-row align-center justify-space-between flex-wrap gap-2">
-                @if (game.GameState == Sdk.GameState.Pending)
+                @switch (game.GameState)
                 {
-                    <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Large"
-                               StartIcon="@Icons.Material.Rounded.PlayArrow"
-                               OnClick="@StartGameAsync">
-                        Start Game
-                    </MudButton>
-                }
-                else if (game.GameState == Sdk.GameState.InProgress)
-                {
-                    <div class="d-flex flex-row align-center gap-2 flex-wrap">
-                        <MudText Typo="Typo.body2">Period:</MudText>
-                        @foreach (var (val, label) in PeriodOptions)
-                        {
-                            <MudButton Size="Size.Small"
-                                       Variant="@(State.CurrentPeriod == val ? Variant.Filled : Variant.Outlined)"
-                                       Color="Color.Primary"
-                                       OnClick="@(() => State.SetCurrentPeriod(val))">
-                                @label
-                            </MudButton>
-                        }
-                    </div>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Medium"
-                               StartIcon="@Icons.Material.Rounded.Stop"
-                               OnClick="@EndGameAsync">
-                        End Game
-                    </MudButton>
-                }
-                else if (game.GameState == Sdk.GameState.Completed)
-                {
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"
-                               StartIcon="@Icons.Material.Rounded.Star"
-                               OnClick="@OpenStarsDialogAsync">
-                        @(game.Stars.Count > 0 ? "Edit Stars" : "Set Stars")
-                    </MudButton>
+                    case Sdk.GameState.Pending:
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Large"
+                                   StartIcon="@Icons.Material.Rounded.PlayArrow"
+                                   OnClick="@StartGameAsync">
+                            Start Game
+                        </MudButton>
+                        break;
+                    case Sdk.GameState.InProgress:
+                    {
+                        <div class="d-flex flex-row align-center gap-2 flex-wrap">
+                            <MudText Typo="Typo.body2">Period:</MudText>
+                            @foreach (var (val, label) in PeriodOptions)
+                            {
+                                <MudButton Size="Size.Small"
+                                           Variant="@(State.CurrentPeriod == val ? Variant.Filled : Variant.Outlined)"
+                                           Color="Color.Primary"
+                                           OnClick="@(() => State.SetCurrentPeriod(val))">
+                                    @label
+                                </MudButton>
+                            }
+                        </div>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Medium"
+                                   StartIcon="@Icons.Material.Rounded.Stop"
+                                   OnClick="@EndGameAsync">
+                            End Game
+                        </MudButton>
+                        break;
+                    }
+                    case Sdk.GameState.Completed:
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"
+                                   StartIcon="@Icons.Material.Rounded.Star"
+                                   OnClick="@OpenStarsDialogAsync">
+                            @(game.Stars.Count > 0 ? "Edit Stars" : "Set Stars")
+                        </MudButton>
+                        break;
                 }
             </div>
 
-            @* Action buttons — only when game is in progress *@
+            @* Action panels — one per team, only when game is in progress. *@
             @if (game.GameState == Sdk.GameState.InProgress)
             {
-                <div class="d-flex flex-row gap-2">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary"
-                               FullWidth
-                               OnClick="@OpenGoalDialogAsync">
-                        + Goal
-                    </MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Warning"
-                               FullWidth
-                               OnClick="@OpenPenaltyDialogAsync">
-                        + Penalty
-                    </MudButton>
+                <div class="d-flex flex-row gap-3">
+                    @foreach (var (team, isHome) in new[] { (game.HomeTeam, true), (game.AwayTeam, false) })
+                    {
+                        var color = team?.PrimaryColorHex ?? "#616161";
+                        var name = team?.NameShort ?? team?.Name ?? (isHome ? "Home" : "Away");
+
+                        <MudPaper Elevation="0" Outlined Class="flex-grow-1 pa-3" Style="flex: 1; min-width: 0;">
+                            <div class="d-flex flex-column align-center gap-3">
+                                <div class="d-flex flex-row align-center gap-2" style="min-width: 0;">
+                                    @if (team?.Logo is not null)
+                                    {
+                                        <MudImage Src="@team.Logo" Height="28" />
+                                    }
+                                    <MudText Typo="Typo.subtitle1" Class="font-weight-bold text-truncate">@name</MudText>
+                                </div>
+                                <MudButton Variant="Variant.Filled" FullWidth Size="Size.Large"
+                                           StartIcon="@Icons.Material.Rounded.SportsHockey"
+                                           Style="@($"background-color: {color}; color: #fff;")"
+                                           OnClick="@(() => OpenGoalDialogAsync(isHome))">
+                                    Goal
+                                </MudButton>
+                                <MudButton Variant="Variant.Outlined" FullWidth Color="Color.Warning"
+                                           StartIcon="@Icons.Material.Rounded.Sports"
+                                           OnClick="@(() => OpenPenaltyDialogAsync(isHome))">
+                                    Penalty
+                                </MudButton>
+                            </div>
+                        </MudPaper>
+                    }
+                </div>
+                <div class="d-flex flex-row justify-end">
+                    <MudCheckBox T="bool" Value="State.AutoplayGoalSong"
+                                 ValueChanged="@(v => State.SetAutoplayGoalSongAsync(v))"
+                                 Label="Autoplay goal song" Dense Size="Size.Small" Color="Color.Primary" />
                 </div>
             }
-
-            <MusicPlayer GameId="GameId" />
 
             @* Stars display *@
             @if (game.Stars.Count > 0)
@@ -245,7 +268,6 @@ else
                                     <MudIconButton Icon="@Icons.Material.Rounded.DeleteOutline"
                                                    Size="Size.Small"
                                                    Color="Color.Error"
-                                                   Title="Delete penalty"
                                                    OnClick="@(() => DeletePenaltyAsync(penalty.Id))" />
                                 </div>
                             </MudPaper>
@@ -256,4 +278,7 @@ else
 
         </MudStack>
     </MudContainer>
+
+    @* Fixed bottom music bar (owns its own positioning). *@
+    <MusicPlayer GameId="GameId" />
 }

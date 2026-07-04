@@ -1,13 +1,12 @@
 @namespace BoltonCup.Timekeeper.Components.Shared
 @using BoltonCup.Sdk
-@using BoltonCup.Timekeeper.Services
 @using BoltonCup.Timekeeper.Services.Music
-@inject MusicCacheService Cache
-@inject TimekeeperStateService State
+@implements IDisposable
+@inject MusicDownloadService Download
 
 <MudDialog>
     <DialogContent>
-        @if (_offline)
+        @if (Download.IsOffline)
         {
             <MudStack AlignItems="AlignItems.Center" Spacing="3" Class="pt-1">
                 <MudIcon Icon="@Icons.Material.Rounded.CloudOff" Size="Size.Large" Color="Color.Warning" />
@@ -18,51 +17,60 @@
         {
             <MudStack Spacing="3">
                 <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    Downloaded @_doneCount / @_items.Count
-                    @if (_skippedCount > 0) { <text>(@_skippedCount already cached)</text> }
+                    Downloaded @(Download.Done) / @Download.Total
+                    @if (Download.Skipped > 0) { <text>(@Download.Skipped already cached)</text> }
                 </MudText>
-                <MudProgressLinear Color="Color.Primary" Value="@OverallPercent" />
+                <MudProgressLinear Color="Color.Primary" Value="@Download.OverallPercent" />
 
                 <MudList T="string" Dense Class="overflow-auto" Style="max-height: 280px;">
-                    @foreach (var item in _items)
+                    @foreach (var track in Tracks)
                     {
+                        var status = Download.Statuses.TryGetValue(track.FileKey, out var s)
+                            ? s : MusicDownloadService.ItemStatus.Pending;
                         <MudListItem T="string">
                             <div class="d-flex align-center gap-2">
-                                @switch (item.Status)
+                                @switch (status)
                                 {
-                                    case ItemStatus.Done:
-                                    case ItemStatus.Skipped:
+                                    case MusicDownloadService.ItemStatus.Done:
+                                    case MusicDownloadService.ItemStatus.Skipped:
                                         <MudIcon Icon="@Icons.Material.Rounded.CheckCircle" Color="Color.Success" Size="Size.Small" />
                                         break;
-                                    case ItemStatus.Downloading:
+                                    case MusicDownloadService.ItemStatus.Downloading:
                                         <MudProgressCircular Indeterminate Size="Size.Small" Color="Color.Primary" />
                                         break;
-                                    case ItemStatus.Failed:
+                                    case MusicDownloadService.ItemStatus.Failed:
                                         <MudIcon Icon="@Icons.Material.Rounded.ErrorOutline" Color="Color.Error" Size="Size.Small" />
                                         break;
                                     default:
                                         <MudIcon Icon="@Icons.Material.Rounded.Schedule" Color="Color.Default" Size="Size.Small" />
                                         break;
                                 }
-                                <MudText Typo="Typo.body2">@item.Track.Title</MudText>
+                                <div class="d-flex flex-column">
+                                    <MudText Typo="Typo.body2"><b>@track.Title</b></MudText>
+                                    <MudText Typo="Typo.caption">@track.Artist</MudText>
+                                </div>
                             </div>
                         </MudListItem>
                     }
                 </MudList>
 
-                @if (_storageText is not null)
+                @if (Download.StorageText is not null)
                 {
-                    <MudText Typo="Typo.caption" Color="Color.Secondary">@_storageText</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@Download.StorageText</MudText>
                 }
             </MudStack>
         }
     </DialogContent>
     <DialogActions>
-        @if (_failedCount > 0 && !_running)
+        @if (Download.IsRunning)
+        {
+            <MudButton OnClick="Cancel" Color="Color.Error">Cancel download</MudButton>
+        }
+        else if (Download.Failed > 0)
         {
             <MudButton OnClick="RetryFailed" Color="Color.Primary">Retry failed</MudButton>
         }
-        <MudButton OnClick="Close" Disabled="_running">@(_running ? "Downloading…" : "Done")</MudButton>
+        <MudButton OnClick="Close">@(Download.IsRunning ? "Continue in background" : "Done")</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -71,95 +79,32 @@
 
     [Parameter] public IReadOnlyList<PlaylistTrackDto> Tracks { get; set; } = [];
 
-    private enum ItemStatus { Pending, Downloading, Done, Skipped, Failed }
-
-    private sealed class Item
-    {
-        public required PlaylistTrackDto Track { get; init; }
-        public ItemStatus Status { get; set; } = ItemStatus.Pending;
-    }
-
-    private List<Item> _items = [];
-    private bool _offline;
-    private bool _running;
-    private int _doneCount;
-    private int _skippedCount;
-    private int _failedCount;
-    private string? _storageText;
-
-    private int OverallPercent => _items.Count == 0 ? 100 : (int)(100.0 * (_doneCount + _skippedCount + _failedCount) / _items.Count);
-
     protected override async Task OnInitializedAsync()
     {
+        Download.OnProgressChanged += OnProgress;
+
         await Dialog.SetOptionsAsync(Dialog.Options with
         {
-            CloseOnEscapeKey = false,
-            BackdropClick = false,
+            CloseOnEscapeKey = true,
+            BackdropClick = true,
             MaxWidth = MaxWidth.Small,
             FullWidth = true,
         });
 
-        if (!State.IsOnline)
+        // Kick off a run only if one isn't already going — reopening mid-download shows live progress.
+        if (!Download.IsRunning)
         {
-            _offline = true;
-            return;
+            Download.Start(Tracks);
         }
-
-        _items = Tracks.Select(t => new Item { Track = t }).ToList();
-        await DownloadAsync(_items);
     }
 
-    private async Task DownloadAsync(List<Item> items)
-    {
-        _running = true;
-        await Cache.RequestPersistAsync();
+    private void Cancel() => Download.Cancel();
 
-        var cached = await Cache.GetCachedKeysAsync(items.Select(i => i.Track.FileKey));
-
-        foreach (var item in items)
-        {
-            if (cached.Contains(item.Track.FileKey))
-            {
-                item.Status = ItemStatus.Skipped;
-                _skippedCount++;
-                continue;
-            }
-
-            item.Status = ItemStatus.Downloading;
-            StateHasChanged();
-
-            var ok = await Cache.DownloadAsync(item.Track.FileKey);
-            if (ok)
-            {
-                item.Status = ItemStatus.Done;
-                _doneCount++;
-            }
-            else
-            {
-                item.Status = ItemStatus.Failed;
-                _failedCount++;
-            }
-            StateHasChanged();
-        }
-
-        var estimate = await Cache.GetStorageEstimateAsync();
-        if (estimate.Quota > 0)
-            _storageText = $"Using {Megabytes(estimate.Usage)} of {Megabytes(estimate.Quota)} available.";
-
-        _running = false;
-        StateHasChanged();
-    }
-
-    private async Task RetryFailed()
-    {
-        var failed = _items.Where(i => i.Status == ItemStatus.Failed).ToList();
-        foreach (var item in failed)
-            item.Status = ItemStatus.Pending;
-        _failedCount = 0;
-        await DownloadAsync(failed);
-    }
-
-    private static string Megabytes(long bytes) => $"{bytes / 1024.0 / 1024.0:0} MB";
+    private void RetryFailed() => Download.Retry();
 
     private void Close() => Dialog.Close();
+
+    private void OnProgress() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Download.OnProgressChanged -= OnProgress;
 }

@@ -3,3 +3,67 @@
     padding-inline-start: 1px !important;
     padding-inline-end: 1px !important;
 }
+
+/* Spotify-style fixed music player, pinned to the bottom of the viewport. */
+.bc-music-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1200; /* above page content, below dialogs (1400) and popovers (1500) */
+    background: var(--mud-palette-appbar-background);
+    border-top: 1px solid var(--mud-palette-appbar-text);
+    padding-bottom: env(safe-area-inset-bottom); /* iOS PWA home indicator */
+}
+
+/* Queue drawer: header + scrollable track list within full height. */
+.bc-queue-drawer .mud-drawer-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Highlight the currently-playing track in the queue. */
+.bc-queue-current {
+    background-color: var(--mud-palette-action-default-hover);
+}
+
+/* Queue track rows: pointer + hover feedback. */
+.bc-queue-drawer .mud-list-item {
+    cursor: pointer;
+    transition: background-color 120ms ease;
+}
+
+.bc-queue-drawer .mud-list-item:hover {
+    background-color: var(--mud-palette-action-default-hover);
+}
+
+/* Keep the current track visually distinct even while hovering. */
+.bc-queue-current:hover {
+    background-color: var(--mud-palette-primary-hover);
+}
+
+/* Album-art play overlay: fades in over the artwork on row hover (Spotify-style). */
+.bc-queue-art {
+    position: relative;
+    display: inline-flex;
+    border-radius: var(--mud-default-borderradius);
+    overflow: hidden;
+}
+
+.bc-queue-art-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    opacity: 0;
+    transition: opacity 120ms ease;
+    pointer-events: none; /* let the click reach the list row */
+}
+
+.bc-queue-drawer .mud-list-item:hover .bc-queue-art-overlay {
+    opacity: 1;
+}
