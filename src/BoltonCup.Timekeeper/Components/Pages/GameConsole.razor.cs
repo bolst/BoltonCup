@@ -1,5 +1,6 @@
 using BoltonCup.Sdk;
 using BoltonCup.Timekeeper.Services;
+using BoltonCup.Timekeeper.Services.Music;
 using BoltonCup.Timekeeper.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -14,6 +15,8 @@ public partial class GameConsole : ComponentBase, IDisposable
 
     [Inject] private TimekeeperStateService State { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] private MusicPlayerService Player { get; set; } = null!;
+    [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
     private static readonly (int Value, string Label)[] PeriodOptions =
     [
@@ -59,6 +62,29 @@ public partial class GameConsole : ComponentBase, IDisposable
 
     private async Task OpenGoalDialogAsync(bool isHome)
     {
+        var team = isHome ? State.Game!.HomeTeam : State.Game!.AwayTeam;
+        if (State.AutoplayGoalSong)
+        {
+            var songResult = await Player.PlayGoalSongAsync(
+                team?.GoalSongFileKey ?? "", team?.GoalSongOffsetSeconds ?? 0, team?.GoalSongTitle);
+            var teamName = team?.NameShort ?? team?.Name ?? "team";
+            switch (songResult)
+            {
+                case MusicPlayerService.GoalSongResult.NoSong:
+                    Snackbar.Add($"No goal song set for {teamName}.", Severity.Info);
+                    break;
+                case MusicPlayerService.GoalSongResult.Unresolved:
+                    Snackbar.Add("Goal song isn't downloaded and you're offline.", Severity.Warning);
+                    break;
+                case MusicPlayerService.GoalSongResult.Blocked:
+                    Snackbar.Add("Browser blocked the goal song from playing.", Severity.Warning);
+                    break;
+                case MusicPlayerService.GoalSongResult.NotReady:
+                    Snackbar.Add("Music player isn't ready yet.", Severity.Warning);
+                    break;
+            }
+        }
+
         var parameters = new DialogParameters<GoalDialog>
         {
             { x => x.HomeTeam, State.Game!.HomeTeam },

@@ -1247,7 +1247,10 @@ public class Mapper : IMapper
             {
                 Id = team.Id, Name = team.Name, NameShort = team.NameShort, Abbreviation = team.Abbreviation,
                 Logo = _urlResolver.GetFullUrl(team.Logo), Banner = _urlResolver.GetFullUrl(team.Banner), Goals = game.Goals.Count(g => g.TeamId == team.Id), PrimaryColorHex = team.PrimaryColorHex,
-                SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex
+                SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex,
+                GoalSongFileKey = team.GoalSongTrack?.AudioFileKey,
+                GoalSongOffsetSeconds = team.GoalSongTrack?.OffsetSeconds,
+                GoalSongTitle = team.GoalSongTrack?.Title
             };
     }
 

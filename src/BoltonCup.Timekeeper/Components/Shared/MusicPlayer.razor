@@ -6,6 +6,7 @@
 @inject MusicPlayerService Player
 @inject MusicCacheService Cache
 @inject MusicDownloadService Download
+@inject TimekeeperStateService State
 @inject IBoltonCupApi Api
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
@@ -73,25 +74,36 @@
                         </MudButton>
                     </MudTooltip>
                 }
-                else if (_cachedCount >= _trackCount)
+                else if (_cachedCount >= _offlineCount)
                 {
-                    <MudTooltip Text="@($"{_cachedCount}/{_trackCount} tracks available offline")">
+                    <MudTooltip Text="@($"{_cachedCount}/{_offlineCount} tracks available offline")">
                         <MudIcon Icon="@Icons.Material.Rounded.DownloadForOffline" Color="Color.Success" Size="Size.Small" />
                     </MudTooltip>
                 }
                 else
                 {
-                    <MudTooltip Text="@($"Download for offline ({_cachedCount}/{_trackCount} cached)")">
+                    <MudTooltip Text="@($"Download for offline ({_cachedCount}/{_offlineCount} cached)")">
                         <MudIconButton Icon="@Icons.Material.Rounded.CloudDownload"
                                        Size="Size.Small"
                                        OnClick="@DownloadForOffline"
                                        Color="Color.Secondary"/>
                     </MudTooltip>
                 }
+                
+                <MudTooltip Text="Queue">
+                    <MudIconButton Icon="@Icons.Material.Rounded.Menu"
+                                   OnClick="@ToggleQueueDrawer"
+                                   Color="(_queueDrawerOpen ? Color.Success : Color.Tertiary)"
+                                   Size="Size.Small"/>
+                </MudTooltip>
             </div>
         }
     </MudContainer>
 </div>
+
+<MudDrawer @bind-Open="@_queueDrawerOpen" Anchor="Anchor.End" Height="100%" Variant="DrawerVariant.Persistent" Fixed="false">
+    <MudText>I am a queue</MudText>
+</MudDrawer>
 
 @code {
     [Parameter] public int GameId { get; set; }
@@ -102,7 +114,10 @@
     private int? _loadedGameId;
     private int _trackCount;
     private int _cachedCount;
+    private int _offlineCount;
+    private int? _offlineForGameId;
     private bool _wasDownloading;
+    private bool _queueDrawerOpen;
 
     private double SliderMax => Player.DurationSec > 0 ? Player.DurationSec : 1;
 
@@ -110,6 +125,7 @@
     {
         Player.OnStateChanged += OnPlayerChanged;
         Download.OnProgressChanged += OnDownloadChanged;
+        State.OnStateChanged += OnGameStateChanged;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -138,7 +154,7 @@
             var tracks = playlist.Tracks.ToList();
             Player.SetPlaylist(tracks);
             _trackCount = tracks.Count;
-            await RefreshCachedCountAsync(tracks);
+            await RefreshCachedCountAsync();
         }
         catch (Exception ex)
         {
@@ -150,14 +166,41 @@
         }
     }
 
-    private async Task RefreshCachedCountAsync(IReadOnlyList<PlaylistTrackDto> tracks)
+    /// <summary>
+    /// The offline download set: the game playlist plus both teams' goal songs (deduped by file key).
+    /// Goal songs are NOT added to the rotating <see cref="MusicPlayerService.Playlist"/> — only cached.
+    /// </summary>
+    private IReadOnlyList<PlaylistTrackDto> BuildOfflineSet()
     {
-        if (tracks.Count == 0)
+        var set = new List<PlaylistTrackDto>(Player.Playlist);
+        var seen = set.Select(t => t.FileKey).ToHashSet();
+
+        foreach (var team in new[] { State.Game?.HomeTeam, State.Game?.AwayTeam })
+        {
+            if (team?.GoalSongFileKey is { Length: > 0 } key && seen.Add(key))
+            {
+                set.Add(new PlaylistTrackDto
+                {
+                    FileKey = key,
+                    Title = team.GoalSongTitle ?? "Goal song",
+                    OffsetSeconds = team.GoalSongOffsetSeconds,
+                });
+            }
+        }
+        return set;
+    }
+
+    private async Task RefreshCachedCountAsync()
+    {
+        _offlineForGameId = State.Game?.Id;
+        var set = BuildOfflineSet();
+        _offlineCount = set.Count;
+        if (set.Count == 0)
         {
             _cachedCount = 0;
             return;
         }
-        var cached = await Cache.GetCachedKeysAsync(tracks.Select(t => t.FileKey));
+        var cached = await Cache.GetCachedKeysAsync(set.Select(t => t.FileKey));
         _cachedCount = cached.Count;
     }
 
@@ -165,9 +208,10 @@
     {
         // The download runs in MusicDownloadService, so the dialog can be closed and reopened
         // while it continues. Progress + completion are handled via OnDownloadChanged.
+        // Include both teams' goal songs so they play offline too.
         var parameters = new DialogParameters<PreloadMusicDialog>
         {
-            { x => x.Tracks, Player.Playlist },
+            { x => x.Tracks, BuildOfflineSet() },
         };
         await DialogService.ShowAsync<PreloadMusicDialog>("Download Music", parameters);
     }
@@ -183,12 +227,22 @@
 
     private void OnPlayerChanged() => InvokeAsync(StateHasChanged);
 
+    // When the game finishes loading, its goal songs become known — fold them into the cached count.
+    private void OnGameStateChanged() => InvokeAsync(async () =>
+    {
+        if (State.Game?.Id != _offlineForGameId)
+        {
+            await RefreshCachedCountAsync();
+        }
+        StateHasChanged();
+    });
+
     private void OnDownloadChanged() => InvokeAsync(async () =>
     {
         // Detect the running→finished transition to refresh the cached count and notify.
         if (_wasDownloading && !Download.IsRunning)
         {
-            await RefreshCachedCountAsync(Player.Playlist);
+            await RefreshCachedCountAsync();
             if (Download.Failed == 0)
             {
                 Snackbar.Add("Music ready for offline", Severity.Success);
@@ -202,9 +256,15 @@
         StateHasChanged();
     });
 
+    private void ToggleQueueDrawer()
+    {
+        _queueDrawerOpen = !_queueDrawerOpen;
+    }
+
     public void Dispose()
     {
         Player.OnStateChanged -= OnPlayerChanged;
         Download.OnProgressChanged -= OnDownloadChanged;
+        State.OnStateChanged -= OnGameStateChanged;
     }
 }

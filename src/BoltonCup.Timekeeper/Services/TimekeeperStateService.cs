@@ -1,16 +1,20 @@
 using System.Text.Json;
 using BoltonCup.Sdk;
+using Microsoft.JSInterop;
 using MudBlazor;
 
 namespace BoltonCup.Timekeeper.Services;
 
 public class TimekeeperStateService : IDisposable
 {
+    private const string AutoplayGoalSongKey = "bc:autoplayGoalSong";
+
     private readonly IBoltonCupApi _api;
     private readonly ISnackbar _snackbar;
     private readonly ILogger<TimekeeperStateService> _logger;
     private readonly IOfflineStore _offlineStore;
     private readonly SyncService _syncService;
+    private readonly IJSRuntime _js;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -27,6 +31,10 @@ public class TimekeeperStateService : IDisposable
     public bool IsLoading { get; private set; }
     public bool IsOnline => _syncService.IsOnline;
 
+    /// <summary>When true, clicking a team's Goal button plays that team's goal song. Persisted to localStorage.</summary>
+    public bool AutoplayGoalSong { get; private set; } = true;
+    private bool _autoplayLoaded;
+
     public event Action? OnStateChanged;
 
     public int HomeScore => (Game?.HomeTeam?.Goals ?? 0) + _pendingHomeGoals;
@@ -39,14 +47,46 @@ public class TimekeeperStateService : IDisposable
         ISnackbar snackbar,
         ILogger<TimekeeperStateService> logger,
         IOfflineStore offlineStore,
-        SyncService syncService)
+        SyncService syncService,
+        IJSRuntime js)
     {
         _api = api;
         _snackbar = snackbar;
         _logger = logger;
         _offlineStore = offlineStore;
         _syncService = syncService;
+        _js = js;
         _syncService.OnSyncCompleted += HandleSyncCompleted;
+    }
+
+    /// <summary>Reads the persisted autoplay preference once (missing → default on).</summary>
+    private async Task EnsureAutoplayLoadedAsync()
+    {
+        if (_autoplayLoaded) return;
+        _autoplayLoaded = true;
+        try
+        {
+            var value = await _js.InvokeAsync<string?>("localStorage.getItem", AutoplayGoalSongKey);
+            AutoplayGoalSong = value != "0";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to read autoplay goal song preference");
+        }
+    }
+
+    public async Task SetAutoplayGoalSongAsync(bool value)
+    {
+        AutoplayGoalSong = value;
+        NotifyStateChanged();
+        try
+        {
+            await _js.InvokeVoidAsync("localStorage.setItem", AutoplayGoalSongKey, value ? "1" : "0");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to persist autoplay goal song preference");
+        }
     }
 
     public static string PeriodLabel(int period) => period switch
@@ -65,6 +105,7 @@ public class TimekeeperStateService : IDisposable
         IsLoading = true;
         _pendingHomeGoals = 0;
         _pendingAwayGoals = 0;
+        await EnsureAutoplayLoadedAsync();
         NotifyStateChanged();
 
         try
