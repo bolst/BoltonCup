@@ -24,7 +24,7 @@
         @if (_loading)
         {
             <div class="d-flex justify-center pa-4">
-                <MudProgressCircular Indeterminate Size="Size.Small" />
+                <MudProgressCircular Indeterminate Size="Size.Small" Color="Color.Tertiary" />
             </div>
         }
         else if (_trackCount == 0)
@@ -36,8 +36,8 @@
         }
         else
         {
-            <div class="d-flex align-center gap-2 pa-4">
-                <MudAvatar Square Size="Size.Medium">
+            <div class="d-flex align-center gap-2 px-4 py-2">
+                <MudAvatar Square Size="Size.Large">
                     @if (Player.CurrentTrack?.AlbumArtUrl is { Length: > 0 } art)
                     {
                         <MudImage Src="@art" />
@@ -48,37 +48,34 @@
                     }
                 </MudAvatar>
 
-                <div class="flex-grow-1" style="min-width: 0;">
+                <div>
                     <MudText Typo="Typo.body2" Class="text-truncate white-text">
-                        @if (Player.CurrentTrack is { Title.Length: > 0 } currentTrack)
-                        {
-                            @($"{currentTrack.Title} | {currentTrack.Artist}")
-                        }
-                        else
-                        {
-                            @:Ready to play
-                        }
+                        @Player.CurrentTrack?.Title
                     </MudText>
-                    <div class="d-flex align-center gap-2">
+                    <MudText Typo="Typo.caption" Class="white-text">
+                        @Player.CurrentTrack?.Artist
+                    </MudText>
+                </div>
+
+                <div class="d-flex flex-column align-center mud-width-full">
+                    <div class="d-flex flex-row align-center gap-1">
+                        <MudIconButton Icon="@Icons.Material.Rounded.SkipPrevious" OnClick="@(() => Player.PrevAsync())" Color="Color.Tertiary"/>
+                        <MudIconButton Icon="@(Player.IsPlaying ? Icons.Material.Rounded.Pause : Icons.Material.Rounded.PlayArrow)" Color="@Color.Tertiary" OnClick="@(() => Player.TogglePlayPauseAsync())"/>
+                        <MudIconButton Icon="@Icons.Material.Rounded.SkipNext" OnClick="@(() => Player.NextAsync())" Color="Color.Tertiary"/>
+                    </div>
+                    <div class="d-flex align-center gap-2 mud-width-full" style="max-width: 400px">
                         <MudText Typo="Typo.caption" Color="Color.Tertiary">@Format(Player.PositionSec)</MudText>
                         <MudSlider T="double" Min="0" Max="@SliderMax" Step="1" Size="Size.Small" Color="Color.Tertiary"
-                                   Value="Player.PositionSec" ValueChanged="OnSeek" Class="flex-grow-1" />
+                                   Value="Player.PositionSec" ValueChanged="OnSeek" Class="flex-grow-1"/>
                         <MudText Typo="Typo.caption" Color="Color.Tertiary">@Format(Player.DurationSec)</MudText>
                     </div>
                 </div>
 
-                <MudButtonGroup OverrideStyles="false" Size="Size.Small">
-                    <MudIconButton Icon="@Icons.Material.Rounded.SkipPrevious" OnClick="@(() => Player.PrevAsync())" Color="Color.Tertiary" />
-                    <MudIconButton Icon="@(Player.IsPlaying ? Icons.Material.Rounded.Pause : Icons.Material.Rounded.PlayArrow)"
-                                   Color="@Color.Tertiary"
-                                   OnClick="@(() => Player.TogglePlayPauseAsync())" />
-                    <MudIconButton Icon="@Icons.Material.Rounded.SkipNext" OnClick="@(() => Player.NextAsync())" Color="Color.Tertiary" />
-                </MudButtonGroup>
 
                 @if (Download.IsRunning)
                 {
                     <MudTooltip Text="Downloading music for offline — tap to view">
-                        <MudButton Size="Size.Small" Variant="Variant.Text"
+                        <MudButton Variant="Variant.Text"
                                    StartIcon="@Icons.Material.Rounded.Downloading"
                                    OnClick="@DownloadForOffline"
                                    Color="Color.Warning">
@@ -89,14 +86,13 @@
                 else if (_cachedCount >= _offlineCount)
                 {
                     <MudTooltip Text="@($"{_cachedCount}/{_offlineCount} tracks available offline")">
-                        <MudIcon Icon="@Icons.Material.Rounded.DownloadForOffline" Color="Color.Success" Size="Size.Small" />
+                        <MudIcon Icon="@Icons.Material.Rounded.DownloadForOffline" Color="Color.Success" />
                     </MudTooltip>
                 }
                 else
                 {
                     <MudTooltip Text="@($"Download for offline ({_cachedCount}/{_offlineCount} cached)")">
                         <MudIconButton Icon="@Icons.Material.Rounded.CloudDownload"
-                                       Size="Size.Small"
                                        OnClick="@DownloadForOffline"
                                        Color="Color.Secondary"/>
                     </MudTooltip>
@@ -105,8 +101,7 @@
                 <MudTooltip Text="Queue">
                     <MudIconButton Icon="@Icons.Material.Rounded.QueueMusic"
                                    OnClick="@ToggleQueueDrawer"
-                                   Color="@(_queueDrawerOpen ? Color.Success : Color.Tertiary)"
-                                   Size="Size.Small"/>
+                                   Color="@(_queueDrawerOpen ? Color.Success : Color.Tertiary)"/>
                 </MudTooltip>
             </div>
         }
