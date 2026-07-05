@@ -6,7 +6,12 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <NavMenu />
+    <MudHidden Breakpoint="Breakpoint.Xs">
+        <NavMenu/>
+    </MudHidden>
+    <MudHidden Breakpoint="Breakpoint.Xs" Invert>
+        <MobileNavBar/>
+    </MudHidden>
     <MudMainContent Style="min-height: 100vh">
         <SyncStatusBar />
         <BoltonCupErrorBoundary>
