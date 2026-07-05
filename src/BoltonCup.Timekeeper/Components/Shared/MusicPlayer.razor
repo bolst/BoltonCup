@@ -20,7 +20,7 @@
 <audio @ref="_audioEl" preload="auto" style="display:none"></audio>
 
 <div class="bc-music-bar">
-    <MudContainer MaxWidth="MaxWidth.Medium" Class="pa-0">
+    <MudContainer MaxWidth="MaxWidth.False" Class="pa-0">
         @if (_loading)
         {
             <div class="d-flex justify-center pa-4">
@@ -70,7 +70,7 @@
                 <MudButtonGroup OverrideStyles="false" Size="Size.Small">
                     <MudIconButton Icon="@Icons.Material.Rounded.SkipPrevious" OnClick="@(() => Player.PrevAsync())" Color="Color.Tertiary" />
                     <MudIconButton Icon="@(Player.IsPlaying ? Icons.Material.Rounded.Pause : Icons.Material.Rounded.PlayArrow)"
-                                   Color="@(Player.IsPlaying ? Color.Tertiary : Color.Tertiary)"
+                                   Color="@Color.Tertiary"
                                    OnClick="@(() => Player.TogglePlayPauseAsync())" />
                     <MudIconButton Icon="@Icons.Material.Rounded.SkipNext" OnClick="@(() => Player.NextAsync())" Color="Color.Tertiary" />
                 </MudButtonGroup>
