@@ -147,8 +147,18 @@ public class MusicLibraryService : IMusicLibraryService
             .OrderBy(t => t.Title)
             .ToListAsync(cancellationToken);
 
+        // Team goal/win songs must never play in the regular rotation — they are one-shots on goal/win only.
+        var excludedTrackIds = (await _db.Teams
+            .Where(t => t.TournamentId == game.TournamentId)
+            .Select(t => new { t.GoalSongTrackId, t.WinSongTrackId })
+            .ToListAsync(cancellationToken))
+            .SelectMany(t => new[] { t.GoalSongTrackId, t.WinSongTrackId })
+            .Where(id => id is not null)
+            .Select(id => id!.Value)
+            .ToHashSet();
+
         var tracks = MusicPlaylistComposer.Compose(
-            requests.Select(r => (MusicProviderType.Spotify, r.SongTrackId)), library);
+            requests.Select(r => (MusicProviderType.Spotify, r.SongTrackId)), library, excludedTrackIds);
 
         var libraryTrackIds = library
             .Where(t => t.ProviderType == MusicProviderType.Spotify && !string.IsNullOrWhiteSpace(t.TrackId))

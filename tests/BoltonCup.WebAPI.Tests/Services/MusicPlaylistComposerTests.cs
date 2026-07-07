@@ -119,6 +119,38 @@ public class MusicPlaylistComposerTests
         result.Should().Equal("base1");
     }
 
+    [Fact]
+    public void Compose_ExcludesGoalWinSong_EvenWhenInBasePool()
+    {
+        var goalSong = Track("goal", "G", basePool: true);
+        goalSong.Id = 42;
+        var library = new[]
+        {
+            goalSong,
+            Track("base1", null, basePool: true),
+        };
+
+        var result = Keys(MusicPlaylistComposer.Compose(Reqs(), library, new HashSet<int> { 42 }));
+
+        result.Should().Equal("base1");
+    }
+
+    [Fact]
+    public void Compose_ExcludesGoalWinSong_EvenWhenRequested()
+    {
+        var goalSong = Track("goal", "G", basePool: false);
+        goalSong.Id = 7;
+        var library = new[]
+        {
+            goalSong,
+            Track("base1", null, basePool: true),
+        };
+
+        var result = Keys(MusicPlaylistComposer.Compose(Reqs("G"), library, new HashSet<int> { 7 }));
+
+        result.Should().Equal("base1");
+    }
+
     private static List<string> Keys(IEnumerable<TournamentMusicTrack> tracks)
         => tracks.Select(t => t.AudioFileKey).ToList();
 }
