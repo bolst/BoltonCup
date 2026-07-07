@@ -67,6 +67,11 @@ public sealed class MusicPlayerService : IAsyncDisposable
             return;
         }
 
+        // Leaving any goal-song one-shot: clear its state so CurrentTrack reflects the playlist track
+        // (and the next natural 'ended' advances the playlist instead of stopping).
+        _oneShot = false;
+        _oneShotTrack = null;
+
         await RevokeCurrentAsync();
 
         CurrentIndex = index;
