@@ -8,6 +8,7 @@ namespace BoltonCup.Timekeeper.Services;
 public class TimekeeperStateService : IDisposable
 {
     private const string AutoplayGoalSongKey = "bc:autoplayGoalSong";
+    private const string NormalizeAudioKey = "bc:normalizeAudio";
 
     private readonly IBoltonCupApi _api;
     private readonly ISnackbar _snackbar;
@@ -33,7 +34,11 @@ public class TimekeeperStateService : IDisposable
 
     /// <summary>When true, clicking a team's Goal button plays that team's goal song. Persisted to localStorage.</summary>
     public bool AutoplayGoalSong { get; private set; } = true;
-    private bool _autoplayLoaded;
+
+    /// <summary>When true, music downloads measure loudness so playback can be level-normalized. Persisted to localStorage.</summary>
+    public bool NormalizeAudio { get; private set; } = true;
+
+    private bool _settingsLoaded;
 
     public event Action? OnStateChanged;
 
@@ -59,21 +64,26 @@ public class TimekeeperStateService : IDisposable
         _syncService.OnSyncCompleted += HandleSyncCompleted;
     }
 
-    /// <summary>Reads the persisted autoplay preference once (missing → default on).</summary>
-    private async Task EnsureAutoplayLoadedAsync()
+    /// <summary>Reads the persisted music preferences once (missing → default on).</summary>
+    private async Task EnsureSettingsLoadedAsync()
     {
-        if (_autoplayLoaded) return;
-        _autoplayLoaded = true;
+        if (_settingsLoaded) return;
+        _settingsLoaded = true;
         try
         {
-            var value = await _js.InvokeAsync<string?>("localStorage.getItem", AutoplayGoalSongKey);
-            AutoplayGoalSong = value != "0";
+            var autoplay = await _js.InvokeAsync<string?>("localStorage.getItem", AutoplayGoalSongKey);
+            AutoplayGoalSong = autoplay != "0";
+            var normalize = await _js.InvokeAsync<string?>("localStorage.getItem", NormalizeAudioKey);
+            NormalizeAudio = normalize != "0";
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to read autoplay goal song preference");
+            _logger.LogWarning(ex, "Failed to read music preferences");
         }
     }
+
+    /// <summary>Ensures the persisted music preferences have been read (safe to call before reading them).</summary>
+    public Task EnsureSettingsLoadedPublicAsync() => EnsureSettingsLoadedAsync();
 
     public async Task SetAutoplayGoalSongAsync(bool value)
     {
@@ -86,6 +96,20 @@ public class TimekeeperStateService : IDisposable
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to persist autoplay goal song preference");
+        }
+    }
+
+    public async Task SetNormalizeAudioAsync(bool value)
+    {
+        NormalizeAudio = value;
+        NotifyStateChanged();
+        try
+        {
+            await _js.InvokeVoidAsync("localStorage.setItem", NormalizeAudioKey, value ? "1" : "0");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to persist normalize audio preference");
         }
     }
 
@@ -105,7 +129,7 @@ public class TimekeeperStateService : IDisposable
         IsLoading = true;
         _pendingHomeGoals = 0;
         _pendingAwayGoals = 0;
-        await EnsureAutoplayLoadedAsync();
+        await EnsureSettingsLoadedAsync();
         NotifyStateChanged();
 
         try

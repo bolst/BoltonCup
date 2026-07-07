@@ -41,7 +41,7 @@ public sealed class MusicPlayerService : IAsyncDisposable
 
     public async Task InitializeAsync(ElementReference audioEl)
     {
-        _module ??= await _js.InvokeAsync<IJSObjectReference>("import", "/js/musicPlayer.js?v=1");
+        _module ??= await _js.InvokeAsync<IJSObjectReference>("import", "/js/musicPlayer.js?v=1.0.1");
         _selfRef ??= DotNetObjectReference.Create(this);
         await _module.InvokeVoidAsync("init", audioEl, _selfRef);
     }
@@ -95,6 +95,7 @@ public sealed class MusicPlayerService : IAsyncDisposable
         }
 
         await _module.InvokeVoidAsync("load", url, offsetSec);
+        await _module.InvokeVoidAsync("setGain", await _cache.GetGainAsync(track.FileKey));
         IsPlaying = await _module.InvokeAsync<bool>("play");
         Notify();
     }
@@ -174,6 +175,7 @@ public sealed class MusicPlayerService : IAsyncDisposable
         DurationSec = 0;
         PositionSec = offsetSeconds;
         await _module.InvokeVoidAsync("load", url, offsetSeconds);
+        await _module.InvokeVoidAsync("setGain", await _cache.GetGainAsync(fileKey));
         IsPlaying = await _module.InvokeAsync<bool>("play");
         Notify();
         return IsPlaying ? GoalSongResult.Playing : GoalSongResult.Blocked;
