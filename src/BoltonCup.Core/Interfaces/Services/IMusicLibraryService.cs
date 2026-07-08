@@ -24,10 +24,22 @@ public interface IMusicLibraryService
     Task DeleteTrackAsync(int tournamentId, int trackId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// The ordered, de-duped playlist for a game (matched player requests first, then base pool) plus the
-    /// player requests that have no matching uploaded file.
+    /// The ordered, de-duped playlist for a game, driven by the shared tournament rotation (current song
+    /// first), plus the player requests that have no matching uploaded file.
     /// </summary>
     Task<GamePlaylistResult> GetGamePlaylistAsync(int gameId, CancellationToken cancellationToken = default);
+
+    /// <summary>Reports that a track has started playing in a game, advancing the tournament's shared queue.</summary>
+    Task AdvanceGameQueueAsync(int gameId, int musicTrackId, CancellationToken cancellationToken = default);
+
+    /// <summary>Reshuffles a fresh cycle for a game's tournament once its deck is exhausted.</summary>
+    Task RollGameQueueAsync(int gameId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// The downloaded base-pool-eligible track ids for a game's participating players' requested songs, in
+    /// roster order (home team first). Used to inject player songs into the queue when a game starts.
+    /// </summary>
+    Task<IReadOnlyList<int>> GetOrderedRequestTrackIdsAsync(int gameId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Tournament-wide download queue items still pending (no matching library file yet). Backs the

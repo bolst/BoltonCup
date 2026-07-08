@@ -12,13 +12,15 @@ public class MusicLibraryService : IMusicLibraryService
     private readonly IStorageService _storage;
     private readonly IAssetKeyGenerator _keyGenerator;
     private readonly IMusicSearchService _search;
+    private readonly IGlobalMusicQueue _queue;
 
-    public MusicLibraryService(BoltonCupDbContext db, IStorageService storage, IAssetKeyGenerator keyGenerator, IMusicSearchService search)
+    public MusicLibraryService(BoltonCupDbContext db, IStorageService storage, IAssetKeyGenerator keyGenerator, IMusicSearchService search, IGlobalMusicQueue queue)
     {
         _db = db;
         _storage = storage;
         _keyGenerator = keyGenerator;
         _search = search;
+        _queue = queue;
     }
 
     public async Task<IReadOnlyList<TournamentMusicTrack>> GetLibraryAsync(int tournamentId, CancellationToken cancellationToken = default)
@@ -144,21 +146,23 @@ public class MusicLibraryService : IMusicLibraryService
 
         var library = await _db.TournamentMusicTracks
             .Where(t => t.TournamentId == game.TournamentId && t.Status == MusicTrackStatus.Downloaded)
-            .OrderBy(t => t.Title)
             .ToListAsync(cancellationToken);
+        var byId = library.ToDictionary(t => t.Id);
 
-        // Team goal/win songs must never play in the regular rotation — they are one-shots on goal/win only.
-        var excludedTrackIds = (await _db.Teams
-            .Where(t => t.TournamentId == game.TournamentId)
-            .Select(t => new { t.GoalSongTrackId, t.WinSongTrackId })
-            .ToListAsync(cancellationToken))
-            .SelectMany(t => new[] { t.GoalSongTrackId, t.WinSongTrackId })
-            .Where(id => id is not null)
-            .Select(id => id!.Value)
-            .ToHashSet();
-
-        var tracks = MusicPlaylistComposer.Compose(
-            requests.Select(r => (MusicProviderType.Spotify, r.SongTrackId)), library, excludedTrackIds);
+        // Order comes from the shared tournament rotation (current song first). Map ids to downloaded tracks,
+        // dropping any that vanished, and de-dupe by audio file key (keeping the first occurrence).
+        var order = await _queue.GetOrderAsync(game.TournamentId, cancellationToken);
+        var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var tracks = new List<TournamentMusicTrack>();
+        foreach (var id in order)
+        {
+            if (byId.TryGetValue(id, out var track)
+                && !string.IsNullOrWhiteSpace(track.AudioFileKey)
+                && seenKeys.Add(track.AudioFileKey!))
+            {
+                tracks.Add(track);
+            }
+        }
 
         var libraryTrackIds = library
             .Where(t => t.ProviderType == MusicProviderType.Spotify && !string.IsNullOrWhiteSpace(t.TrackId))
@@ -171,6 +175,64 @@ public class MusicLibraryService : IMusicLibraryService
             .ToList();
 
         return new GamePlaylistResult(tracks, missing);
+    }
+
+    public async Task AdvanceGameQueueAsync(int gameId, int musicTrackId, CancellationToken cancellationToken = default)
+    {
+        var tournamentId = await GetTournamentIdAsync(gameId, cancellationToken);
+        await _queue.AdvanceAsync(tournamentId, musicTrackId, cancellationToken);
+    }
+
+    public async Task RollGameQueueAsync(int gameId, CancellationToken cancellationToken = default)
+    {
+        var tournamentId = await GetTournamentIdAsync(gameId, cancellationToken);
+        await _queue.RollOverAsync(tournamentId, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<int>> GetOrderedRequestTrackIdsAsync(int gameId, CancellationToken cancellationToken = default)
+    {
+        var game = await _db.Games.FirstOrDefaultAsync(g => g.Id == gameId, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(Game), gameId);
+
+        var requests = await GetOrderedRequestsAsync(game, cancellationToken);
+        var requestedTrackIds = requests
+            .Where(r => !string.IsNullOrWhiteSpace(r.SongTrackId))
+            .Select(r => r.SongTrackId!)
+            .ToList();
+        if (requestedTrackIds.Count == 0)
+        {
+            return [];
+        }
+
+        // Map each request's provider track id to its downloaded library row id, preserving roster order.
+        var downloaded = await _db.TournamentMusicTracks
+            .Where(t => t.TournamentId == game.TournamentId
+                && t.Status == MusicTrackStatus.Downloaded
+                && t.ProviderType == MusicProviderType.Spotify
+                && t.TrackId != null)
+            .Select(t => new { t.Id, t.TrackId })
+            .ToListAsync(cancellationToken);
+        var idByTrackId = downloaded
+            .GroupBy(t => t.TrackId!, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First().Id, StringComparer.OrdinalIgnoreCase);
+
+        var ids = new List<int>();
+        foreach (var trackId in requestedTrackIds)
+            if (idByTrackId.TryGetValue(trackId, out var id) && !ids.Contains(id))
+            {
+                ids.Add(id);
+            }
+        return ids;
+    }
+
+    private async Task<int> GetTournamentIdAsync(int gameId, CancellationToken cancellationToken)
+    {
+        var game = await _db.Games
+            .Where(g => g.Id == gameId)
+            .Select(g => new { g.TournamentId })
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(Game), gameId);
+        return game.TournamentId;
     }
 
     public async Task<IReadOnlyList<MissingSongRequest>> GetMissingRequestsAsync(int tournamentId, CancellationToken cancellationToken = default)

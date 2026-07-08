@@ -20,7 +20,7 @@ public class TeamServiceTests
 
     private static TeamService NewService(BoltonCupDbContext db)
     {
-        var music = new MusicLibraryService(db, Mock.Of<IStorageService>(), Mock.Of<IAssetKeyGenerator>(), Mock.Of<IMusicSearchService>());
+        var music = new MusicLibraryService(db, Mock.Of<IStorageService>(), Mock.Of<IAssetKeyGenerator>(), Mock.Of<IMusicSearchService>(), new GlobalMusicQueue(db));
         return new TeamService(db, Mock.Of<IStorageService>(), Mock.Of<IAssetKeyGenerator>(), music);
     }
 
