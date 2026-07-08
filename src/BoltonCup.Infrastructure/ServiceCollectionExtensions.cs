@@ -50,6 +50,9 @@ public static class ServiceCollectionExtensions
 
         builder.Services.AddSingleton<IRosterValidator, RosterValidator>();
 
+        // The shared music rotation is DB-backed; register explicitly (name ends in Queue, not Service).
+        builder.Services.AddScoped<IGlobalMusicQueue, GlobalMusicQueue>();
+
         builder.Services.Configure<TradeNotificationSettings>(builder.Configuration.GetSection("TradeNotifications"));
 
         return builder;
