@@ -1,0 +1,50 @@
+@implements IDisposable
+@inject NavigationManager Navigation
+
+<MudAppBar Elevation="1" ToolBarClass="d-flex flex-row align-center">
+    <a href="/" style="height: 100%">
+        <BoltonCupLogo Height="48"/>
+    </a>
+    <MudSpacer/>
+    <MudIconButton OnClick="@OpenDrawer" Icon="@Icons.Material.Rounded.Menu" Color="Color.Inherit"/>
+    <MudDrawer @bind-Open="_drawerOpen" Anchor="Anchor.End" Elevation="1" Variant="DrawerVariant.Temporary" Color="Color.Dark" Width="100%">
+        <MudPaper Class="d-flex flex-row align-center px-2 border-solid border-b mud-border-tertiary mud-theme-dark" Elevation="0" Width="100%" Height="64px" Square>
+            <BoltonCupLogo Height="48"/>
+            <MudSpacer/>
+            <MudIconButton OnClick="@CloseDrawer" Icon="@Icons.Material.Rounded.Close" Color="Color.Tertiary"/>
+        </MudPaper>
+        <MudNavMenu Class="mud-width-full" Margin="Margin.Normal" Color="Color.Tertiary" Rounded>
+            <MudNavLink Href="/" Icon="@Icons.Material.Rounded.SportsHockey" Match="NavLinkMatch.All">Games</MudNavLink>
+        </MudNavMenu>
+        <MudSpacer/>
+        <UserMenu OnItemClick="@CloseDrawer"/>
+    </MudDrawer>
+</MudAppBar>
+
+@code {
+
+    private bool _drawerOpen;
+
+    private void OpenDrawer() => _drawerOpen = true;
+    private void CloseDrawer() => _drawerOpen = false;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    // Close the full-screen drawer once a nav link navigates so the page is visible.
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (!_drawerOpen)
+            return;
+        _drawerOpen = false;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+
+}

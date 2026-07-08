@@ -6995,6 +6995,246 @@
         ]
       }
     },
+    "/api/games/{id}/playlist/advance": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Reports that a playlist track started playing, advancing the shared queue (timekeeper or admin only).",
+        "operationId": "AdvancePlaylist",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AdvancePlaylistRequest"
+                  }
+                ],
+                "description": "Reports that a playlist track has started playing, so the shared tournament queue advances."
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AdvancePlaylistRequest"
+                  }
+                ],
+                "description": "Reports that a playlist track has started playing, so the shared tournament queue advances."
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AdvancePlaylistRequest"
+                  }
+                ],
+                "description": "Reports that a playlist track has started playing, so the shared tournament queue advances."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/games/{id}/playlist/rollover": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Reshuffles a fresh cycle once the deck is exhausted (timekeeper or admin only).",
+        "operationId": "RollPlaylist",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKey": [ ]
+          },
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/games/{id}/goals": {
       "post": {
         "tags": [
@@ -13140,6 +13380,18 @@
         "additionalProperties": false,
         "description": "Request to add an uploaded audio file to a tournament's music library."
       },
+      "AdvancePlaylistRequest": {
+        "type": "object",
+        "properties": {
+          "musicTrackId": {
+            "type": "integer",
+            "description": "Gets the library track id that just started playing.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Reports that a playlist track has started playing, so the shared tournament queue advances."
+      },
       "ApplyDefaultRankingRequest": {
         "type": "object",
         "properties": {
@@ -16650,6 +16902,11 @@
       "PlaylistTrackDto": {
         "type": "object",
         "properties": {
+          "musicTrackId": {
+            "type": "integer",
+            "description": "Gets the library track id the client reports back to advance the shared tournament queue.",
+            "format": "int32"
+          },
           "fileKey": {
             "type": "string",
             "description": "Gets the R2 object key the client resolves and caches for playback."
@@ -16678,6 +16935,11 @@
             "type": "integer",
             "description": "Gets the seconds into the track where playback should start; null/0 plays from the beginning.",
             "format": "int32",
+            "nullable": true
+          },
+          "requestedByName": {
+            "type": "string",
+            "description": "Gets the name of the player who requested this song, if it came from a player request.",
             "nullable": true
           }
         },
@@ -18227,6 +18489,10 @@
               }
             ],
             "description": "Gets or sets the new game state."
+          },
+          "includePlayerSongs": {
+            "type": "boolean",
+            "description": "When transitioning into BoltonCup.Core.GameState.InProgress, whether to inject the participating\nplayers' requested songs at the front of the shared queue. Ignored for other transitions."
           }
         },
         "additionalProperties": false,

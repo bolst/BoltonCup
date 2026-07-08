@@ -23,7 +23,7 @@ public sealed class MusicCacheService : IAsyncDisposable
 
     private async Task<IJSObjectReference> ModuleAsync()
         // Query string dodges Blazor's fingerprint import map (see MusicPlayerService) so the dev server serves it.
-        => _module ??= await _js.InvokeAsync<IJSObjectReference>("import", "/js/musicCache.js?v=1");
+        => _module ??= await _js.InvokeAsync<IJSObjectReference>("import", "/js/musicCache.js?v=1.0.1");
 
     public async Task<bool> IsCachedAsync(string fileKey)
         => await (await ModuleAsync()).InvokeAsync<bool>("has", fileKey);
@@ -36,14 +36,22 @@ public sealed class MusicCacheService : IAsyncDisposable
         return cached.ToHashSet();
     }
 
-    public async Task<bool> DownloadAsync(string fileKey)
+    public async Task<bool> DownloadAsync(string fileKey, bool normalize)
     {
         var url = _urlResolver.GetFullUrl(fileKey);
         if (url is null) return false;
         var module = await ModuleAsync();
-        var result = await module.InvokeAsync<DownloadResult>("download", fileKey, url);
+        var result = await module.InvokeAsync<DownloadResult>("download", fileKey, url, normalize);
         return result.Ok;
     }
+
+    /// <summary>Ensures an already-cached track has a measured gain (computed from its stored blob if missing).</summary>
+    public async Task EnsureGainAsync(string fileKey)
+        => await (await ModuleAsync()).InvokeAsync<double>("ensureGain", fileKey);
+
+    /// <summary>The stored playback gain multiplier for a track, or 1.0 if uncached / unmeasured.</summary>
+    public async Task<double> GetGainAsync(string fileKey)
+        => await (await ModuleAsync()).InvokeAsync<double>("getGain", fileKey);
 
     /// <summary>Cached → blob object URL (offline-capable); else online → R2 URL; else null (cannot play).</summary>
     public async Task<string?> GetPlayableUrlAsync(string fileKey)

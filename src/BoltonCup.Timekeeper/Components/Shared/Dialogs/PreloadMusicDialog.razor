@@ -1,8 +1,10 @@
 @namespace BoltonCup.Timekeeper.Components.Shared
 @using BoltonCup.Sdk
+@using BoltonCup.Timekeeper.Services
 @using BoltonCup.Timekeeper.Services.Music
 @implements IDisposable
 @inject MusicDownloadService Download
+@inject TimekeeperStateService State
 
 <MudDialog>
     <DialogContent>
@@ -16,6 +18,8 @@
         else
         {
             <MudStack Spacing="3">
+                <MudSwitch T="bool" Value="State.NormalizeAudio" ValueChanged="OnNormalizeChanged"
+                           Color="Color.Primary" Label="Normalize audio on download" />
                 <MudText Typo="Typo.body2" Color="Color.Secondary">
                     Downloaded @(Download.Done) / @Download.Total
                     @if (Download.Skipped > 0) { <text>(@Download.Skipped already cached)</text> }
@@ -91,12 +95,17 @@
             FullWidth = true,
         });
 
+        // Load the persisted preference so the switch and the run reflect it.
+        await State.EnsureSettingsLoadedPublicAsync();
+
         // Kick off a run only if one isn't already going — reopening mid-download shows live progress.
         if (!Download.IsRunning)
         {
-            Download.Start(Tracks);
+            Download.Start(Tracks, State.NormalizeAudio);
         }
     }
+
+    private async Task OnNormalizeChanged(bool value) => await State.SetNormalizeAudioAsync(value);
 
     private void Cancel() => Download.Cancel();
 

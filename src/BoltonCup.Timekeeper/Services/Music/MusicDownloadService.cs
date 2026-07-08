@@ -42,9 +42,11 @@ public sealed class MusicDownloadService
 
     /// <summary>
     /// Starts a preload run for <paramref name="tracks"/>. No-op if a run is already in progress.
-    /// Returns immediately; progress is reported via <see cref="OnProgressChanged"/>.
+    /// Returns immediately; progress is reported via <see cref="OnProgressChanged"/>. When
+    /// <paramref name="normalize"/> is true, each track's loudness is measured and stored on download
+    /// (and back-filled for already-cached tracks) so playback can be level-normalized.
     /// </summary>
-    public void Start(IReadOnlyList<PlaylistTrackDto> tracks)
+    public void Start(IReadOnlyList<PlaylistTrackDto> tracks, bool normalize)
     {
         if (IsRunning) return;
 
@@ -58,6 +60,7 @@ public sealed class MusicDownloadService
             return;
         }
 
+        _normalize = normalize;
         _cts = new CancellationTokenSource();
         _ = RunAsync(tracks, _cts.Token);
     }
@@ -80,6 +83,7 @@ public sealed class MusicDownloadService
     }
 
     private IReadOnlyList<PlaylistTrackDto> _lastTracks = [];
+    private bool _normalize;
 
     private async Task RunAsync(IReadOnlyList<PlaylistTrackDto> tracks, CancellationToken ct)
     {
@@ -108,6 +112,11 @@ public sealed class MusicDownloadService
 
                 if (cached.Contains(track.FileKey))
                 {
+                    // Already downloaded — still back-fill a gain measurement if it's missing.
+                    if (_normalize)
+                    {
+                        await _cache.EnsureGainAsync(track.FileKey);
+                    }
                     _statuses[track.FileKey] = ItemStatus.Skipped;
                     Skipped++;
                     Notify();
@@ -117,7 +126,7 @@ public sealed class MusicDownloadService
                 _statuses[track.FileKey] = ItemStatus.Downloading;
                 Notify();
 
-                var ok = await _cache.DownloadAsync(track.FileKey);
+                var ok = await _cache.DownloadAsync(track.FileKey, _normalize);
                 if (ok)
                 {
                     _statuses[track.FileKey] = ItemStatus.Done;

@@ -33,6 +33,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<TournamentPlayerInfo> TournamentPlayerInfos { get; set; }
     public DbSet<TournamentPlayerGameAvailability> TournamentPlayerGameAvailabilities { get; set; }
     public DbSet<TournamentMusicTrack> TournamentMusicTracks { get; set; }
+    public DbSet<TournamentMusicQueue> TournamentMusicQueues { get; set; }
     public DbSet<TournamentSponsor> TournamentSponsors { get; set; }
 
     public DbSet<PlayerDraftRanking> PlayerDraftRankings { get; set; }
@@ -1013,6 +1014,25 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Source).HasColumnName("source")
                 .HasConversion(new EnumMemberConverter<MusicTrackSource>());
             entity.Property(e => e.RequestedByName).HasColumnName("requested_by_name");
+        });
+
+        modelBuilder.Entity<TournamentMusicQueue>(entity =>
+        {
+            entity
+                .ToTable("tournament_music_queues")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Tournament)
+                .WithMany()
+                .HasForeignKey(e => e.TournamentId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.TournamentId).IsUnique();
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.Deck).HasColumnName("deck");
+            entity.Property(e => e.DeckCursor).HasColumnName("deck_cursor");
+            entity.Property(e => e.Priority).HasColumnName("priority");
+            entity.Property(e => e.CurrentTrackId).HasColumnName("current_track_id");
         });
 
         modelBuilder.Entity<TournamentPlayerGameAvailability>(entity =>

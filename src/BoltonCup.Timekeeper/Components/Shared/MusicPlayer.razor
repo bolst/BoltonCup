@@ -20,11 +20,11 @@
 <audio @ref="_audioEl" preload="auto" style="display:none"></audio>
 
 <div class="bc-music-bar">
-    <MudContainer MaxWidth="MaxWidth.Medium" Class="pa-0">
+    <MudContainer MaxWidth="MaxWidth.False" Class="pa-0">
         @if (_loading)
         {
             <div class="d-flex justify-center pa-4">
-                <MudProgressCircular Indeterminate Size="Size.Small" />
+                <MudProgressCircular Indeterminate Size="Size.Small" Color="Color.Tertiary" />
             </div>
         }
         else if (_trackCount == 0)
@@ -36,79 +36,77 @@
         }
         else
         {
-            <div class="d-flex align-center gap-2 pa-4">
-                <MudAvatar Square Size="Size.Medium">
-                    @if (Player.CurrentTrack?.AlbumArtUrl is { Length: > 0 } art)
-                    {
-                        <MudImage Src="@art" />
-                    }
-                    else
-                    {
-                        <MudIcon Icon="@Icons.Material.Rounded.MusicNote" />
-                    }
-                </MudAvatar>
-
-                <div class="flex-grow-1" style="min-width: 0;">
-                    <MudText Typo="Typo.body2" Class="text-truncate white-text">
-                        @if (Player.CurrentTrack is { Title.Length: > 0 } currentTrack)
+            <MudStack Row AlignItems="AlignItems.Center" Spacing="2" Class="px-4 py-2">
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="2" Style="flex: 1 1 0; min-width: 0;">
+                    <MudAvatar Square Size="Size.Large">
+                        @if (Player.CurrentTrack?.AlbumArtUrl is { Length: > 0 } art)
                         {
-                            @($"{currentTrack.Title} | {currentTrack.Artist}")
+                            <MudImage Src="@art" />
                         }
                         else
                         {
-                            @:Ready to play
+                            <MudIcon Icon="@Icons.Material.Rounded.MusicNote" />
                         }
-                    </MudText>
-                    <div class="d-flex align-center gap-2">
+                    </MudAvatar>
+
+                    <MudStack Spacing="0" Class="flex-grow-1" Style="min-width: 0;">
+                        <MudText Typo="Typo.body2" Class="white-text text-truncate">
+                            @Player.CurrentTrack?.Title
+                        </MudText>
+                        <MudText Typo="Typo.caption" Class="white-text text-truncate">
+                            @Player.CurrentTrack?.Artist
+                        </MudText>
+                    </MudStack>
+                </MudStack>
+
+                <MudStack AlignItems="AlignItems.Center" Spacing="0" Style="flex: 0 0 400px; max-width: 400px; min-width: 0;">
+                    <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                        <MudIconButton Icon="@Icons.Material.Rounded.SkipPrevious" OnClick="@(() => Player.PrevAsync())" Color="Color.Tertiary"/>
+                        <MudIconButton Icon="@(Player.IsPlaying ? Icons.Material.Rounded.Pause : Icons.Material.Rounded.PlayArrow)" Color="@Color.Tertiary" OnClick="@(() => Player.TogglePlayPauseAsync())"/>
+                        <MudIconButton Icon="@Icons.Material.Rounded.SkipNext" OnClick="@(() => Player.NextAsync())" Color="Color.Tertiary"/>
+                    </MudStack>
+                    <MudStack Row AlignItems="AlignItems.Center" Spacing="2" Class="mud-width-full">
                         <MudText Typo="Typo.caption" Color="Color.Tertiary">@Format(Player.PositionSec)</MudText>
                         <MudSlider T="double" Min="0" Max="@SliderMax" Step="1" Size="Size.Small" Color="Color.Tertiary"
-                                   Value="Player.PositionSec" ValueChanged="OnSeek" Class="flex-grow-1" />
+                                   Value="Player.PositionSec" ValueChanged="OnSeek" Class="flex-grow-1"/>
                         <MudText Typo="Typo.caption" Color="Color.Tertiary">@Format(Player.DurationSec)</MudText>
-                    </div>
-                </div>
+                    </MudStack>
+                </MudStack>
 
-                <MudButtonGroup OverrideStyles="false" Size="Size.Small">
-                    <MudIconButton Icon="@Icons.Material.Rounded.SkipPrevious" OnClick="@(() => Player.PrevAsync())" Color="Color.Tertiary" />
-                    <MudIconButton Icon="@(Player.IsPlaying ? Icons.Material.Rounded.Pause : Icons.Material.Rounded.PlayArrow)"
-                                   Color="@(Player.IsPlaying ? Color.Tertiary : Color.Tertiary)"
-                                   OnClick="@(() => Player.TogglePlayPauseAsync())" />
-                    <MudIconButton Icon="@Icons.Material.Rounded.SkipNext" OnClick="@(() => Player.NextAsync())" Color="Color.Tertiary" />
-                </MudButtonGroup>
-
-                @if (Download.IsRunning)
-                {
-                    <MudTooltip Text="Downloading music for offline — tap to view">
-                        <MudButton Size="Size.Small" Variant="Variant.Text"
-                                   StartIcon="@Icons.Material.Rounded.Downloading"
-                                   OnClick="@DownloadForOffline"
-                                   Color="Color.Warning">
-                            @(Download.Done + Download.Skipped)/@Download.Total
-                        </MudButton>
-                    </MudTooltip>
-                }
-                else if (_cachedCount >= _offlineCount)
-                {
-                    <MudTooltip Text="@($"{_cachedCount}/{_offlineCount} tracks available offline")">
-                        <MudIcon Icon="@Icons.Material.Rounded.DownloadForOffline" Color="Color.Success" Size="Size.Small" />
-                    </MudTooltip>
-                }
-                else
-                {
-                    <MudTooltip Text="@($"Download for offline ({_cachedCount}/{_offlineCount} cached)")">
-                        <MudIconButton Icon="@Icons.Material.Rounded.CloudDownload"
-                                       Size="Size.Small"
+                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexEnd" Spacing="2" Style="flex: 1 1 0; min-width: 0;">
+                    @if (Download.IsRunning)
+                    {
+                        <MudTooltip Text="Downloading music for offline — tap to view">
+                            <MudButton Variant="Variant.Text"
+                                       StartIcon="@Icons.Material.Rounded.Downloading"
                                        OnClick="@DownloadForOffline"
-                                       Color="Color.Secondary"/>
+                                       Color="Color.Warning">
+                                @(Download.Done + Download.Skipped)/@Download.Total
+                            </MudButton>
+                        </MudTooltip>
+                    }
+                    else if (_cachedCount >= _offlineCount)
+                    {
+                        <MudTooltip Text="@($"{_cachedCount}/{_offlineCount} tracks available offline")">
+                            <MudIcon Icon="@Icons.Material.Rounded.DownloadForOffline" Color="Color.Success" />
+                        </MudTooltip>
+                    }
+                    else
+                    {
+                        <MudTooltip Text="@($"Download for offline ({_cachedCount}/{_offlineCount} cached)")">
+                            <MudIconButton Icon="@Icons.Material.Rounded.CloudDownload"
+                                           OnClick="@DownloadForOffline"
+                                           Color="Color.Secondary"/>
+                        </MudTooltip>
+                    }
+
+                    <MudTooltip Text="Queue">
+                        <MudIconButton Icon="@Icons.Material.Rounded.QueueMusic"
+                                       OnClick="@ToggleQueueDrawer"
+                                       Color="@(_queueDrawerOpen ? Color.Success : Color.Tertiary)"/>
                     </MudTooltip>
-                }
-                
-                <MudTooltip Text="Queue">
-                    <MudIconButton Icon="@Icons.Material.Rounded.QueueMusic"
-                                   OnClick="@ToggleQueueDrawer"
-                                   Color="@(_queueDrawerOpen ? Color.Success : Color.Tertiary)"
-                                   Size="Size.Small"/>
-                </MudTooltip>
-            </div>
+                </MudStack>
+            </MudStack>
         }
     </MudContainer>
 </div>
@@ -161,11 +159,19 @@
                         </div>
 
                         <div class="flex-grow-1" style="min-width: 0;">
-                            <MudText Typo="Typo.body2" Class="text-truncate"
-                                     Color="@(isCurrent ? Color.Error : Color.Tertiary)"
-                                     Style="@(isCurrent ? "font-weight:600;" : null)">
-                                @track.Title
-                            </MudText>
+                            <div class="d-flex flex-row">
+                                @if (!string.IsNullOrWhiteSpace(track.RequestedByName))
+                                {
+                                    <MudTooltip Text="@track.RequestedByName">
+                                        <MudIcon Icon="@Icons.Material.Rounded.Person" Size="Size.Small" Color="Color.Info"/>
+                                    </MudTooltip>
+                                }
+                                <MudText Typo="Typo.body2" Class="text-truncate"
+                                         Color="@(isCurrent ? Color.Error : Color.Tertiary)"
+                                         Style="@(isCurrent ? "font-weight:600;" : null)">
+                                    @track.Title
+                                </MudText>
+                            </div>
                             <MudText Typo="Typo.caption" Class="text-truncate white-text">
                                 @(string.IsNullOrWhiteSpace(track.Artist) ? " " : track.Artist)
                             </MudText>
@@ -200,12 +206,15 @@
     private int? _offlineForGameId;
     private bool _wasDownloading;
     private bool _queueDrawerOpen;
+    private GameState? _lastGameState;
 
     private double SliderMax => Player.DurationSec > 0 ? Player.DurationSec : 1;
 
     protected override void OnInitialized()
     {
         Player.OnStateChanged += OnPlayerChanged;
+        Player.OnTrackStarted += OnTrackStarted;
+        Player.OnReachedEnd += OnReachedEnd;
         Download.OnProgressChanged += OnDownloadChanged;
         State.OnStateChanged += OnGameStateChanged;
     }
@@ -215,6 +224,9 @@
         if (_loadedGameId == GameId)
             return;
         _loadedGameId = GameId;
+        // Record the state we first observe so a later Pending→InProgress transition triggers a refetch
+        // (this component only mounts after the game has loaded, so it misses the initial state notification).
+        _lastGameState = State.Game?.GameState;
         await LoadPlaylistAsync();
     }
 
@@ -336,13 +348,47 @@
 
     private void OnPlayerChanged() => InvokeAsync(StateHasChanged);
 
-    // When the game finishes loading, its goal songs become known — fold them into the cached count.
+    // Report each track that starts so the shared tournament queue advances. Best-effort: a missed report at
+    // worst repeats a song slightly sooner, so failures are swallowed.
+    private void OnTrackStarted(PlaylistTrackDto track) => InvokeAsync(async () =>
+    {
+        if (!State.IsOnline) return;
+        try
+        {
+            await Api.AdvancePlaylistAsync(GameId, new AdvancePlaylistRequest { MusicTrackId = track.MusicTrackId });
+        }
+        catch { /* best-effort */ }
+    });
+
+    // Playback ran past the end of the rotation — ask the server to reshuffle a fresh cycle, then continue.
+    private void OnReachedEnd() => InvokeAsync(async () =>
+    {
+        if (!State.IsOnline) return;
+        try
+        {
+            await Api.RollPlaylistAsync(GameId);
+            await LoadPlaylistAsync();
+            await Player.PlayAsync();
+        }
+        catch { /* best-effort */ }
+    });
+
+    // When the game finishes loading, its goal songs become known — fold them into the cached count. When it
+    // transitions into InProgress, refetch so any freshly-injected player songs appear at the front.
     private void OnGameStateChanged() => InvokeAsync(async () =>
     {
         if (State.Game?.Id != _offlineForGameId)
         {
             await RefreshCachedCountAsync();
         }
+
+        var state = State.Game?.GameState;
+        if (state == GameState.InProgress && _lastGameState != GameState.InProgress)
+        {
+            await LoadPlaylistAsync();
+        }
+        _lastGameState = state;
+
         StateHasChanged();
     });
 
@@ -373,6 +419,8 @@
     public void Dispose()
     {
         Player.OnStateChanged -= OnPlayerChanged;
+        Player.OnTrackStarted -= OnTrackStarted;
+        Player.OnReachedEnd -= OnReachedEnd;
         Download.OnProgressChanged -= OnDownloadChanged;
         State.OnStateChanged -= OnGameStateChanged;
     }

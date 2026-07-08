@@ -1,16 +1,46 @@
 // Drives a single hidden <audio> element and marshals media events back to the MusicPlayerService.
+// Audio is routed through a Web Audio gain node so per-track loudness normalization can be applied
+// (see musicCache.js for how the gain value is measured and stored).
 let audio = null;
 let dotnet = null;
 let lastWholeSecond = -1;
 let pendingStartSec = 0;
 
+// Web Audio graph: <audio> -> MediaElementSource -> GainNode -> destination.
+// If graph setup fails (unsupported/blocked), we fall back to the bare element and setGain is a no-op.
+let audioCtx = null;
+let sourceNode = null;
+let gainNode = null;
+
 export function init(audioEl, dotnetRef) {
     audio = audioEl;
     dotnet = dotnetRef;
+    // Must be set before any src is loaded so the Web Audio graph can read cross-origin (R2) media.
+    audio.crossOrigin = 'anonymous';
     audio.addEventListener('ended', onEnded);
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
     audio.addEventListener('error', onError);
+    setupGraph();
+}
+
+function setupGraph() {
+    if (gainNode) return;
+    try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        audioCtx = new Ctx();
+        sourceNode = audioCtx.createMediaElementSource(audio);
+        gainNode = audioCtx.createGain();
+        gainNode.gain.value = 1;
+        sourceNode.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+    } catch {
+        // Graph unavailable — leave audio playing through the element directly; setGain becomes a no-op.
+        audioCtx = null;
+        sourceNode = null;
+        gainNode = null;
+    }
 }
 
 function onEnded() {
@@ -57,12 +87,24 @@ export function load(objectUrl, startSec) {
 
 export async function play() {
     if (!audio) return false;
+    // The context starts suspended (created before a user gesture); play() is user-initiated, so resume here.
+    if (audioCtx && audioCtx.state === 'suspended') {
+        try { await audioCtx.resume(); } catch { }
+    }
     try { await audio.play(); return true; } catch { return false; }
 }
 
 export function pause() { if (audio) audio.pause(); }
 export function seek(sec) { if (audio) audio.currentTime = sec; }
 export function setVolume(v) { if (audio) audio.volume = v; }
+
+// Per-track loudness normalization multiplier (1 = unchanged). No-op if the Web Audio graph is unavailable.
+export function setGain(v) {
+    if (gainNode) {
+        const g = (typeof v === 'number' && isFinite(v) && v > 0) ? v : 1;
+        gainNode.gain.value = g;
+    }
+}
 
 export function dispose() {
     if (!audio) return;
@@ -71,7 +113,11 @@ export function dispose() {
     audio.removeEventListener('loadedmetadata', onLoadedMetadata);
     audio.removeEventListener('error', onError);
     try { audio.pause(); } catch { }
+    try { if (audioCtx) audioCtx.close(); } catch { }
     audio = null;
     dotnet = null;
+    audioCtx = null;
+    sourceNode = null;
+    gainNode = null;
     lastWholeSecond = -1;
 }

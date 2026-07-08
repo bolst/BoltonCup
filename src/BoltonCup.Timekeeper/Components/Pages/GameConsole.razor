@@ -18,7 +18,7 @@ else if (State.Game is not { } game)
 }
 else
 {
-    <MudContainer MaxWidth="MaxWidth.Medium" Class="py-4" Style="padding-bottom: 104px">
+    <MudContainer MaxWidth="MaxWidth.Large" Class="py-4" Style="padding-bottom: 104px">
         <MudStack Spacing="4">
 
             @* Scoreboard *@
@@ -28,9 +28,9 @@ else
                     <div class="d-flex flex-column align-center" style="flex: 1">
                         @if (game.HomeTeam?.Logo is not null)
                         {
-                            <MudImage Src="@game.HomeTeam.Logo" Height="56" Class="mb-1" />
+                            <MudImage Src="@game.HomeTeam.Logo" Height="48" Class="mb-1" />
                         }
-                        <MudText Typo="Typo.h6" Align="Align.Center">
+                        <MudText Typo="Typo.body2" Align="Align.Center">
                             @(game.HomeTeam?.NameShort ?? game.HomeTeam?.Name ?? "Home")
                         </MudText>
                     </div>
@@ -54,9 +54,9 @@ else
                     <div class="d-flex flex-column align-center" style="flex: 1">
                         @if (game.AwayTeam?.Logo is not null)
                         {
-                            <MudImage Src="@game.AwayTeam.Logo" Height="56" Class="mb-1" />
+                            <MudImage Src="@game.AwayTeam.Logo" Height="48" Class="mb-1" />
                         }
-                        <MudText Typo="Typo.h6" Align="Align.Center">
+                        <MudText Typo="Typo.body2" Align="Align.Center">
                             @(game.AwayTeam?.NameShort ?? game.AwayTeam?.Name ?? "Away")
                         </MudText>
                     </div>
@@ -89,6 +89,9 @@ else
                                 </MudButton>
                             }
                         </div>
+                        <MudCheckBox T="bool" Value="State.AutoplayGoalSong"
+                                     ValueChanged="@(v => State.SetAutoplayGoalSongAsync(v))"
+                                     Label="Autoplay goal song" Dense Size="Size.Small" Color="Color.Primary" />
                         <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Medium"
                                    StartIcon="@Icons.Material.Rounded.Stop"
                                    OnClick="@EndGameAsync">
@@ -138,11 +141,6 @@ else
                             </div>
                         </MudPaper>
                     }
-                </div>
-                <div class="d-flex flex-row justify-end">
-                    <MudCheckBox T="bool" Value="State.AutoplayGoalSong"
-                                 ValueChanged="@(v => State.SetAutoplayGoalSongAsync(v))"
-                                 Label="Autoplay goal song" Dense Size="Size.Small" Color="Color.Primary" />
                 </div>
             }
 

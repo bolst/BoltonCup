@@ -23,8 +23,16 @@ public class MusicLibraryServiceTests
             .UseInMemoryDatabase($"music-{Guid.NewGuid()}")
             .Options);
 
-    private static MusicLibraryService NewService(BoltonCupDbContext db, IMusicSearchService? search = null) =>
-        new(db, Mock.Of<IStorageService>(), Mock.Of<IAssetKeyGenerator>(), search ?? Mock.Of<IMusicSearchService>());
+    // Fisher-Yates with rng.Next(k) == k - 1 leaves the input order unchanged → deterministic deck order.
+    private sealed class IdentityRandom : Random
+    {
+        public override int Next(int maxValue) => maxValue - 1;
+    }
+
+    private static readonly Random Identity = new IdentityRandom();
+
+    private static MusicLibraryService NewService(BoltonCupDbContext db, IMusicSearchService? search = null, IGlobalMusicQueue? queue = null) =>
+        new(db, Mock.Of<IStorageService>(), Mock.Of<IAssetKeyGenerator>(), search ?? Mock.Of<IMusicSearchService>(), queue ?? new GlobalMusicQueue(db, Identity));
 
     // A service whose storage + key generator are stubbed so AddTrackAsync (upload) can run.
     private static MusicLibraryService NewUploadService(BoltonCupDbContext db)
@@ -35,7 +43,7 @@ public class MusicLibraryServiceTests
         var storage = new Mock<IStorageService>();
         storage.Setup(s => s.CopyAssetAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
-        return new MusicLibraryService(db, storage.Object, keyGen.Object, Mock.Of<IMusicSearchService>());
+        return new MusicLibraryService(db, storage.Object, keyGen.Object, Mock.Of<IMusicSearchService>(), new GlobalMusicQueue(db, Identity));
     }
 
     private static IMusicSearchService SearchReturning(params MusicTrack[] tracks)
@@ -47,15 +55,16 @@ public class MusicLibraryServiceTests
     }
 
     [Fact]
-    public async Task GetGamePlaylistAsync_MatchesRequestsByTrackId_AppendsBasePool_AndReportsMissing()
+    public async Task GetGamePlaylistAsync_ReturnsBasePoolRotation_AndReportsMissing()
     {
         await using var db = await SeedAsync();
         var service = NewService(db);
 
         var result = await service.GetGamePlaylistAsync(GameId);
 
-        // Alice's request (SA) matched to a file first, then the base-pool track.
-        result.Tracks.Select(t => t.AudioFileKey).Should().Equal("kSA", "kbase");
+        // Player requests are not auto-prepended anymore — they only arrive via game-start injection.
+        // Alice's SA (downloaded, not base pool) is absent; only the base-pool track plays.
+        result.Tracks.Select(t => t.AudioFileKey).Should().Equal("kbase");
 
         // Bob's request (SB) has no uploaded file -> reported as missing.
         result.Missing.Should().ContainSingle()
@@ -63,14 +72,45 @@ public class MusicLibraryServiceTests
     }
 
     [Fact]
-    public async Task GetGamePlaylistAsync_DeDupesRequestThatIsAlsoInBasePool()
+    public async Task GetGamePlaylistAsync_InjectedPlayerSongLeadsTheBasePool()
     {
-        await using var db = await SeedAsync(saTrackIsBasePool: true);
-        var service = NewService(db);
+        await using var db = await SeedAsync();
+        var queue = new GlobalMusicQueue(db, Identity);
+        var service = NewService(db, queue: queue);
+
+        // Simulate starting the game with player songs: track id 1 is Alice's downloaded request (SA).
+        await queue.StartGameAsync(TournamentId, [1]);
 
         var result = await service.GetGamePlaylistAsync(GameId);
 
         result.Tracks.Select(t => t.AudioFileKey).Should().Equal("kSA", "kbase");
+    }
+
+    [Fact]
+    public async Task GetGamePlaylistAsync_DeDupesTrackThatIsInjectedAndInBasePool()
+    {
+        await using var db = await SeedAsync(saTrackIsBasePool: true);
+        var queue = new GlobalMusicQueue(db, Identity);
+        var service = NewService(db, queue: queue);
+
+        // SA is both a base-pool track and injected as a player song — it must appear once.
+        await queue.StartGameAsync(TournamentId, [1]);
+
+        var result = await service.GetGamePlaylistAsync(GameId);
+
+        result.Tracks.Select(t => t.AudioFileKey).Should().Equal("kSA", "kbase");
+    }
+
+    [Fact]
+    public async Task GetOrderedRequestTrackIdsAsync_ReturnsDownloadedRequestsInRosterOrder()
+    {
+        await using var db = await SeedAsync();
+        var service = NewService(db);
+
+        var ids = await service.GetOrderedRequestTrackIdsAsync(GameId);
+
+        // Alice's SA is downloaded (track id 1); Bob's SB has no file, so it is skipped.
+        ids.Should().Equal(1);
     }
 
     [Fact]

@@ -10,6 +10,8 @@ namespace BoltonCup.Timekeeper.Services.Music;
 /// </summary>
 public sealed class MusicPlayerService : IAsyncDisposable
 {
+    private const string MusicPlayerVersion = "1.0.1";
+
     private readonly IJSRuntime _js;
     private readonly MusicCacheService _cache;
 
@@ -33,6 +35,12 @@ public sealed class MusicPlayerService : IAsyncDisposable
 
     public event Action? OnStateChanged;
 
+    /// <summary>Raised when a playlist track starts, so the shared tournament queue can be advanced. Not raised for goal songs.</summary>
+    public event Action<PlaylistTrackDto>? OnTrackStarted;
+
+    /// <summary>Raised when playback runs past the last track, so a fresh rotation cycle can be requested.</summary>
+    public event Action? OnReachedEnd;
+
     public MusicPlayerService(IJSRuntime js, MusicCacheService cache)
     {
         _js = js;
@@ -41,7 +49,7 @@ public sealed class MusicPlayerService : IAsyncDisposable
 
     public async Task InitializeAsync(ElementReference audioEl)
     {
-        _module ??= await _js.InvokeAsync<IJSObjectReference>("import", "/js/musicPlayer.js?v=1");
+        _module ??= await _js.InvokeAsync<IJSObjectReference>("import", $"/js/musicPlayer.js?v={MusicPlayerVersion}");
         _selfRef ??= DotNetObjectReference.Create(this);
         await _module.InvokeVoidAsync("init", audioEl, _selfRef);
     }
@@ -57,7 +65,16 @@ public sealed class MusicPlayerService : IAsyncDisposable
 
     public Task PlayAsync() => CurrentIndex < 0 ? PlayIndexAsync(0) : ResumeAsync();
     public Task TogglePlayPauseAsync() => IsPlaying ? PauseAsync() : PlayAsync();
-    public Task NextAsync() => CurrentIndex + 1 < Playlist.Count ? PlayIndexAsync(CurrentIndex + 1) : StopAsync();
+    public Task NextAsync()
+    {
+        if (CurrentIndex + 1 < Playlist.Count)
+        {
+            return PlayIndexAsync(CurrentIndex + 1);
+        }
+        // Past the last track — the rotation has exhausted its cycle; let a listener reshuffle and continue.
+        OnReachedEnd?.Invoke();
+        return StopAsync();
+    }
     public Task PrevAsync() => CurrentIndex > 0 ? PlayIndexAsync(CurrentIndex - 1) : Task.CompletedTask;
 
     public async Task PlayIndexAsync(int index)
@@ -66,6 +83,11 @@ public sealed class MusicPlayerService : IAsyncDisposable
         {
             return;
         }
+
+        // Leaving any goal-song one-shot: clear its state so CurrentTrack reflects the playlist track
+        // (and the next natural 'ended' advances the playlist instead of stopping).
+        _oneShot = false;
+        _oneShotTrack = null;
 
         await RevokeCurrentAsync();
 
@@ -90,8 +112,10 @@ public sealed class MusicPlayerService : IAsyncDisposable
         }
 
         await _module.InvokeVoidAsync("load", url, offsetSec);
+        await _module.InvokeVoidAsync("setGain", await _cache.GetGainAsync(track.FileKey));
         IsPlaying = await _module.InvokeAsync<bool>("play");
         Notify();
+        OnTrackStarted?.Invoke(track);
     }
 
     public async Task PauseAsync()
@@ -169,6 +193,7 @@ public sealed class MusicPlayerService : IAsyncDisposable
         DurationSec = 0;
         PositionSec = offsetSeconds;
         await _module.InvokeVoidAsync("load", url, offsetSeconds);
+        await _module.InvokeVoidAsync("setGain", await _cache.GetGainAsync(fileKey));
         IsPlaying = await _module.InvokeAsync<bool>("play");
         Notify();
         return IsPlaying ? GoalSongResult.Playing : GoalSongResult.Blocked;
@@ -269,7 +294,10 @@ public sealed class MusicPlayerService : IAsyncDisposable
                 await _module.DisposeAsync();
             }
         }
-        catch (JSDisconnectedException) { }
+        catch (JSDisconnectedException)
+        {
+            
+        }
         await RevokeCurrentAsync();
         _selfRef?.Dispose();
     }

@@ -44,7 +44,12 @@ public partial class GameConsole : ComponentBase, IDisposable
 
     private async Task StartGameAsync()
     {
-        await State.UpdateGameStateAsync(GameState.InProgress);
+        var dialog = await DialogService.ShowAsync<StartGameDialog>("Start Game");
+        var result = await dialog.Result;
+        if (result is { Canceled: false, Data: bool includePlayerSongs })
+        {
+            await State.UpdateGameStateAsync(GameState.InProgress, includePlayerSongs);
+        }
     }
 
     private async Task EndGameAsync()

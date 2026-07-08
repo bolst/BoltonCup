@@ -12,6 +12,9 @@ public record GamePlaylistDto
 /// <summary>A single playable track in a game playlist.</summary>
 public record PlaylistTrackDto
 {
+    /// <summary>Gets the library track id the client reports back to advance the shared tournament queue.</summary>
+    public int MusicTrackId { get; init; }
+
     /// <summary>Gets the R2 object key the client resolves and caches for playback.</summary>
     public string FileKey { get; init; } = string.Empty;
 
@@ -29,6 +32,9 @@ public record PlaylistTrackDto
 
     /// <summary>Gets the seconds into the track where playback should start; null/0 plays from the beginning.</summary>
     public int? OffsetSeconds { get; init; }
+
+    /// <summary>Gets the name of the player who requested this song, if it came from a player request.</summary>
+    public string? RequestedByName { get; init; }
 }
 /// <summary>A player song request that could not be matched to an uploaded file.</summary>
 public record MissingSongRequestDto

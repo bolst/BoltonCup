@@ -6,15 +6,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Services;
 
-public class GameWriteService(BoltonCupDbContext _dbContext) : IGameWriteService
+public class GameWriteService(
+    BoltonCupDbContext _dbContext,
+    IGlobalMusicQueue _queue,
+    IMusicLibraryService _music) : IGameWriteService
 {
     public async Task UpdateStateAsync(UpdateGameStateCommand command, CancellationToken cancellationToken = default)
     {
         var game = await _dbContext.Games.FirstOrDefaultAsync(g => g.Id == command.GameId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Game), command.GameId);
 
+        var wasInProgress = game.GameState == GameState.InProgress;
         game.GameState = command.State;
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        // Starting a game clears the previous game's injected player songs and (optionally) queues this
+        // game's participating players' songs at the front of the shared rotation.
+        if (command.State == GameState.InProgress && !wasInProgress)
+        {
+            var playerTrackIds = command.IncludePlayerSongs
+                ? await _music.GetOrderedRequestTrackIdsAsync(game.Id, cancellationToken)
+                : [];
+            await _queue.StartGameAsync(game.TournamentId, playerTrackIds, cancellationToken);
+        }
     }
 
     public async Task<int> AddGoalAsync(CreateGoalCommand command, CancellationToken cancellationToken = default)

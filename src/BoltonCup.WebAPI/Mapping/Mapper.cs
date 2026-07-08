@@ -523,7 +523,7 @@ public class Mapper : IMapper
     }
 
     public UpdateGameStateCommand ToCommand(int gameId, UpdateGameStateRequest request)
-        => new(gameId, request.State);
+        => new(gameId, request.State, request.IncludePlayerSongs);
 
     public CreateGoalCommand ToCommand(int gameId, CreateGoalRequest request)
         => new(
@@ -1000,8 +1000,14 @@ public class Mapper : IMapper
         {
             Tracks = result.Tracks.Select(t => new PlaylistTrackDto
             {
-                FileKey = t.AudioFileKey, Title = t.Title, Artist = t.Artist, AlbumArtUrl = t.AlbumArtUrl,
-                DurationMs = t.DurationMs, OffsetSeconds = t.OffsetSeconds,
+                MusicTrackId = t.Id, 
+                FileKey = t.AudioFileKey, 
+                Title = t.Title, 
+                Artist = t.Artist, 
+                AlbumArtUrl = t.AlbumArtUrl,
+                DurationMs = t.DurationMs,
+                OffsetSeconds = t.OffsetSeconds,
+                RequestedByName = t.RequestedByName,
             }).ToList(),
             Missing = result.Missing.Select(ToDto).ToList(),
         };
