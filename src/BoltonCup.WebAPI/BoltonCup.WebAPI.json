@@ -16936,6 +16936,11 @@
             "description": "Gets the seconds into the track where playback should start; null/0 plays from the beginning.",
             "format": "int32",
             "nullable": true
+          },
+          "requestedByName": {
+            "type": "string",
+            "description": "Gets the name of the player who requested this song, if it came from a player request.",
+            "nullable": true
           }
         },
         "additionalProperties": false,

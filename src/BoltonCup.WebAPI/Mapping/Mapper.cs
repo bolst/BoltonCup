@@ -1005,8 +1005,9 @@ public class Mapper : IMapper
                 Title = t.Title, 
                 Artist = t.Artist, 
                 AlbumArtUrl = t.AlbumArtUrl,
-                DurationMs = t.DurationMs, 
+                DurationMs = t.DurationMs,
                 OffsetSeconds = t.OffsetSeconds,
+                RequestedByName = t.RequestedByName,
             }).ToList(),
             Missing = result.Missing.Select(ToDto).ToList(),
         };

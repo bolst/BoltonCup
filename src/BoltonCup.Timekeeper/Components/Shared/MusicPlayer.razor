@@ -159,11 +159,19 @@
                         </div>
 
                         <div class="flex-grow-1" style="min-width: 0;">
-                            <MudText Typo="Typo.body2" Class="text-truncate"
-                                     Color="@(isCurrent ? Color.Error : Color.Tertiary)"
-                                     Style="@(isCurrent ? "font-weight:600;" : null)">
-                                @track.Title
-                            </MudText>
+                            <div class="d-flex flex-row">
+                                @if (!string.IsNullOrWhiteSpace(track.RequestedByName))
+                                {
+                                    <MudTooltip Text="@track.RequestedByName">
+                                        <MudIcon Icon="@Icons.Material.Rounded.Person" Size="Size.Small" Color="Color.Info"/>
+                                    </MudTooltip>
+                                }
+                                <MudText Typo="Typo.body2" Class="text-truncate"
+                                         Color="@(isCurrent ? Color.Error : Color.Tertiary)"
+                                         Style="@(isCurrent ? "font-weight:600;" : null)">
+                                    @track.Title
+                                </MudText>
+                            </div>
                             <MudText Typo="Typo.caption" Class="text-truncate white-text">
                                 @(string.IsNullOrWhiteSpace(track.Artist) ? " " : track.Artist)
                             </MudText>
