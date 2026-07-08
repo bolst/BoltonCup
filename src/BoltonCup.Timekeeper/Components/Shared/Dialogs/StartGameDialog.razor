@@ -1,0 +1,24 @@
+@namespace BoltonCup.Timekeeper.Components.Shared
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body2" Class="mb-3">
+            Queue the songs requested by the players in this game to play first, ahead of the tournament rotation.
+        </MudText>
+        <MudSwitch T="bool" @bind-Value="_includePlayerSongs" Color="Color.Primary" Label="Include player songs" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Start">Start Game</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] 
+    private IMudDialogInstance Dialog { get; set; } = null!;
+
+    private bool _includePlayerSongs = true;
+
+    private void Start() => Dialog.Close(DialogResult.Ok(_includePlayerSongs));
+    private void Cancel() => Dialog.Cancel();
+}

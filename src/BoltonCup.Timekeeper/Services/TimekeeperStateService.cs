@@ -217,14 +217,15 @@ public class TimekeeperStateService : IDisposable
         NotifyStateChanged();
     }
 
-    public async Task UpdateGameStateAsync(GameState state)
+    public async Task UpdateGameStateAsync(GameState state, bool includePlayerSongs = true)
     {
         if (Game is null) return;
+        var request = new UpdateGameStateRequest { State = state, IncludePlayerSongs = includePlayerSongs };
         if (_syncService.IsOnline)
         {
             try
             {
-                await _api.UpdateGameStateAsync(Game.Id, new UpdateGameStateRequest { State = state });
+                await _api.UpdateGameStateAsync(Game.Id, request);
                 await RefreshGameAsync();
                 _snackbar.Add($"Game state set to {state}.", Severity.Success);
             }
@@ -236,7 +237,7 @@ public class TimekeeperStateService : IDisposable
         }
         else
         {
-            await EnqueueAsync("GameState", new UpdateGameStateRequest { State = state });
+            await EnqueueAsync("GameState", request);
             _snackbar.Add("Game state queued — will sync when online", Severity.Warning);
         }
     }

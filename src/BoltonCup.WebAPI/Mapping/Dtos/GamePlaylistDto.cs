@@ -12,6 +12,9 @@ public record GamePlaylistDto
 /// <summary>A single playable track in a game playlist.</summary>
 public record PlaylistTrackDto
 {
+    /// <summary>Gets the library track id the client reports back to advance the shared tournament queue.</summary>
+    public int MusicTrackId { get; init; }
+
     /// <summary>Gets the R2 object key the client resolves and caches for playback.</summary>
     public string FileKey { get; init; } = string.Empty;
 

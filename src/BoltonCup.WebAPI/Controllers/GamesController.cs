@@ -64,6 +64,24 @@ public class GamesController(
         return Ok(_mapper.ToDto(result));
     }
 
+    /// <remarks>Reports that a playlist track started playing, advancing the shared queue (timekeeper or admin only).</remarks>
+    [Authorize(Roles = $"{Admin},{Timekeeper}")]
+    [HttpPost("{id:int}/playlist/advance")]
+    public async Task<IActionResult> AdvancePlaylist(int id, [FromBody] AdvancePlaylistRequest request)
+    {
+        await _music.AdvanceGameQueueAsync(id, request.MusicTrackId);
+        return Ok();
+    }
+
+    /// <remarks>Reshuffles a fresh cycle once the deck is exhausted (timekeeper or admin only).</remarks>
+    [Authorize(Roles = $"{Admin},{Timekeeper}")]
+    [HttpPost("{id:int}/playlist/rollover")]
+    public async Task<IActionResult> RollPlaylist(int id)
+    {
+        await _music.RollGameQueueAsync(id);
+        return Ok();
+    }
+
     /// <remarks>Records a goal in a game (timekeeper or admin only).</remarks>
     [Authorize(Roles = $"{Admin},{Timekeeper}")]
     [HttpPost("{id:int}/goals")]

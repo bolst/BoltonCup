@@ -198,12 +198,15 @@
     private int? _offlineForGameId;
     private bool _wasDownloading;
     private bool _queueDrawerOpen;
+    private GameState? _lastGameState;
 
     private double SliderMax => Player.DurationSec > 0 ? Player.DurationSec : 1;
 
     protected override void OnInitialized()
     {
         Player.OnStateChanged += OnPlayerChanged;
+        Player.OnTrackStarted += OnTrackStarted;
+        Player.OnReachedEnd += OnReachedEnd;
         Download.OnProgressChanged += OnDownloadChanged;
         State.OnStateChanged += OnGameStateChanged;
     }
@@ -213,6 +216,9 @@
         if (_loadedGameId == GameId)
             return;
         _loadedGameId = GameId;
+        // Record the state we first observe so a later Pending→InProgress transition triggers a refetch
+        // (this component only mounts after the game has loaded, so it misses the initial state notification).
+        _lastGameState = State.Game?.GameState;
         await LoadPlaylistAsync();
     }
 
@@ -334,13 +340,47 @@
 
     private void OnPlayerChanged() => InvokeAsync(StateHasChanged);
 
-    // When the game finishes loading, its goal songs become known — fold them into the cached count.
+    // Report each track that starts so the shared tournament queue advances. Best-effort: a missed report at
+    // worst repeats a song slightly sooner, so failures are swallowed.
+    private void OnTrackStarted(PlaylistTrackDto track) => InvokeAsync(async () =>
+    {
+        if (!State.IsOnline) return;
+        try
+        {
+            await Api.AdvancePlaylistAsync(GameId, new AdvancePlaylistRequest { MusicTrackId = track.MusicTrackId });
+        }
+        catch { /* best-effort */ }
+    });
+
+    // Playback ran past the end of the rotation — ask the server to reshuffle a fresh cycle, then continue.
+    private void OnReachedEnd() => InvokeAsync(async () =>
+    {
+        if (!State.IsOnline) return;
+        try
+        {
+            await Api.RollPlaylistAsync(GameId);
+            await LoadPlaylistAsync();
+            await Player.PlayAsync();
+        }
+        catch { /* best-effort */ }
+    });
+
+    // When the game finishes loading, its goal songs become known — fold them into the cached count. When it
+    // transitions into InProgress, refetch so any freshly-injected player songs appear at the front.
     private void OnGameStateChanged() => InvokeAsync(async () =>
     {
         if (State.Game?.Id != _offlineForGameId)
         {
             await RefreshCachedCountAsync();
         }
+
+        var state = State.Game?.GameState;
+        if (state == GameState.InProgress && _lastGameState != GameState.InProgress)
+        {
+            await LoadPlaylistAsync();
+        }
+        _lastGameState = state;
+
         StateHasChanged();
     });
 
@@ -371,6 +411,8 @@
     public void Dispose()
     {
         Player.OnStateChanged -= OnPlayerChanged;
+        Player.OnTrackStarted -= OnTrackStarted;
+        Player.OnReachedEnd -= OnReachedEnd;
         Download.OnProgressChanged -= OnDownloadChanged;
         State.OnStateChanged -= OnGameStateChanged;
     }
