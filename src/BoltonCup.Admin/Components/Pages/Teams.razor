@@ -1,5 +1,6 @@
 @page "/teams"
 @inject ITeamService TeamService
+@inject IDialogService DialogService
 
 <EntityDataGrid
     @ref="@_dataGrid"
@@ -21,8 +22,17 @@
         <ColorPickerColumn Title="Primary" Property="x => x.PrimaryColorHex" />
         <ColorPickerColumn Title="Secondary" Property="x => x.SecondaryColorHex" />
         <ColorPickerColumn Title="Tertiary" Property="x => x.TertiaryColorHex" />
-        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament!" 
+        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament!"
                        EqualityComparer="new TournamentComparer()!" ImageSrcFunc="t => t.Logo" />
+        <TemplateColumn Title="Songs" Sortable="false" Editable="false">
+            <CellTemplate>
+                <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Info"
+                           Disabled="@(context.Item.Id == 0 || context.Item.TournamentId is null)"
+                           OnClick="@(() => EditSongs(context.Item))">
+                    Edit
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
     </Columns>
 </EntityDataGrid>
 
@@ -63,6 +73,28 @@
         if (string.IsNullOrEmpty(result.NewKey))
             return;
         await TeamService.UpdateBannerAsync(result.Item.Id, result.NewKey);
+    }
+
+    private async Task EditSongs(Team team)
+    {
+        if (team.TournamentId is not { } tournamentId)
+            return;
+
+        var dialog = await DialogService.ShowAsync<TeamSongsDialog>(
+            $"Team songs — {team.Name}",
+            new DialogParameters<TeamSongsDialog>
+            {
+                { x => x.TeamId, team.Id },
+                { x => x.TournamentId, tournamentId },
+                { x => x.GoalTrackId, team.GoalSongTrackId },
+                { x => x.WinTrackId, team.WinSongTrackId },
+            });
+
+        var result = await dialog.Result;
+        if (result?.Data is true)
+        {
+            await _dataGrid.ReloadAsync();
+        }
     }
 
     private async Task UpdateTeamGms(ManyForeignSelection<Team, Account> selection)

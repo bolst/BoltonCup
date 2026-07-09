@@ -24,6 +24,7 @@ public class Game : EntityBase
     public ICollection<GameHighlight> Highlights { get; set; } = [];
     public ICollection<GameStar> Stars { get; set; } = [];
     public ICollection<Referee> Referees { get; set; } = [];
+    public ICollection<GameWarmupTrack> WarmupTracks { get; set; } = [];
 
     public override string ToString()
     {

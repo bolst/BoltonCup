@@ -33,6 +33,9 @@ public class AssetFileUploader : IAssetFileUploader
 
         using var content = new StreamContent(uploadStream);
         content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mime);
+        // R2 rejects chunked uploads with 411 Length Required, so send an explicit Content-Length. The browser
+        // file stream isn't seekable (no Length), so fall back to the reported file size for non-resized uploads.
+        content.Headers.ContentLength = uploadStream.CanSeek ? uploadStream.Length : file.Size;
         var response = await _httpClient.PutAsync(upload.UploadUrl, content, cancellationToken);
         response.EnsureSuccessStatusCode();
 

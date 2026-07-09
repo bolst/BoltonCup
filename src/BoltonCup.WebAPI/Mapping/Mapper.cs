@@ -998,20 +998,23 @@ public class Mapper : IMapper
     {
         return new GamePlaylistDto
         {
-            Tracks = result.Tracks.Select(t => new PlaylistTrackDto
-            {
-                MusicTrackId = t.Id, 
-                FileKey = t.AudioFileKey, 
-                Title = t.Title, 
-                Artist = t.Artist, 
-                AlbumArtUrl = t.AlbumArtUrl,
-                DurationMs = t.DurationMs,
-                OffsetSeconds = t.OffsetSeconds,
-                RequestedByName = t.RequestedByName,
-            }).ToList(),
+            Warmup = result.Warmup.Select(ToPlaylistTrackDto).ToList(),
+            Tracks = result.Tracks.Select(ToPlaylistTrackDto).ToList(),
             Missing = result.Missing.Select(ToDto).ToList(),
         };
     }
+
+    private static PlaylistTrackDto ToPlaylistTrackDto(TournamentMusicTrack t) => new()
+    {
+        MusicTrackId = t.Id,
+        FileKey = t.AudioFileKey,
+        Title = t.Title,
+        Artist = t.Artist,
+        AlbumArtUrl = t.AlbumArtUrl,
+        DurationMs = t.DurationMs,
+        OffsetSeconds = t.OffsetSeconds,
+        RequestedByName = t.RequestedByName,
+    };
 
     public IReadOnlyList<MusicLibraryTrackDto> ToDtoList(IReadOnlyList<TournamentMusicTrack> tracks)
         => tracks.Select(ToDto).ToList();

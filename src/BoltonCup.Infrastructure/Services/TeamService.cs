@@ -58,6 +58,33 @@ public class TeamService : ITeamService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task SetSongTracksAsync(int teamId, int? goalTrackId, int? winTrackId, CancellationToken cancellationToken = default)
+    {
+        var team = await _dbContext.Teams.FirstOrDefaultAsync(t => t.Id == teamId, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(Team), teamId);
+
+        team.GoalSongTrackId = await ValidatePoolTrackIdAsync(team, goalTrackId, cancellationToken);
+        team.WinSongTrackId = await ValidatePoolTrackIdAsync(team, winTrackId, cancellationToken);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    // A picked pool track must belong to the team's tournament; null clears the selection.
+    private async Task<int?> ValidatePoolTrackIdAsync(Team team, int? trackId, CancellationToken cancellationToken)
+    {
+        if (trackId is null)
+            return null;
+
+        var exists = await _dbContext.TournamentMusicTracks
+            .AnyAsync(t => t.Id == trackId && t.TournamentId == team.TournamentId, cancellationToken);
+        if (!exists)
+        {
+            throw new EntityNotFoundException(nameof(TournamentMusicTrack), trackId.Value);
+        }
+
+        return trackId;
+    }
+
     public async Task SetGeneralManagersAsync(int teamId, IReadOnlyCollection<int> accountIds, CancellationToken cancellationToken = default)
     {
         var team = await _dbContext.Teams.FirstOrDefaultAsync(t => t.Id == teamId, cancellationToken)

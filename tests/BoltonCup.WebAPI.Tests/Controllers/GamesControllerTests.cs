@@ -30,7 +30,7 @@ public class GamesControllerTests
     [Fact]
     public async Task GetGamePlaylist_ReturnsMappedDto()
     {
-        var serviceResult = new GamePlaylistResult([], []);
+        var serviceResult = new GamePlaylistResult([], [], []);
         var dto = new GamePlaylistDto
         {
             Tracks = [new PlaylistTrackDto { FileKey = "k1", Title = "Song" }],

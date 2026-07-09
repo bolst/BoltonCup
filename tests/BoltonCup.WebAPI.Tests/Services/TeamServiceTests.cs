@@ -1,4 +1,5 @@
 using BoltonCup.Core;
+using BoltonCup.Core.Exceptions;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Services;
 using FluentAssertions;
@@ -88,6 +89,52 @@ public class TeamServiceTests
         team.GoalSongTrackId.Should().BeNull();
         // The track row is left in place (it may still be wanted as a player request / library item).
         db.TournamentMusicTracks.Any(t => t.Id == goalId).Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task SetSongTracksAsync_SetsFksToExistingPoolTracks()
+    {
+        await using var db = await SeedAsync();
+        db.TournamentMusicTracks.AddRange(
+            new TournamentMusicTrack { Id = 1, TournamentId = TournamentId, Title = "Goal", AudioFileKey = "g" },
+            new TournamentMusicTrack { Id = 2, TournamentId = TournamentId, Title = "Win", AudioFileKey = "w" });
+        await db.SaveChangesAsync();
+        var service = NewService(db);
+
+        await service.SetSongTracksAsync(TeamId, 1, 2);
+
+        var team = await db.Teams.SingleAsync(t => t.Id == TeamId);
+        team.GoalSongTrackId.Should().Be(1);
+        team.WinSongTrackId.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task SetSongTracksAsync_NullClearsSelection()
+    {
+        await using var db = await SeedAsync();
+        db.TournamentMusicTracks.Add(new TournamentMusicTrack { Id = 1, TournamentId = TournamentId, Title = "Goal", AudioFileKey = "g" });
+        await db.SaveChangesAsync();
+        var service = NewService(db);
+        await service.SetSongTracksAsync(TeamId, 1, null);
+
+        await service.SetSongTracksAsync(TeamId, null, null);
+
+        var team = await db.Teams.SingleAsync(t => t.Id == TeamId);
+        team.GoalSongTrackId.Should().BeNull();
+        team.WinSongTrackId.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task SetSongTracksAsync_RejectsTrackFromAnotherTournament()
+    {
+        await using var db = await SeedAsync();
+        db.TournamentMusicTracks.Add(new TournamentMusicTrack { Id = 5, TournamentId = 999, Title = "Foreign", AudioFileKey = "f" });
+        await db.SaveChangesAsync();
+        var service = NewService(db);
+
+        var act = () => service.SetSongTracksAsync(TeamId, 5, null);
+
+        await act.Should().ThrowAsync<EntityNotFoundException>();
     }
 
     private static async Task<BoltonCupDbContext> SeedAsync()

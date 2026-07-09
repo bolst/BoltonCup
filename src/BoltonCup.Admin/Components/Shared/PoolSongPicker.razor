@@ -1,0 +1,96 @@
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject IDialogService DialogService
+
+@* Single-select picker over a tournament's downloaded music pool, with an inline upload for new tracks. *@
+<MudStack Row AlignItems="AlignItems.Center" Spacing="1" Class="@Class">
+    <MudAutocomplete T="TournamentMusicTrack"
+                     Label="@Label"
+                     Value="Value"
+                     ValueChanged="OnValueChanged"
+                     SearchFunc="Search"
+                     ToStringFunc="@ToLabel"
+                     Clearable
+                     ResetValueOnEmptyText
+                     Variant="Variant.Outlined"
+                     Class="flex-grow-1">
+        <ItemTemplate Context="track">
+            <div class="d-flex align-center gap-3">
+                <MudAvatar Square Size="Size.Medium">
+                    @if (!string.IsNullOrEmpty(track.AlbumArtUrl))
+                    {
+                        <MudImage Src="@track.AlbumArtUrl" Alt="@track.Title" />
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Rounded.MusicNote" />
+                    }
+                </MudAvatar>
+                <div>
+                    <MudText Typo="Typo.body2">@track.Title</MudText>
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary">@track.Artist</MudText>
+                </div>
+            </div>
+        </ItemTemplate>
+    </MudAutocomplete>
+    <MudTooltip Text="Upload a new track">
+        <MudIconButton Icon="@Icons.Material.Rounded.UploadFile" Color="Color.Primary" OnClick="UploadNew" />
+    </MudTooltip>
+</MudStack>
+
+@code {
+    [Parameter] public int TournamentId { get; set; }
+    [Parameter] public TournamentMusicTrack? Value { get; set; }
+    [Parameter] public EventCallback<TournamentMusicTrack?> ValueChanged { get; set; }
+    [Parameter] public string Label { get; set; } = "Song";
+    [Parameter] public string? Class { get; set; }
+
+    private List<TournamentMusicTrack> _pool = [];
+    private int? _loadedTournamentId;
+
+    protected override async Task OnParametersSetAsync() => await EnsurePoolAsync();
+
+    private async Task EnsurePoolAsync()
+    {
+        if (_loadedTournamentId == TournamentId)
+            return;
+        _loadedTournamentId = TournamentId;
+        // Read via a short-lived context from the factory: in Blazor Server the scoped DbContext is shared
+        // across the whole circuit, so a service call here would collide with sibling components.
+        await using var db = await DbContextFactory.CreateDbContextAsync();
+        _pool = await db.TournamentMusicTracks
+            .Where(t => t.TournamentId == TournamentId && t.Status == MusicTrackStatus.Downloaded)
+            .OrderBy(t => t.Title)
+            .ToListAsync();
+    }
+
+    private static string ToLabel(TournamentMusicTrack? track)
+        => track is null ? string.Empty
+            : string.IsNullOrWhiteSpace(track.Artist) ? track.Title : $"{track.Artist} – {track.Title}";
+
+    private Task<IEnumerable<TournamentMusicTrack>> Search(string? value, CancellationToken ct)
+    {
+        IEnumerable<TournamentMusicTrack> results = _pool;
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            results = _pool.Where(t =>
+                (t.Title?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (t.Artist?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
+        }
+        return Task.FromResult(results.Take(25));
+    }
+
+    private Task OnValueChanged(TournamentMusicTrack? track) => ValueChanged.InvokeAsync(track);
+
+    private async Task UploadNew()
+    {
+        var parameters = new DialogParameters { [nameof(MusicTrackDialog.TournamentId)] = TournamentId };
+        var dialog = await DialogService.ShowAsync<MusicTrackDialog>("Upload Track", parameters);
+        var result = await dialog.Result;
+        if (result is { Canceled: false, Data: TournamentMusicTrack created })
+        {
+            _loadedTournamentId = null; // force a pool refresh so the new track is searchable
+            await EnsurePoolAsync();
+            await ValueChanged.InvokeAsync(created);
+        }
+    }
+}

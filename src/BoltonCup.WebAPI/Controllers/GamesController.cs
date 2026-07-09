@@ -82,6 +82,31 @@ public class GamesController(
         return Ok();
     }
 
+    /// <remarks>
+    /// Gets the tournament's downloaded music pool for a game, for picking warmup tracks (timekeeper or admin only).
+    /// </remarks>
+    [Authorize(Roles = $"{Admin},{Timekeeper}")]
+    [HttpGet("{id:int}/music-pool")]
+    public async Task<ActionResult<IReadOnlyList<MusicLibraryTrackDto>>> GetGameMusicPool(int id)
+    {
+        var game = await _games.GetByIdAsync(id);
+        if (game is null)
+        {
+            return NoContent();
+        }
+        var library = await _music.GetLibraryAsync(game.TournamentId);
+        return Ok(_mapper.ToDtoList(library));
+    }
+
+    /// <remarks>Replaces a game's warmup playlist with the given ordered pool track ids (timekeeper or admin only).</remarks>
+    [Authorize(Roles = $"{Admin},{Timekeeper}")]
+    [HttpPut("{id:int}/warmup")]
+    public async Task<IActionResult> SetGameWarmup(int id, [FromBody] SetGameWarmupRequest request)
+    {
+        await _music.SetGameWarmupAsync(id, request.TrackIds);
+        return Ok();
+    }
+
     /// <remarks>Records a goal in a game (timekeeper or admin only).</remarks>
     [Authorize(Roles = $"{Admin},{Timekeeper}")]
     [HttpPost("{id:int}/goals")]
