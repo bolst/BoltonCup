@@ -55,9 +55,26 @@ public interface IMusicLibraryService
 
     /// <summary>Soft-deletes a queue item (sets it cancelled); player request rows on their entity are untouched.</summary>
     Task CancelQueueItemAsync(int tournamentId, int queueItemId, CancellationToken cancellationToken = default);
+
+    /// <summary>The game's warmup tracks (downloaded pool tracks) in playback order.</summary>
+    Task<IReadOnlyList<TournamentMusicTrack>> GetGameWarmupAsync(int gameId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Replaces a game's warmup playlist with the given pool track ids, in order. Ids must belong to the
+    /// game's tournament; unknown ids are rejected.
+    /// </summary>
+    Task SetGameWarmupAsync(int gameId, IReadOnlyList<int> trackIds, CancellationToken cancellationToken = default);
 }
 
-public record GamePlaylistResult(IReadOnlyList<TournamentMusicTrack> Tracks, IReadOnlyList<MissingSongRequest> Missing);
+/// <summary>
+/// A game's computed music: <paramref name="Warmup"/> plays first (game-specific, one-shot), then
+/// <paramref name="Tracks"/> is the shared tournament rotation. <paramref name="Missing"/> are player
+/// requests with no uploaded file.
+/// </summary>
+public record GamePlaylistResult(
+    IReadOnlyList<TournamentMusicTrack> Tracks,
+    IReadOnlyList<MissingSongRequest> Missing,
+    IReadOnlyList<TournamentMusicTrack> Warmup);
 
 public record MusicQueueItemView(
     int Id,

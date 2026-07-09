@@ -1,0 +1,159 @@
+@namespace BoltonCup.Timekeeper.Components.Shared
+@inject IBoltonCupApi Api
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="3" Style="min-width: 460px;">
+            <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                Warmup songs play at the start of the game, in order, before the regular rotation.
+            </MudText>
+
+            @if (_loading)
+            {
+                <div class="d-flex justify-center pa-4">
+                    <MudProgressCircular Indeterminate Size="Size.Small" />
+                </div>
+            }
+            else
+            {
+                @if (_selected.Count == 0)
+                {
+                    <MudText Typo="Typo.body2">No warmup songs yet.</MudText>
+                }
+                else
+                {
+                    <MudList T="MusicLibraryTrackDto" Dense="true">
+                        @for (var i = 0; i < _selected.Count; i++)
+                        {
+                            var index = i;
+                            var track = _selected[index];
+                            <MudListItem T="MusicLibraryTrackDto">
+                                <div class="d-flex align-center gap-2">
+                                    <MudText Typo="Typo.caption" Style="width: 1.75rem;">@(index + 1).</MudText>
+                                    <div class="flex-grow-1" style="min-width: 0;">
+                                        <MudText Typo="Typo.body2" Class="text-truncate">@track.Title</MudText>
+                                        <MudText Typo="Typo.caption" Class="mud-text-secondary text-truncate">@track.Artist</MudText>
+                                    </div>
+                                    <MudIconButton Icon="@Icons.Material.Rounded.ArrowUpward" Size="Size.Small"
+                                                   Disabled="@(index == 0)" OnClick="@(() => Move(index, -1))" />
+                                    <MudIconButton Icon="@Icons.Material.Rounded.ArrowDownward" Size="Size.Small"
+                                                   Disabled="@(index == _selected.Count - 1)" OnClick="@(() => Move(index, 1))" />
+                                    <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Small"
+                                                   OnClick="@(() => Remove(index))" />
+                                </div>
+                            </MudListItem>
+                        }
+                    </MudList>
+                }
+
+                <MudDivider />
+                <MudAutocomplete T="MusicLibraryTrackDto"
+                                 Label="Add a warmup song"
+                                 Value="_toAdd"
+                                 ValueChanged="OnAdd"
+                                 SearchFunc="Search"
+                                 ToStringFunc="@ToLabel"
+                                 Clearable
+                                 ResetValueOnEmptyText
+                                 Variant="Variant.Outlined" />
+            }
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_saving">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save" Disabled="@(_saving || _loading)">
+            @(_saving ? "Saving…" : "Save")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter] public int GameId { get; set; }
+
+    private readonly List<MusicLibraryTrackDto> _selected = [];
+    private List<MusicLibraryTrackDto> _pool = [];
+    private MusicLibraryTrackDto? _toAdd;
+    private bool _loading = true;
+    private bool _saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _pool = (await Api.GetGameMusicPoolAsync(GameId)).ToList();
+            var byId = _pool.ToDictionary(t => t.Id);
+
+            var playlist = await Api.GetGamePlaylistAsync(GameId);
+            foreach (var w in playlist.Warmup)
+            {
+                if (byId.TryGetValue(w.MusicTrackId, out var track))
+                    _selected.Add(track);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Couldn't load warmup: {ex.Message}", Severity.Warning);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private static string ToLabel(MusicLibraryTrackDto? track)
+        => track is null ? string.Empty
+            : string.IsNullOrWhiteSpace(track.Artist) ? track.Title : $"{track.Artist} – {track.Title}";
+
+    private Task<IEnumerable<MusicLibraryTrackDto>> Search(string? value, CancellationToken ct)
+    {
+        var selectedIds = _selected.Select(t => t.Id).ToHashSet();
+        IEnumerable<MusicLibraryTrackDto> results = _pool.Where(t => !selectedIds.Contains(t.Id));
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            results = results.Where(t =>
+                (t.Title?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (t.Artist?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
+        }
+        return Task.FromResult(results.Take(25));
+    }
+
+    private void OnAdd(MusicLibraryTrackDto? track)
+    {
+        _toAdd = null;
+        if (track is null || _selected.Any(t => t.Id == track.Id))
+            return;
+        _selected.Add(track);
+    }
+
+    private void Move(int index, int delta)
+    {
+        var target = index + delta;
+        (_selected[index], _selected[target]) = (_selected[target], _selected[index]);
+    }
+
+    private void Remove(int index) => _selected.RemoveAt(index);
+
+    private async Task Save()
+    {
+        _saving = true;
+        try
+        {
+            await Api.SetGameWarmupAsync(GameId, new SetGameWarmupRequest { TrackIds = _selected.Select(t => t.Id).ToList() });
+            Snackbar.Add("Warmup saved.", Severity.Success);
+            Dialog.Close(DialogResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Save failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private void Cancel() => Dialog.Cancel();
+}

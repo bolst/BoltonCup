@@ -20,6 +20,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<Game> Games { get; set; }
     public DbSet<GameHighlight> GameHighlights { get; set; }
     public DbSet<GameStar> GameStars { get; set; }
+    public DbSet<GameWarmupTrack> GameWarmupTracks { get; set; }
     public DbSet<Goal> Goals { get; set; }
     public DbSet<GoalieStat> GoalieStats { get; set; }
     public DbSet<InfoGuide> InfoGuides { get; set; }
@@ -309,6 +310,29 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.VideoId).HasColumnName("video_id");
             entity.Property(e => e.Title).HasColumnName("title");
             entity.Property(e => e.Description).HasColumnName("description");
+        });
+
+        modelBuilder.Entity<GameWarmupTrack>(entity =>
+        {
+            entity
+                .ToTable("game_warmup_tracks")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Game)
+                .WithMany(g => g.WarmupTracks)
+                .HasForeignKey(e => e.GameId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity
+                .HasOne(e => e.Track)
+                .WithMany()
+                .HasForeignKey(e => e.TournamentMusicTrackId)
+                .OnDelete(DeleteBehavior.Cascade);
+            // One row per (game, track); a track can't appear twice in a game's warmup.
+            entity.HasIndex(e => new { e.GameId, e.TournamentMusicTrackId }).IsUnique();
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.TournamentMusicTrackId).HasColumnName("tournament_music_track_id");
+            entity.Property(e => e.Position).HasColumnName("position");
         });
 
         modelBuilder.Entity<GameStar>(entity =>

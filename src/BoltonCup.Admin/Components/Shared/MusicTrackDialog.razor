@@ -175,11 +175,14 @@
             else
             {
                 var tempKey = await Uploader.UploadAsync(_file!, resize: false, maxFileSize: AudioMaxBytes);
-                await MusicLibrary.AddTrackAsync(new AddMusicTrackCommand(
+                var created = await MusicLibrary.AddTrackAsync(new AddMusicTrackCommand(
                     TournamentId, tempKey, _title.Trim(), _artist, _trackId, MusicProviderType.Spotify, _albumArtUrl, _durationMs, _offsetSeconds, _isInBasePool));
+                Snackbar.Add("Saved.", Severity.Success);
+                Dialog.Close(DialogResult.Ok(created));
+                return;
             }
             Snackbar.Add("Saved.", Severity.Success);
-            Dialog.Close(DialogResult.Ok(true));
+            Dialog.Close(DialogResult.Ok(Track));
         }
         catch (Exception ex)
         {

@@ -174,7 +174,86 @@ public class MusicLibraryService : IMusicLibraryService
             .Select(r => new MissingSongRequest(r.PlayerName, r.SongName, r.SongTrackId, false))
             .ToList();
 
-        return new GamePlaylistResult(tracks, missing);
+        // Warmup plays first: game-specific tracks, ordered, filtered to downloaded rows with a file.
+        var warmup = await GetGameWarmupInternalAsync(gameId, byId, cancellationToken);
+
+        return new GamePlaylistResult(tracks, missing, warmup);
+    }
+
+    public async Task<IReadOnlyList<TournamentMusicTrack>> GetGameWarmupAsync(int gameId, CancellationToken cancellationToken = default)
+        => await GetGameWarmupInternalAsync(gameId, byId: null, cancellationToken);
+
+    // Ordered, downloaded warmup tracks for a game. Reuses a caller-supplied downloaded-track lookup when
+    // available (the game-playlist path already has one) to avoid a second query.
+    private async Task<IReadOnlyList<TournamentMusicTrack>> GetGameWarmupInternalAsync(
+        int gameId, IReadOnlyDictionary<int, TournamentMusicTrack>? byId, CancellationToken cancellationToken)
+    {
+        var warmupIds = await _db.GameWarmupTracks
+            .Where(w => w.GameId == gameId)
+            .OrderBy(w => w.Position)
+            .Select(w => w.TournamentMusicTrackId)
+            .ToListAsync(cancellationToken);
+        if (warmupIds.Count == 0)
+        {
+            return [];
+        }
+
+        var lookup = byId;
+        if (lookup is null)
+        {
+            lookup = await _db.TournamentMusicTracks
+                .Where(t => warmupIds.Contains(t.Id) && t.Status == MusicTrackStatus.Downloaded)
+                .ToDictionaryAsync(t => t.Id, cancellationToken);
+        }
+
+        var warmup = new List<TournamentMusicTrack>();
+        foreach (var id in warmupIds)
+        {
+            if (lookup.TryGetValue(id, out var track) && !string.IsNullOrWhiteSpace(track.AudioFileKey))
+            {
+                warmup.Add(track);
+            }
+        }
+        return warmup;
+    }
+
+    public async Task SetGameWarmupAsync(int gameId, IReadOnlyList<int> trackIds, CancellationToken cancellationToken = default)
+    {
+        var game = await _db.Games
+            .Where(g => g.Id == gameId)
+            .Select(g => new { g.TournamentId })
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(Game), gameId);
+
+        // De-dupe while preserving order; validate every id belongs to the game's tournament.
+        var orderedIds = trackIds.Distinct().ToList();
+        if (orderedIds.Count > 0)
+        {
+            var validIds = await _db.TournamentMusicTracks
+                .Where(t => t.TournamentId == game.TournamentId && orderedIds.Contains(t.Id))
+                .Select(t => t.Id)
+                .ToListAsync(cancellationToken);
+            var invalid = orderedIds.Except(validIds).ToList();
+            if (invalid.Count > 0)
+                throw new EntityNotFoundException(nameof(TournamentMusicTrack), invalid[0]);
+        }
+
+        var existing = await _db.GameWarmupTracks
+            .Where(w => w.GameId == gameId)
+            .ToListAsync(cancellationToken);
+        _db.GameWarmupTracks.RemoveRange(existing);
+
+        for (var i = 0; i < orderedIds.Count; i++)
+        {
+            _db.GameWarmupTracks.Add(new GameWarmupTrack
+            {
+                GameId = gameId,
+                TournamentMusicTrackId = orderedIds[i],
+                Position = i,
+            });
+        }
+
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task AdvanceGameQueueAsync(int gameId, int musicTrackId, CancellationToken cancellationToken = default)

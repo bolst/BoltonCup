@@ -3,6 +3,9 @@ namespace BoltonCup.WebAPI.Mapping;
 /// <summary>The computed music playlist for a game: ordered playable tracks plus unplayable (missing) requests.</summary>
 public record GamePlaylistDto
 {
+    /// <summary>Gets the warmup tracks, in order, that play at the start of the game before the rotation.</summary>
+    public IReadOnlyList<PlaylistTrackDto> Warmup { get; init; } = [];
+
     /// <summary>Gets the ordered, de-duped tracks: matched player requests first, then base pool.</summary>
     public IReadOnlyList<PlaylistTrackDto> Tracks { get; init; } = [];
 

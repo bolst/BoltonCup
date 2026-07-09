@@ -32,6 +32,11 @@
             <div class="d-flex align-center gap-2 pa-4">
                 <MudIcon Icon="@Icons.Material.Rounded.MusicOff" Size="Size.Small" Color="Color.Secondary" />
                 <MudText Typo="Typo.body2" Color="Color.Tertiary">No music for this game.</MudText>
+                <MudSpacer />
+                <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Tertiary"
+                           StartIcon="@Icons.Material.Rounded.PlaylistPlay" OnClick="EditWarmup">
+                    Warmup
+                </MudButton>
             </div>
         }
         else
@@ -118,8 +123,14 @@
             <MudText Typo="Typo.h6">Queue</MudText>
             <MudText Typo="Typo.caption" Class="white-text">@Player.Playlist.Count tracks</MudText>
         </div>
-        <MudIconButton Icon="@Icons.Material.Rounded.Close" Size="Size.Small"
-                       OnClick="@(() => _queueDrawerOpen = false)" Class="white-text" />
+        <MudStack Row Spacing="1" AlignItems="AlignItems.Center">
+            <MudTooltip Text="Edit warmup playlist">
+                <MudIconButton Icon="@Icons.Material.Rounded.PlaylistPlay" Size="Size.Small"
+                               OnClick="EditWarmup" Class="white-text" />
+            </MudTooltip>
+            <MudIconButton Icon="@Icons.Material.Rounded.Close" Size="Size.Small"
+                           OnClick="@(() => _queueDrawerOpen = false)" Class="white-text" />
+        </MudStack>
     </div>
 
     <MudDivider />
@@ -207,6 +218,8 @@
     private bool _wasDownloading;
     private bool _queueDrawerOpen;
     private GameState? _lastGameState;
+    private IReadOnlyList<PlaylistTrackDto> _warmup = [];
+    private HashSet<int> _warmupTrackIds = [];
 
     private double SliderMax => Player.DurationSec > 0 ? Player.DurationSec : 1;
 
@@ -245,7 +258,12 @@
         try
         {
             var playlist = await Api.GetGamePlaylistAsync(GameId);
-            var tracks = playlist.Tracks.ToList();
+            // Warmup leads the playlist only before the game starts; on later reloads (rollover, or once the
+            // game is in progress) it's omitted so it isn't replayed. Warmup tracks never advance the shared queue.
+            var includeWarmup = State.Game?.GameState is null or GameState.Pending;
+            _warmup = includeWarmup ? playlist.Warmup.ToList() : [];
+            _warmupTrackIds = _warmup.Select(t => t.MusicTrackId).ToHashSet();
+            var tracks = _warmup.Concat(playlist.Tracks).ToList();
             Player.SetPlaylist(tracks);
             _trackCount = tracks.Count;
             await RefreshCachedCountAsync();
@@ -353,6 +371,8 @@
     private void OnTrackStarted(PlaylistTrackDto track) => InvokeAsync(async () =>
     {
         if (!State.IsOnline) return;
+        // Warmup is game-specific and one-shot: it must never advance the shared tournament rotation.
+        if (_warmupTrackIds.Contains(track.MusicTrackId)) return;
         try
         {
             await Api.AdvancePlaylistAsync(GameId, new AdvancePlaylistRequest { MusicTrackId = track.MusicTrackId });
@@ -414,6 +434,17 @@
     private void ToggleQueueDrawer()
     {
         _queueDrawerOpen = !_queueDrawerOpen;
+    }
+
+    private async Task EditWarmup()
+    {
+        var parameters = new DialogParameters<WarmupEditorDialog> { { x => x.GameId, GameId } };
+        var dialog = await DialogService.ShowAsync<WarmupEditorDialog>("Warmup playlist", parameters);
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+        {
+            await LoadPlaylistAsync();
+        }
     }
 
     public void Dispose()

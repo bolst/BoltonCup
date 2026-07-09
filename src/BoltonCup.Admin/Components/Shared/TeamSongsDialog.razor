@@ -1,0 +1,71 @@
+@inject ITeamService TeamService
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="4" Style="min-width: 480px;">
+            <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                Pick from the tournament music pool, or upload a new track.
+            </MudText>
+            <PoolSongPicker TournamentId="TournamentId" Label="Goal song"
+                            Value="_goal" ValueChanged="@(v => _goal = v)" />
+            <PoolSongPicker TournamentId="TournamentId" Label="Win song"
+                            Value="_win" ValueChanged="@(v => _win = v)" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_saving">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save" Disabled="_saving">
+            @(_saving ? "Saving…" : "Save")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter] public int TeamId { get; set; }
+    [Parameter] public int TournamentId { get; set; }
+    [Parameter] public int? GoalTrackId { get; set; }
+    [Parameter] public int? WinTrackId { get; set; }
+
+    private TournamentMusicTrack? _goal;
+    private TournamentMusicTrack? _win;
+    private bool _saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (GoalTrackId is null && WinTrackId is null)
+            return;
+
+        var ids = new[] { GoalTrackId, WinTrackId }.Where(id => id is not null).Select(id => id!.Value).ToList();
+        await using var db = await DbContextFactory.CreateDbContextAsync();
+        var tracks = await db.TournamentMusicTracks
+            .Where(t => ids.Contains(t.Id))
+            .ToListAsync();
+        _goal = tracks.FirstOrDefault(t => t.Id == GoalTrackId);
+        _win = tracks.FirstOrDefault(t => t.Id == WinTrackId);
+    }
+
+    private async Task Save()
+    {
+        _saving = true;
+        try
+        {
+            await TeamService.SetSongTracksAsync(TeamId, _goal?.Id, _win?.Id);
+            Snackbar.Add("Team songs saved.", Severity.Success);
+            Dialog.Close(DialogResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Save failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private void Cancel() => Dialog.Cancel();
+}

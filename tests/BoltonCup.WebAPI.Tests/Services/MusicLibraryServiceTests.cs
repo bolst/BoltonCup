@@ -1,5 +1,6 @@
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
+using BoltonCup.Core.Exceptions;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Services;
 using FluentAssertions;
@@ -209,6 +210,47 @@ public class MusicLibraryServiceTests
         db.TournamentMusicTracks.Count(t => t.TournamentId == TournamentId && t.TrackId == "SB").Should().Be(1);
         (await service.GetLibraryAsync(TournamentId)).Should().Contain(t => t.TrackId == "SB");
         (await service.GetQueueAsync(TournamentId)).Should().NotContain(q => q.TrackId == "SB");
+    }
+
+    [Fact]
+    public async Task SetGameWarmupAsync_PersistsOrderedTracks_ThatLeadTheGamePlaylist()
+    {
+        await using var db = await SeedAsync();
+        var service = NewService(db);
+
+        // Warmup order: base anthem (id 2) then Alice's song (id 1).
+        await service.SetGameWarmupAsync(GameId, [2, 1]);
+
+        var warmup = await service.GetGameWarmupAsync(GameId);
+        warmup.Select(t => t.AudioFileKey).Should().Equal("kbase", "kSA");
+
+        var playlist = await service.GetGamePlaylistAsync(GameId);
+        playlist.Warmup.Select(t => t.AudioFileKey).Should().Equal("kbase", "kSA");
+        // Warmup is a separate lane; the shared rotation is unchanged (base pool only).
+        playlist.Tracks.Select(t => t.AudioFileKey).Should().Equal("kbase");
+    }
+
+    [Fact]
+    public async Task SetGameWarmupAsync_ReplacesPreviousSelection()
+    {
+        await using var db = await SeedAsync();
+        var service = NewService(db);
+
+        await service.SetGameWarmupAsync(GameId, [1, 2]);
+        await service.SetGameWarmupAsync(GameId, [2]);
+
+        (await service.GetGameWarmupAsync(GameId)).Select(t => t.Id).Should().Equal(2);
+    }
+
+    [Fact]
+    public async Task SetGameWarmupAsync_RejectsTrackNotInTournament()
+    {
+        await using var db = await SeedAsync();
+        var service = NewService(db);
+
+        var act = () => service.SetGameWarmupAsync(GameId, [999]);
+
+        await act.Should().ThrowAsync<EntityNotFoundException>();
     }
 
     private static async Task<BoltonCupDbContext> SeedAsync(bool saTrackIsBasePool = false)

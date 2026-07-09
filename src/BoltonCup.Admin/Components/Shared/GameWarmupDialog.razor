@@ -1,0 +1,119 @@
+@inject IMusicLibraryService MusicLibrary
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="3" Style="min-width: 520px;">
+            <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                Warmup songs play at the start of the game, in order, before the regular rotation.
+            </MudText>
+
+            @if (_tracks.Count == 0)
+            {
+                <MudText Typo="Typo.body2">No warmup songs yet.</MudText>
+            }
+            else
+            {
+                <MudList T="TournamentMusicTrack" Dense="true">
+                    @for (var i = 0; i < _tracks.Count; i++)
+                    {
+                        var index = i;
+                        var track = _tracks[index];
+                        <MudListItem T="TournamentMusicTrack">
+                            <div class="d-flex align-center gap-2">
+                                <MudText Typo="Typo.caption" Style="width: 1.75rem;">@(index + 1).</MudText>
+                                <div class="flex-grow-1" style="min-width: 0;">
+                                    <MudText Typo="Typo.body2" Class="text-truncate">@track.Title</MudText>
+                                    <MudText Typo="Typo.caption" Class="mud-text-secondary text-truncate">@track.Artist</MudText>
+                                </div>
+                                <MudIconButton Icon="@Icons.Material.Rounded.ArrowUpward" Size="Size.Small"
+                                               Disabled="@(index == 0)" OnClick="@(() => Move(index, -1))" />
+                                <MudIconButton Icon="@Icons.Material.Rounded.ArrowDownward" Size="Size.Small"
+                                               Disabled="@(index == _tracks.Count - 1)" OnClick="@(() => Move(index, 1))" />
+                                <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Small"
+                                               OnClick="@(() => Remove(index))" />
+                            </div>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+
+            <MudDivider />
+            <PoolSongPicker TournamentId="TournamentId" Label="Add a warmup song"
+                            Value="_toAdd" ValueChanged="OnAdd" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_saving">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save" Disabled="_saving">
+            @(_saving ? "Saving…" : "Save")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter] public int GameId { get; set; }
+    [Parameter] public int TournamentId { get; set; }
+
+    private readonly List<TournamentMusicTrack> _tracks = [];
+    private TournamentMusicTrack? _toAdd;
+    private bool _saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Read via a short-lived factory context (see PoolSongPicker): avoids sharing the circuit's scoped context.
+        await using var db = await DbContextFactory.CreateDbContextAsync();
+        var current = await db.GameWarmupTracks
+            .Where(w => w.GameId == GameId)
+            .OrderBy(w => w.Position)
+            .Select(w => w.Track)
+            .Where(t => t.Status == MusicTrackStatus.Downloaded)
+            .ToListAsync();
+        _tracks.AddRange(current);
+    }
+
+    private void OnAdd(TournamentMusicTrack? track)
+    {
+        _toAdd = null; // keep the picker ready for the next add
+        if (track is null)
+            return;
+        if (_tracks.Any(t => t.Id == track.Id))
+        {
+            Snackbar.Add("That song is already in the warmup list.", Severity.Info);
+            return;
+        }
+        _tracks.Add(track);
+    }
+
+    private void Move(int index, int delta)
+    {
+        var target = index + delta;
+        (_tracks[index], _tracks[target]) = (_tracks[target], _tracks[index]);
+    }
+
+    private void Remove(int index) => _tracks.RemoveAt(index);
+
+    private async Task Save()
+    {
+        _saving = true;
+        try
+        {
+            await MusicLibrary.SetGameWarmupAsync(GameId, _tracks.Select(t => t.Id).ToList());
+            Snackbar.Add("Warmup playlist saved.", Severity.Success);
+            Dialog.Close(DialogResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Save failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private void Cancel() => Dialog.Cancel();
+}

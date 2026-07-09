@@ -31,6 +31,15 @@
                 </MudButton>
             </CellTemplate>
         </TemplateColumn>
+        <TemplateColumn Title="Warmup" Sortable="false" Editable="false">
+            <CellTemplate>
+                <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Info"
+                           Disabled="@(context.Item.Id == 0)"
+                           OnClick="@(() => EditWarmup(context.Item))">
+                    Edit
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
     </Columns>
     <ChildRowContent>
         @{
@@ -76,7 +85,18 @@
             await _dataGrid.ReloadAsync();
         }
     }
-    
+
+    private async Task EditWarmup(Game game)
+    {
+        await DialogService.ShowAsync<GameWarmupDialog>(
+            $"Warmup — {game}",
+            new DialogParameters<GameWarmupDialog>
+            {
+                { x => x.GameId, game.Id },
+                { x => x.TournamentId, game.TournamentId },
+            });
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
