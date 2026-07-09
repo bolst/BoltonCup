@@ -6,17 +6,17 @@ public interface ITeamService
     Task UpdateBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Sets the team's goal and win songs from picked tracks. Each track is registered in the tournament's
-    /// music library (the fetcher downloads it); a null clears that song without touching any track row.
+    /// Sets the team's goal, win and penalty songs from picked tracks. Each track is registered in the
+    /// tournament's music library (the fetcher downloads it); a null clears that song without touching any track row.
     /// </summary>
-    Task UpdateSongsAsync(int teamId, MusicTrack? goalSong, MusicTrack? winSong, CancellationToken cancellationToken = default);
+    Task UpdateSongsAsync(int teamId, MusicTrack? goalSong, MusicTrack? winSong, MusicTrack? penaltySong, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Sets the team's goal and win songs to existing tournament music-pool tracks by id (or null to clear).
-    /// Each non-null id must belong to the team's tournament. Used by the admin pool-picker, which selects
+    /// Sets the team's goal, win and penalty songs to existing tournament music-pool tracks by id (or null to
+    /// clear). Each non-null id must belong to the team's tournament. Used by the admin pool-picker, which selects
     /// already-present tracks rather than queuing a Spotify download.
     /// </summary>
-    Task SetSongTracksAsync(int teamId, int? goalTrackId, int? winTrackId, CancellationToken cancellationToken = default);
+    Task SetSongTracksAsync(int teamId, int? goalTrackId, int? winTrackId, int? penaltyTrackId, CancellationToken cancellationToken = default);
 
     /// <summary>Replaces the team's set of general managers with the given accounts, adding/removing memberships as needed.</summary>
     Task SetGeneralManagersAsync(int teamId, IReadOnlyCollection<int> accountIds, CancellationToken cancellationToken = default);

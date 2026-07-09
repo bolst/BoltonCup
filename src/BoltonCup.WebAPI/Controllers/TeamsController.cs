@@ -71,7 +71,7 @@ public class TeamsController(
         return Ok();
     }
 
-    /// <summary>Sets the team's goal and win songs (admin or the team's GM). A null song clears that selection.</summary>
+    /// <summary>Sets the team's goal, win and penalty songs (admin or the team's GM). A null song clears that selection.</summary>
     [Authorize]
     [HttpPut("{id:int}/songs")]
     public async Task<ActionResult> UpdateTeamSongs(int id, [FromBody] UpdateTeamSongsRequest request)
@@ -82,7 +82,7 @@ public class TeamsController(
             return Forbid();
         }
 
-        await _teamService.UpdateSongsAsync(id, ToTrack(request.GoalSong), ToTrack(request.WinSong));
+        await _teamService.UpdateSongsAsync(id, ToTrack(request.GoalSong), ToTrack(request.WinSong), ToTrack(request.PenaltySong));
         return Ok();
     }
 

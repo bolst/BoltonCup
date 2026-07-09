@@ -103,9 +103,9 @@ public class GlobalMusicQueue : IGlobalMusicQueue
     {
         return (await _db.Teams
             .Where(t => t.TournamentId == tournamentId)
-            .Select(t => new { t.GoalSongTrackId, t.WinSongTrackId })
+            .Select(t => new { t.GoalSongTrackId, t.WinSongTrackId, t.PenaltySongTrackId })
             .ToListAsync(cancellationToken))
-            .SelectMany(t => new[] { t.GoalSongTrackId, t.WinSongTrackId })
+            .SelectMany(t => new[] { t.GoalSongTrackId, t.WinSongTrackId, t.PenaltySongTrackId })
             .Where(id => id is not null)
             .Select(id => id!.Value)
             .ToHashSet();

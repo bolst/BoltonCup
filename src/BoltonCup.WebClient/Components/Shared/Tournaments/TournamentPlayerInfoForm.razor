@@ -73,7 +73,7 @@
             {
                 <MudDivider Class="my-4" />
                 <MudText Typo="Typo.h6" Class="mb-1"><b>Team Music — @managedTeam.TeamName</b></MudText>
-                <MudText Typo="Typo.body2" Class="mb-3 mud-text-secondary">As GM, pick the songs that play when your team scores and wins.</MudText>
+                <MudText Typo="Typo.body2" Class="mb-3 mud-text-secondary">As GM, pick the songs that play when your team scores, wins, and takes a penalty.</MudText>
                 <SongPickerField Label="Goal song"
                                  Value="_goalSong"
                                  ValueChanged="@(track => _goalSong = track)"
@@ -81,6 +81,10 @@
                 <SongPickerField Label="Win song"
                                  Value="_winSong"
                                  ValueChanged="@(track => _winSong = track)"
+                                 Class="mb-3" />
+                <SongPickerField Label="Penalty song"
+                                 Value="_penaltySong"
+                                 ValueChanged="@(track => _penaltySong = track)"
                                  Class="mb-4" />
             }
 
@@ -117,6 +121,7 @@
     private Sdk.ManagedTeamDto? _managedTeam;
     private Sdk.MusicTrackDto? _goalSong;
     private Sdk.MusicTrackDto? _winSong;
+    private Sdk.MusicTrackDto? _penaltySong;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -138,6 +143,7 @@
             _managedTeam = dto.ManagedTeam;
             _goalSong = dto.ManagedTeam?.GoalSong;
             _winSong = dto.ManagedTeam?.WinSong;
+            _penaltySong = dto.ManagedTeam?.PenaltySong;
             _isInTournament = true;
         }
         catch (Sdk.ApiException<Sdk.BoltonCupProblemDetails> e)
@@ -209,6 +215,7 @@
                 {
                     GoalSong = _goalSong,
                     WinSong = _winSong,
+                    PenaltySong = _penaltySong,
                 });
             }
 

@@ -109,6 +109,29 @@ public partial class GameConsole : ComponentBase, IDisposable
 
     private async Task OpenPenaltyDialogAsync(bool isHome)
     {
+        var team = isHome ? State.Game!.HomeTeam : State.Game!.AwayTeam;
+        if (State.AutoplayPenaltySong)
+        {
+            var songResult = await Player.PlayGoalSongAsync(
+                team?.PenaltySongFileKey ?? "", team?.PenaltySongOffsetSeconds ?? 0, team?.PenaltySongTitle);
+            var teamName = team?.NameShort ?? team?.Name ?? "team";
+            switch (songResult)
+            {
+                case MusicPlayerService.GoalSongResult.NoSong:
+                    Snackbar.Add($"No penalty song set for {teamName}.", Severity.Info);
+                    break;
+                case MusicPlayerService.GoalSongResult.Unresolved:
+                    Snackbar.Add("Penalty song isn't downloaded and you're offline.", Severity.Warning);
+                    break;
+                case MusicPlayerService.GoalSongResult.Blocked:
+                    Snackbar.Add("Browser blocked the penalty song from playing.", Severity.Warning);
+                    break;
+                case MusicPlayerService.GoalSongResult.NotReady:
+                    Snackbar.Add("Music player isn't ready yet.", Severity.Warning);
+                    break;
+            }
+        }
+
         var parameters = new DialogParameters<PenaltyDialog>
         {
             { x => x.HomeTeam, State.Game!.HomeTeam },

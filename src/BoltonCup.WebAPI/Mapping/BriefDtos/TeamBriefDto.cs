@@ -33,4 +33,10 @@ public record TeamInGameDto : TeamBriefDto
     public int? GoalSongOffsetSeconds { get; set; }
     /// <summary>Title of the goal song, for display.</summary>
     public string? GoalSongTitle { get; set; }
+    /// <summary>Raw R2 object key of this team's penalty song (not a resolved URL). Null if unset.</summary>
+    public string? PenaltySongFileKey { get; set; }
+    /// <summary>Seconds into the penalty song where playback should start.</summary>
+    public int? PenaltySongOffsetSeconds { get; set; }
+    /// <summary>Title of the penalty song, for display.</summary>
+    public string? PenaltySongTitle { get; set; }
 }

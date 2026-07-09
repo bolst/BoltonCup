@@ -10630,7 +10630,7 @@
         "tags": [
           "Teams"
         ],
-        "description": "Sets the team's goal and win songs (admin or the team's GM). A null song clears that selection.",
+        "description": "Sets the team's goal, win and penalty songs (admin or the team's GM). A null song clears that selection.",
         "operationId": "UpdateTeamSongs",
         "parameters": [
           {
@@ -10652,7 +10652,7 @@
                     "$ref": "#/components/schemas/UpdateTeamSongsRequest"
                   }
                 ],
-                "description": "Request to set a team's goal and win songs. A null song clears that selection."
+                "description": "Request to set a team's goal, win and penalty songs. A null song clears that selection."
               }
             },
             "text/json": {
@@ -10662,7 +10662,7 @@
                     "$ref": "#/components/schemas/UpdateTeamSongsRequest"
                   }
                 ],
-                "description": "Request to set a team's goal and win songs. A null song clears that selection."
+                "description": "Request to set a team's goal, win and penalty songs. A null song clears that selection."
               }
             },
             "application/*+json": {
@@ -10672,7 +10672,7 @@
                     "$ref": "#/components/schemas/UpdateTeamSongsRequest"
                   }
                 ],
-                "description": "Request to set a team's goal and win songs. A null song clears that selection."
+                "description": "Request to set a team's goal, win and penalty songs. A null song clears that selection."
               }
             }
           }
@@ -16208,6 +16208,15 @@
             ],
             "description": "Gets the team's currently selected win song, if any.",
             "nullable": true
+          },
+          "penaltySong": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MusicTrackDto"
+              }
+            ],
+            "description": "Gets the team's currently selected penalty song, if any.",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -17826,6 +17835,11 @@
             "description": "Gets the URL of the team's win song, once its track has been downloaded.",
             "nullable": true
           },
+          "penaltySongUrl": {
+            "type": "string",
+            "description": "Gets the URL of the team's penalty song, once its track has been downloaded.",
+            "nullable": true
+          },
           "generalManagers": {
             "type": "array",
             "items": {
@@ -17963,6 +17977,22 @@
             "type": "string",
             "description": "Title of the goal song, for display.",
             "nullable": true
+          },
+          "penaltySongFileKey": {
+            "type": "string",
+            "description": "Raw R2 object key of this team's penalty song (not a resolved URL). Null if unset.",
+            "nullable": true
+          },
+          "penaltySongOffsetSeconds": {
+            "type": "integer",
+            "description": "Seconds into the penalty song where playback should start.",
+            "format": "int32",
+            "nullable": true
+          },
+          "penaltySongTitle": {
+            "type": "string",
+            "description": "Title of the penalty song, for display.",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -18037,6 +18067,11 @@
           "winSongUrl": {
             "type": "string",
             "description": "Gets the URL of the team's win song, once its track has been downloaded.",
+            "nullable": true
+          },
+          "penaltySongUrl": {
+            "type": "string",
+            "description": "Gets the URL of the team's penalty song, once its track has been downloaded.",
             "nullable": true
           },
           "generalManagers": {
@@ -18943,10 +18978,19 @@
             ],
             "description": "Gets the picked win song, or null to clear it.",
             "nullable": true
+          },
+          "penaltySong": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MusicTrackDto"
+              }
+            ],
+            "description": "Gets the picked penalty song, or null to clear it.",
+            "nullable": true
           }
         },
         "additionalProperties": false,
-        "description": "Request to set a team's goal and win songs. A null song clears that selection."
+        "description": "Request to set a team's goal, win and penalty songs. A null song clears that selection."
       },
       "UpdateTournamentPlayerInfoRequest": {
         "type": "object",

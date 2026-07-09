@@ -45,8 +45,9 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
             .AsNoTracking()
             .Include(t => t.GoalSongTrack)
             .Include(t => t.WinSongTrack)
+            .Include(t => t.PenaltySongTrack)
             .Where(t => t.TournamentId == tournamentId && t.GeneralManagers.Any(g => g.Id == accountId))
-            .Select(t => new ManagedTeamSongs(t.Id, t.Name, t.GoalSongTrack, t.WinSongTrack))
+            .Select(t => new ManagedTeamSongs(t.Id, t.Name, t.GoalSongTrack, t.WinSongTrack, t.PenaltySongTrack))
             .FirstOrDefaultAsync(cancellationToken);
 
         return new TournamentPlayerInfoContext(info, games, player.Team, managedTeam);

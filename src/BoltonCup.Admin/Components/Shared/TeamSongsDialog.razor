@@ -12,6 +12,8 @@
                             Value="_goal" ValueChanged="@(v => _goal = v)" />
             <PoolSongPicker TournamentId="TournamentId" Label="Win song"
                             Value="_win" ValueChanged="@(v => _win = v)" />
+            <PoolSongPicker TournamentId="TournamentId" Label="Penalty song"
+                            Value="_penalty" ValueChanged="@(v => _penalty = v)" />
         </MudStack>
     </DialogContent>
     <DialogActions>
@@ -29,23 +31,26 @@
     [Parameter] public int TournamentId { get; set; }
     [Parameter] public int? GoalTrackId { get; set; }
     [Parameter] public int? WinTrackId { get; set; }
+    [Parameter] public int? PenaltyTrackId { get; set; }
 
     private TournamentMusicTrack? _goal;
     private TournamentMusicTrack? _win;
+    private TournamentMusicTrack? _penalty;
     private bool _saving;
 
     protected override async Task OnInitializedAsync()
     {
-        if (GoalTrackId is null && WinTrackId is null)
+        if (GoalTrackId is null && WinTrackId is null && PenaltyTrackId is null)
             return;
 
-        var ids = new[] { GoalTrackId, WinTrackId }.Where(id => id is not null).Select(id => id!.Value).ToList();
+        var ids = new[] { GoalTrackId, WinTrackId, PenaltyTrackId }.Where(id => id is not null).Select(id => id!.Value).ToList();
         await using var db = await DbContextFactory.CreateDbContextAsync();
         var tracks = await db.TournamentMusicTracks
             .Where(t => ids.Contains(t.Id))
             .ToListAsync();
         _goal = tracks.FirstOrDefault(t => t.Id == GoalTrackId);
         _win = tracks.FirstOrDefault(t => t.Id == WinTrackId);
+        _penalty = tracks.FirstOrDefault(t => t.Id == PenaltyTrackId);
     }
 
     private async Task Save()
@@ -53,7 +58,7 @@
         _saving = true;
         try
         {
-            await TeamService.SetSongTracksAsync(TeamId, _goal?.Id, _win?.Id);
+            await TeamService.SetSongTracksAsync(TeamId, _goal?.Id, _win?.Id, _penalty?.Id);
             Snackbar.Add("Team songs saved.", Severity.Success);
             Dialog.Close(DialogResult.Ok(true));
         }

@@ -32,4 +32,7 @@ public record ManagedTeamDto
 
     /// <summary>Gets the team's currently selected win song, if any.</summary>
     public MusicTrackDto? WinSong { get; init; }
+
+    /// <summary>Gets the team's currently selected penalty song, if any.</summary>
+    public MusicTrackDto? PenaltySong { get; init; }
 }

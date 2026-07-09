@@ -19,10 +19,14 @@ public class Team : EntityBase
     /// <summary>The library track played when this team wins. Null until a GM picks one.</summary>
     public int? WinSongTrackId { get; set; }
 
+    /// <summary>The library track played when this team takes a penalty. Null until a GM picks one.</summary>
+    public int? PenaltySongTrackId { get; set; }
+
     public Tournament Tournament { get; set; } = null!;
     public ICollection<Account> GeneralManagers { get; set; } = [];
     public TournamentMusicTrack? GoalSongTrack { get; set; }
     public TournamentMusicTrack? WinSongTrack { get; set; }
+    public TournamentMusicTrack? PenaltySongTrack { get; set; }
     public ICollection<Player> Players { get; set; } = [];
     public ICollection<Game> HomeGames { get; set; } = [];
     public ICollection<Game> AwayGames { get; set; } = [];

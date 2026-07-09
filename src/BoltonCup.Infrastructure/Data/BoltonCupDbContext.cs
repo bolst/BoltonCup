@@ -869,6 +869,11 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .WithMany()
                 .HasForeignKey(e => e.WinSongTrackId)
                 .OnDelete(DeleteBehavior.SetNull);
+            entity
+                .HasOne(e => e.PenaltySongTrack)
+                .WithMany()
+                .HasForeignKey(e => e.PenaltySongTrackId)
+                .OnDelete(DeleteBehavior.SetNull);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.NameShort).HasColumnName("name_short");
@@ -881,6 +886,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TertiaryColorHex).HasColumnName("tertiary_hex");
             entity.Property(e => e.GoalSongTrackId).HasColumnName("goal_song_track_id");
             entity.Property(e => e.WinSongTrackId).HasColumnName("win_song_track_id");
+            entity.Property(e => e.PenaltySongTrackId).HasColumnName("penalty_song_track_id");
         });
 
         modelBuilder.Entity<Tournament>(entity =>
