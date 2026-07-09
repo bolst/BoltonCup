@@ -1262,7 +1262,10 @@ public class Mapper : IMapper
                 GoalSongTitle = team.GoalSongTrack?.Title,
                 PenaltySongFileKey = team.PenaltySongTrack?.AudioFileKey,
                 PenaltySongOffsetSeconds = team.PenaltySongTrack?.OffsetSeconds,
-                PenaltySongTitle = team.PenaltySongTrack?.Title
+                PenaltySongTitle = team.PenaltySongTrack?.Title,
+                WinSongFileKey = team.WinSongTrack?.AudioFileKey,
+                WinSongOffsetSeconds = team.WinSongTrack?.OffsetSeconds,
+                WinSongTitle = team.WinSongTrack?.Title
             };
     }
 

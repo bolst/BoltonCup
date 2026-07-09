@@ -279,7 +279,7 @@
     }
 
     /// <summary>
-    /// The offline download set: the game playlist plus both teams' goal and penalty songs (deduped by file key).
+    /// The offline download set: the game playlist plus both teams' goal, penalty, and win songs (deduped by file key).
     /// These songs are NOT added to the rotating <see cref="MusicPlayerService.Playlist"/> — only cached.
     /// </summary>
     private IReadOnlyList<PlaylistTrackDto> BuildOfflineSet()
@@ -305,6 +305,15 @@
                     FileKey = penaltyKey,
                     Title = team.PenaltySongTitle ?? "Penalty song",
                     OffsetSeconds = team.PenaltySongOffsetSeconds,
+                });
+            }
+            if (team?.WinSongFileKey is { Length: > 0 } winKey && seen.Add(winKey))
+            {
+                set.Add(new PlaylistTrackDto
+                {
+                    FileKey = winKey,
+                    Title = team.WinSongTitle ?? "Win song",
+                    OffsetSeconds = team.WinSongOffsetSeconds,
                 });
             }
         }

@@ -59,10 +59,39 @@ public partial class GameConsole : ComponentBase, IDisposable
             "Are you sure you want to end this game?",
             yesText: "End Game",
             cancelText: "Cancel");
-        if (confirmed == true)
+        if (confirmed != true)
         {
-            await State.UpdateGameStateAsync(GameState.Completed);
+            return;
         }
+
+        // Play the winning team's win song as a one-shot the moment End Game is confirmed. A tie has
+        // no winner, so nothing plays.
+        var winner = State.HomeScore > State.AwayScore ? State.Game!.HomeTeam
+            : State.AwayScore > State.HomeScore ? State.Game!.AwayTeam
+            : null;
+        if (State.AutoplayWinSong && winner is not null)
+        {
+            var songResult = await Player.PlayGoalSongAsync(
+                winner.WinSongFileKey ?? "", winner.WinSongOffsetSeconds ?? 0, winner.WinSongTitle);
+            var teamName = winner.NameShort ?? winner.Name ?? "team";
+            switch (songResult)
+            {
+                case MusicPlayerService.GoalSongResult.NoSong:
+                    Snackbar.Add($"No win song set for {teamName}.", Severity.Info);
+                    break;
+                case MusicPlayerService.GoalSongResult.Unresolved:
+                    Snackbar.Add("Win song isn't downloaded and you're offline.", Severity.Warning);
+                    break;
+                case MusicPlayerService.GoalSongResult.Blocked:
+                    Snackbar.Add("Browser blocked the win song from playing.", Severity.Warning);
+                    break;
+                case MusicPlayerService.GoalSongResult.NotReady:
+                    Snackbar.Add("Music player isn't ready yet.", Severity.Warning);
+                    break;
+            }
+        }
+
+        await State.UpdateGameStateAsync(GameState.Completed);
     }
 
     private async Task OpenGoalDialogAsync(bool isHome)

@@ -95,6 +95,9 @@ else
                         <MudCheckBox T="bool" Value="State.AutoplayPenaltySong"
                                      ValueChanged="@(v => State.SetAutoplayPenaltySongAsync(v))"
                                      Label="Autoplay penalty song" Dense Size="Size.Small" Color="Color.Primary" />
+                        <MudCheckBox T="bool" Value="State.AutoplayWinSong"
+                                     ValueChanged="@(v => State.SetAutoplayWinSongAsync(v))"
+                                     Label="Autoplay win song" Dense Size="Size.Small" Color="Color.Primary" />
                         <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Medium"
                                    StartIcon="@Icons.Material.Rounded.Stop"
                                    OnClick="@EndGameAsync">
