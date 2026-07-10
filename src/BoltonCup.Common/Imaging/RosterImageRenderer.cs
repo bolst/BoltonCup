@@ -99,7 +99,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         // Center the densely-packed content vertically within the fixed canvas.
         var cursorY = Math.Max(Margin, (Height - totalHeight) / 2f);
 
-        DrawHeader(canvas, typeface, model.TeamName, primary, palette.TitleOutline, logo,
+        DrawHeader(canvas, typeface, model.TeamName, palette.TitleFill, palette.TitleOutline, logo,
             new SKRect(Margin, cursorY, Margin + ContentW, cursorY + HeaderHeight));
         cursorY += HeaderHeight + SectionGapY;
 
@@ -191,14 +191,14 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         using var bg = new SKPaint();
         bg.IsAntialias = true;
         bg.Style = SKPaintStyle.Fill;
-        bg.Color = palette.BarFill;
+        bg.Color = palette.PositionBarBackground;
         canvas.DrawRect(rect, bg);
 
         const float borderWidth = 3f;
         using var border = new SKPaint();
         border.IsAntialias = true;
         border.Style = SKPaintStyle.Stroke;
-        border.Color = palette.BarOutline;
+        border.Color = palette.PositionBarOutline;
         border.StrokeWidth = borderWidth;
         var inset = rect;
         inset.Inflate(-borderWidth / 2f, -borderWidth / 2f);
@@ -210,7 +210,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         using var text = new SKPaint();
         text.IsAntialias = true;
         text.Style = SKPaintStyle.Fill;
-        text.Color = palette.BarText;
+        text.Color = palette.PositionBarFill;
         var baseline = VerticalCenterBaseline(font, rect.MidY);
         canvas.DrawText(label, rect.MidX, baseline, SKTextAlign.Center, font, text);
     }
@@ -277,6 +277,15 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         if (logo is not null)
         {
             var logoBox = new SKRect(rect.Left + jerseyW + 2f, rect.Top + rowH * 2f, rect.Left + jerseyW + midW - 2f, rect.Bottom - 4f);
+            // Shrink the logo to ~80% of the mid-column box and nudge it left toward the jersey number.
+            const float logoScale = 0.8f;
+            const float logoShiftLeft = 8f;
+            var logoCenterX = logoBox.MidX - logoShiftLeft;
+            var logoCenterY = logoBox.MidY;
+            var logoHalfW = logoBox.Width * logoScale / 2f;
+            var logoHalfH = logoBox.Height * logoScale / 2f;
+            logoBox = new SKRect(logoCenterX - logoHalfW, logoCenterY - logoHalfH,
+                logoCenterX + logoHalfW, logoCenterY + logoHalfH);
             DrawBitmapContained(canvas, logo, logoBox);
         }
 
@@ -480,10 +489,11 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
 
         return new Palette(
             Background: Resolve(colorway.Background),
+            TitleFill: Resolve(colorway.TitleFill),
             TitleOutline: Resolve(colorway.TitleOutline),
-            BarFill: Resolve(colorway.BarFill),
-            BarOutline: Resolve(colorway.BarOutline),
-            BarText: Resolve(colorway.BarText),
+            PositionBarBackground: Resolve(colorway.PositionBarBackground),
+            PositionBarOutline: Resolve(colorway.PositionBarOutline),
+            PositionBarFill: Resolve(colorway.PositionBarFill),
             JerseyFill: Resolve(colorway.JerseyNumber),
             JerseyOutline: Resolve(colorway.JerseyNumberOutline),
             DetailText: Resolve(colorway.PlayerDetailText),
@@ -493,10 +503,11 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
 
     private sealed record Palette(
         SKColor Background,
+        SKColor TitleFill,
         SKColor TitleOutline,
-        SKColor BarFill,
-        SKColor BarOutline,
-        SKColor BarText,
+        SKColor PositionBarBackground,
+        SKColor PositionBarOutline,
+        SKColor PositionBarFill,
         SKColor JerseyFill,
         SKColor JerseyOutline,
         SKColor DetailText,
