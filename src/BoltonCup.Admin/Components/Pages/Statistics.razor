@@ -1,0 +1,41 @@
+@page "/statistics"
+@inject IStatisticsRefreshService StatisticsRefresh
+@inject ISnackbar Snackbar
+
+<MudText Typo="Typo.h5" Class="mb-4">Statistics</MudText>
+
+<MudPaper Class="pa-4" Elevation="1" MaxWidth="600px">
+    <MudText Typo="Typo.subtitle1" Class="mb-1">Skater &amp; goalie stats</MudText>
+    <MudText Typo="Typo.body2" Class="mb-4 mud-text-secondary">
+        Skater and goalie statistics are served from materialized views that don't update automatically.
+        They refresh whenever a game is completed; use this if you've edited game data and want the
+        leaderboards to reflect it immediately.
+    </MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+               StartIcon="@Icons.Material.Rounded.Refresh"
+               OnClick="RefreshAsync" Disabled="@_refreshing">
+        @(_refreshing ? "Refreshing…" : "Refresh stats now")
+    </MudButton>
+</MudPaper>
+
+@code {
+    private bool _refreshing;
+
+    private async Task RefreshAsync()
+    {
+        _refreshing = true;
+        try
+        {
+            await StatisticsRefresh.RefreshAsync();
+            Snackbar.Add("Skater and goalie stats refreshed.", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to refresh stats: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _refreshing = false;
+        }
+    }
+}
