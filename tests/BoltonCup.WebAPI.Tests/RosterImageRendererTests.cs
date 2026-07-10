@@ -30,9 +30,11 @@ public class RosterImageRendererTests
             Colorway = new RosterColorway
             {
                 Background = RosterColor.White,
-                BarFill = RosterColor.Primary,
-                BarOutline = RosterColor.Black,
-                BarText = RosterColor.White,
+                TitleFill = RosterColor.Primary,
+                TitleOutline = RosterColor.Black,
+                PositionBarBackground =  RosterColor.Black,
+                PositionBarOutline = RosterColor.Black,
+                PositionBarFill = RosterColor.Black,
                 JerseyNumber = RosterColor.Primary,
                 JerseyNumberOutline = RosterColor.Black,
                 PlayerDetailText = RosterColor.Black,
