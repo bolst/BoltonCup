@@ -91,10 +91,22 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         strokePaint.Style = SKPaintStyle.Stroke;
 
         const float forwardGridHeight = ForwardRows * RowH + (ForwardRows - 1) * GapY;
-        const float defenseGridHeight = DefenseRows * RowH + (DefenseRows - 1) * GapY;
-        const float totalHeight = HeaderHeight + SectionGapY 
-                                               + BarHeight + SectionGapY + forwardGridHeight + SectionGapY
-                                               + BarHeight + SectionGapY + defenseGridHeight;
+
+        // Defenders bottom-align within the 3-row defense band. Rows freed at the top host a team's
+        // overflow forwards (those beyond the 9 the forwards grid holds) and stay empty otherwise. The
+        // DEFENSE/GOALIE bars sit directly on top of the defenders — below any overflow row — so the
+        // spilled forwards never read as defenders sitting under the DEFENSE label.
+        var defenseCount = Math.Min(model.Defense.Count, DefenseCols * DefenseRows);
+        var defenderRows = Math.Min(DefenseRows, (defenseCount + DefenseCols - 1) / DefenseCols);
+        var freedRows = DefenseRows - defenderRows;
+
+        var overflowBandHeight = freedRows > 0 ? freedRows * RowH + (freedRows - 1) * GapY : 0f;
+        var defenderGridHeight = defenderRows > 0 ? defenderRows * RowH + (defenderRows - 1) * GapY : 0f;
+
+        var totalHeight = HeaderHeight + SectionGapY
+                          + BarHeight + SectionGapY + forwardGridHeight + SectionGapY
+                          + (freedRows > 0 ? overflowBandHeight + SectionGapY : 0f)
+                          + BarHeight + SectionGapY + defenderGridHeight;
 
         // Center the densely-packed content vertically within the fixed canvas.
         var cursorY = Math.Max(Margin, (Height - totalHeight) / 2f);
@@ -124,7 +136,16 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
 
         cursorY += forwardGridHeight + SectionGapY;
 
-        // DEFENSE | GOALIE bars
+        // Overflow forwards (beyond the 9 that fit above) fill the freed rows, above the DEFENSE bar.
+        if (freedRows > 0)
+        {
+            var overflow = OverflowForwards(model.Forwards, freedRows * DefenseCols);
+            DrawGrid(canvas, typeface, palette, overflow,
+                Margin, cursorY, defenseColW, RowH, DefenseCols, freedRows, jerseyFontSize);
+            cursorY += overflowBandHeight + SectionGapY;
+        }
+
+        // DEFENSE | GOALIE bars, shifted down to sit directly on top of the defenders.
         DrawSectionBar(canvas, typeface, "DEFENSE", palette,
             new SKRect(Margin, cursorY, Margin + defenseRegionW, cursorY + BarHeight));
         DrawSectionBar(canvas, typeface, "GOALIE", palette,
@@ -132,7 +153,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         cursorY += BarHeight + SectionGapY;
 
         DrawGrid(canvas, typeface, palette, model.Defense,
-            Margin, cursorY, defenseColW, RowH, DefenseCols, DefenseRows, jerseyFontSize);
+            Margin, cursorY, defenseColW, RowH, DefenseCols, defenderRows, jerseyFontSize);
 
         // Single goalie block, kept the same height as one defense row so it isn't oversized.
         var goalie = model.Goalies.Count > 0 ? model.Goalies[0] : EmptyCell();
@@ -232,6 +253,22 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
             var y = originY + row * (rowH + GapY);
             DrawPlayerBlock(canvas, typeface, palette, cell, new SKRect(x, y, x + colW, y + rowH), jerseyFontSize);
         }
+    }
+
+    // The forwards a team carries beyond the 9 the forwards grid holds, laid out into `slotCount`
+    // freed defense-region slots left-to-right. Slots past the overflow count render as empty.
+    private static IReadOnlyList<RosterPlayerCell> OverflowForwards(
+        IReadOnlyList<RosterPlayerCell> forwards, int slotCount)
+    {
+        const int forwardGridSlots = ForwardCols * ForwardRows;
+
+        var cells = new RosterPlayerCell[slotCount];
+        for (var i = 0; i < slotCount; i++)
+        {
+            var index = forwardGridSlots + i;
+            cells[i] = index < forwards.Count ? forwards[index] : EmptyCell();
+        }
+        return cells;
     }
 
     private void DrawPlayerBlock(SKCanvas canvas, SKTypeface typeface, Palette palette,
