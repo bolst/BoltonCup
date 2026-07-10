@@ -3,6 +3,7 @@
 @using MudBlazor.Utilities
 @attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-02-01")]
 @inject BcStateService BcState
+@inject Sdk.IBoltonCupApi BoltonCupApi
 
 <PageTitle>Bolton Cup</PageTitle>
 
@@ -17,18 +18,29 @@
             }
             else if (_context.ActiveTournament is { } tournament)
             {
-                <div class="d-flex flex-row align-center">
-                    <Countdown To="@tournament.StartDate"/>
-                </div>
-                
-                if (tournament.IsRegistrationOpen)
+                if (_started)
                 {
-                    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">
-                        Registration for @tournament.Name is live!
-                        <MudLink Underline="Underline.Always" Typo="Typo.body2" Href="@($"/tournaments/{tournament.Id}/register")">
-                            <b>Register now.</b>
-                        </MudLink>
-                    </MudAlert>
+                    <MudPaper Class="pa-2 mud-width-full" Elevation="2">
+                        <CompletedGamesStrip Games="_completedGames" />
+                        <StandingsDataGrid Rows="_standings?.RoundRobin ?? []" ShowPointsFirst />
+                        <MudButton Href="standings" EndIcon="@Icons.Material.Rounded.KeyboardArrowRight" FullWidth>Full Standings</MudButton>
+                    </MudPaper>
+                }
+                else
+                {
+                    <div class="d-flex flex-row align-center">
+                        <Countdown To="@tournament.StartDate"/>
+                    </div>
+
+                    if (tournament.IsRegistrationOpen)
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Filled">
+                            Registration for @tournament.Name is live!
+                            <MudLink Underline="Underline.Always" Typo="Typo.body2" Href="@($"/tournaments/{tournament.Id}/register")">
+                                <b>Register now.</b>
+                            </MudLink>
+                        </MudAlert>
+                    }
                 }
             }
         </div>
@@ -84,6 +96,10 @@
 
     private static Sdk.SystemContextDto? _context;
 
+    private static bool _started;
+    private static Sdk.TournamentStandingsDto? _standings;
+    private static List<Sdk.GameDto> _completedGames = [];
+
     private string? BkgImageUrl => _context?.ActiveTournament?.BackgroundImage;
 
     private string HomeBannerStyle => new StyleBuilder()
@@ -93,11 +109,31 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (_context is null)
+        _context = await BcState.Context;
+        // If the tournament has already started, switch to standings/results
+        if (_context.ActiveTournament?.StartDate is { } startDate
+            && DateTime.SpecifyKind(startDate, DateTimeKind.Utc) <= DateTime.UtcNow)
         {
-            _context = await BcState.Context;
-            await InvokeAsync(StateHasChanged);
+            await EnterStartedModeAsync();
         }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task EnterStartedModeAsync()
+    {
+        if (_started || _context?.ActiveTournament is not { } tournament)
+        {
+            return;
+        }
+
+        _started = true;
+        _standings = await BoltonCupApi.GetStandingsAsync(tournament.Id);
+        var games = await BoltonCupApi.GetGamesAsync(tournamentId: tournament.Id, size: 50);
+        _completedGames = games.Items
+            .Where(g => g.GameState == Sdk.GameState.Completed)
+            .OrderByDescending(g => g.GameTime)
+            .ToList();
     }
 
 }

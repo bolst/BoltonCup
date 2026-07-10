@@ -1,0 +1,34 @@
+<div class="d-flex flex-row" style="overflow-x:auto">
+    @foreach (var game in Games)
+    {
+        <div class="d-flex flex-column align-center pa-2 border-r mud-border-lines-default" style="min-width:140px">
+            <MudText Typo="Typo.caption">@game.GameTime.ToLocalTime().ToString("MMM d, h:mm tt")</MudText>
+            @ScoreLine(game)
+        </div>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public IEnumerable<Sdk.GameDto> Games { get; set; } = [];
+
+    private RenderFragment ScoreLine(Sdk.GameDto game)
+    {
+        if (game.HomeTeam is null || game.AwayTeam is null)
+        {
+            return _ => { };
+        }
+
+        var homeWins = game.HomeTeam.Goals >= game.AwayTeam.Goals;
+
+        return @<div class="d-flex flex-row align-center gap-2 mt-1">
+                   <MudImage Src="@game.AwayTeam.Logo" Height="28" Alt="@game.AwayTeam.Abbreviation" />
+                   <MudText Typo="Typo.body2" Style="@(homeWins ? string.Empty : "font-weight:700")">@game.AwayTeam.Goals</MudText>
+                   <MudText Typo="Typo.body2">-</MudText>
+                   <MudText Typo="Typo.body2" Style="@(homeWins ? "font-weight:700" : string.Empty)">@game.HomeTeam.Goals</MudText>
+                   <MudImage Src="@game.HomeTeam.Logo" Height="28" Alt="@game.HomeTeam.Abbreviation" />
+               </div>;
+    }
+
+}
