@@ -1,0 +1,60 @@
+@page "/settings"
+@using BoltonCup.Timekeeper.Services
+@inject DeviceStorageService DeviceStorage
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>Settings</PageTitle>
+
+<MudContainer Class="py-4" MaxWidth="MaxWidth.Medium">
+    <MudText Typo="Typo.h5" Class="mb-4">Settings</MudText>
+
+    <MudPaper Class="pa-4" Elevation="0" Square Outlined>
+        <div class="d-flex flex-row align-center gap-3">
+            <div class="flex-grow-1">
+                <MudText Typo="Typo.subtitle1">Clear cache</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Removes all downloaded music and locally saved timekeeper data from this device.
+                </MudText>
+            </div>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Error"
+                       StartIcon="@Icons.Material.Rounded.DeleteSweep"
+                       OnClick="ClearCacheAsync"
+                       Disabled="_clearing">
+                @(_clearing ? "Clearing…" : "Clear cache")
+            </MudButton>
+        </div>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private bool _clearing;
+
+    private async Task ClearCacheAsync()
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Clear cache",
+            "This will remove all downloaded music and locally saved timekeeper data on this device. This cannot be undone.",
+            yesText: "Clear cache",
+            cancelText: "Cancel");
+        if (confirmed != true)
+        {
+            return;
+        }
+
+        _clearing = true;
+        try
+        {
+            await DeviceStorage.ClearAllAsync();
+            // Full reload so in-memory state (playlists, sync queue) starts fresh from the now-empty storage.
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Couldn't clear cache: {ex.Message}", Severity.Error);
+            _clearing = false;
+        }
+    }
+}
