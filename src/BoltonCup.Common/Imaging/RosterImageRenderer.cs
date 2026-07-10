@@ -179,10 +179,14 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         stroke.IsAntialias = true;
         stroke.Style = SKPaintStyle.Stroke;
         stroke.Color = titleOutline;
-        stroke.StrokeWidth = Math.Max(1f, size * 0.001f);
+        // Draw the outline UNDERNEATH the fill: a centred stroke drawn on top of the fill eats into
+        // each glyph by half its width, so the surviving outer band varies letter-to-letter and looks
+        // uneven. Stroking first and painting the fill over it leaves a uniform outer band (= half the
+        // stroke width) with the glyph interior fully intact.
+        stroke.StrokeWidth = Math.Max(2f, size * 0.022f);
         stroke.StrokeJoin = SKStrokeJoin.Round;
-        canvas.DrawText(name, textX, baseline, SKTextAlign.Left, font, fill);
         canvas.DrawText(name, textX, baseline, SKTextAlign.Left, font, stroke);
+        canvas.DrawText(name, textX, baseline, SKTextAlign.Left, font, fill);
     }
 
     private static void DrawSectionBar(SKCanvas canvas, SKTypeface typeface, string label,
