@@ -14,6 +14,14 @@
                 </MudLink>
             </CellTemplate>
         </PropertyColumn>
+        @if (ShowPointsFirst)
+        {
+            <PropertyColumn Property="x => x.Points" Title="PTS" CellStyle="width: 50px">
+                <CellTemplate>
+                    <MudText Typo="Typo.body2"><b>@context.Item.Points</b></MudText>
+                </CellTemplate>
+            </PropertyColumn>
+        }
         <PropertyColumn Property="x => x.GamesPlayed" Title="GP" CellStyle="width: 50px" />
         <PropertyColumn Property="x => x.Wins" Title="W" CellStyle="width: 50px" />
         <PropertyColumn Property="x => x.Losses" Title="L" CellStyle="width: 50px" />
@@ -23,15 +31,21 @@
         <PropertyColumn Property="x => x.GoalsFor" Title="GF" CellStyle="width: 50px" />
         <PropertyColumn Property="x => x.GoalsAgainst" Title="GA" CellStyle="width: 50px" />
         <PropertyColumn Property="x => x.GoalDifferential" Title="DIFF" CellStyle="width: 60px" />
-        <PropertyColumn Property="x => x.Points" Title="PTS" CellStyle="width: 50px">
-            <CellTemplate>
-                <MudText Typo="Typo.body2"><b>@context.Item.Points</b></MudText>
-            </CellTemplate>
-        </PropertyColumn>
+        @if (!ShowPointsFirst)
+        {
+            <PropertyColumn Property="x => x.Points" Title="PTS" CellStyle="width: 50px">
+                <CellTemplate>
+                    <MudText Typo="Typo.body2"><b>@context.Item.Points</b></MudText>
+                </CellTemplate>
+            </PropertyColumn>
+        }
     </Columns>
 </MudDataGrid>
 
 @code {
     [Parameter, EditorRequired]
     public required IEnumerable<Sdk.StandingRowDto> Rows { get; set; }
+
+    [Parameter]
+    public bool ShowPointsFirst { get; set; }
 }

@@ -27,6 +27,8 @@ public record TeamDto
     public string? GoalSongUrl { get; init; }
     /// <summary>Gets the URL of the team's win song, once its track has been downloaded.</summary>
     public string? WinSongUrl { get; init; }
+    /// <summary>Gets the URL of the team's penalty song, once its track has been downloaded.</summary>
+    public string? PenaltySongUrl { get; init; }
     /// <summary>Gets the team's general managers.</summary>
     public IReadOnlyList<TeamGmDto> GeneralManagers { get; init; } = [];
 }

@@ -783,7 +783,7 @@ public class Mapper : IMapper
         {
             Id = team.Id, Name = team.Name, NameShort = team.NameShort, Abbreviation = team.Abbreviation,
             Tournament = ToTournamentBriefDto(team.Tournament), LogoUrl = _urlResolver.GetFullUrl(team.Logo), BannerUrl = _urlResolver.GetFullUrl(team.Banner), PrimaryColorHex = team.PrimaryColorHex,
-            SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex, GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack != null ? team.GoalSongTrack.AudioFileKey : null), WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack != null ? team.WinSongTrack.AudioFileKey : null),
+            SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex, GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack != null ? team.GoalSongTrack.AudioFileKey : null), WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack != null ? team.WinSongTrack.AudioFileKey : null), PenaltySongUrl = _urlResolver.GetFullUrl(team.PenaltySongTrack != null ? team.PenaltySongTrack.AudioFileKey : null),
             GeneralManagers = ToTeamGmDtos(team),
         });
     }
@@ -796,7 +796,7 @@ public class Mapper : IMapper
             {
                 Id = team.Id, Name = team.Name, NameShort = team.NameShort, Abbreviation = team.Abbreviation,
                 Tournament = ToTournamentBriefDto(team.Tournament), LogoUrl = _urlResolver.GetFullUrl(team.Logo), BannerUrl = _urlResolver.GetFullUrl(team.Banner), PrimaryColorHex = team.PrimaryColorHex,
-                SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex, GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack?.AudioFileKey), WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack?.AudioFileKey),
+                SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex, GoalSongUrl = _urlResolver.GetFullUrl(team.GoalSongTrack?.AudioFileKey), WinSongUrl = _urlResolver.GetFullUrl(team.WinSongTrack?.AudioFileKey), PenaltySongUrl = _urlResolver.GetFullUrl(team.PenaltySongTrack?.AudioFileKey),
                 GeneralManagers = ToTeamGmDtos(team),
                 Players = team.Players
                     .Select(ToPlayerBriefDto)
@@ -969,7 +969,7 @@ public class Mapper : IMapper
             CurrentTeam = context.CurrentTeam is { } currentTeam ? ToTeamBriefDto(currentTeam) : null, ManagedTeam = context.ManagedTeam is { } team
                 ? new ManagedTeamDto
                 {
-                    TeamId = team.TeamId, TeamName = team.TeamName, GoalSong = ToMusicTrackDto(team.GoalSongTrack), WinSong = ToMusicTrackDto(team.WinSongTrack),
+                    TeamId = team.TeamId, TeamName = team.TeamName, GoalSong = ToMusicTrackDto(team.GoalSongTrack), WinSong = ToMusicTrackDto(team.WinSongTrack), PenaltySong = ToMusicTrackDto(team.PenaltySongTrack),
                 }
                 : null,
         };
@@ -1259,7 +1259,13 @@ public class Mapper : IMapper
                 SecondaryColorHex = team.SecondaryColorHex, TertiaryColorHex = team.TertiaryColorHex,
                 GoalSongFileKey = team.GoalSongTrack?.AudioFileKey,
                 GoalSongOffsetSeconds = team.GoalSongTrack?.OffsetSeconds,
-                GoalSongTitle = team.GoalSongTrack?.Title
+                GoalSongTitle = team.GoalSongTrack?.Title,
+                PenaltySongFileKey = team.PenaltySongTrack?.AudioFileKey,
+                PenaltySongOffsetSeconds = team.PenaltySongTrack?.OffsetSeconds,
+                PenaltySongTitle = team.PenaltySongTrack?.Title,
+                WinSongFileKey = team.WinSongTrack?.AudioFileKey,
+                WinSongOffsetSeconds = team.WinSongTrack?.OffsetSeconds,
+                WinSongTitle = team.WinSongTrack?.Title
             };
     }
 

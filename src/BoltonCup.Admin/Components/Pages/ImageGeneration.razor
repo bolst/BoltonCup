@@ -34,22 +34,26 @@
 
                 <MudExpansionPanels Class="mb-4" Elevation="0" MultiExpansion="true">
                     <MudExpansionPanel Text="Colours" Disabled="@(SelectedTeam is null)">
-                        @foreach (var field in _colorFields)
+                        @foreach (var group in _colorFields.GroupBy(f => f.Group))
                         {
-                            <div class="d-flex align-center gap-2 mb-2">
-                                <MudSelect T="RosterColor" Label="@field.Label" Value="field.Get()"
-                                           ValueChanged="@(v => OnColorChanged(field, v))" Dense="true" Class="flex-grow-1">
-                                    @foreach (var c in ColorOptions)
-                                    {
-                                        <MudSelectItem T="RosterColor" Value="c">
-                                            <div class="d-flex align-center gap-2">
-                                                <span style="@SwatchStyle(c)"></span>
-                                                <span>@c</span>
-                                            </div>
-                                        </MudSelectItem>
-                                    }
-                                </MudSelect>
-                            </div>
+                            <MudText Typo="Typo.subtitle2" Class="mt-3 mb-1">@group.Key</MudText>
+                            @foreach (var field in group)
+                            {
+                                <div class="d-flex align-center gap-2 mb-2">
+                                    <MudSelect T="RosterColor" Label="@field.Label" Value="field.Get()"
+                                               ValueChanged="@(v => OnColorChanged(field, v))" Dense="true" Class="flex-grow-1">
+                                        @foreach (var c in ColorOptions)
+                                        {
+                                            <MudSelectItem T="RosterColor" Value="c">
+                                                <div class="d-flex align-center gap-2">
+                                                    <span style="@SwatchStyle(c)"></span>
+                                                    <span>@c</span>
+                                                </div>
+                                            </MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                </div>
+                            }
                         }
                     </MudExpansionPanel>
 
@@ -154,16 +158,17 @@
     {
         _colorFields =
         [
-            new("Background", () => _colorway.Background, v => _colorway.Background = v),
-            new("Title outline", () => _colorway.TitleOutline, v => _colorway.TitleOutline = v),
-            new("Title bar fill", () => _colorway.BarFill, v => _colorway.BarFill = v),
-            new("Title bar outline", () => _colorway.BarOutline, v => _colorway.BarOutline = v),
-            new("Title bar text", () => _colorway.BarText, v => _colorway.BarText = v),
-            new("Jersey number", () => _colorway.JerseyNumber, v => _colorway.JerseyNumber = v),
-            new("Jersey number outline", () => _colorway.JerseyNumberOutline, v => _colorway.JerseyNumberOutline = v),
-            new("Player detail text", () => _colorway.PlayerDetailText, v => _colorway.PlayerDetailText = v),
-            new("Captaincy fill", () => _colorway.CaptaincyFill, v => _colorway.CaptaincyFill = v),
-            new("Captaincy outline", () => _colorway.CaptaincyOutline, v => _colorway.CaptaincyOutline = v),
+            new("Card", "Background", () => _colorway.Background, v => _colorway.Background = v),
+            new("Team name", "Fill", () => _colorway.TitleFill, v => _colorway.TitleFill = v),
+            new("Team name", "Outline", () => _colorway.TitleOutline, v => _colorway.TitleOutline = v),
+            new("Position title bar", "Background", () => _colorway.PositionBarBackground, v => _colorway.PositionBarBackground = v),
+            new("Position title bar", "Outline", () => _colorway.PositionBarOutline, v => _colorway.PositionBarOutline = v),
+            new("Position title bar", "Fill", () => _colorway.PositionBarFill, v => _colorway.PositionBarFill = v),
+            new("Jersey number", "Fill", () => _colorway.JerseyNumber, v => _colorway.JerseyNumber = v),
+            new("Jersey number", "Outline", () => _colorway.JerseyNumberOutline, v => _colorway.JerseyNumberOutline = v),
+            new("Player details", "Text", () => _colorway.PlayerDetailText, v => _colorway.PlayerDetailText = v),
+            new("Captaincy", "Fill", () => _colorway.CaptaincyFill, v => _colorway.CaptaincyFill = v),
+            new("Captaincy", "Outline", () => _colorway.CaptaincyOutline, v => _colorway.CaptaincyOutline = v),
         ];
 
         await using var dbContext = await DbContextFactory.CreateDbContextAsync();
@@ -351,5 +356,5 @@
 
     private sealed record TeamOption(int Id, string Label, string PrimaryHex, string SecondaryHex, string? TertiaryHex);
 
-    private sealed record ColorField(string Label, Func<RosterColor> Get, Action<RosterColor> Set);
+    private sealed record ColorField(string Group, string Label, Func<RosterColor> Get, Action<RosterColor> Set);
 }

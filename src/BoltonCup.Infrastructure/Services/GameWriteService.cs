@@ -3,13 +3,16 @@ using BoltonCup.Core.Commands;
 using BoltonCup.Core.Exceptions;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BoltonCup.Infrastructure.Services;
 
 public class GameWriteService(
     BoltonCupDbContext _dbContext,
     IGlobalMusicQueue _queue,
-    IMusicLibraryService _music) : IGameWriteService
+    IMusicLibraryService _music,
+    IStatisticsRefreshService _stats,
+    ILogger<GameWriteService> _logger) : IGameWriteService
 {
     public async Task UpdateStateAsync(UpdateGameStateCommand command, CancellationToken cancellationToken = default)
     {
@@ -17,6 +20,7 @@ public class GameWriteService(
             ?? throw new EntityNotFoundException(nameof(Game), command.GameId);
 
         var wasInProgress = game.GameState == GameState.InProgress;
+        var wasCompleted = game.GameState == GameState.Completed;
         game.GameState = command.State;
         await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -28,6 +32,20 @@ public class GameWriteService(
                 ? await _music.GetOrderedRequestTrackIdsAsync(game.Id, cancellationToken)
                 : [];
             await _queue.StartGameAsync(game.TournamentId, playerTrackIds, cancellationToken);
+        }
+
+        // Ending a game finalizes its goals/penalties, so refresh the stat materialized views. Best-effort:
+        // a refresh failure must not fail the state change (the views can also be refreshed manually).
+        if (command.State == GameState.Completed && !wasCompleted)
+        {
+            try
+            {
+                await _stats.RefreshAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to refresh stat materialized views after completing game {GameId}", game.Id);
+            }
         }
     }
 

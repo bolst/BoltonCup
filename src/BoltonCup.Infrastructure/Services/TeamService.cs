@@ -47,24 +47,26 @@ public class TeamService : ITeamService
         );
     }
 
-    public async Task UpdateSongsAsync(int teamId, MusicTrack? goalSong, MusicTrack? winSong, CancellationToken cancellationToken = default)
+    public async Task UpdateSongsAsync(int teamId, MusicTrack? goalSong, MusicTrack? winSong, MusicTrack? penaltySong, CancellationToken cancellationToken = default)
     {
         var team = await _dbContext.Teams.FirstOrDefaultAsync(t => t.Id == teamId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Team), teamId);
 
         team.GoalSongTrackId = await ResolveTrackIdAsync(team, goalSong, cancellationToken);
         team.WinSongTrackId = await ResolveTrackIdAsync(team, winSong, cancellationToken);
+        team.PenaltySongTrackId = await ResolveTrackIdAsync(team, penaltySong, cancellationToken);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task SetSongTracksAsync(int teamId, int? goalTrackId, int? winTrackId, CancellationToken cancellationToken = default)
+    public async Task SetSongTracksAsync(int teamId, int? goalTrackId, int? winTrackId, int? penaltyTrackId, CancellationToken cancellationToken = default)
     {
         var team = await _dbContext.Teams.FirstOrDefaultAsync(t => t.Id == teamId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Team), teamId);
 
         team.GoalSongTrackId = await ValidatePoolTrackIdAsync(team, goalTrackId, cancellationToken);
         team.WinSongTrackId = await ValidatePoolTrackIdAsync(team, winTrackId, cancellationToken);
+        team.PenaltySongTrackId = await ValidatePoolTrackIdAsync(team, penaltyTrackId, cancellationToken);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }

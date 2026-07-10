@@ -88,6 +88,7 @@
                 { x => x.TournamentId, tournamentId },
                 { x => x.GoalTrackId, team.GoalSongTrackId },
                 { x => x.WinTrackId, team.WinSongTrackId },
+                { x => x.PenaltyTrackId, team.PenaltySongTrackId },
             });
 
         var result = await dialog.Result;

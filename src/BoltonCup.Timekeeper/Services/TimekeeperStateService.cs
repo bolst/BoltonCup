@@ -8,6 +8,8 @@ namespace BoltonCup.Timekeeper.Services;
 public class TimekeeperStateService : IDisposable
 {
     private const string AutoplayGoalSongKey = "bc:autoplayGoalSong";
+    private const string AutoplayPenaltySongKey = "bc:autoplayPenaltySong";
+    private const string AutoplayWinSongKey = "bc:autoplayWinSong";
     private const string NormalizeAudioKey = "bc:normalizeAudio";
 
     private readonly IBoltonCupApi _api;
@@ -34,6 +36,12 @@ public class TimekeeperStateService : IDisposable
 
     /// <summary>When true, clicking a team's Goal button plays that team's goal song. Persisted to localStorage.</summary>
     public bool AutoplayGoalSong { get; private set; } = true;
+
+    /// <summary>When true, clicking a team's Penalty button plays that team's penalty song. Persisted to localStorage.</summary>
+    public bool AutoplayPenaltySong { get; private set; } = true;
+
+    /// <summary>When true, ending a game plays the winning team's win song. Off by default. Persisted to localStorage.</summary>
+    public bool AutoplayWinSong { get; private set; }
 
     /// <summary>When true, music downloads measure loudness so playback can be level-normalized. Persisted to localStorage.</summary>
     public bool NormalizeAudio { get; private set; } = true;
@@ -73,6 +81,10 @@ public class TimekeeperStateService : IDisposable
         {
             var autoplay = await _js.InvokeAsync<string?>("localStorage.getItem", AutoplayGoalSongKey);
             AutoplayGoalSong = autoplay != "0";
+            var autoplayPenalty = await _js.InvokeAsync<string?>("localStorage.getItem", AutoplayPenaltySongKey);
+            AutoplayPenaltySong = autoplayPenalty != "0";
+            var autoplayWin = await _js.InvokeAsync<string?>("localStorage.getItem", AutoplayWinSongKey);
+            AutoplayWinSong = autoplayWin == "1";
             var normalize = await _js.InvokeAsync<string?>("localStorage.getItem", NormalizeAudioKey);
             NormalizeAudio = normalize != "0";
         }
@@ -96,6 +108,34 @@ public class TimekeeperStateService : IDisposable
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to persist autoplay goal song preference");
+        }
+    }
+
+    public async Task SetAutoplayPenaltySongAsync(bool value)
+    {
+        AutoplayPenaltySong = value;
+        NotifyStateChanged();
+        try
+        {
+            await _js.InvokeVoidAsync("localStorage.setItem", AutoplayPenaltySongKey, value ? "1" : "0");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to persist autoplay penalty song preference");
+        }
+    }
+
+    public async Task SetAutoplayWinSongAsync(bool value)
+    {
+        AutoplayWinSong = value;
+        NotifyStateChanged();
+        try
+        {
+            await _js.InvokeVoidAsync("localStorage.setItem", AutoplayWinSongKey, value ? "1" : "0");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to persist autoplay win song preference");
         }
     }
 

@@ -23,4 +23,4 @@ public record TournamentPlayerInfoContext(
     ManagedTeamSongs? ManagedTeam = null);
 
 /// <summary>The team the requesting user is GM of in this tournament, with its current song selections.</summary>
-public record ManagedTeamSongs(int TeamId, string TeamName, TournamentMusicTrack? GoalSongTrack, TournamentMusicTrack? WinSongTrack);
+public record ManagedTeamSongs(int TeamId, string TeamName, TournamentMusicTrack? GoalSongTrack, TournamentMusicTrack? WinSongTrack, TournamentMusicTrack? PenaltySongTrack);

@@ -91,15 +91,27 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         strokePaint.Style = SKPaintStyle.Stroke;
 
         const float forwardGridHeight = ForwardRows * RowH + (ForwardRows - 1) * GapY;
-        const float defenseGridHeight = DefenseRows * RowH + (DefenseRows - 1) * GapY;
-        const float totalHeight = HeaderHeight + SectionGapY 
-                                               + BarHeight + SectionGapY + forwardGridHeight + SectionGapY
-                                               + BarHeight + SectionGapY + defenseGridHeight;
+
+        // Defenders bottom-align within the 3-row defense band. Rows freed at the top host a team's
+        // overflow forwards (those beyond the 9 the forwards grid holds) and stay empty otherwise. The
+        // DEFENSE/GOALIE bars sit directly on top of the defenders — below any overflow row — so the
+        // spilled forwards never read as defenders sitting under the DEFENSE label.
+        var defenseCount = Math.Min(model.Defense.Count, DefenseCols * DefenseRows);
+        var defenderRows = Math.Min(DefenseRows, (defenseCount + DefenseCols - 1) / DefenseCols);
+        var freedRows = DefenseRows - defenderRows;
+
+        var overflowBandHeight = freedRows > 0 ? freedRows * RowH + (freedRows - 1) * GapY : 0f;
+        var defenderGridHeight = defenderRows > 0 ? defenderRows * RowH + (defenderRows - 1) * GapY : 0f;
+
+        var totalHeight = HeaderHeight + SectionGapY
+                          + BarHeight + SectionGapY + forwardGridHeight + SectionGapY
+                          + (freedRows > 0 ? overflowBandHeight + SectionGapY : 0f)
+                          + BarHeight + SectionGapY + defenderGridHeight;
 
         // Center the densely-packed content vertically within the fixed canvas.
         var cursorY = Math.Max(Margin, (Height - totalHeight) / 2f);
 
-        DrawHeader(canvas, typeface, model.TeamName, primary, palette.TitleOutline, logo,
+        DrawHeader(canvas, typeface, model.TeamName, palette.TitleFill, palette.TitleOutline, logo,
             new SKRect(Margin, cursorY, Margin + ContentW, cursorY + HeaderHeight));
         cursorY += HeaderHeight + SectionGapY;
 
@@ -124,7 +136,16 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
 
         cursorY += forwardGridHeight + SectionGapY;
 
-        // DEFENSE | GOALIE bars
+        // Overflow forwards (beyond the 9 that fit above) fill the freed rows, above the DEFENSE bar.
+        if (freedRows > 0)
+        {
+            var overflow = OverflowForwards(model.Forwards, freedRows * DefenseCols);
+            DrawGrid(canvas, typeface, palette, overflow,
+                Margin, cursorY, defenseColW, RowH, DefenseCols, freedRows, jerseyFontSize);
+            cursorY += overflowBandHeight + SectionGapY;
+        }
+
+        // DEFENSE | GOALIE bars, shifted down to sit directly on top of the defenders.
         DrawSectionBar(canvas, typeface, "DEFENSE", palette,
             new SKRect(Margin, cursorY, Margin + defenseRegionW, cursorY + BarHeight));
         DrawSectionBar(canvas, typeface, "GOALIE", palette,
@@ -132,7 +153,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         cursorY += BarHeight + SectionGapY;
 
         DrawGrid(canvas, typeface, palette, model.Defense,
-            Margin, cursorY, defenseColW, RowH, DefenseCols, DefenseRows, jerseyFontSize);
+            Margin, cursorY, defenseColW, RowH, DefenseCols, defenderRows, jerseyFontSize);
 
         // Single goalie block, kept the same height as one defense row so it isn't oversized.
         var goalie = model.Goalies.Count > 0 ? model.Goalies[0] : EmptyCell();
@@ -179,10 +200,14 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         stroke.IsAntialias = true;
         stroke.Style = SKPaintStyle.Stroke;
         stroke.Color = titleOutline;
-        stroke.StrokeWidth = Math.Max(1f, size * 0.001f);
+        // Draw the outline UNDERNEATH the fill: a centred stroke drawn on top of the fill eats into
+        // each glyph by half its width, so the surviving outer band varies letter-to-letter and looks
+        // uneven. Stroking first and painting the fill over it leaves a uniform outer band (= half the
+        // stroke width) with the glyph interior fully intact.
+        stroke.StrokeWidth = Math.Max(2f, size * 0.022f);
         stroke.StrokeJoin = SKStrokeJoin.Round;
-        canvas.DrawText(name, textX, baseline, SKTextAlign.Left, font, fill);
         canvas.DrawText(name, textX, baseline, SKTextAlign.Left, font, stroke);
+        canvas.DrawText(name, textX, baseline, SKTextAlign.Left, font, fill);
     }
 
     private static void DrawSectionBar(SKCanvas canvas, SKTypeface typeface, string label,
@@ -191,14 +216,14 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         using var bg = new SKPaint();
         bg.IsAntialias = true;
         bg.Style = SKPaintStyle.Fill;
-        bg.Color = palette.BarFill;
+        bg.Color = palette.PositionBarBackground;
         canvas.DrawRect(rect, bg);
 
         const float borderWidth = 3f;
         using var border = new SKPaint();
         border.IsAntialias = true;
         border.Style = SKPaintStyle.Stroke;
-        border.Color = palette.BarOutline;
+        border.Color = palette.PositionBarOutline;
         border.StrokeWidth = borderWidth;
         var inset = rect;
         inset.Inflate(-borderWidth / 2f, -borderWidth / 2f);
@@ -210,7 +235,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         using var text = new SKPaint();
         text.IsAntialias = true;
         text.Style = SKPaintStyle.Fill;
-        text.Color = palette.BarText;
+        text.Color = palette.PositionBarFill;
         var baseline = VerticalCenterBaseline(font, rect.MidY);
         canvas.DrawText(label, rect.MidX, baseline, SKTextAlign.Center, font, text);
     }
@@ -228,6 +253,22 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
             var y = originY + row * (rowH + GapY);
             DrawPlayerBlock(canvas, typeface, palette, cell, new SKRect(x, y, x + colW, y + rowH), jerseyFontSize);
         }
+    }
+
+    // The forwards a team carries beyond the 9 the forwards grid holds, laid out into `slotCount`
+    // freed defense-region slots left-to-right. Slots past the overflow count render as empty.
+    private static IReadOnlyList<RosterPlayerCell> OverflowForwards(
+        IReadOnlyList<RosterPlayerCell> forwards, int slotCount)
+    {
+        const int forwardGridSlots = ForwardCols * ForwardRows;
+
+        var cells = new RosterPlayerCell[slotCount];
+        for (var i = 0; i < slotCount; i++)
+        {
+            var index = forwardGridSlots + i;
+            cells[i] = index < forwards.Count ? forwards[index] : EmptyCell();
+        }
+        return cells;
     }
 
     private void DrawPlayerBlock(SKCanvas canvas, SKTypeface typeface, Palette palette,
@@ -277,6 +318,15 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         if (logo is not null)
         {
             var logoBox = new SKRect(rect.Left + jerseyW + 2f, rect.Top + rowH * 2f, rect.Left + jerseyW + midW - 2f, rect.Bottom - 4f);
+            // Shrink the logo to ~80% of the mid-column box and nudge it left toward the jersey number.
+            const float logoScale = 0.8f;
+            const float logoShiftLeft = 8f;
+            var logoCenterX = logoBox.MidX - logoShiftLeft;
+            var logoCenterY = logoBox.MidY;
+            var logoHalfW = logoBox.Width * logoScale / 2f;
+            var logoHalfH = logoBox.Height * logoScale / 2f;
+            logoBox = new SKRect(logoCenterX - logoHalfW, logoCenterY - logoHalfH,
+                logoCenterX + logoHalfW, logoCenterY + logoHalfH);
             DrawBitmapContained(canvas, logo, logoBox);
         }
 
@@ -480,10 +530,11 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
 
         return new Palette(
             Background: Resolve(colorway.Background),
+            TitleFill: Resolve(colorway.TitleFill),
             TitleOutline: Resolve(colorway.TitleOutline),
-            BarFill: Resolve(colorway.BarFill),
-            BarOutline: Resolve(colorway.BarOutline),
-            BarText: Resolve(colorway.BarText),
+            PositionBarBackground: Resolve(colorway.PositionBarBackground),
+            PositionBarOutline: Resolve(colorway.PositionBarOutline),
+            PositionBarFill: Resolve(colorway.PositionBarFill),
             JerseyFill: Resolve(colorway.JerseyNumber),
             JerseyOutline: Resolve(colorway.JerseyNumberOutline),
             DetailText: Resolve(colorway.PlayerDetailText),
@@ -493,10 +544,11 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
 
     private sealed record Palette(
         SKColor Background,
+        SKColor TitleFill,
         SKColor TitleOutline,
-        SKColor BarFill,
-        SKColor BarOutline,
-        SKColor BarText,
+        SKColor PositionBarBackground,
+        SKColor PositionBarOutline,
+        SKColor PositionBarFill,
         SKColor JerseyFill,
         SKColor JerseyOutline,
         SKColor DetailText,
