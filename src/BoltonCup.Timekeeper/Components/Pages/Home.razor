@@ -36,7 +36,7 @@
                                  Color="@GetStateColor(game.GameState)">
                             @game.GameState
                         </MudChip>
-                        <MudText Typo="Typo.caption">@game.GameTime.ToString("h:mm tt")</MudText>
+                        <MudText Typo="Typo.caption">@game.GameTime.ToLocalTime().ToString("h:mm tt")</MudText>
                     </div>
                     <div class="d-flex flex-row align-center justify-center gap-4 py-2">
                         <div class="d-flex flex-column align-center" style="min-width: 100px;">
