@@ -1,10 +1,12 @@
 <div class="d-flex flex-row" style="overflow-x:auto">
     @foreach (var game in Games)
     {
-        <div class="d-flex flex-column align-center pa-2 border-r mud-border-lines-default" style="min-width:140px">
-            <MudText Typo="Typo.caption">@game.GameTime.ToLocalTime().ToString("MMM d, h:mm tt")</MudText>
-            @ScoreLine(game)
-        </div>
+        <a href="@($"/games/{game.Id}")">
+            <div class="d-flex flex-column align-center pa-2 border-r mud-border-lines-default" style="min-width:140px">
+                <MudText Typo="Typo.caption">@game.GameTime.ToLocalTime().ToString("MMM d, h:mm tt")</MudText>
+                @ScoreLine(game)
+            </div>
+        </a>
     }
 </div>
 
