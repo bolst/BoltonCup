@@ -30,6 +30,7 @@ builder.Services.AddMudServices(config =>
 builder.Services.AddSingleton<IOfflineStore, LocalStorageOfflineStore>();
 builder.Services.AddSingleton<SyncService>();
 builder.Services.AddScoped<TimekeeperStateService>();
+builder.Services.AddScoped<DeviceStorageService>();
 builder.Services.AddScoped<MusicCacheService>();
 builder.Services.AddScoped<MusicPlayerService>();
 builder.Services.AddScoped<MusicDownloadService>();

@@ -101,6 +101,11 @@ public class GlobalMusicQueue : IGlobalMusicQueue
 
     private async Task<HashSet<int>> GetExcludedTrackIdsAsync(int tournamentId, CancellationToken cancellationToken)
     {
+        var warmupSongIds = await _db.Games
+            .Where(g => g.TournamentId == tournamentId)
+            .SelectMany(g => g.WarmupTracks)
+            .Select(t => t.Id)
+            .ToListAsync(cancellationToken);
         return (await _db.Teams
             .Where(t => t.TournamentId == tournamentId)
             .Select(t => new { t.GoalSongTrackId, t.WinSongTrackId, t.PenaltySongTrackId })
@@ -108,6 +113,7 @@ public class GlobalMusicQueue : IGlobalMusicQueue
             .SelectMany(t => new[] { t.GoalSongTrackId, t.WinSongTrackId, t.PenaltySongTrackId })
             .Where(id => id is not null)
             .Select(id => id!.Value)
+            .Concat(warmupSongIds)
             .ToHashSet();
     }
 }

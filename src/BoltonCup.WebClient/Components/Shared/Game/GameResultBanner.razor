@@ -1,10 +1,12 @@
+@using BoltonCup.Core
+@using GameState = BoltonCup.Sdk.GameState
 @namespace BoltonCup.WebClient.Components.Shared
 
-<MudPaper Class="@_classname" Width="100%" Height="100px" Elevation="0" Outlined>
+<MudPaper Class="@Classname" Width="100%" Height="100px" Elevation="0" Outlined>
     @TeamTemplate(Game.AwayTeam, reverse: false)
     @TeamGoalText(Game.AwayTeam)
     <div class="d-flex flex-column align-center justify-space-evenly">
-        <MudChip T="string" Variant="Variant.Text" Size="Size.Small" Label="true"><b>FINAL</b></MudChip>
+        @GetHeaderChip(Game)
         <MudText Typo="Typo.caption">@Game.GameTime.ToString("d")</MudText>
     </div>
     @TeamGoalText(Game.HomeTeam)
@@ -19,21 +21,38 @@
     [Parameter]
     public string? Class { get; set; }
 
-    private string _classname => $"d-flex flex-row align-center justify-space-evenly gap-3 {Class}";
-
+    private string Classname => $"d-flex flex-row align-center justify-space-evenly gap-3 {Class}";
+    
     private Sdk.TeamInGameDto? GetWinningTeam()
     {
-        if (Game.HomeTeam is null || Game.AwayTeam is null)
+        if (Game is not { GameState: GameState.Completed, HomeTeam: not null, AwayTeam: not null })
+        {
             return null;
-        return Game.HomeTeam.Goals > Game.AwayTeam.Goals 
-            ? Game.HomeTeam 
-            : Game.AwayTeam;
+        }
+        if (Game.HomeTeam.Goals == Game.AwayTeam.Goals)
+        {
+            return null;
+        }
+        return Game.HomeTeam.Goals > Game.AwayTeam.Goals ? Game.HomeTeam : Game.AwayTeam;
+    }
+    
+    private static RenderFragment GetHeaderChip(Sdk.GameSingleDto game)
+    {
+        var (text, color, icon) = game.GameState switch
+        {
+            GameState.Completed => ("FINAL", Color.Default, null),
+            GameState.InProgress => ("LIVE", Color.Error, Icons.Material.Rounded.Circle),
+            _ => (game.GameTime.ToLocalTime().ToString("t"), Color.Default, null),
+        };
+        return @<MudChip T="string" Variant="Variant.Text" Size="Size.Small" Label="true" Color="@color" Icon="@icon"><b>@text</b></MudChip>;
     }
 
     private RenderFragment TeamGoalText(Sdk.TeamInGameDto? team)
     {
         if (team is null)
+        {
             return @<MudText Typo="Typo.h4">-</MudText>;
+        }
         
         return team.Id == GetWinningTeam()?.Id 
             ? @<MudText Typo="Typo.h4"><b>@team.Goals</b></MudText> 
