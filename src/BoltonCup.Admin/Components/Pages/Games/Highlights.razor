@@ -27,14 +27,20 @@
                        SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"/>
         <PropertyColumn Title="Title" Property="x => x.Title" />
         <PropertyColumn Title="Description" Property="x => x.Description" Required="false" />
-        <PropertyColumn Title="Game date" Property="x => x.Game.GameTime" Format="g" Editable="false" InitialDirection="SortDirection.Ascending">
+        <PropertyColumn Title="Game date" Property="x => x.Game.GameTime" Format="g" Editable="false" InitialDirection="SortDirection.Ascending" Required>
             <CellTemplate>
-                <span>@context.Item.Game.GameTime.ToEstString("g")</span>
+                @if (context.Item.Game is { } game)
+                {
+                    <span>@game.GameTime.ToEstString("g")</span>
+                }
             </CellTemplate>
         </PropertyColumn>
-        <TemplateColumn Title="Tournament" Editable="false">
+        <TemplateColumn Title="Tournament" Editable="false" Required>
             <CellTemplate>
-                <span>@context.Item.Game.Tournament.Name</span>
+                @if (context.Item.Game is { } game)
+                {
+                    <span>@game.Tournament.Name</span>
+                }
             </CellTemplate>
         </TemplateColumn>
     </Columns>
