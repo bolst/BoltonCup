@@ -1,3 +1,4 @@
+@using BoltonCup.Sdk
 <div class="d-flex flex-row" style="overflow-x:auto">
     @foreach (var game in Games)
     {
@@ -5,6 +6,27 @@
             <div class="d-flex flex-column align-center pa-2 border-r mud-border-lines-default" style="min-width:140px">
                 <MudText Typo="Typo.caption">@game.GameTime.ToLocalTime().ToString("MMM d, h:mm tt")</MudText>
                 @ScoreLine(game)
+                @switch (game.GameType)
+                {
+                    case GameType.RoundRobin:
+                        <MudChip T="string" Color="Color.Default" Size="Size.Small" Variant="Variant.Text" Label="true">Round robin</MudChip>
+                        break;
+                    case GameType.QuarterFinals:
+                        <MudChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Text" Label="true">Quarters</MudChip>
+                        break;
+                    case GameType.SemiFinals:
+                        <MudChip T="string" Color="Color.Info" Size="Size.Small" Variant="Variant.Text" Label="true">Semis</MudChip>
+                        break;
+                    case GameType.FifthPlaceFinals:
+                        <MudChip T="string" Color="Color.Error" Size="Size.Small" Variant="Variant.Text" Label="true">Finals (5th)</MudChip>
+                        break;
+                    case GameType.ThirdPlaceFinals:
+                        <MudChip T="string" Color="Color.Surface" Size="Size.Small" Variant="Variant.Text" Label="true">Finals (3rd)</MudChip>
+                        break;
+                    case GameType.Finals:
+                        <MudChip T="string" Color="Color.Warning" Size="Size.Small" Variant="Variant.Text" Label="true">Finals</MudChip>
+                        break;
+                }
             </div>
         </a>
     }
