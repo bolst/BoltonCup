@@ -9,5 +9,6 @@ public sealed record CreateGoalCommand(
     int GoalPlayerId,
     int? Assist1PlayerId,
     int? Assist2PlayerId,
-    string? Notes
+    string? Notes,
+    bool IsEmptyNetGoal
 );

@@ -12,6 +12,7 @@ public class Goal : EntityBase
     public int? Assist1PlayerId { get; set; }
     public int? Assist2PlayerId { get; set; }
     public string? Notes { get; set; }
+    public bool IsEmptyNetGoal { get; set; }
     
     public Team Team { get; set; } = null!;
     public Game Game { get; set; } = null!;

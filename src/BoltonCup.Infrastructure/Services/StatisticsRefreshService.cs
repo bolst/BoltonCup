@@ -74,6 +74,12 @@ public sealed class StatisticsRefreshService(IDbContextFactory<BoltonCupDbContex
         var goalsByGameTeam = goals
             .GroupBy(g => (g.GameId, g.TeamId))
             .ToDictionary(g => g.Key, g => g.Count());
+        // Empty-net goals per (game, scoring team). Excluded from the conceding goalie's GAA (but not
+        // from raw GoalsAgainst) since they're scored after that team pulled its goalie.
+        var emptyNetGoalsByGameTeam = goals
+            .Where(g => g.IsEmptyNetGoal)
+            .GroupBy(g => (g.GameId, g.TeamId))
+            .ToDictionary(g => g.Key, g => g.Count());
 
         var skaterRows = new List<SkaterStat>();
         var goalieRows = new List<GoalieStat>();
@@ -124,6 +130,9 @@ public sealed class StatisticsRefreshService(IDbContextFactory<BoltonCupDbContex
                 {
                     var goalsAgainst = goalsByGameTeam.GetValueOrDefault((game.Id, opponentId));
                     var ownGoals = goalsByGameTeam.GetValueOrDefault((game.Id, teamId));
+                    // Empty-net goals against don't count toward GAA (goalie was pulled), but still
+                    // count in raw GoalsAgainst / Shutouts / Wins.
+                    var emptyNetAgainst = emptyNetGoalsByGameTeam.GetValueOrDefault((game.Id, opponentId));
 
                     goalieRows.Add(new GoalieStat
                     {
@@ -135,7 +144,7 @@ public sealed class StatisticsRefreshService(IDbContextFactory<BoltonCupDbContex
                         Shutouts = goalsAgainst == 0 ? 1 : 0,
                         Wins = ownGoals > goalsAgainst ? 1 : 0,
                         SavePercentage = 0.0,
-                        GoalsAgainstAverage = goalsAgainst,
+                        GoalsAgainstAverage = goalsAgainst - emptyNetAgainst,
                         GamesPlayed = 1,
                         Goals = goalsScored,
                         Assists = assists,

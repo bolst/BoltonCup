@@ -26,4 +26,7 @@ public record UpdateGoalRequest
 
     /// <summary>Gets or sets optional notes about the goal.</summary>
     public string? Notes { get; set; }
+
+    /// <summary>Gets or sets whether the goal was scored into an empty net (conceding team's goalie pulled).</summary>
+    public bool IsEmptyNetGoal { get; set; }
 }

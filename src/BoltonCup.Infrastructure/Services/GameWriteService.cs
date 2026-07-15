@@ -56,6 +56,7 @@ public class GameWriteService(
             Assist1PlayerId = command.Assist1PlayerId,
             Assist2PlayerId = command.Assist2PlayerId,
             Notes = command.Notes,
+            IsEmptyNetGoal = command.IsEmptyNetGoal,
         };
         _dbContext.Goals.Add(goal);
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -77,6 +78,7 @@ public class GameWriteService(
         goal.Assist1PlayerId = command.Assist1PlayerId;
         goal.Assist2PlayerId = command.Assist2PlayerId;
         goal.Notes = command.Notes;
+        goal.IsEmptyNetGoal = command.IsEmptyNetGoal;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         await TryRefreshStatsAsync(command.GameId, cancellationToken);

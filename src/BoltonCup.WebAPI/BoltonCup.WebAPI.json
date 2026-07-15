@@ -14098,6 +14098,10 @@
             "type": "string",
             "description": "Gets or sets optional notes about the goal.",
             "nullable": true
+          },
+          "isEmptyNetGoal": {
+            "type": "boolean",
+            "description": "Gets or sets whether the goal was scored into an empty net (conceding team's goalie pulled)."
           }
         },
         "additionalProperties": false,
@@ -15791,6 +15795,7 @@
       "GoalBriefDto": {
         "required": [
           "id",
+          "isEmptyNetGoal",
           "period",
           "primaryAssist",
           "scorer",
@@ -15845,6 +15850,10 @@
             ],
             "description": "Gets or sets the player credited with the secondary assist.",
             "nullable": true
+          },
+          "isEmptyNetGoal": {
+            "type": "boolean",
+            "description": "Gets or sets whether the goal was scored into an empty net."
           },
           "periodLabel": {
             "type": "string",
@@ -18880,6 +18889,10 @@
             "type": "string",
             "description": "Gets or sets optional notes about the goal.",
             "nullable": true
+          },
+          "isEmptyNetGoal": {
+            "type": "boolean",
+            "description": "Gets or sets whether the goal was scored into an empty net (conceding team's goalie pulled)."
           }
         },
         "additionalProperties": false,

@@ -226,8 +226,8 @@ public class MusicLibraryServiceTests
 
         var playlist = await service.GetGamePlaylistAsync(GameId);
         playlist.Warmup.Select(t => t.AudioFileKey).Should().Equal("kbase", "kSA");
-        // Warmup is a separate lane; the shared rotation is unchanged (base pool only).
-        playlist.Tracks.Select(t => t.AudioFileKey).Should().Equal("kbase");
+        // Warmup is a separate lane; the shared rotation excludes warmup songs.
+        playlist.Tracks.Select(t => t.AudioFileKey).Should().BeEmpty();
     }
 
     [Fact]

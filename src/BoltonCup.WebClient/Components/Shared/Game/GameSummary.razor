@@ -128,7 +128,13 @@
                                         <MudImage Src="@goal.Scorer.ProfilePicture" Alt="@goal.Scorer.FullName"/>
                                     </MudAvatar>
                                     <div class="d-flex flex-column align-start justify-space-between">
-                                        <PlayerLink Player="@goal.Scorer" Typo="Typo.body1"/>
+                                        <div class="d-flex flex-row align-center gap-2">
+                                            <PlayerLink Player="@goal.Scorer" Typo="Typo.body1"/>
+                                            @if (goal.IsEmptyNetGoal)
+                                            {
+                                                <MudChip T="string" Size="Size.Small" Color="Color.Error" Variant="Variant.Filled" Class="ma-0" Label="true">EN</MudChip>
+                                            }
+                                        </div>
                                         <div class="d-flex flex-row align-center gap-1">
                                             <MudImage Src="@(goal.TeamId == Game.HomeTeam.Id ? Game.HomeTeam.Logo : Game.AwayTeam.Logo)" Height="24"/>
                                             <MudText Typo="Typo.body2">@assists</MudText>

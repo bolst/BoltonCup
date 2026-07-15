@@ -10,5 +10,6 @@ public sealed record UpdateGoalCommand(
     int GoalPlayerId,
     int? Assist1PlayerId,
     int? Assist2PlayerId,
-    string? Notes
+    string? Notes,
+    bool IsEmptyNetGoal
 );

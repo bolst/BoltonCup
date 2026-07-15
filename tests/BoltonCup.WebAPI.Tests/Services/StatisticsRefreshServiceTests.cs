@@ -168,6 +168,51 @@ public class StatisticsRefreshServiceTests
     }
 
     [Fact]
+    public async Task RefreshAsync_ExcludesEmptyNetGoalsFromGaa_ButNotGoalsAgainst()
+    {
+        var factory = BuildFactory($"stats-emptynet-{Guid.NewGuid()}");
+
+        await using (var db = await factory.CreateDbContextAsync())
+        {
+            db.Tournaments.Add(new Tournament { Id = 1, Name = "Cup", IsActive = true });
+            db.Teams.AddRange(Team(1, "Home"), Team(2, "Away"));
+            db.Accounts.AddRange(Account(1), Account(2), Account(3), Account(4), Account(5));
+            db.Players.AddRange(
+                Player(1, teamId: 1, Position.Forward),
+                Player(2, teamId: 1, Position.Forward),
+                Player(3, teamId: 1, Position.Goalie),
+                Player(4, teamId: 2, Position.Forward),
+                Player(5, teamId: 2, Position.Goalie));
+            db.Games.Add(new Game
+            {
+                Id = 1,
+                TournamentId = 1,
+                GameTime = new DateTime(2026, 1, 1),
+                HomeTeamId = 1,
+                AwayTeamId = 2,
+                GameType = GameType.RoundRobin,
+                GameState = GameState.Completed,
+            });
+            // Away (team 2) scores twice against the home goalie; the second is an empty-netter.
+            var enGoal = Goal(2, gameId: 1, teamId: 2, scorerId: 4);
+            enGoal.IsEmptyNetGoal = true;
+            db.Goals.AddRange(
+                Goal(1, gameId: 1, teamId: 2, scorerId: 4),
+                enGoal);
+            await db.SaveChangesAsync();
+        }
+
+        await new StatisticsRefreshService(factory).RefreshAsync();
+
+        await using var read = await factory.CreateDbContextAsync();
+        var homeGoalie = await read.GoalieStats.AsNoTracking().SingleAsync(g => g.PlayerId == 3);
+
+        // Raw goals-against still counts the empty-netter (2), but GAA excludes it (1).
+        homeGoalie.GoalsAgainst.Should().Be(2);
+        homeGoalie.GoalsAgainstAverage.Should().Be(1);
+    }
+
+    [Fact]
     public async Task RefreshAsync_IsIdempotent_ReplacingExistingRows()
     {
         var factory = BuildFactory($"stats-idempotent-{Guid.NewGuid()}");

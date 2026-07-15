@@ -28,7 +28,7 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
                 Shutouts = g.Sum(x => x.Shutouts),
                 Wins = g.Sum(x => x.Wins),
                 SavePercentage = g.Sum(x => x.ShotsAgainst) == 0 ? 0 : g.Sum(x => x.Saves) / (double)g.Sum(x => x.ShotsAgainst),
-                GoalsAgainstAverage = g.Average(x => x.GoalsAgainst),
+                GoalsAgainstAverage = g.Average(x => x.GoalsAgainstAverage),
                 GamesPlayed = g.Sum(x => x.GamesPlayed),
                 Goals = g.Sum(x => x.Goals),
                 Assists = g.Sum(x => x.Assists),

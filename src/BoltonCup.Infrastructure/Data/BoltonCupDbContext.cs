@@ -512,6 +512,7 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Assist1PlayerId).HasColumnName("assist1_player_id");
             entity.Property(e => e.Assist2PlayerId).HasColumnName("assist2_player_id");
             entity.Property(e => e.Notes).HasColumnName("notes");
+            entity.Property(e => e.IsEmptyNetGoal).HasColumnName("is_empty_net_goal");
         });
 
         modelBuilder.Entity<GoalieStat>(entity =>

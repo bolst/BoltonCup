@@ -535,7 +535,8 @@ public class Mapper : IMapper
             GoalPlayerId: request.GoalPlayerId,
             Assist1PlayerId: request.Assist1PlayerId,
             Assist2PlayerId: request.Assist2PlayerId,
-            Notes: request.Notes
+            Notes: request.Notes,
+            IsEmptyNetGoal: request.IsEmptyNetGoal
         );
 
     public UpdateGoalCommand ToCommand(int gameId, int goalId, UpdateGoalRequest request)
@@ -549,7 +550,8 @@ public class Mapper : IMapper
             GoalPlayerId: request.GoalPlayerId,
             Assist1PlayerId: request.Assist1PlayerId,
             Assist2PlayerId: request.Assist2PlayerId,
-            Notes: request.Notes
+            Notes: request.Notes,
+            IsEmptyNetGoal: request.IsEmptyNetGoal
         );
 
     public CreatePenaltyCommand ToCommand(int gameId, CreatePenaltyRequest request)
@@ -1096,6 +1098,7 @@ public class Mapper : IMapper
         {
             Id = goal.Id, TimeRemaining = goal.PeriodTimeRemaining, Period = goal.Period, TeamId = goal.TeamId,
             Scorer = ToPlayerBriefDto(goal.Scorer), PrimaryAssist = goal.Assist1Player == null ? null : ToPlayerBriefDto(goal.Assist1Player), SecondaryAssist = goal.Assist2Player == null ? null : ToPlayerBriefDto(goal.Assist2Player),
+            IsEmptyNetGoal = goal.IsEmptyNetGoal,
         };
     }
 

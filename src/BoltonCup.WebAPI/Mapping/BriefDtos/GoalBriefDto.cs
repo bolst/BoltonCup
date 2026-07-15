@@ -17,6 +17,8 @@ public sealed record GoalBriefDto
     public required PlayerBriefDto? PrimaryAssist { get; set; }
     /// <summary>Gets or sets the player credited with the secondary assist.</summary>
     public required PlayerBriefDto? SecondaryAssist { get; set; }
+    /// <summary>Gets or sets whether the goal was scored into an empty net.</summary>
+    public required bool IsEmptyNetGoal { get; set; }
 
     /// <summary>Gets the display label for the period.</summary>
     public string? PeriodLabel => Utilities.Mapping.TryGetPeriodName(Period);

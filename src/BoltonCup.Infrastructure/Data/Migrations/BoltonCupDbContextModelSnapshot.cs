@@ -1116,6 +1116,10 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("goal_player_id");
 
+                    b.Property<bool>("IsEmptyNetGoal")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_empty_net_goal");
+
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_modified");

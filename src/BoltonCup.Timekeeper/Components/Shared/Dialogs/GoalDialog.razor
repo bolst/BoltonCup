@@ -76,6 +76,11 @@
                               Class="flex-grow-1" />
             </div>
 
+            <MudSwitch T="bool"
+                       @bind-Value="_isEmptyNet"
+                       Label="Empty net goal"
+                       Color="Color.Error" />
+
         </MudStack>
     </DialogContent>
     <DialogActions>
@@ -123,6 +128,7 @@
     private PlayerDto? _assist2;
     private int _period;
     private string _timeRemaining = "00:00";
+    private bool _isEmptyNet;
 
     private List<PlayerDto> ActiveRoster => _homeSelected ? HomePlayers : AwayPlayers;
 
@@ -190,6 +196,7 @@
             GoalPlayerId = _scorer.Id,
             Assist1PlayerId = _assist1?.Id,
             Assist2PlayerId = _assist2?.Id,
+            IsEmptyNetGoal = _isEmptyNet,
         };
         Dialog.Close(DialogResult.Ok(request));
     }
