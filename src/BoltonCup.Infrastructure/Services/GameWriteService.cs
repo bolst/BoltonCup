@@ -34,18 +34,10 @@ public class GameWriteService(
             await _queue.StartGameAsync(game.TournamentId, playerTrackIds, cancellationToken);
         }
 
-        // Ending a game finalizes its goals/penalties, so refresh the stat materialized views. Best-effort:
-        // a refresh failure must not fail the state change (the views can also be refreshed manually).
+        // Ending a game finalizes its goals/penalties, so recompute the stat tables.
         if (command.State == GameState.Completed && !wasCompleted)
         {
-            try
-            {
-                await _stats.RefreshAsync(cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to refresh stat materialized views after completing game {GameId}", game.Id);
-            }
+            await TryRefreshStatsAsync(game.Id, cancellationToken);
         }
     }
 
@@ -67,6 +59,7 @@ public class GameWriteService(
         };
         _dbContext.Goals.Add(goal);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        await TryRefreshStatsAsync(command.GameId, cancellationToken);
         return goal.Id;
     }
 
@@ -86,6 +79,7 @@ public class GameWriteService(
         goal.Notes = command.Notes;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+        await TryRefreshStatsAsync(command.GameId, cancellationToken);
     }
 
     public async Task DeleteGoalAsync(int gameId, int goalId, CancellationToken cancellationToken = default)
@@ -96,6 +90,7 @@ public class GameWriteService(
 
         _dbContext.Goals.Remove(goal);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        await TryRefreshStatsAsync(gameId, cancellationToken);
     }
 
     public async Task<int> AddPenaltyAsync(CreatePenaltyCommand command, CancellationToken cancellationToken = default)
@@ -116,6 +111,7 @@ public class GameWriteService(
         };
         _dbContext.Penalties.Add(penalty);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        await TryRefreshStatsAsync(command.GameId, cancellationToken);
         return penalty.Id;
     }
 
@@ -135,6 +131,7 @@ public class GameWriteService(
         penalty.Notes = command.Notes;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+        await TryRefreshStatsAsync(command.GameId, cancellationToken);
     }
 
     public async Task DeletePenaltyAsync(int gameId, int penaltyId, CancellationToken cancellationToken = default)
@@ -145,6 +142,7 @@ public class GameWriteService(
 
         _dbContext.Penalties.Remove(penalty);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        await TryRefreshStatsAsync(gameId, cancellationToken);
     }
 
     public async Task SetStarsAsync(SetGameStarsCommand command, CancellationToken cancellationToken = default)
@@ -178,5 +176,19 @@ public class GameWriteService(
         var exists = await _dbContext.Games.AnyAsync(g => g.Id == gameId, cancellationToken);
         if (!exists)
             throw new EntityNotFoundException(nameof(Game), gameId);
+    }
+
+    // Recompute the stat tables after a change to game data. Best-effort: a refresh failure must not
+    // fail the write that triggered it (the stats can also be refreshed manually from the Admin app).
+    private async Task TryRefreshStatsAsync(int gameId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _stats.RefreshAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to refresh stats after updating game {GameId}", gameId);
+        }
     }
 }

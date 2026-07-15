@@ -7,9 +7,9 @@
 <MudPaper Class="pa-4" Elevation="1" MaxWidth="600px">
     <MudText Typo="Typo.subtitle1" Class="mb-1">Skater &amp; goalie stats</MudText>
     <MudText Typo="Typo.body2" Class="mb-4 mud-text-secondary">
-        Skater and goalie statistics are served from materialized views that don't update automatically.
-        They refresh whenever a game is completed; use this if you've edited game data and want the
-        leaderboards to reflect it immediately.
+        Skater and goalie statistics are computed from game data and stored in game-log tables. They
+        refresh automatically as goals/penalties are recorded and when a game is completed; use this if
+        you've edited game data directly and want the leaderboards to reflect it immediately.
     </MudText>
     <MudButton Variant="Variant.Filled" Color="Color.Primary"
                StartIcon="@Icons.Material.Rounded.Refresh"

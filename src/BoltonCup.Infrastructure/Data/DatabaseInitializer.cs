@@ -1,3 +1,4 @@
+using BoltonCup.Core;
 using BoltonCup.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +19,17 @@ public static class DatabaseInitializer
             var userManager = services.GetRequiredService<UserManager<BoltonCupUser>>();
 
             await RoleSeeder.SeedAdminUserAsync(roleManager, userManager, configuration);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        try
+        {
+            // Populate the skater/goalie game-log tables so stats aren't empty before the first game
+            // event triggers a refresh. Best-effort: a failure here must not block startup.
+            await services.GetRequiredService<IStatisticsRefreshService>().RefreshAsync();
         }
         catch (Exception ex)
         {
