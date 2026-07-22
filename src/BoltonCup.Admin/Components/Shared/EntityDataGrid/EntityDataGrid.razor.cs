@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using BoltonCup.Admin.Extensions;
+using BoltonCup.Admin.Services;
 using BoltonCup.Core.Queries.Base;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Infrastructure.Extensions;
@@ -54,6 +55,22 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     
     [Inject]
     public IDbContextFactory<BoltonCupDbContext> DbContextFactory { get; set; } = null!;
+
+    [Inject]
+    public TournamentStateService TournamentState { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        TournamentState.Changed += OnTournamentChanged;
+    }
+
+    private void OnTournamentChanged()
+    {
+        if (TournamentFilter is null)
+            return;
+        _ = InvokeAsync(async () => await _dataGrid.ReloadServerData());
+    }
 
     [Parameter]
     public RenderFragment? Columns { get; set; }
@@ -117,6 +134,14 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     
     [Parameter]
     public Expression<Func<T, bool>>? Filter { get; set; }
+
+    /// <summary>
+    /// When set, the grid scopes to the app-wide current tournament: given the current
+    /// tournament id it returns a predicate the query is filtered by, and the grid reloads
+    /// automatically whenever the current tournament changes.
+    /// </summary>
+    [Parameter]
+    public Func<int, Expression<Func<T, bool>>>? TournamentFilter { get; set; }
     
     [Parameter]
     public bool NoDeleting { get; set; }
@@ -164,6 +189,13 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
 
             if (Filter is not null)
                 dbSet = dbSet.Where(Filter);
+
+            if (TournamentFilter is not null)
+            {
+                var current = await TournamentState.GetCurrentAsync(cancellationToken);
+                if (current is not null)
+                    dbSet = dbSet.Where(TournamentFilter(current.Id));
+            }
 
             if (SearchBy is not null)
                 dbSet = dbSet.WhereContains(SearchBy, _search);
@@ -310,6 +342,7 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
 
     public void Dispose()
     {
+        TournamentState.Changed -= OnTournamentChanged;
         _cts.Cancel();
         _cts.Dispose();
     }

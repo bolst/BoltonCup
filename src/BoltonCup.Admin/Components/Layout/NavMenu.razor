@@ -4,23 +4,31 @@
     </MudDrawerHeader>
     <MudNavMenu Class="px-2" Margin="Margin.Normal" Rounded>
         <MudNavLink Href="/" Icon="@Icons.Material.Rounded.Home" Match="NavLinkMatch.All">Home</MudNavLink>
-        <MudNavLink Href="/registrations" Icon="@Icons.Material.Rounded.DynamicForm" Match="NavLinkMatch.All">Registrations</MudNavLink>
-        <MudNavLink Href="/accounts" Icon="@Icons.Material.Rounded.ManageAccounts" Match="NavLinkMatch.Prefix">Accounts</MudNavLink>
-        <MudNavLink Href="/tournaments" Icon="@Icons.Material.Rounded.Lan" Match="NavLinkMatch.All">Tournaments</MudNavLink>
-        <MudNavLink Href="/teams" Icon="@Icons.Material.Rounded.Groups" Match="NavLinkMatch.Prefix">Teams</MudNavLink>
-        <MudNavGroup Title="Games" Expanded>
+        <MudNavGroup Title="Tournament" Icon="@Icons.Material.Rounded.Lan" Expanded>
+            <MudNavLink Href="/registrations" Icon="@Icons.Material.Rounded.DynamicForm" Match="NavLinkMatch.Prefix">Registrations</MudNavLink>
+            <MudNavLink Href="/players" Icon="@Icons.Material.Rounded.SportsHockey" Match="NavLinkMatch.Prefix">Players</MudNavLink>
+            <MudNavLink Href="/teams" Icon="@Icons.Material.Rounded.Groups" Match="NavLinkMatch.Prefix">Teams</MudNavLink>
+            <MudNavLink Href="/player-info" Icon="@Icons.Material.Rounded.ContactPage" Match="NavLinkMatch.Prefix">Player Info</MudNavLink>
+            <MudNavLink Href="/budget" Icon="@Icons.Material.Rounded.AccountBalance" Match="NavLinkMatch.Prefix">Budget</MudNavLink>
+            <MudNavLink Href="/sponsors" Icon="@Icons.Material.Rounded.Handshake" Match="NavLinkMatch.Prefix">Sponsors</MudNavLink>
+            <MudNavLink Href="/music" Icon="@Icons.Material.Rounded.LibraryMusic" Match="NavLinkMatch.Prefix">Music</MudNavLink>
+        </MudNavGroup>
+        <MudNavGroup Title="Games" Icon="@Icons.Material.Rounded.SportsScore" Expanded>
             <MudNavLink Href="/games/schedules" Icon="@Icons.Material.Rounded.CalendarMonth" Match="NavLinkMatch.Prefix">Schedules</MudNavLink>
             <MudNavLink Href="/games/stars" Icon="@Icons.Material.Rounded.Star" Match="NavLinkMatch.Prefix">Stars</MudNavLink>
             <MudNavLink Href="/games/highlights" Icon="@Icons.Material.Rounded.VideoLibrary" Match="NavLinkMatch.Prefix">Highlights</MudNavLink>
-            <MudNavLink Href="/referees" Icon="@Icons.Material.Rounded.Security" Match="NavLinkMatch.Prefix">Referees</MudNavLink>
         </MudNavGroup>
-        <MudNavGroup Title="Authentication" Expanded>
+        <MudNavGroup Title="Global" Icon="@Icons.Material.Rounded.Public" Expanded>
+            <MudNavLink Href="/accounts" Icon="@Icons.Material.Rounded.ManageAccounts" Match="NavLinkMatch.Prefix">Accounts</MudNavLink>
+            <MudNavLink Href="/referees" Icon="@Icons.Material.Rounded.Security" Match="NavLinkMatch.Prefix">Referees</MudNavLink>
+            <MudNavLink Href="/galleries" Icon="@Icons.Material.Rounded.PhotoLibrary" Match="NavLinkMatch.Prefix">Galleries</MudNavLink>
+            <MudNavLink Href="/bracket-challenges" Icon="@Icons.Material.Rounded.AccountTree" Match="NavLinkMatch.Prefix">Bracket Challenges</MudNavLink>
+        </MudNavGroup>
+        <MudNavGroup Title="Authentication" Icon="@Icons.Material.Rounded.AdminPanelSettings" Expanded>
             <MudNavLink Href="/authentication/users" Icon="@Icons.Material.Rounded.SupervisedUserCircle" Match="NavLinkMatch.Prefix">Users</MudNavLink>
             <MudNavLink Href="/authentication/roles" Icon="@Icons.Material.Rounded.AdminPanelSettings" Match="NavLinkMatch.Prefix">Roles</MudNavLink>
         </MudNavGroup>
-        <MudNavLink Href="/bracket-challenges" Icon="@Icons.Material.Rounded.AccountTree" Match="NavLinkMatch.Prefix">Bracket Challenges</MudNavLink>
-        <MudNavLink Href="/galleries" Icon="@Icons.Material.Rounded.PhotoLibrary">Galleries</MudNavLink>
-        <MudNavGroup Title="Utilities" Expanded>
+        <MudNavGroup Title="Utilities" Icon="@Icons.Material.Rounded.Build" Expanded>
             <MudNavLink Href="/emails" Icon="@Icons.Material.Rounded.Email" Match="NavLinkMatch.Prefix">Email</MudNavLink>
             <MudNavLink Href="/image-generation" Icon="@Icons.Material.Rounded.AutoAwesome" Match="NavLinkMatch.Prefix">Image Generation</MudNavLink>
             <MudNavLink Href="/statistics" Icon="@Icons.Material.Rounded.Leaderboard" Match="NavLinkMatch.Prefix">Statistics</MudNavLink>

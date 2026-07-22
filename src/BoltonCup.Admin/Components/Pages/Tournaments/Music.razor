@@ -1,8 +1,11 @@
-@page "/tournaments/{TournamentId:int}/music"
+@page "/music"
+@using BoltonCup.Admin.Services
 @inject IMusicLibraryService MusicLibrary
 @inject IAssetUrlResolver AssetUrls
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject TournamentStateService TournamentState
+@implements IDisposable
 
 <MudStack Spacing="4" Class="pa-4">
     <div class="d-flex align-center justify-space-between">
@@ -154,14 +157,13 @@
 </MudStack>
 
 @code {
-    
-    [Parameter]
-    public int TournamentId { get; set; }
+
+    // Resolved from the app-wide current tournament.
+    private int TournamentId;
 
     private IReadOnlyList<TournamentMusicTrack> _tracks = [];
     private IReadOnlyList<MusicQueueItemView> _queue = [];
     private bool _loading = true;
-    private int? _loadedId;
 
     private int _pendingCount => _queue.Count(q => q.Status == MusicTrackStatus.Pending);
 
@@ -181,20 +183,44 @@
         _ => Color.Default,
     };
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnInitialized()
     {
-        if (_loadedId == TournamentId)
+        TournamentState.Changed += OnTournamentChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
             return;
-        _loadedId = TournamentId;
+        }
         await ReloadAsync();
+    }
+
+    private void OnTournamentChanged()
+    {
+        _ = InvokeAsync(ReloadAsync);
     }
 
     private async Task ReloadAsync()
     {
+        if (await TournamentState.GetCurrentAsync() is not { } current)
+        {
+            return;
+        }
+        TournamentId = current.Id;
+
         _loading = true;
+        StateHasChanged();
         _tracks = await MusicLibrary.GetLibraryAsync(TournamentId);
         _queue = await MusicLibrary.GetQueueAsync(TournamentId);
         _loading = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        TournamentState.Changed -= OnTournamentChanged;
     }
 
     private async Task AddTrack()

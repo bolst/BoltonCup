@@ -1,0 +1,64 @@
+@using BoltonCup.Admin.Services
+@inject TournamentStateService TournamentState
+@implements IDisposable
+
+<div style="max-width: 200px">
+    <MudSelect
+        T="Tournament" Value="@_current" ValueChanged="@OnTournamentChanged"
+        Variant="Variant.Text" Margin="Margin.Dense" ToStringFunc="x => x?.Name" Dense>
+        @foreach (var tournament in _tournaments)
+        {
+            <MudSelectItem T="Tournament" Value="@tournament" />
+        }
+    </MudSelect>
+</div>
+
+@code {
+
+    private Tournament? _current;
+    private IReadOnlyList<Tournament> _tournaments = [];
+
+    protected override void OnInitialized()
+    {
+        TournamentState.Changed += OnStateChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Storage / URL resolution needs JS interop, which is only available after the first render.
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _tournaments = await TournamentState.GetTournamentsAsync();
+        _current = await TournamentState.GetCurrentAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnTournamentChanged(Tournament? tournament)
+    {
+        if (tournament is null || tournament.Id == _current?.Id)
+        {
+            return;
+        }
+
+        _current = tournament;
+        await TournamentState.SetCurrentAsync(tournament);
+    }
+
+    private void OnStateChanged()
+    {
+        _ = InvokeAsync(async () =>
+        {
+            _current = await TournamentState.GetCurrentAsync();
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        TournamentState.Changed -= OnStateChanged;
+    }
+
+}

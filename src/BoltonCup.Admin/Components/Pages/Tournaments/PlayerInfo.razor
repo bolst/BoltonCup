@@ -1,4 +1,4 @@
-@page "/tournaments/{TournamentId:int}/player-info"
+@page "/player-info"
 @using BoltonCup.Common
 @using BoltonCup.Common.Components
 @using BoltonCup.Sdk
@@ -7,12 +7,11 @@
 }
 
 <EntityDataGrid
-    @ref="_dataGrid"
     T="TournamentPlayerInfo"
     ReadOnly
     Selectable="false"
     Include="@_includes"
-    Filter="@_filter"
+    TournamentFilter="id => x => x.TournamentId == id"
     SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"
     Comparer="_comparer">
     <Columns>
@@ -60,36 +59,13 @@
 
 @code {
 
-    [Parameter]
-    public int TournamentId { get; set; }
-
-    private int? _tournamentId;
-    private EntityDataGrid<TournamentPlayerInfo>? _dataGrid;
     private static readonly TournamentPlayerInfoComparer _comparer = new();
-
-    private System.Linq.Expressions.Expression<Func<TournamentPlayerInfo, bool>>? _filter;
 
     private static readonly Func<IQueryable<TournamentPlayerInfo>, IQueryable<TournamentPlayerInfo>> _includes =
         x => x
             .Include(e => e.Account)
             .Include(e => e.GameAvailabilities)
             .ThenInclude(a => a.Game);
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (_tournamentId == TournamentId)
-            return;
-        _tournamentId = TournamentId;
-
-        // Built once; EF re-reads the captured field on each query execution.
-        _filter = x => x.TournamentId == _tournamentId;
-
-        if (_dataGrid is not null)
-        {
-            await _dataGrid.ReloadAsync();
-            StateHasChanged();
-        }
-    }
 
     private static List<PlayerGameAvailabilityDto> BuildAvailabilities(TournamentPlayerInfo info)
         => info.GameAvailabilities

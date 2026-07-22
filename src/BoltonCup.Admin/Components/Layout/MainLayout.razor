@@ -2,6 +2,7 @@
 @inherits LayoutComponentBase
 @inject Common.Theme.BoltonCupTheme Theme
 @inject IOptions<Common.BoltonCupConfiguration> BcConfig
+@inject Services.TournamentStateService TournamentStateService
 @inject NavigationManager Navigation
 
 <MudThemeProvider Theme="Theme.MudTheme" IsDarkMode="true" />
@@ -11,7 +12,8 @@
 
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <TournamentStateSelect />
         <MudSpacer />
         
         <UserMenu>
@@ -40,5 +42,10 @@
     private bool _isDrawerOpen = true;
 
     private void ToggleDrawer() => _isDrawerOpen = !_isDrawerOpen;
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
 
 }

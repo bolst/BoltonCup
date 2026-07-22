@@ -1,7 +1,10 @@
-@page "/tournaments/{TournamentId:int}/players"
+@page "/players"
 @using System.Linq.Expressions
+@using BoltonCup.Admin.Services
 @inject IDialogService DialogService
 @inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject TournamentStateService TournamentState
+@implements IDisposable
 @{
 #nullable enable
 }
@@ -11,6 +14,7 @@
     T="Player"
     SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"
     Filter="@_filter"
+    TournamentFilter="id => x => x.TournamentId == id"
     Comparer="_comparer">
     <ActionMenu>
         <MudMenuItem Label="Populate teams from draft" OnClick="@PopulateTeamsFromDraft" />
@@ -46,10 +50,9 @@
 
 @code {
 
-    [Parameter]
-    public int TournamentId { get; set; }
-
-    private int? _tournamentId;
+    // Resolved from the app-wide current tournament; used by the team dropdown query,
+    // the Team foreign-column filter, and the "populate from draft" dialog.
+    private int TournamentId;
 
     private EntityDataGrid<Player>? _dataGrid;
     private static readonly PlayerComparer _comparer = new();
@@ -59,30 +62,53 @@
     private List<Team> _teams = [];
     private int? _selectedTeamId;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnInitialized()
     {
-        if (_tournamentId == TournamentId)
-            return;
-        _tournamentId = TournamentId;
-        _selectedTeamId = null;
+        // Tournament scoping is applied by the grid's TournamentFilter; this filter only
+        // narrows to the selected team. EF re-reads the captured field on each query.
+        _filter = x => _selectedTeamId == null || x.TeamId == _selectedTeamId;
+        TournamentState.Changed += OnTournamentChanged;
+    }
 
-        // Built once; EF re-reads the captured fields on each query execution, so
-        // changing _selectedTeamId and reloading is enough to re-filter.
-        _filter = x => x.TournamentId == _tournamentId
-                       && (_selectedTeamId == null || x.TeamId == _selectedTeamId);
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+        await LoadForCurrentAsync();
+    }
+
+    private void OnTournamentChanged()
+    {
+        _ = InvokeAsync(async () =>
+        {
+            _selectedTeamId = null;
+            await LoadForCurrentAsync();
+        });
+    }
+
+    private async Task LoadForCurrentAsync()
+    {
+        var current = await TournamentState.GetCurrentAsync();
+        if (current is null)
+        {
+            return;
+        }
+        TournamentId = current.Id;
 
         await using var dbContext = await DbContextFactory.CreateDbContextAsync();
         _teams = await dbContext.Teams
             .AsNoTracking()
-            .Where(t => t.TournamentId == _tournamentId)
+            .Where(t => t.TournamentId == TournamentId)
             .OrderBy(t => t.Name)
             .ToListAsync();
 
         if (_dataGrid is not null)
         {
             await _dataGrid.ReloadAsync();
-            StateHasChanged();
         }
+        StateHasChanged();
     }
 
     private async Task OnTeamFilterChanged(int? teamId)
@@ -109,6 +135,11 @@
             _selectedTeamId = null;
             await _dataGrid.ReloadAsync();
         }
+    }
+
+    public void Dispose()
+    {
+        TournamentState.Changed -= OnTournamentChanged;
     }
 
 }

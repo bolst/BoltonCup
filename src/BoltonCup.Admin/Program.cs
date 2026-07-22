@@ -1,10 +1,12 @@
 using BoltonCup.Admin.Components;
 using BoltonCup.Admin.Imaging;
+using BoltonCup.Admin.Services;
 using BoltonCup.Common;
 using BoltonCup.Common.Imaging;
 using BoltonCup.Infrastructure;
 using BoltonCup.Infrastructure.Data;
 using BoltonCup.Sdk;
+using BoltonCup.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.DataProtection;
@@ -26,12 +28,16 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
+builder.Services.AddBoltonCupSessionStorage();
 builder.AddBoltonCupInfrastructure();
 
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<IRosterImageRenderer, RosterImageRenderer>();
-builder.Services.AddScoped<IImageTemplate, TeamRosterTemplate>();
-builder.Services.AddScoped<ITeamRosterImageGenerator, TeamRosterImageGenerator>();
+builder.Services
+    .AddSingleton<IRosterImageRenderer, RosterImageRenderer>()
+    .AddScoped<IImageTemplate, TeamRosterTemplate>()
+    .AddScoped<ITeamRosterImageGenerator, TeamRosterImageGenerator>();
+builder.Services
+    .AddScoped<TournamentStateService>();
 
 var configSection = builder.Configuration.GetSection(BoltonCupConfiguration.SectionName);
 var bcConfig = configSection.Get<BoltonCupConfiguration>() 

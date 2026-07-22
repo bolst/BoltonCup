@@ -1,11 +1,14 @@
 @page "/games/schedules"
+@using BoltonCup.Admin.Services
 @inject IDialogService DialogService
+@inject TournamentStateService TournamentState
 
 <EntityDataGrid
     T="Game"
     @ref="@_dataGrid"
     NewItemFunc="NewItemFunc"
     Include="x => x.Include(p => p.Goals).Include(p => p.Penalties).Include(p => p.Referees)"
+    TournamentFilter="id => x => x.TournamentId == id"
     Comparer="_comparer">
     <Columns>
         <ForeignColumn Title="Home" Property="x => x.HomeTeam" PropertySetter="(game, team) => game.HomeTeam = team" 
@@ -62,9 +65,15 @@
     
     private async Task<Game?> NewItemFunc()
     {
+        var current = await TournamentState.GetCurrentAsync();
+        if (current is null)
+        {
+            return null;
+        }
+
         return new Game
         {
-            TournamentId = 1,
+            TournamentId = current.Id,
             GameTime = DateTime.Now,
         };
     }

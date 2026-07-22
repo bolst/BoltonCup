@@ -1,7 +1,10 @@
-@page "/tournaments/{TournamentId:int}/budget"
+@page "/budget"
 @using System.Linq.Expressions
 @using BoltonCup.Infrastructure
+@using BoltonCup.Admin.Services
 @inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject TournamentStateService TournamentState
+@implements IDisposable
 
 <MudGrid Class="pa-1" Spacing="1">
     <MudItem xs="6" md="3">
@@ -22,6 +25,7 @@
     SearchBy="x => x.Title"
     Height="calc(100vh - 264px - var(--mud-appbar-height))"
     Filter="@_filter"
+    TournamentFilter="id => x => x.TournamentId == id"
     ColumnResizeMode="ResizeMode.Column"
     NewItemFunc="@NewItemFunc"
     OnServerReload="@OnServerReload"
@@ -60,39 +64,64 @@
 
 @code {
 
-    [Parameter]
-    public int TournamentId { get; set; }
-
-    private int? _tournamentId;
+    // Resolved from the app-wide current tournament.
+    private int TournamentId;
     private Tournament? _tournament;
 
     private decimal _actualPlayerIncome = 0;
     private decimal _projectedPlayerIncome = 0;
-    
+
     private decimal? _incomeTotal;
     private decimal? _expensesTotal;
 
     private decimal ActualIncome => _actualPlayerIncome + _incomeTotal ?? 0;
     private decimal ProjectedIncome => _projectedPlayerIncome + _incomeTotal ?? 0;
-    
+
     private EntityDataGrid<TournamentBudgetItem>? _dataGrid;
     private static readonly TournamentBudgetItemComparer _comparer = new();
 
     private bool _showIncome;
     private Expression<Func<TournamentBudgetItem, bool>>? _filter;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnInitialized()
     {
-        if (_tournamentId == TournamentId)
+        // Tournament scoping is applied by the grid's TournamentFilter; this filter only
+        // toggles income vs expense. EF re-reads the captured field on each query.
+        _filter = x => x.BudgetItemType == (_showIncome ? BudgetItemType.Income : BudgetItemType.Expense);
+        TournamentState.Changed += OnTournamentChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
             return;
-        _tournamentId = TournamentId;
-        
+        }
+        await LoadForCurrentAsync();
+    }
+
+    private void OnTournamentChanged()
+    {
+        _ = InvokeAsync(LoadForCurrentAsync);
+    }
+
+    private async Task LoadForCurrentAsync()
+    {
+        var current = await TournamentState.GetCurrentAsync();
+        if (current is null)
+        {
+            return;
+        }
+        TournamentId = current.Id;
+        _tournament = null;
+
         await LoadPlayerIncomeDataAsync();
 
-        _filter = x => x.TournamentId == TournamentId 
-                       && x.BudgetItemType ==  (_showIncome ? BudgetItemType.Income : BudgetItemType.Expense);
         if (_dataGrid is not null)
+        {
             await _dataGrid.ReloadAsync();
+        }
+        StateHasChanged();
     }
 
     private async Task LoadPlayerIncomeDataAsync()
@@ -143,6 +172,11 @@
         if (dbContext is not BoltonCupDbContext bcDbContext)
             return;
 
+        if (await TournamentState.GetCurrentAsync() is { } current)
+        {
+            TournamentId = current.Id;
+        }
+
         _expensesTotal = await bcDbContext.TournamentBudgetItems
             .Where(t => t.TournamentId == TournamentId)
             .Where(t => t.BudgetItemType == BudgetItemType.Expense)
@@ -151,5 +185,10 @@
             .Where(t => t.TournamentId == TournamentId)
             .Where(t => t.BudgetItemType == BudgetItemType.Income)
             .SumAsync(t => t.Amount);
+    }
+
+    public void Dispose()
+    {
+        TournamentState.Changed -= OnTournamentChanged;
     }
 }

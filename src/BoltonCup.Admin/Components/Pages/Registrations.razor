@@ -9,6 +9,7 @@
     T="TournamentRegistration"
     SelectedItemsChanged="@SelectedItemsChanged"
     Filter="@_filter"
+    TournamentFilter="id => x => x.TournamentId == id"
     Comparer="@_comparer"
     SearchBy="@(x => x.Account.FirstName + " " + x.Account.LastName)"
     Include="@_include"

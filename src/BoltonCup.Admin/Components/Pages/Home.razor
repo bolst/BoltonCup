@@ -1,96 +1,127 @@
 @page "/"
-@inject BoltonCupDbContext DbContext
+@using BoltonCup.Admin.Services
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject ITournamentService TournamentService
+@inject TournamentStateService TournamentState
+@implements IDisposable
 
-<MudContainer MaxWidth="MaxWidth.False">
-    
-    <div class="mud-width-full d-flex flex-column align-end">
-        <MudIconButton OnClick="@LoadDataAsync" Icon="@Icons.Material.Rounded.Refresh" Disabled="@_loading" />
-    </div>
+<MudTabs Rounded MinimumTabWidth="20px" Class="mud-width-full">
 
-    @if (_loading)
-    {
-        <MudGrid>
-            <MudItem xs="6" md="3">
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
-            </MudItem>
-        </MudGrid>
-    }
-    else
-    {
-        <MudGrid>
-            <MudItem xs="6" md="3">
-                <DataCard Title="Registrations completed">
-                    @_completeRegistrationCount
-                </DataCard>
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <DataCard Title="Incomplete registrations">
-                    @_incompleteRegistrationCount
-                </DataCard>
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <DataCard Title="Skaters">
-                    @_skaterCount / @_tournament?.SkaterLimit
-                </DataCard>
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <DataCard Title="Goalies">
-                    @_goalieCount / @_tournament?.GoalieLimit
-                </DataCard>
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <DataCard Title="Forwards">
-                    @_forwardCount
-                </DataCard>
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <DataCard Title="Defensemen">
-                    @_defenseCount
-                </DataCard>
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <DataCard Title="Forwards can play defense">
-                    @_forwardCanPlayDefenseCount / @_forwardCount
-                </DataCard>
-            </MudItem>
-            <MudItem xs="6" md="3">
-                <DataCard Title="Defensemen can play forward">
-                    @_defenseCanPlayForwardCount / @_defenseCount
-                </DataCard>
-            </MudItem>
-        </MudGrid>
-    }
-    
-</MudContainer>
+    <MudTabPanel Icon="@Icons.Material.Rounded.Settings" Text="Configuration">
+        <EntityDataGrid
+            @ref="_configGrid"
+            T="Tournament"
+            NewItemFunc="NewTournamentFunc"
+            SearchBy="x => x.Name"
+            TournamentFilter="id => x => x.Id == id"
+            Comparer="_tournamentComparer">
+            <Columns>
+                <PropertyColumn Title="Tournament" Property="x => x.Name" />
+                <ImageColumn T="Tournament" Title="Logo" Property="x => x.Logo" OnImageUploaded="UpdateTournamentLogo" />
+                <ImageColumn T="Tournament" Title="Background" Property="x => x.BackgroundImage" OnImageUploaded="UpdateTournamentBackgroundImage" />
+                <TemplateColumn Title="Info">
+                    <EditTemplate>
+                        <TournamentInfoEditButton TournamentId="@context.Item.Id" />
+                    </EditTemplate>
+                </TemplateColumn>
+                <DatePickerColumn Title="Start" Property="x => x.StartDate" InitialDirection="SortDirection.Descending" />
+                <DatePickerColumn Title="End" Property="x => x.EndDate" />
+                <BoolColumn Title="Active?" Property="x => x.IsActive" />
+                <BoolColumn Title="Registration Open?" Property="x => x.IsRegistrationOpen" />
+                <BoolColumn Title="Payment Open" Property="x => x.IsPaymentOpen" />
+                <BoolColumn Title="Player Info Open?" Property="x => x.IsPlayerInfoOpen" />
+                <BoolColumn Title="Trading Open?" Property="x => x.IsTradingOpen" />
+                <PropertyColumn Title="Skater Limit" Property="x => x.SkaterLimit" />
+                <PropertyColumn Title="Goalie Limit" Property="x => x.GoalieLimit" />
+                <PropertyColumn Title="Skater Registration Fee" Property="x => x.SkaterRegistrationFee" />
+                <PropertyColumn Title="Goalie Registration Fee" Property="x => x.GoalieRegistrationFee" />
+                <ForeignColumn Title="Winner" Property="x => x.WinningTeam"
+                               EqualityComparer="new TeamComparer()!" ImageSrcFunc="t => t.Logo" />
+                <ForeignColumn Title="Gallery" Property="x => x.Gallery" PropertySetter="(t, g) => { t.Gallery = g; t.GalleryId = g?.Id; }"
+                               EqualityComparer="new GalleryComparer()!" Required="false"/>
+                <BoolColumn Title="Stats Featured?" Property="x => x.IsStatsFeatured" />
+                <PropertyColumn Title="Featured Stats Label" Property="x => x.FeaturedStatsLabel" Required />
+            </Columns>
+        </EntityDataGrid>
+    </MudTabPanel>
+
+    <MudTabPanel Icon="@Icons.Material.Rounded.Dashboard" Text="Dashboard">
+        <MudContainer MaxWidth="MaxWidth.False">
+
+            <div class="mud-width-full d-flex flex-column align-end">
+                <MudIconButton OnClick="@LoadDashboardAsync" Icon="@Icons.Material.Rounded.Refresh" Disabled="@_loading" />
+            </div>
+
+            @if (_loading)
+            {
+                <MudGrid>
+                    @for (var i = 0; i < 8; i++)
+                    {
+                        <MudItem xs="6" md="3">
+                            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="130px" />
+                        </MudItem>
+                    }
+                </MudGrid>
+            }
+            else
+            {
+                <MudGrid>
+                    <MudItem xs="6" md="3">
+                        <DataCard Title="Registrations completed">
+                            @_completeRegistrationCount
+                        </DataCard>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <DataCard Title="Incomplete registrations">
+                            @_incompleteRegistrationCount
+                        </DataCard>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <DataCard Title="Skaters">
+                            @_skaterCount / @_tournament?.SkaterLimit
+                        </DataCard>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <DataCard Title="Goalies">
+                            @_goalieCount / @_tournament?.GoalieLimit
+                        </DataCard>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <DataCard Title="Forwards">
+                            @_forwardCount
+                        </DataCard>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <DataCard Title="Defensemen">
+                            @_defenseCount
+                        </DataCard>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <DataCard Title="Forwards can play defense">
+                            @_forwardCanPlayDefenseCount / @_forwardCount
+                        </DataCard>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <DataCard Title="Defensemen can play forward">
+                            @_defenseCanPlayForwardCount / @_defenseCount
+                        </DataCard>
+                    </MudItem>
+                </MudGrid>
+            }
+
+        </MudContainer>
+    </MudTabPanel>
+
+</MudTabs>
 
 
 @code {
 
-    private const int _tournamentId = 3;
+    private EntityDataGrid<Tournament>? _configGrid;
+    private readonly TournamentComparer _tournamentComparer = new();
 
     private Tournament? _tournament;
-    
+
     private bool _loading = true;
 
     private int _completeRegistrationCount;
@@ -101,28 +132,77 @@
     private int _defenseCount;
     private int _forwardCanPlayDefenseCount;
     private int _defenseCanPlayForwardCount;
-    
-    protected override Task OnParametersSetAsync()
+
+    protected override void OnInitialized()
     {
-        return _tournament is null
-            ? LoadDataAsync()
-            : Task.CompletedTask;
+        TournamentState.Changed += OnTournamentChanged;
     }
 
-    private async Task LoadDataAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _loading = true;
+        if (!firstRender)
+        {
+            return;
+        }
+        await LoadDashboardAsync();
+    }
 
-        var delay = Task.Delay(1000);
-        
-        _tournament = await DbContext.Tournaments
+    private void OnTournamentChanged()
+    {
+        _ = InvokeAsync(LoadDashboardAsync);
+    }
+
+    private async Task<Tournament?> NewTournamentFunc()
+    {
+        return new Tournament
+        {
+            Name = "New Tournament"
+        };
+    }
+
+    private async Task UpdateTournamentLogo(ImageUploadResult<Tournament> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey))
+        {
+            return;
+        }
+        await TournamentService.UpdateLogoAsync(result.Item.Id, result.NewKey);
+    }
+
+    private async Task UpdateTournamentBackgroundImage(ImageUploadResult<Tournament> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey))
+        {
+            return;
+        }
+        await TournamentService.UpdateBackgroundImageAsync(result.Item.Id, result.NewKey);
+    }
+
+    private async Task LoadDashboardAsync()
+    {
+        var current = await TournamentState.GetCurrentAsync();
+        if (current is null)
+        {
+            return;
+        }
+
+        _loading = true;
+        StateHasChanged();
+
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        _tournament = await dbContext.Tournaments
             .AsNoTracking()
             .Include(t => t.Registrations)
             .Include(t => t.Players)
-            .SingleAsync(t => t.Id == _tournamentId);
+            .SingleOrDefaultAsync(t => t.Id == current.Id);
 
-        await delay;
-        
+        if (_tournament is null)
+        {
+            _loading = false;
+            StateHasChanged();
+            return;
+        }
+
         _completeRegistrationCount = _tournament.Registrations.Count(x => x.IsComplete);
         _incompleteRegistrationCount = _tournament.Registrations.Count - _completeRegistrationCount;
         _goalieCount = _tournament.Players.Count(p => p.Position == Core.Values.Position.Goalie);
@@ -134,8 +214,13 @@
         _defenseCount = defense.Count;
         _forwardCanPlayDefenseCount = forwards.Count(f => f.CanPlayEitherPosition);
         _defenseCanPlayForwardCount = defense.Count(d => d.CanPlayEitherPosition);
-        
+
         _loading = false;
-        await InvokeAsync(StateHasChanged);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        TournamentState.Changed -= OnTournamentChanged;
     }
 }

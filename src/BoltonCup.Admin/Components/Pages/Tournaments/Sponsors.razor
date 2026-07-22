@@ -1,14 +1,17 @@
-@page "/tournaments/{TournamentId:int}/sponsors"
+@page "/sponsors"
 @using System.Linq.Expressions
+@using BoltonCup.Admin.Services
 @inject IStorageService StorageService
 @inject BoltonCupDbContext DbContext
 @inject IAssetKeyGenerator AssetKeyGenerator
+@inject TournamentStateService TournamentState
+@implements IDisposable
 
 <EntityDataGrid
     @ref="_dataGrid"
     T="TournamentSponsor"
     SearchBy="x => x.Name"
-    Filter="@_filter"
+    TournamentFilter="id => x => x.TournamentId == id"
     NewItemFunc="@(() => Task.FromResult(new TournamentSponsor { TournamentId = TournamentId })!)"
     Comparer="_comparer">
     <ActionMenu>
@@ -32,32 +35,53 @@
 
 @code {
 
-    [Parameter]
-    public int TournamentId { get; set; }
-
-    private int? _tournamentId;
+    // Resolved from the app-wide current tournament.
+    private int TournamentId;
 
     private EntityDataGrid<TournamentSponsor>? _dataGrid;
     private static readonly TournamentSponsorComparer _comparer = new();
 
-    private Expression<Func<TournamentSponsor, bool>>? _filter;
-
     private List<Tournament> _otherTournaments = [];
-    
-    protected override async Task OnParametersSetAsync()
-    {
-        if (_tournamentId == TournamentId)
-            return;
-        _tournamentId = TournamentId;
 
-        _filter = x => x.TournamentId == TournamentId;
-        await (_dataGrid?.ReloadAsync() ?? Task.CompletedTask);
-        
+    protected override void OnInitialized()
+    {
+        TournamentState.Changed += OnTournamentChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+        await LoadForCurrentAsync();
+    }
+
+    private void OnTournamentChanged()
+    {
+        _ = InvokeAsync(LoadForCurrentAsync);
+    }
+
+    private async Task LoadForCurrentAsync()
+    {
+        var current = await TournamentState.GetCurrentAsync();
+        if (current is null)
+        {
+            return;
+        }
+        TournamentId = current.Id;
+
+        if (_dataGrid is not null)
+        {
+            await _dataGrid.ReloadAsync();
+        }
+
         _otherTournaments = await DbContext.Tournaments
             .Where(t => t.Id != TournamentId)
             .Include(t => t.Sponsors)
             .OrderBy(t => t.Name)
             .ToListAsync();
+        StateHasChanged();
     }
 
     private void CloneSponsors(Tournament tournament)
@@ -87,6 +111,11 @@
             result.NewKey,
             result.Item.Id.ToString("N")
         );
+    }
+
+    public void Dispose()
+    {
+        TournamentState.Changed -= OnTournamentChanged;
     }
 
 }

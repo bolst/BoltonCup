@@ -5,6 +5,7 @@
     T="GameHighlight"
     NewItemFunc="NewItemFunc"
     Include="@_includes"
+    TournamentFilter="id => x => x.Game.TournamentId == id"
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Video ID" Property="x => x.VideoId" Required />
