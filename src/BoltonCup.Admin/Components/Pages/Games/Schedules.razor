@@ -24,8 +24,6 @@
         <PropertyColumn Title="Away placeholder" Property="x => x.AwayTeamPlaceholder"/>
         <PropertyColumn Title="Venue" Property="x => x.Venue"/>
         <PropertyColumn Title="Rink" Property="x => x.Rink"/>
-        <ForeignColumn Title="Tournament" Property="x => x.Tournament" PropertySetter="(game, tournament) => game.Tournament = tournament!"
-                       EqualityComparer="new TournamentComparer()!" ImageSrcFunc="t => t.Logo" />
         <TemplateColumn Title="Officials" Sortable="false" Editable="false">
             <CellTemplate>
                 <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Info"

@@ -36,14 +36,6 @@
                 }
             </CellTemplate>
         </PropertyColumn>
-        <TemplateColumn Title="Tournament" Editable="false" Required>
-            <CellTemplate>
-                @if (context.Item.Game is { } game)
-                {
-                    <span>@game.Tournament.Name</span>
-                }
-            </CellTemplate>
-        </TemplateColumn>
     </Columns>
 </EntityDataGrid>
 
