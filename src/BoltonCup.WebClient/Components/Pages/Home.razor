@@ -3,7 +3,6 @@
 @using MudBlazor.Utilities
 @attribute [Sitemap(SitemapChangeFrequency.Monthly, Priority = 0.8f, LastModified = "2026-02-01")]
 @inject BcStateService BcState
-@inject Sdk.IBoltonCupApi BoltonCupApi
 
 <PageTitle>Bolton Cup</PageTitle>
 
@@ -94,11 +93,10 @@
 
 @code {
 
-    private static Sdk.SystemContextDto? _context;
+    private Sdk.SystemContextDto? _context;
 
-    private static bool _started;
-    private static Sdk.TournamentStandingsDto? _standings;
-    private static List<Sdk.GameDto> _completedGames = [];
+    private bool _started;
+    private IReadOnlyList<Sdk.GameDto> _completedGames = [];
 
     private string? BkgImageUrl => _context?.ActiveTournament?.BackgroundImage;
 
@@ -111,8 +109,7 @@
     {
         _context = await BcState.Context;
         // If the tournament has already started, switch to standings/results
-        if (_context.ActiveTournament?.StartDate is { } startDate
-            && DateTime.SpecifyKind(startDate, DateTimeKind.Utc) <= DateTime.UtcNow)
+        if (await BcState.IsActiveTournamentStartedAsync())
         {
             await EnterStartedModeAsync();
         }
@@ -122,18 +119,12 @@
 
     private async Task EnterStartedModeAsync()
     {
-        if (_started || _context?.ActiveTournament is not { } tournament)
+        if (_started || _context?.ActiveTournament is null)
         {
             return;
         }
 
         _started = true;
-        _standings = await BoltonCupApi.GetStandingsAsync(tournament.Id);
-        var games = await BoltonCupApi.GetGamesAsync(tournamentId: tournament.Id, size: 50);
-        _completedGames = games.Items
-            .Where(g => g.GameState == Sdk.GameState.Completed)
-            .OrderByDescending(g => g.GameTime)
-            .ToList();
+        _completedGames = await BcState.GetCompletedGamesAsync();
     }
-
 }
