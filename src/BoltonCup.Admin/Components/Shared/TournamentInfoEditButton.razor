@@ -2,7 +2,14 @@
 @inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
 @inject ISnackbar Snackbar
 
-<MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="ShowDialog" Size="Size.Small" />
+@if (ActivatorContent is not null)
+{
+    @ActivatorContent(_activatorContext)
+}
+else
+{
+    <MudIconButton Icon="@Icons.Material.Rounded.Info" Color="Color.Info" OnClick="@ShowDialog" Size="Size.Small" />
+}
 
 <MudDialog @bind-Visible="_dialogVisible" Options="_dialogOptions">
     <TitleContent>
@@ -14,7 +21,7 @@
         {
             <div class="mud-width-full d-flex flex-column align-center gap-2">
                 <MudText>No info guide exists!</MudText>
-                <MudButton OnClick="CreateInfoGuide" Variant="Variant.Filled" EndIcon="@Icons.Material.Rounded.Add" Color="Color.Primary">Create New</MudButton>
+                <MudButton OnClick="@CreateInfoGuide" Variant="Variant.Filled" EndIcon="@Icons.Material.Rounded.Add" Color="Color.Primary">Create New</MudButton>
                 <MudMenu Label="Copy existing" Variant="Variant.Filled" EndIcon="@Icons.Material.Rounded.KeyboardArrowDown" Color="Color.Primary">
                     @foreach(var copyInfoGuide in _copyInfoGuides ?? [])
                     {
@@ -63,6 +70,30 @@
 
     [Parameter]
     public required int TournamentId { get; set; }
+
+    /// <summary>
+    /// Optional custom activator (e.g. a labelled button). The provided <see cref="ActivatorContext"/>
+    /// exposes the <c>OnClick</c> handler to wire onto your own control. When null, a small info icon
+    /// button is rendered instead.
+    /// </summary>
+    [Parameter]
+    public RenderFragment<ActivatorContext>? ActivatorContent { get; set; }
+
+    /// <summary>Passed to <see cref="ActivatorContent"/> so a custom activator can open the dialog.</summary>
+    public sealed class ActivatorContext
+    {
+        public required EventCallback<MouseEventArgs> OnClick { get; init; }
+    }
+
+    private ActivatorContext _activatorContext = null!;
+
+    protected override void OnInitialized()
+    {
+        _activatorContext = new ActivatorContext
+        {
+            OnClick = EventCallback.Factory.Create<MouseEventArgs>(this, ShowDialog)
+        };
+    }
 
     private Tournament? _tournament;
     private InfoGuide? _infoGuide;

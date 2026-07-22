@@ -3,46 +3,224 @@
 @inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
 @inject ITournamentService TournamentService
 @inject TournamentStateService TournamentState
+@inject ISnackbar Snackbar
 @implements IDisposable
 
 <MudTabs Rounded MinimumTabWidth="20px" Class="mud-width-full">
 
     <MudTabPanel Icon="@Icons.Material.Rounded.Settings" Text="Configuration">
-        <EntityDataGrid
-            @ref="_configGrid"
-            T="Tournament"
-            NewItemFunc="NewTournamentFunc"
-            SearchBy="x => x.Name"
-            TournamentFilter="id => x => x.Id == id"
-            Comparer="_tournamentComparer">
-            <Columns>
-                <PropertyColumn Title="Tournament" Property="x => x.Name" />
-                <ImageColumn T="Tournament" Title="Logo" Property="x => x.Logo" OnImageUploaded="UpdateTournamentLogo" />
-                <ImageColumn T="Tournament" Title="Background" Property="x => x.BackgroundImage" OnImageUploaded="UpdateTournamentBackgroundImage" />
-                <TemplateColumn Title="Info">
-                    <EditTemplate>
-                        <TournamentInfoEditButton TournamentId="@context.Item.Id" />
-                    </EditTemplate>
-                </TemplateColumn>
-                <DatePickerColumn Title="Start" Property="x => x.StartDate" InitialDirection="SortDirection.Descending" />
-                <DatePickerColumn Title="End" Property="x => x.EndDate" />
-                <BoolColumn Title="Active?" Property="x => x.IsActive" />
-                <BoolColumn Title="Registration Open?" Property="x => x.IsRegistrationOpen" />
-                <BoolColumn Title="Payment Open" Property="x => x.IsPaymentOpen" />
-                <BoolColumn Title="Player Info Open?" Property="x => x.IsPlayerInfoOpen" />
-                <BoolColumn Title="Trading Open?" Property="x => x.IsTradingOpen" />
-                <PropertyColumn Title="Skater Limit" Property="x => x.SkaterLimit" />
-                <PropertyColumn Title="Goalie Limit" Property="x => x.GoalieLimit" />
-                <PropertyColumn Title="Skater Registration Fee" Property="x => x.SkaterRegistrationFee" />
-                <PropertyColumn Title="Goalie Registration Fee" Property="x => x.GoalieRegistrationFee" />
-                <ForeignColumn Title="Winner" Property="x => x.WinningTeam"
-                               EqualityComparer="new TeamComparer()!" ImageSrcFunc="t => t.Logo" />
-                <ForeignColumn Title="Gallery" Property="x => x.Gallery" PropertySetter="(t, g) => { t.Gallery = g; t.GalleryId = g?.Id; }"
-                               EqualityComparer="new GalleryComparer()!" Required="false"/>
-                <BoolColumn Title="Stats Featured?" Property="x => x.IsStatsFeatured" />
-                <PropertyColumn Title="Featured Stats Label" Property="x => x.FeaturedStatsLabel" Required />
-            </Columns>
-        </EntityDataGrid>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="py-6">
+            @if (_config is null)
+            {
+                <MudStack Spacing="4">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="140px" />
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="220px" />
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="180px" />
+                </MudStack>
+            }
+            else
+            {
+                <MudStack Spacing="6">
+
+                    @* ---------- Hero header ---------- *@
+                    <MudPaper Elevation="0" Class="rounded-lg overflow-hidden border mud-border-lines-default">
+                        <div class="pa-6">
+                            <div class="d-flex align-center flex-wrap" style="gap: 24px;">
+                                <div class="rounded-lg border mud-border-lines-default">
+                                    <BoltonCupImage Src="@_config.Logo" SrcChanged="@OnLogoChanged" Height="88" Width="88" Editable="true" ObjectFit="ObjectFit.Contain" />
+                                </div>
+                                <div class="flex-grow-1" style="min-width: 220px;">
+                                    <MudText Typo="Typo.overline" Style="opacity:.7;">Tournament</MudText>
+                                    <MudText Typo="Typo.h4" Class="mb-1" Style="font-weight:700; line-height:1.1;">@DisplayName</MudText>
+                                    <div class="d-flex align-center flex-wrap mt-2" style="gap: 8px;">
+                                        <MudChip T="string" Size="Size.Small" Icon="@Icons.Material.Rounded.CalendarMonth"
+                                                 Color="Color.Default" Variant="Variant.Text">@DateRange</MudChip>
+                                        @if (_config.IsActive)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Icon="@Icons.Material.Rounded.CheckCircle"
+                                                     Color="Color.Success" Variant="Variant.Filled">Active</MudChip>
+                                        }
+                                        else
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Icon="@Icons.Material.Rounded.DoNotDisturbOn"
+                                                     Color="Color.Default" Variant="Variant.Outlined">Inactive</MudChip>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="d-flex align-center" style="gap: 8px;">
+                                    <TournamentInfoEditButton TournamentId="@_config.Id">
+                                        <ActivatorContent Context="info">
+                                            <MudButton Variant="Variant.Outlined" Color="Color.Info" Size="Size.Large"
+                                                       StartIcon="@Icons.Material.Rounded.Info" OnClick="@info.OnClick">Edit info guide</MudButton>
+                                        </ActivatorContent>
+                                    </TournamentInfoEditButton>
+                                    <MudButton OnClick="@SaveConfigAsync" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large"
+                                               StartIcon="@Icons.Material.Rounded.Save" Disabled="@_saving">
+                                        @(_saving ? "Saving…" : "Save changes")
+                                    </MudButton>
+                                </div>
+                            </div>
+                        </div>
+                    </MudPaper>
+
+                    @* ---------- General ---------- *@
+                    <MudPaper Elevation="0" Class="pa-6 rounded-lg border mud-border-lines-default">
+                        <div class="d-flex align-center mb-4" style="gap: 10px;">
+                            <MudIcon Icon="@Icons.Material.Rounded.Edit" Color="Color.Primary" />
+                            <MudText Typo="Typo.h6">General</MudText>
+                        </div>
+                        <MudGrid Spacing="4">
+                            <MudItem xs="12" md="8">
+                                <MudTextField @bind-Value="_config.Name" Label="Tournament name" Variant="Variant.Outlined"
+                                              Immediate Required RequiredError="Name is required" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudDatePicker @bind-Date="_config.StartDate" Label="Start date" Variant="Variant.Outlined"
+                                               Editable PickerVariant="PickerVariant.Dialog" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudDatePicker @bind-Date="_config.EndDate" Label="End date" Variant="Variant.Outlined"
+                                               Editable PickerVariant="PickerVariant.Dialog" />
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.caption" Class="mb-2" Style="opacity:.7;">Background</MudText>
+                                <div class="pa-2 rounded-lg border border-dashed mud-border-lines-default" style="width: 220px;">
+                                    <BoltonCupImage Src="@_config.BackgroundImage" SrcChanged="OnBackgroundChanged" Height="96" Width="200" Editable="true" ObjectFit="ObjectFit.Cover" />
+                                </div>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+
+                    @* ---------- Status toggles ---------- *@
+                    <MudPaper Elevation="0" Class="pa-6 rounded-lg border mud-border-lines-default">
+                        <div class="d-flex align-center mb-4" style="gap: 10px;">
+                            <MudIcon Icon="@Icons.Material.Rounded.ToggleOn" Color="Color.Primary" />
+                            <MudText Typo="Typo.h6">Status &amp; access</MudText>
+                        </div>
+                        <MudGrid Spacing="3">
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudPaper Elevation="0" Class="pa-3 rounded d-flex align-center justify-space-between config-toggle-tile">
+                                    <div>
+                                        <MudText Typo="Typo.body2">Active</MudText>
+                                        <MudText Typo="Typo.caption" Style="opacity:.6;">Show as the live tournament</MudText>
+                                    </div>
+                                    <MudSwitch @bind-Value="_config.IsActive" Color="Color.Success" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudPaper Elevation="0" Class="pa-3 rounded d-flex align-center justify-space-between config-toggle-tile">
+                                    <div>
+                                        <MudText Typo="Typo.body2">Registration open</MudText>
+                                        <MudText Typo="Typo.caption" Style="opacity:.6;">Accept new sign-ups</MudText>
+                                    </div>
+                                    <MudSwitch @bind-Value="_config.IsRegistrationOpen" Color="Color.Primary" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudPaper Elevation="0" Class="pa-3 rounded d-flex align-center justify-space-between config-toggle-tile">
+                                    <div>
+                                        <MudText Typo="Typo.body2">Payment open</MudText>
+                                        <MudText Typo="Typo.caption" Style="opacity:.6;">Allow registration payments</MudText>
+                                    </div>
+                                    <MudSwitch @bind-Value="_config.IsPaymentOpen" Color="Color.Primary" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudPaper Elevation="0" Class="pa-3 rounded d-flex align-center justify-space-between config-toggle-tile">
+                                    <div>
+                                        <MudText Typo="Typo.body2">Player info open</MudText>
+                                        <MudText Typo="Typo.caption" Style="opacity:.6;">Players can edit their info</MudText>
+                                    </div>
+                                    <MudSwitch @bind-Value="_config.IsPlayerInfoOpen" Color="Color.Primary" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudPaper Elevation="0" Class="pa-3 rounded d-flex align-center justify-space-between config-toggle-tile">
+                                    <div>
+                                        <MudText Typo="Typo.body2">Trading open</MudText>
+                                        <MudText Typo="Typo.caption" Style="opacity:.6;">GMs can trade players</MudText>
+                                    </div>
+                                    <MudSwitch @bind-Value="_config.IsTradingOpen" Color="Color.Primary" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudPaper Elevation="0" Class="pa-3 rounded d-flex align-center justify-space-between config-toggle-tile">
+                                    <div>
+                                        <MudText Typo="Typo.body2">Stats featured</MudText>
+                                        <MudText Typo="Typo.caption" Style="opacity:.6;">Highlight on the stats page</MudText>
+                                    </div>
+                                    <MudSwitch @bind-Value="_config.IsStatsFeatured" Color="Color.Primary" />
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+
+                    @* ---------- Registration limits & fees ---------- *@
+                    <MudPaper Elevation="0" Class="pa-6 rounded-lg border mud-border-lines-default">
+                        <div class="d-flex align-center mb-4" style="gap: 10px;">
+                            <MudIcon Icon="@Icons.Material.Rounded.Payments" Color="Color.Primary" />
+                            <MudText Typo="Typo.h6">Roster limits &amp; fees</MudText>
+                        </div>
+                        <MudGrid Spacing="4">
+                            <MudItem xs="6" md="3">
+                                <MudNumericField @bind-Value="_config.SkaterLimit" Label="Skater limit" Variant="Variant.Outlined"
+                                                 Min="0" HideSpinButtons />
+                            </MudItem>
+                            <MudItem xs="6" md="3">
+                                <MudNumericField @bind-Value="_config.GoalieLimit" Label="Goalie limit" Variant="Variant.Outlined"
+                                                 Min="0" HideSpinButtons />
+                            </MudItem>
+                            <MudItem xs="6" md="3">
+                                <MudNumericField @bind-Value="_config.SkaterRegistrationFee" Label="Skater fee" Format="F2"
+                                                 Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentText="$" Min="0" HideSpinButtons />
+                            </MudItem>
+                            <MudItem xs="6" md="3">
+                                <MudNumericField @bind-Value="_config.GoalieRegistrationFee" Label="Goalie fee" Format="F2"
+                                                 Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentText="$" Min="0" HideSpinButtons />
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+
+                    @* ---------- Awards & presentation ---------- *@
+                    <MudPaper Elevation="0" Class="pa-6 rounded-lg border mud-border-lines-default">
+                        <div class="d-flex align-center mb-4" style="gap: 10px;">
+                            <MudIcon Icon="@Icons.Material.Rounded.EmojiEvents" Color="Color.Primary" />
+                            <MudText Typo="Typo.h6">Awards &amp; presentation</MudText>
+                        </div>
+                        <MudGrid Spacing="4">
+                            <MudItem xs="12" md="6">
+                                <MudSelect T="int?" @bind-Value="_config.WinningTeamId" Label="Winning team" Variant="Variant.Outlined"
+                                           Clearable Dense>
+                                    @foreach (var team in _teams)
+                                    {
+                                        <MudSelectItem T="int?" Value="@team.Id">
+                                            <div class="d-flex align-center" style="gap: 10px;">
+                                                <BoltonCupImage Src="@team.Logo" Height="22" Width="22" ObjectFit="ObjectFit.Contain" />
+                                                <span>@team.Name</span>
+                                            </div>
+                                        </MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudSelect T="int?" @bind-Value="_config.GalleryId" Label="Gallery" Variant="Variant.Outlined"
+                                           Clearable Dense AdornmentIcon="@Icons.Material.Rounded.PhotoLibrary" Adornment="Adornment.Start">
+                                    @foreach (var gallery in _galleries)
+                                    {
+                                        <MudSelectItem T="int?" Value="@gallery.Id">@gallery.ToString()</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudTextField @bind-Value="_config.FeaturedStatsLabel" Label="Featured stats label"
+                                              Variant="Variant.Outlined" Required RequiredError="Featured stats label is required" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+
+                </MudStack>
+            }
+        </MudContainer>
     </MudTabPanel>
 
     <MudTabPanel Icon="@Icons.Material.Rounded.Dashboard" Text="Dashboard">
@@ -114,14 +292,49 @@
 
 </MudTabs>
 
+<style>
+
+    .config-toggle-tile {
+        background: color-mix(in srgb, var(--mud-palette-surface) 80%, black 6%);
+        border: 1px solid var(--mud-palette-lines-default);
+        transition: border-color .15s ease;
+    }
+
+    .config-toggle-tile:hover {
+        border-color: color-mix(in srgb, var(--mud-palette-primary) 55%, transparent);
+    }
+</style>
+
 
 @code {
 
-    private EntityDataGrid<Tournament>? _configGrid;
-    private readonly TournamentComparer _tournamentComparer = new();
+    // Configuration form
+    private Tournament? _config;
+    private List<Team> _teams = [];
+    private List<Gallery> _galleries = [];
+    private bool _saving;
 
+    private string DisplayName => string.IsNullOrWhiteSpace(_config?.Name) ? "Untitled tournament" : _config!.Name;
+
+    private string TeamName(int? teamId) => _teams.FirstOrDefault(t => t.Id == teamId)?.Name ?? string.Empty;
+
+    private string DateRange
+    {
+        get
+        {
+            const string format = "MMM d, yyyy";
+            var start = _config?.StartDate?.ToString(format);
+            var end = _config?.EndDate?.ToString(format);
+            if (start is not null && end is not null)
+            {
+                return $"{start} – {end}";
+            }
+            return start ?? end ?? "Dates not set";
+        }
+    }
+
+    // Dashboard
     private Tournament? _tournament;
-
     private bool _loading = true;
 
     private int _completeRegistrationCount;
@@ -144,38 +357,114 @@
         {
             return;
         }
+        await LoadConfigAsync();
         await LoadDashboardAsync();
     }
 
     private void OnTournamentChanged()
     {
-        _ = InvokeAsync(LoadDashboardAsync);
-    }
-
-    private async Task<Tournament?> NewTournamentFunc()
-    {
-        return new Tournament
+        _ = InvokeAsync(async () =>
         {
-            Name = "New Tournament"
-        };
+            await LoadConfigAsync();
+            await LoadDashboardAsync();
+        });
     }
 
-    private async Task UpdateTournamentLogo(ImageUploadResult<Tournament> result)
+    private async Task LoadConfigAsync()
     {
-        if (string.IsNullOrEmpty(result.NewKey))
+        var current = await TournamentState.GetCurrentAsync();
+        if (current is null)
         {
             return;
         }
-        await TournamentService.UpdateLogoAsync(result.Item.Id, result.NewKey);
-    }
 
-    private async Task UpdateTournamentBackgroundImage(ImageUploadResult<Tournament> result)
-    {
-        if (string.IsNullOrEmpty(result.NewKey))
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        _config = await dbContext.Tournaments
+            .AsNoTracking()
+            .SingleOrDefaultAsync(t => t.Id == current.Id);
+
+        if (_config is null)
         {
             return;
         }
-        await TournamentService.UpdateBackgroundImageAsync(result.Item.Id, result.NewKey);
+
+        _teams = await dbContext.Teams
+            .AsNoTracking()
+            .Where(t => t.TournamentId == _config.Id)
+            .OrderBy(t => t.Name)
+            .ToListAsync();
+
+        _galleries = await dbContext.Galleries
+            .AsNoTracking()
+            .OrderBy(g => g.Title)
+            .ToListAsync();
+
+        StateHasChanged();
+    }
+
+    private async Task OnLogoChanged(string? newKey)
+    {
+        if (_config is null || string.IsNullOrEmpty(newKey))
+        {
+            return;
+        }
+        await TournamentService.UpdateLogoAsync(_config.Id, newKey);
+        _config.Logo = newKey;
+    }
+
+    private async Task OnBackgroundChanged(string? newKey)
+    {
+        if (_config is null || string.IsNullOrEmpty(newKey))
+        {
+            return;
+        }
+        await TournamentService.UpdateBackgroundImageAsync(_config.Id, newKey);
+        _config.BackgroundImage = newKey;
+    }
+
+    private async Task SaveConfigAsync()
+    {
+        if (_config is null || _saving)
+        {
+            return;
+        }
+
+        _saving = true;
+        try
+        {
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            var entity = await dbContext.Tournaments.SingleOrDefaultAsync(t => t.Id == _config.Id);
+            if (entity is null)
+            {
+                Snackbar.Add("Tournament no longer exists.", Severity.Error);
+                return;
+            }
+
+            // Logo / BackgroundImage are persisted separately via ITournamentService.
+            entity.Name = _config.Name;
+            entity.StartDate = _config.StartDate;
+            entity.EndDate = _config.EndDate;
+            entity.IsActive = _config.IsActive;
+            entity.IsRegistrationOpen = _config.IsRegistrationOpen;
+            entity.IsPaymentOpen = _config.IsPaymentOpen;
+            entity.IsPlayerInfoOpen = _config.IsPlayerInfoOpen;
+            entity.IsTradingOpen = _config.IsTradingOpen;
+            entity.IsStatsFeatured = _config.IsStatsFeatured;
+            entity.SkaterLimit = _config.SkaterLimit;
+            entity.GoalieLimit = _config.GoalieLimit;
+            entity.SkaterRegistrationFee = _config.SkaterRegistrationFee;
+            entity.GoalieRegistrationFee = _config.GoalieRegistrationFee;
+            entity.WinningTeamId = _config.WinningTeamId;
+            entity.GalleryId = _config.GalleryId;
+            entity.FeaturedStatsLabel = _config.FeaturedStatsLabel;
+
+            await dbContext.SaveChangesAsync();
+            Snackbar.Add("Tournament saved.", Severity.Success);
+        }
+        finally
+        {
+            _saving = false;
+        }
     }
 
     private async Task LoadDashboardAsync()
