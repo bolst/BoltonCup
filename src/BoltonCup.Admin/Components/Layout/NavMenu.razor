@@ -2,6 +2,12 @@
     <MudDrawerHeader>
         <BoltonCupLogo Height="48" />
     </MudDrawerHeader>
+    <MudHidden Breakpoint="Breakpoint.SmAndUp">
+        <div class="pa-2">
+            <TournamentStateSelect />
+        </div>
+        <MudDivider Class="mb-2" />
+    </MudHidden>
     <MudNavMenu Class="px-2" Margin="Margin.Normal" Rounded>
         <MudNavLink Href="/" Icon="@Icons.Material.Rounded.Home" Match="NavLinkMatch.All">Home</MudNavLink>
         <MudNavGroup Title="Tournament" Icon="@Icons.Material.Rounded.Lan" Expanded>

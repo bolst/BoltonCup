@@ -1,0 +1,122 @@
+@using BoltonCup.Admin.Services
+@inject TournamentStateService TournamentState
+
+<MudDialog ContentClass="pa-0">
+    <TitleContent>
+        <div class="d-flex align-center justify-space-between flex-wrap" style="gap: 12px;">
+            <MudText Typo="Typo.h6">Select a tournament</MudText>
+            @* TODO: wire up creating a new tournament. *@
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                       StartIcon="@Icons.Material.Rounded.Add" Disabled>
+                New tournament
+            </MudButton>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <div class="px-6 pb-3" style="min-width: 300px;">
+            <MudTextField @bind-Value="_search" Placeholder="Search tournaments" FullWidth
+                          Immediate Clearable Variant="Variant.Outlined" Margin="Margin.Dense"
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Rounded.Search" />
+        </div>
+
+        <MudTable T="Tournament" Items="_tournaments" Filter="Matches" Dense Hover
+                  Elevation="0" FixedHeader Height="420px" Breakpoint="Breakpoint.None"
+                  Class="mud-width-full" HeaderClass="gray lighten-2"
+                  RowStyleFunc="RowStyleFunc" Square>
+            <HeaderContent>
+                <MudTh Style="min-width: 8rem">Name</MudTh>
+                <MudTh Style="min-width: 8rem">Date</MudTh>
+                <MudTh>Active</MudTh>
+                <MudTh>ID</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">
+                    <div class="d-flex align-center gap-2">
+                        <BoltonCupImage Src="@context.Logo" Width="32" />
+                        <MudLink Color="Color.Info" Underline="Underline.Always" OnClick="@(() => Select(context))">@context.Name</MudLink>
+                    </div>
+                </MudTd>
+                <MudTd DataLabel="Date">@FormatDate(context)</MudTd>
+                <MudTd DataLabel="Active">
+                    @if (context.IsActive)
+                    {
+                        <MudIcon Icon="@Icons.Material.Rounded.Check" Color="Color.Success" Size="Size.Small" />
+                    }
+                </MudTd>
+                <MudTd DataLabel="ID">@context.Id</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance Dialog { get; set; } = null!;
+
+    private IReadOnlyList<Tournament> _tournaments = [];
+    private int? _currentId;
+    private string? _search;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currentId = (await TournamentState.GetCurrentAsync())?.Id;
+        // Keep the current tournament pinned to the top; the service list is already date-ordered.
+        _tournaments = (await TournamentState.GetTournamentsAsync())
+            .OrderByDescending(t => t.Id == _currentId)
+            .ToList();
+    }
+
+    private bool Matches(Tournament tournament)
+    {
+        if (string.IsNullOrWhiteSpace(_search))
+            return true;
+        return tournament.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)
+               || tournament.Id.ToString().Contains(_search, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string RowStyleFunc(Tournament tournament, int index)
+        => tournament.Id == _currentId
+            ? "background-color: var(--mud-palette-primary-hover);"
+            : string.Empty;
+
+    private void Select(Tournament tournament) => Dialog.Close(DialogResult.Ok(tournament));
+
+    private void Cancel() => Dialog.Cancel();
+
+    /// <summary>Formats a tournament's dates, e.g. "Jul. 10-12/26".</summary>
+    private static string FormatDate(Tournament tournament)
+    {
+        var start = tournament.StartDate;
+        var end = tournament.EndDate;
+
+        if (start is null && end is null)
+        {
+            return "—";
+        }
+        if (start is null)
+        {
+            return One(end!.Value);
+        }
+        if (end is null)
+        {
+            return One(start.Value);
+        }
+
+        var s = start.Value;
+        var e = end.Value;
+
+        if (s.Year == e.Year && s.Month == e.Month)
+        {
+            return $"{s:MMM}.{s.Day}-{e.Day}, {s:yyyy}";
+        }
+        if (s.Year == e.Year)
+        {
+            return $"{s:MMM}.{s.Day}-{e:MMM}. {e.Day}, {s:yyyy}";
+        }
+        return $"{One(s)}-{One(e)}";
+
+        static string One(DateTime d) => $"{d:MMM}. {d.Day}, {d:yyyy}";
+    }
+}

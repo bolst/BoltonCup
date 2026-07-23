@@ -1,22 +1,25 @@
 @using BoltonCup.Admin.Services
 @inject TournamentStateService TournamentState
+@inject IDialogService DialogService
 @implements IDisposable
 
-<div style="max-width: 200px">
-    <MudSelect
-        T="Tournament" Value="@_current" ValueChanged="@OnTournamentChanged"
-        Variant="Variant.Text" Margin="Margin.Dense" ToStringFunc="x => x?.Name" Dense>
-        @foreach (var tournament in _tournaments)
+<MudChip T="string" Variant="Variant.Outlined" OnClick="@OpenDialogAsync">
+    <div class="d-flex align-center" style="gap: 8px;">
+        @if (_current is not null)
         {
-            <MudSelectItem T="Tournament" Value="@tournament" />
+            <BoltonCupImage Src="@_current.Logo" Height="32" ObjectFit="ObjectFit.Contain" />
+            <span><b>@_current.Name</b></span>
         }
-    </MudSelect>
-</div>
+        else
+        {
+            <span><b>Select a tournament</b></span>
+        }
+    </div>
+</MudChip>
 
 @code {
 
     private Tournament? _current;
-    private IReadOnlyList<Tournament> _tournaments = [];
 
     protected override void OnInitialized()
     {
@@ -31,20 +34,26 @@
             return;
         }
 
-        _tournaments = await TournamentState.GetTournamentsAsync();
         _current = await TournamentState.GetCurrentAsync();
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task OnTournamentChanged(Tournament? tournament)
+    private async Task OpenDialogAsync()
     {
-        if (tournament is null || tournament.Id == _current?.Id)
+        var options = new DialogOptions
         {
-            return;
-        }
+            CloseOnEscapeKey = true,
+            BackdropClick = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+        };
 
-        _current = tournament;
-        await TournamentState.SetCurrentAsync(tournament);
+        var dialog = await DialogService.ShowAsync<SelectTournamentDialog>(null, options);
+        var result = await dialog.Result;
+        if (result is { Canceled: false, Data: Tournament tournament })
+        {
+            await TournamentState.SetCurrentAsync(tournament);
+        }
     }
 
     private void OnStateChanged()
