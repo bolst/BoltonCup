@@ -122,7 +122,7 @@ else
                                     <PropertyColumn Property="x => x.Wins" Title="W" CellStyle="width: 50px" Hidden="!_player.IsGoalie" />
                                     <PropertyColumn Property="x => x.GamesPlayed - x.Wins" Title="L" CellStyle="width: 50px" Hidden="!_player.IsGoalie" />
                                     <PropertyColumn Property="x => x.Shutouts" Title="SO" CellStyle="width: 50px" Hidden="!_player.IsGoalie" />
-                                    <PropertyColumn Property="x => x.GoalsAgainstAverage" Title="GAA" CellStyle="width: 50px" Hidden="!_player.IsGoalie" />
+                                    <PropertyColumn Property="x => x.GoalsAgainstAverage" Title="GAA" CellStyle="width: 50px" Format="N2" Hidden="!_player.IsGoalie" />
                                     
                                     <PropertyColumn Property="x => x.Goals" Title="G" CellStyle="width: 50px" />
                                     <PropertyColumn Property="x => x.Assists" Title="A" CellStyle="width: 50px" />
