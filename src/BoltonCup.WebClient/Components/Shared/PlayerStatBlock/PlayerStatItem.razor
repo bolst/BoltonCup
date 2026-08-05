@@ -6,9 +6,9 @@
 }
 <div class="d-flex flex-column align-center justify-space-evenly" style="min-width: 30px">
     <MudText Typo="Typo.caption">@Title</MudText>
-    @if (Property is not null)
+    @if (Aggregate is not null || Property is not null)
     {
-        <MudText Typo="Typo.h5"><b>@TournamentStats.Sum(Property).ToString(Format)</b></MudText>
+        <MudText Typo="Typo.h5"><b>@Value().ToString(Format)</b></MudText>
     }
 </div>
 
@@ -23,11 +23,24 @@
     
     [Parameter]
     public Func<Sdk.PlayerTournamentStats, double>? Property { get; set; }
-    
+
+    [Parameter]
+    public Func<IEnumerable<Sdk.PlayerTournamentStats>, double>? Aggregate { get; set; }
+
     [Parameter]
     public string? Format { get; set; }
-    
+
     [Parameter]
     public bool HideDivider { get; set; }
+
+    private double Value()
+    {
+        if (Aggregate is not null)
+        {
+            return Aggregate(TournamentStats);
+        }
+
+        return Property is not null ? TournamentStats.Sum(Property) : 0;
+    }
 
 }

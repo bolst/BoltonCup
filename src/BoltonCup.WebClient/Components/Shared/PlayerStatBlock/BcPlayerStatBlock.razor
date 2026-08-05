@@ -24,7 +24,7 @@
                         <PlayerStatItem Title="GP" Property="x => x.GamesPlayed" HideDivider="!InlineTitle"/>
                         <PlayerStatItem Title="W" Property="x => x.Wins"/>
                         <PlayerStatItem Title="SO" Property="x => x.Shutouts"/>
-                        <PlayerStatItem Title="GAA" Property="x => x.GoalsAgainstAverage.GetValueOrDefault()" Format="N2" />
+                        <PlayerStatItem Title="GAA" Aggregate="CareerGoalsAgainstAverage" Format="N2" />
                         <PlayerStatItem Title="PIM" Property="x => x.PenaltyMinutes"/>
                     }
                     else
@@ -90,5 +90,18 @@
     }
 
     private RenderFragment TitleContent => @<MudText Typo="Typo.body1" Align="Align.Center"><b>@Title</b></MudText>;
+
+    // GAA is a rate, so it cannot be summed across tournaments. Recombine it as a games-played
+    // weighted average, which equals total goals-against over total games played.
+    private static double CareerGoalsAgainstAverage(IEnumerable<Sdk.PlayerTournamentStats> stats)
+    {
+        var statList = stats.ToArray();
+        var gamesPlayed = statList.Sum(x => x.GamesPlayed);
+        if (gamesPlayed == 0)
+        {
+            return 0;
+        }
+        return statList.Sum(x => x.GoalsAgainstAverage.GetValueOrDefault() * x.GamesPlayed) / gamesPlayed;
+    }
 
 }
