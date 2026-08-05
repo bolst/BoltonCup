@@ -1230,7 +1230,7 @@ public class Mapper : IMapper
             .Select(g => new PlayerTournamentStats
             {
                 GamesPlayed = g.Sum(x => x.SkaterGameLogs.Count + x.GoalieGameLogs.Count), Goals = g.Sum(x => x.Goals.Count), Assists = g.Sum(x => x.PrimaryAssists.Count + x.SecondaryAssists.Count), PenaltyMinutes = g.Sum(x => x.Penalties.Sum(p => p.DurationMinutes)),
-                Wins = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Wins)), Shutouts = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Shutouts)), GoalsAgainst = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.GoalsAgainst)),
+                Wins = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Wins)), Shutouts = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Shutouts)), GoalieGamesPlayed = g.Sum(x => x.GoalieGameLogs.Count), GoalsAgainst = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.GoalsAgainst)),
                 GoalsAgainstAverage = g
                     .SelectMany(x => x.GoalieGameLogs)
                     .Select(x => x.GoalsAgainst)

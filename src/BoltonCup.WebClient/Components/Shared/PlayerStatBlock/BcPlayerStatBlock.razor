@@ -92,16 +92,17 @@
     private RenderFragment TitleContent => @<MudText Typo="Typo.body1" Align="Align.Center"><b>@Title</b></MudText>;
 
     // GAA is a rate, so it cannot be summed across tournaments. Recombine it from totals:
-    // total goals-against over total games played.
+    // total goals-against over games played in goal. The divisor is goalie games (not total
+    // games played) so a player with both skater and goalie appearances still gets a correct GAA.
     private static double CareerGoalsAgainstAverage(IEnumerable<Sdk.PlayerTournamentStats> stats)
     {
         var statList = stats.ToArray();
-        var gamesPlayed = statList.Sum(x => x.GamesPlayed);
-        if (gamesPlayed == 0)
+        var goalieGamesPlayed = statList.Sum(x => x.GoalieGamesPlayed);
+        if (goalieGamesPlayed == 0)
         {
             return 0;
         }
-        return (double)statList.Sum(x => x.GoalsAgainst) / gamesPlayed;
+        return (double)statList.Sum(x => x.GoalsAgainst) / goalieGamesPlayed;
     }
 
 }

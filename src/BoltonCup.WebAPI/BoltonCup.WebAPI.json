@@ -17117,6 +17117,7 @@
         "required": [
           "assists",
           "gamesPlayed",
+          "goalieGamesPlayed",
           "goals",
           "goalsAgainst",
           "goalsAgainstAverage",
@@ -17162,6 +17163,11 @@
           "shutouts": {
             "type": "integer",
             "description": "Gets or sets the number of shutouts (goalie stat).",
+            "format": "int32"
+          },
+          "goalieGamesPlayed": {
+            "type": "integer",
+            "description": "Gets or sets the number of games played in goal (goalie stat, GAA divisor).",
             "format": "int32"
           },
           "goalsAgainst": {
