@@ -1230,10 +1230,13 @@ public class Mapper : IMapper
             .Select(g => new PlayerTournamentStats
             {
                 GamesPlayed = g.Sum(x => x.SkaterGameLogs.Count + x.GoalieGameLogs.Count), Goals = g.Sum(x => x.Goals.Count), Assists = g.Sum(x => x.PrimaryAssists.Count + x.SecondaryAssists.Count), PenaltyMinutes = g.Sum(x => x.Penalties.Sum(p => p.DurationMinutes)),
-                Wins = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Wins)), Shutouts = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Shutouts)), GoalieGamesPlayed = g.Sum(x => x.GoalieGameLogs.Count), GoalsAgainst = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.GoalsAgainst)),
+                Wins = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Wins)), Shutouts = g.Sum(x => x.GoalieGameLogs.Sum(gl => gl.Shutouts)), GoalieGamesPlayed = g.Sum(x => x.GoalieGameLogs.Count),
+                // Per-game GoalsAgainstAverage stores goals-against with empty-net goals already removed
+                // (see StatisticsRefreshService), so summing/averaging it keeps empty-net goals out of GAA.
+                GoalsAgainst = g.Sum(x => x.GoalieGameLogs.Sum(gl => (int)gl.GoalsAgainstAverage)),
                 GoalsAgainstAverage = g
                     .SelectMany(x => x.GoalieGameLogs)
-                    .Select(x => x.GoalsAgainst)
+                    .Select(x => x.GoalsAgainstAverage)
                     .DefaultIfEmpty(0)
                     .Average(),
                 Tournament = ToTournamentBriefDto(g.Key), Team = g.First().Team == null ? null : ToTeamBriefDto(g.First().Team!),

@@ -31,7 +31,10 @@ public sealed record PlayerTournamentStats
     public required int Shutouts { get; set; }
     /// <summary>Gets or sets the number of games played in goal (goalie stat, GAA divisor).</summary>
     public required int GoalieGamesPlayed { get; set; }
-    /// <summary>Gets or sets the total goals allowed across the tournament (goalie stat).</summary>
+    /// <summary>
+    /// Gets or sets the goals allowed (goalie stat). Empty-net goals are excluded, since they are
+    /// scored after the goalie was pulled and never count against a goalie. This is the GAA numerator.
+    /// </summary>
     public required int GoalsAgainst { get; set; }
     /// <summary>Gets or sets the goals against average (goalie stat).</summary>
     public required double? GoalsAgainstAverage { get; set; }

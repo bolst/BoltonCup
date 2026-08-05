@@ -17172,7 +17172,7 @@
           },
           "goalsAgainst": {
             "type": "integer",
-            "description": "Gets or sets the total goals allowed across the tournament (goalie stat).",
+            "description": "Gets or sets the goals allowed (goalie stat). Empty-net goals are excluded, since they are\nscored after the goalie was pulled and never count against a goalie. This is the GAA numerator.",
             "format": "int32"
           },
           "goalsAgainstAverage": {
