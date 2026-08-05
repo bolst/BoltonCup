@@ -29,6 +29,8 @@ public sealed record PlayerTournamentStats
     public required int Wins { get; set; }
     /// <summary>Gets or sets the number of shutouts (goalie stat).</summary>
     public required int Shutouts { get; set; }
+    /// <summary>Gets or sets the total goals allowed across the tournament (goalie stat).</summary>
+    public required int GoalsAgainst { get; set; }
     /// <summary>Gets or sets the goals against average (goalie stat).</summary>
     public required double? GoalsAgainstAverage { get; set; }
     /// <summary>Gets or sets the tournament these stats are from.</summary>

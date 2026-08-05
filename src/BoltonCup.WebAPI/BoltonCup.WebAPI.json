@@ -17118,6 +17118,7 @@
           "assists",
           "gamesPlayed",
           "goals",
+          "goalsAgainst",
           "goalsAgainstAverage",
           "penaltyMinutes",
           "shutouts",
@@ -17161,6 +17162,11 @@
           "shutouts": {
             "type": "integer",
             "description": "Gets or sets the number of shutouts (goalie stat).",
+            "format": "int32"
+          },
+          "goalsAgainst": {
+            "type": "integer",
+            "description": "Gets or sets the total goals allowed across the tournament (goalie stat).",
             "format": "int32"
           },
           "goalsAgainstAverage": {
