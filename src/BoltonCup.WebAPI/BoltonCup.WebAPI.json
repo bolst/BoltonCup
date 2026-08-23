@@ -8635,6 +8635,147 @@
         }
       }
     },
+    "/api/highlights": {
+      "get": {
+        "tags": [
+          "Highlights"
+        ],
+        "description": "Gets a paginated list of the most recent video highlights across all tournaments.",
+        "operationId": "GetHighlights",
+        "parameters": [
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "Gets or sets the 1-based page number to retrieve.",
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Size",
+            "in": "query",
+            "description": "Gets or sets the number of items per page.",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SortBy",
+            "in": "query",
+            "description": "Gets or sets the field name to sort results by.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Descending",
+            "in": "query",
+            "description": "Gets or sets whether to sort results in descending order.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecentHighlightDtoIPagedList"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecentHighlightDtoIPagedList"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecentHighlightDtoIPagedList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/infoguides": {
       "get": {
         "tags": [
@@ -17273,6 +17414,63 @@
         "additionalProperties": false,
         "description": "An account that can be invited to view a ranking (a GM of the tournament)."
       },
+      "RecentHighlightDto": {
+        "type": "object",
+        "properties": {
+          "highlight": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameHighlightDto"
+              }
+            ],
+            "description": "The highlight video details."
+          },
+          "gameId": {
+            "type": "integer",
+            "description": "The ID of the game the highlight belongs to.",
+            "format": "int32"
+          },
+          "gameTime": {
+            "type": "string",
+            "description": "The scheduled time of the game.",
+            "format": "date-time"
+          },
+          "tournamentName": {
+            "type": "string",
+            "description": "The name of the tournament the game belongs to."
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a game highlight with game context, for the cross-tournament recent-highlights feed."
+      },
+      "RecentHighlightDtoIPagedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecentHighlightDto"
+            },
+            "readOnly": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
       "RefereeDto": {
         "required": [
           "firstName",
@@ -19124,6 +19322,9 @@
     },
     {
       "name": "GoalieStats"
+    },
+    {
+      "name": "Highlights"
     },
     {
       "name": "InfoGuides"

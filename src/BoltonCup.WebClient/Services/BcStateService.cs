@@ -12,6 +12,9 @@ public class BcStateService(IBoltonCupApi _api)
     List<GameDto>? _completedGames;
     DateTime _completedGamesFetchedAtUtc;
 
+    List<RecentHighlightDto>? _recentHighlights;
+    DateTime _recentHighlightsFetchedAtUtc;
+
     public Task<SystemContextDto> Context => GetContextAsync();
 
     /// <summary>
@@ -52,6 +55,23 @@ public class BcStateService(IBoltonCupApi _api)
             .ToList();
         _completedGamesFetchedAtUtc = DateTime.UtcNow;
         return _completedGames;
+    }
+
+    /// <summary>
+    /// The most recent video highlights across all tournaments, newest first.
+    /// Cached with the same short TTL as the context.
+    /// </summary>
+    public async Task<IReadOnlyList<RecentHighlightDto>> GetRecentHighlightsAsync()
+    {
+        if (_recentHighlights is not null && DateTime.UtcNow - _recentHighlightsFetchedAtUtc < CacheDuration)
+        {
+            return _recentHighlights;
+        }
+
+        var highlights = await _api.GetHighlightsAsync(size: 16);
+        _recentHighlights = highlights.Items.ToList();
+        _recentHighlightsFetchedAtUtc = DateTime.UtcNow;
+        return _recentHighlights;
     }
 
     async Task<SystemContextDto> GetContextAsync()

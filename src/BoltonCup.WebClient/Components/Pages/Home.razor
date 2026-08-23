@@ -61,7 +61,12 @@
             </div>
         }
     </div>
-    
+
+    @if (_recentHighlights is { Count: > 0 })
+    {
+        <MustWatchCarousel Highlights="_recentHighlights" />
+    }
+
     @if (_context is null)
     {
         <div class="pa-4">
@@ -97,6 +102,7 @@
 
     private bool _started;
     private IReadOnlyList<Sdk.GameDto> _completedGames = [];
+    private IReadOnlyList<Sdk.RecentHighlightDto>? _recentHighlights;
 
     private string? BkgImageUrl => _context?.ActiveTournament?.BackgroundImage;
 
@@ -113,6 +119,8 @@
         {
             await EnterStartedModeAsync();
         }
+
+        _recentHighlights = await BcState.GetRecentHighlightsAsync();
 
         await InvokeAsync(StateHasChanged);
     }

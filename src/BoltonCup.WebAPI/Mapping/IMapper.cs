@@ -65,6 +65,10 @@ public interface IMapper
     UpdatePenaltyCommand ToCommand(int gameId, int penaltyId, UpdatePenaltyRequest request);
     SetGameStarsCommand ToCommand(int gameId, SetGameStarsRequest request);
 
+    // Highlights
+    GetHighlightsQuery ToQuery(GetHighlightsRequest request);
+    IPagedList<RecentHighlightDto> ToDtoList(IPagedList<GameHighlight> highlights);
+
     // GoalieStat
     GetGoalieStatsQuery ToQuery(GetGoalieStatsRequest request);
     IPagedList<GoalieStatDto> ToDtoList(IPagedList<GoalieStat> goalies);

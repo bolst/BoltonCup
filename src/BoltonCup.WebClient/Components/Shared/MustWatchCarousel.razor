@@ -1,0 +1,43 @@
+@using BoltonCup.Sdk
+@using BoltonCup.Common.Components
+
+<div class="d-flex flex-column gap-3 border-y mud-border-lines-default pa-4">
+    <MudText Typo="Typo.h6"><b>Must Watch</b></MudText>
+    <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+        @HighlightCarousel(4, "280px")
+    </MudHidden>
+    <MudHidden Breakpoint="Breakpoint.Sm" Invert>
+        @HighlightCarousel(3, "250px")
+    </MudHidden>
+    <MudHidden Breakpoint="Breakpoint.Xs" Invert>
+        @HighlightCarousel(2, "220px")
+    </MudHidden>
+</div>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required IReadOnlyList<RecentHighlightDto> Highlights { get; set; }
+
+    private RenderFragment HighlightCarousel(int chunkSize, string width)
+        => @<MudCarousel TData="object" Style="height: 350px" BulletsColor="Color.Primary" AutoCycle="false" ShowArrows="false" ShowBullets EnableSwipeGesture>
+            @foreach (var page in Highlights.Chunk(chunkSize))
+            {
+                <MudCarouselItem Transition="Transition.Slide" Color="Color.Surface">
+                    <div class="d-flex gap-3 overflow-x-hidden px-1">
+                        @foreach (var item in page)
+                        {
+                            @HighlightCard(item, width)
+                        }
+                    </div>
+                </MudCarouselItem>
+            }
+        </MudCarousel>;
+
+    private RenderFragment HighlightCard(RecentHighlightDto item, string width)
+        => @<div style="@($"flex: 0 0 {width}")">
+            <VideoHighlight Highlight="@item.Highlight" MaxWidth="100%" />
+            <MudText Typo="Typo.caption">@item.GameTime.ToLocalTime().ToString("MMM d, yyyy")</MudText>
+        </div>;
+}

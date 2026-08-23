@@ -120,6 +120,21 @@ public partial class Mapper
             .OrderBy(gs => gs.StarRank)
             .ToList();
 
+    public GetHighlightsQuery ToQuery(GetHighlightsRequest request) => new GetHighlightsQuery
+    {
+        Page = request.Page,
+        Size = request.Size,
+        SortBy = request.SortBy,
+        Descending = request.Descending,
+    };
+
+    public IPagedList<RecentHighlightDto> ToDtoList(IPagedList<GameHighlight> highlights) => highlights.ProjectTo(highlight => new RecentHighlightDto(
+        Highlight: ToGameHighlightDto(highlight),
+        GameId: highlight.GameId,
+        GameTime: highlight.Game.GameTime,
+        TournamentName: highlight.Game.Tournament.Name
+    ));
+
     GameHighlightDto ToGameHighlightDto(GameHighlight highlight)
     {
         var highlightUrls = _urlResolver.GetHighlightUrls(highlight.VideoId);

@@ -9,6 +9,7 @@ public class BoltonCupTheme
         PaletteLight = new PaletteLight
         {
             Primary = "#0B2551",
+            PrimaryContrastText = "#424242",
             Secondary = "#EB443A",
             Tertiary = "#DDCBA4",
             AppbarBackground = "#191A21",
