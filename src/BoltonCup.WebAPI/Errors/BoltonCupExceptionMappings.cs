@@ -126,11 +126,16 @@ public static class BoltonCupExceptionMappings
             m.ExceptionType.IsAssignableFrom(exception.GetType()));
 
         if (mapping is null)
+        {
             return null;
+        }
 
         return new BoltonCupProblemDetails
         {
-            Type = mapping.ErrorType, Title = mapping.Title, Status = mapping.StatusCode, Detail = exception.Message
+            Type = mapping.ErrorType,
+            Title = mapping.Title,
+            Status = mapping.StatusCode,
+            Detail = exception.Message
         };
     }
 

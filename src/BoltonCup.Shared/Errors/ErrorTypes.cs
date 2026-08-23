@@ -2,7 +2,7 @@ namespace BoltonCup.Shared
 {
     public static class ErrorTypes
     {
-        private const string Base = "https://api.boltoncup.ca/errors";
+        const string Base = "https://api.boltoncup.ca/errors";
 
         public const string NotFound = Base + "/not-found";
         public const string TooManyRequests = Base + "/too-many-requests";
@@ -11,20 +11,20 @@ namespace BoltonCup.Shared
 
         public static class Auth
         {
-            private const string Base = ErrorTypes.Base + "/auth";
-            
+            const string Base = ErrorTypes.Base + "/auth";
+
             public const string AccountNotConfirmed = Base + "/account-not-confirmed";
             public const string InvalidCredentials = Base + "/invalid-credentials";
             public const string UserRegistrationFailed = Base + "/user-registration-failed";
             public const string PasswordResetFailed = Base + "/password-reset-failed";
         }
-        
-        
-        
+
+
+
         public static class Tournaments
         {
-            private const string Base = ErrorTypes.Base + "/tournaments";
-            
+            const string Base = ErrorTypes.Base + "/tournaments";
+
             public const string AccountAlreadyRegistered = Base + "/account-already-registered";
             public const string AccountNotRegistered = Base + "/account-not-registered";
             public const string RegistrationClosed = Base + "/registration-closed";
@@ -33,7 +33,7 @@ namespace BoltonCup.Shared
 
         public static class BracketChallenges
         {
-            private const string Base = ErrorTypes.Base + "/bracket-challenges";
+            const string Base = ErrorTypes.Base + "/bracket-challenges";
 
             public const string EmailAlreadyRegistered = Base + "/email-already-registered";
             public const string RegistrationClosed = Base + "/registration-closed";
@@ -42,7 +42,7 @@ namespace BoltonCup.Shared
 
         public static class Trades
         {
-            private const string Base = ErrorTypes.Base + "/trades";
+            const string Base = ErrorTypes.Base + "/trades";
 
             public const string TradingClosed = Base + "/trading-closed";
             public const string InvalidState = Base + "/invalid-state";

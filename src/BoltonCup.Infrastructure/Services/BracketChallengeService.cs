@@ -17,25 +17,17 @@ public class BracketChallengeService(
 ) : IBracketChallengeService
 {
 
-    public async Task<IPagedList<Core.BracketChallenge.Event>> GetAsync(GetBracketChallengesQuery query, 
-        CancellationToken cancellationToken = default)
-    {
-        return await _dbContext.BracketChallenges
+    public async Task<IPagedList<Core.BracketChallenge.Event>> GetAsync(GetBracketChallengesQuery query,
+        CancellationToken cancellationToken = default) => await _dbContext.BracketChallenges
             .AsNoTracking()
             .OrderByDescending(b => b.Title)
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
-    }
 
-    public async Task<Core.BracketChallenge.Event?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return await _dbContext.BracketChallenges
+    public async Task<Core.BracketChallenge.Event?> GetByIdAsync(int id, CancellationToken cancellationToken = default) => await _dbContext.BracketChallenges
             .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken: cancellationToken);
-    }
 
-    public Task UpdateLogoAsync(int eventId, string tempKey, CancellationToken cancellationToken = default)
-    {
-        return _storageService.UpdateAssetAsync<Core.BracketChallenge.Event>(
+    public Task UpdateLogoAsync(int eventId, string tempKey, CancellationToken cancellationToken = default) => _storageService.UpdateAssetAsync<Core.BracketChallenge.Event>(
             _dbContext,
             _assetKeyGenerator,
             e => e.Id == eventId,
@@ -44,8 +36,7 @@ public class BracketChallengeService(
             eventId.ToString(),
             cancellationToken
         );
-    }
-    
+
     public async Task<BracketChallengePaymentIntent> CreatePaymentIntentAsync(
         CreateBracketChallengePaymentIntentCommand command, CancellationToken cancellationToken = default)
     {
@@ -55,19 +46,25 @@ public class BracketChallengeService(
                              .SingleOrDefaultAsync(t => t.Id == command.BracketChallengeId,
                                  cancellationToken: cancellationToken)
                          ?? throw new EntityNotFoundException(nameof(Core.BracketChallenge.Event), command.BracketChallengeId);
-        
+
         // ensure bracket challenge has registration open
         if (!bracketChallenge.IsOpen)
+        {
             throw new BracketChallengeRegistrationClosedException(bracketChallenge.Id);
-        
+        }
+
         // ensure bracket challenge has appropriate registration fee
         if (bracketChallenge.Fee is not { } registrationFeeAmount)
+        {
             throw new InvalidOperationException($"Bracket Challenge with ID {bracketChallenge.Id} does not have a registration fee.");
-        
+        }
+
         // ensure email is not already in bracket challenge
         if (bracketChallenge.Registrations.Any(x => x.Email.Equals(command.Email, StringComparison.CurrentCultureIgnoreCase)))
+        {
             throw new EmailAlreadyInBracketChallengeException(command.Email, bracketChallenge.Id);
-        
+        }
+
         // create payment intent using Stripe
         var service = new PaymentIntentService();
         var adjustedAmount = FeeCalculator.GetAdjustedStripeAmount(registrationFeeAmount);
@@ -89,7 +86,7 @@ public class BracketChallengeService(
                 { "AgreedToTOS", "true" }
             }
         }, cancellationToken: cancellationToken);
-        
+
         return new BracketChallengePaymentIntent(
             EventId: bracketChallenge.Id,
             Name: command.Name,
@@ -97,15 +94,15 @@ public class BracketChallengeService(
             Amount: adjustedAmount,
             Currency: "CAD",
             Secret: paymentIntent.ClientSecret,
-            AmountBreakdown: 
+            AmountBreakdown:
             [
                 new PaymentBreakdown(
                     Amount: registrationFeeAmount,
                     Title: "Bracket Challenge Fee"
                 ),
                 new PaymentBreakdown(
-                    Amount: adjustedAmount - registrationFeeAmount, 
-                    Title: "Service fee", 
+                    Amount: adjustedAmount - registrationFeeAmount,
+                    Title: "Service fee",
                     Description: "This covers the service we use for handling payments."
                 )
             ]
@@ -118,7 +115,7 @@ public class BracketChallengeService(
         var bracketChallenge = await _dbContext.BracketChallenges
             .FirstOrDefaultAsync(e => e.Id == command.EventId, cancellationToken: cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Core.BracketChallenge.Event), command.EventId);
-        
+
         _dbContext.BracketChallengeRegistrations.Add(new Core.BracketChallenge.Registration
         {
             EventId = command.EventId,

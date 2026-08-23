@@ -54,22 +54,23 @@ public class UpdateAccountRequestValidator : AbstractValidator<UpdateAccountRequ
         RuleFor(x => x.Height)
             .Matches(@"^[1-9]'\s*(1[0-1]|[0-9])$")
             .WithMessage("Height must be in the format FT'IN (e.g., 5'11 or 6'3).")
-            .DependentRules(() =>
-            {
-                RuleFor(x => x.Height)
+            .DependentRules(() => RuleFor(x => x.Height)
                     .Must(h =>
                     {
                         if (string.IsNullOrEmpty(h))
+                        {
                             return true;
+                        }
 
                         var parts = h.Split("'");
                         if (parts.Length == 2 && int.TryParse(parts[1].Trim(), out var inches))
+                        {
                             return inches is >= 0 and < 12;
+                        }
 
                         return false;
                     })
-                    .WithMessage("Invalid height.");
-            });
+                    .WithMessage("Invalid height."));
 
         RuleFor(x => x.Weight)
             .InclusiveBetween(0, 1000).WithMessage("Weight must be between 0 and 1000");

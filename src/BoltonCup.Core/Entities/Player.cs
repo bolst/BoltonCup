@@ -21,30 +21,30 @@ public class Player : EntityBase
     public Tournament Tournament { get; set; } = null!;
     public Team? Team { get; set; }
     public ICollection<Goal> Goals { get; set; } = [];
-    public ICollection <Goal> PrimaryAssists { get; set; } = [];
-    public ICollection <Goal> SecondaryAssists { get; set; } = [];
+    public ICollection<Goal> PrimaryAssists { get; set; } = [];
+    public ICollection<Goal> SecondaryAssists { get; set; } = [];
     public ICollection<Penalty> Penalties { get; set; } = [];
     public ICollection<SkaterStat> SkaterGameLogs { get; set; } = [];
     public ICollection<GoalieStat> GoalieGameLogs { get; set; } = [];
     public ICollection<GameHighlight> GameHighlights { get; set; } = [];
     public ICollection<GameStar> Stars { get; set; } = [];
 
-    public override string ToString()
-    {
-        return Account != null 
-            ? Account.ToString() 
+    public override string ToString() => Account != null
+            ? Account.ToString()
             : $"Player {Id}";
-    }
 }
 
 public class PlayerComparer : IEqualityComparer<Player>
 {
     public bool Equals(Player? item1, Player? item2)
     {
-        if (ReferenceEquals(item1, item2)) 
+        if (ReferenceEquals(item1, item2))
+        {
             return true;
+        }
+
         return item1 is not null && item2 is not null && item1.Id == item2.Id;
     }
-        
+
     public int GetHashCode(Player item) => item.Id;
 }

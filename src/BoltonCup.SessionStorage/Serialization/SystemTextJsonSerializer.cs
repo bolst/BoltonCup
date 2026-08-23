@@ -4,9 +4,9 @@ using BoltonCup.SessionStorage.StorageOptions;
 
 namespace BoltonCup.SessionStorage.Serialization;
 
-internal class SystemTextJsonSerializer : IJsonSerializer
+class SystemTextJsonSerializer : IJsonSerializer
 {
-    private readonly JsonSerializerOptions _options;
+    readonly JsonSerializerOptions _options;
 
     public SystemTextJsonSerializer(IOptions<SessionStorageOptions> options)
     {
@@ -18,7 +18,7 @@ internal class SystemTextJsonSerializer : IJsonSerializer
         _options = sessionStorageOptions.JsonSerializerOptions;
     }
 
-    public T Deserialize<T>(string data) 
+    public T Deserialize<T>(string data)
         => JsonSerializer.Deserialize<T>(data, _options)!;
 
     public string Serialize<T>(T data)

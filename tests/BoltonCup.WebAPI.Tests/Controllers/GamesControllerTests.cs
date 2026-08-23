@@ -10,12 +10,12 @@ namespace BoltonCup.WebAPI.Tests.Controllers;
 
 public class GamesControllerTests
 {
-    private readonly Mock<IGameRepository> _games = new();
-    private readonly Mock<ISkaterStatRepository> _skaterStats = new();
-    private readonly Mock<IMapper> _mapper = new();
-    private readonly Mock<IGameWriteService> _gameWrites = new();
-    private readonly Mock<IMusicLibraryService> _music = new();
-    private readonly GamesController _controller;
+    readonly Mock<IGameRepository> _games = new();
+    readonly Mock<ISkaterStatRepository> _skaterStats = new();
+    readonly Mock<IMapper> _mapper = new();
+    readonly Mock<IGameWriteService> _gameWrites = new();
+    readonly Mock<IMusicLibraryService> _music = new();
+    readonly GamesController _controller;
 
     public GamesControllerTests()
     {

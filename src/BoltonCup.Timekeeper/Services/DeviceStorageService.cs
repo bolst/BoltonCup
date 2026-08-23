@@ -8,15 +8,15 @@ namespace BoltonCup.Timekeeper.Services;
 /// </summary>
 public sealed class DeviceStorageService : IAsyncDisposable
 {
-    private readonly IJSRuntime _js;
-    private IJSObjectReference? _module;
+    readonly IJSRuntime _js;
+    IJSObjectReference? _module;
 
     public DeviceStorageService(IJSRuntime js)
     {
         _js = js;
     }
 
-    private async Task<IJSObjectReference> ModuleAsync()
+    async Task<IJSObjectReference> ModuleAsync()
         // Query string dodges Blazor's fingerprint import map so the dev server serves it.
         => _module ??= await _js.InvokeAsync<IJSObjectReference>("import", "/js/storage.js?v=1.0.0");
 

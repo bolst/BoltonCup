@@ -1,6 +1,6 @@
 namespace BoltonCup.SessionStorage;
 
-internal interface IStorageProvider
+interface IStorageProvider
 {
     void Clear();
     ValueTask ClearAsync(CancellationToken cancellationToken = default);

@@ -10,13 +10,13 @@ public class LogInWithPasswordFormModel
     [EmailAddress]
     [ReadOnly(true)]
     public string Email { get; set; } = string.Empty;
-        
+
     [Required]
     [DataType(DataType.Password)]
     [MinLength(8, ErrorMessage = "Password must have at least 8 characters")]
     [AutoFocus]
     public string Password { get; set; } = string.Empty;
-    
+
     [Display(Name = "Remember me")]
     public bool RememberMe { get; set; } = true;
 }

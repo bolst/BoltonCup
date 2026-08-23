@@ -106,7 +106,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.EventId, e.Email
+                    e.EventId,
+                    e.Email
                 })
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
@@ -173,13 +174,15 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.DraftId, e.TeamId
+                    e.DraftId,
+                    e.TeamId
                 })
                 .IsUnique();
             entity
                 .HasIndex(e => new
                 {
-                    e.DraftId, e.Pick
+                    e.DraftId,
+                    e.Pick
                 })
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
@@ -209,13 +212,15 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.DraftId, e.OverallPick
+                    e.DraftId,
+                    e.OverallPick
                 })
                 .IsUnique();
             entity
                 .HasIndex(e => new
                 {
-                    e.DraftId, e.PlayerId
+                    e.DraftId,
+                    e.PlayerId
                 })
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
@@ -351,13 +356,15 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.PlayerId, e.GameId
+                    e.PlayerId,
+                    e.GameId
                 })
                 .IsUnique();
             entity
                 .HasIndex(e => new
                 {
-                    e.StarRank, e.GameId
+                    e.StarRank,
+                    e.GameId
                 })
                 .IsUnique();
             entity.HasIndex(e => e.GameId);
@@ -386,12 +393,15 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.AccountId, e.DraftId, e.PlayerId
+                    e.AccountId,
+                    e.DraftId,
+                    e.PlayerId
                 })
                 .IsUnique();
             entity.HasIndex(e => new
             {
-                e.AccountId, e.DraftId
+                e.AccountId,
+                e.DraftId
             });
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.AccountId).HasColumnName("account_id");
@@ -419,7 +429,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => new
             {
-                e.AccountId, e.TournamentId
+                e.AccountId,
+                e.TournamentId
             });
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.AccountId).HasColumnName("account_id");
@@ -439,7 +450,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.CustomRankingId, e.PlayerId
+                    e.CustomRankingId,
+                    e.PlayerId
                 })
                 .IsUnique();
             entity.HasIndex(e => e.CustomRankingId);
@@ -469,7 +481,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.CustomRankingId, e.SharedWithAccountId
+                    e.CustomRankingId,
+                    e.SharedWithAccountId
                 })
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
@@ -521,7 +534,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .ToTable("goalie_game_logs")
                 .HasKey(e => new
                 {
-                    e.GameId, e.PlayerId
+                    e.GameId,
+                    e.PlayerId
                 });
             entity
                 .HasOne(e => e.Player)
@@ -646,7 +660,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.AccountId, e.TournamentId
+                    e.AccountId,
+                    e.TournamentId
                 })
                 .IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
@@ -690,7 +705,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.TournamentId, e.Status
+                    e.TournamentId,
+                    e.Status
                 });
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
@@ -743,7 +759,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.PlayerId, e.DraftId
+                    e.PlayerId,
+                    e.DraftId
                 })
                 .IsUnique();
             entity
@@ -782,7 +799,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .ToTable("skater_game_logs")
                 .HasKey(e => new
                 {
-                    e.GameId, e.PlayerId
+                    e.GameId,
+                    e.PlayerId
                 });
             entity
                 .HasOne(e => e.Player)
@@ -959,7 +977,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.AccountId, e.TournamentId
+                    e.AccountId,
+                    e.TournamentId
                 })
                 .IsUnique();
             entity
@@ -986,7 +1005,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.AccountId, e.TournamentId
+                    e.AccountId,
+                    e.TournamentId
                 })
                 .IsUnique();
             entity
@@ -1024,7 +1044,9 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             // Unique on the match key; Postgres treats NULL track ids as distinct, so untagged uploads coexist.
             entity.HasIndex(e => new
             {
-                e.TournamentId, e.ProviderType, e.TrackId
+                e.TournamentId,
+                e.ProviderType,
+                e.TrackId
             }).IsUnique();
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
@@ -1074,7 +1096,8 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity
                 .HasIndex(e => new
                 {
-                    e.TournamentPlayerInfoId, e.GameId
+                    e.TournamentPlayerInfoId,
+                    e.GameId
                 })
                 .IsUnique();
             entity.HasIndex(e => e.GameId);
@@ -1223,13 +1246,10 @@ public class EnumMemberConverter<TEnum>()
         s => GetEnumFromValue(s)
     ) where TEnum : Enum
 {
-    public static string GetEnumMemberValue(TEnum value)
-    {
-        return typeof(TEnum)
+    public static string GetEnumMemberValue(TEnum value) => typeof(TEnum)
                    .GetField(value.ToString())?
                    .GetCustomAttribute<EnumMemberAttribute>()?.Value
                ?? value.ToString();
-    }
 
     public static TEnum GetEnumFromValue(string value)
     {

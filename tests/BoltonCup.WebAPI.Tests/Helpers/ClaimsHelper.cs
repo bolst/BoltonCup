@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Tests.Helpers;
 
-internal static class ClaimsHelper
+static class ClaimsHelper
 {
     public static ControllerContext WithAccountId(int accountId)
     {

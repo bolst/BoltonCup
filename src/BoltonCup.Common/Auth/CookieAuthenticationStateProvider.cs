@@ -8,7 +8,7 @@ namespace BoltonCup.Common.Auth;
 
 public class CookieAuthenticationStateProvider(IBoltonCupApi _api, ILogger<CookieAuthenticationStateProvider> _logger) : AuthenticationStateProvider
 {
-    private static AuthenticationState AnonymousUser => new(new ClaimsPrincipal(new ClaimsIdentity()));
+    static AuthenticationState AnonymousUser => new(new ClaimsPrincipal(new ClaimsIdentity()));
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
@@ -28,7 +28,9 @@ public class CookieAuthenticationStateProvider(IBoltonCupApi _api, ILogger<Cooki
 
             var accountIdString = currentUser.AccountId?.ToString();
             if (!string.IsNullOrEmpty(accountIdString))
+            {
                 claims.Add(new Claim(BoltonCupClaimTypes.AccountId, accountIdString));
+            }
 
             claims.AddRange(
                 currentUser.TeamGmIds

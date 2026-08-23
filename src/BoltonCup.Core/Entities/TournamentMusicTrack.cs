@@ -51,7 +51,10 @@ public class TournamentMusicTrackComparer : IEqualityComparer<TournamentMusicTra
     public bool Equals(TournamentMusicTrack? item1, TournamentMusicTrack? item2)
     {
         if (ReferenceEquals(item1, item2))
+        {
             return true;
+        }
+
         return item1 is not null && item2 is not null && item1.Id == item2.Id;
     }
 

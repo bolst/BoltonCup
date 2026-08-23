@@ -9,12 +9,12 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class TournamentPlayerInfoServiceTests
 {
-    private const int TournamentId = 1;
-    private const int TeamId = 10;
-    private const int GmId = 100;
-    private const int PlayerId = 200;
+    const int TournamentId = 1;
+    const int TeamId = 10;
+    const int GmId = 100;
+    const int PlayerId = 200;
 
-    private static BoltonCupDbContext NewContext() =>
+    static BoltonCupDbContext NewContext() =>
         new(new DbContextOptionsBuilder<BoltonCupDbContext>()
             .UseInMemoryDatabase($"playerinfo-{Guid.NewGuid()}")
             .Options);
@@ -41,7 +41,7 @@ public class TournamentPlayerInfoServiceTests
         context.ManagedTeam.Should().BeNull();
     }
 
-    private static async Task<BoltonCupDbContext> SeedAsync()
+    static async Task<BoltonCupDbContext> SeedAsync()
     {
         var db = NewContext();
         db.Tournaments.Add(new Tournament { Id = TournamentId, Name = "Test Cup" });
@@ -83,7 +83,7 @@ public class TournamentPlayerInfoServiceTests
         return db;
     }
 
-    private static Account Account(int id, string first, string last) => new()
+    static Account Account(int id, string first, string last) => new()
     {
         Id = id,
         FirstName = first,

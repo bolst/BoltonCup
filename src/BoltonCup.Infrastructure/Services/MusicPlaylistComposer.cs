@@ -43,11 +43,13 @@ public static class MusicPlaylistComposer
         foreach (var track in library.Where(t => t.IsInBasePool))
         {
             if (!IsExcluded(track) && seen.Add(track.AudioFileKey))
+            {
                 result.Add(track);
+            }
         }
 
         return result;
     }
 
-    private static string Key(MusicProviderType provider, string trackId) => $"{provider}:{trackId}";
+    static string Key(MusicProviderType provider, string trackId) => $"{provider}:{trackId}";
 }

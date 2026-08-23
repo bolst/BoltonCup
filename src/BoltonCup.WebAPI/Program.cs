@@ -39,16 +39,25 @@ builder.Services.AddSwaggerGen(options =>
 
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Bolton Cup", Version = "v1", Description = "Bolton Cup API"
+        Title = "Bolton Cup",
+        Version = "v1",
+        Description = "Bolton Cup API"
     });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Name = "Authorization", Type = SecuritySchemeType.Http, Scheme = "Bearer", BearerFormat = "JWT",
-        In = ParameterLocation.Header, Description = "Enter access token below."
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter access token below."
     });
     options.AddSecurityDefinition(ApiKeyConstants.Scheme, new OpenApiSecurityScheme
     {
-        Name = ApiKeyConstants.Header, Type = SecuritySchemeType.ApiKey, Scheme = ApiKeyConstants.Scheme, In = ParameterLocation.Header,
+        Name = ApiKeyConstants.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = ApiKeyConstants.Scheme,
+        In = ParameterLocation.Header,
         Description = "Enter your API key below."
     });
 
@@ -63,7 +72,9 @@ builder.Services.AddSwaggerGen(options =>
         {
             var type = methodInfo.DeclaringType;
             if (type != null && typeof(BoltonCupControllerBase).IsAssignableFrom(type))
+            {
                 return methodInfo.Name;
+            }
         }
         return null;
     });
@@ -129,9 +140,9 @@ app.MapGet("/", context =>
 app.MapHub<DraftHub>(Hubs.Draft);
 
 app.MapGet("/health", () => Results.Ok(new
-    {
-        status = "healthy"
-    }))
+{
+    status = "healthy"
+}))
     .AllowAnonymous();
 
 // Sentry

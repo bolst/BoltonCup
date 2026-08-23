@@ -34,12 +34,16 @@ public class TeamManagerHandler(BoltonCupDbContext _dbContext)
         }
 
         if (!context.User.TryGetAccountId(out var accountId))
+        {
             return;
+        }
 
         var isTeamGm = await _dbContext.Teams
             .AnyAsync(t => t.Id == teamId && t.GeneralManagers.Any(g => g.Id == accountId));
 
         if (isTeamGm)
+        {
             context.Succeed(requirement);
+        }
     }
 }

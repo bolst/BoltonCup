@@ -39,7 +39,7 @@ public static class ServiceCollectionExtensions
         builder.AddBoltonCupS3();
         builder.AddBoltonCupPayments();
         builder.AddBoltonCupMusic();
-        
+
         var connectionString = builder.Configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
         builder.Services
             .AddDbContextFactory<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
@@ -60,7 +60,7 @@ public static class ServiceCollectionExtensions
 
     // Registers all concrete classes ending with `suffix` against their matching interface (I<ClassName>)
     // found in any loaded assembly. Skips classes with no matching interface.
-    private static void RegisterByConvention(IServiceCollection services, System.Reflection.Assembly implAssembly, string suffix)
+    static void RegisterByConvention(IServiceCollection services, System.Reflection.Assembly implAssembly, string suffix)
     {
         var interfaceAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 
@@ -75,7 +75,9 @@ public static class ServiceCollectionExtensions
                 .FirstOrDefault(t => t.IsInterface && t.Name == interfaceName);
 
             if (serviceType is not null)
+            {
                 services.AddTransient(serviceType, impl);
+            }
         }
     }
 
@@ -87,7 +89,7 @@ public static class ServiceCollectionExtensions
         return builder;
     }
 
-    private static IServiceCollection AddBoltonCupEmails(this WebApplicationBuilder builder)
+    static IServiceCollection AddBoltonCupEmails(this WebApplicationBuilder builder)
     {
         var razorEngine = new RazorLightEngineBuilder()
             .UseEmbeddedResourcesProject(typeof(EmailSender).Assembly, "BoltonCup.Infrastructure.EmailTemplates")
@@ -105,10 +107,7 @@ public static class ServiceCollectionExtensions
         // Set "Resend:Enabled": false (e.g. in appsettings.Development.json) to log emails instead of sending them.
         if (builder.Configuration.GetValue("Resend:Enabled", true))
         {
-            builder.Services.AddHttpClient<IEmailTransport, ResendEmailTransport>(client =>
-            {
-                client.BaseAddress = new Uri("https://api.resend.com/");
-            });
+            builder.Services.AddHttpClient<IEmailTransport, ResendEmailTransport>(client => client.BaseAddress = new Uri("https://api.resend.com/"));
         }
         else
         {
@@ -120,8 +119,8 @@ public static class ServiceCollectionExtensions
             .AddHostedService<EmailBackgroundService>()
             .AddTransient<IEmailer, EmailSender>();
     }
-    
-    private static IServiceCollection AddBoltonCupSms(this WebApplicationBuilder builder)
+
+    static IServiceCollection AddBoltonCupSms(this WebApplicationBuilder builder)
     {
         builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twilio"));
 
@@ -141,13 +140,13 @@ public static class ServiceCollectionExtensions
             .AddTransient<ISmsSender, SmsSender>();
     }
 
-    private static IServiceCollection AddBoltonCupS3(this WebApplicationBuilder builder)
+    static IServiceCollection AddBoltonCupS3(this WebApplicationBuilder builder)
     {
         var r2Config = builder.Configuration.GetRequiredSection("CloudflareR2");
         var accountId = r2Config["AccountId"];
         var accessKey = r2Config["AccessKey"];
         var secretKey = r2Config["SecretKey"];
-        
+
         var s3Credentials = new Amazon.Runtime.BasicAWSCredentials(accessKey, secretKey);
         var s3Config = new AmazonS3Config
         {
@@ -160,14 +159,14 @@ public static class ServiceCollectionExtensions
             .Replace(ServiceDescriptor.Singleton<IStorageService, ServerStorageService>());
     }
 
-    private static IServiceCollection AddBoltonCupPayments(this WebApplicationBuilder builder)
+    static IServiceCollection AddBoltonCupPayments(this WebApplicationBuilder builder)
     {
         Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetRequiredSection("Stripe").GetValue<string>(nameof(StripeSettings.ApiKey));
         builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
         return builder.Services.AddTransient<ITournamentPaymentService, TournamentPaymentService>();
     }
 
-    private static IServiceCollection AddBoltonCupMusic(this WebApplicationBuilder builder)
+    static IServiceCollection AddBoltonCupMusic(this WebApplicationBuilder builder)
     {
         builder.Services.Configure<SpotifySettings>(builder.Configuration.GetSection("Spotify"));
         builder.Services.AddHttpClient<IMusicSearchService, SpotifyMusicSearchService>();

@@ -13,18 +13,18 @@ namespace BoltonCup.WebAPI.Tests.Controllers;
 
 public class DraftsControllerTests
 {
-    private readonly Mock<IDraftService> _draftService = new();
-    private readonly Mock<IPlayerRepository> _players = new();
-    private readonly Mock<IMapper> _mapper = new();
-    private readonly Mock<IAuthorizationService> _authService = new();
-    private readonly DraftsController _controller;
+    readonly Mock<IDraftService> _draftService = new();
+    readonly Mock<IPlayerRepository> _players = new();
+    readonly Mock<IMapper> _mapper = new();
+    readonly Mock<IAuthorizationService> _authService = new();
+    readonly DraftsController _controller;
 
     public DraftsControllerTests()
     {
         _controller = new DraftsController(_draftService.Object, _players.Object, _mapper.Object, _authService.Object);
     }
 
-    private void SetupAuthSuccess()
+    void SetupAuthSuccess()
     {
         _authService
             .Setup(a => a.AuthorizeAsync(
@@ -34,7 +34,7 @@ public class DraftsControllerTests
             .ReturnsAsync(AuthorizationResult.Success());
     }
 
-    private void SetupAuthFailure()
+    void SetupAuthFailure()
     {
         _authService
             .Setup(a => a.AuthorizeAsync(

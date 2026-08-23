@@ -19,7 +19,7 @@ public static class DateTimeExtensions
         var estZone = GetEasternTimeZone();
         return TimeZoneInfo.ConvertTimeToUtc(dateTime, estZone);
     }
-    
+
     public static DateTime ToEst(this DateTime dateTime)
     {
         var utcDate = dateTime.Kind == DateTimeKind.Utc
@@ -30,16 +30,10 @@ public static class DateTimeExtensions
         var estTime = TimeZoneInfo.ConvertTimeFromUtc(utcDate, estZone);
         return estTime;
     }
-    
-    public static string ToEstString(this DateTime dateTime, string format = "g")
-    {
-        return dateTime.ToEst().ToString(format);
-    }
 
-    public static string ToEstString(this DateTime? dateTime, string format = "g")
-    {
-        return dateTime == null 
-            ? string.Empty 
+    public static string ToEstString(this DateTime dateTime, string format = "g") => dateTime.ToEst().ToString(format);
+
+    public static string ToEstString(this DateTime? dateTime, string format = "g") => dateTime == null
+            ? string.Empty
             : dateTime.Value.ToEstString(format);
-    }
 }

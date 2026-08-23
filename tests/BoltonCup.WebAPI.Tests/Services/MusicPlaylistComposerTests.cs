@@ -7,7 +7,7 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class MusicPlaylistComposerTests
 {
-    private static TournamentMusicTrack Track(string fileKey, string? trackId, bool basePool) => new()
+    static TournamentMusicTrack Track(string fileKey, string? trackId, bool basePool) => new()
     {
         TournamentId = 1,
         AudioFileKey = fileKey,
@@ -17,7 +17,7 @@ public class MusicPlaylistComposerTests
         IsInBasePool = basePool,
     };
 
-    private static IEnumerable<(MusicProviderType, string?)> Reqs(params string?[] ids)
+    static IEnumerable<(MusicProviderType, string?)> Reqs(params string?[] ids)
         => ids.Select(id => (MusicProviderType.Spotify, id));
 
     [Fact]
@@ -151,6 +151,6 @@ public class MusicPlaylistComposerTests
         result.Should().Equal("base1");
     }
 
-    private static List<string> Keys(IEnumerable<TournamentMusicTrack> tracks)
+    static List<string> Keys(IEnumerable<TournamentMusicTrack> tracks)
         => tracks.Select(t => t.AudioFileKey).ToList();
 }

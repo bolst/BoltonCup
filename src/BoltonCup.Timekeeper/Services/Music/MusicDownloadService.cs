@@ -10,11 +10,11 @@ namespace BoltonCup.Timekeeper.Services.Music;
 /// </summary>
 public sealed class MusicDownloadService
 {
-    private readonly MusicCacheService _cache;
-    private readonly SyncService _sync;
+    readonly MusicCacheService _cache;
+    readonly SyncService _sync;
 
-    private CancellationTokenSource? _cts;
-    private readonly Dictionary<string, ItemStatus> _statuses = new();
+    CancellationTokenSource? _cts;
+    readonly Dictionary<string, ItemStatus> _statuses = new();
 
     public MusicDownloadService(MusicCacheService cache, SyncService sync)
     {
@@ -48,7 +48,10 @@ public sealed class MusicDownloadService
     /// </summary>
     public void Start(IReadOnlyList<PlaylistTrackDto> tracks, bool normalize)
     {
-        if (IsRunning) return;
+        if (IsRunning)
+        {
+            return;
+        }
 
         IsOffline = false;
         StorageText = null;
@@ -71,21 +74,31 @@ public sealed class MusicDownloadService
     /// <summary>Re-runs only the tracks that previously failed.</summary>
     public void Retry()
     {
-        if (IsRunning) return;
+        if (IsRunning)
+        {
+            return;
+        }
+
         var failed = _statuses.Where(kv => kv.Value == ItemStatus.Failed).Select(kv => kv.Key).ToArray();
-        if (failed.Length == 0) return;
+        if (failed.Length == 0)
+        {
+            return;
+        }
 
         var tracks = _lastTracks.Where(t => failed.Contains(t.FileKey)).ToList();
-        if (tracks.Count == 0) return;
+        if (tracks.Count == 0)
+        {
+            return;
+        }
 
         _cts = new CancellationTokenSource();
         _ = RunAsync(tracks, _cts.Token);
     }
 
-    private IReadOnlyList<PlaylistTrackDto> _lastTracks = [];
-    private bool _normalize;
+    IReadOnlyList<PlaylistTrackDto> _lastTracks = [];
+    bool _normalize;
 
-    private async Task RunAsync(IReadOnlyList<PlaylistTrackDto> tracks, CancellationToken ct)
+    async Task RunAsync(IReadOnlyList<PlaylistTrackDto> tracks, CancellationToken ct)
     {
         IsRunning = true;
         IsOffline = false;
@@ -108,7 +121,10 @@ public sealed class MusicDownloadService
 
             foreach (var track in tracks)
             {
-                if (ct.IsCancellationRequested) break;
+                if (ct.IsCancellationRequested)
+                {
+                    break;
+                }
 
                 if (cached.Contains(track.FileKey))
                 {
@@ -158,7 +174,7 @@ public sealed class MusicDownloadService
         }
     }
 
-    private static string Megabytes(long bytes) => $"{bytes / 1024.0 / 1024.0:0} MB";
+    static string Megabytes(long bytes) => $"{bytes / 1024.0 / 1024.0:0} MB";
 
-    private void Notify() => OnProgressChanged?.Invoke();
+    void Notify() => OnProgressChanged?.Invoke();
 }

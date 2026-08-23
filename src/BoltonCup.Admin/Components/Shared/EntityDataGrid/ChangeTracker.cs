@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace BoltonCup.Admin.Components.Shared;
 
-public sealed class ChangeTracker<T> 
+public sealed class ChangeTracker<T>
     where T : class
 {
     public HashSet<T> EditItems { get; private set; }
@@ -20,25 +20,28 @@ public sealed class ChangeTracker<T>
         DeleteItems = new HashSet<T>(comparer);
         NewItems = new HashSet<T>(comparer);
     }
-    
+
     public void TrackEdit(T item)
     {
         if (DeleteItems.Contains(item) || NewItems.Contains(item))
+        {
             return;
+        }
+
         EditItems.Add(item);
     }
 
     public void TrackDelete(T item)
     {
         EditItems.Remove(item);
-        
+
         // db doesnt have this yet
         if (!NewItems.Remove(item))
         {
             DeleteItems.Add(item);
         }
     }
-    
+
     public void TrackDeletes(IEnumerable<T> items)
     {
         var itemsHash = items.ToHashSet();
@@ -66,7 +69,7 @@ public sealed class ChangeTracker<T>
         void TrackNode(EntityEntryGraphNode node)
         {
             var entry = node.Entry;
-            
+
             // check if is root item
             if (NewItems.Contains(entry.Entity))
             {
@@ -78,20 +81,20 @@ public sealed class ChangeTracker<T>
                 entry.State = EntityState.Modified;
                 return;
             }
-            
+
             // check for new foreign entity
             if (!entry.IsKeySet)
             {
                 entry.State = EntityState.Added;
                 return;
             }
-            
+
             // check for collisions
             var pk = entry.Metadata.FindPrimaryKey();
             if (pk is not null)
             {
                 var keyValues = pk.Properties.Select(p => entry.Property(p.Name).CurrentValue).ToArray();
-                
+
                 // check if we are already tracking this entity
                 var existingTracked = dbContext.ChangeTracker.Entries()
                     .FirstOrDefault(e => e.Metadata.ClrType == entry.Metadata.ClrType &&
@@ -120,13 +123,13 @@ public sealed class ChangeTracker<T>
 
             entry.State = EntityState.Unchanged;
         }
-        
+
         // new and edit items
         foreach (var item in NewItems.Concat(EditItems))
         {
             dbContext.ChangeTracker.TrackGraph(item, TrackNode);
         }
-        
+
         // delete items
         foreach (var item in DeleteItems)
         {
@@ -134,7 +137,7 @@ public sealed class ChangeTracker<T>
             if (entry.Metadata.FindPrimaryKey() is { } pk)
             {
                 var keyValues = pk.Properties.Select(p => entry.Property(p.Name).CurrentValue).ToArray();
-                
+
                 // check if we are already tracking an entity with this key
                 var existingTracked = dbContext.ChangeTracker
                     .Entries()
@@ -151,10 +154,10 @@ public sealed class ChangeTracker<T>
                     continue;
                 }
             }
-            
+
             entry.State = EntityState.Deleted;
         }
-        
+
         await dbContext.SaveChangesAsync();
         Clear();
     }

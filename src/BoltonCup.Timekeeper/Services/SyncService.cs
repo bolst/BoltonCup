@@ -7,13 +7,13 @@ namespace BoltonCup.Timekeeper.Services;
 
 public class SyncService : IAsyncDisposable
 {
-    private readonly IBoltonCupApi _api;
-    private readonly IOfflineStore _store;
-    private readonly IJSRuntime _js;
-    private readonly ILogger<SyncService> _logger;
-    private readonly CancellationTokenSource _cts = new();
+    readonly IBoltonCupApi _api;
+    readonly IOfflineStore _store;
+    readonly IJSRuntime _js;
+    readonly ILogger<SyncService> _logger;
+    readonly CancellationTokenSource _cts = new();
 
-    private static readonly JsonSerializerOptions Options = new()
+    static readonly JsonSerializerOptions Options = new()
     {
         PropertyNameCaseInsensitive = true
     };
@@ -25,7 +25,7 @@ public class SyncService : IAsyncDisposable
     public event Action? OnStatusChanged;
     public event Action? OnSyncCompleted;
 
-    private int? _activeGameId;
+    int? _activeGameId;
 
     public SyncService(IBoltonCupApi api, IOfflineStore store, IJSRuntime js, ILogger<SyncService> logger)
     {
@@ -48,7 +48,7 @@ public class SyncService : IAsyncDisposable
         return Task.CompletedTask;
     }
 
-    private async Task RunLoopAsync(CancellationToken ct)
+    async Task RunLoopAsync(CancellationToken ct)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
         try
@@ -61,7 +61,7 @@ public class SyncService : IAsyncDisposable
         catch (OperationCanceledException) { }
     }
 
-    private async Task TickAsync()
+    async Task TickAsync()
     {
         try
         {
@@ -86,10 +86,13 @@ public class SyncService : IAsyncDisposable
         }
     }
 
-    private async Task ProcessQueueAsync(int gameId)
+    async Task ProcessQueueAsync(int gameId)
     {
         var queue = await _store.GetQueueAsync(gameId);
-        if (queue.Count == 0) return;
+        if (queue.Count == 0)
+        {
+            return;
+        }
 
         var anySynced = false;
         foreach (var record in queue)
@@ -114,7 +117,7 @@ public class SyncService : IAsyncDisposable
         }
     }
 
-    private async Task DispatchAsync(int gameId, OfflineEventRecord record)
+    async Task DispatchAsync(int gameId, OfflineEventRecord record)
     {
         switch (record.EventType)
         {
@@ -142,7 +145,7 @@ public class SyncService : IAsyncDisposable
         }
     }
 
-    private static T Deserialize<T>(string json) =>
+    static T Deserialize<T>(string json) =>
         JsonSerializer.Deserialize<T>(json, Options)
         ?? throw new InvalidOperationException($"Failed to deserialize {typeof(T).Name}");
 

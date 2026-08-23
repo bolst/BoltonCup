@@ -11,50 +11,50 @@ namespace BoltonCup.Common.Imaging;
 /// </summary>
 public sealed class RosterImageRenderer : IRosterImageRenderer
 {
-    private const int Width = 1080;
-    private const int Height = 1220;
-    private const float Margin = 24f;
-    private const float ContentW = Width - 2 * Margin;
+    const int Width = 1080;
+    const int Height = 1220;
+    const float Margin = 24f;
+    const float ContentW = Width - 2 * Margin;
 
-    private const float HeaderHeight = 150f;
-    private const float BarHeight = 44f;
+    const float HeaderHeight = 150f;
+    const float BarHeight = 44f;
     // Fixed block row height with a tight inter-row gap keeps the rows dense rather than
     // stretching to fill the canvas; the packed content is centered vertically. Sized so the
     // three-forward-rows + three-defense-rows stack still fits the fixed canvas height.
-    private const float RowH = 140f;
-    private const float GapY = 6f;
-    private const float SectionGapY = 12f;
+    const float RowH = 140f;
+    const float GapY = 6f;
+    const float SectionGapY = 12f;
 
-    private const int ForwardCols = 3;
-    private const int ForwardRows = 3;
-    private const int DefenseCols = 2;
-    private const int DefenseRows = 3;
+    const int ForwardCols = 3;
+    const int ForwardRows = 3;
+    const int DefenseCols = 2;
+    const int DefenseRows = 3;
 
     // The lower section splits into DEFENSE (left) and GOALIE (right).
-    private const float DefenseRegionFraction = 2f / 3f;
-    private const float RegionGap = 8f;
+    const float DefenseRegionFraction = 2f / 3f;
+    const float RegionGap = 8f;
 
     // Player-block sub-column split: jersey number | captaincy+logo | name details.
-    private const float JerseyColFraction = 0.50f;
-    private const float MidColFraction = 0.18f;
+    const float JerseyColFraction = 0.50f;
+    const float MidColFraction = 0.18f;
     // Jersey number height as a fraction of the block height (large, sample-style numbers).
-    private const float JerseyHeightFraction = 0.95f;
+    const float JerseyHeightFraction = 0.95f;
 
     // Horizontal glyph scale applied to all text (<1 = skinnier / more condensed).
-    private const float FontScaleX = 0.98f;
+    const float FontScaleX = 0.98f;
 
     // Extra spacing between letters in the player-detail stack, as a fraction of font size.
-    private const float DetailTrackingFactor = 0.05f;
+    const float DetailTrackingFactor = 0.05f;
 
     // Stroke weight added to player-detail glyphs (fraction of font size) to thicken the text.
-    private const float DetailStrokeFactor = 0.01f;
+    const float DetailStrokeFactor = 0.01f;
 
     // Fixed player-detail font sizes, identical across every block.
-    private const float FirstNameSize = 14f * 1.3f;
-    private const float LastNameSize = 22f * 1.3f;
-    private const float DetailSize = 14f * 1.3f;
+    const float FirstNameSize = 14f * 1.3f;
+    const float LastNameSize = 22f * 1.3f;
+    const float DetailSize = 14f * 1.3f;
 
-    private static SKFont CreateFont(SKTypeface typeface, float size) =>
+    static SKFont CreateFont(SKTypeface typeface, float size) =>
         new(typeface, size)
         {
             ScaleX = FontScaleX,
@@ -165,7 +165,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         return data.ToArray();
     }
 
-    private void DrawHeader(SKCanvas canvas, SKTypeface typeface, string teamName,
+    void DrawHeader(SKCanvas canvas, SKTypeface typeface, string teamName,
         SKColor titleFill, SKColor titleOutline, SKBitmap? logo, SKRect rect)
     {
         var logoSize = rect.Height;
@@ -210,7 +210,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         canvas.DrawText(name, textX, baseline, SKTextAlign.Left, font, fill);
     }
 
-    private static void DrawSectionBar(SKCanvas canvas, SKTypeface typeface, string label,
+    static void DrawSectionBar(SKCanvas canvas, SKTypeface typeface, string label,
         Palette palette, SKRect rect)
     {
         using var bg = new SKPaint();
@@ -240,7 +240,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         canvas.DrawText(label, rect.MidX, baseline, SKTextAlign.Center, font, text);
     }
 
-    private void DrawGrid(SKCanvas canvas, SKTypeface typeface, Palette palette,
+    void DrawGrid(SKCanvas canvas, SKTypeface typeface, Palette palette,
         IReadOnlyList<RosterPlayerCell> cells, float originX, float originY,
         float colW, float rowH, int cols, int rows, float jerseyFontSize)
     {
@@ -257,7 +257,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
 
     // The forwards a team carries beyond the 9 the forwards grid holds, laid out into `slotCount`
     // freed defense-region slots left-to-right. Slots past the overflow count render as empty.
-    private static IReadOnlyList<RosterPlayerCell> OverflowForwards(
+    static IReadOnlyList<RosterPlayerCell> OverflowForwards(
         IReadOnlyList<RosterPlayerCell> forwards, int slotCount)
     {
         const int forwardGridSlots = ForwardCols * ForwardRows;
@@ -271,7 +271,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         return cells;
     }
 
-    private void DrawPlayerBlock(SKCanvas canvas, SKTypeface typeface, Palette palette,
+    void DrawPlayerBlock(SKCanvas canvas, SKTypeface typeface, Palette palette,
         RosterPlayerCell cell, SKRect rect, float jerseyFontSize)
     {
         using var detail = new SKPaint();
@@ -285,7 +285,9 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
 
         // Nothing renders for an empty padding slot — not even the team logo.
         if (cell.IsEmpty)
+        {
             return;
+        }
 
         var rowH = rect.Height / 4f;
         var jerseyW = rect.Width * JerseyColFraction;
@@ -346,7 +348,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
     }
 
     // Draws right-aligned text rows at fixed sizes, stacked with tight leading, vertically centered on centerY.
-    private static void DrawTextStack(SKCanvas canvas, SKTypeface typeface,
+    static void DrawTextStack(SKCanvas canvas, SKTypeface typeface,
         IReadOnlyList<(string Text, float Size, SKPaint Paint)> rows, float right, float centerY)
     {
         const float lineFactor = 1.1f;
@@ -371,7 +373,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         }
     }
 
-    private static void DrawTextFilledOutlined(SKCanvas canvas, string text, float x, float baseline,
+    static void DrawTextFilledOutlined(SKCanvas canvas, string text, float x, float baseline,
         SKTextAlign align, SKFont font, SKColor fill, SKColor outline, float strokeWidth)
     {
         using var fillPaint = new SKPaint();
@@ -389,7 +391,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
     }
 
     // Largest jersey size that fits the narrowest block, using a fixed two-digit width budget.
-    private static float ComputeJerseyFontSize(SKTypeface typeface, float minBlockW)
+    static float ComputeJerseyFontSize(SKTypeface typeface, float minBlockW)
     {
         var heightBound = RowH * JerseyHeightFraction;
         var avail = minBlockW * JerseyColFraction - 6f;
@@ -402,7 +404,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         return twoDigitWidth <= avail ? heightBound : Math.Max(6f, heightBound * (avail / twoDigitWidth));
     }
 
-    private static float MaxDigitWidth(SKFont font)
+    static float MaxDigitWidth(SKFont font)
     {
         var max = 0f;
         for (var d = '0'; d <= '9'; d++)
@@ -413,7 +415,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
     }
 
     // Renders each digit centered in a fixed-width cell, so equal-length numbers share an exact width.
-    private static void DrawFixedWidthNumber(SKCanvas canvas, SKTypeface typeface, string text,
+    static void DrawFixedWidthNumber(SKCanvas canvas, SKTypeface typeface, string text,
         float centerX, float centerY, float size, SKColor fill, SKColor outline)
     {
         using var font = CreateFont(typeface, size);
@@ -429,7 +431,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         }
     }
 
-    private static void DrawBitmapContained(SKCanvas canvas, SKBitmap bitmap, SKRect dst)
+    static void DrawBitmapContained(SKCanvas canvas, SKBitmap bitmap, SKRect dst)
     {
         var scale = Math.Min(dst.Width / bitmap.Width, dst.Height / bitmap.Height);
         var w = bitmap.Width * scale;
@@ -442,7 +444,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
     }
 
     // Total width of text drawn with `tracking` extra pixels between each letter (no trailing gap).
-    private static float MeasureTrackedWidth(SKFont font, string text, float tracking)
+    static float MeasureTrackedWidth(SKFont font, string text, float tracking)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -458,7 +460,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
 
     // Right-aligns at `right`, advancing each glyph by its width plus the tracking gap.
     // A non-null stroke is drawn over each glyph to thicken it.
-    private static void DrawTrackedTextRight(SKCanvas canvas, string text, float right, float baseline,
+    static void DrawTrackedTextRight(SKCanvas canvas, string text, float right, float baseline,
         SKFont font, SKPaint fill, SKPaint? stroke, float tracking)
     {
         var x = right - MeasureTrackedWidth(font, text, tracking);
@@ -474,7 +476,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         }
     }
 
-    private static float FitTextSize(SKTypeface typeface, string text, float maxWidth, float maxSize)
+    static float FitTextSize(SKTypeface typeface, string text, float maxWidth, float maxSize)
     {
         if (string.IsNullOrEmpty(text) || maxWidth <= 0)
         {
@@ -489,13 +491,13 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         return Math.Max(6f, maxSize * (maxWidth / width));
     }
 
-    private static float VerticalCenterBaseline(SKFont font, float centerY)
+    static float VerticalCenterBaseline(SKFont font, float centerY)
     {
         var metrics = font.Metrics;
         return centerY - (metrics.Ascent + metrics.Descent) / 2f;
     }
 
-    private static SKBitmap? DecodeLogo(byte[]? bytes)
+    static SKBitmap? DecodeLogo(byte[]? bytes)
     {
         if (bytes is null || bytes.Length == 0)
         {
@@ -511,12 +513,12 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
         }
     }
 
-    private static SKColor ParseColor(string? hex, SKColor fallback)
+    static SKColor ParseColor(string? hex, SKColor fallback)
         => !string.IsNullOrWhiteSpace(hex) && SKColor.TryParse(hex, out var color) ? color : fallback;
 
-    private static RosterPlayerCell EmptyCell() => new() { IsEmpty = true };
+    static RosterPlayerCell EmptyCell() => new() { IsEmpty = true };
 
-    private static Palette BuildPalette(RosterColorway colorway, SKColor primary, SKColor secondary, SKColor tertiary)
+    static Palette BuildPalette(RosterColorway colorway, SKColor primary, SKColor secondary, SKColor tertiary)
     {
         SKColor Resolve(RosterColor c) => c switch
         {
@@ -542,7 +544,7 @@ public sealed class RosterImageRenderer : IRosterImageRenderer
             CaptaincyOutline: Resolve(colorway.CaptaincyOutline));
     }
 
-    private sealed record Palette(
+    sealed record Palette(
         SKColor Background,
         SKColor TitleFill,
         SKColor TitleOutline,

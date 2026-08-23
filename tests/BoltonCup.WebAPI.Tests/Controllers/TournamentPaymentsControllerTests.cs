@@ -12,11 +12,11 @@ namespace BoltonCup.WebAPI.Tests.Controllers;
 
 public class TournamentPaymentsControllerTests
 {
-    private const int AccountId = 42;
+    const int AccountId = 42;
 
-    private readonly Mock<ITournamentPaymentService> _paymentService = new();
-    private readonly Mock<IMapper> _mapper = new();
-    private readonly TournamentPaymentsController _controller;
+    readonly Mock<ITournamentPaymentService> _paymentService = new();
+    readonly Mock<IMapper> _mapper = new();
+    readonly TournamentPaymentsController _controller;
 
     public TournamentPaymentsControllerTests()
     {
@@ -29,7 +29,7 @@ public class TournamentPaymentsControllerTests
         };
     }
 
-    private static TournamentPaymentIntent BuildPaymentIntent() =>
+    static TournamentPaymentIntent BuildPaymentIntent() =>
         new(AccountId: 42, TournamentId: 5, Amount: 1000m, Currency: "USD", Secret: "secret", AmountBreakdown: []);
 
     [Fact]

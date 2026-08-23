@@ -9,9 +9,9 @@ namespace BoltonCup.Infrastructure.Services;
 
 public class SmsBackgroundService : BackgroundService
 {
-    private readonly ISmsQueue _queue;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<SmsBackgroundService> _logger;
+    readonly ISmsQueue _queue;
+    readonly IServiceProvider _serviceProvider;
+    readonly ILogger<SmsBackgroundService> _logger;
 
     public SmsBackgroundService(ISmsQueue queue, IServiceProvider serviceProvider, ILogger<SmsBackgroundService> logger)
     {
@@ -47,7 +47,7 @@ public class SmsBackgroundService : BackgroundService
         }
     }
 
-    private async Task ProcessSmsAsync(SmsPayload payload, ISmsTransport transport, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
+    async Task ProcessSmsAsync(SmsPayload payload, ISmsTransport transport, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
     {
         var succeeded = false;
         string? error = null;
@@ -69,7 +69,7 @@ public class SmsBackgroundService : BackgroundService
         await WriteLogAsync(payload, succeeded, error, dbFactory, token);
     }
 
-    private async Task WriteLogAsync(SmsPayload payload, bool succeeded, string? error, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
+    async Task WriteLogAsync(SmsPayload payload, bool succeeded, string? error, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
     {
         try
         {

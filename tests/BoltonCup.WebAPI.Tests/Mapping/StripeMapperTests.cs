@@ -8,9 +8,9 @@ namespace BoltonCup.WebAPI.Tests.Mapping;
 
 public class StripeMapperTests
 {
-    private readonly Mapper _mapper = new(new Mock<BoltonCup.Core.IAssetUrlResolver>().Object);
+    readonly Mapper _mapper = new(new Mock<BoltonCup.Core.IAssetUrlResolver>().Object);
 
-    private static PaymentIntent BuildPaymentIntent(string id, Dictionary<string, string> metadata) =>
+    static PaymentIntent BuildPaymentIntent(string id, Dictionary<string, string> metadata) =>
         new() { Id = id, Metadata = metadata };
 
     // ---------------- TryParseTournamentPaymentCommand ----------------
@@ -86,10 +86,10 @@ public class StripeMapperTests
             ["AgreedToTOS"] = "true"
         };
         metadata.Remove(keyToOmit);
-        
+
         var paymentIntent = BuildPaymentIntent("pi_x", metadata);
         var success = _mapper.TryParseBracketChallengePaymentCommand(paymentIntent, out _);
-        
+
         success.Should().BeFalse();
     }
 }

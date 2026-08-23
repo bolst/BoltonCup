@@ -9,7 +9,7 @@ public class AutoFocusAttribute : Attribute
     {
         AutoFocus = true;
     }
-    
+
     public AutoFocusAttribute() : this(true)
     {
     }

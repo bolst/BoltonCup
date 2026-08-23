@@ -9,8 +9,8 @@ public abstract class QueryBaseValidator<T> : AbstractValidator<T>
     {
         RuleFor(x => x.Page)
             .GreaterThanOrEqualTo(1)
-            .WithMessage("Page must be >= 1");        
-        
+            .WithMessage("Page must be >= 1");
+
         RuleFor(x => x.Size)
             .InclusiveBetween(1, 100)
             .WithMessage("Size must be an integer in [1,...,100]");

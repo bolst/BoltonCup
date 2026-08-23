@@ -160,29 +160,41 @@ public class GameWriteService(
 
         var newStars = new List<GameStar>();
         if (command.FirstStarPlayerId.HasValue)
+        {
             newStars.Add(new GameStar { GameId = command.GameId, StarRank = 1, PlayerId = command.FirstStarPlayerId.Value });
+        }
+
         if (command.SecondStarPlayerId.HasValue)
+        {
             newStars.Add(new GameStar { GameId = command.GameId, StarRank = 2, PlayerId = command.SecondStarPlayerId.Value });
+        }
+
         if (command.ThirdStarPlayerId.HasValue)
+        {
             newStars.Add(new GameStar { GameId = command.GameId, StarRank = 3, PlayerId = command.ThirdStarPlayerId.Value });
+        }
 
         if (newStars.Count > 0)
+        {
             _dbContext.GameStars.AddRange(newStars);
+        }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
     }
 
-    private async Task EnsureGameExistsAsync(int gameId, CancellationToken cancellationToken)
+    async Task EnsureGameExistsAsync(int gameId, CancellationToken cancellationToken)
     {
         var exists = await _dbContext.Games.AnyAsync(g => g.Id == gameId, cancellationToken);
         if (!exists)
+        {
             throw new EntityNotFoundException(nameof(Game), gameId);
+        }
     }
 
     // Recompute the stat tables after a change to game data. Best-effort: a refresh failure must not
     // fail the write that triggered it (the stats can also be refreshed manually from the Admin app).
-    private async Task TryRefreshStatsAsync(int gameId, CancellationToken cancellationToken)
+    async Task TryRefreshStatsAsync(int gameId, CancellationToken cancellationToken)
     {
         try
         {

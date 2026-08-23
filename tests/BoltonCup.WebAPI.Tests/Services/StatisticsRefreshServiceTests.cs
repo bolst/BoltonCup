@@ -12,7 +12,7 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class StatisticsRefreshServiceTests
 {
-    private static IDbContextFactory<BoltonCupDbContext> BuildFactory(string dbName)
+    static IDbContextFactory<BoltonCupDbContext> BuildFactory(string dbName)
     {
         var services = new ServiceCollection();
         services.AddDbContextFactory<BoltonCupDbContext>(o => o
@@ -21,7 +21,7 @@ public class StatisticsRefreshServiceTests
         return services.BuildServiceProvider().GetRequiredService<IDbContextFactory<BoltonCupDbContext>>();
     }
 
-    private static Team Team(int id, string name) => new()
+    static Team Team(int id, string name) => new Team
     {
         Id = id,
         Name = name,
@@ -31,7 +31,7 @@ public class StatisticsRefreshServiceTests
         SecondaryColorHex = "#FFFFFF",
     };
 
-    private static Account Account(int id) => new()
+    static Account Account(int id) => new Account
     {
         Id = id,
         FirstName = $"First{id}",
@@ -40,7 +40,7 @@ public class StatisticsRefreshServiceTests
         Birthday = new DateTime(1990, 1, 1),
     };
 
-    private static Player Player(int id, int teamId, string position) => new()
+    static Player Player(int id, int teamId, string position) => new Player
     {
         Id = id,
         TournamentId = 1,
@@ -49,7 +49,7 @@ public class StatisticsRefreshServiceTests
         Position = position,
     };
 
-    private static Goal Goal(int id, int gameId, int teamId, int scorerId, int? assistId = null) => new()
+    static Goal Goal(int id, int gameId, int teamId, int scorerId, int? assistId = null) => new Goal
     {
         Id = id,
         GameId = gameId,
@@ -61,7 +61,7 @@ public class StatisticsRefreshServiceTests
         Assist1PlayerId = assistId,
     };
 
-    private static async Task SeedAsync(IDbContextFactory<BoltonCupDbContext> factory)
+    static async Task SeedAsync(IDbContextFactory<BoltonCupDbContext> factory)
     {
         await using var db = await factory.CreateDbContextAsync();
 

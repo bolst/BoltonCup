@@ -11,15 +11,15 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class TeamServiceTests
 {
-    private const int TournamentId = 1;
-    private const int TeamId = 10;
+    const int TournamentId = 1;
+    const int TeamId = 10;
 
-    private static BoltonCupDbContext NewContext() =>
+    static BoltonCupDbContext NewContext() =>
         new(new DbContextOptionsBuilder<BoltonCupDbContext>()
             .UseInMemoryDatabase($"team-{Guid.NewGuid()}")
             .Options);
 
-    private static TeamService NewService(BoltonCupDbContext db)
+    static TeamService NewService(BoltonCupDbContext db)
     {
         var music = new MusicLibraryService(db, Mock.Of<IStorageService>(), Mock.Of<IAssetKeyGenerator>(), Mock.Of<IMusicSearchService>(), new GlobalMusicQueue(db));
         return new TeamService(db, Mock.Of<IStorageService>(), Mock.Of<IAssetKeyGenerator>(), music);
@@ -147,7 +147,7 @@ public class TeamServiceTests
         await act.Should().ThrowAsync<EntityNotFoundException>();
     }
 
-    private static async Task<BoltonCupDbContext> SeedAsync()
+    static async Task<BoltonCupDbContext> SeedAsync()
     {
         var db = NewContext();
         db.Tournaments.Add(new Tournament { Id = TournamentId, Name = "Test Cup" });

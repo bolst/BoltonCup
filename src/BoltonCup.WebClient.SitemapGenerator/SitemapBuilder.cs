@@ -8,16 +8,16 @@ using BoltonCup.WebClient.Attributes;
 
 namespace BoltonCup.WebClient.SitemapGenerator;
 
-internal class SitemapBuilder
+class SitemapBuilder
 {
-    private const float _defaultPriority = 0.5f;
-    private static readonly Regex _invalidRouteRegex = new Regex(@"^[^A-Za-z0-9-&'""<> _/.%\\/]$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
+    const float _defaultPriority = 0.5f;
+    static readonly Regex _invalidRouteRegex = new Regex(@"^[^A-Za-z0-9-&'""<> _/.%\\/]$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
-    private readonly StringBuilder _builder;
-    private readonly string _scheme;
-    private readonly string _host;
+    readonly StringBuilder _builder;
+    readonly string _scheme;
+    readonly string _host;
 
-    private string? _result;
+    string? _result;
 
     public SitemapBuilder(string scheme, string host)
     {
@@ -38,7 +38,9 @@ internal class SitemapBuilder
         if (string.IsNullOrEmpty(location))
         {
             if (sitemapAttribute is null)
+            {
                 Log.Debug("Sitemap attribute for {PageType} not found, checking route", pageType.FullName);
+            }
 
             var routeAttribute = pageType.GetCustomAttribute<RouteAttribute>();
             if (routeAttribute is null)
@@ -51,11 +53,15 @@ internal class SitemapBuilder
 
         // did not find a location for the page: cannot generate a valid sitemap node for it
         if (string.IsNullOrEmpty(location))
+        {
             return;
+        }
 
         DateTimeOffset? modifiedTime = null;
         if (sitemapAttribute?.LastModified != null)
+        {
             modifiedTime = DateTimeOffset.Parse(sitemapAttribute.LastModified);
+        }
 
         AddRoute(location, sitemapAttribute?.Priority ?? _defaultPriority, sitemapAttribute?.ChangeFrequency, modifiedTime);
     }
@@ -63,7 +69,9 @@ internal class SitemapBuilder
     public void AddRoute(string location, float priority = _defaultPriority, SitemapChangeFrequency? changeFrequency = null, DateTimeOffset? lastModified = null)
     {
         if (string.IsNullOrWhiteSpace(location))
+        {
             throw new ArgumentNullException(nameof(location));
+        }
 
         Log.Information("Building sitemap node for route {Route}", location);
         if (!location.StartsWith('/') || _invalidRouteRegex.IsMatch(location))
@@ -83,9 +91,15 @@ internal class SitemapBuilder
             _builder.Append($"<loc>{loc}</loc>");
             _builder.Append($"<priority>{priorityValue}</priority>");
             if (!string.IsNullOrEmpty(changeFreq))
+            {
                 _builder.Append($"<changefreq>{changeFreq}</changefreq>");
+            }
+
             if (!string.IsNullOrEmpty(lastmod))
+            {
                 _builder.Append($"<lastmod>{lastmod}</lastmod>");
+            }
+
             _builder.Append("</url>");
         }
 
@@ -93,22 +107,21 @@ internal class SitemapBuilder
             location, loc, priorityValue, changeFreq ?? "null", lastmod ?? "null");
     }
 
-    private static string Escape(string input)
-    {
-        return input
+    static string Escape(string input) => input
             .Replace("&", "&amp;")
             .Replace("'", "&apos;")
             .Replace("\"", "&quot;")
             .Replace(">", "&gt;")
             .Replace("<", "&lt;")
             .Replace(" ", "%20");
-    }
 
     public string Build()
     {
-        if (!string.IsNullOrEmpty(_result)) 
+        if (!string.IsNullOrEmpty(_result))
+        {
             return _result;
-        
+        }
+
         lock (_builder)
         {
             _builder.Append("</urlset>");

@@ -22,34 +22,31 @@ public static class ServiceCollectionExtensions
     {
         var configSection = configuration.GetSection(BoltonCupConfiguration.SectionName);
         services.Configure<BoltonCupConfiguration>(configSection);
-        
+
         var bcConfig = configSection.Get<BoltonCupConfiguration>();
         var apiBaseUrl = bcConfig?.ApiBaseUrl
             ?? throw new ArgumentException("Missing API base URL.", nameof(BoltonCupConfiguration.ApiBaseUrl));
-        
+
         // theming
         services.AddSingleton<BoltonCupTheme>();
-        
+
         // s3
         services
             .AddSingleton<IAssetUrlResolver, AssetUrlResolver>(_ => new AssetUrlResolver(bcConfig))
             .AddSingleton<IAssetFileUploader, AssetFileUploader>()
             .TryAddSingleton<IStorageService, ClientStorageService>();
-        
+
         // auth
         services
             .AddAuthorizationCore()
             .AddScoped<AuthenticationStateProvider, CookieAuthenticationStateProvider>()
             .AddTransient<CookieHandler>()
             .AddTransient<SentryHttpMessageHandler>()
-            .AddHttpClient<IBoltonCupApi, BoltonCupApi>(client => 
-            {
-                client.BaseAddress = new Uri(apiBaseUrl);
-            })
+            .AddHttpClient<IBoltonCupApi, BoltonCupApi>(client => client.BaseAddress = new Uri(apiBaseUrl))
             .AddHttpMessageHandler<CookieHandler>()
             .AddHttpMessageHandler<SentryHttpMessageHandler>()
             .AddTypedClient<IBoltonCupApi>((http, sp) => new BoltonCupApi(apiBaseUrl, http));
-        
+
         return services;
     }
 
@@ -61,7 +58,9 @@ public static class ServiceCollectionExtensions
             options.Dsn = configuration["Sentry::Dsn"] ?? string.Empty;
             options.TracesSampleRate = 1.0;
             if (configuration["BoltonCup::ApiBaseUrl"] is { } apiBaseUrl)
+            {
                 options.TracePropagationTargets.Add(apiBaseUrl);
+            }
         });
     }
 }

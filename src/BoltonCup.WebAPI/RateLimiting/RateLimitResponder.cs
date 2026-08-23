@@ -20,7 +20,10 @@ public static class RateLimitResponder
 
         var problem = new BoltonCupProblemDetails
         {
-            Type = errorType, Title = title, Status = StatusCodes.Status429TooManyRequests, Detail = detail,
+            Type = errorType,
+            Title = title,
+            Status = StatusCodes.Status429TooManyRequests,
+            Detail = detail,
             Instance = context.HttpContext.Request.Path
         };
 

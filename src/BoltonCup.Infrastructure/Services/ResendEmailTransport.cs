@@ -13,10 +13,10 @@ public interface IEmailTransport
 
 public sealed class ResendEmailTransport : IEmailTransport
 {
-    private const string SendEndpoint = "emails";
+    const string SendEndpoint = "emails";
 
-    private readonly HttpClient _httpClient;
-    private readonly ResendSettings _settings;
+    readonly HttpClient _httpClient;
+    readonly ResendSettings _settings;
 
     public ResendEmailTransport(HttpClient httpClient, IOptions<ResendSettings> settings, ILogger<ResendEmailTransport> logger)
     {

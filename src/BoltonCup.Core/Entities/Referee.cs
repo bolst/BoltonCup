@@ -18,7 +18,10 @@ public class RefereeComparer : IEqualityComparer<Referee>
     public bool Equals(Referee? item1, Referee? item2)
     {
         if (ReferenceEquals(item1, item2))
+        {
             return true;
+        }
+
         return item1 is not null && item2 is not null && item1.Id == item2.Id;
     }
 

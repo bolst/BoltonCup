@@ -11,11 +11,11 @@ namespace BoltonCup.WebAPI.Tests.Controllers;
 
 public class TournamentRegistrationsControllerTests
 {
-    private const int AccountId = 42;
+    const int AccountId = 42;
 
-    private readonly Mock<ITournamentRegistrationService> _registrationService = new();
-    private readonly Mock<IMapper> _mapper = new();
-    private readonly TournamentRegistrationsController _controller;
+    readonly Mock<ITournamentRegistrationService> _registrationService = new();
+    readonly Mock<IMapper> _mapper = new();
+    readonly TournamentRegistrationsController _controller;
 
     public TournamentRegistrationsControllerTests()
     {

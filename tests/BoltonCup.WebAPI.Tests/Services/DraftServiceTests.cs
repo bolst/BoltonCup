@@ -12,7 +12,7 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class DraftServiceTests
 {
-    private static BoltonCupDbContext NewContext()
+    static BoltonCupDbContext NewContext()
     {
         var options = new DbContextOptionsBuilder<BoltonCupDbContext>()
             .UseInMemoryDatabase($"draft-{Guid.NewGuid()}")
@@ -25,7 +25,7 @@ public class DraftServiceTests
     /// Seeds a tournament with <paramref name="teamCount"/> teams and <paramref name="playerCount"/> players,
     /// a draft in the given status with default orderings, one ranking per player, and one pick per player.
     /// </summary>
-    private static async Task<(BoltonCupDbContext Db, Draft Draft, List<int> PlayerIds, List<int> TeamIds)> SeedDraftAsync(
+    static async Task<(BoltonCupDbContext Db, Draft Draft, List<int> PlayerIds, List<int> TeamIds)> SeedDraftAsync(
         int teamCount,
         int playerCount,
         DraftStatus status,
@@ -170,7 +170,9 @@ public class DraftServiceTests
 
         var rankingsAfter = await db.PlayerDraftRankings.Where(r => r.DraftId == draft.Id).ToListAsync();
         foreach (var r in rankingsAfter)
+        {
             r.DraftRanking.Should().Be(rankingsBefore[r.PlayerId]); // ordering untouched
+        }
     }
 
     [Fact]
@@ -380,20 +382,32 @@ public class DraftServiceTests
 
         var gmAccount = new Account
         {
-            Id = gmAccountId, FirstName = "Gina", LastName = "Manager",
-            Email = "gm@test.com", Birthday = new DateTime(1990, 1, 1),
+            Id = gmAccountId,
+            FirstName = "Gina",
+            LastName = "Manager",
+            Email = "gm@test.com",
+            Birthday = new DateTime(1990, 1, 1),
         };
         db.Accounts.Add(gmAccount);
         db.Teams.Add(new Team
         {
-            Id = 1, Name = "Team 1", NameShort = "T1", Abbreviation = "T1",
-            PrimaryColorHex = "#000000", SecondaryColorHex = "#ffffff",
-            TournamentId = 1, GeneralManagers = [gmAccount],
+            Id = 1,
+            Name = "Team 1",
+            NameShort = "T1",
+            Abbreviation = "T1",
+            PrimaryColorHex = "#000000",
+            SecondaryColorHex = "#ffffff",
+            TournamentId = 1,
+            GeneralManagers = [gmAccount],
         });
         db.Teams.Add(new Team
         {
-            Id = 2, Name = "Team 2", NameShort = "T2", Abbreviation = "T2",
-            PrimaryColorHex = "#000000", SecondaryColorHex = "#ffffff",
+            Id = 2,
+            Name = "Team 2",
+            NameShort = "T2",
+            Abbreviation = "T2",
+            PrimaryColorHex = "#000000",
+            SecondaryColorHex = "#ffffff",
             TournamentId = 1,
         });
 
@@ -404,8 +418,11 @@ public class DraftServiceTests
             {
                 db.Accounts.Add(new Account
                 {
-                    Id = accountId, FirstName = $"First{accountId}", LastName = $"Last{accountId}",
-                    Email = $"p{accountId}@test.com", Birthday = new DateTime(1990, 1, 1),
+                    Id = accountId,
+                    FirstName = $"First{accountId}",
+                    LastName = $"Last{accountId}",
+                    Email = $"p{accountId}@test.com",
+                    Birthday = new DateTime(1990, 1, 1),
                 });
             }
             db.Players.Add(new Player { Id = playerId, AccountId = accountId, TournamentId = 1, Position = Position.Forward });
@@ -422,7 +439,7 @@ public class DraftServiceTests
         rankings.Where(r => r.PlayerId != 3).Should().OnlyContain(r => !r.IsExcluded);
     }
 
-    private static void AddLateRegistrant(BoltonCupDbContext db, int playerId, int accountId)
+    static void AddLateRegistrant(BoltonCupDbContext db, int playerId, int accountId)
     {
         db.Accounts.Add(new Account
         {
@@ -441,7 +458,7 @@ public class DraftServiceTests
         });
     }
 
-    private static async Task MakePickAsync(BoltonCupDbContext db, DraftPick pick, int playerId, bool isAuto)
+    static async Task MakePickAsync(BoltonCupDbContext db, DraftPick pick, int playerId, bool isAuto)
     {
         pick.PlayerId = playerId;
         pick.IsAutoPick = isAuto;

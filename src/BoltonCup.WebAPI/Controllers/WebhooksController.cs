@@ -22,7 +22,7 @@ public class WebhooksController(
 ) : BoltonCupControllerBase
 {
 
-    private readonly string _stripeWebhookSecret = _stripeSettings.Value.WebhookSecret;
+    readonly string _stripeWebhookSecret = _stripeSettings.Value.WebhookSecret;
 
     /// <summary>Receives and processes Stripe webhook events.</summary>
     [AllowAnonymous]
@@ -49,11 +49,17 @@ public class WebhooksController(
                 {
                     case PurchaseType.TournamentRegistration:
                         if (_mapper.TryParseTournamentPaymentCommand(paymentIntent, out var tournamentCommand))
+                        {
                             await _tournamentPaymentService.ProcessPaymentIntentAsync(tournamentCommand);
+                        }
+
                         break;
                     case PurchaseType.BracketChallengeRegistration:
                         if (_mapper.TryParseBracketChallengePaymentCommand(paymentIntent, out var bracketChallengeCommand))
+                        {
                             await _bracketChallengeService.ProcessPaymentIntentAsync(bracketChallengeCommand);
+                        }
+
                         break;
                     default:
                         _logger.LogWarning("Unhandled purchase type {PurchaseType}", purchaseType);

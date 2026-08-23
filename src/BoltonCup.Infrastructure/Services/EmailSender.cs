@@ -104,47 +104,57 @@ public class EmailSender(
         return broadcastId;
     }
 
-    public Task SendTradeCreatedAsync(IEnumerable<string> recipients, TradeEmailInfo info) =>
-        SendTradeNotificationAsync(
+    public Task SendTradeCreatedAsync(IEnumerable<string> recipients, TradeEmailInfo info)
+    {
+        return SendTradeNotificationAsync(
             recipients,
             subject: $"Trade proposed: {info.ProposingTeamName.ToUpper()} and {info.ReceivingTeamName.ToUpper()}",
             heading: "A trade has been proposed",
             intro: $"{info.ProposingTeamName} has requested a trade with {info.ReceivingTeamName}.",
             info);
+    }
 
-    public Task SendTradeAcceptedAsync(IEnumerable<string> recipients, TradeEmailInfo info) =>
-        SendTradeNotificationAsync(
+    public Task SendTradeAcceptedAsync(IEnumerable<string> recipients, TradeEmailInfo info)
+    {
+        return SendTradeNotificationAsync(
             recipients,
             subject: $"Trade accepted: {info.ProposingTeamName.ToUpper()} and {info.ReceivingTeamName.ToUpper()}",
             heading: "A trade has been accepted",
             intro: $"{info.ReceivingTeamName} has accepted {info.ProposingTeamName}'s proposed trade. It now awaits admin approval.",
             info);
+    }
 
-    public Task SendTradeDeclinedAsync(IEnumerable<string> recipients, TradeEmailInfo info) =>
-        SendTradeNotificationAsync(
+    public Task SendTradeDeclinedAsync(IEnumerable<string> recipients, TradeEmailInfo info)
+    {
+        return SendTradeNotificationAsync(
             recipients,
             subject: $"Trade declined: {info.ProposingTeamName.ToUpper()} and {info.ReceivingTeamName.ToUpper()}",
             heading: "A trade has been declined",
             intro: $"{info.ReceivingTeamName} has declined {info.ProposingTeamName}'s proposed trade.",
             info);
+    }
 
-    public Task SendTradeCancelledAsync(IEnumerable<string> recipients, TradeEmailInfo info) =>
-        SendTradeNotificationAsync(
+    public Task SendTradeCancelledAsync(IEnumerable<string> recipients, TradeEmailInfo info)
+    {
+        return SendTradeNotificationAsync(
             recipients,
             subject: $"Trade cancelled: {info.ProposingTeamName.ToUpper()} and {info.ReceivingTeamName.ToUpper()}",
             heading: "A trade has been cancelled",
             intro: $"The proposed trade between {info.ProposingTeamName} and {info.ReceivingTeamName} has been cancelled.",
             info);
+    }
 
-    public Task SendTradeApprovedAsync(IEnumerable<string> recipients, TradeEmailInfo info) =>
-        SendTradeNotificationAsync(
+    public Task SendTradeApprovedAsync(IEnumerable<string> recipients, TradeEmailInfo info)
+    {
+        return SendTradeNotificationAsync(
             recipients,
             subject: $"Trade processed: {info.ProposingTeamName.ToUpper()} and {info.ReceivingTeamName.ToUpper()}",
             heading: "A trade has been processed",
             intro: $"The trade between {info.ProposingTeamName} and {info.ReceivingTeamName} has been approved and processed. Rosters have been updated.",
             info);
+    }
 
-    private async Task SendTradeNotificationAsync(IEnumerable<string> recipients, string subject, string heading, string intro, TradeEmailInfo info)
+    async Task SendTradeNotificationAsync(IEnumerable<string> recipients, string subject, string heading, string intro, TradeEmailInfo info)
     {
         var logoUrl = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? "";
 
@@ -176,7 +186,7 @@ public class EmailSender(
         {
             Title = bracketChallenge.Title ?? "",
             Link = bracketChallenge.Link ?? "",
-            Password = bracketChallenge.Password ?? "", 
+            Password = bracketChallenge.Password ?? "",
             LogoUrl = _urlResolver.GetFullUrl(AssetUrlResolver.StaticKeys.Logo) ?? ""
         };
         var payload = new EmailPayload(

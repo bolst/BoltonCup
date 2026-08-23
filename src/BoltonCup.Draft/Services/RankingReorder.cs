@@ -34,9 +34,13 @@ public static class RankingReorder
         if (target >= visible.Count)
         {
             if (visible.Count == 0)
+            {
                 players.Add(item);
+            }
             else
+            {
                 players.Insert(players.IndexOf(visible[^1]) + 1, item);
+            }
         }
         else
         {
@@ -52,7 +56,9 @@ public static class RankingReorder
         var visible = Visible(players, positionFilter);
         var vi = visible.ToList().IndexOf(player);
         if (vi <= 0)
+        {
             return;
+        }
 
         var prev = visible[vi - 1];
         players.Remove(player);
@@ -66,7 +72,9 @@ public static class RankingReorder
         var visible = Visible(players, positionFilter);
         var vi = visible.ToList().IndexOf(player);
         if (vi < 0 || vi >= visible.Count - 1)
+        {
             return;
+        }
 
         var next = visible[vi + 1];
         players.Remove(player);
@@ -79,7 +87,9 @@ public static class RankingReorder
     {
         var first = Visible(players, positionFilter).FirstOrDefault();
         if (first is null || first == player)
+        {
             return;
+        }
 
         players.Remove(player);
         players.Insert(players.IndexOf(first), player);
@@ -91,7 +101,9 @@ public static class RankingReorder
     {
         var last = Visible(players, positionFilter).LastOrDefault();
         if (last is null || last == player)
+        {
             return;
+        }
 
         players.Remove(player);
         players.Insert(players.IndexOf(last) + 1, player);
@@ -101,6 +113,8 @@ public static class RankingReorder
     public static void Renumber(List<Sdk.CustomRankingPlayerDto> players)
     {
         for (var i = 0; i < players.Count; i++)
+        {
             players[i].Rank = i + 1;
+        }
     }
 }

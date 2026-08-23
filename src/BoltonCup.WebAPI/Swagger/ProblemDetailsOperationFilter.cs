@@ -20,7 +20,8 @@ public sealed class ProblemDetailsOperationFilter : IOperationFilter
         {
             operation.Responses["400"] = new OpenApiResponse
             {
-                Description = "Validation Error", Content = new Dictionary<string, OpenApiMediaType>
+                Description = "Validation Error",
+                Content = new Dictionary<string, OpenApiMediaType>
                 {
                     ["application/problem+json"] = new()
                     {
@@ -38,7 +39,8 @@ public sealed class ProblemDetailsOperationFilter : IOperationFilter
         {
             operation.Responses["429"] = new OpenApiResponse
             {
-                Description = "Too Many Requests", Content = new Dictionary<string, OpenApiMediaType>
+                Description = "Too Many Requests",
+                Content = new Dictionary<string, OpenApiMediaType>
                 {
                     ["application/json"] = new()
                     {
@@ -53,18 +55,16 @@ public sealed class ProblemDetailsOperationFilter : IOperationFilter
             .Distinct()
             .Where(statusCode => !operation.Responses.ContainsKey(statusCode))
             .ToList()
-            .ForEach(statusCode =>
+            .ForEach(statusCode => operation.Responses?[statusCode] = new OpenApiResponse
             {
-                operation.Responses?[statusCode] = new OpenApiResponse
+                Description = "Error",
+                Content = new Dictionary<string, OpenApiMediaType>
                 {
-                    Description = "Error", Content = new Dictionary<string, OpenApiMediaType>
+                    ["application/problem+json"] = new()
                     {
-                        ["application/problem+json"] = new()
-                        {
-                            Schema = problemSchema
-                        }
+                        Schema = problemSchema
                     }
-                };
+                }
             });
     }
 }

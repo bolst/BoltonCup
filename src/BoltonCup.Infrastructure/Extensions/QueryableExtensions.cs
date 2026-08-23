@@ -18,8 +18,7 @@ public static class QueryableExtensions
         this IQueryable<TSource> source,
         Expression<Func<TSource, bool>> predicate,
         Func<bool> condition) => source.ConditionalWhere(predicate, condition());
-    
-    
+
     /// <summary>
     /// Filters a sequence of values based on a predicate if the specified condition is true.
     /// </summary>
@@ -31,10 +30,7 @@ public static class QueryableExtensions
     /// An <see cref="IQueryable{TSource}"/> that contains elements from the input sequence that satisfy the condition specified by <paramref name="predicate"/> if <paramref name="condition"/> is true; otherwise, the original <paramref name="source"/>.
     /// </returns>
     public static IQueryable<TSource> ConditionalWhere<TSource>(
-        this IQueryable<TSource> source, 
-        Expression<Func<TSource, bool>> predicate, 
-        bool condition)
-    {
-        return condition ? source.Where(predicate) : source;
-    }
+        this IQueryable<TSource> source,
+        Expression<Func<TSource, bool>> predicate,
+        bool condition) => condition ? source.Where(predicate) : source;
 }

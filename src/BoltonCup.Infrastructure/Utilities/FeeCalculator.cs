@@ -8,8 +8,5 @@ public static class FeeCalculator
     /// <remarks>
     /// Stripe charges 2.9% + 0.3c.
     /// </remarks>
-    public static decimal GetAdjustedStripeAmount(decimal amount)
-    {
-        return (amount + (decimal)0.3) / (decimal)(1 - 0.029);
-    }
+    public static decimal GetAdjustedStripeAmount(decimal amount) => (amount + (decimal)0.3) / (decimal)(1 - 0.029);
 }

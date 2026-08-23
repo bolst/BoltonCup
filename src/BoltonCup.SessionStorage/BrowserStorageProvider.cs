@@ -3,12 +3,12 @@ using BoltonCup.SessionStorage.Exceptions;
 
 namespace BoltonCup.SessionStorage;
 
-internal class BrowserStorageProvider : IStorageProvider
+class BrowserStorageProvider : IStorageProvider
 {
-    private const string StorageNotAvailableMessage = "Unable to access the browser storage. This is most likely due to the browser settings.";
-    
-    private readonly IJSRuntime _jSRuntime;
-    private readonly IJSInProcessRuntime _jSInProcessRuntime;
+    const string StorageNotAvailableMessage = "Unable to access the browser storage. This is most likely due to the browser settings.";
+
+    readonly IJSRuntime _jSRuntime;
+    readonly IJSInProcessRuntime _jSInProcessRuntime;
 
     public BrowserStorageProvider(IJSRuntime jSRuntime)
     {
@@ -225,7 +225,7 @@ internal class BrowserStorageProvider : IStorageProvider
             throw;
         }
     }
-    
+
     public IEnumerable<string> Keys()
     {
         CheckForInProcessRuntime();
@@ -297,7 +297,7 @@ internal class BrowserStorageProvider : IStorageProvider
             throw;
         }
     }
-    
+
     public void RemoveItems(IEnumerable<string> keys)
     {
         CheckForInProcessRuntime();
@@ -337,12 +337,14 @@ internal class BrowserStorageProvider : IStorageProvider
         }
     }
 
-    private void CheckForInProcessRuntime()
+    void CheckForInProcessRuntime()
     {
         if (_jSInProcessRuntime == null)
+        {
             throw new InvalidOperationException("IJSInProcessRuntime not available");
+        }
     }
-    
-    private static bool IsStorageDisabledException(Exception exception) 
+
+    static bool IsStorageDisabledException(Exception exception)
         => exception.Message.Contains("Failed to read the 'sessionStorage' property from 'Window'");
 }

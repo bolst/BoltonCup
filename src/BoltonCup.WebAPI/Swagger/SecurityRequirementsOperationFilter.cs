@@ -17,7 +17,9 @@ public class SecurityRequirementsOperationFilter : IOperationFilter
 
         // if it is anonymous, don't add security
         if (hasAllowAnonymous)
+        {
             return;
+        }
 
         // assume everything else requires the API Key or "Bearer" scheme.
         operation.Security =

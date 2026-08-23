@@ -8,22 +8,22 @@ namespace BoltonCup.Common.Components;
 
 public partial class BoltonCupEditForm<T> : ComponentBase where T : class, new()
 {
-    private readonly List<FieldContext> _fields = [];
+    readonly List<FieldContext> _fields = [];
 
-    private bool _isSubmitting;
+    bool _isSubmitting;
 
-    private EditContext? _editContext;
+    EditContext? _editContext;
 
     [Parameter]
     [EditorRequired]
     public required T Model { get; set; }
-    
+
     [Parameter]
     public EventCallback<EditContext> OnValidSubmit { get; set; }
 
     [Parameter]
     public RenderFragment ActionsContent { get; set; } = null!;
-    
+
     [Parameter]
     public string? Title { get; set; }
 
@@ -32,7 +32,7 @@ public partial class BoltonCupEditForm<T> : ComponentBase where T : class, new()
 
     [Parameter]
     public Margin Margin { get; set; } = Margin.None;
-    
+
     [Parameter]
     public bool Dense { get; set; }
 
@@ -44,7 +44,7 @@ public partial class BoltonCupEditForm<T> : ComponentBase where T : class, new()
 
     [Parameter]
     public bool ShrinkLabel { get; set; } = true;
-    
+
     [Parameter]
     public bool Disabled { get; set; }
 
@@ -63,7 +63,7 @@ public partial class BoltonCupEditForm<T> : ComponentBase where T : class, new()
         _editContext ??= new EditContext(Model);
     }
 
-    private async Task HandleValidSubmitAsync()
+    async Task HandleValidSubmitAsync()
     {
         _isSubmitting = true;
         try
@@ -77,13 +77,10 @@ public partial class BoltonCupEditForm<T> : ComponentBase where T : class, new()
         }
     }
 
-    private void OnValueChanged(FieldContext field, object? value)
-    {
-        field.PropertyInfo.SetValue(Model, value);
-    }
+    void OnValueChanged(FieldContext field, object? value) => field.PropertyInfo.SetValue(Model, value);
 
     // creates the "() => Model.Property" expression
-    private Expression<Func<TProperty>> CreateValidationExpression<TProperty>(FieldContext field)
+    Expression<Func<TProperty>> CreateValidationExpression<TProperty>(FieldContext field)
     {
         var constant = Expression.Constant(Model);
         var propertyAccess = Expression.Property(constant, field.PropertyInfo);

@@ -13,10 +13,10 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class SmsPipelineTests
 {
-    private const string ToNumber = "+15555550123";
-    private const string Body = "hello from the trade hub";
+    const string ToNumber = "+15555550123";
+    const string Body = "hello from the trade hub";
 
-    private static ServiceProvider BuildProvider(string dbName, ISmsTransport transport)
+    static ServiceProvider BuildProvider(string dbName, ISmsTransport transport)
     {
         var services = new ServiceCollection();
         services.AddLogging();
@@ -27,13 +27,16 @@ public class SmsPipelineTests
         return services.BuildServiceProvider();
     }
 
-    private static async Task WaitForAsync(Func<Task<bool>> condition, int timeoutMs = 3000)
+    static async Task WaitForAsync(Func<Task<bool>> condition, int timeoutMs = 3000)
     {
         var sw = Stopwatch.StartNew();
         while (sw.ElapsedMilliseconds < timeoutMs)
         {
             if (await condition())
+            {
                 return;
+            }
+
             await Task.Delay(25);
         }
         throw new TimeoutException("Condition was not met within the timeout.");

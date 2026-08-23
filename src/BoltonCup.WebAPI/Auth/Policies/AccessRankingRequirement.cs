@@ -14,7 +14,7 @@ public static partial class BoltonCupPolicy
     public const string CanAccessRanking = "CanAccessRanking";
 }
 /// <summary>Resolves the ranking id under authorization from the request route or an explicit int resource.</summary>
-internal static class RankingAuthorizationResource
+static class RankingAuthorizationResource
 {
     public static bool TryGetRankingId(AuthorizationHandlerContext context, out int rankingId)
     {
@@ -54,10 +54,14 @@ public class RankingAccessHandler(BoltonCupDbContext _dbContext)
         }
 
         if (!RankingAuthorizationResource.TryGetRankingId(context, out var rankingId))
+        {
             return;
+        }
 
         if (!context.User.TryGetAccountId(out var accountId))
+        {
             return;
+        }
 
         var canView = await _dbContext.CustomRankings
             .AnyAsync(r => r.Id == rankingId
@@ -65,6 +69,8 @@ public class RankingAccessHandler(BoltonCupDbContext _dbContext)
                                || r.SharedWith.Any(s => s.SharedWithAccountId == accountId)));
 
         if (canView)
+        {
             context.Succeed(requirement);
+        }
     }
 }

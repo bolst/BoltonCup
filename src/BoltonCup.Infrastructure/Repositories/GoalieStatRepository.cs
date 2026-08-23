@@ -9,9 +9,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepository
 {
-    public async Task<IPagedList<GoalieStat>> GetAllAsync(GetGoalieStatsQuery query, CancellationToken cancellationToken = default)
-    {
-        return await _context.GoalieStats
+    public async Task<IPagedList<GoalieStat>> GetAllAsync(GetGoalieStatsQuery query, CancellationToken cancellationToken = default) => await _context.GoalieStats
             .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => query.TeamIds!.Contains(p.TeamId), query.TeamIds?.Count > 0)
@@ -54,5 +52,4 @@ public class GoalieStatRepository(BoltonCupDbContext _context) : IGoalieStatRepo
                 .ThenBy(p => p.GamesPlayed)
             )
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
-    }       
 }

@@ -11,14 +11,14 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class CustomRankingServiceTests
 {
-    private const int OwnerId = 1;
-    private const int Gm1Id = 2;
-    private const int Gm2Id = 3;
-    private const int NonGmId = 4;
-    private const int TournamentId = 1;
-    private const int RankingId = 1;
+    const int OwnerId = 1;
+    const int Gm1Id = 2;
+    const int Gm2Id = 3;
+    const int NonGmId = 4;
+    const int TournamentId = 1;
+    const int RankingId = 1;
 
-    private static BoltonCupDbContext NewContext()
+    static BoltonCupDbContext NewContext()
     {
         var options = new DbContextOptionsBuilder<BoltonCupDbContext>()
             .UseInMemoryDatabase($"custom-ranking-{Guid.NewGuid()}")
@@ -31,7 +31,7 @@ public class CustomRankingServiceTests
     /// Seeds tournament 1 with two GM teams (GMs = accounts 2 and 3), an owner (1) and a non-GM account (4),
     /// and a custom ranking (id 1) owned by the owner.
     /// </summary>
-    private static async Task<BoltonCupDbContext> SeedAsync()
+    static async Task<BoltonCupDbContext> SeedAsync()
     {
         var db = NewContext();
 
@@ -55,15 +55,25 @@ public class CustomRankingServiceTests
 
         db.Teams.Add(new Team
         {
-            Id = 1, Name = "Team 1", NameShort = "T1", Abbreviation = "T1",
-            PrimaryColorHex = "#000000", SecondaryColorHex = "#ffffff",
-            TournamentId = TournamentId, GeneralManagers = [accountsById[Gm1Id]],
+            Id = 1,
+            Name = "Team 1",
+            NameShort = "T1",
+            Abbreviation = "T1",
+            PrimaryColorHex = "#000000",
+            SecondaryColorHex = "#ffffff",
+            TournamentId = TournamentId,
+            GeneralManagers = [accountsById[Gm1Id]],
         });
         db.Teams.Add(new Team
         {
-            Id = 2, Name = "Team 2", NameShort = "T2", Abbreviation = "T2",
-            PrimaryColorHex = "#000000", SecondaryColorHex = "#ffffff",
-            TournamentId = TournamentId, GeneralManagers = [accountsById[Gm2Id]],
+            Id = 2,
+            Name = "Team 2",
+            NameShort = "T2",
+            Abbreviation = "T2",
+            PrimaryColorHex = "#000000",
+            SecondaryColorHex = "#ffffff",
+            TournamentId = TournamentId,
+            GeneralManagers = [accountsById[Gm2Id]],
         });
 
         db.CustomRankings.Add(new CustomRanking
@@ -239,10 +249,20 @@ public class CustomRankingServiceTests
         AddPoolPlayer(db, playerId: 11, accountId: 11);
         db.SkaterStats.Add(new SkaterStat
         {
-            GameId = 1, PlayerId = 11, AccountId = 11,
-            GamesPlayed = 1, Goals = 5, Assists = 0, Points = 5, PenaltyMinutes = 0,
-            FirstName = "Pool", LastName = "Player11", Position = null, JerseyNumber = null,
-            Birthday = new DateTime(1990, 1, 1), ProfilePicture = null,
+            GameId = 1,
+            PlayerId = 11,
+            AccountId = 11,
+            GamesPlayed = 1,
+            Goals = 5,
+            Assists = 0,
+            Points = 5,
+            PenaltyMinutes = 0,
+            FirstName = "Pool",
+            LastName = "Player11",
+            Position = null,
+            JerseyNumber = null,
+            Birthday = new DateTime(1990, 1, 1),
+            ProfilePicture = null,
         });
         await db.SaveChangesAsync();
         var service = new CustomRankingService(db);
@@ -352,7 +372,7 @@ public class CustomRankingServiceTests
         ranking.Players.Single(p => p.PlayerId == 10).Rank.Should().Be(1);
     }
 
-    private static void AddPoolPlayer(BoltonCupDbContext db, int playerId, int accountId)
+    static void AddPoolPlayer(BoltonCupDbContext db, int playerId, int accountId)
     {
         db.Accounts.Add(new Account
         {

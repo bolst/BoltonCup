@@ -11,9 +11,9 @@ public class Game : EntityBase
     public string? AwayTeamPlaceholder { get; set; }
     public GameType GameType { get; set; }
     public GameState GameState { get; set; }
-    public string? Venue  { get; set; }
+    public string? Venue { get; set; }
     public string? Rink { get; set; }
-    
+
     public Tournament Tournament { get; set; } = null!;
     public Team? HomeTeam { get; set; }
     public Team? AwayTeam { get; set; }
@@ -29,7 +29,10 @@ public class Game : EntityBase
     public override string ToString()
     {
         if (HomeTeam is null || AwayTeam is null)
+        {
             return $"Game {Id} (T{TournamentId})";
+        }
+
         return $"{HomeTeam.NameShort} vs. {AwayTeam.NameShort}";
     }
 }
@@ -38,10 +41,13 @@ public class GameComparer : IEqualityComparer<Game>
 {
     public bool Equals(Game? item1, Game? item2)
     {
-        if (ReferenceEquals(item1, item2)) 
+        if (ReferenceEquals(item1, item2))
+        {
             return true;
+        }
+
         return item1 is not null && item2 is not null && item1.Id == item2.Id;
     }
-        
+
     public int GetHashCode(Game item) => item.Id;
 }

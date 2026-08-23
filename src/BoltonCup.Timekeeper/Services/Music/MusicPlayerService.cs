@@ -10,18 +10,18 @@ namespace BoltonCup.Timekeeper.Services.Music;
 /// </summary>
 public sealed class MusicPlayerService : IAsyncDisposable
 {
-    private const string MusicPlayerVersion = "1.0.1";
+    const string MusicPlayerVersion = "1.0.1";
 
-    private readonly IJSRuntime _js;
-    private readonly MusicCacheService _cache;
+    readonly IJSRuntime _js;
+    readonly MusicCacheService _cache;
 
-    private IJSObjectReference? _module;
-    private DotNetObjectReference<MusicPlayerService>? _selfRef;
-    private string? _currentObjectUrl;
+    IJSObjectReference? _module;
+    DotNetObjectReference<MusicPlayerService>? _selfRef;
+    string? _currentObjectUrl;
 
     // One-shot goal song: plays over the single <audio> element, then stops (no playlist advance).
-    private bool _oneShot;
-    private PlaylistTrackDto? _oneShotTrack;
+    bool _oneShot;
+    PlaylistTrackDto? _oneShotTrack;
 
     public IReadOnlyList<PlaylistTrackDto> Playlist { get; private set; } = [];
     public int CurrentIndex { get; private set; } = -1;
@@ -140,7 +140,7 @@ public sealed class MusicPlayerService : IAsyncDisposable
         Notify();
     }
 
-    private async Task ResumeAsync()
+    async Task ResumeAsync()
     {
         if (_module is null)
         {
@@ -150,7 +150,7 @@ public sealed class MusicPlayerService : IAsyncDisposable
         Notify();
     }
 
-    private Task StopAsync()
+    Task StopAsync()
     {
         IsPlaying = false;
         Notify();
@@ -208,7 +208,7 @@ public sealed class MusicPlayerService : IAsyncDisposable
         NotReady,    // audio module not initialized yet
     }
 
-    private async Task StopAfterOneShotAsync()
+    async Task StopAfterOneShotAsync()
     {
         _oneShot = false;
         _oneShotTrack = null;
@@ -269,20 +269,20 @@ public sealed class MusicPlayerService : IAsyncDisposable
         await NextAsync();
     }
 
-    private async Task RevokeCurrentAsync()
+    async Task RevokeCurrentAsync()
     {
         if (_currentObjectUrl is not null)
         {
             try
             {
                 await _cache.RevokeAsync(_currentObjectUrl);
-            } 
+            }
             catch (JSDisconnectedException) { }
             _currentObjectUrl = null;
         }
     }
 
-    private void Notify() => OnStateChanged?.Invoke();
+    void Notify() => OnStateChanged?.Invoke();
 
     public async ValueTask DisposeAsync()
     {
@@ -296,7 +296,7 @@ public sealed class MusicPlayerService : IAsyncDisposable
         }
         catch (JSDisconnectedException)
         {
-            
+
         }
         await RevokeCurrentAsync();
         _selfRef?.Dispose();

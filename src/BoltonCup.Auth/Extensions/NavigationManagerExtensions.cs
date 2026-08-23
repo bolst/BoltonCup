@@ -9,10 +9,13 @@ public static class NavigationManagerExtensions
     {
         var returnUrl = navigation.GetReturnUrl();
         if (!string.IsNullOrEmpty(returnUrl))
+        {
             uri += "?returnUrl=" + returnUrl;
+        }
+
         navigation.NavigateTo(uri, forceLoad: forceLoad);
     }
-    
+
     public static string? GetReturnUrl(this NavigationManager navigation)
     {
         var uriBuilder = new UriBuilder(navigation.Uri);

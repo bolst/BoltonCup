@@ -1,7 +1,7 @@
 namespace BoltonCup.Core.Queries.Base;
 
-public interface IQueryBase 
-    : IPaginationQuery, ISortQuery 
+public interface IQueryBase
+    : IPaginationQuery, ISortQuery
 { }
 
 public record QueryBase : IQueryBase

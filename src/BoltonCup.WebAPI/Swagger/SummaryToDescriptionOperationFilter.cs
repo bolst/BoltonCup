@@ -11,7 +11,9 @@ public sealed class SummaryToDescriptionOperationFilter : IOperationFilter
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         if (string.IsNullOrEmpty(operation.Summary))
+        {
             return;
+        }
 
         operation.Description = string.IsNullOrEmpty(operation.Description)
             ? operation.Summary

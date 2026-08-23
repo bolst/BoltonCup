@@ -4,10 +4,10 @@ using BoltonCup.Core;
 
 namespace BoltonCup.Infrastructure.Services;
 
-public class ServerStorageService(IAmazonS3 _s3Client, IAssetKeyGenerator _keyGenerator) 
+public class ServerStorageService(IAmazonS3 _s3Client, IAssetKeyGenerator _keyGenerator)
     : IStorageService
 {
-    private const string _bucketName = "bolton-cup-assets";
+    const string _bucketName = "bolton-cup-assets";
 
     public async Task<UploadCredentials> GenerateUploadCredentialsAsync(string fileExtension, string contentType,
         CancellationToken cancellationToken = default)
@@ -39,9 +39,7 @@ public class ServerStorageService(IAmazonS3 _s3Client, IAssetKeyGenerator _keyGe
     }
 
     public Task PutAssetAsync(Stream content, string key, string contentType,
-        CancellationToken cancellationToken = default)
-    {
-        return _s3Client.PutObjectAsync(new PutObjectRequest
+        CancellationToken cancellationToken = default) => _s3Client.PutObjectAsync(new PutObjectRequest
         {
             BucketName = _bucketName,
             Key = key,
@@ -49,5 +47,4 @@ public class ServerStorageService(IAmazonS3 _s3Client, IAssetKeyGenerator _keyGe
             ContentType = contentType,
             DisablePayloadSigning = true,
         }, cancellationToken);
-    }
 }

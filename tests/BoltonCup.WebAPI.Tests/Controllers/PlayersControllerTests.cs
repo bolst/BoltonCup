@@ -10,9 +10,9 @@ namespace BoltonCup.WebAPI.Tests.Controllers;
 
 public class PlayersControllerTests
 {
-    private readonly Mock<IPlayerRepository> _playerRepository = new();
-    private readonly Mock<IMapper> _mapper = new();
-    private readonly PlayersController _controller;
+    readonly Mock<IPlayerRepository> _playerRepository = new();
+    readonly Mock<IMapper> _mapper = new();
+    readonly PlayersController _controller;
 
     public PlayersControllerTests()
     {

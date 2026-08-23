@@ -20,14 +20,14 @@ namespace BoltonCup.WebAPI.Tests.Controllers;
 
 public class WebhooksControllerTests
 {
-    private const string WebhookSecret = "whsec_test";
+    const string WebhookSecret = "whsec_test";
 
-    private readonly Mock<IStripeEventConstructor> _eventConstructor = new();
-    private readonly Mock<IMapper> _mapper = new();
-    private readonly Mock<ITournamentPaymentService> _tournamentPaymentService = new();
-    private readonly Mock<IBracketChallengeService> _bracketChallengeService = new();
-    private readonly Mock<ILogger<WebhooksController>> _logger = new();
-    private readonly WebhooksController _controller;
+    readonly Mock<IStripeEventConstructor> _eventConstructor = new();
+    readonly Mock<IMapper> _mapper = new();
+    readonly Mock<ITournamentPaymentService> _tournamentPaymentService = new();
+    readonly Mock<IBracketChallengeService> _bracketChallengeService = new();
+    readonly Mock<ILogger<WebhooksController>> _logger = new();
+    readonly WebhooksController _controller;
 
     public WebhooksControllerTests()
     {
@@ -45,7 +45,7 @@ public class WebhooksControllerTests
         SetupHttpContext("{}");
     }
 
-    private void SetupHttpContext(string body, string signature = "sig_test")
+    void SetupHttpContext(string body, string signature = "sig_test")
     {
         var ctx = new DefaultHttpContext();
         ctx.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body));
@@ -53,14 +53,14 @@ public class WebhooksControllerTests
         _controller.ControllerContext = new ControllerContext { HttpContext = ctx };
     }
 
-    private void SetupStripeEvent(StripeEvent stripeEvent)
+    void SetupStripeEvent(StripeEvent stripeEvent)
     {
         _eventConstructor
             .Setup(e => e.ConstructEvent(It.IsAny<string>(), It.IsAny<string>(), WebhookSecret))
             .Returns(stripeEvent);
     }
 
-    private static StripeEvent BuildPaymentSucceededEvent(Dictionary<string, string> metadata)
+    static StripeEvent BuildPaymentSucceededEvent(Dictionary<string, string> metadata)
     {
         var paymentIntent = new PaymentIntent
         {

@@ -24,7 +24,7 @@ public class BoltonCupValidationProblemDetails : BoltonCupProblemDetails
     {
     }
 
-    private BoltonCupValidationProblemDetails(Dictionary<string, string[]> errors)
+    BoltonCupValidationProblemDetails(Dictionary<string, string[]> errors)
     {
         Title = "One or more validation errors occurred.";
         Errors = errors;

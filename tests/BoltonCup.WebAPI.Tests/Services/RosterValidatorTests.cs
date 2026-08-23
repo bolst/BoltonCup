@@ -7,18 +7,27 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class RosterValidatorTests
 {
-    private static readonly RosterValidator Validator = new();
+    static readonly RosterValidator Validator = new();
 
-    private static List<Player> Roster(int forwards, int defense, int goalies)
+    static List<Player> Roster(int forwards, int defense, int goalies)
     {
         var players = new List<Player>();
         var id = 1;
         for (var i = 0; i < forwards; i++)
+        {
             players.Add(new Player { Id = id++, AccountId = id, TournamentId = 1, Position = Position.Forward });
+        }
+
         for (var i = 0; i < defense; i++)
+        {
             players.Add(new Player { Id = id++, AccountId = id, TournamentId = 1, Position = Position.Defense });
+        }
+
         for (var i = 0; i < goalies; i++)
+        {
             players.Add(new Player { Id = id++, AccountId = id, TournamentId = 1, Position = Position.Goalie });
+        }
+
         return players;
     }
 

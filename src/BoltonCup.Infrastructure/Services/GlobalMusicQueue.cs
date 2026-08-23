@@ -11,8 +11,8 @@ namespace BoltonCup.Infrastructure.Services;
 /// </summary>
 public class GlobalMusicQueue : IGlobalMusicQueue
 {
-    private readonly BoltonCupDbContext _db;
-    private readonly Random _rng;
+    readonly BoltonCupDbContext _db;
+    readonly Random _rng;
 
     public GlobalMusicQueue(BoltonCupDbContext db) : this(db, Random.Shared) { }
 
@@ -36,7 +36,9 @@ public class GlobalMusicQueue : IGlobalMusicQueue
     {
         var queue = await _db.TournamentMusicQueues.FirstOrDefaultAsync(q => q.TournamentId == tournamentId, cancellationToken);
         if (queue is null)
+        {
             return; // nothing to advance yet
+        }
 
         var eligible = await GetEligibleBasePoolIdsAsync(tournamentId, cancellationToken);
         MusicQueueEngine.Reconcile(queue, eligible, _rng);
@@ -65,7 +67,7 @@ public class GlobalMusicQueue : IGlobalMusicQueue
         await _db.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<TournamentMusicQueue> LoadOrCreateAsync(int tournamentId, CancellationToken cancellationToken)
+    async Task<TournamentMusicQueue> LoadOrCreateAsync(int tournamentId, CancellationToken cancellationToken)
     {
         var queue = await _db.TournamentMusicQueues.FirstOrDefaultAsync(q => q.TournamentId == tournamentId, cancellationToken);
         if (queue is null)
@@ -77,7 +79,7 @@ public class GlobalMusicQueue : IGlobalMusicQueue
     }
 
     // Base-pool tracks that are downloaded and not reserved as a team goal/win song.
-    private async Task<IReadOnlyList<int>> GetEligibleBasePoolIdsAsync(int tournamentId, CancellationToken cancellationToken)
+    async Task<IReadOnlyList<int>> GetEligibleBasePoolIdsAsync(int tournamentId, CancellationToken cancellationToken)
     {
         var excluded = await GetExcludedTrackIdsAsync(tournamentId, cancellationToken);
         return await _db.TournamentMusicTracks
@@ -90,16 +92,13 @@ public class GlobalMusicQueue : IGlobalMusicQueue
             .ToListAsync(cancellationToken);
     }
 
-    private async Task<HashSet<int>> GetDownloadedTrackIdsAsync(int tournamentId, CancellationToken cancellationToken)
-    {
-        return (await _db.TournamentMusicTracks
+    async Task<HashSet<int>> GetDownloadedTrackIdsAsync(int tournamentId, CancellationToken cancellationToken) => (await _db.TournamentMusicTracks
             .Where(t => t.TournamentId == tournamentId && t.Status == MusicTrackStatus.Downloaded)
             .Select(t => t.Id)
             .ToListAsync(cancellationToken))
             .ToHashSet();
-    }
 
-    private async Task<HashSet<int>> GetExcludedTrackIdsAsync(int tournamentId, CancellationToken cancellationToken)
+    async Task<HashSet<int>> GetExcludedTrackIdsAsync(int tournamentId, CancellationToken cancellationToken)
     {
         var warmupSongIds = await _db.Games
             .Where(g => g.TournamentId == tournamentId)

@@ -40,18 +40,23 @@ public class SystemController(
     }
 
 
-    private async Task<TournamentStatLeadersDto?> GetFeaturedStatsOrDefault()
+    async Task<TournamentStatLeadersDto?> GetFeaturedStatsOrDefault()
     {
         if (await _dbContext.Tournaments.FirstOrDefaultAsync(t => t.IsStatsFeatured) is not { } featuredStatsTournament)
+        {
             return null;
+        }
 
         var baseSkaterQuery = new GetSkaterStatsQuery
         {
-            TournamentId = featuredStatsTournament.Id, Size = 5, Descending = true
+            TournamentId = featuredStatsTournament.Id,
+            Size = 5,
+            Descending = true
         };
         var baseGoalieQuery = new GetGoalieStatsQuery
         {
-            TournamentId = featuredStatsTournament.Id, Size = 5
+            TournamentId = featuredStatsTournament.Id,
+            Size = 5
         };
 
         var points = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with
@@ -73,7 +78,9 @@ public class SystemController(
 
         return new TournamentStatLeadersDto
         {
-            TournamentId = featuredStatsTournament.Id, Title = featuredStatsTournament.FeaturedStatsLabel ?? featuredStatsTournament.Name, StatLeaders =
+            TournamentId = featuredStatsTournament.Id,
+            Title = featuredStatsTournament.FeaturedStatsLabel ?? featuredStatsTournament.Name,
+            StatLeaders =
             [
                 _mapper.ToDto(
                     "Points",

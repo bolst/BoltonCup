@@ -20,7 +20,10 @@ public sealed class UnhandledExceptionHandler(
 
         var problemDetails = new BoltonCupProblemDetails
         {
-            Type = ErrorTypes.Unexpected, Title = "An unexpected error occurred", Status = StatusCodes.Status500InternalServerError, Instance = context.TraceIdentifier
+            Type = ErrorTypes.Unexpected,
+            Title = "An unexpected error occurred",
+            Status = StatusCodes.Status500InternalServerError,
+            Instance = context.TraceIdentifier
         };
 
         // log to sentry

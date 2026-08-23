@@ -13,36 +13,41 @@ public partial class GameConsole : ComponentBase, IDisposable
     [EditorRequired]
     public required int GameId { get; set; }
 
-    [Inject] private TimekeeperStateService State { get; set; } = null!;
-    [Inject] private IDialogService DialogService { get; set; } = null!;
-    [Inject] private MusicPlayerService Player { get; set; } = null!;
-    [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject]
+    TimekeeperStateService State { get; set; } = null!;
 
-    private static readonly (int Value, string Label)[] PeriodOptions =
+    [Inject]
+    IDialogService DialogService { get; set; } = null!;
+
+    [Inject]
+    MusicPlayerService Player { get; set; } = null!;
+
+    [Inject]
+    ISnackbar Snackbar { get; set; } = null!;
+
+    static readonly (int Value, string Label)[] PeriodOptions =
     [
         (1, "1st"), (2, "2nd"), (3, "3rd"), (4, "OT"),
     ];
 
-    private int? _loadedGameId;
+    int? _loadedGameId;
 
-    protected override void OnInitialized()
-    {
-        State.OnStateChanged += HandleStateChanged;
-    }
+    protected override void OnInitialized() => State.OnStateChanged += HandleStateChanged;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (GameId == _loadedGameId) return;
+        if (GameId == _loadedGameId)
+        {
+            return;
+        }
+
         _loadedGameId = GameId;
         await State.LoadGameAsync(GameId);
     }
 
-    private void HandleStateChanged()
-    {
-        InvokeAsync(StateHasChanged);
-    }
+    void HandleStateChanged() => InvokeAsync(StateHasChanged);
 
-    private async Task StartGameAsync()
+    async Task StartGameAsync()
     {
         var dialog = await DialogService.ShowAsync<StartGameDialog>("Start Game");
         var result = await dialog.Result;
@@ -52,7 +57,7 @@ public partial class GameConsole : ComponentBase, IDisposable
         }
     }
 
-    private async Task EndGameAsync()
+    async Task EndGameAsync()
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
             "End Game",
@@ -94,7 +99,7 @@ public partial class GameConsole : ComponentBase, IDisposable
         await State.UpdateGameStateAsync(GameState.Completed);
     }
 
-    private async Task OpenGoalDialogAsync(bool isHome)
+    async Task OpenGoalDialogAsync(bool isHome)
     {
         var team = isHome ? State.Game!.HomeTeam : State.Game!.AwayTeam;
         if (State.AutoplayGoalSong)
@@ -136,7 +141,7 @@ public partial class GameConsole : ComponentBase, IDisposable
         }
     }
 
-    private async Task OpenPenaltyDialogAsync(bool isHome)
+    async Task OpenPenaltyDialogAsync(bool isHome)
     {
         var team = isHome ? State.Game!.HomeTeam : State.Game!.AwayTeam;
         if (State.AutoplayPenaltySong)
@@ -178,7 +183,7 @@ public partial class GameConsole : ComponentBase, IDisposable
         }
     }
 
-    private async Task OpenStarsDialogAsync()
+    async Task OpenStarsDialogAsync()
     {
         var parameters = new DialogParameters<GameStarsDialog>
         {
@@ -193,14 +198,14 @@ public partial class GameConsole : ComponentBase, IDisposable
         }
     }
 
-    private async Task<bool> ConfirmDeletionAsync(string title)
+    async Task<bool> ConfirmDeletionAsync(string title)
     {
         var result = await DialogService.ShowMessageBoxAsync(title, "Are you sure you want to delete this?",
             yesText: "Delete", cancelText: "Cancel");
         return result == true;
     }
 
-    private async Task DeleteGoalAsync(int goalId)
+    async Task DeleteGoalAsync(int goalId)
     {
         if (await ConfirmDeletionAsync("Delete Goal"))
         {
@@ -208,7 +213,7 @@ public partial class GameConsole : ComponentBase, IDisposable
         }
     }
 
-    private async Task DeletePenaltyAsync(int penaltyId)
+    async Task DeletePenaltyAsync(int penaltyId)
     {
         if (await ConfirmDeletionAsync("Delete Penalty"))
         {
@@ -216,15 +221,12 @@ public partial class GameConsole : ComponentBase, IDisposable
         }
     }
 
-    private static Color GetStateColor(GameState state) => state switch
+    static Color GetStateColor(GameState state) => state switch
     {
         GameState.InProgress => Color.Error,
         GameState.Completed => Color.Success,
         _ => Color.Default,
     };
 
-    public void Dispose()
-    {
-        State.OnStateChanged -= HandleStateChanged;
-    }
+    public void Dispose() => State.OnStateChanged -= HandleStateChanged;
 }

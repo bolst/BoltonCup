@@ -19,13 +19,11 @@ public class TradeService(
     IOptions<TradeNotificationSettings> _notificationOptions
 ) : ITradeService
 {
-    private const string SiteBaseUrl = "https://boltoncup.ca";
+    const string SiteBaseUrl = "https://boltoncup.ca";
 
-    private bool EmailEnabled => _notificationOptions.Value.EmailEnabled;
+    bool EmailEnabled => _notificationOptions.Value.EmailEnabled;
 
-    public async Task<IReadOnlyList<Trade>> GetByTournamentAsync(int tournamentId, CancellationToken cancellationToken = default)
-    {
-        return await _dbContext.Trades
+    public async Task<IReadOnlyList<Trade>> GetByTournamentAsync(int tournamentId, CancellationToken cancellationToken = default) => await _dbContext.Trades
             .AsNoTracking()
             .AsSplitQuery()
             .Include(t => t.ProposingTeam).ThenInclude(t => t.GeneralManagers)
@@ -36,11 +34,8 @@ public class TradeService(
             .Where(t => t.TournamentId == tournamentId)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync(cancellationToken);
-    }
 
-    public async Task<Trade?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return await _dbContext.Trades
+    public async Task<Trade?> GetByIdAsync(int id, CancellationToken cancellationToken = default) => await _dbContext.Trades
             .AsNoTracking()
             .AsSplitQuery()
             .Include(t => t.ProposingTeam)
@@ -49,8 +44,7 @@ public class TradeService(
             .ThenInclude(tp => tp.Player)
             .ThenInclude(p => p.Account)
             .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
-    }
-    
+
     public async Task<int> CreateAsync(CreateTradeCommand command, CancellationToken cancellationToken = default)
     {
         var tournament = await _dbContext.Tournaments.FirstOrDefaultAsync(t => t.Id == command.TournamentId, cancellationToken)
@@ -152,7 +146,7 @@ public class TradeService(
         return trade.Id;
     }
 
-    private async Task SendSmsAsync(IEnumerable<Account> gms, string message)
+    async Task SendSmsAsync(IEnumerable<Account> gms, string message)
     {
         var phones = gms
             .Select(gm => gm.Phone)
@@ -165,10 +159,10 @@ public class TradeService(
         }
     }
 
-    private static string TradeHubLink(int tournamentId) =>
+    static string TradeHubLink(int tournamentId) =>
         $"\nTrade hub: {SiteBaseUrl}/tournaments/{tournamentId}/trade-hub";
 
-    private static string BuildTradeProposalSms(int tournamentId, TradeEmailInfo info)
+    static string BuildTradeProposalSms(int tournamentId, TradeEmailInfo info)
     {
         var proposingTeam = info.ProposingTeamName.ToUpperInvariant();
         var lines = new List<string> { $"{proposingTeam} has sent you a trade.", "\nYour team receives:" };
@@ -182,19 +176,19 @@ public class TradeService(
             players.Count == 0 ? ["- none"] : players.Select(p => $"- {p}");
     }
 
-    private static string BuildTradeAcceptedSms(Trade trade) => string.Join("\n",
+    static string BuildTradeAcceptedSms(Trade trade) => string.Join("\n",
         $"{trade.ReceivingTeam.Name.ToUpperInvariant()} accepted your trade. It now awaits admin approval.",
         TradeHubLink(trade.TournamentId));
 
-    private static string BuildTradeDeclinedSms(Trade trade) => string.Join("\n",
+    static string BuildTradeDeclinedSms(Trade trade) => string.Join("\n",
         $"{trade.ReceivingTeam.Name.ToUpperInvariant()} declined your trade.",
         TradeHubLink(trade.TournamentId));
 
-    private static string BuildTradeCancelledSms(Trade trade) => string.Join("\n",
+    static string BuildTradeCancelledSms(Trade trade) => string.Join("\n",
         $"The trade between {trade.ProposingTeam.Name.ToUpperInvariant()} and {trade.ReceivingTeam.Name.ToUpperInvariant()} was cancelled.",
         TradeHubLink(trade.TournamentId));
 
-    private static string BuildTradeApprovedSms(Trade trade) => string.Join("\n",
+    static string BuildTradeApprovedSms(Trade trade) => string.Join("\n",
         $"The trade between {trade.ProposingTeam.Name.ToUpperInvariant()} and {trade.ReceivingTeam.Name.ToUpperInvariant()} was approved. Rosters have been updated.",
         TradeHubLink(trade.TournamentId));
 
@@ -309,18 +303,15 @@ public class TradeService(
         await SendSmsAsync(trade.ProposingTeam.GeneralManagers.Concat(trade.ReceivingTeam.GeneralManagers), BuildTradeApprovedSms(trade));
     }
 
-    private async Task<Trade> LoadTradeAsync(int tradeId, CancellationToken cancellationToken)
-    {
-        return await _dbContext.Trades
+    async Task<Trade> LoadTradeAsync(int tradeId, CancellationToken cancellationToken) => await _dbContext.Trades
             .Include(t => t.Tournament)
             .Include(t => t.ProposingTeam).ThenInclude(team => team.GeneralManagers)
             .Include(t => t.ReceivingTeam).ThenInclude(team => team.GeneralManagers)
             .Include(t => t.Players).ThenInclude(tp => tp.Player).ThenInclude(p => p.Account)
             .FirstOrDefaultAsync(t => t.Id == tradeId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Trade), tradeId);
-    }
 
-    private static void ValidateSide(IEnumerable<int> playerIds, int fromTeamId, IReadOnlyDictionary<int, Player> playerMap, IReadOnlySet<int> gmAccountIds)
+    static void ValidateSide(IEnumerable<int> playerIds, int fromTeamId, IReadOnlyDictionary<int, Player> playerMap, IReadOnlySet<int> gmAccountIds)
     {
         foreach (var id in playerIds)
         {
@@ -335,7 +326,7 @@ public class TradeService(
         }
     }
 
-    private static void ReleasePlayers(Trade trade)
+    static void ReleasePlayers(Trade trade)
     {
         foreach (var tp in trade.Players)
         {
@@ -343,7 +334,7 @@ public class TradeService(
         }
     }
 
-    private static void RevalidatePlayers(Trade trade, IReadOnlySet<int> gmAccountIds)
+    static void RevalidatePlayers(Trade trade, IReadOnlySet<int> gmAccountIds)
     {
         foreach (var tp in trade.Players)
         {
@@ -354,7 +345,7 @@ public class TradeService(
         }
     }
 
-    private async Task ValidatePostTradeRostersAsync(Trade trade, CancellationToken cancellationToken)
+    async Task ValidatePostTradeRostersAsync(Trade trade, CancellationToken cancellationToken)
     {
         var teamIds = new[] { trade.ProposingTeamId, trade.ReceivingTeamId };
         var roster = await _dbContext.Players
@@ -376,15 +367,12 @@ public class TradeService(
         }
     }
 
-    private async Task<HashSet<int>> GetGmAccountIdsAsync(int tournamentId, CancellationToken cancellationToken)
-    {
-        return (await _dbContext.Teams
+    async Task<HashSet<int>> GetGmAccountIdsAsync(int tournamentId, CancellationToken cancellationToken) => (await _dbContext.Teams
             .Where(t => t.TournamentId == tournamentId)
             .SelectMany(t => t.GeneralManagers.Select(g => g.Id))
             .ToListAsync(cancellationToken)).ToHashSet();
-    }
 
-    private async Task ValidateLockedPlayersAsync(IReadOnlyCollection<int> playerIds, CancellationToken cancellationToken)
+    async Task ValidateLockedPlayersAsync(IReadOnlyCollection<int> playerIds, CancellationToken cancellationToken)
     {
         var lockedTp = await _dbContext.TradePlayers
             .Include(tp => tp.Player).ThenInclude(p => p.Account)
@@ -397,7 +385,7 @@ public class TradeService(
         }
     }
 
-    private async Task<List<string>> GetRecipientsAsync(Trade trade, bool includePlayers)
+    async Task<List<string>> GetRecipientsAsync(Trade trade, bool includePlayers)
     {
         var emails = new List<string>();
         emails.AddRange(trade.ProposingTeam.GeneralManagers
@@ -418,7 +406,7 @@ public class TradeService(
         return emails;
     }
 
-    private static TradeEmailInfo BuildEmailInfo(Trade trade)
+    static TradeEmailInfo BuildEmailInfo(Trade trade)
     {
         var fromProposing = trade.Players.Where(tp => tp.FromTeamId == trade.ProposingTeamId).Select(Name).ToList();
         var fromReceiving = trade.Players.Where(tp => tp.FromTeamId == trade.ReceivingTeamId).Select(Name).ToList();

@@ -9,9 +9,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class GameRepository(BoltonCupDbContext _context) : IGameRepository
 {
-    public async Task<IPagedList<Game>> GetAllAsync(GetGamesQuery query, CancellationToken cancellationToken = default)
-    {
-        return await _context.Games
+    public async Task<IPagedList<Game>> GetAllAsync(GetGamesQuery query, CancellationToken cancellationToken = default) => await _context.Games
             .AsNoTracking()
             .Include(p => p.Tournament)
             .Include(p => p.HomeTeam)
@@ -20,18 +18,15 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => p.HomeTeamId == query.TeamId || p.AwayTeamId == query.TeamId, query.TeamId.HasValue)
             .ApplySorting(
-                query, 
+                query,
                 x => x
                     .OrderByDescending(p => p.Tournament.StartDate)
                     .ThenBy(p => p.GameTime)
                     .ThenBy(p => p.GameState == GameState.InProgress ? 0 : (p.GameState == GameState.Pending ? 1 : 2))
             )
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
-    }       
-    
-    public async Task<Game?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return await _context.Games
+
+    public async Task<Game?> GetByIdAsync(int id, CancellationToken cancellationToken = default) => await _context.Games
             .AsNoTracking()
             .Include(p => p.Tournament)
             .Include(p => p.HomeTeam)
@@ -66,5 +61,4 @@ public class GameRepository(BoltonCupDbContext _context) : IGameRepository
                 .ThenInclude(p => p!.Account)
             .Include(p => p.Referees)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken: cancellationToken);
-    }
 }

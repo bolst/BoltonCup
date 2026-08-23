@@ -16,15 +16,15 @@ namespace BoltonCup.Admin.Services;
 /// </summary>
 public sealed class TournamentStateService : IDisposable
 {
-    private const string StorageKey = "bc.admin.currentTournamentId";
-    private const string QueryParam = "tournament";
+    const string StorageKey = "bc.admin.currentTournamentId";
+    const string QueryParam = "tournament";
 
-    private readonly IDbContextFactory<BoltonCupDbContext> _dbFactory;
-    private readonly IJSRuntime _js;
-    private readonly NavigationManager _navigation;
+    readonly IDbContextFactory<BoltonCupDbContext> _dbFactory;
+    readonly IJSRuntime _js;
+    readonly NavigationManager _navigation;
 
-    private Tournament? _current;
-    private IReadOnlyList<Tournament>? _tournaments;
+    Tournament? _current;
+    IReadOnlyList<Tournament>? _tournaments;
 
     public TournamentStateService(
         IDbContextFactory<BoltonCupDbContext> dbFactory,
@@ -103,12 +103,9 @@ public sealed class TournamentStateService : IDisposable
         Changed?.Invoke();
     }
 
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        _ = HandleLocationChangedAsync();
-    }
+    void OnLocationChanged(object? sender, LocationChangedEventArgs e) => _ = HandleLocationChangedAsync();
 
-    private async Task HandleLocationChangedAsync()
+    async Task HandleLocationChangedAsync()
     {
         if (ReadUrlId() is int id)
         {
@@ -134,7 +131,7 @@ public sealed class TournamentStateService : IDisposable
         }
     }
 
-    private int? ReadUrlId()
+    int? ReadUrlId()
     {
         var uri = _navigation.ToAbsoluteUri(_navigation.Uri);
         var query = QueryHelpers.ParseQuery(uri.Query);
@@ -146,7 +143,7 @@ public sealed class TournamentStateService : IDisposable
         return null;
     }
 
-    private async Task<int?> ReadStoredIdAsync(CancellationToken cancellationToken)
+    async Task<int?> ReadStoredIdAsync(CancellationToken cancellationToken)
     {
         try
         {
@@ -160,7 +157,7 @@ public sealed class TournamentStateService : IDisposable
         }
     }
 
-    private async Task WriteStoredIdAsync(int id, CancellationToken cancellationToken)
+    async Task WriteStoredIdAsync(int id, CancellationToken cancellationToken)
     {
         try
         {
@@ -172,8 +169,5 @@ public sealed class TournamentStateService : IDisposable
         }
     }
 
-    public void Dispose()
-    {
-        _navigation.LocationChanged -= OnLocationChanged;
-    }
+    public void Dispose() => _navigation.LocationChanged -= OnLocationChanged;
 }

@@ -4,19 +4,25 @@ namespace BoltonCup.Infrastructure.Services;
 
 public class AssetUrlResolver(string baseUrl) : IAssetUrlResolver
 {
-    private readonly string _baseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl));
+    readonly string _baseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl));
 
     public string? GetFullUrl(string? s3Key)
     {
-        if (string.IsNullOrEmpty(s3Key)) 
+        if (string.IsNullOrEmpty(s3Key))
+        {
             return null;
+        }
+
         return $"{_baseUrl}{s3Key}";
     }
 
     public HighlightUrls? GetHighlightUrls(string? videoId)
     {
         if (string.IsNullOrEmpty(videoId))
+        {
             return null;
+        }
+
         return new HighlightUrls(
             VideoUrl: $"https://www.youtube.com/embed/{videoId}",
             ThumbnailUrl: $"https://img.youtube.com/vi/{videoId}/hqdefault.jpg"

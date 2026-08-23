@@ -43,10 +43,13 @@ public class TournamentComparer : IEqualityComparer<Tournament>
 {
     public bool Equals(Tournament? item1, Tournament? item2)
     {
-        if (ReferenceEquals(item1, item2)) 
+        if (ReferenceEquals(item1, item2))
+        {
             return true;
+        }
+
         return item1 is not null && item2 is not null && item1.Id == item2.Id;
     }
-        
+
     public int GetHashCode(Tournament item) => item.Id;
 }

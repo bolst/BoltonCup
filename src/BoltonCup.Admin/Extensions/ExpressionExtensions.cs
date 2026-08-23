@@ -20,7 +20,7 @@ public static class ExpressionExtensions
 
 public sealed class PropertyHolder
 {
-    private readonly List<MemberInfo> _members;
+    readonly List<MemberInfo> _members;
     public bool IsBodyMemberExpression { get; }
     public IReadOnlyList<MemberInfo> Members => _members;
 
@@ -30,10 +30,10 @@ public sealed class PropertyHolder
         _members = [];
     }
 
-    public void AddMember(MemberInfo member) 
+    public void AddMember(MemberInfo member)
         => _members.Insert(0, member);
 
-    public string GetPath() 
+    public string GetPath()
         => string.Join(".", _members.Select(x => x.Name));
 
     public string GetLastMemberName()
@@ -41,16 +41,16 @@ public sealed class PropertyHolder
         var lastMemberName = _members
             .Select(x => x.Name)
             .LastOrDefault();
-        return string.IsNullOrEmpty(lastMemberName) 
-            ? string.Empty 
+        return string.IsNullOrEmpty(lastMemberName)
+            ? string.Empty
             : lastMemberName;
     }
 
-    public override string ToString() 
+    public override string ToString()
         => GetPath();
 }
 
-public sealed class PropertyVisitor(bool isBodyMemberExpression) 
+public sealed class PropertyVisitor(bool isBodyMemberExpression)
     : ExpressionVisitor
 {
     public PropertyHolder PropertyHolder { get; } = new(isBodyMemberExpression);

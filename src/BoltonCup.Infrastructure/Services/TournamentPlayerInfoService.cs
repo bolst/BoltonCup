@@ -60,7 +60,9 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
             ?? throw new EntityNotFoundException(nameof(Tournament), command.TournamentId);
 
         if (!tournament.IsPlayerInfoOpen)
+        {
             throw new InvalidOperationException("Player info is not open for this tournament.");
+        }
 
         var player = await _dbContext.Players
                 .AsNoTracking()
@@ -128,7 +130,7 @@ public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITourn
         }
     }
 
-    private static void ApplyChanges(TournamentPlayerInfo entry, UpsertTournamentPlayerInfoCommand command,
+    static void ApplyChanges(TournamentPlayerInfo entry, UpsertTournamentPlayerInfoCommand command,
         IReadOnlyDictionary<int, GameAvailability> availabilities)
     {
         entry.SongTrackId = command.Song?.TrackId;

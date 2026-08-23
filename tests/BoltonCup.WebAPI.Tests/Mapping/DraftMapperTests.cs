@@ -9,8 +9,8 @@ namespace BoltonCup.WebAPI.Tests.Mapping;
 
 public class DraftMapperTests
 {
-    private readonly Mock<IAssetUrlResolver> _urlResolver = new();
-    private readonly Mapper _mapper;
+    readonly Mock<IAssetUrlResolver> _urlResolver = new();
+    readonly Mapper _mapper;
 
     public DraftMapperTests()
     {

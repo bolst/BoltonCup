@@ -8,7 +8,7 @@ namespace BoltonCup.Infrastructure.Services;
 /// </summary>
 public sealed class LoggingSmsTransport : ISmsTransport
 {
-    private readonly ILogger<LoggingSmsTransport> _logger;
+    readonly ILogger<LoggingSmsTransport> _logger;
 
     public LoggingSmsTransport(ILogger<LoggingSmsTransport> logger)
     {

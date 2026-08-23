@@ -73,7 +73,9 @@ public class DraftsController(
     public async Task<ActionResult<int>> CreateDraft([FromBody] CreateDraftRequest request)
     {
         if (!User.IsInRole(Admin) && !User.IsGmForTournament(request.TournamentId))
+        {
             return Forbid();
+        }
 
         var command = _mapper.ToCommand(request, User);
         var newDraftId = await _draftService.CreateAsync(command);
@@ -292,7 +294,7 @@ public class DraftsController(
     }
 
     /// <summary>Resolves any auto-picks for teams on the clock and broadcasts each to connected clients.</summary>
-    private async Task BroadcastAutoPicksAsync(int id, IHubContext<Hubs.DraftHub> hubContext)
+    async Task BroadcastAutoPicksAsync(int id, IHubContext<Hubs.DraftHub> hubContext)
     {
         var group = hubContext.Clients.Group($"Draft_{id}");
         var started = false;
@@ -339,7 +341,9 @@ public class DraftsController(
     {
         var player = await _players.GetByIdAsync(playerId);
         if (player is null)
+        {
             return OkOrNoContent<DraftPlayerSingleDto>(null);
+        }
 
         var availability = await _draftService.GetTournamentAvailabilityAsync(player.TournamentId);
         return OkOrNoContent(_mapper.ToDraftPlayerDto(player, availability));

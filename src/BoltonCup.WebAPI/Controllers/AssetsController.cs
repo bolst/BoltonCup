@@ -14,8 +14,5 @@ public class AssetsController(IStorageService _storageService) : BoltonCupContro
     /// </remarks>
     [Authorize(Policy = RequireCompletedAccount)]
     [HttpGet]
-    public async Task<ActionResult<UploadCredentials>> GenerateUploadCredentials(string fileExtension, string contentType)
-    {
-        return Ok(await _storageService.GenerateUploadCredentialsAsync(fileExtension, contentType));
-    }
+    public async Task<ActionResult<UploadCredentials>> GenerateUploadCredentials(string fileExtension, string contentType) => Ok(await _storageService.GenerateUploadCredentialsAsync(fileExtension, contentType));
 }

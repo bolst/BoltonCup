@@ -15,10 +15,13 @@ public class GameStarComparer : IEqualityComparer<GameStar>
 {
     public bool Equals(GameStar? item1, GameStar? item2)
     {
-        if (ReferenceEquals(item1, item2)) 
+        if (ReferenceEquals(item1, item2))
+        {
             return true;
+        }
+
         return item1 is not null && item2 is not null && item1.Id == item2.Id;
     }
-        
+
     public int GetHashCode(GameStar item) => item.Id;
 }

@@ -4,13 +4,13 @@ namespace BoltonCup.WebClient.Services;
 
 public class BcStateService(IBoltonCupApi _api)
 {
-    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(2);
+    static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(2);
 
-    private SystemContextDto? _context;
-    private DateTime _fetchedAtUtc;
+    SystemContextDto? _context;
+    DateTime _fetchedAtUtc;
 
-    private List<GameDto>? _completedGames;
-    private DateTime _completedGamesFetchedAtUtc;
+    List<GameDto>? _completedGames;
+    DateTime _completedGamesFetchedAtUtc;
 
     public Task<SystemContextDto> Context => GetContextAsync();
 
@@ -54,7 +54,7 @@ public class BcStateService(IBoltonCupApi _api)
         return _completedGames;
     }
 
-    private async Task<SystemContextDto> GetContextAsync()
+    async Task<SystemContextDto> GetContextAsync()
     {
         if (_context is not null && DateTime.UtcNow - _fetchedAtUtc < CacheDuration)
         {

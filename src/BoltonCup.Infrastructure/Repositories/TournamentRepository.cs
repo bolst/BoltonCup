@@ -7,9 +7,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepository
 {
-    public async Task<IPagedList<Tournament>> GetAllAsync(GetTournamentsQuery query, CancellationToken cancellationToken = default)
-    {
-        return await context.Tournaments
+    public async Task<IPagedList<Tournament>> GetAllAsync(GetTournamentsQuery query, CancellationToken cancellationToken = default) => await context.Tournaments
             .AsNoTracking()
             .ConditionalWhere(e => e.IsRegistrationOpen == query.RegistrationOpen!.Value, query.RegistrationOpen.HasValue)
             .Include(e => e.Games)
@@ -17,11 +15,8 @@ public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepos
             .Include(e => e.Gallery)
             .ApplySorting(query, x => x.OrderBy(t => t.StartDate))
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
-    }
-        
-    public async Task<Tournament?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return await context.Tournaments
+
+    public async Task<Tournament?> GetByIdAsync(int id, CancellationToken cancellationToken = default) => await context.Tournaments
             .AsNoTracking()
             .Include(e => e.InfoGuide)
             .Include(e => e.Games)
@@ -32,11 +27,8 @@ public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepos
                 .OrderBy(s => s.SortKey)
             )
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken: cancellationToken);
-    }
 
-    public async Task<Tournament?> GetActiveAsync(CancellationToken cancellationToken = default)
-    {
-        return await context.Tournaments
+    public async Task<Tournament?> GetActiveAsync(CancellationToken cancellationToken = default) => await context.Tournaments
             .AsNoTracking()
             .Include(e => e.InfoGuide)
             .Include(e => e.Games)
@@ -47,5 +39,4 @@ public class TournamentRepository(BoltonCupDbContext context) : ITournamentRepos
                 .OrderBy(s => s.SortKey)
             )
             .FirstOrDefaultAsync(e => e.IsActive, cancellationToken: cancellationToken);
-    }
 }

@@ -10,7 +10,7 @@ public interface ISmsQueue
 
 public class SmsQueue : ISmsQueue
 {
-    private readonly Channel<SmsPayload> _queue;
+    readonly Channel<SmsPayload> _queue;
 
     public SmsQueue()
     {
@@ -20,11 +20,9 @@ public class SmsQueue : ISmsQueue
         _queue = Channel.CreateBounded<SmsPayload>(options);
     }
 
-    public async ValueTask EnqueueAsync(SmsPayload payload) =>
-        await _queue.Writer.WriteAsync(payload);
+    public async ValueTask EnqueueAsync(SmsPayload payload) => await _queue.Writer.WriteAsync(payload);
 
-    public async ValueTask<SmsPayload> DequeueAsync(CancellationToken cancellationToken) =>
-        await _queue.Reader.ReadAsync(cancellationToken);
+    public async ValueTask<SmsPayload> DequeueAsync(CancellationToken cancellationToken) => await _queue.Reader.ReadAsync(cancellationToken);
 }
 
 public sealed record SmsPayload(string ToPhoneNumber, string Body);

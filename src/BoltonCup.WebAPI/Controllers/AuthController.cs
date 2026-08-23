@@ -109,10 +109,7 @@ public class AuthController(
     [AllowAnonymous]
     [HttpPost("continue")]
     [EnableRateLimiting(nameof(StrictEmailCheckPolicy))]
-    public async Task<ActionResult<bool>> CheckUserAsync([FromBody] CheckUserRequest request)
-    {
-        return await _userManager.FindByEmailAsync(request.Email) is not null;
-    }
+    public async Task<ActionResult<bool>> CheckUserAsync([FromBody] CheckUserRequest request) => await _userManager.FindByEmailAsync(request.Email) is not null;
 }
 /// <summary>Request payload for verifying a password reset code.</summary>
 public record VerifyPasswordResetCodeRequest(string Email, string Code);

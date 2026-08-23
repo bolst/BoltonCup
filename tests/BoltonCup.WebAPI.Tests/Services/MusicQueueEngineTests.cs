@@ -9,14 +9,14 @@ public class MusicQueueEngineTests
 {
     // Fisher-Yates with rng.Next(k) == k - 1 leaves the input order unchanged, so shuffles are deterministic
     // and assertions can be exact.
-    private sealed class IdentityRandom : Random
+    sealed class IdentityRandom : Random
     {
         public override int Next(int maxValue) => maxValue - 1;
     }
 
-    private static readonly Random Identity = new IdentityRandom();
+    static readonly Random Identity = new IdentityRandom();
 
-    private static TournamentMusicQueue NewQueue() => new() { TournamentId = 1 };
+    static TournamentMusicQueue NewQueue() => new() { TournamentId = 1 };
 
     [Fact]
     public void Reconcile_FirstBuild_ShufflesDeckAndStartsAtTop()
@@ -187,7 +187,9 @@ public class MusicQueueEngineTests
             var order = MusicQueueEngine.BuildOrder(q);
             played.Add(order[0]);
             if (order.Count > 1)
+            {
                 MusicQueueEngine.Advance(q, order[1]);
+            }
         }
 
         played.Should().OnlyHaveUniqueItems();

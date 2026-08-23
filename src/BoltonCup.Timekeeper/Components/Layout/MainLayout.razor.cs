@@ -6,10 +6,10 @@ namespace BoltonCup.Timekeeper.Components.Layout;
 
 public partial class MainLayout : LayoutComponentBase
 {
-    [Inject] 
-    private BoltonCupTheme Theme { get; set; } = null!;
+    [Inject]
+    BoltonCupTheme Theme { get; set; } = null!;
 
-    private MudTheme GetTheme()
+    MudTheme GetTheme()
     {
         var theme = Theme.MudTheme;
         theme.PaletteLight.DrawerBackground = theme.PaletteDark.DrawerBackground;

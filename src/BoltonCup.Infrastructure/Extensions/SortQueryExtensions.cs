@@ -6,7 +6,7 @@ namespace BoltonCup.Infrastructure.Extensions;
 public static class SortQueryExtensions
 {
     public static IQueryable<TSource> ApplySorting<TSource>(
-        this IQueryable<TSource> source, 
+        this IQueryable<TSource> source,
         ISortQuery query,
         Func<IQueryable<TSource>, IOrderedQueryable<TSource>>? fallback)
     {
@@ -22,4 +22,3 @@ public static class SortQueryExtensions
         return source.OrderBy(expr);
     }
 }
-

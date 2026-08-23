@@ -8,7 +8,7 @@ namespace BoltonCup.WebAPI.Tests.Mapping;
 
 public class TournamentPaymentMapperTests
 {
-    private readonly Mapper _mapper = new(new Mock<IAssetUrlResolver>().Object);
+    readonly Mapper _mapper = new(new Mock<IAssetUrlResolver>().Object);
 
     // ---------- ToDto ----------
 

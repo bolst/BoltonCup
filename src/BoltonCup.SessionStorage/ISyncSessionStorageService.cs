@@ -27,7 +27,7 @@ public interface ISyncSessionStorageService
     /// <param name="index"></param>
     /// <returns>The name of the key at the specified <paramref name="index"/></returns>
     string Key(int index);
-    
+
     /// <summary>
     /// Get the keys of all items stored in session storage.
     /// </summary>
@@ -52,7 +52,7 @@ public interface ISyncSessionStorageService
     /// </summary>
     /// <param name="key">A <see cref="string"/> value specifying the name of the storage slot to use</param>
     void RemoveItem(string key);
-    
+
     /// <summary>
     /// Removes a collection of <paramref name="keys"/>.
     /// </summary>

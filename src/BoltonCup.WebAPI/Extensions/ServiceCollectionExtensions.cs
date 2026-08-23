@@ -20,7 +20,7 @@ namespace BoltonCup.WebAPI;
 /// <summary>Extension methods for registering BoltonCup WebAPI services with the DI container.</summary>
 public static class ServiceCollectionExtensions
 {
-    private static IServiceCollection AddFluentValidationServices(this IServiceCollection services)
+    static IServiceCollection AddFluentValidationServices(this IServiceCollection services)
     {
         return services
             .AddFluentValidationAutoValidation()
@@ -29,20 +29,17 @@ public static class ServiceCollectionExtensions
             .AddValidatorsFromAssemblyContaining<Controllers.BoltonCupControllerBase>();
     }
 
-    private static IServiceCollection AddAuthServices(this WebApplicationBuilder builder)
+    static IServiceCollection AddAuthServices(this WebApplicationBuilder builder)
     {
         builder.Services
             // Override the default scheme (set to Identity.Bearer by AddIdentityApiEndpoints) with a
             // forwarder: requests with the API key header use the API key scheme, everything else uses
             // the cookie scheme browsers/WASM authenticate with. It's one or the other per request.
             .AddAuthentication(options => options.DefaultScheme = ApiKeyConstants.ForwardingScheme)
-            .AddPolicyScheme(ApiKeyConstants.ForwardingScheme, ApiKeyConstants.ForwardingScheme, options =>
-            {
-                options.ForwardDefaultSelector = context =>
+            .AddPolicyScheme(ApiKeyConstants.ForwardingScheme, ApiKeyConstants.ForwardingScheme, options => options.ForwardDefaultSelector = context =>
                     context.Request.Headers.ContainsKey(ApiKeyConstants.Header)
                         ? ApiKeyConstants.Scheme
-                        : IdentityConstants.ApplicationScheme;
-            })
+                        : IdentityConstants.ApplicationScheme)
             .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.Scheme, null);
 
         return builder.Services
@@ -73,7 +70,6 @@ public static class ServiceCollectionExtensions
                 };
             })
             .Configure<SecurityStampValidatorOptions>(options =>
-            {
                 // The security-stamp validator periodically rebuilds the principal from the user, which
                 // would drop the masquerade marker claims. Carry them forward so a masquerade survives.
                 options.OnRefreshingPrincipal = context =>
@@ -95,8 +91,7 @@ public static class ServiceCollectionExtensions
                     }
 
                     return Task.CompletedTask;
-                };
-            })
+                })
             .AddScoped<IAuthorizationHandler, DraftAccessHandler>()
             .AddScoped<IAuthorizationHandler, DraftManagerHandler>()
             .AddScoped<IAuthorizationHandler, TeamManagerHandler>()
@@ -132,13 +127,9 @@ public static class ServiceCollectionExtensions
             });
     }
 
-    private static IServiceCollection AddCorsServices(this IServiceCollection services)
+    static IServiceCollection AddCorsServices(this IServiceCollection services)
     {
-        services.AddCors(options =>
-        {
-            options.AddDefaultPolicy(policy =>
-            {
-                policy.WithOrigins(
+        services.AddCors(options => options.AddDefaultPolicy(policy => policy.WithOrigins(
                         "http://localhost:5239",
                         "http://localhost:5170",
                         "https://localhost:7244",
@@ -154,13 +145,11 @@ public static class ServiceCollectionExtensions
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .AllowCredentials();
-            });
-        });
+                    .AllowCredentials()));
         return services;
     }
 
-    private static IServiceCollection AddRateLimitingServices(this IServiceCollection services)
+    static IServiceCollection AddRateLimitingServices(this IServiceCollection services)
     {
         return services
             .Configure<ForwardedHeadersOptions>(options =>
@@ -182,23 +171,24 @@ public static class ServiceCollectionExtensions
             });
     }
 
-    private static IServiceCollection AddMappers(this IServiceCollection services)
+    static IServiceCollection AddMappers(this IServiceCollection services)
     {
         services.AddTransient<IMapper, Mapper>();
         return services;
     }
 
-    private static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
+    static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
     {
         return services
             .AddProblemDetails()
-            .PostConfigure<ApiBehaviorOptions>(options =>
-            {
-                options.InvalidModelStateResponseFactory = context =>
+            .PostConfigure<ApiBehaviorOptions>(options => options.InvalidModelStateResponseFactory = context =>
                 {
                     var problem = new BoltonCupValidationProblemDetails(context.ModelState.ToErrorDictionary())
                     {
-                        Type = ErrorTypes.Validation, Title = "One or more validation errors occurred", Status = StatusCodes.Status400BadRequest, Instance = context.HttpContext.Request.Path,
+                        Type = ErrorTypes.Validation,
+                        Title = "One or more validation errors occurred",
+                        Status = StatusCodes.Status400BadRequest,
+                        Instance = context.HttpContext.Request.Path,
                     };
 
                     return new BadRequestObjectResult(problem)
@@ -208,13 +198,12 @@ public static class ServiceCollectionExtensions
                             "application/problem+json"
                         }
                     };
-                };
-            })
+                })
             .AddExceptionHandler<BoltonCupExceptionHandler>()
             .AddExceptionHandler<UnhandledExceptionHandler>();
     }
 
-    private static IServiceCollection AddSignalRServices(this IServiceCollection services)
+    static IServiceCollection AddSignalRServices(this IServiceCollection services)
     {
         services.AddSignalR();
         return services;
@@ -234,10 +223,7 @@ public static class ServiceCollectionExtensions
             .AddSignalRServices()
             .AddTransient<IStripeEventConstructor, StripeEventConstructor>()
             .AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
         return builder.Services;
     }

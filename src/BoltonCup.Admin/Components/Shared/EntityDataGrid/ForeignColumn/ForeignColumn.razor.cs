@@ -15,10 +15,10 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     where TEntity : EntityBase
 {
 
-    private string? _entityName;
-    private Func<T, TEntity?>? _compiledExpression;
-    private List<TEntity> _options = [];
-    private bool _pendingRegistration = true;
+    string? _entityName;
+    Func<T, TEntity?>? _compiledExpression;
+    List<TEntity> _options = [];
+    bool _pendingRegistration = true;
 
     [CascadingParameter]
     public EntityDataGrid<T> ParentGrid { get; set; } = null!;
@@ -26,34 +26,38 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     [Inject]
     public IDbContextFactory<BoltonCupDbContext> DbContextFactory { get; set; } = null!;
 
-    [Parameter, EditorRequired]
+    [Parameter]
+    [EditorRequired]
     public Expression<Func<T, TEntity?>> Property { get; set; } = null!;
 
     [Parameter]
     public Action<T, TEntity?>? PropertySetter { get; set; }
-    
+
     [Parameter]
     public IEqualityComparer<TEntity?>? EqualityComparer { get; set; }
-    
+
     [Parameter]
     public Func<TEntity, string?>? ImageSrcFunc { get; set; }
-    
+
     [Parameter]
     public Func<T, Expression<Func<TEntity, bool>>>? Filter { get; set; }
-    
+
     [Parameter]
     public Func<IQueryable<TEntity>, IQueryable<TEntity>>? Include { get; set; }
-    
+
     [Parameter]
     public Expression<Func<TEntity, string?>>? SearchBy { get; set; }
-    
+
     protected override Task OnInitializedAsync()
     {
         EditTemplate = EntityEditTemplate;
         if (Property.Body is MemberExpression memberExpr)
         {
             if (string.IsNullOrEmpty(Title))
+            {
                 Title = memberExpr.Member.Name;
+            }
+
             _entityName = memberExpr.Member.Name;
         }
 
@@ -69,8 +73,8 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
             _pendingRegistration = false;
         }
     }
-    
-    public override string? PropertyName 
+
+    public override string? PropertyName
         => _entityName;
 
     protected override object? CellContent(T item)
@@ -78,30 +82,35 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
         _compiledExpression ??= Property.Compile();
         return _compiledExpression(item);
     }
-    
+
     protected override object? PropertyFunc(T item)
     {
         _compiledExpression ??= Property.Compile();
         return _compiledExpression(item);
     }
-    
+
     protected override Type PropertyType
         => typeof(TEntity);
 
     protected override void SetProperty(object? item, object? value)
     {
         var expression = Property.Body;
-        
+
         // Only MemberExpression is supported, MemberExpression access members like 'x.y' is accessing the member 'y'
-        if (expression is not MemberExpression memberExpression) 
+        if (expression is not MemberExpression memberExpression)
+        {
             return;
-        if (memberExpression.Member is not PropertyInfo propertyInfo) 
+        }
+
+        if (memberExpression.Member is not PropertyInfo propertyInfo)
+        {
             return;
-        
+        }
+
         var rootItem = item;
         item = RecursiveGetSubProperties(memberExpression, item);
         if (value == null)
-        { 
+        {
             propertyInfo.SetValue(item, null);
         }
         else
@@ -109,26 +118,30 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
             var actualType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? PropertyType;
             propertyInfo.SetValue(item, Convert.ChangeType(value, actualType), null);
         }
-        
+
         if (rootItem is T entity)
+        {
             InvokeAsync(() => ParentGrid.NotifyItemChangedAsync(entity));
+        }
     }
-    
-    private object? RecursiveGetSubProperties(MemberExpression memberExpression, object? item)
+
+    object? RecursiveGetSubProperties(MemberExpression memberExpression, object? item)
     {
         if (memberExpression.Expression is not MemberExpression
             {
                 Member: PropertyInfo propertyInfo
-            } subMemberExpress) 
+            } subMemberExpress)
+        {
             return item;
-        
+        }
+
         var subObject = RecursiveGetSubProperties(subMemberExpress, item);
-        return propertyInfo.GetValue(subObject) 
+        return propertyInfo.GetValue(subObject)
                ?? throw new NullReferenceException($"Unable to get property value, value of '{propertyInfo.Name}' is null in '{Property}'");
     }
-    
-    
-    private async Task<IEnumerable<TEntity?>> SearchOptionsAsync(string? search, CellContext<T> context, CancellationToken token)
+
+
+    async Task<IEnumerable<TEntity?>> SearchOptionsAsync(string? search, CellContext<T> context, CancellationToken token)
     {
         try
         {
@@ -137,20 +150,26 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
             var dbSet = dbContext.Set<TEntity>().AsNoTracking();
 
             if (Include is not null)
+            {
                 dbSet = Include(dbSet);
-        
+            }
+
             if (Filter is not null)
+            {
                 dbSet = dbSet.Where(Filter(context.Item));
-        
+            }
+
             if (string.IsNullOrEmpty(search))
             {
                 return await dbSet
                     .Order()
                     .ToListAsync(cancellationToken: token);
             }
-        
+
             if (SearchBy is not null)
+            {
                 dbSet = dbSet.WhereContains(SearchBy, search);
+            }
 
             var query = new Core.Queries.Base.QueryBase { Size = 10 };
             var result = await dbSet
@@ -168,25 +187,29 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
         }
     }
 
-    private async Task LoadOptionsAsync(CellContext<T> context)
+    async Task LoadOptionsAsync(CellContext<T> context)
     {
         await using var dbContext = await DbContextFactory.CreateDbContextAsync();
         // Grabs all records of the target foreign entity type
-        
+
         var dbSet = dbContext.Set<TEntity>().AsNoTracking();
 
         if (Include is not null)
+        {
             dbSet = Include(dbSet);
-        
+        }
+
         if (Filter is not null)
+        {
             dbSet = dbSet.Where(Filter(context.Item));
-        
+        }
+
         _options = await dbSet
             .Order()
             .ToListAsync();
     }
 
-    private async Task OnValueChangedAsync(T item, TEntity? newValue)
+    async Task OnValueChangedAsync(T item, TEntity? newValue)
     {
         if (PropertySetter is not null)
         {

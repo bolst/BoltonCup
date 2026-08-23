@@ -28,9 +28,7 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
         }, cancellationToken)).Items;
     }
 
-    public async Task<IPagedList<SkaterStat>> GetAllAsync(GetSkaterStatsQuery query, CancellationToken cancellationToken = default)
-    {
-        return await _context.SkaterStats
+    public async Task<IPagedList<SkaterStat>> GetAllAsync(GetSkaterStatsQuery query, CancellationToken cancellationToken = default) => await _context.SkaterStats
             .AsNoTracking()
             .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
             .ConditionalWhere(p => query.TeamIds!.Contains(p.TeamId), query.TeamIds?.Count > 0)
@@ -69,5 +67,4 @@ public class SkaterStatRepository(BoltonCupDbContext _context) : ISkaterStatRepo
                 .ThenBy(p => p.GamesPlayed)
             )
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
-    }       
 }

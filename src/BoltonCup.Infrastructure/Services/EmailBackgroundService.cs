@@ -10,9 +10,9 @@ namespace BoltonCup.Infrastructure.Services;
 
 public class EmailBackgroundService : BackgroundService
 {
-    private readonly IEmailQueue _queue;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<EmailBackgroundService> _logger;
+    readonly IEmailQueue _queue;
+    readonly IServiceProvider _serviceProvider;
+    readonly ILogger<EmailBackgroundService> _logger;
 
     public EmailBackgroundService(IEmailQueue queue, IServiceProvider serviceProvider, ILogger<EmailBackgroundService> logger)
     {
@@ -49,7 +49,7 @@ public class EmailBackgroundService : BackgroundService
         }
     }
 
-    private async Task ProcessEmailAsync(EmailPayload payload, IRazorLightEngine razor, IEmailTransport transport, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
+    async Task ProcessEmailAsync(EmailPayload payload, IRazorLightEngine razor, IEmailTransport transport, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
     {
         var succeeded = false;
         string? error = null;
@@ -75,7 +75,7 @@ public class EmailBackgroundService : BackgroundService
         await WriteLogAsync(payload, succeeded, error, dbFactory, token);
     }
 
-    private async Task WriteLogAsync(EmailPayload payload, bool succeeded, string? error, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
+    async Task WriteLogAsync(EmailPayload payload, bool succeeded, string? error, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
     {
         try
         {

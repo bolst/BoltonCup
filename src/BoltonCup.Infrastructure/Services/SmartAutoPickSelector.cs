@@ -111,7 +111,7 @@ public static class SmartAutoPickSelector
         return best;
     }
 
-    private static AutoPickCandidate? BestRanked(IEnumerable<AutoPickCandidate> candidates, Random? random, double noiseMagnitude)
+    static AutoPickCandidate? BestRanked(IEnumerable<AutoPickCandidate> candidates, Random? random, double noiseMagnitude)
     {
         AutoPickCandidate? best = null;
         var bestRank = double.MaxValue;
@@ -128,15 +128,12 @@ public static class SmartAutoPickSelector
         return best;
     }
 
-    private static bool IsGoalie(RosteredPlayer player) 
+    static bool IsGoalie(RosteredPlayer player)
         => IsGoalie(player.Position);
 
-    private static bool IsGoalie(string? position) =>
-        string.Equals(position, Position.Goalie, StringComparison.OrdinalIgnoreCase);
+    static bool IsGoalie(string? position) => string.Equals(position, Position.Goalie, StringComparison.OrdinalIgnoreCase);
 
-    private static bool IsForward(string? position) =>
-        string.Equals(position, Position.Forward, StringComparison.OrdinalIgnoreCase);
+    static bool IsForward(string? position) => string.Equals(position, Position.Forward, StringComparison.OrdinalIgnoreCase);
 
-    private static bool IsDefense(string? position) =>
-        string.Equals(position, Position.Defense, StringComparison.OrdinalIgnoreCase);
+    static bool IsDefense(string? position) => string.Equals(position, Position.Defense, StringComparison.OrdinalIgnoreCase);
 }

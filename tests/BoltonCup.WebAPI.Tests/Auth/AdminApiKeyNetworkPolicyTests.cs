@@ -7,7 +7,7 @@ namespace BoltonCup.WebAPI.Tests.Auth;
 
 public class AdminApiKeyNetworkPolicyTests
 {
-    private static readonly string[] Defaults = AdminApiKeyNetworkPolicy.DefaultAllowedNetworks;
+    static readonly string[] Defaults = AdminApiKeyNetworkPolicy.DefaultAllowedNetworks;
 
     [Theory]
     [InlineData("100.126.217.83")] // Tailscale CGNAT

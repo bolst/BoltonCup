@@ -13,15 +13,16 @@ namespace BoltonCup.Auth.Components.Shared;
 
 public partial class AutoEditForm<T> : ComponentBase where T : class, new()
 {
-    private T? _model { get; set; }
-    private readonly List<FieldMetadata> _fields = [];
+    T? _model { get; set; }
+    readonly List<FieldMetadata> _fields = [];
 
-    private bool _isSubmitting;
+    bool _isSubmitting;
 
-    [Inject] 
+    [Inject]
     public AuthSessionStateService AuthSessionState { get; set; } = null!;
 
-    [Parameter, EditorRequired]
+    [Parameter]
+    [EditorRequired]
     public required EditContext EditContext { get; set; }
 
     [Parameter]
@@ -29,16 +30,16 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
 
     [Parameter]
     public RenderFragment ActionsContent { get; set; } = null!;
-    
+
     [Parameter]
     public string? Title { get; set; }
 
     [Parameter]
     public bool AutoFillPageTitle { get; set; } = true;
-    
+
     [Parameter]
     public bool ShowForgotPasswordLink { get; set; }
-    
+
     protected override void OnInitialized()
     {
         var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -51,15 +52,17 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
     protected override void OnParametersSet()
     {
         if (EditContext.Model is not T model)
+        {
             throw new InvalidOperationException($"EditContext model must be of type {typeof(T).Name}");
-        
+        }
+
         if (_model != model)
         {
             _model = model;
         }
     }
 
-    private async Task HandleValidSubmitAsync()
+    async Task HandleValidSubmitAsync()
     {
         _isSubmitting = true;
         try
@@ -73,13 +76,10 @@ public partial class AutoEditForm<T> : ComponentBase where T : class, new()
         }
     }
 
-    private void OnValueChanged(FieldMetadata field, object? value)
-    {
-        field.PropertyInfo.SetValue(_model, value);
-    }
+    void OnValueChanged(FieldMetadata field, object? value) => field.PropertyInfo.SetValue(_model, value);
 
     // creates the "() => Model.Property" expression
-    private Expression<Func<TProperty>> CreateValidationExpression<TProperty>(FieldMetadata field)
+    Expression<Func<TProperty>> CreateValidationExpression<TProperty>(FieldMetadata field)
     {
         var constant = Expression.Constant(_model);
         var propertyAccess = Expression.Property(constant, field.PropertyInfo);

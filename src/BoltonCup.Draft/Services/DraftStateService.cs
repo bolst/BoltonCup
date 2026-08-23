@@ -10,18 +10,18 @@ namespace BoltonCup.Draft.Services;
 
 public class DraftStateService : IAsyncDisposable
 {
-    private readonly IBoltonCupApi _api;
-    private readonly ILogger<DraftStateService> _logger;
-    private readonly IJSRuntime _js;
-    private readonly HubConnection _hubConnection;
-    private readonly SemaphoreSlim _fetchLock;
-    private readonly CancellationTokenSource _cts;
+    readonly IBoltonCupApi _api;
+    readonly ILogger<DraftStateService> _logger;
+    readonly IJSRuntime _js;
+    readonly HubConnection _hubConnection;
+    readonly SemaphoreSlim _fetchLock;
+    readonly CancellationTokenSource _cts;
 
-    private bool _disposed;
-    private CancellationTokenSource? _pollCts;
-    private CancellationTokenSource? _countdownCts;
-    private int? _draftId;
-    private Dictionary<int, int>? _customRankByPlayerId;
+    bool _disposed;
+    CancellationTokenSource? _pollCts;
+    CancellationTokenSource? _countdownCts;
+    int? _draftId;
+    Dictionary<int, int>? _customRankByPlayerId;
 
     public DraftSingleDto? Draft { get; private set; }
     public DraftPickSingleDto? CurrentPick { get; private set; }
@@ -67,7 +67,7 @@ public class DraftStateService : IAsyncDisposable
         _hubConnection.Reconnecting += OnReconnecting;
         _hubConnection.Reconnected += OnReconnected;
         _hubConnection.Closed += OnClosed;
-        
+
         _hubConnection.On<DraftUpdateEventDto>(HubEvents.Draft.OnDraftUpdate, HandleDraftUpdate);
         _hubConnection.On<DraftStatus>(HubEvents.Draft.OnDraftStatusChange, HandleDraftStatusChange);
         _hubConnection.On<DraftPickMadeEventDto>(HubEvents.Draft.OnPickMade, HandlePickMade);
@@ -81,7 +81,7 @@ public class DraftStateService : IAsyncDisposable
         {
             await _hubConnection.InvokeAsync("LeaveLiveDraft", _draftId.Value);
         }
-        
+
         _draftId = draftId;
 
         await FetchStateAsync();
@@ -90,16 +90,20 @@ public class DraftStateService : IAsyncDisposable
 
         // a completed draft will not have any updates
         if (Draft is null or { Status: DraftStatus.Completed })
+        {
             return;
+        }
 
         await EnsureConnectedAndJoinedAsync(draftId);
     }
 
 
-    private async Task LoadCustomRankingsAsync(int draftId)
+    async Task LoadCustomRankingsAsync(int draftId)
     {
         if (Draft is null)
+        {
             return;
+        }
 
         try
         {
@@ -160,21 +164,25 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private void ApplyCustomRanking()
+    void ApplyCustomRanking()
     {
         if (_customRankByPlayerId is not { } order)
+        {
             return;
+        }
 
         foreach (var item in PlayerRankings)
+        {
             item.DraftRanking = order.TryGetValue(item.Player.Id, out var rank) ? rank : int.MaxValue;
+        }
 
         PlayerRankings = PlayerRankings.OrderBy(p => p.DraftRanking).ToList();
     }
 
 
-    private string RankingStorageKey(int draftId) => $"bc-draft-{draftId}-custom-ranking";
+    string RankingStorageKey(int draftId) => $"bc-draft-{draftId}-custom-ranking";
 
-    private async Task<int?> GetPersistedRankingIdAsync(int draftId)
+    async Task<int?> GetPersistedRankingIdAsync(int draftId)
     {
         try
         {
@@ -188,10 +196,12 @@ public class DraftStateService : IAsyncDisposable
         }
     }
 
-    private async Task PersistRankingAsync(int rankingId)
+    async Task PersistRankingAsync(int rankingId)
     {
         if (_draftId is not { } draftId)
+        {
             return;
+        }
 
         try
         {
@@ -203,10 +213,12 @@ public class DraftStateService : IAsyncDisposable
         }
     }
 
-    private async Task RemovePersistedRankingAsync()
+    async Task RemovePersistedRankingAsync()
     {
         if (_draftId is not { } draftId)
+        {
             return;
+        }
 
         try
         {
@@ -219,7 +231,7 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private Task OnReconnecting(Exception? error)
+    Task OnReconnecting(Exception? error)
     {
         ConnectionState = DraftConnectionState.Reconnecting;
         NotifyStateChanged();
@@ -228,7 +240,7 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private async Task OnReconnected(string? connectionId)
+    async Task OnReconnected(string? connectionId)
     {
         StopFallbackPoll();
         ConnectionState = DraftConnectionState.Connected;
@@ -242,7 +254,7 @@ public class DraftStateService : IAsyncDisposable
         await FetchStateAsync();
     }
 
-    private Task OnClosed(Exception? error)
+    Task OnClosed(Exception? error)
     {
         ConnectionState = DraftConnectionState.Disconnected;
         IsAutoPicking = false;
@@ -252,7 +264,7 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private async Task RunFallbackPollAsync(CancellationToken cancellationToken)
+    async Task RunFallbackPollAsync(CancellationToken cancellationToken)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(8));
 
@@ -269,7 +281,7 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private async Task HandleDraftUpdate(DraftUpdateEventDto eventDto)
+    async Task HandleDraftUpdate(DraftUpdateEventDto eventDto)
     {
         Draft = eventDto.Draft;
         CurrentPick = eventDto.NextPick;
@@ -282,10 +294,13 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private async Task HandleDraftStatusChange(DraftStatus newStatus)
+    async Task HandleDraftStatusChange(DraftStatus newStatus)
     {
         if (Draft is null)
+        {
             return;
+        }
+
         Draft.Status = newStatus;
 
         if (newStatus is DraftStatus.Paused or DraftStatus.Completed)
@@ -310,21 +325,23 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private void HandleAutoPickStateChange(bool isAutoPicking)
+    void HandleAutoPickStateChange(bool isAutoPicking)
     {
         IsAutoPicking = isAutoPicking;
         NotifyStateChanged();
     }
 
 
-    private void HandlePickMade(DraftPickMadeEventDto eventDto)
+    void HandlePickMade(DraftPickMadeEventDto eventDto)
     {
         var existingPick = Draft?.DraftPicksByRound
             .Where(dpr => dpr.Round == eventDto.CompletedPick.Round)
             .SelectMany(pick => pick.Picks)
             .FirstOrDefault(p => p.OverallPick == eventDto.CompletedPick.OverallPick);
         if (existingPick is not null)
+        {
             existingPick.Player = eventDto.DraftedPlayer;
+        }
 
         var draftedPlayer = PlayerRankings
             .FirstOrDefault(p => p.Player.Id == eventDto.DraftedPlayer.Id);
@@ -341,14 +358,18 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private async Task FetchStateAsync()
+    async Task FetchStateAsync()
     {
         if (_draftId is not { } draftId || _disposed)
+        {
             return;
+        }
 
         if (!await _fetchLock.WaitAsync(TimeSpan.Zero))
+        {
             return;
-        
+        }
+
         var token = _cts.Token;
 
         try
@@ -391,7 +412,7 @@ public class DraftStateService : IAsyncDisposable
     }
 
 
-    private void SyncCountdown()
+    void SyncCountdown()
     {
         var shouldRun = Draft is { Status: DraftStatus.InProgress } && CurrentPick?.ClockStartedAt is not null;
         if (shouldRun)
@@ -406,7 +427,7 @@ public class DraftStateService : IAsyncDisposable
         }
     }
 
-    private void RecomputeRemaining()
+    void RecomputeRemaining()
     {
         if (Draft?.SecondsPerPick is not { } perPick || CurrentPick?.ClockStartedAt is not { } startedAt)
         {
@@ -418,16 +439,18 @@ public class DraftStateService : IAsyncDisposable
         RemainingSeconds = Math.Max(0, perPick - (int)elapsed);
     }
 
-    private void StartCountdown()
+    void StartCountdown()
     {
         if (_countdownCts is not null)
+        {
             return;
+        }
 
         _countdownCts = new CancellationTokenSource();
         _ = RunCountdownAsync(_countdownCts.Token);
     }
 
-    private async Task RunCountdownAsync(CancellationToken cancellationToken)
+    async Task RunCountdownAsync(CancellationToken cancellationToken)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
 
@@ -444,18 +467,20 @@ public class DraftStateService : IAsyncDisposable
         }
     }
 
-    private void StopCountdown()
+    void StopCountdown()
     {
         if (_countdownCts is null)
+        {
             return;
+        }
 
         _countdownCts.Cancel();
         _countdownCts.Dispose();
         _countdownCts = null;
     }
 
-    
-    private async Task EnsureConnectedAndJoinedAsync(int draftId)
+
+    async Task EnsureConnectedAndJoinedAsync(int draftId)
     {
         if (_hubConnection.State == HubConnectionState.Disconnected)
         {
@@ -465,52 +490,59 @@ public class DraftStateService : IAsyncDisposable
         if (_hubConnection.State == HubConnectionState.Connected)
         {
             await _hubConnection.InvokeAsync("JoinLiveDraft", draftId);
-            ConnectionState = DraftConnectionState.Connected;   
+            ConnectionState = DraftConnectionState.Connected;
         }
     }
 
 
-    private void StartFallbackPoll()
+    void StartFallbackPoll()
     {
         StopFallbackPoll();
         _pollCts = new CancellationTokenSource();
         _ = RunFallbackPollAsync(_pollCts.Token);
     }
 
-    private void StopFallbackPoll()
+    void StopFallbackPoll()
     {
-        if (_pollCts is null) 
+        if (_pollCts is null)
+        {
             return;
-        
+        }
+
         _pollCts.Cancel();
         _pollCts.Dispose();
         _pollCts = null;
     }
 
-    private async Task StopHubAsync()
+    async Task StopHubAsync()
     {
         if (_hubConnection.State is HubConnectionState.Connected or HubConnectionState.Connecting)
         {
             if (_draftId.HasValue && _hubConnection.State == HubConnectionState.Connected)
+            {
                 await _hubConnection.InvokeAsync("LeaveLiveDraft", _draftId.Value);
+            }
 
             await _hubConnection.StopAsync();
         }
     }
 
-    
-    private void NotifyStateChanged() => OnStateChanged?.Invoke();
 
-    
+    void NotifyStateChanged() => OnStateChanged?.Invoke();
+
+
     public async ValueTask DisposeAsync()
     {
         if (_disposed)
+        {
             return;
+        }
+
         _disposed = true;
 
         await _cts.CancelAsync();
         _cts.Dispose();
-        
+
         StopFallbackPoll();
         StopCountdown();
         _fetchLock.Dispose();
@@ -523,8 +555,8 @@ public class DraftStateService : IAsyncDisposable
 public enum DraftConnectionState
 {
     Connected,
-    
+
     Reconnecting,
-    
+
     Disconnected
 }

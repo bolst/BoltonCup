@@ -10,7 +10,7 @@ public static class SkillLevel
     public const string JrA = "Jr. A or higher";
 
     // A handy list to use inside our validator
-    public static readonly IReadOnlyList<string> All = 
+    public static readonly IReadOnlyList<string> All =
     [
         HouseLeague, AA, AAA, JrC, JrB, JrA
     ];

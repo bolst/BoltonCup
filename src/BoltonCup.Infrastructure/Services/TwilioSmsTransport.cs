@@ -14,8 +14,8 @@ public interface ISmsTransport
 
 public sealed class TwilioSmsTransport : ISmsTransport
 {
-    private readonly ITwilioRestClient _client;
-    private readonly TwilioSettings _settings;
+    readonly ITwilioRestClient _client;
+    readonly TwilioSettings _settings;
 
     public TwilioSmsTransport(IOptions<TwilioSettings> settings, ILogger<TwilioSmsTransport> logger)
     {

@@ -33,7 +33,7 @@ public class SkaterStat
     public int TournamentId { get; init; }
     public string? TournamentName { get; init; }
     public bool TournamentActive { get; init; }
-    
+
     public Player Player { get; set; } = null!;
     public Team Team { get; set; } = null!;
     public Team Opponent { get; set; } = null!;

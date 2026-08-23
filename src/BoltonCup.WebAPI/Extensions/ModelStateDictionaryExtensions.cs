@@ -48,12 +48,9 @@ public static class ModelStateDictionaryExtensions
 
         return errorDictionary;
 
-        static string GetErrorMessage(ModelError error)
-        {
-            return string.IsNullOrEmpty(error.ErrorMessage)
+        static string GetErrorMessage(ModelError error) => string.IsNullOrEmpty(error.ErrorMessage)
                 ? "unknown error"
                 : error.ErrorMessage;
-        }
     }
 
 }

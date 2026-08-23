@@ -25,7 +25,9 @@ public class StandingsController(
         {
             var active = await _tournaments.GetActiveAsync();
             if (active is null)
+            {
                 return NoContent();
+            }
 
             tournamentId = active.Id;
         }

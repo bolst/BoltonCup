@@ -27,24 +27,26 @@ public record FieldContext
         IsRequired = propertyInfo.GetCustomAttribute<RequiredAttribute>() is not null;
         AllowedValues = GetAllowedValues(propertyInfo);
     }
-    
-    private static string GetDisplayName(PropertyInfo prop)
+
+    static string GetDisplayName(PropertyInfo prop)
     {
         var attr = prop.GetCustomAttribute<DisplayAttribute>();
         return attr?.Name ?? prop.Name;
     }
 
-    private static string? GetDescription(PropertyInfo prop)
+    static string? GetDescription(PropertyInfo prop)
     {
         var attr = prop.GetCustomAttribute<DescriptionAttribute>();
         return attr?.Description;
     }
 
-    private static InputType GetInputType(PropertyInfo prop)
+    static InputType GetInputType(PropertyInfo prop)
     {
         // first check for [EmailAddress]
-        if (prop.GetCustomAttribute<EmailAddressAttribute>() != null) 
+        if (prop.GetCustomAttribute<EmailAddressAttribute>() != null)
+        {
             return InputType.Email;
+        }
 
         var dataType = prop.GetCustomAttribute<DataTypeAttribute>();
         return dataType?.DataType switch
@@ -56,21 +58,23 @@ public record FieldContext
         };
     }
 
-    private static bool GetReadOnly(PropertyInfo prop)
+    static bool GetReadOnly(PropertyInfo prop)
     {
         // only read-only if [ReadOnly(true)]
         var attr = prop.GetCustomAttribute<ReadOnlyAttribute>();
         return attr is not null && attr.IsReadOnly;
     }
 
-    private static string[]? GetAllowedValues(PropertyInfo prop)
+    static string[]? GetAllowedValues(PropertyInfo prop)
     {
         var attr = prop.GetCustomAttribute<AllowedValuesAttribute>();
         if (attr?.Values == null)
+        {
             return null;
+        }
 
-        return attr.Values.All(v => v is string or null) 
-            ? attr.Values.Select(v => (string)v!).ToArray() 
+        return attr.Values.All(v => v is string or null)
+            ? attr.Values.Select(v => (string)v!).ToArray()
             : null;
     }
 }

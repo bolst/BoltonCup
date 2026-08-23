@@ -8,11 +8,11 @@ namespace BoltonCup.Infrastructure.Services;
 
 public class MusicLibraryService : IMusicLibraryService
 {
-    private readonly BoltonCupDbContext _db;
-    private readonly IStorageService _storage;
-    private readonly IAssetKeyGenerator _keyGenerator;
-    private readonly IMusicSearchService _search;
-    private readonly IGlobalMusicQueue _queue;
+    readonly BoltonCupDbContext _db;
+    readonly IStorageService _storage;
+    readonly IAssetKeyGenerator _keyGenerator;
+    readonly IMusicSearchService _search;
+    readonly IGlobalMusicQueue _queue;
 
     public MusicLibraryService(BoltonCupDbContext db, IStorageService storage, IAssetKeyGenerator keyGenerator, IMusicSearchService search, IGlobalMusicQueue queue)
     {
@@ -23,14 +23,12 @@ public class MusicLibraryService : IMusicLibraryService
         _queue = queue;
     }
 
-    public async Task<IReadOnlyList<TournamentMusicTrack>> GetLibraryAsync(int tournamentId, CancellationToken cancellationToken = default)
-    {
+    public async Task<IReadOnlyList<TournamentMusicTrack>> GetLibraryAsync(int tournamentId, CancellationToken cancellationToken = default) =>
         // The library is the playable catalog: downloaded rows only (pending/cancelled live in the queue view).
-        return await _db.TournamentMusicTracks
+        await _db.TournamentMusicTracks
             .Where(t => t.TournamentId == tournamentId && t.Status == MusicTrackStatus.Downloaded)
             .OrderBy(t => t.Title)
             .ToListAsync(cancellationToken);
-    }
 
     public async Task<TournamentMusicTrack> AddTrackAsync(AddMusicTrackCommand command, CancellationToken cancellationToken = default)
     {
@@ -185,7 +183,7 @@ public class MusicLibraryService : IMusicLibraryService
 
     // Ordered, downloaded warmup tracks for a game. Reuses a caller-supplied downloaded-track lookup when
     // available (the game-playlist path already has one) to avoid a second query.
-    private async Task<IReadOnlyList<TournamentMusicTrack>> GetGameWarmupInternalAsync(
+    async Task<IReadOnlyList<TournamentMusicTrack>> GetGameWarmupInternalAsync(
         int gameId, IReadOnlyDictionary<int, TournamentMusicTrack>? byId, CancellationToken cancellationToken)
     {
         var warmupIds = await _db.GameWarmupTracks
@@ -235,7 +233,9 @@ public class MusicLibraryService : IMusicLibraryService
                 .ToListAsync(cancellationToken);
             var invalid = orderedIds.Except(validIds).ToList();
             if (invalid.Count > 0)
+            {
                 throw new EntityNotFoundException(nameof(TournamentMusicTrack), invalid[0]);
+            }
         }
 
         var existing = await _db.GameWarmupTracks
@@ -297,14 +297,17 @@ public class MusicLibraryService : IMusicLibraryService
 
         var ids = new List<int>();
         foreach (var trackId in requestedTrackIds)
+        {
             if (idByTrackId.TryGetValue(trackId, out var id) && !ids.Contains(id))
             {
                 ids.Add(id);
             }
+        }
+
         return ids;
     }
 
-    private async Task<int> GetTournamentIdAsync(int gameId, CancellationToken cancellationToken)
+    async Task<int> GetTournamentIdAsync(int gameId, CancellationToken cancellationToken)
     {
         var game = await _db.Games
             .Where(g => g.Id == gameId)
@@ -343,7 +346,9 @@ public class MusicLibraryService : IMusicLibraryService
     {
         var tracks = await _search.GetPlaylistTracksAsync(playlistUrlOrId, cancellationToken);
         if (tracks.Count == 0)
+        {
             return 0;
+        }
 
         // Reconcile player requests first so imports dedupe against songs players already requested.
         await SyncPlayerRequestsAsync(tournamentId, cancellationToken);
@@ -357,7 +362,9 @@ public class MusicLibraryService : IMusicLibraryService
         foreach (var track in tracks)
         {
             if (string.IsNullOrEmpty(track.Id))
+            {
                 continue;
+            }
 
             if (byTrackId.TryGetValue(track.Id, out var item))
             {
@@ -404,7 +411,7 @@ public class MusicLibraryService : IMusicLibraryService
 
     // Ensure every player song request has a row in the table. Insert-only: a downloaded row keeps its
     // file, and a cancelled row stays cancelled (an admin decision), so neither is disturbed here.
-    private async Task SyncPlayerRequestsAsync(int tournamentId, CancellationToken cancellationToken)
+    async Task SyncPlayerRequestsAsync(int tournamentId, CancellationToken cancellationToken)
     {
         var existingTrackIds = (await _db.TournamentMusicTracks
                 .Where(t => t.TournamentId == tournamentId && t.ProviderType == MusicProviderType.Spotify && t.TrackId != null)
@@ -427,7 +434,9 @@ public class MusicLibraryService : IMusicLibraryService
         foreach (var r in requests)
         {
             if (!existingTrackIds.Add(r.SongTrackId!))
+            {
                 continue;
+            }
 
             _db.TournamentMusicTracks.Add(new TournamentMusicTrack
             {
@@ -448,13 +457,23 @@ public class MusicLibraryService : IMusicLibraryService
     }
 
     // Player song requests for both teams in the game, home team first then away, in roster (jersey) order.
-    private async Task<List<RequestRow>> GetOrderedRequestsAsync(Game game, CancellationToken cancellationToken)
+    async Task<List<RequestRow>> GetOrderedRequestsAsync(Game game, CancellationToken cancellationToken)
     {
         var teamIds = new List<int>();
-        if (game.HomeTeamId is { } home) teamIds.Add(home);
-        if (game.AwayTeamId is { } away) teamIds.Add(away);
+        if (game.HomeTeamId is { } home)
+        {
+            teamIds.Add(home);
+        }
+
+        if (game.AwayTeamId is { } away)
+        {
+            teamIds.Add(away);
+        }
+
         if (teamIds.Count == 0)
+        {
             return [];
+        }
 
         var players = await _db.Players
             .Where(p => p.TournamentId == game.TournamentId && p.TeamId != null && teamIds.Contains(p.TeamId!.Value))
@@ -463,7 +482,9 @@ public class MusicLibraryService : IMusicLibraryService
             .ToListAsync(cancellationToken);
 
         if (players.Count == 0)
+        {
             return [];
+        }
 
         var accountIds = players.Select(p => p.AccountId).Distinct().ToList();
 
@@ -473,7 +494,7 @@ public class MusicLibraryService : IMusicLibraryService
             .ToDictionaryAsync(i => i.AccountId, i => new { i.SongTrackId, i.SongName }, cancellationToken);
 
         var ordered = new List<RequestRow>();
-        foreach(var player in players.Where(p => p.TeamId is {} teamId && teamIds.Contains(teamId)))
+        foreach (var player in players.Where(p => p.TeamId is { } teamId && teamIds.Contains(teamId)))
         {
             if (songByAccount.TryGetValue(player.AccountId, out var song))
             {
@@ -484,5 +505,5 @@ public class MusicLibraryService : IMusicLibraryService
         return ordered;
     }
 
-    private sealed record RequestRow(string PlayerName, string? SongName, string? SongTrackId);
+    sealed record RequestRow(string PlayerName, string? SongName, string? SongTrackId);
 }

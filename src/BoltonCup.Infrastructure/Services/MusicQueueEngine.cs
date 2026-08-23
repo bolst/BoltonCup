@@ -112,7 +112,7 @@ public static class MusicQueueEngine
         q.CurrentTrackId = null;
     }
 
-    private static List<int> Shuffle(List<int> items, Random rng)
+    static List<int> Shuffle(List<int> items, Random rng)
     {
         var arr = items.ToList();
         for (var i = arr.Count - 1; i > 0; i--)

@@ -49,7 +49,9 @@ public class StandingsService(BoltonCupDbContext _context) : IStandingsService
             var homeId = game.HomeTeamId!.Value;
             var awayId = game.AwayTeamId!.Value;
             if (!rows.TryGetValue(homeId, out var home) || !rows.TryGetValue(awayId, out var away))
+            {
                 continue;
+            }
 
             var homeGoals = game.Goals.Count(g => g.TeamId == homeId);
             var awayGoals = game.Goals.Count(g => g.TeamId == awayId);
@@ -62,7 +64,7 @@ public class StandingsService(BoltonCupDbContext _context) : IStandingsService
         return Rank(rows.Values, stageGames, rules);
     }
 
-    private static void ApplyResult(StandingRow row, int goalsFor, int goalsAgainst, bool isOtSo, StandingsRules rules)
+    static void ApplyResult(StandingRow row, int goalsFor, int goalsAgainst, bool isOtSo, StandingsRules rules)
     {
         row.GamesPlayed++;
         row.GoalsFor += goalsFor;
@@ -101,7 +103,7 @@ public class StandingsService(BoltonCupDbContext _context) : IStandingsService
         }
     }
 
-    private static IReadOnlyList<StandingRow> Rank(
+    static IReadOnlyList<StandingRow> Rank(
         IEnumerable<StandingRow> rows,
         IReadOnlyList<Game> stageGames,
         StandingsRules rules)
@@ -127,13 +129,15 @@ public class StandingsService(BoltonCupDbContext _context) : IStandingsService
         }
 
         for (var i = 0; i < result.Count; i++)
+        {
             result[i].Rank = i + 1;
+        }
 
         return result;
     }
 
     /// <summary>Points each tied team earned only in games played among the tied group (mini-table).</summary>
-    private static Dictionary<int, int> HeadToHeadPoints(
+    static Dictionary<int, int> HeadToHeadPoints(
         IReadOnlyCollection<StandingRow> groupRows,
         IReadOnlyList<Game> stageGames,
         StandingsRules rules)
@@ -146,7 +150,9 @@ public class StandingsService(BoltonCupDbContext _context) : IStandingsService
             var homeId = game.HomeTeamId!.Value;
             var awayId = game.AwayTeamId!.Value;
             if (!ids.Contains(homeId) || !ids.Contains(awayId))
+            {
                 continue;
+            }
 
             var homeGoals = game.Goals.Count(g => g.TeamId == homeId);
             var awayGoals = game.Goals.Count(g => g.TeamId == awayId);
@@ -159,7 +165,7 @@ public class StandingsService(BoltonCupDbContext _context) : IStandingsService
         return points;
     }
 
-    private static int PointsFor(int goalsFor, int goalsAgainst, bool isOtSo, StandingsRules rules)
+    static int PointsFor(int goalsFor, int goalsAgainst, bool isOtSo, StandingsRules rules)
         => goalsFor > goalsAgainst ? (isOtSo ? rules.OtSoWin : rules.RegulationWin)
             : goalsFor < goalsAgainst ? (isOtSo ? rules.OtSoLoss : rules.RegulationLoss)
             : rules.Tie;

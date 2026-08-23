@@ -40,15 +40,12 @@ builder.Services
     .AddScoped<TournamentStateService>();
 
 var configSection = builder.Configuration.GetSection(BoltonCupConfiguration.SectionName);
-var bcConfig = configSection.Get<BoltonCupConfiguration>() 
+var bcConfig = configSection.Get<BoltonCupConfiguration>()
                ?? throw new ArgumentException("Missing Bolton Cup configuration.", nameof(BoltonCupConfiguration));
 
 builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
 builder.Services.AddHttpClient("BoltonCupApi")
-    .ConfigureHttpClient(client => 
-    {
-        client.BaseAddress = new Uri(bcConfig.ApiBaseUrl);
-    })
+    .ConfigureHttpClient(client => client.BaseAddress = new Uri(bcConfig.ApiBaseUrl))
     .AddTypedClient((http, _) => new BoltonCupApi(bcConfig.ApiBaseUrl, http));
 
 builder.Services.AddAuthentication("Identity.Application")

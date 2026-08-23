@@ -9,9 +9,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class AccountRepository(BoltonCupDbContext _context) : IAccountRepository
 {
-    public async Task<IPagedList<Account>> GetAllAsync(GetAccountsQuery query, CancellationToken cancellationToken = default)
-    {
-        return await _context.Accounts
+    public async Task<IPagedList<Account>> GetAllAsync(GetAccountsQuery query, CancellationToken cancellationToken = default) => await _context.Accounts
             .AsNoTracking()
             .Include(a => a.Players)
             .Include(a => a.ManagedTeams)
@@ -19,14 +17,10 @@ public class AccountRepository(BoltonCupDbContext _context) : IAccountRepository
             .ConditionalWhere(a => a.Players.Any(p => p.TeamId == query.TeamId), query.TeamId.HasValue)
             .ApplySorting(query, x => x.OrderBy(a => a.Id))
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
-    }
-    public async Task<Account?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return await _context.Accounts
+    public async Task<Account?> GetByIdAsync(int id, CancellationToken cancellationToken = default) => await _context.Accounts
             .AsNoTracking()
-            .Include(a => a.Players) .ThenInclude(p => p.Team)
-            .Include(a => a.Players) .ThenInclude(p => p.Tournament)
+            .Include(a => a.Players).ThenInclude(p => p.Team)
+            .Include(a => a.Players).ThenInclude(p => p.Tournament)
             .Include(a => a.ManagedTeams)
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken: cancellationToken);
-    }
 }

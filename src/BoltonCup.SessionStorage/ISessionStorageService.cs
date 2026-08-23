@@ -33,7 +33,7 @@ public interface ISessionStorageService
     /// <param name="cancellationToken">A cancellation token to signal the cancellation of the operation. Specifying this parameter will override any default cancellations such as due to timeouts (<see cref="JSRuntime.DefaultAsyncTimeout"/>) from being applied.</param>
     /// <returns>A <see cref="ValueTask"/> representing the completion of the operation.</returns>
     ValueTask<string> KeyAsync(int index, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Returns a collection of strings representing the names of the keys in the Session storage.
     /// </summary>
@@ -63,7 +63,7 @@ public interface ISessionStorageService
     /// <param name="cancellationToken">A cancellation token to signal the cancellation of the operation. Specifying this parameter will override any default cancellations such as due to timeouts (<see cref="JSRuntime.DefaultAsyncTimeout"/>) from being applied.</param>
     /// <returns>A <see cref="ValueTask"/> representing the completion of the operation.</returns>
     ValueTask RemoveItemAsync(string key, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Removes a collection of <paramref name="keys"/>.
     /// </summary>

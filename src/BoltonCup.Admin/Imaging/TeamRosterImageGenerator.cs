@@ -18,13 +18,13 @@ public sealed class TeamRosterImageGenerator(
     IMemoryCache _cache) : ITeamRosterImageGenerator
 {
     // The template font lives in R2 under this fixed key (upload the .ttf there).
-    private const string FontStorageKey = "static/fonts/roster.ttf";
-    private const string FontCacheKey = "roster-font-ttf";
-    private const string ContentType = "image/png";
+    const string FontStorageKey = "static/fonts/roster.ttf";
+    const string FontCacheKey = "roster-font-ttf";
+    const string ContentType = "image/png";
 
     // Live preview renders at base resolution for speed; the saved export is supersampled.
-    private const float PreviewScale = 1f;
-    private const float SaveScale = 3f;
+    const float PreviewScale = 1f;
+    const float SaveScale = 3f;
 
     public async Task<TeamRosterOptions> GetRosterAsync(int teamId, CancellationToken cancellationToken = default)
     {
@@ -66,7 +66,7 @@ public sealed class TeamRosterImageGenerator(
         return new GeneratedImageResult(png, storageKey, ContentType);
     }
 
-    private async Task<Team> LoadTeamAsync(int teamId, CancellationToken cancellationToken)
+    async Task<Team> LoadTeamAsync(int teamId, CancellationToken cancellationToken)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
         return await dbContext.Teams
@@ -76,7 +76,7 @@ public sealed class TeamRosterImageGenerator(
                ?? throw new EntityNotFoundException(nameof(Team), teamId);
     }
 
-    private async Task<RosterImageModel> BuildModelAsync(int teamId, RosterColorway colorway,
+    async Task<RosterImageModel> BuildModelAsync(int teamId, RosterColorway colorway,
         RosterOrdering? ordering, CancellationToken cancellationToken)
     {
         var team = await LoadTeamAsync(teamId, cancellationToken);
@@ -101,7 +101,7 @@ public sealed class TeamRosterImageGenerator(
 
     // Filters players to one position and applies the desired order. When an explicit order is
     // given, listed players lead in that order and any unlisted players follow in the default sort.
-    private static IReadOnlyList<Player> OrderRoster(IEnumerable<Player> players, string position,
+    static IReadOnlyList<Player> OrderRoster(IEnumerable<Player> players, string position,
         IReadOnlyList<int>? order)
     {
         var filtered = players
@@ -129,9 +129,9 @@ public sealed class TeamRosterImageGenerator(
     }
 
     // Default hometown when a player has none set, matching the original static template value.
-    private const string DefaultHometown = "WINDSOR, ON";
+    const string DefaultHometown = "WINDSOR, ON";
 
-    private async Task<IReadOnlyList<RosterPlayerCell>> MapCellsAsync(IEnumerable<Player> players, string position,
+    async Task<IReadOnlyList<RosterPlayerCell>> MapCellsAsync(IEnumerable<Player> players, string position,
         IReadOnlyList<int>? order, byte[]? teamLogo, CancellationToken cancellationToken)
     {
         var roster = OrderRoster(players, position, order);
@@ -160,7 +160,7 @@ public sealed class TeamRosterImageGenerator(
         return cells;
     }
 
-    private async Task<byte[]> GetFontAsync(CancellationToken cancellationToken)
+    async Task<byte[]> GetFontAsync(CancellationToken cancellationToken)
     {
         if (_cache.TryGetValue(FontCacheKey, out byte[]? cached) && cached is not null)
         {
@@ -176,7 +176,7 @@ public sealed class TeamRosterImageGenerator(
     }
 
     // Cache the logo so repeated live-preview renders don't re-fetch it from storage on every change.
-    private async Task<byte[]?> GetLogoAsync(string? key, CancellationToken cancellationToken)
+    async Task<byte[]?> GetLogoAsync(string? key, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(key))
         {
@@ -192,7 +192,7 @@ public sealed class TeamRosterImageGenerator(
         return bytes;
     }
 
-    private async Task<byte[]?> DownloadAssetAsync(string? key, CancellationToken cancellationToken)
+    async Task<byte[]?> DownloadAssetAsync(string? key, CancellationToken cancellationToken)
     {
         var url = _assetUrlResolver.GetFullUrl(key);
         if (string.IsNullOrEmpty(url))

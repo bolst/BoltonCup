@@ -10,7 +10,7 @@ public interface IEmailQueue
 
 public class EmailQueue : IEmailQueue
 {
-    private readonly Channel<EmailPayload> _queue;
+    readonly Channel<EmailPayload> _queue;
 
     public EmailQueue()
     {
@@ -20,11 +20,9 @@ public class EmailQueue : IEmailQueue
         _queue = Channel.CreateBounded<EmailPayload>(options);
     }
 
-    public async ValueTask EnqueueAsync(EmailPayload payload) =>
-        await _queue.Writer.WriteAsync(payload);
+    public async ValueTask EnqueueAsync(EmailPayload payload) => await _queue.Writer.WriteAsync(payload);
 
-    public async ValueTask<EmailPayload> DequeueAsync(CancellationToken cancellationToken) =>
-        await _queue.Reader.ReadAsync(cancellationToken);
+    public async ValueTask<EmailPayload> DequeueAsync(CancellationToken cancellationToken) => await _queue.Reader.ReadAsync(cancellationToken);
 }
 
 public sealed record EmailPayload(string Email, string Subject, string TemplateName, object Model, Guid? BroadcastId = null);

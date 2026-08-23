@@ -28,7 +28,9 @@ public class AccountsController(
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
+        {
             return Unauthorized("ID claim is missing.");
+        }
 
         var command = _mapper.ToCommand(request, User);
         var user = await _userService.CompleteUserAccountAsync(userId, command);

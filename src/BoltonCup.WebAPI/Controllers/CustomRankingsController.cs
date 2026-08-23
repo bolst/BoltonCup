@@ -39,7 +39,9 @@ public class CustomRankingsController(
     {
         var ranking = await _customRankingService.GetByIdAsync(id);
         if (ranking is null)
+        {
             return NoContent();
+        }
 
         var canEdit = (await _authService.AuthorizeAsync(User, id, CanManageRanking)).Succeeded;
 
@@ -114,7 +116,9 @@ public class CustomRankingsController(
     public async Task<ActionResult<int>> CreateCustomRanking([FromBody] CreateCustomRankingRequest request)
     {
         if (!User.IsInRole(Admin) && !User.IsGmForTournament(request.TournamentId))
+        {
             return Forbid();
+        }
 
         var command = _mapper.ToCommand(request, User);
         var newId = await _customRankingService.CreateAsync(command);
@@ -128,10 +132,14 @@ public class CustomRankingsController(
     {
         var ranking = await _customRankingService.GetByIdAsync(id);
         if (ranking is null)
+        {
             return NotFound();
+        }
 
         if (!User.IsInRole(Admin) && !User.IsGmForTournament(ranking.TournamentId))
+        {
             return Forbid();
+        }
 
         var newId = await _customRankingService.CloneAsync(id, User.GetAccountId(), request.Title);
         return Ok(newId);

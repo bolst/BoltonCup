@@ -9,7 +9,7 @@ public class CreateAccountWithPasswordFormModel
     [EmailAddress]
     [ReadOnly(true)]
     public string Email { get; set; } = string.Empty;
-        
+
     [Required]
     [DataType(DataType.Password)]
     [MinLength(8, ErrorMessage = "Password must have at least 8 characters")]

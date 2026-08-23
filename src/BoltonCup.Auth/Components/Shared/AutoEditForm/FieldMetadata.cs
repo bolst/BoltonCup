@@ -19,17 +19,19 @@ public record FieldMetadata(PropertyInfo PropertyInfo)
 
     public readonly bool AutoFocus = GetAutoFocus(PropertyInfo);
 
-    private static string GetDisplayName(PropertyInfo prop)
+    static string GetDisplayName(PropertyInfo prop)
     {
         var attr = prop.GetCustomAttribute<DisplayAttribute>();
         return attr?.Name ?? prop.Name;
     }
 
-    private static InputType GetInputType(PropertyInfo prop)
+    static InputType GetInputType(PropertyInfo prop)
     {
         // first check for [EmailAddress]
-        if (prop.GetCustomAttribute<EmailAddressAttribute>() != null) 
+        if (prop.GetCustomAttribute<EmailAddressAttribute>() != null)
+        {
             return InputType.Email;
+        }
 
         var dataType = prop.GetCustomAttribute<DataTypeAttribute>();
         return dataType?.DataType switch
@@ -40,14 +42,14 @@ public record FieldMetadata(PropertyInfo PropertyInfo)
         };
     }
 
-    private static bool GetReadOnly(PropertyInfo prop)
+    static bool GetReadOnly(PropertyInfo prop)
     {
         // only read-only if [ReadOnly(true)]
         var attr = prop.GetCustomAttribute<ReadOnlyAttribute>();
         return attr is not null && attr.IsReadOnly;
     }
 
-    private static bool GetAutoFocus(PropertyInfo prop)
+    static bool GetAutoFocus(PropertyInfo prop)
     {
         var attr = prop.GetCustomAttribute<AutoFocusAttribute>();
         return attr is { AutoFocus: true };

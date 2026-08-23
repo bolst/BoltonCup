@@ -9,10 +9,10 @@ namespace BoltonCup.Timekeeper.Services.Music;
 /// </summary>
 public sealed class MusicCacheService : IAsyncDisposable
 {
-    private readonly IJSRuntime _js;
-    private readonly IAssetUrlResolver _urlResolver;
-    private readonly SyncService _sync;
-    private IJSObjectReference? _module;
+    readonly IJSRuntime _js;
+    readonly IAssetUrlResolver _urlResolver;
+    readonly SyncService _sync;
+    IJSObjectReference? _module;
 
     public MusicCacheService(IJSRuntime js, IAssetUrlResolver urlResolver, SyncService sync)
     {
@@ -21,7 +21,7 @@ public sealed class MusicCacheService : IAsyncDisposable
         _sync = sync;
     }
 
-    private async Task<IJSObjectReference> ModuleAsync()
+    async Task<IJSObjectReference> ModuleAsync()
         // Query string dodges Blazor's fingerprint import map (see MusicPlayerService) so the dev server serves it.
         => _module ??= await _js.InvokeAsync<IJSObjectReference>("import", "/js/musicCache.js?v=1.0.1");
 
@@ -39,7 +39,11 @@ public sealed class MusicCacheService : IAsyncDisposable
     public async Task<bool> DownloadAsync(string fileKey, bool normalize)
     {
         var url = _urlResolver.GetFullUrl(fileKey);
-        if (url is null) return false;
+        if (url is null)
+        {
+            return false;
+        }
+
         var module = await ModuleAsync();
         var result = await module.InvokeAsync<DownloadResult>("download", fileKey, url, normalize);
         return result.Ok;
@@ -59,7 +63,10 @@ public sealed class MusicCacheService : IAsyncDisposable
         var module = await ModuleAsync();
         var objectUrl = await module.InvokeAsync<string?>("getObjectUrl", fileKey);
         if (!string.IsNullOrEmpty(objectUrl))
+        {
             return objectUrl;
+        }
+
         return _sync.IsOnline ? _urlResolver.GetFullUrl(fileKey) : null;
     }
 

@@ -16,7 +16,7 @@ public class TournamentPaymentService(
     ILogger<TournamentPaymentService> _logger
 ) : ITournamentPaymentService
 {
-    
+
     public async Task<TournamentPaymentIntent> CreateTournamentPaymentIntentAsync(
         CreateTournamentPaymentIntentCommand command, CancellationToken cancellationToken = default)
     {
@@ -26,23 +26,31 @@ public class TournamentPaymentService(
                              .SingleOrDefaultAsync(t => t.Id == command.TournamentId,
                                  cancellationToken: cancellationToken)
                          ?? throw new EntityNotFoundException(nameof(Tournament), command.TournamentId);
-        
+
         // ensure tournament has registration open
         if (!tournament.IsRegistrationOpen)
+        {
             throw new TournamentRegistrationClosedException(tournament.Id);
-        
+        }
+
         // ensure tournament has appropriate registration fee
         if ((command.IsGoalie ? tournament.GoalieRegistrationFee : tournament.SkaterRegistrationFee) is not { } registrationFeeAmount)
+        {
             throw new InvalidOperationException($"Tournament with ID {tournament.Id} does not have a registration fee.");
-        
+        }
+
         // ensure account exists
         if (await _dbContext.Accounts.FindAsync([command.AccountId], cancellationToken) is not { } account)
+        {
             throw new EntityNotFoundException(nameof(Core.Account), command.AccountId);
-        
+        }
+
         // ensure account is not already in tournament
         if (tournament.Players.Any(x => x.AccountId == account.Id))
+        {
             throw new AccountAlreadyInTournamentException(account.Id, tournament.Id);
-        
+        }
+
         // create payment intent using Stripe
         var service = new PaymentIntentService();
         var adjustedAmount = FeeCalculator.GetAdjustedStripeAmount(registrationFeeAmount);
@@ -63,22 +71,22 @@ public class TournamentPaymentService(
                 { "Position", command.Position },
             }
         }, cancellationToken: cancellationToken);
-        
+
         return new TournamentPaymentIntent(
             AccountId: account.Id,
             Currency: "CAD",
             TournamentId: tournament.Id,
             Amount: adjustedAmount,
             Secret: paymentIntent.ClientSecret,
-            AmountBreakdown: 
+            AmountBreakdown:
             [
                 new PaymentBreakdown(
                     Amount: registrationFeeAmount,
                     Title: "Tournament Registration Fee"
                 ),
                 new PaymentBreakdown(
-                    Amount: adjustedAmount - registrationFeeAmount, 
-                    Title: "Service fee", 
+                    Amount: adjustedAmount - registrationFeeAmount,
+                    Title: "Service fee",
                     Description: "This covers the few services we use to run Bolton Cup."
                 )
             ]
@@ -88,12 +96,12 @@ public class TournamentPaymentService(
 
     public async Task ProcessPaymentIntentAsync(ProcessTournamentPaymentIntentCommand command, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Processing payment for account {AccountId} in tournament {TournamentId}", 
+        _logger.LogInformation("Processing payment for account {AccountId} in tournament {TournamentId}",
             command.AccountId, command.TournamentId);
         await _registrationService.CompleteRegistrationAsync(
-            accountId: command.AccountId, 
-            tournamentId: command.TournamentId, 
-            paymentId: command.PaymentId, 
+            accountId: command.AccountId,
+            tournamentId: command.TournamentId,
+            paymentId: command.PaymentId,
             cancellationToken: cancellationToken
         );
     }

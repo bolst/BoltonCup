@@ -9,9 +9,7 @@ namespace BoltonCup.Infrastructure.Repositories;
 
 public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
 {
-    public async Task<IPagedList<Player>> GetAllAsync(GetPlayersQuery query, CancellationToken cancellationToken = default)
-    {
-        return await _context.Players
+    public async Task<IPagedList<Player>> GetAllAsync(GetPlayersQuery query, CancellationToken cancellationToken = default) => await _context.Players
             .AsNoTracking()
             .Include(p => p.Account)
             .Include(p => p.Tournament)
@@ -20,7 +18,6 @@ public class PlayerRepository(BoltonCupDbContext _context) : IPlayerRepository
             .ConditionalWhere(p => p.TeamId == query.TeamId, query.TeamId.HasValue)
             .ApplySorting(query, x => x.OrderBy(p => p.Id))
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
-    }
 
     public async Task<Player?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {

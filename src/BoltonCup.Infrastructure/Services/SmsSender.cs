@@ -8,6 +8,5 @@ public interface ISmsSender
 
 public sealed class SmsSender(ISmsQueue _queue) : ISmsSender
 {
-    public async Task SendAsync(string toPhoneNumber, string message, CancellationToken cancellationToken = default) =>
-        await _queue.EnqueueAsync(new SmsPayload(toPhoneNumber, message));
+    public async Task SendAsync(string toPhoneNumber, string message, CancellationToken cancellationToken = default) => await _queue.EnqueueAsync(new SmsPayload(toPhoneNumber, message));
 }

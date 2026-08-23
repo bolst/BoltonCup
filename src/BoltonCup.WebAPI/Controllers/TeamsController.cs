@@ -86,6 +86,6 @@ public class TeamsController(
         return Ok();
     }
 
-    private static MusicTrack? ToTrack(MusicTrackDto? dto)
+    static MusicTrack? ToTrack(MusicTrackDto? dto)
         => dto is null ? null : new MusicTrack(dto.Id, dto.Name, dto.Artist, dto.AlbumArtUrl);
 }

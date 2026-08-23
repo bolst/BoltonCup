@@ -6,14 +6,17 @@ namespace BoltonCup.Timekeeper.Services;
 
 public class LocalStorageOfflineStore : IOfflineStore
 {
-    private readonly IJSRuntime _js;
+    readonly IJSRuntime _js;
 
-    private static readonly JsonSerializerOptions Options = new()
+    static readonly JsonSerializerOptions Options = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public LocalStorageOfflineStore(IJSRuntime js) => _js = js;
+    public LocalStorageOfflineStore(IJSRuntime js)
+    {
+        _js = js;
+    }
 
     public async Task CacheGameAsync(GameSingleDto game)
     {
@@ -86,7 +89,7 @@ public class LocalStorageOfflineStore : IOfflineStore
     public async Task<int> GetPendingCountAsync(int gameId)
         => (await GetQueueAsync(gameId)).Count;
 
-    private async Task SaveQueueAsync(int gameId, List<OfflineEventRecord> queue)
+    async Task SaveQueueAsync(int gameId, List<OfflineEventRecord> queue)
     {
         var json = JsonSerializer.Serialize(queue, Options);
         await _js.InvokeVoidAsync("localStorage.setItem", $"bc:queue:{gameId}", json);

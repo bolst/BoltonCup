@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using BoltonCup.SessionStorage.JsonConverters;
 using BoltonCup.SessionStorage.Serialization;
 using BoltonCup.SessionStorage.StorageOptions;
@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
                 configureOptions.JsonSerializerOptions.Converters.Add(new TimespanJsonConverter());
             });
     }
-    
+
     /// <summary>
     /// Registers the Blazored SessionStorage services as singletons. This should only be used in Blazor WebAssembly applications.
     /// Using this in Blazor Server applications will cause unexpected and potentially dangerous behaviour. 
@@ -33,7 +33,7 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddBlazoredSessionStorageAsSingleton(this IServiceCollection services)
         => AddBlazoredSessionStorageAsSingleton(services, null!);
-        
+
     /// <summary>
     /// Registers the Blazored SessionStorage services as singletons. This should only be used in Blazor WebAssembly applications.
     /// Using this in Blazor Server applications will cause unexpected and potentially dangerous behaviour. 

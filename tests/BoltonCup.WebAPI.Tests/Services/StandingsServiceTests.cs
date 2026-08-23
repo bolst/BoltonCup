@@ -7,7 +7,7 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class StandingsServiceTests
 {
-    private static Team Team(int id, string name) => new()
+    static Team Team(int id, string name) => new()
     {
         Id = id,
         Name = name,
@@ -17,7 +17,7 @@ public class StandingsServiceTests
         SecondaryColorHex = "#FFFFFF",
     };
 
-    private static Goal Goal(int gameId, int teamId, int period) => new()
+    static Goal Goal(int gameId, int teamId, int period) => new()
     {
         GameId = gameId,
         TeamId = teamId,
@@ -27,7 +27,7 @@ public class StandingsServiceTests
         GoalPlayerId = 1,
     };
 
-    private static Game Game(
+    static Game Game(
         int id,
         int homeId,
         int awayId,
@@ -38,9 +38,20 @@ public class StandingsServiceTests
         GameState state = GameState.Completed)
     {
         var goals = new List<Goal>();
-        for (var i = 0; i < homeGoals; i++) goals.Add(Goal(id, homeId, period: 1));
-        for (var i = 0; i < awayGoals; i++) goals.Add(Goal(id, awayId, period: 1));
-        if (otSo && goals.Count > 0) goals[^1].Period = 4;
+        for (var i = 0; i < homeGoals; i++)
+        {
+            goals.Add(Goal(id, homeId, period: 1));
+        }
+
+        for (var i = 0; i < awayGoals; i++)
+        {
+            goals.Add(Goal(id, awayId, period: 1));
+        }
+
+        if (otSo && goals.Count > 0)
+        {
+            goals[^1].Period = 4;
+        }
 
         return new Game
         {
@@ -55,7 +66,7 @@ public class StandingsServiceTests
         };
     }
 
-    private static StandingRow Row(IReadOnlyList<StandingRow> rows, int teamId) =>
+    static StandingRow Row(IReadOnlyList<StandingRow> rows, int teamId) =>
         rows.Single(r => r.TeamId == teamId);
 
     [Fact]

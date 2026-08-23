@@ -23,7 +23,10 @@ public class TournamentPlayerInfoComparer : IEqualityComparer<TournamentPlayerIn
     public bool Equals(TournamentPlayerInfo? item1, TournamentPlayerInfo? item2)
     {
         if (ReferenceEquals(item1, item2))
+        {
             return true;
+        }
+
         return item1 is not null && item2 is not null && item1.Id == item2.Id;
     }
 

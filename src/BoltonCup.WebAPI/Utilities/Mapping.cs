@@ -6,30 +6,24 @@ namespace BoltonCup.WebAPI.Utilities;
 public static class Mapping
 {
     /// <summary>Returns the full period name for the given period number, or <see langword="null"/> if unrecognised.</summary>
-    public static string? TryGetPeriodName(int period)
+    public static string? TryGetPeriodName(int period) => period switch
     {
-        return period switch
-        {
-            1 => "1st Period",
-            2 => "2nd Period",
-            3 => "3rd Period",
-            4 => "Overtime",
-            5 => "Shootout",
-            _ => null
-        };
-    }
+        1 => "1st Period",
+        2 => "2nd Period",
+        3 => "3rd Period",
+        4 => "Overtime",
+        5 => "Shootout",
+        _ => null
+    };
 
     /// <summary>Returns the abbreviated period label for the given period number, or <see langword="null"/> if unrecognised.</summary>
-    public static string? TryGetPeriodAbbreviation(int period)
+    public static string? TryGetPeriodAbbreviation(int period) => period switch
     {
-        return period switch
-        {
-            1 => "1st",
-            2 => "2nd",
-            3 => "3rd",
-            4 => "OT",
-            5 => "SO",
-            _ => null
-        };
-    }
+        1 => "1st",
+        2 => "2nd",
+        3 => "3rd",
+        4 => "OT",
+        5 => "SO",
+        _ => null
+    };
 }

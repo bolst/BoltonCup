@@ -33,15 +33,21 @@ public class RankingManagerHandler(BoltonCupDbContext _dbContext)
         }
 
         if (!RankingAuthorizationResource.TryGetRankingId(context, out var rankingId))
+        {
             return;
+        }
 
         if (!context.User.TryGetAccountId(out var accountId))
+        {
             return;
+        }
 
         var isOwner = await _dbContext.CustomRankings
             .AnyAsync(r => r.Id == rankingId && r.AccountId == accountId);
 
         if (isOwner)
+        {
             context.Succeed(requirement);
+        }
     }
 }

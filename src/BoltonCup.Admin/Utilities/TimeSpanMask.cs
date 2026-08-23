@@ -5,9 +5,9 @@ namespace BoltonCup.Admin.Utilities;
 
 public partial class TimeSpanMask : PatternMask
 {
-    private char _hourChar;
-    private char _minuteChar;
-    private char _secondChar;
+    char _hourChar;
+    char _minuteChar;
+    char _secondChar;
 
     /// <summary>
     /// Creates a new TimeSpan mask.
@@ -21,11 +21,11 @@ public partial class TimeSpanMask : PatternMask
         _hourChar = hour;
         _minuteChar = minute;
         _secondChar = second;
-        
+
         // Register the specific mask characters to only accept digits
         MaskChars = MaskChars.Concat([
-            MaskChar.Digit(hour), 
-            MaskChar.Digit(minute), 
+            MaskChar.Digit(hour),
+            MaskChar.Digit(minute),
             MaskChar.Digit(second)
         ]).ToArray();
     }
@@ -42,13 +42,15 @@ public partial class TimeSpanMask : PatternMask
         SecondLogic(mask, maskOffset, ref maskIndex, ref alignedText);
     }
 
-    private void MinuteLogic(string mask, int maskOffset, ref int maskIndex, ref string alignedText)
+    void MinuteLogic(string mask, int maskOffset, ref int maskIndex, ref string alignedText)
     {
         var minutePattern = new string(_minuteChar, 2);
         var (minuteString, index) = Extract(minutePattern, mask, maskOffset, alignedText);
-        
+
         if (minuteString == null || !int.TryParse(minuteString, out var minute))
+        {
             return;
+        }
 
         if (minuteString.Length == 1)
         {
@@ -70,13 +72,15 @@ public partial class TimeSpanMask : PatternMask
         }
     }
 
-    private void SecondLogic(string mask, int maskOffset, ref int maskIndex, ref string alignedText)
+    void SecondLogic(string mask, int maskOffset, ref int maskIndex, ref string alignedText)
     {
         var secondPattern = new string(_secondChar, 2);
         var (secondString, index) = Extract(secondPattern, mask, maskOffset, alignedText);
-        
+
         if (secondString == null || !int.TryParse(secondString, out var second))
+        {
             return;
+        }
 
         if (secondString.Length == 1)
         {
@@ -111,7 +115,7 @@ public partial class TimeSpanMask : PatternMask
         {
             var mm = new string(_minuteChar, 2);
             var ss = new string(_secondChar, 2);
-            
+
             var maskHasMinute = Mask.Contains(mm);
             var maskHasSecond = Mask.Contains(ss);
 
@@ -137,24 +141,30 @@ public partial class TimeSpanMask : PatternMask
         {
             return text;
         }
-        
+
         return text;
     }
 
-    private static (string?, int) Extract(string maskPart, string mask, int maskOffset, string alignedText)
+    static (string?, int) Extract(string maskPart, string mask, int maskOffset, string alignedText)
     {
         var maskIndex = mask.IndexOf(maskPart, StringComparison.Ordinal);
         if (maskIndex < 0)
+        {
             return (null, -1);
+        }
 
         var index = maskIndex - maskOffset;
         if (index < 0 || index >= alignedText.Length)
+        {
             return (null, -1);
-            
+        }
+
         var subString = alignedText.Substring(index, Math.Min(maskPart.Length, alignedText.Length - index));
         if (!ValidDigitRegularExpression().IsMatch(subString))
+        {
             return (null, -1);
-            
+        }
+
         return (subString, index);
     }
 

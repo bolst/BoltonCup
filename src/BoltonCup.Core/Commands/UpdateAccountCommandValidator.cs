@@ -30,13 +30,16 @@ public class UpdateAccountCommandValidator : AbstractValidator<UpdateAccountComm
             .WithMessage("What kind of beer has over 100 characters in its name? Use a shorter one.");
     }
 
-    private bool BeAValidAge(DateTime birthday)
+    bool BeAValidAge(DateTime birthday)
     {
         var today = DateTime.Today;
         var yearsOld = today.Year - birthday.Year;
         // Go back to the year in which the person was born in case of a leap year
-        if (birthday.Date > today.AddYears(-yearsOld)) 
+        if (birthday.Date > today.AddYears(-yearsOld))
+        {
             yearsOld--;
+        }
+
         return yearsOld is >= 16 and <= 80;
     }
 }

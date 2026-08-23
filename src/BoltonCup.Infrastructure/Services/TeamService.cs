@@ -8,10 +8,10 @@ namespace BoltonCup.Infrastructure.Services;
 
 public class TeamService : ITeamService
 {
-    private readonly BoltonCupDbContext _dbContext;
-    private readonly IStorageService _storageService;
-    private readonly IAssetKeyGenerator _assetKeyGenerator;
-    private readonly IMusicLibraryService _music;
+    readonly BoltonCupDbContext _dbContext;
+    readonly IStorageService _storageService;
+    readonly IAssetKeyGenerator _assetKeyGenerator;
+    readonly IMusicLibraryService _music;
 
     public TeamService(BoltonCupDbContext dbContext, IStorageService storageService, IAssetKeyGenerator assetKeyGenerator, IMusicLibraryService music)
     {
@@ -20,10 +20,8 @@ public class TeamService : ITeamService
         _assetKeyGenerator = assetKeyGenerator;
         _music = music;
     }
-    
-    public Task UpdateLogoAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
-    {
-        return _storageService.UpdateAssetAsync<Team>(
+
+    public Task UpdateLogoAsync(int teamId, string tempKey, CancellationToken cancellationToken = default) => _storageService.UpdateAssetAsync<Team>(
             _dbContext,
             _assetKeyGenerator,
             t => t.Id == teamId,
@@ -32,11 +30,8 @@ public class TeamService : ITeamService
             teamId.ToString(),
             cancellationToken
         );
-    }    
-    
-    public Task UpdateBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default)
-    {
-        return _storageService.UpdateAssetAsync<Team>(
+
+    public Task UpdateBannerAsync(int teamId, string tempKey, CancellationToken cancellationToken = default) => _storageService.UpdateAssetAsync<Team>(
             _dbContext,
             _assetKeyGenerator,
             t => t.Id == teamId,
@@ -45,7 +40,6 @@ public class TeamService : ITeamService
             teamId.ToString(),
             cancellationToken
         );
-    }
 
     public async Task UpdateSongsAsync(int teamId, MusicTrack? goalSong, MusicTrack? winSong, MusicTrack? penaltySong, CancellationToken cancellationToken = default)
     {
@@ -72,10 +66,12 @@ public class TeamService : ITeamService
     }
 
     // A picked pool track must belong to the team's tournament; null clears the selection.
-    private async Task<int?> ValidatePoolTrackIdAsync(Team team, int? trackId, CancellationToken cancellationToken)
+    async Task<int?> ValidatePoolTrackIdAsync(Team team, int? trackId, CancellationToken cancellationToken)
     {
         if (trackId is null)
+        {
             return null;
+        }
 
         var exists = await _dbContext.TournamentMusicTracks
             .AnyAsync(t => t.Id == trackId && t.TournamentId == team.TournamentId, cancellationToken);
@@ -116,13 +112,17 @@ public class TeamService : ITeamService
 
     // A picked track is registered in the tournament's music library (so the fetcher downloads it) and the
     // team points at it; clearing the pick returns null and leaves any existing track row untouched.
-    private async Task<int?> ResolveTrackIdAsync(Team team, MusicTrack? song, CancellationToken cancellationToken)
+    async Task<int?> ResolveTrackIdAsync(Team team, MusicTrack? song, CancellationToken cancellationToken)
     {
         if (song is null)
+        {
             return null;
+        }
 
         if (team.TournamentId is not { } tournamentId)
+        {
             throw new InvalidOperationException($"Team {team.Id} has no tournament; cannot register a song.");
+        }
 
         return await _music.EnsureTrackAsync(tournamentId, song, MusicTrackSource.PlayerRequest, cancellationToken);
     }

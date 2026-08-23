@@ -14,10 +14,13 @@ public class TournamentBudgetItemComparer : IEqualityComparer<TournamentBudgetIt
 {
     public bool Equals(TournamentBudgetItem? item1, TournamentBudgetItem? item2)
     {
-        if (ReferenceEquals(item1, item2)) 
+        if (ReferenceEquals(item1, item2))
+        {
             return true;
+        }
+
         return item1 is not null && item2 is not null && item1.Id == item2.Id;
     }
-        
+
     public int GetHashCode(TournamentBudgetItem item) => item.GetHashCode();
 }

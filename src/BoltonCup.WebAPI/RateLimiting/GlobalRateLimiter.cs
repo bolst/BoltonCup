@@ -10,12 +10,13 @@ public static class GlobalRateLimiter
     {
         return PartitionedRateLimiter.Create<HttpContext, string>(context =>
         {
-            string partitionKey = context.User.Identity?.Name ??
-                                  context.Connection.RemoteIpAddress?.ToString() ??
-                                  "anon";
+            var partitionKey = context.User.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "anon";
             return RateLimitPartition.GetSlidingWindowLimiter(partitionKey, _ => new SlidingWindowRateLimiterOptions
             {
-                PermitLimit = 100, SegmentsPerWindow = 4, Window = TimeSpan.FromMinutes(1), QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                PermitLimit = 100,
+                SegmentsPerWindow = 4,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 QueueLimit = 0,
             });
         });

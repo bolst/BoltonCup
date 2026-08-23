@@ -6,23 +6,25 @@ namespace BoltonCup.Common.Services;
 
 public class AssetFileUploader : IAssetFileUploader
 {
-    private readonly HttpClient _httpClient;
-    private readonly IStorageService _storageService;
-    private const int MaxFileSize = 10 * 1024 * 1024; // 10 MB
+    readonly HttpClient _httpClient;
+    readonly IStorageService _storageService;
+    const int MaxFileSize = 10 * 1024 * 1024; // 10 MB
 
     public AssetFileUploader(IStorageService storageService)
     {
         _httpClient = new HttpClient();
         _storageService = storageService;
     }
-    
+
     public async Task<string> UploadAsync(IBrowserFile file, bool resize = true, long? maxFileSize = null, CancellationToken cancellationToken = default)
     {
         var ext = resize ? ".webp" : Path.GetExtension(file.Name);
         var mime = resize ? "image/webp" : file.ContentType;
         var upload = await _storageService.GenerateUploadCredentialsAsync(ext, mime, cancellationToken);
         if (upload is null)
+        {
             throw new InvalidOperationException("Failed to generate pre-signed URL for upload.");
+        }
 
         await using var fileStream = file.OpenReadStream(maxFileSize ?? MaxFileSize, cancellationToken);
         var uploadStream = fileStream;

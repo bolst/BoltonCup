@@ -20,16 +20,16 @@ public partial class River : ComponentBase
 
     [Parameter]
     public string? Class { get; set; }
-    
+
     [Parameter]
     public string? Style { get; set; }
-    
-    private string Classname => new CssBuilder()
+
+    string Classname => new CssBuilder()
         .AddClass("fluid-carousel-container")
         .AddClass(Class)
         .Build();
-    
-    private string Stylename => new StyleBuilder()
+
+    string Stylename => new StyleBuilder()
         .AddStyle("--animation-speed", $"{AnimationDuration}s")
         .AddStyle(Style)
         .Build();

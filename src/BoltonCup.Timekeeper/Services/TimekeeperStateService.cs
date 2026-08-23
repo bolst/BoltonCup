@@ -7,25 +7,25 @@ namespace BoltonCup.Timekeeper.Services;
 
 public class TimekeeperStateService : IDisposable
 {
-    private const string AutoplayGoalSongKey = "bc:autoplayGoalSong";
-    private const string AutoplayPenaltySongKey = "bc:autoplayPenaltySong";
-    private const string AutoplayWinSongKey = "bc:autoplayWinSong";
-    private const string NormalizeAudioKey = "bc:normalizeAudio";
+    const string AutoplayGoalSongKey = "bc:autoplayGoalSong";
+    const string AutoplayPenaltySongKey = "bc:autoplayPenaltySong";
+    const string AutoplayWinSongKey = "bc:autoplayWinSong";
+    const string NormalizeAudioKey = "bc:normalizeAudio";
 
-    private readonly IBoltonCupApi _api;
-    private readonly ISnackbar _snackbar;
-    private readonly ILogger<TimekeeperStateService> _logger;
-    private readonly IOfflineStore _offlineStore;
-    private readonly SyncService _syncService;
-    private readonly IJSRuntime _js;
+    readonly IBoltonCupApi _api;
+    readonly ISnackbar _snackbar;
+    readonly ILogger<TimekeeperStateService> _logger;
+    readonly IOfflineStore _offlineStore;
+    readonly SyncService _syncService;
+    readonly IJSRuntime _js;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    private int _pendingHomeGoals;
-    private int _pendingAwayGoals;
+    int _pendingHomeGoals;
+    int _pendingAwayGoals;
 
     public GameSingleDto? Game { get; private set; }
     public List<PlayerDto> HomePlayers { get; private set; } = [];
@@ -46,7 +46,7 @@ public class TimekeeperStateService : IDisposable
     /// <summary>When true, music downloads measure loudness so playback can be level-normalized. Persisted to localStorage.</summary>
     public bool NormalizeAudio { get; private set; } = true;
 
-    private bool _settingsLoaded;
+    bool _settingsLoaded;
 
     public event Action? OnStateChanged;
 
@@ -73,9 +73,13 @@ public class TimekeeperStateService : IDisposable
     }
 
     /// <summary>Reads the persisted music preferences once (missing → default on).</summary>
-    private async Task EnsureSettingsLoadedAsync()
+    async Task EnsureSettingsLoadedAsync()
     {
-        if (_settingsLoaded) return;
+        if (_settingsLoaded)
+        {
+            return;
+        }
+
         _settingsLoaded = true;
         try
         {
@@ -215,9 +219,15 @@ public class TimekeeperStateService : IDisposable
         {
             var maxEventPeriod = 0;
             if (Game.Goals.Count > 0)
+            {
                 maxEventPeriod = Math.Max(maxEventPeriod, Game.Goals.Max(g => g.Period));
+            }
+
             if (Game.Penalties.Count > 0)
+            {
                 maxEventPeriod = Math.Max(maxEventPeriod, Game.Penalties.Max(p => p.Period));
+            }
+
             CurrentPeriod = Math.Max(1, maxEventPeriod);
         }
 
@@ -226,15 +236,19 @@ public class TimekeeperStateService : IDisposable
         NotifyStateChanged();
     }
 
-    private async Task<List<PlayerDto>> FetchRosterAsync(int teamId)
+    async Task<List<PlayerDto>> FetchRosterAsync(int teamId)
     {
         var result = await _api.GetPlayersAsync(teamId: teamId, size: 100);
-        return [..result.Items.OrderBy(p => p.JerseyNumber ?? int.MaxValue)];
+        return [.. result.Items.OrderBy(p => p.JerseyNumber ?? int.MaxValue)];
     }
 
     public async Task RefreshGameAsync()
     {
-        if (Game is null) return;
+        if (Game is null)
+        {
+            return;
+        }
+
         try
         {
             Game = await _api.GetGameByIdAsync(Game.Id);
@@ -251,15 +265,27 @@ public class TimekeeperStateService : IDisposable
 
     public void SetCurrentPeriod(int period)
     {
-        if (period < 1) period = 1;
-        if (period == CurrentPeriod) return;
+        if (period < 1)
+        {
+            period = 1;
+        }
+
+        if (period == CurrentPeriod)
+        {
+            return;
+        }
+
         CurrentPeriod = period;
         NotifyStateChanged();
     }
 
     public async Task UpdateGameStateAsync(GameState state, bool includePlayerSongs = true)
     {
-        if (Game is null) return;
+        if (Game is null)
+        {
+            return;
+        }
+
         var request = new UpdateGameStateRequest { State = state, IncludePlayerSongs = includePlayerSongs };
         if (_syncService.IsOnline)
         {
@@ -284,7 +310,11 @@ public class TimekeeperStateService : IDisposable
 
     public async Task<bool> AddGoalAsync(CreateGoalRequest request)
     {
-        if (Game is null) return false;
+        if (Game is null)
+        {
+            return false;
+        }
+
         if (_syncService.IsOnline)
         {
             try
@@ -303,8 +333,15 @@ public class TimekeeperStateService : IDisposable
         }
         else
         {
-            if (request.TeamId == Game.HomeTeam?.Id) _pendingHomeGoals++;
-            else if (request.TeamId == Game.AwayTeam?.Id) _pendingAwayGoals++;
+            if (request.TeamId == Game.HomeTeam?.Id)
+            {
+                _pendingHomeGoals++;
+            }
+            else if (request.TeamId == Game.AwayTeam?.Id)
+            {
+                _pendingAwayGoals++;
+            }
+
             await EnqueueAsync("AddGoal", request);
             _snackbar.Add("Goal queued — will sync when online", Severity.Warning);
             NotifyStateChanged();
@@ -314,7 +351,11 @@ public class TimekeeperStateService : IDisposable
 
     public async Task<bool> DeleteGoalAsync(int goalId)
     {
-        if (Game is null) return false;
+        if (Game is null)
+        {
+            return false;
+        }
+
         if (_syncService.IsOnline)
         {
             try
@@ -341,7 +382,11 @@ public class TimekeeperStateService : IDisposable
 
     public async Task<bool> AddPenaltyAsync(CreatePenaltyRequest request)
     {
-        if (Game is null) return false;
+        if (Game is null)
+        {
+            return false;
+        }
+
         if (_syncService.IsOnline)
         {
             try
@@ -368,7 +413,11 @@ public class TimekeeperStateService : IDisposable
 
     public async Task<bool> DeletePenaltyAsync(int penaltyId)
     {
-        if (Game is null) return false;
+        if (Game is null)
+        {
+            return false;
+        }
+
         if (_syncService.IsOnline)
         {
             try
@@ -395,7 +444,11 @@ public class TimekeeperStateService : IDisposable
 
     public async Task<bool> SetStarsAsync(SetGameStarsRequest request)
     {
-        if (Game is null) return false;
+        if (Game is null)
+        {
+            return false;
+        }
+
         if (_syncService.IsOnline)
         {
             try
@@ -420,9 +473,13 @@ public class TimekeeperStateService : IDisposable
         }
     }
 
-    private async Task EnqueueAsync<T>(string eventType, T payload)
+    async Task EnqueueAsync<T>(string eventType, T payload)
     {
-        if (Game is null) return;
+        if (Game is null)
+        {
+            return;
+        }
+
         var record = new OfflineEventRecord
         {
             Id = Guid.NewGuid(),
@@ -433,15 +490,9 @@ public class TimekeeperStateService : IDisposable
         await _offlineStore.EnqueueAsync(Game.Id, record);
     }
 
-    private void HandleSyncCompleted()
-    {
-        _ = RefreshGameAsync();
-    }
+    void HandleSyncCompleted() => _ = RefreshGameAsync();
 
-    private void NotifyStateChanged() => OnStateChanged?.Invoke();
+    void NotifyStateChanged() => OnStateChanged?.Invoke();
 
-    public void Dispose()
-    {
-        _syncService.OnSyncCompleted -= HandleSyncCompleted;
-    }
+    public void Dispose() => _syncService.OnSyncCompleted -= HandleSyncCompleted;
 }

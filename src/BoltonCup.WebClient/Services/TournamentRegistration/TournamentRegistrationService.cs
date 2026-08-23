@@ -17,7 +17,7 @@ public class TournamentRegistrationService(
 ) : ITournamentRegistrationService
 {
 
-    private static readonly JsonSerializerOptions _serializerOptions = new()
+    static readonly JsonSerializerOptions _serializerOptions = new()
     {
     };
 
@@ -25,13 +25,13 @@ public class TournamentRegistrationService(
     {
         var me = await _api.GetMeAsync()
             ?? throw new InvalidOperationException("Unauthorized access.");
-        
+
         try
         {
             var dto = await _api.GetMyTournamentRegistrationAsync(tournamentId);
-            return TryParseDto(dto, out var model) 
-                ? new TournamentRegistrationContext(tournamentId, dto.CurrentStep, dto.IsComplete, model) 
-                : new TournamentRegistrationContext(tournamentId, 0,  false, GetDefaultRegistrationModel(me));
+            return TryParseDto(dto, out var model)
+                ? new TournamentRegistrationContext(tournamentId, dto.CurrentStep, dto.IsComplete, model)
+                : new TournamentRegistrationContext(tournamentId, 0, false, GetDefaultRegistrationModel(me));
         }
         catch (ApiException e)
             when (e.StatusCode is 204)
@@ -42,7 +42,7 @@ public class TournamentRegistrationService(
 
     public async Task<TournamentRegistrationContext> SaveAndContinueAsync(TournamentRegistrationContext context)
     {
-        var newContext = context with { CurrentStep = context.CurrentStep + 1, IsComplete = false};
+        var newContext = context with { CurrentStep = context.CurrentStep + 1, IsComplete = false };
         await _api.UpdateMyTournamentRegistrationAsync(context.TournamentId, new TournamentRegistrationDto
         {
             CurrentStep = newContext.CurrentStep,
@@ -55,8 +55,10 @@ public class TournamentRegistrationService(
     public async Task<TournamentRegistrationContext> CompleteAsync(TournamentRegistrationContext context)
     {
         if (context.CurrentStep != 2)
+        {
             return context;
-        
+        }
+
         var newContext = context with { CurrentStep = context.CurrentStep + 1, IsComplete = true };
         await _api.UpdateMyTournamentRegistrationAsync(context.TournamentId, new TournamentRegistrationDto
         {
@@ -68,19 +70,16 @@ public class TournamentRegistrationService(
     }
 
 
-    private static string Serialize(TournamentRegistrationModel model)
-    {
-        return JsonSerializer.Serialize(model, _serializerOptions);
-    }
+    static string Serialize(TournamentRegistrationModel model) => JsonSerializer.Serialize(model, _serializerOptions);
 
-    private static bool TryParseDto(TournamentRegistrationDto dto, [NotNullWhen(true)] out TournamentRegistrationModel? model)
+    static bool TryParseDto(TournamentRegistrationDto dto, [NotNullWhen(true)] out TournamentRegistrationModel? model)
     {
         if (string.IsNullOrEmpty(dto?.Payload))
         {
             model = null;
             return false;
         }
-        
+
         try
         {
             model = JsonSerializer.Deserialize<TournamentRegistrationModel>(dto.Payload, _serializerOptions);
@@ -93,19 +92,16 @@ public class TournamentRegistrationService(
         }
     }
 
-    private static TournamentRegistrationModel GetDefaultRegistrationModel(AccountDto me)
+    static TournamentRegistrationModel GetDefaultRegistrationModel(AccountDto me) => new TournamentRegistrationModel
     {
-        return new TournamentRegistrationModel
+        UserInfo = new UserInfoModel
         {
-            UserInfo = new UserInfoModel
-            {
-                FirstName = me.FirstName ?? "",
-                LastName = me.LastName ?? "",
-                Email = me.Email ?? "",
-                Phone = me.Phone ?? "",
-                HighestLevel = me.HighestLevel,
-            },
-            Documents = new DocumentModel()
-        };
-    }
+            FirstName = me.FirstName ?? "",
+            LastName = me.LastName ?? "",
+            Email = me.Email ?? "",
+            Phone = me.Phone ?? "",
+            HighestLevel = me.HighestLevel,
+        },
+        Documents = new DocumentModel()
+    };
 }

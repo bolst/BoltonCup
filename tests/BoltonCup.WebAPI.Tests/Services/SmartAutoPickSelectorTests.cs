@@ -7,25 +7,41 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class SmartAutoPickSelectorTests
 {
-    private static AutoPickCandidate Skater(int id, double rank, string position, bool fluid = false) =>
+    static AutoPickCandidate Skater(int id, double rank, string position, bool fluid = false) =>
         new(id, rank, position, fluid);
 
-    private static AutoPickCandidate Forward(int id, double rank, bool fluid = false) =>
+    static AutoPickCandidate Forward(int id, double rank, bool fluid = false) =>
         Skater(id, rank, Position.Forward, fluid);
 
-    private static AutoPickCandidate Defense(int id, double rank, bool fluid = false) =>
+    static AutoPickCandidate Defense(int id, double rank, bool fluid = false) =>
         Skater(id, rank, Position.Defense, fluid);
 
-    private static AutoPickCandidate Goalie(int id, double rank) =>
+    static AutoPickCandidate Goalie(int id, double rank) =>
         new(id, rank, Position.Goalie, false);
 
-    private static List<RosteredPlayer> Roster(int forwards, int defense, int goalies = 0, int fluid = 0)
+    static List<RosteredPlayer> Roster(int forwards, int defense, int goalies = 0, int fluid = 0)
     {
         var roster = new List<RosteredPlayer>();
-        for (var i = 0; i < forwards; i++) roster.Add(new RosteredPlayer(Position.Forward, false));
-        for (var i = 0; i < defense; i++) roster.Add(new RosteredPlayer(Position.Defense, false));
-        for (var i = 0; i < goalies; i++) roster.Add(new RosteredPlayer(Position.Goalie, false));
-        for (var i = 0; i < fluid; i++) roster.Add(new RosteredPlayer(Position.Forward, true));
+        for (var i = 0; i < forwards; i++)
+        {
+            roster.Add(new RosteredPlayer(Position.Forward, false));
+        }
+
+        for (var i = 0; i < defense; i++)
+        {
+            roster.Add(new RosteredPlayer(Position.Defense, false));
+        }
+
+        for (var i = 0; i < goalies; i++)
+        {
+            roster.Add(new RosteredPlayer(Position.Goalie, false));
+        }
+
+        for (var i = 0; i < fluid; i++)
+        {
+            roster.Add(new RosteredPlayer(Position.Forward, true));
+        }
+
         return roster;
     }
 

@@ -40,7 +40,7 @@ public sealed class StatisticsRefreshService(IDbContextFactory<BoltonCupDbContex
     /// Builds the per-player-per-game "game log" rows in memory, mirroring the SQL the
     /// <c>mv_skater_game_logs</c>/<c>mv_goalie_game_logs</c> materialized views used to run.
     /// </summary>
-    private static async Task<(List<SkaterStat> Skaters, List<GoalieStat> Goalies)> ComputeGameLogsAsync(
+    static async Task<(List<SkaterStat> Skaters, List<GoalieStat> Goalies)> ComputeGameLogsAsync(
         BoltonCupDbContext db,
         CancellationToken cancellationToken)
     {

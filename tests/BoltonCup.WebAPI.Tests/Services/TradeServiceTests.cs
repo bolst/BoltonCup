@@ -18,20 +18,20 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class TradeServiceTests
 {
-    private const int TournamentId = 1;
-    private const int TeamAId = 10;
-    private const int TeamBId = 20;
-    private const int GmAAccountId = 100;
-    private const int GmBAccountId = 200;
-    private const int AdminAccountId = 999;
+    const int TournamentId = 1;
+    const int TeamAId = 10;
+    const int TeamBId = 20;
+    const int GmAAccountId = 100;
+    const int GmBAccountId = 200;
+    const int AdminAccountId = 999;
 
-    private static BoltonCupDbContext NewContext() =>
+    static BoltonCupDbContext NewContext() =>
         new(new DbContextOptionsBuilder<BoltonCupDbContext>()
             .UseInMemoryDatabase($"trade-{Guid.NewGuid()}")
             .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
             .Options);
 
-    private static UserManager<BoltonCupUser> EmptyAdminUserManager()
+    static UserManager<BoltonCupUser> EmptyAdminUserManager()
     {
         var store = new Mock<IUserStore<BoltonCupUser>>();
         var mgr = new Mock<UserManager<BoltonCupUser>>(store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
@@ -39,10 +39,10 @@ public class TradeServiceTests
         return mgr.Object;
     }
 
-    private static TradeService NewService(BoltonCupDbContext db, out Mock<IEmailer> emailer)
+    static TradeService NewService(BoltonCupDbContext db, out Mock<IEmailer> emailer)
         => NewService(db, out emailer, out _);
 
-    private static TradeService NewService(BoltonCupDbContext db, out Mock<IEmailer> emailer, out Mock<ISmsSender> sms, bool emailEnabled = true)
+    static TradeService NewService(BoltonCupDbContext db, out Mock<IEmailer> emailer, out Mock<ISmsSender> sms, bool emailEnabled = true)
     {
         emailer = new Mock<IEmailer>();
         sms = new Mock<ISmsSender>();
@@ -51,7 +51,7 @@ public class TradeServiceTests
     }
 
     /// <summary>Seeds a tournament with two teams (each with a GM) and N players per team.</summary>
-    private static async Task<BoltonCupDbContext> SeedAsync(
+    static async Task<BoltonCupDbContext> SeedAsync(
         bool tradingOpen = true,
         int playersPerTeam = 5,
         int? skaterLimit = null,
@@ -97,7 +97,7 @@ public class TradeServiceTests
         return db;
     }
 
-    private static Account Account(int id) => new()
+    static Account Account(int id) => new()
     {
         Id = id,
         FirstName = $"First{id}",
@@ -106,7 +106,7 @@ public class TradeServiceTests
         Birthday = new DateTime(1990, 1, 1),
     };
 
-    private static Team Team(int id, Account gm) => new()
+    static Team Team(int id, Account gm) => new()
     {
         Id = id,
         Name = $"Team {id}",
@@ -119,7 +119,7 @@ public class TradeServiceTests
     };
 
     // Team A forwards are player ids 2..5 (id 1 is a goalie); Team B forwards are 7..10 (id 6 goalie).
-    private static CreateTradeCommand Trade(IReadOnlyList<int> fromA, IReadOnlyList<int> fromB) =>
+    static CreateTradeCommand Trade(IReadOnlyList<int> fromA, IReadOnlyList<int> fromB) =>
         new(TournamentId, TeamAId, TeamBId, fromA, fromB, Note: null, CreatedByAccountId: GmAAccountId);
 
     [Fact]

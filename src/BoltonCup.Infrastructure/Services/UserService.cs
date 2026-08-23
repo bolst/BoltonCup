@@ -39,7 +39,10 @@ public class UserService(
     public async Task<Account?> GetMyAccountAsync(ClaimsPrincipal claimsPrincipal)
     {
         if (!claimsPrincipal.TryGetAccountId(out var accountId))
+        {
             return null;
+        }
+
         return await _dbContext.Accounts.FindAsync(accountId);
     }
 
@@ -49,13 +52,17 @@ public class UserService(
         var result = await _signInManager.PasswordSignInAsync(email, password, persist, lockoutOnFailure);
 
         if (result == SignInResult.Failed)
+        {
             throw new InvalidCredentialsException();
+        }
 
         if (result == SignInResult.NotAllowed)
+        {
             throw new AccountNotConfirmedException();
+        }
     }
-    
-    
+
+
     public async Task RegisterAsync(string email, string password)
     {
         var user = new BoltonCupUser();
@@ -63,55 +70,69 @@ public class UserService(
         await _userManager.SetEmailAsync(user, email);
 
         if (await _userManager.CreateAsync(user, password) is { Succeeded: false } failResult)
+        {
             throw new UserRegistrationFailedException(failResult);
-        
-        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user); 
-        await _emailer.SendConfirmationCodeAsync(user, email, code);
-    }
+        }
 
-    
-    
-    public async Task ResendConfirmationEmailAsync(string email)
-    {
-        if (await _userManager.FindByEmailAsync(email) is not { } user)
-            return;
         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         await _emailer.SendConfirmationCodeAsync(user, email, code);
     }
-    
-    
-    
+
+
+
+    public async Task ResendConfirmationEmailAsync(string email)
+    {
+        if (await _userManager.FindByEmailAsync(email) is not { } user)
+        {
+            return;
+        }
+
+        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        await _emailer.SendConfirmationCodeAsync(user, email, code);
+    }
+
+
+
     public async Task VerifyPasswordResetCodeAsync(string email, string code)
     {
         if (await _userManager.FindByEmailAsync(email) is not { } user)
+        {
             throw new InvalidCredentialsException();
+        }
 
         var isValidToken = await _userManager.VerifyUserTokenAsync(
-                   user: user, 
+                   user: user,
                    tokenProvider: _userManager.Options.Tokens.PasswordResetTokenProvider,
                    purpose: UserManager<BoltonCupUser>.ResetPasswordTokenPurpose,
                    token: code
                 );
         if (!isValidToken)
+        {
             throw new InvalidCredentialsException();
+        }
     }
 
-    
-    
+
+
     public async Task ForgotPasswordAsync(string email)
     {
         if (await _userManager.FindByEmailAsync(email) is not { } user)
+        {
             return;
+        }
+
         var code = await _userManager.GeneratePasswordResetTokenAsync(user);
         await _emailer.SendPasswordResetCodeAsync(user, email, code);
     }
 
-    
-    
+
+
     public async Task ResetPasswordAsync(string email, string code, string newPassword)
     {
         if (await _userManager.FindByEmailAsync(email) is not { } user)
+        {
             throw new InvalidCredentialsException();
+        }
 
         if (await _userManager.ResetPasswordAsync(user, code, newPassword) is { Succeeded: false } result)
         {
@@ -136,11 +157,15 @@ public class UserService(
     public async Task ConfirmEmailAsync(string email, string code)
     {
         if (await _userManager.FindByEmailAsync(email) is not { } user)
+        {
             throw new InvalidCredentialsException();
+        }
 
         if (await _userManager.ConfirmEmailAsync(user, code) is { Succeeded: false })
+        {
             throw new InvalidCredentialsException();
-        
+        }
+
         // if a user already has an account, join it to them
         if (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == user.Email) is { } account)
         {
@@ -156,12 +181,14 @@ public class UserService(
         var user = await _userManager.FindByIdAsync(userId)
             ?? throw new EntityNotFoundException("User", userId);
         if (user.AccountId.HasValue)
+        {
             return user;
-        
+        }
+
         var accountId = await _accountService.CreateAsync(command);
         user.AccountId = accountId;
         await _userManager.UpdateAsync(user);
-        
+
         return user;
     }
 }

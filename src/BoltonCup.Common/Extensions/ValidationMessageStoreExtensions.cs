@@ -12,7 +12,9 @@ public static class ValidationMessageStoreExtensions
     public static void AddApiErrorResponse<T>(this ValidationMessageStore messageStore, T model, BoltonCupValidationProblemDetails validationProblemDetails)
     {
         if (model is null)
+        {
             return;
+        }
 
         if (validationProblemDetails.Errors is not null)
         {
@@ -23,5 +25,5 @@ public static class ValidationMessageStoreExtensions
             }
         }
     }
-    
+
 }

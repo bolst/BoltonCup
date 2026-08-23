@@ -34,7 +34,9 @@ public class DraftAccessHandler(BoltonCupDbContext _dbContext)
         }
 
         if (!context.User.TryGetAccountId(out var accountId))
+        {
             return;
+        }
 
         var isTournamentGm = await _dbContext.Drafts
             .Where(d => d.Id == draftId)
@@ -42,6 +44,8 @@ public class DraftAccessHandler(BoltonCupDbContext _dbContext)
             .AnyAsync();
 
         if (isTournamentGm)
+        {
             context.Succeed(requirement);
+        }
     }
 }

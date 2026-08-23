@@ -20,10 +20,10 @@ public partial class ManyForeignColumn<T, TEntity> : Column<T>
     where T : EntityBase
     where TEntity : EntityBase
 {
-    private string? _entityName;
-    private Func<T, ICollection<TEntity>?>? _compiledExpression;
-    private TEntity? _pendingAdd;
-    private bool _pendingRegistration = true;
+    string? _entityName;
+    Func<T, ICollection<TEntity>?>? _compiledExpression;
+    TEntity? _pendingAdd;
+    bool _pendingRegistration = true;
 
     [CascadingParameter]
     public EntityDataGrid<T> ParentGrid { get; set; } = null!;
@@ -31,7 +31,8 @@ public partial class ManyForeignColumn<T, TEntity> : Column<T>
     [Inject]
     public IDbContextFactory<BoltonCupDbContext> DbContextFactory { get; set; } = null!;
 
-    [Parameter, EditorRequired]
+    [Parameter]
+    [EditorRequired]
     public Expression<Func<T, ICollection<TEntity>>> Property { get; set; } = null!;
 
     [Parameter]
@@ -59,7 +60,10 @@ public partial class ManyForeignColumn<T, TEntity> : Column<T>
         if (Property.Body is MemberExpression memberExpr)
         {
             if (string.IsNullOrEmpty(Title))
+            {
                 Title = memberExpr.Member.Name;
+            }
+
             _entityName = memberExpr.Member.Name;
         }
 
@@ -79,13 +83,13 @@ public partial class ManyForeignColumn<T, TEntity> : Column<T>
     public override string? PropertyName
         => _entityName;
 
-    private ICollection<TEntity> GetCollection(T item)
+    ICollection<TEntity> GetCollection(T item)
     {
         _compiledExpression ??= Property.Compile();
         return _compiledExpression(item) ?? [];
     }
 
-    private IEqualityComparer<TEntity> EntityComparer
+    IEqualityComparer<TEntity> EntityComparer
         => EqualityComparer ?? EqualityComparer<TEntity>.Default;
 
     protected override object? CellContent(T item)
@@ -102,24 +106,32 @@ public partial class ManyForeignColumn<T, TEntity> : Column<T>
     {
     }
 
-    private async Task<IEnumerable<TEntity>> SearchOptionsAsync(string? search, CellContext<T> context, CancellationToken token)
+    async Task<IEnumerable<TEntity>> SearchOptionsAsync(string? search, CellContext<T> context, CancellationToken token)
     {
         await using var dbContext = await DbContextFactory.CreateDbContextAsync(token);
 
         var dbSet = dbContext.Set<TEntity>().AsNoTracking();
 
         if (Include is not null)
+        {
             dbSet = Include(dbSet);
+        }
 
         var query = dbSet;
         if (Filter is not null)
+        {
             query = query.Where(Filter(context.Item));
+        }
 
         if (!string.IsNullOrEmpty(search) && SearchBy is not null)
+        {
             query = query.WhereContains(SearchBy, search);
+        }
 
         if (SearchBy is not null)
+        {
             query = query.OrderBy(SearchBy);
+        }
 
         var result = await query.ToPagedListAsync(new QueryBase { Size = 10 }, cancellationToken: token);
 
@@ -128,31 +140,37 @@ public partial class ManyForeignColumn<T, TEntity> : Column<T>
         return result.Items.Where(e => !current.Any(c => EntityComparer.Equals(c, e))).ToList();
     }
 
-    private async Task AddAsync(T item, TEntity? value)
+    async Task AddAsync(T item, TEntity? value)
     {
         _pendingAdd = null;
         if (value is null)
+        {
             return;
+        }
 
         var collection = GetCollection(item);
         if (collection.Any(c => EntityComparer.Equals(c, value)))
+        {
             return;
+        }
 
         collection.Add(value);
         await NotifySelectionAsync(item, collection);
     }
 
-    private async Task RemoveAsync(T item, TEntity value)
+    async Task RemoveAsync(T item, TEntity value)
     {
         var collection = GetCollection(item);
         var existing = collection.FirstOrDefault(e => EntityComparer.Equals(e, value));
         if (existing is null)
+        {
             return;
+        }
 
         collection.Remove(existing);
         await NotifySelectionAsync(item, collection);
     }
 
-    private Task NotifySelectionAsync(T item, ICollection<TEntity> collection)
+    Task NotifySelectionAsync(T item, ICollection<TEntity> collection)
         => OnSelectionChanged.InvokeAsync(new ManyForeignSelection<T, TEntity>(item, collection.ToList()));
 }

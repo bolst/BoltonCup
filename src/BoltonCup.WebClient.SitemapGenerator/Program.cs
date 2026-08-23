@@ -5,7 +5,7 @@ using Serilog;
 
 namespace BoltonCup.WebClient.SitemapGenerator;
 
-internal class Program
+class Program
 {
     static void Main(string[] args)
     {
@@ -13,13 +13,16 @@ internal class Program
         ConfigureLogging(options);
 
         var pages = typeof(Components.Pages.Home).Assembly.GetRoutes();
-        
+
         SitemapBuilder builder = new SitemapBuilder(options.Protocol, options.Domain);
         foreach (var page in pages)
+        {
             builder.AddRoute(page);
+        }
+
         var output = builder.Build();
         var filepath = Path.GetFullPath(Path.Combine(options.OutputDirectory, options.OutputFile));
-        
+
         Log.Information("Writing to {FilePath}", filepath);
         Directory.CreateDirectory(options.OutputDirectory);
         using var file = File.Create(filepath);
@@ -27,7 +30,7 @@ internal class Program
         writer.Write(output);
     }
 
-    private static void ConfigureLogging(Options options)
+    static void ConfigureLogging(Options options)
     {
         var config = new LoggerConfiguration();
         if (Debugger.IsAttached)
@@ -47,13 +50,10 @@ internal class Program
 
         Log.Logger = config.CreateLogger();
 
-        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
-        {
-            Log.Fatal((Exception)e.ExceptionObject, "An unhandled exception has occured");
-        };
+        AppDomain.CurrentDomain.UnhandledException += (_, e) => Log.Fatal((Exception)e.ExceptionObject, "An unhandled exception has occured");
     }
 
-    private static Options ParseOptions(string[] args)
+    static Options ParseOptions(string[] args)
     {
         using var parser = new Parser(config =>
         {
@@ -66,4 +66,3 @@ internal class Program
         return parseResult.Value;
     }
 }
-

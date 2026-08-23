@@ -12,31 +12,31 @@ namespace BoltonCup.WebAPI.Tests.Services;
 
 public class MusicLibraryServiceTests
 {
-    private const int TournamentId = 1;
-    private const int HomeTeamId = 10;
-    private const int AwayTeamId = 20;
-    private const int GameId = 5;
-    private const int AliceId = 100;
-    private const int BobId = 200;
+    const int TournamentId = 1;
+    const int HomeTeamId = 10;
+    const int AwayTeamId = 20;
+    const int GameId = 5;
+    const int AliceId = 100;
+    const int BobId = 200;
 
-    private static BoltonCupDbContext NewContext() =>
+    static BoltonCupDbContext NewContext() =>
         new(new DbContextOptionsBuilder<BoltonCupDbContext>()
             .UseInMemoryDatabase($"music-{Guid.NewGuid()}")
             .Options);
 
     // Fisher-Yates with rng.Next(k) == k - 1 leaves the input order unchanged → deterministic deck order.
-    private sealed class IdentityRandom : Random
+    sealed class IdentityRandom : Random
     {
         public override int Next(int maxValue) => maxValue - 1;
     }
 
-    private static readonly Random Identity = new IdentityRandom();
+    static readonly Random Identity = new IdentityRandom();
 
-    private static MusicLibraryService NewService(BoltonCupDbContext db, IMusicSearchService? search = null, IGlobalMusicQueue? queue = null) =>
+    static MusicLibraryService NewService(BoltonCupDbContext db, IMusicSearchService? search = null, IGlobalMusicQueue? queue = null) =>
         new(db, Mock.Of<IStorageService>(), Mock.Of<IAssetKeyGenerator>(), search ?? Mock.Of<IMusicSearchService>(), queue ?? new GlobalMusicQueue(db, Identity));
 
     // A service whose storage + key generator are stubbed so AddTrackAsync (upload) can run.
-    private static MusicLibraryService NewUploadService(BoltonCupDbContext db)
+    static MusicLibraryService NewUploadService(BoltonCupDbContext db)
     {
         var keyGen = new Mock<IAssetKeyGenerator>();
         keyGen.Setup(k => k.GenerateFinalKey<TournamentMusicTrack>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -47,7 +47,7 @@ public class MusicLibraryServiceTests
         return new MusicLibraryService(db, storage.Object, keyGen.Object, Mock.Of<IMusicSearchService>(), new GlobalMusicQueue(db, Identity));
     }
 
-    private static IMusicSearchService SearchReturning(params MusicTrack[] tracks)
+    static IMusicSearchService SearchReturning(params MusicTrack[] tracks)
     {
         var mock = new Mock<IMusicSearchService>();
         mock.Setup(s => s.GetPlaylistTracksAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -253,7 +253,7 @@ public class MusicLibraryServiceTests
         await act.Should().ThrowAsync<EntityNotFoundException>();
     }
 
-    private static async Task<BoltonCupDbContext> SeedAsync(bool saTrackIsBasePool = false)
+    static async Task<BoltonCupDbContext> SeedAsync(bool saTrackIsBasePool = false)
     {
         var db = NewContext();
 
@@ -285,7 +285,7 @@ public class MusicLibraryServiceTests
         return db;
     }
 
-    private static Account Account(int id, string first, string last) => new()
+    static Account Account(int id, string first, string last) => new()
     {
         Id = id,
         FirstName = first,

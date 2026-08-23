@@ -7,14 +7,16 @@ namespace BoltonCup.WebAPI.Tests;
 
 public class RosterImageRendererTests
 {
-    private const string SystemFont = "/System/Library/Fonts/Supplemental/DIN Condensed Bold.ttf";
+    const string SystemFont = "/System/Library/Fonts/Supplemental/DIN Condensed Bold.ttf";
 
     [Fact]
     public void Render_ProducesPngOfExpectedSize()
     {
         // Dev-only visual smoke test: depends on a macOS system font. Skip elsewhere (e.g. Linux CI).
         if (!File.Exists(SystemFont))
+        {
             return;
+        }
 
         var fontBytes = File.ReadAllBytes(SystemFont);
         var logoBytes = BuildSampleLogo();
@@ -32,7 +34,7 @@ public class RosterImageRendererTests
                 Background = RosterColor.White,
                 TitleFill = RosterColor.Primary,
                 TitleOutline = RosterColor.Black,
-                PositionBarBackground =  RosterColor.Black,
+                PositionBarBackground = RosterColor.Black,
                 PositionBarOutline = RosterColor.Black,
                 PositionBarFill = RosterColor.Black,
                 JerseyNumber = RosterColor.Primary,
@@ -58,7 +60,7 @@ public class RosterImageRendererTests
         File.WriteAllBytes(Path.Combine(Path.GetTempPath(), "roster-test.png"), png);
     }
 
-    private static IReadOnlyList<RosterPlayerCell> BuildCells(int count, char group)
+    static IReadOnlyList<RosterPlayerCell> BuildCells(int count, char group)
     {
         var names = new[]
         {
@@ -82,7 +84,7 @@ public class RosterImageRendererTests
         return cells;
     }
 
-    private static byte[] BuildSampleLogo()
+    static byte[] BuildSampleLogo()
     {
         using var surface = SKSurface.Create(new SKImageInfo(200, 200));
         var canvas = surface.Canvas;

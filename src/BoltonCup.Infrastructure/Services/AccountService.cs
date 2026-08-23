@@ -7,9 +7,9 @@ namespace BoltonCup.Infrastructure.Services;
 
 public class AccountService : IAccountService
 {
-    private readonly BoltonCupDbContext _dbContext;
-    private readonly IStorageService _storageService;
-    private readonly IAssetKeyGenerator _assetKeyGenerator;
+    readonly BoltonCupDbContext _dbContext;
+    readonly IStorageService _storageService;
+    readonly IAssetKeyGenerator _assetKeyGenerator;
 
     public AccountService(BoltonCupDbContext dbContext, IStorageService storageService, IAssetKeyGenerator assetKeyGenerator)
     {
@@ -31,10 +31,10 @@ public class AccountService : IAccountService
             HeightFeet = command.HeightFeet,
             HeightInches = command.HeightInches,
             Weight = command.Weight,
-        }; 
+        };
         _dbContext.Accounts.Add(newAccount);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        
+
         return newAccount.Id;
     }
 
@@ -51,7 +51,7 @@ public class AccountService : IAccountService
         account.HeightFeet = command.HeightFeet;
         account.HeightInches = command.HeightInches;
         account.Weight = command.Weight;
-        
+
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -66,8 +66,8 @@ public class AccountService : IAccountService
             accountId.ToString(),
             cancellationToken
         );
-    }    
-    
+    }
+
     public Task UpdateBannerAsync(int accountId, string tempKey, CancellationToken cancellationToken = default)
     {
         return _storageService.UpdateAssetAsync<Account>(
