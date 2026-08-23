@@ -4,7 +4,7 @@
 @if (_player is null)
 {
     <div class="mud-full-width" style="background-color: var(--mud-palette-appbar-background)">
-        <MudContainer MaxWidth="MaxWidth.Medium" Style="background-color: white" Gutters="false">
+        <MudContainer MaxWidth="MaxWidth.Large" Style="background-color: white" Gutters="false">
             <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="220px" />
             <div class="d-flex flex-column align-center gap-3 mt-n20">
                 <MudSkeleton SkeletonType="SkeletonType.Circle" Width="160px" Height="160px" />
@@ -23,7 +23,7 @@ else
     <PageTitle>@_player.FullName</PageTitle>
     
     <div class="mud-full-width" style="background-color: var(--mud-palette-appbar-background)">
-        <MudContainer MaxWidth="MaxWidth.Medium" Style="background-color: white" Gutters="false">
+        <MudContainer MaxWidth="MaxWidth.Large" Style="background-color: white" Gutters="false">
             <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
                 <div class="d-flex flex-row align-center gap-6 pa-4">
                     <MudText Typo="Typo.h4"><b>@_player.FullName</b></MudText>
