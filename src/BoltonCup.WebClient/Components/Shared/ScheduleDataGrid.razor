@@ -1,6 +1,20 @@
 @using BoltonCup.Sdk
 @inject IBoltonCupApi BoltonCupApi
+@inject IJSRuntime JS
+@implements IAsyncDisposable
 
+@if (_stickyTournament is not null)
+{
+    <div class="pa-4 d-flex flex-row align-center gap-2" style="position: sticky; top: 56px; z-index: 10; background-color: var(--mud-palette-background); box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+        <MudText Typo="Typo.h6"><b>@_stickyTournament</b></MudText>
+        @if (!string.IsNullOrEmpty(_stickyTournamentLogo))
+        {
+            <MudImage Src="@_stickyTournamentLogo" Height="40" />
+        }
+    </div>
+}
+
+<div @ref="_containerRef">
 <MudTable
     @ref="_dataGrid"
     T="Sdk.GameDto"
@@ -32,6 +46,7 @@
             {
                 case TournamentGroupKey key:
                     <MudTh colspan="5">
+                        <div data-tournament-sentinel="@key.TournamentName" data-tournament-logo="@key.TournamentLogo" style="height: 0; overflow: hidden;"></div>
                         <div class="d-flex flex-row align-center gap-1">
                             <MudText Typo="Typo.h6"><b>@key.TournamentName</b></MudText>
                             @if (!string.IsNullOrEmpty(key.TournamentLogo))
@@ -114,10 +129,17 @@
         <MudTablePager HideRowsPerPage/>
     </PagerContent>
 </MudTable>
+</div>
 
 @code {
 
     private MudTable<Sdk.GameDto> _dataGrid = null!;
+    private ElementReference _containerRef;
+    private IJSObjectReference? _module;
+    private IJSObjectReference? _handle;
+    private DotNetObjectReference<ScheduleDataGrid>? _dotNetRef;
+    private string? _stickyTournament;
+    private string? _stickyTournamentLogo;
 
     private readonly ScheduleFilterModel _filter = new();
 
@@ -156,6 +178,41 @@
             Items = data.Items,
             TotalItems = data.Total,
         };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./Components/Shared/ScheduleDataGrid.razor.js?v=1.0");
+            _dotNetRef = DotNetObjectReference.Create(this);
+            _handle = await _module.InvokeAsync<IJSObjectReference>("initStickyTournamentHeader", _dotNetRef, _containerRef);
+        }
+    }
+
+    [JSInvokable]
+    public void OnStickyTournamentChanged(string? tournamentName, string? tournamentLogo)
+    {
+        _stickyTournament = tournamentName;
+        _stickyTournamentLogo = tournamentLogo;
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is not null && _handle is not null)
+        {
+            await _module.InvokeVoidAsync("dispose", _handle);
+        }
+        if (_handle is not null)
+        {
+            await _handle.DisposeAsync();
+        }
+        if (_module is not null)
+        {
+            await _module.DisposeAsync();
+        }
+        _dotNetRef?.Dispose();
     }
 
     private Task OnFilterTournamentChange(Sdk.TournamentDto? tournament)
