@@ -1,0 +1,15 @@
+@namespace BoltonCup.Common.Components
+
+<MudIcon Icon="@Icon" Size="@Size" Color="@Color" />
+
+@code {
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+    [Parameter]
+    public Color Color { get; set; } = Color.Warning;
+
+    private const string Icon = Icons.Material.Rounded.EmojiEvents;
+
+}
