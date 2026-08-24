@@ -62,7 +62,11 @@
         }
     </div>
 
-    @if (_recentHighlights is { Count: > 0 })
+    @if (_recentHighlights is null)
+    {
+        <MudSkeleton Width="100%" Height="400px" />
+    }
+    else if (_recentHighlights is { Count: > 0 })
     {
         <MustWatchCarousel Highlights="_recentHighlights" />
     }
