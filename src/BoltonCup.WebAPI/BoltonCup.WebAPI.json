@@ -17757,6 +17757,12 @@
             "type": "string",
             "description": "Gets the player's full name.",
             "readOnly": true
+          },
+          "pointsPerGame": {
+            "type": "number",
+            "description": "Gets the points per game, rounded to two decimal places.",
+            "format": "double",
+            "readOnly": true
           }
         },
         "additionalProperties": false,
