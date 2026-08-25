@@ -34,6 +34,8 @@ public class SkaterStat
     public string? TournamentName { get; init; }
     public bool TournamentActive { get; init; }
 
+    public double PointsPerGame => GamesPlayed == 0 ? 0 : Math.Round((double)Points / GamesPlayed, 2);
+
     public Player Player { get; set; } = null!;
     public Team Team { get; set; } = null!;
     public Team Opponent { get; set; } = null!;

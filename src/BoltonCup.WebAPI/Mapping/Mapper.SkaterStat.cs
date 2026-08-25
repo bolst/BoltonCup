@@ -36,6 +36,7 @@ public partial class Mapper
         Goals = skater.Goals,
         Assists = skater.Assists,
         Points = skater.Points,
-        PenaltyMinutes = skater.PenaltyMinutes
+        PenaltyMinutes = skater.PenaltyMinutes,
+        PointsPerGame = skater.PointsPerGame
     });
 }

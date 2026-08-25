@@ -17663,6 +17663,7 @@
           "penaltyMinutes",
           "playerId",
           "points",
+          "pointsPerGame",
           "position",
           "profilePicture"
         ],
@@ -17761,8 +17762,7 @@
           "pointsPerGame": {
             "type": "number",
             "description": "Gets the points per game, rounded to two decimal places.",
-            "format": "double",
-            "readOnly": true
+            "format": "double"
           }
         },
         "additionalProperties": false,
