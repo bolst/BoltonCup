@@ -39,4 +39,6 @@ public record SkaterStatDto
     public required double PenaltyMinutes { get; init; }
     /// <summary>Gets the player's full name.</summary>
     public string FullName => FirstName + " " + LastName;
+    /// <summary>Gets the points per game, rounded to two decimal places.</summary>
+    public double PointsPerGame => GamesPlayed == 0 ? 0 : Math.Round((double)Points / GamesPlayed, 2);
 }
