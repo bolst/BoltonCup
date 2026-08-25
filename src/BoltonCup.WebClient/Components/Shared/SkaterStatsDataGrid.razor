@@ -58,7 +58,7 @@
         <PropertyColumn Property="x => x.Assists" Title="A" CellStyle="@_dataCellStyle"/>
         <PropertyColumn Property="x => x.Points" Title="P" CellStyle="@_dataCellStyle" InitialDirection="SortDirection.Descending" />
         <PropertyColumn Property="x => x.PenaltyMinutes" Title="PIM" CellStyle="@_dataCellStyle" />
-        <PropertyColumn Property="x => x.PointsPerGame" Title="P/GP" CellStyle="@_dataCellStyle" />
+        <PropertyColumn Property="x => x.PointsPerGame" Title="P/GP" CellStyle="@_dataCellStyle" Sortable="false" />
     </Columns>
     <PagerContent>
         <MudDataGridPager T="Sdk.SkaterStatDto" PageSizeSelector="false"/>
