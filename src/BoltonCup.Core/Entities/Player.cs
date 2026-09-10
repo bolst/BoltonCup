@@ -26,7 +26,6 @@ public class Player : EntityBase
     public ICollection<Penalty> Penalties { get; set; } = [];
     public ICollection<SkaterStat> SkaterGameLogs { get; set; } = [];
     public ICollection<GoalieStat> GoalieGameLogs { get; set; } = [];
-    public ICollection<GameHighlight> GameHighlights { get; set; } = [];
     public ICollection<GameStar> Stars { get; set; } = [];
 
     public override string ToString() => Account != null

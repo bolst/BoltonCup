@@ -1,0 +1,18 @@
+.tag-input-field {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    min-width: 10rem;
+    padding: 2px 4px;
+    border-bottom: 1px solid var(--mud-palette-lines-inputs);
+}
+
+.tag-input-field:focus {
+    border-bottom-color: var(--mud-palette-primary);
+}
+
+.tag-input-field::placeholder {
+    color: var(--mud-palette-text-disabled);
+}

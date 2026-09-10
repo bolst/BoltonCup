@@ -1,0 +1,26 @@
+@page "/tag-labels"
+
+<EntityDataGrid
+    T="TagLabel"
+    SearchBy="x => x.Name"
+    NewItemFunc="NewItemFunc"
+    ColumnResizeMode="ResizeMode.Column"
+    Comparer="_comparer">
+    <Columns>
+        <PropertyColumn Title="Label" Property="x => x.Name" Editable="true" InitialDirection="SortDirection.Ascending"/>
+    </Columns>
+    <ChildRowContent>
+        <div class="pa-2">
+            <LabelHighlights LabelId="context.Item.Id"/>
+        </div>
+    </ChildRowContent>
+</EntityDataGrid>
+
+@code {
+
+    private static readonly TagLabelComparer _comparer = new();
+
+    private static Task<TagLabel?> NewItemFunc()
+        => Task.FromResult<TagLabel?>(new TagLabel { Name = string.Empty });
+
+}

@@ -57,7 +57,7 @@ public interface IMapper
     // Game
     GetGamesQuery ToQuery(GetGamesRequest request);
     IPagedList<GameDto> ToDtoList(IPagedList<Game> games);
-    GameSingleDto? ToDto(Game? game, IReadOnlyList<SkaterStat> homeStats, IReadOnlyList<SkaterStat> awayStats);
+    GameSingleDto? ToDto(Game? game, IReadOnlyList<SkaterStat> homeStats, IReadOnlyList<SkaterStat> awayStats, IReadOnlyList<Highlight> highlights);
     UpdateGameStateCommand ToCommand(int gameId, UpdateGameStateRequest request);
     CreateGoalCommand ToCommand(int gameId, CreateGoalRequest request);
     UpdateGoalCommand ToCommand(int gameId, int goalId, UpdateGoalRequest request);
@@ -67,7 +67,7 @@ public interface IMapper
 
     // Highlights
     GetHighlightsQuery ToQuery(GetHighlightsRequest request);
-    IPagedList<RecentHighlightDto> ToDtoList(IPagedList<GameHighlight> highlights);
+    IPagedList<RecentHighlightDto> ToDtoList(IPagedList<Highlight> highlights);
 
     // GoalieStat
     GetGoalieStatsQuery ToQuery(GetGoalieStatsRequest request);

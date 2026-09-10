@@ -1,60 +1,58 @@
 @page "/games/highlights"
+@using System.Linq.Expressions
 @using BoltonCup.Common
 
 <EntityDataGrid
-    T="GameHighlight"
+    T="Highlight"
     NewItemFunc="NewItemFunc"
     Include="@_includes"
-    TournamentFilter="id => x => x.Game.TournamentId == id"
-    Comparer="_comparer">
+    TournamentFilter="TournamentFilter"
+    Comparer="_comparer"
+    ColumnResizeMode="ResizeMode.None">
     <Columns>
-        <PropertyColumn Title="Video ID" Property="x => x.VideoId" Required />
-        <ForeignColumn Title="Game" Property="x => x.Game" PropertySetter="(gs, game) => gs.Game = game"
-                       Include="x => x.Include(g => g.HomeTeam).Include(g => g.AwayTeam).Include(g => g.Tournament)"
-                       SearchBy="@(x => (x.HomeTeam != null ? x.HomeTeam.Name : " ") + ' ' + (x.AwayTeam != null ? x.AwayTeam.Name : " "))"
-                       EqualityComparer="new GameComparer()">
-            <ItemTemplate>
-                <MudText>@context.HomeTeam?.NameShort vs. @context.AwayTeam?.NameShort</MudText>
-                <MudChip T="string" Variant="Variant.Text" Color="Color.Info" Size="Size.Small" Label="true">
-                    @context.GameTime.ToEstString("g")
-                </MudChip>
-                <MudText Typo="Typo.caption">@context.Tournament.Name</MudText>
-                <MudDivider Class="mt-2"/>
-            </ItemTemplate>
-        </ForeignColumn>
-        <ForeignColumn Title="Player" Property="x => x.Player" PropertySetter="(gs, player) => gs.Player = player"
-                       EqualityComparer="new PlayerComparer()!" Include="x => x.Include(p => p.Account)"
-                       Filter="@(x => y => y.TournamentId == x.Game.TournamentId)"
-                       SearchBy="x => x.Account.FirstName + ' ' + x.Account.LastName"/>
+        <PropertyColumn Title="Video ID" Property="x => x.VideoId" CellStyle="max-width: 6rem" Required />
         <PropertyColumn Title="Title" Property="x => x.Title" />
         <PropertyColumn Title="Description" Property="x => x.Description" Required="false" />
-        <PropertyColumn Title="Game date" Property="x => x.Game.GameTime" Format="g" Editable="false" InitialDirection="SortDirection.Ascending" Required>
-            <CellTemplate>
-                @if (context.Item.Game is { } game)
-                {
-                    <span>@game.GameTime.ToEstString("g")</span>
-                }
-            </CellTemplate>
-        </PropertyColumn>
     </Columns>
+    <ChildRowContent>
+        <div class="pa-2">
+            <TagInput TTag="HighlightTag" Subject="context.Item" />
+        </div>
+    </ChildRowContent>
 </EntityDataGrid>
 
 @code {
-    
-    private static readonly GameHighlightComparer _comparer = new();
-    
-    private async Task<GameHighlight?> NewItemFunc()
+
+    private static readonly HighlightComparer _comparer = new();
+
+    private async Task<Highlight?> NewItemFunc()
     {
-        return new GameHighlight
+        return new Highlight
         {
         };
     }
 
-    private static readonly Func<IQueryable<GameHighlight>, IQueryable<GameHighlight>> _includes = 
+    private static readonly Func<IQueryable<Highlight>, IQueryable<Highlight>> _includes =
         x => x
-            .Include(g => g.Player).ThenInclude(p => p.Account)
-            .Include(g => g.Game).ThenInclude(g => g.HomeTeam)
-            .Include(g => g.Game).ThenInclude(g => g.AwayTeam)
-            .Include(g => g.Game).ThenInclude(g => g.Tournament);
-    
+            .Include(h => h.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.HomeTeam)
+            .Include(h => h.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.AwayTeam)
+            .Include(h => h.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.Tournament)
+            .Include(h => h.Tags).ThenInclude(t => t.Player).ThenInclude(p => p!.Account)
+            .Include(h => h.Tags).ThenInclude(t => t.Team)
+            .Include(h => h.Tags).ThenInclude(t => t.Tournament)
+            .Include(h => h.Tags).ThenInclude(t => t.Label);
+
+    // Highlights carrying no tournament-bearing tag belong to no tournament. They must stay
+    // visible or a newly saved highlight disappears from the only page that can tag it.
+    private static Expression<Func<Highlight, bool>> TournamentFilter(int id) => x => x.Tags.Any(t =>
+            t.TournamentId == id
+            || (t.Game != null && t.Game.TournamentId == id)
+            || (t.Player != null && t.Player.TournamentId == id)
+            || (t.Team != null && t.Team.TournamentId == id))
+        || !x.Tags.Any(t =>
+            t.TournamentId != null
+            || t.GameId != null
+            || t.PlayerId != null
+            || t.TeamId != null);
+
 }

@@ -1,0 +1,73 @@
+@namespace BoltonCup.Admin.Components.Shared
+@typeparam TTag
+
+<div class="d-flex flex-row flex-wrap align-center gap-1">
+
+    @foreach (var tag in OrderedTags().ToList())
+    {
+        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="@ChipColor(tag)"
+                 OnClose="@(() => RemoveAsync(tag))">
+            @ChipLabel(tag)
+        </MudChip>
+    }
+
+    @if (!CanTag)
+    {
+        <MudText Typo="Typo.caption" Class="mud-text-secondary">Save the highlight before tagging.</MudText>
+    }
+    else
+    {
+        if (_stage == Stage.SelectingTarget && _pendingType is { } pending)
+        {
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Filled" Color="@ChipColor(pending)" OnClose="@BackToTypeStageAsync">
+                @Prefix(pending):
+            </MudChip>
+        }
+
+        <div class="tag-input-anchor" style="position: relative;">
+            <input @ref="_input"
+                   class="tag-input-field"
+                   type="text"
+                   value="@_text"
+                   data-trap-tab="@(SuppressDefaultKey ? "true" : "false")"
+                   placeholder="@(_stage == Stage.SelectingTarget ? $"search {Prefix(_pendingType!.Value)}..." : "add tag...")"
+                   @oninput="OnTextChanged"
+                   @onkeydown="OnKeyDown"
+                   @onfocus="@(() => _open = _options.Count > 0)"
+                   @onblur="OnBlur" />
+
+            <MudPopover Open="@(_open && _options.Count > 0)"
+                        AnchorOrigin="Origin.BottomLeft"
+                        TransformOrigin="Origin.TopLeft"
+                        RelativeWidth="DropdownWidth.Adaptive"
+                        MaxHeight="320"
+                        Class="pa-0">
+                @* Keeping mousedown from landing stops the input blurring, so a click commits
+                   the option instead of racing the blur-close. *@
+                <div @onmousedown:preventDefault="true">
+                    <MudList T="string" Dense="true">
+                        @for (var i = 0; i < _options.Count; i++)
+                        {
+                            var index = i;
+                            var option = _options[i];
+                            @if (index == _labelSectionStart)
+                            {
+                                <MudDivider Class="my-1"/>
+                            }
+                            <MudListItem T="string"
+                                         Text="@option.Display"
+                                         Class="@(index == _highlight ? "mud-selected-item" : null)"
+                                         OnClick="@(() => SelectAsync(option))" />
+                        }
+                    </MudList>
+                </div>
+            </MudPopover>
+        </div>
+
+        @if (_busy)
+        {
+            <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Default" />
+        }
+    }
+
+</div>

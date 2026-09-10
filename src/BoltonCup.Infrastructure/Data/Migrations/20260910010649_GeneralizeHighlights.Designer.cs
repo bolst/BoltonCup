@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260910010649_GeneralizeHighlights")]
+    partial class GeneralizeHighlights
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1384,26 +1387,6 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     b.HasIndex("TournamentId");
 
-                    b.HasIndex("SubjectId", "GameId")
-                        .IsUnique()
-                        .HasFilter("game_id IS NOT NULL");
-
-                    b.HasIndex("SubjectId", "LabelId")
-                        .IsUnique()
-                        .HasFilter("label_id IS NOT NULL");
-
-                    b.HasIndex("SubjectId", "PlayerId")
-                        .IsUnique()
-                        .HasFilter("player_id IS NOT NULL");
-
-                    b.HasIndex("SubjectId", "TeamId")
-                        .IsUnique()
-                        .HasFilter("team_id IS NOT NULL");
-
-                    b.HasIndex("SubjectId", "TournamentId")
-                        .IsUnique()
-                        .HasFilter("tournament_id IS NOT NULL");
-
                     b.ToTable("highlight_tags", "core", t =>
                         {
                             t.HasCheckConstraint("CK_highlight_tags_exactly_one_target", "num_nonnulls(game_id, player_id, team_id, tournament_id, label_id) = 1");
@@ -2068,7 +2051,8 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name");
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("tag_labels", "core");
                 });

@@ -18,7 +18,9 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<DraftPick> DraftPicks { get; set; }
     public DbSet<Gallery> Galleries { get; set; }
     public DbSet<Game> Games { get; set; }
-    public DbSet<GameHighlight> GameHighlights { get; set; }
+    public DbSet<Highlight> Highlights { get; set; }
+    public DbSet<HighlightTag> HighlightTags { get; set; }
+    public DbSet<TagLabel> TagLabels { get; set; }
     public DbSet<GameStar> GameStars { get; set; }
     public DbSet<GameWarmupTrack> GameWarmupTracks { get; set; }
     public DbSet<Goal> Goals { get; set; }
@@ -291,30 +293,32 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Rink).HasColumnName("rink");
         });
 
-        modelBuilder.Entity<GameHighlight>(entity =>
+        modelBuilder.Entity<Highlight>(entity =>
         {
             entity
-                .ToTable("game_highlights")
+                .ToTable("highlights")
                 .HasKey(e => e.Id);
-            entity
-                .HasOne(e => e.Game)
-                .WithMany(g => g.Highlights)
-                .HasForeignKey(e => e.GameId);
-            entity
-                .HasOne(e => e.Player)
-                .WithMany(p => p.GameHighlights)
-                .HasForeignKey(e => e.PlayerId);
             entity
                 .HasIndex(e => e.VideoId)
                 .IsUnique();
-            entity
-                .HasIndex(e => e.GameId);
             entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
-            entity.Property(e => e.GameId).HasColumnName("game_id");
-            entity.Property(e => e.PlayerId).HasColumnName("player_id");
             entity.Property(e => e.VideoId).HasColumnName("video_id");
             entity.Property(e => e.Title).HasColumnName("title");
             entity.Property(e => e.Description).HasColumnName("description");
+        });
+
+        modelBuilder.ConfigureTagTable<HighlightTag, Highlight>("highlight_tags", "highlight_id", h => h.Tags);
+
+        modelBuilder.Entity<TagLabel>(entity =>
+        {
+            entity
+                .ToTable("tag_labels")
+                .HasKey(e => e.Id);
+            // Uniqueness is enforced by a unique index on lower(name), created in the
+            // AddTagIntegrityConstraints migration: an expression index EF cannot model.
+            entity.HasIndex(e => e.Name);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.Name).HasColumnName("name");
         });
 
         modelBuilder.Entity<GameWarmupTrack>(entity =>
