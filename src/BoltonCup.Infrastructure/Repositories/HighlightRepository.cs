@@ -18,7 +18,7 @@ public class HighlightRepository(BoltonCupDbContext _context) : IHighlightReposi
                 .ThenInclude(t => t.Player)
                     .ThenInclude(p => p!.Account)
             .Where(h => h.VideoId != null && h.VideoId != "")
-            .Where(h => h.Tags.Any(t => t.GameId != null))
+            .ConditionalWhere(h => h.Tags.Any(t => t.PlayerId == query.PlayerId), query.PlayerId.HasValue)
             .ApplySorting(
                 query,
                 x => x

@@ -6,14 +6,14 @@
 @inject IBrowserViewportService ViewportService
 
 <div @ref="_root" class="d-flex flex-column gap-3 border-y mud-border-lines-default pa-4">
-    <MudText Typo="Typo.h6"><b>Must Watch</b></MudText>
+    <MudText Typo="Typo.h6"><b>@Title</b></MudText>
     <MudCarousel @ref="_carousel"
                  TData="object"
                  Style="height: 350px"
                  BulletsColor="Color.Primary"
+                 ShowBullets="@ShowBullets"
                  AutoCycle="false"
-                 ShowArrows="false"
-                 ShowBullets>
+                 ShowArrows="false">
         @foreach (var page in Highlights.Chunk(_chunkSize))
         {
             <MudCarouselItem Transition="Transition.Slide" Color="Color.Surface">
@@ -34,6 +34,9 @@
     [EditorRequired]
     public required IReadOnlyList<RecentHighlightDto> Highlights { get; set; }
 
+    [Parameter]
+    public string Title { get; set; } = "Must Watch";
+
     private MudCarousel<object>? _carousel;
     private ElementReference _root;
 
@@ -47,6 +50,8 @@
     private string _cardWidth = "280px";
 
     private int PageCount => (Highlights.Count + _chunkSize - 1) / _chunkSize;
+
+    private bool ShowBullets => Highlights.Count > _chunkSize;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -126,7 +131,10 @@
     private RenderFragment HighlightCard(RecentHighlightDto item, string width)
         => @<div style="@($"flex: 0 0 {width}")">
             <VideoHighlight Highlight="@item.Highlight" MaxWidth="100%" />
-            <MudText Typo="Typo.caption">@item.GameTime.ToLocalTime().ToString("MMM d, yyyy")</MudText>
+            @if (item.GameTime is { } gameTime)
+            {
+                <MudText Typo="Typo.caption">@gameTime.ToLocalTime().ToString("MMM d, yyyy")</MudText>
+            }
         </div>;
 
     public async ValueTask DisposeAsync()

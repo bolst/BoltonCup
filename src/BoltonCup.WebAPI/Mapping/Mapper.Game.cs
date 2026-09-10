@@ -122,6 +122,7 @@ public partial class Mapper
 
     public GetHighlightsQuery ToQuery(GetHighlightsRequest request) => new GetHighlightsQuery
     {
+        PlayerId = request.PlayerId,
         Page = request.Page,
         Size = request.Size,
         SortBy = request.SortBy,
@@ -130,21 +131,18 @@ public partial class Mapper
 
     public IPagedList<RecentHighlightDto> ToDtoList(IPagedList<Highlight> highlights) => highlights.ProjectTo(highlight =>
     {
+        // A highlight need not be tagged with a game, so game context is optional.
         var game = highlight.Tags
             .Where(t => t.Game != null)
             .Select(t => t.Game!)
             .OrderByDescending(g => g.GameTime)
-            .FirstOrDefault()
-            // The repository only returns highlights carrying a game tag; RecentHighlightDto
-            // cannot be built without one, so a miss means that filter was bypassed.
-            ?? throw new InvalidOperationException(
-                $"Highlight {highlight.Id} has no game tag and cannot be mapped to a recent highlight.");
+            .FirstOrDefault();
 
         return new RecentHighlightDto(
             Highlight: ToGameHighlightDto(highlight),
-            GameId: game.Id,
-            GameTime: game.GameTime,
-            TournamentName: game.Tournament.Name
+            GameId: game?.Id,
+            GameTime: game?.GameTime,
+            TournamentName: game?.Tournament.Name
         );
     });
 
