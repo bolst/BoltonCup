@@ -298,8 +298,14 @@ public partial class TagInput<TTag> : ComponentBase, IDisposable
 
     static int Rank(string name, string text)
     {
-        if (text.Length == 0 || name.StartsWith(text, StringComparison.OrdinalIgnoreCase)) return 0;
-        if (name.Contains(text, StringComparison.OrdinalIgnoreCase)) return 1;
+        if (text.Length == 0 || name.StartsWith(text, StringComparison.OrdinalIgnoreCase))
+        {
+            return 0;
+        }
+        if (name.Contains(text, StringComparison.OrdinalIgnoreCase))
+        {
+            return 1;
+        }
         return 2;
     }
 

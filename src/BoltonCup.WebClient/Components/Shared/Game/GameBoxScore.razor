@@ -124,7 +124,8 @@ else
 
 @code {
 
-    [Parameter, EditorRequired]
+    [Parameter]
+    [EditorRequired]
     public required Sdk.GameSingleDto Game { get; set; }
     
     private Sdk.GameSingleDto? _game;
