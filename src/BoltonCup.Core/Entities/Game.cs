@@ -21,7 +21,6 @@ public class Game : EntityBase
     public ICollection<Penalty> Penalties { get; set; } = [];
     public ICollection<SkaterStat> SkaterGameLogs { get; set; } = [];
     public ICollection<GoalieStat> GoalieGameLogs { get; set; } = [];
-    public ICollection<GameHighlight> Highlights { get; set; } = [];
     public ICollection<GameStar> Stars { get; set; } = [];
     public ICollection<Referee> Referees { get; set; } = [];
     public ICollection<GameWarmupTrack> WarmupTracks { get; set; } = [];

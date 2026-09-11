@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BoltonCup.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Infrastructure.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260910141441_AddTagIntegrityConstraints")]
+    partial class AddTagIntegrityConstraints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1328,10 +1331,6 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AccountId")
-                        .HasColumnType("integer")
-                        .HasColumnName("account_id");
-
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -1358,6 +1357,10 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("last_modified_by");
 
+                    b.Property<int?>("PlayerId")
+                        .HasColumnType("integer")
+                        .HasColumnName("player_id");
+
                     b.Property<int>("SubjectId")
                         .HasColumnType("integer")
                         .HasColumnName("highlight_id");
@@ -1372,21 +1375,17 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
-
                     b.HasIndex("GameId");
 
                     b.HasIndex("LabelId");
+
+                    b.HasIndex("PlayerId");
 
                     b.HasIndex("SubjectId");
 
                     b.HasIndex("TeamId");
 
                     b.HasIndex("TournamentId");
-
-                    b.HasIndex("SubjectId", "AccountId")
-                        .IsUnique()
-                        .HasFilter("account_id IS NOT NULL");
 
                     b.HasIndex("SubjectId", "GameId")
                         .IsUnique()
@@ -1395,6 +1394,10 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.HasIndex("SubjectId", "LabelId")
                         .IsUnique()
                         .HasFilter("label_id IS NOT NULL");
+
+                    b.HasIndex("SubjectId", "PlayerId")
+                        .IsUnique()
+                        .HasFilter("player_id IS NOT NULL");
 
                     b.HasIndex("SubjectId", "TeamId")
                         .IsUnique()
@@ -1406,7 +1409,7 @@ namespace BoltonCup.Infrastructure.Migrations
 
                     b.ToTable("highlight_tags", "core", t =>
                         {
-                            t.HasCheckConstraint("CK_highlight_tags_exactly_one_target", "num_nonnulls(game_id, account_id, team_id, tournament_id, label_id) = 1");
+                            t.HasCheckConstraint("CK_highlight_tags_exactly_one_target", "num_nonnulls(game_id, player_id, team_id, tournament_id, label_id) = 1");
                         });
                 });
 
@@ -3164,11 +3167,6 @@ namespace BoltonCup.Infrastructure.Migrations
 
             modelBuilder.Entity("BoltonCup.Core.HighlightTag", b =>
                 {
-                    b.HasOne("BoltonCup.Core.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("BoltonCup.Core.Game", "Game")
                         .WithMany()
                         .HasForeignKey("GameId")
@@ -3177,6 +3175,11 @@ namespace BoltonCup.Infrastructure.Migrations
                     b.HasOne("BoltonCup.Core.TagLabel", "Label")
                         .WithMany()
                         .HasForeignKey("LabelId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("BoltonCup.Core.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BoltonCup.Core.Highlight", "Subject")
@@ -3195,11 +3198,11 @@ namespace BoltonCup.Infrastructure.Migrations
                         .HasForeignKey("TournamentId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Navigation("Account");
-
                     b.Navigation("Game");
 
                     b.Navigation("Label");
+
+                    b.Navigation("Player");
 
                     b.Navigation("Subject");
 

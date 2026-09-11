@@ -11,6 +11,7 @@ namespace BoltonCup.WebAPI.Tests.Controllers;
 public class GamesControllerTests
 {
     readonly Mock<IGameRepository> _games = new();
+    readonly Mock<IHighlightRepository> _highlights = new();
     readonly Mock<ISkaterStatRepository> _skaterStats = new();
     readonly Mock<IMapper> _mapper = new();
     readonly Mock<IGameWriteService> _gameWrites = new();
@@ -21,6 +22,7 @@ public class GamesControllerTests
     {
         _controller = new GamesController(
             _games.Object,
+            _highlights.Object,
             _skaterStats.Object,
             _mapper.Object,
             _gameWrites.Object,

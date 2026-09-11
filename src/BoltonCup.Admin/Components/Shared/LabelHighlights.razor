@@ -1,0 +1,63 @@
+@namespace BoltonCup.Admin.Components.Shared
+@inject ITagUsageService TagUsage
+
+<div class="d-flex flex-row flex-wrap align-center gap-1">
+    @if (_groups is null)
+    {
+        <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Default"/>
+    }
+    else if (_groups.Count == 0)
+    {
+        <MudText Typo="Typo.caption" Class="mud-text-secondary">Not used yet.</MudText>
+    }
+    else
+    {
+        @foreach (var group in _groups)
+        {
+            <MudText Typo="Typo.caption" Class="mud-text-secondary mr-1">
+                @group.SubjectName (@group.Items.Count):
+            </MudText>
+            @foreach (var item in group.Items)
+            {
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Default">@item</MudChip>
+            }
+        }
+    }
+</div>
+
+@code {
+
+    private IReadOnlyList<TagUsageGroup>? _groups;
+    private int _loadedFor = -1;
+
+    [Parameter]
+    [EditorRequired]
+    public int LabelId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_loadedFor == LabelId)
+        {
+            return;
+        }
+
+        var requested = LabelId;
+        _loadedFor = requested;
+        _groups = null;
+
+        if (requested == 0)
+        {
+            _groups = [];
+            return;
+        }
+
+        var groups = await TagUsage.GetLabelUsageAsync(requested);
+
+        // A newer rebind may have landed while this query ran; the newest wins.
+        if (_loadedFor == requested)
+        {
+            _groups = groups;
+        }
+    }
+
+}

@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
-namespace BoltonCup.Admin.Extensions;
+namespace BoltonCup.Infrastructure.Extensions;
 
-public static class IQueryableExtensions
+public static class QueryableSearchExtensions
 {
     public static IQueryable<T> WhereContains<T>(
         this IQueryable<T> query,
@@ -22,7 +22,13 @@ public static class IQueryableExtensions
 
         var lowerProperty = Expression.Call(selector.Body, toLowerMethod!);
 
-        var pattern = $"%{searchTerm}%";
+        // The column is lowered below, so the pattern must be too, and LIKE metacharacters in
+        // user input are escaped rather than treated as wildcards.
+        var escaped = searchTerm.ToLower()
+            .Replace("\\", "\\\\")
+            .Replace("%", "\\%")
+            .Replace("_", "\\_");
+        var pattern = $"%{escaped}%";
         var patternConstant = Expression.Constant(pattern);
 
         var functionsProperty = Expression.Property(null, typeof(EF), nameof(EF.Functions));

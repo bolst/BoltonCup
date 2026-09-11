@@ -33,7 +33,7 @@ public partial class Mapper
         AwayTeamPlaceholder = game.AwayTeamPlaceholder,
     });
 
-    public GameSingleDto? ToDto(Game? game, IReadOnlyList<SkaterStat> homeStats, IReadOnlyList<SkaterStat> awayStats) => game is null
+    public GameSingleDto? ToDto(Game? game, IReadOnlyList<SkaterStat> homeStats, IReadOnlyList<SkaterStat> awayStats, IReadOnlyList<Highlight> highlights) => game is null
             ? null
             : new GameSingleDto
             {
@@ -57,7 +57,7 @@ public partial class Mapper
                     .ThenByDescending(penalty => penalty.TimeRemaining)
                     .ToList(),
                 Stars = GetGameStarDtos(game),
-                Highlights = game.Highlights
+                Highlights = highlights
                     .Select(ToGameHighlightDto)
                     .ToList(),
                 Officials = game.Referees
@@ -122,28 +122,38 @@ public partial class Mapper
 
     public GetHighlightsQuery ToQuery(GetHighlightsRequest request) => new GetHighlightsQuery
     {
+        AccountId = request.AccountId,
         Page = request.Page,
         Size = request.Size,
         SortBy = request.SortBy,
         Descending = request.Descending,
     };
 
-    public IPagedList<RecentHighlightDto> ToDtoList(IPagedList<GameHighlight> highlights) => highlights.ProjectTo(highlight => new RecentHighlightDto(
-        Highlight: ToGameHighlightDto(highlight),
-        GameId: highlight.GameId,
-        GameTime: highlight.Game.GameTime,
-        TournamentName: highlight.Game.Tournament.Name
-    ));
+    public IPagedList<RecentHighlightDto> ToDtoList(IPagedList<Highlight> highlights) => highlights.ProjectTo(highlight =>
+    {
+        // A highlight need not be tagged with a game, so game context is optional.
+        var game = highlight.Tags
+            .Where(t => t.Game != null)
+            .Select(t => t.Game!)
+            .OrderByDescending(g => g.GameTime)
+            .FirstOrDefault();
 
-    GameHighlightDto ToGameHighlightDto(GameHighlight highlight)
+        return new RecentHighlightDto(
+            Highlight: ToGameHighlightDto(highlight),
+            GameId: game?.Id,
+            GameTime: game?.GameTime,
+            TournamentName: game?.Tournament.Name
+        );
+    });
+
+    GameHighlightDto ToGameHighlightDto(Highlight highlight)
     {
         var highlightUrls = _urlResolver.GetHighlightUrls(highlight.VideoId);
         return new GameHighlightDto(
             VideoUrl: highlightUrls?.VideoUrl ?? string.Empty,
             ThumbnailUrl: highlightUrls?.ThumbnailUrl ?? string.Empty,
             Title: highlight.Title,
-            Description: highlight.Description,
-            Player: highlight.Player is null ? null : ToPlayerBriefDto(highlight.Player)
+            Description: highlight.Description
         );
     }
 

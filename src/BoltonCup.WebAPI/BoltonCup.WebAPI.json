@@ -8644,6 +8644,15 @@
         "operationId": "GetHighlights",
         "parameters": [
           {
+            "name": "AccountId",
+            "in": "query",
+            "description": "When set, only highlights tagged with this account.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
             "name": "Page",
             "in": "query",
             "description": "Gets or sets the 1-based page number to retrieve.",
@@ -15540,15 +15549,6 @@
             "type": "string",
             "description": "A description of the highlight.",
             "nullable": true
-          },
-          "player": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PlayerBriefDto"
-              }
-            ],
-            "description": "The player featured in the highlight, if any.",
-            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -17427,21 +17427,24 @@
           },
           "gameId": {
             "type": "integer",
-            "description": "The ID of the game the highlight belongs to.",
-            "format": "int32"
+            "description": "The ID of the most recent game the highlight is tagged with, if any.",
+            "format": "int32",
+            "nullable": true
           },
           "gameTime": {
             "type": "string",
-            "description": "The scheduled time of the game.",
-            "format": "date-time"
+            "description": "The scheduled time of that game, if any.",
+            "format": "date-time",
+            "nullable": true
           },
           "tournamentName": {
             "type": "string",
-            "description": "The name of the tournament the game belongs to."
+            "description": "The name of that game's tournament, if any.",
+            "nullable": true
           }
         },
         "additionalProperties": false,
-        "description": "DTO representing a game highlight with game context, for the cross-tournament recent-highlights feed."
+        "description": "DTO representing a video highlight with its game context, where it has one."
       },
       "RecentHighlightDtoIPagedList": {
         "type": "object",

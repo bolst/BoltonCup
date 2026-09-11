@@ -8,6 +8,7 @@ namespace BoltonCup.WebAPI.Controllers;
 
 public class GamesController(
     IGameRepository _games,
+    IHighlightRepository _highlights,
     ISkaterStatRepository _skaterStats,
     IMapper _mapper,
     IGameWriteService _gameWrites,
@@ -40,7 +41,8 @@ public class GamesController(
         }
         var homeStats = await _skaterStats.GetCareerStatsAsync(game.TournamentId, game.HomeTeamId);
         var awayStats = await _skaterStats.GetCareerStatsAsync(game.TournamentId, game.AwayTeamId);
-        return Ok(_mapper.ToDto(game, homeStats, awayStats));
+        var highlights = await _highlights.GetForGameAsync(id, take: 3);
+        return Ok(_mapper.ToDto(game, homeStats, awayStats, highlights));
     }
 
     /// <remarks>Updates a game's state (timekeeper or admin only).</remarks>

@@ -48,6 +48,10 @@ public static class ServiceCollectionExtensions
         RegisterByConvention(builder.Services, typeof(AccountRepository).Assembly, "Repository");
         RegisterByConvention(builder.Services, typeof(AccountRepository).Assembly, "Service");
 
+        // Convention scanning matches on Type.Name, which for a generic is "TagService`1" and so
+        // never ends with "Service". Open generics must be registered explicitly.
+        builder.Services.AddTransient(typeof(ITagService<>), typeof(TagService<>));
+
         builder.Services.AddSingleton<IRosterValidator, RosterValidator>();
 
         // The shared music rotation is DB-backed; register explicitly (name ends in Queue, not Service).
