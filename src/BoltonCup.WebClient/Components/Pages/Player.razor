@@ -105,20 +105,7 @@ else
                     </Columns>
                 </MudDataGrid>
             </div>
-            @if (_highlights is null)
-            {
-                <div class="my-6 px-4">
-                    <MudSkeleton SkeletonType="SkeletonType.Text" Width="200px" Height="32px" Class="mb-2" />
-                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="350px" />
-                </div>
-            }
-            else if (_highlights is { Count: > 0 })
-            {
-                <div class="my-6 px-4">
-                    <MustWatchCarousel Title="Latest Highlights" Highlights="_highlights" />
-                </div>
-            }
-            <div class="mt-6 px-4">
+            <div class="my-6 px-4">
                 <div class="d-flex flex-column align-center">
                     <MudText Typo="Typo.h4"><b>STATS</b></MudText>
                     <MudTabs Style="max-width: 100%" Elevation="0" KeepPanelsAlive Centered>
@@ -176,6 +163,19 @@ else
                     </MudTabs>
                 </div>
             </div>
+            @if (_highlights is null)
+            {
+                <div class="mt-6 px-4">
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Width="200px" Height="32px" Class="mb-2" />
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="350px" />
+                </div>
+            }
+            else if (_highlights is { Count: > 0 })
+            {
+                <div class="mt-6 px-4">
+                    <MustWatchCarousel Title="Latest Highlights" Highlights="_highlights" />
+                </div>
+            }
         </MudContainer>
     </div>
         
@@ -209,7 +209,7 @@ else
         await InvokeAsync(StateHasChanged);
 
         // Loaded after the profile so the page is not held up by the highlights call.
-        var highlights = await BoltonCupApi.GetHighlightsAsync(playerId: PlayerId, size: 12);
+        var highlights = await BoltonCupApi.GetHighlightsAsync(accountId: _player.AccountId, size: 12);
         _highlights = highlights.Items.ToList();
         await InvokeAsync(StateHasChanged);
     }

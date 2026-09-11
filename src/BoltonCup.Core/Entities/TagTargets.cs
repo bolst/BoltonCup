@@ -3,7 +3,7 @@ namespace BoltonCup.Core;
 public enum TagTargetType
 {
     Game,
-    Player,
+    Account,
     Team,
     Tournament,
     Label,
@@ -31,8 +31,10 @@ public static class TagTargets
     [
         new(TagTargetType.Game, typeof(Game), nameof(EntityTag.Game), nameof(EntityTag.GameId), "game_id", true,
             t => t.GameId, (t, v) => t.GameId = v, t => t.Game),
-        new(TagTargetType.Player, typeof(Player), nameof(EntityTag.Player), nameof(EntityTag.PlayerId), "player_id", true,
-            t => t.PlayerId, (t, v) => t.PlayerId = v, t => t.Player),
+        // Accounts, not players: one person has a player row per tournament, so tagging players
+        // would offer the same name once per tournament and split a person's highlights.
+        new(TagTargetType.Account, typeof(Account), nameof(EntityTag.Account), nameof(EntityTag.AccountId), "account_id", true,
+            t => t.AccountId, (t, v) => t.AccountId = v, t => t.Account),
         new(TagTargetType.Team, typeof(Team), nameof(EntityTag.Team), nameof(EntityTag.TeamId), "team_id", true,
             t => t.TeamId, (t, v) => t.TeamId = v, t => t.Team),
         new(TagTargetType.Tournament, typeof(Tournament), nameof(EntityTag.Tournament), nameof(EntityTag.TournamentId), "tournament_id", true,

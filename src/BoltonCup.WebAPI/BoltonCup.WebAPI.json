@@ -8644,9 +8644,9 @@
         "operationId": "GetHighlights",
         "parameters": [
           {
-            "name": "PlayerId",
+            "name": "AccountId",
             "in": "query",
-            "description": "When set, only highlights tagged with this player.",
+            "description": "When set, only highlights tagged with this account.",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -15548,15 +15548,6 @@
           "description": {
             "type": "string",
             "description": "A description of the highlight.",
-            "nullable": true
-          },
-          "player": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PlayerBriefDto"
-              }
-            ],
-            "description": "The player featured in the highlight, if any.",
             "nullable": true
           }
         },

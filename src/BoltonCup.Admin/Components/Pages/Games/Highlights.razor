@@ -37,7 +37,7 @@
             .Include(h => h.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.HomeTeam)
             .Include(h => h.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.AwayTeam)
             .Include(h => h.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.Tournament)
-            .Include(h => h.Tags).ThenInclude(t => t.Player).ThenInclude(p => p!.Account)
+            .Include(h => h.Tags).ThenInclude(t => t.Account)
             .Include(h => h.Tags).ThenInclude(t => t.Team)
             .Include(h => h.Tags).ThenInclude(t => t.Tournament)
             .Include(h => h.Tags).ThenInclude(t => t.Label);
@@ -47,12 +47,10 @@
     private static Expression<Func<Highlight, bool>> TournamentFilter(int id) => x => x.Tags.Any(t =>
             t.TournamentId == id
             || (t.Game != null && t.Game.TournamentId == id)
-            || (t.Player != null && t.Player.TournamentId == id)
             || (t.Team != null && t.Team.TournamentId == id))
         || !x.Tags.Any(t =>
             t.TournamentId != null
             || t.GameId != null
-            || t.PlayerId != null
             || t.TeamId != null);
 
 }

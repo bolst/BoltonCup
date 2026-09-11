@@ -122,7 +122,7 @@ public partial class Mapper
 
     public GetHighlightsQuery ToQuery(GetHighlightsRequest request) => new GetHighlightsQuery
     {
-        PlayerId = request.PlayerId,
+        AccountId = request.AccountId,
         Page = request.Page,
         Size = request.Size,
         SortBy = request.SortBy,
@@ -149,17 +149,11 @@ public partial class Mapper
     GameHighlightDto ToGameHighlightDto(Highlight highlight)
     {
         var highlightUrls = _urlResolver.GetHighlightUrls(highlight.VideoId);
-        var player = highlight.Tags
-            .Where(t => t.Player != null)
-            .OrderBy(t => t.Id)
-            .Select(t => t.Player)
-            .FirstOrDefault();
         return new GameHighlightDto(
             VideoUrl: highlightUrls?.VideoUrl ?? string.Empty,
             ThumbnailUrl: highlightUrls?.ThumbnailUrl ?? string.Empty,
             Title: highlight.Title,
-            Description: highlight.Description,
-            Player: player is null ? null : ToPlayerBriefDto(player)
+            Description: highlight.Description
         );
     }
 

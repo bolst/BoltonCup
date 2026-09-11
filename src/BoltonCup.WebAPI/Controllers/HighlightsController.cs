@@ -18,7 +18,7 @@ public class HighlightsController(
     public async Task<ActionResult<IPagedList<RecentHighlightDto>>> GetHighlights([FromQuery] GetHighlightsRequest request)
     {
         var result = await GetOrCreateAsync(
-            $"highlights:{request.Page}:{request.Size}:{request.SortBy}:{request.Descending}:{request.PlayerId}",
+            $"highlights:{request.Page}:{request.Size}:{request.SortBy}:{request.Descending}:{request.AccountId}",
             async () =>
             {
                 var query = _mapper.ToQuery(request);

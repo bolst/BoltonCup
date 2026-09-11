@@ -79,7 +79,7 @@ public partial class TagInput<TTag> : ComponentBase, IDisposable
     static Color ChipColor(TagTargetType type) => type switch
     {
         TagTargetType.Game => Color.Info,
-        TagTargetType.Player => Color.Success,
+        TagTargetType.Account => Color.Success,
         TagTargetType.Team => Color.Warning,
         TagTargetType.Tournament => Color.Tertiary,
         TagTargetType.Label => Color.Default,

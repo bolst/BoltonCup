@@ -15,10 +15,9 @@ public class HighlightRepository(BoltonCupDbContext _context) : IHighlightReposi
                 .ThenInclude(t => t.Game)
                     .ThenInclude(g => g!.Tournament)
             .Include(h => h.Tags)
-                .ThenInclude(t => t.Player)
-                    .ThenInclude(p => p!.Account)
+                .ThenInclude(t => t.Account)
             .Where(h => h.VideoId != null && h.VideoId != "")
-            .ConditionalWhere(h => h.Tags.Any(t => t.PlayerId == query.PlayerId), query.PlayerId.HasValue)
+            .ConditionalWhere(h => h.Tags.Any(t => t.AccountId == query.AccountId), query.AccountId.HasValue)
             .ApplySorting(
                 query,
                 x => x
@@ -30,8 +29,7 @@ public class HighlightRepository(BoltonCupDbContext _context) : IHighlightReposi
     public async Task<IReadOnlyList<Highlight>> GetForGameAsync(int gameId, int take, CancellationToken cancellationToken = default) => await _context.Highlights
             .AsNoTracking()
             .Include(h => h.Tags)
-                .ThenInclude(t => t.Player)
-                    .ThenInclude(p => p!.Account)
+                .ThenInclude(t => t.Account)
             .Where(h => h.Tags.Any(t => t.GameId == gameId))
             .OrderByDescending(h => h.CreatedAt)
             .ThenByDescending(h => h.Id)

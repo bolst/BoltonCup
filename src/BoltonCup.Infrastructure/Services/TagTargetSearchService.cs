@@ -32,10 +32,10 @@ public class TagTargetSearchService(IDbContextFactory<BoltonCupDbContext> _dbCon
                 g => (g.HomeTeam != null ? g.HomeTeam.Name : " ") + ' ' + (g.AwayTeam != null ? g.AwayTeam.Name : " "),
                 g => g.Id, excludeIds, term, cancellationToken),
 
-            TagTargetType.Player => await QueryAsync(
-                db.Players.AsNoTracking().Include(p => p.Account),
-                p => p.Account.FirstName + ' ' + p.Account.LastName,
-                p => p.Id, excludeIds, term, cancellationToken),
+            TagTargetType.Account => await QueryAsync(
+                db.Accounts.AsNoTracking(),
+                a => a.FirstName + ' ' + a.LastName,
+                a => a.Id, excludeIds, term, cancellationToken),
 
             TagTargetType.Team => await QueryAsync(
                 db.Teams.AsNoTracking(), t => t.Name, t => t.Id, excludeIds, term, cancellationToken),

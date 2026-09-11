@@ -12,13 +12,13 @@ public abstract class EntityTag : EntityBase
     public int SubjectId { get; set; }
 
     public int? GameId { get; set; }
-    public int? PlayerId { get; set; }
+    public int? AccountId { get; set; }
     public int? TeamId { get; set; }
     public int? TournamentId { get; set; }
     public int? LabelId { get; set; }
 
     public Game? Game { get; set; }
-    public Player? Player { get; set; }
+    public Account? Account { get; set; }
     public Team? Team { get; set; }
     public Tournament? Tournament { get; set; }
     public TagLabel? Label { get; set; }
