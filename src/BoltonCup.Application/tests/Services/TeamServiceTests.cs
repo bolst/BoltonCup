@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 
-namespace BoltonCup.WebAPI.Tests.Services;
+namespace BoltonCup.Application.Tests.Services;
 
 public class TeamServiceTests
 {

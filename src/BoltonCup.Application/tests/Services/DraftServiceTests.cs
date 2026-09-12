@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Xunit;
 
-namespace BoltonCup.WebAPI.Tests.Services;
+namespace BoltonCup.Application.Tests.Services;
 
 public class DraftServiceTests
 {

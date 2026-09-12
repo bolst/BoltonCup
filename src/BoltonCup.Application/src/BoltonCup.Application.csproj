@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <InternalsVisibleTo Include="BoltonCup.WebAPI.Tests" />
+      <InternalsVisibleTo Include="BoltonCup.Application.Tests" />
       <InternalsVisibleTo Include="BoltonCup.Admin" />
     </ItemGroup>
 

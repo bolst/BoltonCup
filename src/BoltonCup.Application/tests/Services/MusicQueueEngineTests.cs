@@ -3,7 +3,7 @@ using BoltonCup.Application.Services;
 using FluentAssertions;
 using Xunit;
 
-namespace BoltonCup.WebAPI.Tests.Services;
+namespace BoltonCup.Application.Tests.Services;
 
 public class MusicQueueEngineTests
 {

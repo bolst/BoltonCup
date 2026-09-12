@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace BoltonCup.WebAPI.Tests.Services;
+namespace BoltonCup.Application.Tests.Services;
 
 public class SmsPipelineTests
 {

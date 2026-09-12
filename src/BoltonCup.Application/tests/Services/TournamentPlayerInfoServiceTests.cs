@@ -5,7 +5,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace BoltonCup.WebAPI.Tests.Services;
+namespace BoltonCup.Application.Tests.Services;
 
 public class TournamentPlayerInfoServiceTests
 {
