@@ -14,7 +14,7 @@ namespace BoltonCup.WebAPI.Tests.Controllers;
 public class DraftsControllerTests
 {
     readonly Mock<IDraftService> _draftService = new();
-    readonly Mock<IPlayerRepository> _players = new();
+    readonly Mock<IPlayerService> _players = new();
     readonly Mock<IMapper> _mapper = new();
     readonly Mock<IAuthorizationService> _authService = new();
     readonly DraftsController _controller;

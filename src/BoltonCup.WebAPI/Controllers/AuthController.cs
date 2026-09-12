@@ -1,5 +1,5 @@
 using BoltonCup.Persistence.Identity;
-using BoltonCup.Infrastructure.Services;
+using BoltonCup.Application.Services;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
 using Microsoft.AspNetCore.Authorization;

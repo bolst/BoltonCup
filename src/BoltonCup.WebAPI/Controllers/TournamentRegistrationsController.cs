@@ -1,5 +1,5 @@
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Application.Extensions;
 using BoltonCup.Shared;
 using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
 using BoltonCup.WebAPI.Mapping;

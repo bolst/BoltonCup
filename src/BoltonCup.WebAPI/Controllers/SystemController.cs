@@ -10,9 +10,9 @@ namespace BoltonCup.WebAPI.Controllers;
 /// <summary>Provides global system context including the active tournament and featured stats.</summary>
 public class SystemController(
     BoltonCupDbContext _dbContext,
-    ITournamentRepository _tournamentRepo,
-    ISkaterStatRepository _skaterStatRepo,
-    IGoalieStatRepository _goalieStatRepo,
+    ITournamentService _tournamentRepo,
+    ISkaterStatService _skaterStatRepo,
+    IGoalieStatService _goalieStatRepo,
     IMapper _mapper
 ) : BoltonCupControllerBase
 {

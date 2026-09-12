@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.WebAPI", "BoltonCup.WebAPI\BoltonCup.WebAPI.csproj", "{E88DDCAA-4FF7-4E74-955E-81FDA4118217}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Infrastructure", "BoltonCup.Infrastructure\BoltonCup.Infrastructure.csproj", "{FCF2951D-1DCB-417B-AF1C-8AF01DEFD2C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Application", "BoltonCup.Application\BoltonCup.Application.csproj", "{FCF2951D-1DCB-417B-AF1C-8AF01DEFD2C5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Core", "BoltonCup.Core\BoltonCup.Core.csproj", "{B23D8616-A874-4480-A9F4-6A9B308AC9A4}"
 EndProject

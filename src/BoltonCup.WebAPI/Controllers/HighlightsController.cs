@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BoltonCup.WebAPI.Controllers;
 
 public class HighlightsController(
-    IHighlightRepository _highlights,
+    IHighlightService _highlights,
     IMapper _mapper
 ) : BoltonCupControllerBase
 {

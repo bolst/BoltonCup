@@ -3,7 +3,7 @@ using BoltonCup.Admin.Imaging;
 using BoltonCup.Admin.Services;
 using BoltonCup.Common;
 using BoltonCup.Common.Imaging;
-using BoltonCup.Infrastructure;
+using BoltonCup.Application;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Sdk;
 using BoltonCup.SessionStorage;
@@ -29,7 +29,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddBoltonCupCommonServices(builder.Configuration);
 builder.Services.AddBoltonCupSessionStorage();
-builder.AddBoltonCupInfrastructure();
+builder.AddBoltonCupApplication();
 
 builder.Services.AddHttpClient();
 builder.Services

@@ -1,5 +1,5 @@
 using BoltonCup.Core.Exceptions;
-using BoltonCup.Infrastructure.Exceptions;
+using BoltonCup.Application.Exceptions;
 using BoltonCup.Shared;
 
 namespace BoltonCup.WebAPI.Errors;

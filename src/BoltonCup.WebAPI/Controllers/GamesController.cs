@@ -7,11 +7,10 @@ using static BoltonCup.Persistence.Identity.BoltonCupRole;
 namespace BoltonCup.WebAPI.Controllers;
 
 public class GamesController(
-    IGameRepository _games,
-    IHighlightRepository _highlights,
-    ISkaterStatRepository _skaterStats,
+    IGameService _games,
+    IHighlightService _highlights,
+    ISkaterStatService _skaterStats,
     IMapper _mapper,
-    IGameWriteService _gameWrites,
     IMusicLibraryService _music
 ) : BoltonCupControllerBase
 {
@@ -50,7 +49,7 @@ public class GamesController(
     [HttpPatch("{id:int}/state")]
     public async Task<IActionResult> UpdateGameState(int id, [FromBody] UpdateGameStateRequest request)
     {
-        await _gameWrites.UpdateStateAsync(_mapper.ToCommand(id, request));
+        await _games.UpdateStateAsync(_mapper.ToCommand(id, request));
         return Ok();
     }
 
@@ -114,7 +113,7 @@ public class GamesController(
     [HttpPost("{id:int}/goals")]
     public async Task<ActionResult<int>> AddGoal(int id, [FromBody] CreateGoalRequest request)
     {
-        var goalId = await _gameWrites.AddGoalAsync(_mapper.ToCommand(id, request));
+        var goalId = await _games.AddGoalAsync(_mapper.ToCommand(id, request));
         return Ok(goalId);
     }
 
@@ -123,7 +122,7 @@ public class GamesController(
     [HttpPut("{id:int}/goals/{goalId:int}")]
     public async Task<IActionResult> UpdateGoal(int id, int goalId, [FromBody] UpdateGoalRequest request)
     {
-        await _gameWrites.UpdateGoalAsync(_mapper.ToCommand(id, goalId, request));
+        await _games.UpdateGoalAsync(_mapper.ToCommand(id, goalId, request));
         return Ok();
     }
 
@@ -132,7 +131,7 @@ public class GamesController(
     [HttpDelete("{id:int}/goals/{goalId:int}")]
     public async Task<IActionResult> DeleteGoal(int id, int goalId)
     {
-        await _gameWrites.DeleteGoalAsync(id, goalId);
+        await _games.DeleteGoalAsync(id, goalId);
         return Ok();
     }
 
@@ -141,7 +140,7 @@ public class GamesController(
     [HttpPost("{id:int}/penalties")]
     public async Task<ActionResult<int>> AddPenalty(int id, [FromBody] CreatePenaltyRequest request)
     {
-        var penaltyId = await _gameWrites.AddPenaltyAsync(_mapper.ToCommand(id, request));
+        var penaltyId = await _games.AddPenaltyAsync(_mapper.ToCommand(id, request));
         return Ok(penaltyId);
     }
 
@@ -150,7 +149,7 @@ public class GamesController(
     [HttpPut("{id:int}/penalties/{penaltyId:int}")]
     public async Task<IActionResult> UpdatePenalty(int id, int penaltyId, [FromBody] UpdatePenaltyRequest request)
     {
-        await _gameWrites.UpdatePenaltyAsync(_mapper.ToCommand(id, penaltyId, request));
+        await _games.UpdatePenaltyAsync(_mapper.ToCommand(id, penaltyId, request));
         return Ok();
     }
 
@@ -159,7 +158,7 @@ public class GamesController(
     [HttpDelete("{id:int}/penalties/{penaltyId:int}")]
     public async Task<IActionResult> DeletePenalty(int id, int penaltyId)
     {
-        await _gameWrites.DeletePenaltyAsync(id, penaltyId);
+        await _games.DeletePenaltyAsync(id, penaltyId);
         return Ok();
     }
 
@@ -168,7 +167,7 @@ public class GamesController(
     [HttpPut("{id:int}/stars")]
     public async Task<IActionResult> SetGameStars(int id, [FromBody] SetGameStarsRequest request)
     {
-        await _gameWrites.SetStarsAsync(_mapper.ToCommand(id, request));
+        await _games.SetStarsAsync(_mapper.ToCommand(id, request));
         return Ok();
     }
 }

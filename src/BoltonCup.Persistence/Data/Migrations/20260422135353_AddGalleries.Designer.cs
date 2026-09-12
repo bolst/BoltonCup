@@ -1479,7 +1479,7 @@ namespace BoltonCup.Persistence.Migrations
                     b.ToTable("tournament_registrations", "core");
                 });
 
-            modelBuilder.Entity("BoltonCup.Infrastructure.ViewModels.PlayerDraftRanking", b =>
+            modelBuilder.Entity("BoltonCup.Application.ViewModels.PlayerDraftRanking", b =>
                 {
                     b.Property<int>("PlayerId")
                         .HasColumnType("integer")
@@ -1879,7 +1879,7 @@ namespace BoltonCup.Persistence.Migrations
                     b.Navigation("Tournament");
                 });
 
-            modelBuilder.Entity("BoltonCup.Infrastructure.ViewModels.PlayerDraftRanking", b =>
+            modelBuilder.Entity("BoltonCup.Application.ViewModels.PlayerDraftRanking", b =>
                 {
                     b.HasOne("BoltonCup.Core.Player", "Player")
                         .WithMany()

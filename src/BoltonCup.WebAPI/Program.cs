@@ -1,4 +1,4 @@
-using BoltonCup.Infrastructure;
+using BoltonCup.Application;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Persistence.Identity;
 using BoltonCup.Shared;
@@ -24,7 +24,7 @@ builder.Services.AddDataProtection()
 builder.Services.AddIdentityApiEndpoints<BoltonCupUser>();
 
 builder
-    .AddBoltonCupInfrastructure()
+    .AddBoltonCupApplication()
     .AddBoltonCupAssetUrlResolver();
 builder.AddBoltonCupWebAPIServices();
 

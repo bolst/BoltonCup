@@ -26,7 +26,7 @@ namespace BoltonCup.Persistence.Migrations.Auth
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("BoltonCup.Infrastructure.BoltonCupUser", b =>
+            modelBuilder.Entity("BoltonCup.Application.BoltonCupUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -233,7 +233,7 @@ namespace BoltonCup.Persistence.Migrations.Auth
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("BoltonCup.Infrastructure.BoltonCupUser", null)
+                    b.HasOne("BoltonCup.Application.BoltonCupUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -242,7 +242,7 @@ namespace BoltonCup.Persistence.Migrations.Auth
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("BoltonCup.Infrastructure.BoltonCupUser", null)
+                    b.HasOne("BoltonCup.Application.BoltonCupUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -257,7 +257,7 @@ namespace BoltonCup.Persistence.Migrations.Auth
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BoltonCup.Infrastructure.BoltonCupUser", null)
+                    b.HasOne("BoltonCup.Application.BoltonCupUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -266,7 +266,7 @@ namespace BoltonCup.Persistence.Migrations.Auth
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("BoltonCup.Infrastructure.BoltonCupUser", null)
+                    b.HasOne("BoltonCup.Application.BoltonCupUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -1,5 +1,5 @@
 using BoltonCup.Persistence.Data;
-using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Application.Extensions;
 using BoltonCup.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

@@ -1,7 +1,7 @@
 using System.Text;
 using BoltonCup.Core;
 using BoltonCup.Core.BracketChallenge;
-using BoltonCup.Infrastructure;
+using BoltonCup.Application;
 using BoltonCup.Integrations.Payments;
 using BoltonCup.WebAPI.Controllers;
 using BoltonCup.WebAPI.Mapping;

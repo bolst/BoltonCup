@@ -1,7 +1,7 @@
 using BoltonCup.Core;
 using BoltonCup.Core.Exceptions;
 using BoltonCup.Persistence.Data;
-using BoltonCup.Infrastructure.Services;
+using BoltonCup.Application.Services;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;

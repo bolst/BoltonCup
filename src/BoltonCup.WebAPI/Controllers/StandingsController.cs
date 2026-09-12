@@ -8,7 +8,7 @@ namespace BoltonCup.WebAPI.Controllers;
 /// <summary>Provides computed tournament standings.</summary>
 public class StandingsController(
     IStandingsService _standings,
-    ITournamentRepository _tournaments,
+    ITournamentService _tournaments,
     IMapper _mapper
 ) : BoltonCupControllerBase
 {

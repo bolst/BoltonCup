@@ -9,7 +9,6 @@ namespace BoltonCup.WebAPI.Controllers;
 
 /// <summary>Manages team queries and team asset uploads.</summary>
 public class TeamsController(
-    ITeamRepository _teams,
     ITeamService _teamService,
     IAuthorizationService _authorizationService,
     IMapper _mapper
@@ -27,7 +26,7 @@ public class TeamsController(
         var teams = await GetOrCreateAsync($"{nameof(GetTeams)}:{request}", async () =>
         {
             var query = _mapper.ToQuery(request);
-            var result = await _teams.GetAllAsync(query);
+            var result = await _teamService.GetAllAsync(query);
             return _mapper.ToDtoList(result);
         });
         return Ok(teams);
@@ -41,7 +40,7 @@ public class TeamsController(
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TeamSingleDto>> GetTeamById(int id)
     {
-        var team = await _teams.GetByIdAsync(id);
+        var team = await _teamService.GetByIdAsync(id);
         return OkOrNoContent(_mapper.ToDto(team));
     }
 

@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using BoltonCup.Persistence.Identity;
-using BoltonCup.Infrastructure.Services;
+using BoltonCup.Application.Services;
 using BoltonCup.Shared;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;

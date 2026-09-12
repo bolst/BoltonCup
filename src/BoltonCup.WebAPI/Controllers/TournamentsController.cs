@@ -8,7 +8,6 @@ namespace BoltonCup.WebAPI.Controllers;
 
 /// <summary>Provides access to tournament data and admin tournament management.</summary>
 public class TournamentsController(
-    ITournamentRepository _tournaments,
     ITournamentService _tournamentService,
     IMapper _mapper
 ) : BoltonCupControllerBase
@@ -24,7 +23,7 @@ public class TournamentsController(
         var tournaments = await GetOrCreateAsync($"{nameof(GetTournaments)}:{request}", async () =>
         {
             var query = _mapper.ToQuery(request);
-            var result = await _tournaments.GetAllAsync(query);
+            var result = await _tournamentService.GetAllAsync(query);
             return _mapper.ToDtoList(result);
         });
         return Ok(tournaments);
@@ -38,7 +37,7 @@ public class TournamentsController(
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TournamentSingleDto>> GetTournamentById(int id)
     {
-        var tournament = await _tournaments.GetByIdAsync(id);
+        var tournament = await _tournamentService.GetByIdAsync(id);
         return OkOrNoContent(_mapper.ToDto(tournament));
     }
 

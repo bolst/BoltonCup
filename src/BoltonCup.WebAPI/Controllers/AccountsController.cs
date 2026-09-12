@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Application.Extensions;
 using BoltonCup.Persistence.Identity;
-using BoltonCup.Infrastructure.Services;
+using BoltonCup.Application.Services;
 using BoltonCup.Shared;
 using BoltonCup.WebAPI.Mapping;
 using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
@@ -14,7 +14,6 @@ namespace BoltonCup.WebAPI.Controllers;
 
 /// <summary>Manages the authenticated user's account details.</summary>
 public class AccountsController(
-    IAccountRepository _accounts,
     IAccountService _accountService,
     IUserService _userService,
     IMapper _mapper,
@@ -65,7 +64,7 @@ public class AccountsController(
     public async Task<ActionResult<ICollection<AccountTournamentDto>>> GetMyTournaments()
     {
         var accountId = User.GetAccountId();
-        var account = await _accounts.GetByIdAsync(accountId);
+        var account = await _accountService.GetByIdAsync(accountId);
         return Ok(_mapper.ToAccountTournamentDtoList(account));
     }
 

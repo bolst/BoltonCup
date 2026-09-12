@@ -10,13 +10,13 @@ namespace BoltonCup.WebAPI.Tests.Controllers;
 
 public class PlayersControllerTests
 {
-    readonly Mock<IPlayerRepository> _playerRepository = new();
+    readonly Mock<IPlayerService> _players = new();
     readonly Mock<IMapper> _mapper = new();
     readonly PlayersController _controller;
 
     public PlayersControllerTests()
     {
-        _controller = new PlayersController(_playerRepository.Object, _mapper.Object);
+        _controller = new PlayersController(_players.Object, _mapper.Object);
     }
 
     [Fact]
@@ -26,13 +26,13 @@ public class PlayersControllerTests
         var query = new GetPlayersQuery { TournamentId = 1, Page = 1, Size = 10 };
 
         _mapper.Setup(m => m.ToQuery(request)).Returns(query);
-        _playerRepository.Setup(r => r.GetAllAsync(It.IsAny<GetPlayersQuery>())).ReturnsAsync(Mock.Of<IPagedList<Player>>());
+        _players.Setup(r => r.GetAllAsync(It.IsAny<GetPlayersQuery>())).ReturnsAsync(Mock.Of<IPagedList<Player>>());
         _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<Player>>())).Returns(Mock.Of<IPagedList<PlayerDto>>());
 
         var result = await _controller.GetPlayers(request);
 
         result.Result.Should().BeOfType<OkObjectResult>();
-        _playerRepository.Verify(r => r.GetAllAsync(It.IsAny<GetPlayersQuery>()), Times.Once);
+        _players.Verify(r => r.GetAllAsync(It.IsAny<GetPlayersQuery>()), Times.Once);
         _mapper.Verify(m => m.ToDtoList(It.IsAny<IPagedList<Player>>()), Times.Once);
     }
 
@@ -42,12 +42,12 @@ public class PlayersControllerTests
         var request = new GetPlayersRequest { TeamId = 5, TournamentId = 2, SortBy = "jerseyNumber" };
 
         _mapper.Setup(m => m.ToQuery(request)).Returns(new GetPlayersQuery { TeamId = 5, TournamentId = 2, SortBy = "jerseyNumber" });
-        _playerRepository.Setup(r => r.GetAllAsync(It.IsAny<GetPlayersQuery>())).ReturnsAsync(Mock.Of<IPagedList<Player>>());
+        _players.Setup(r => r.GetAllAsync(It.IsAny<GetPlayersQuery>())).ReturnsAsync(Mock.Of<IPagedList<Player>>());
         _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<Player>>())).Returns(Mock.Of<IPagedList<PlayerDto>>());
 
         await _controller.GetPlayers(request);
 
-        _playerRepository.Verify(r => r.GetAllAsync(It.Is<GetPlayersQuery>(q =>
+        _players.Verify(r => r.GetAllAsync(It.Is<GetPlayersQuery>(q =>
             q.TeamId == 5 && q.TournamentId == 2 && q.SortBy == "jerseyNumber"
         )), Times.Once);
     }
@@ -55,7 +55,7 @@ public class PlayersControllerTests
     [Fact]
     public async Task GetPlayerById_WhenFound_ReturnsOk()
     {
-        _playerRepository.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(Mock.Of<Player>(p => p.TournamentId == 1 && p.AccountId == 5));
+        _players.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(Mock.Of<Player>(p => p.TournamentId == 1 && p.AccountId == 5));
         _mapper.Setup(m => m.ToDto(It.IsAny<Player>())).Returns(Mock.Of<PlayerSingleDto>());
 
         var result = await _controller.GetPlayerById(1);
@@ -66,7 +66,7 @@ public class PlayersControllerTests
     [Fact]
     public async Task GetPlayerById_NotFound_ReturnsNoContent()
     {
-        _playerRepository.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((Player?)null);
+        _players.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((Player?)null);
         _mapper.Setup(m => m.ToDto((Player?)null)).Returns((PlayerSingleDto?)null);
 
         var result = await _controller.GetPlayerById(1);

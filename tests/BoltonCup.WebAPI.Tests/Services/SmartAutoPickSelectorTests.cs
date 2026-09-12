@@ -1,5 +1,5 @@
 using BoltonCup.Core.Values;
-using BoltonCup.Infrastructure.Services;
+using BoltonCup.Application.Services;
 using FluentAssertions;
 using Xunit;
 

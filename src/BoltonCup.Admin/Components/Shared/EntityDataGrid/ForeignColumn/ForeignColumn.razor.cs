@@ -3,7 +3,7 @@ using System.Reflection;
 using BoltonCup.Admin.Extensions;
 using BoltonCup.Core;
 using BoltonCup.Persistence.Data;
-using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Application.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
