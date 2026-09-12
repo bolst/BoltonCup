@@ -1212,14 +1212,21 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.ContentType).HasColumnName("content_type");
         });
 
-        // entities deriving from EntityBase should have created_at = now() by default
+        // Audit columns are shared by every EntityBase subclass
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (entityType.ClrType.IsSubclassOf(typeof(EntityBase)))
             {
-                modelBuilder.Entity(entityType.ClrType)
-                    .Property(nameof(EntityBase.CreatedAt))
-                    .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
+                modelBuilder.Entity(entityType.ClrType, entity =>
+                {
+                    entity.Property(nameof(EntityBase.CreatedAt))
+                        .HasColumnName("created_at")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
+                    entity.Property(nameof(EntityBase.CreatedBy)).HasColumnName("created_by");
+                    entity.Property(nameof(EntityBase.LastModified)).HasColumnName("last_modified");
+                    entity.Property(nameof(EntityBase.LastModifiedBy)).HasColumnName("last_modified_by");
+                });
             }
         }
     }
