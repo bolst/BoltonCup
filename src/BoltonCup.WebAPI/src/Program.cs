@@ -90,7 +90,7 @@ var app = builder.Build();
 await app.Services.InitializeDbAsync(app.Configuration);
 
 // Configure the HTTP request pipeline.
-if (true) //(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     var defaultApiKey = app.Configuration[ApiKeyConstants.AppSettingsPath] ?? string.Empty;
     app.MapSwagger("/openapi/{documentName}.json");
