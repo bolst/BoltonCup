@@ -1,4 +1,4 @@
-using BoltonCup.Core;
+using BoltonCup.Shared;
 using Microsoft.JSInterop;
 
 namespace BoltonCup.Timekeeper.Services.Music;

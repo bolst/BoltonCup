@@ -1,6 +1,7 @@
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.EmailTemplates;
 using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Shared;
 using Markdig;
 
 namespace BoltonCup.Infrastructure.Services;

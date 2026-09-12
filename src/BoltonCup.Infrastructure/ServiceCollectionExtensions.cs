@@ -5,6 +5,7 @@ using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Repositories;
 using BoltonCup.Infrastructure.Services;
 using BoltonCup.Infrastructure.Settings;
+using BoltonCup.Shared;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

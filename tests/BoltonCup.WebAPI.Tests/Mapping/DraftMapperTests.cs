@@ -1,5 +1,5 @@
 using BoltonCup.Core;
-using BoltonCup.Core.Commands;
+using BoltonCup.Shared;
 using BoltonCup.WebAPI.Mapping;
 using FluentAssertions;
 using Moq;

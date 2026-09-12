@@ -1,4 +1,5 @@
 using BoltonCup.WebAPI.Mapping;
+using BoltonCup.Shared;
 using FluentAssertions;
 using Moq;
 using Stripe;
@@ -8,17 +9,16 @@ namespace BoltonCup.WebAPI.Tests.Mapping;
 
 public class StripeMapperTests
 {
-    readonly Mapper _mapper = new(new Mock<BoltonCup.Core.IAssetUrlResolver>().Object);
+    readonly Mapper _mapper = new Mapper(new Mock<IAssetUrlResolver>().Object);
 
-    static PaymentIntent BuildPaymentIntent(string id, Dictionary<string, string> metadata) =>
-        new() { Id = id, Metadata = metadata };
+    static PaymentIntent BuildPaymentIntent(string id, Dictionary<string, string> metadata) => new PaymentIntent { Id = id, Metadata = metadata };
 
     // ---------------- TryParseTournamentPaymentCommand ----------------
 
     [Fact]
     public void TryParseTournamentPaymentCommand_ValidMetadata_ReturnsTrueWithCorrectFields()
     {
-        var paymentIntent = BuildPaymentIntent("pi_tournament_123", new()
+        var paymentIntent = BuildPaymentIntent("pi_tournament_123", new Dictionary<string, string>
         {
             ["AccountId"] = "42",
             ["TournamentId"] = "7"
@@ -43,7 +43,7 @@ public class StripeMapperTests
     [Fact]
     public void TryParseTournamentPaymentCommand_MissingTournamentId_ReturnsFalse()
     {
-        var paymentIntent = BuildPaymentIntent("pi_x", new() { ["AccountId"] = "42" });
+        var paymentIntent = BuildPaymentIntent("pi_x", new Dictionary<string, string> { ["AccountId"] = "42" });
         var success = _mapper.TryParseTournamentPaymentCommand(paymentIntent, out _);
         success.Should().BeFalse();
     }
@@ -53,7 +53,7 @@ public class StripeMapperTests
     [Fact]
     public void TryParseBracketChallengePaymentCommand_ValidMetadata_ReturnsTrueWithCorrectFields()
     {
-        var paymentIntent = BuildPaymentIntent("pi_bracket_456", new()
+        var paymentIntent = BuildPaymentIntent("pi_bracket_456", new Dictionary<string, string>
         {
             ["EventId"] = "12",
             ["Name"] = "Jane Doe",

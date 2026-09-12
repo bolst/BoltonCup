@@ -1,6 +1,7 @@
 using BoltonCup.Core;
+using BoltonCup.Shared;
 
-#pragma warning disable CS1591
+#pragma warning disable CS1591 // Disable warning for missing XML comments
 
 namespace BoltonCup.WebAPI.Mapping;
 

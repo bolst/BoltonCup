@@ -1,6 +1,6 @@
-using BoltonCup.Core;
+using System;
 
-namespace BoltonCup.Infrastructure.Services;
+namespace BoltonCup.Shared;
 
 public class AssetUrlResolver(string baseUrl) : IAssetUrlResolver
 {
@@ -24,11 +24,10 @@ public class AssetUrlResolver(string baseUrl) : IAssetUrlResolver
         }
 
         return new HighlightUrls(
-            VideoUrl: $"https://www.youtube.com/embed/{videoId}",
-            ThumbnailUrl: $"https://img.youtube.com/vi/{videoId}/hqdefault.jpg"
+            videoUrl: $"https://www.youtube.com/embed/{videoId}",
+            thumbnailUrl: $"https://img.youtube.com/vi/{videoId}/hqdefault.jpg"
         );
     }
-
 
     public static class StaticKeys
     {

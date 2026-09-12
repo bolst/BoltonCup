@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Services;
+using BoltonCup.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 

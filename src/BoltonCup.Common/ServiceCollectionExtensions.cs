@@ -4,6 +4,7 @@ using BoltonCup.Common.Services;
 using BoltonCup.Common.Theme;
 using BoltonCup.Core;
 using BoltonCup.Sdk;
+using BoltonCup.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,7 @@ public static class ServiceCollectionExtensions
 
         // s3
         services
-            .AddSingleton<IAssetUrlResolver, AssetUrlResolver>(_ => new AssetUrlResolver(bcConfig))
+            .AddSingleton<IAssetUrlResolver, AssetUrlResolver>(_ => new AssetUrlResolver(bcConfig.S3BaseUrl!))
             .AddSingleton<IAssetFileUploader, AssetFileUploader>()
             .TryAddSingleton<IStorageService, ClientStorageService>();
 
