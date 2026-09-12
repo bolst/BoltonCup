@@ -169,7 +169,7 @@ resharper_web_config_module_not_resolved_highlighting = warning
 resharper_web_config_type_not_resolved_highlighting = warning
 resharper_web_config_wrong_module_highlighting = warning
 
-[src/BoltonCup.Infrastructure/Data/Migrations/**.cs]
+[src/BoltonCup.Persistence/Data/Migrations/**.cs]
 dotnet_analyzer_diagnostic.severity = none
 generated_code = true
 
