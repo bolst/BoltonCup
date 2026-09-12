@@ -1,6 +1,6 @@
 using System.Reflection;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Services;

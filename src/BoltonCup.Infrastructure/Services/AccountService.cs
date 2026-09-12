@@ -1,6 +1,6 @@
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using BoltonCup.Infrastructure.Extensions;
 
 namespace BoltonCup.Infrastructure.Services;

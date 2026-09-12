@@ -1,5 +1,5 @@
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,13 +1,11 @@
 using Amazon.S3;
-using BoltonCup.Infrastructure.Data;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Identity;
 using BoltonCup.Infrastructure.Repositories;
 using BoltonCup.Infrastructure.Services;
 using BoltonCup.Infrastructure.Settings;
+using BoltonCup.Persistence;
 using BoltonCup.Shared;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,18 +19,7 @@ public static class ServiceCollectionExtensions
 {
     public static WebApplicationBuilder AddBoltonCupInfrastructure(this WebApplicationBuilder builder)
     {
-        builder.Services
-            .AddIdentityCore<BoltonCupUser>(options =>
-            {
-                options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
-                options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
-                options.SignIn.RequireConfirmedAccount = true;
-            })
-            .AddRoles<IdentityRole>()
-            .AddSignInManager()
-            .AddEntityFrameworkStores<AuthDbContext>()
-            .AddDefaultTokenProviders()
-            .AddClaimsPrincipalFactory<BoltonCupClaimsPrincipalFactory>();
+        builder.AddBoltonCupPersistence();
 
         builder.Services.AddMemoryCache();
         builder.AddBoltonCupEmails();
@@ -40,11 +27,6 @@ public static class ServiceCollectionExtensions
         builder.AddBoltonCupS3();
         builder.AddBoltonCupPayments();
         builder.AddBoltonCupMusic();
-
-        var connectionString = builder.Configuration.GetValue<string>(ConfigurationPaths.ConnectionString);
-        builder.Services
-            .AddDbContextFactory<BoltonCupDbContext>(options => options.UseNpgsql(connectionString))
-            .AddDbContextFactory<AuthDbContext>(options => options.UseNpgsql(connectionString));
 
         RegisterByConvention(builder.Services, typeof(AccountRepository).Assembly, "Repository");
         RegisterByConvention(builder.Services, typeof(AccountRepository).Assembly, "Service");
@@ -177,9 +159,4 @@ public static class ServiceCollectionExtensions
         builder.Services.AddHttpClient<IMusicSearchService, SpotifyMusicSearchService>();
         return builder.Services;
     }
-}
-
-public static class ConfigurationPaths
-{
-    public const string ConnectionString = "BoltonCup:ConnectionString";
 }

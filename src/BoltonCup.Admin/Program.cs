@@ -4,7 +4,7 @@ using BoltonCup.Admin.Services;
 using BoltonCup.Common;
 using BoltonCup.Common.Imaging;
 using BoltonCup.Infrastructure;
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using BoltonCup.Sdk;
 using BoltonCup.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;

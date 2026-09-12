@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using BoltonCup.Admin.Extensions;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using BoltonCup.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;

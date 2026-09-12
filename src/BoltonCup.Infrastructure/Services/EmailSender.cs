@@ -1,6 +1,6 @@
 using BoltonCup.Core;
 using BoltonCup.Infrastructure.EmailTemplates;
-using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Persistence.Identity;
 using BoltonCup.Shared;
 using Markdig;
 

@@ -1,7 +1,7 @@
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
 using BoltonCup.Core.Exceptions;
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using BoltonCup.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

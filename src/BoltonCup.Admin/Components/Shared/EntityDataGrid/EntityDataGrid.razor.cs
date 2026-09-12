@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using BoltonCup.Admin.Extensions;
 using BoltonCup.Admin.Services;
 using BoltonCup.Core.Queries.Base;
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using BoltonCup.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;

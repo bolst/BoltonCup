@@ -1,5 +1,5 @@
-using BoltonCup.Infrastructure.Data;
-using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Persistence.Data;
+using BoltonCup.Persistence.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,12 +1,12 @@
 using System.Security.Claims;
-using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Persistence.Identity;
 using BoltonCup.Infrastructure.Services;
 using BoltonCup.Shared;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
+using static BoltonCup.Persistence.Identity.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Controllers;
 

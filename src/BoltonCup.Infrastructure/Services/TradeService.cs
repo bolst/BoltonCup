@@ -1,8 +1,8 @@
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
 using BoltonCup.Core.Exceptions;
-using BoltonCup.Infrastructure.Data;
-using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Persistence.Data;
+using BoltonCup.Persistence.Identity;
 using BoltonCup.Infrastructure.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

@@ -1,5 +1,5 @@
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 

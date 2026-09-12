@@ -2,7 +2,7 @@ using BoltonCup.Core;
 using BoltonCup.Core.Commands;
 using BoltonCup.Core.Exceptions;
 using BoltonCup.Core.Values;
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using BoltonCup.Infrastructure.Extensions;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;

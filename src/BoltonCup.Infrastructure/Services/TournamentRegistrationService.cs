@@ -1,6 +1,6 @@
 using System.Data;
 using System.Text.Json;
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using BoltonCup.Core;
 using BoltonCup.Core.Exceptions;
 using Microsoft.EntityFrameworkCore;

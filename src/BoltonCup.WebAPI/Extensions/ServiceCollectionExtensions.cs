@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using BoltonCup.Core;
-using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Persistence.Identity;
 using BoltonCup.Shared;
 using BoltonCup.WebAPI.Auth;
 using BoltonCup.WebAPI.Errors;

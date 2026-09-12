@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
-using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Persistence.Identity;
 using BoltonCup.Shared;
 
 namespace BoltonCup.WebAPI.Mapping;

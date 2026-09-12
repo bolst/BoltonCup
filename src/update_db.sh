@@ -14,13 +14,13 @@ done
 if [ -z "$MIGRATION" ]; then
     echo "Updating $CONTEXT to the latest migration..."
     dotnet ef database update \
-        --project ./BoltonCup.Infrastructure \
+        --project ./BoltonCup.Persistence \
         --startup-project ./BoltonCup.WebAPI \
         -c "$CONTEXT"
 else
     echo "Updating $CONTEXT to migration: '$MIGRATION'..."
     dotnet ef database update "$MIGRATION" \
-        --project ./BoltonCup.Infrastructure \
+        --project ./BoltonCup.Persistence \
         --startup-project ./BoltonCup.WebAPI \
         -c "$CONTEXT"
 fi

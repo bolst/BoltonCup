@@ -1,6 +1,6 @@
 using BoltonCup.Infrastructure;
-using BoltonCup.Infrastructure.Data;
-using BoltonCup.Infrastructure.Identity;
+using BoltonCup.Persistence.Data;
+using BoltonCup.Persistence.Identity;
 using BoltonCup.Shared;
 using BoltonCup.WebAPI;
 using BoltonCup.WebAPI.Auth;

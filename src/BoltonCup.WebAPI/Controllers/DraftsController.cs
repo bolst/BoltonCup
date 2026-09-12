@@ -4,7 +4,7 @@ using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using static BoltonCup.Infrastructure.Identity.BoltonCupRole;
+using static BoltonCup.Persistence.Identity.BoltonCupRole;
 using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
 using static BoltonCup.Shared.HubEvents.Draft;
 

@@ -1,4 +1,4 @@
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 

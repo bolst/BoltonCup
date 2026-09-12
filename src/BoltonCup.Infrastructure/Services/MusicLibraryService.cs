@@ -1,7 +1,7 @@
 using BoltonCup.Core;
 using BoltonCup.Core.Commands;
 using BoltonCup.Core.Exceptions;
-using BoltonCup.Infrastructure.Data;
+using BoltonCup.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Infrastructure.Services;
