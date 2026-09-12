@@ -1231,7 +1231,6 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
         }
     }
 
-
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder
@@ -1242,7 +1241,31 @@ public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             .Properties<DateTime?>()
             .HaveConversion<NullableDateTimeWithKindConverter>();
     }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        StampLastModified();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        StampLastModified();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    void StampLastModified()
+    {
+        foreach (var entry in ChangeTracker.Entries<EntityBase>())
+        {
+            if (entry.State == EntityState.Modified)
+            {
+                entry.Entity.LastModified = DateTime.UtcNow;
+            }
+        }
+    }
 }
+
 public class DateTimeWithKindConverter() : ValueConverter<DateTime, DateTime>(
     v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc),
     v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
