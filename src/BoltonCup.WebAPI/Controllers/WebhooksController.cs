@@ -1,7 +1,7 @@
 using BoltonCup.Core;
 using BoltonCup.Core.BracketChallenge;
 using BoltonCup.Infrastructure;
-using BoltonCup.Infrastructure.Settings;
+using BoltonCup.Integrations.Payments;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.Stripe;
 using Microsoft.AspNetCore.Authorization;

@@ -6,6 +6,8 @@ using BoltonCup.Persistence.Data;
 using BoltonCup.Persistence.Identity;
 using BoltonCup.Infrastructure.Services;
 using BoltonCup.Infrastructure.Settings;
+using BoltonCup.Integrations.Email;
+using BoltonCup.Integrations.Sms;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

@@ -3,6 +3,8 @@ using BoltonCup.Core.BracketChallenge;
 using BoltonCup.Core.Exceptions;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Integrations.Email;
+using BoltonCup.Integrations.Payments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Stripe;

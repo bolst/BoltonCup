@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using BoltonCup.Persistence.Data;
-using BoltonCup.Infrastructure.Services;
+using BoltonCup.Integrations.Sms;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;

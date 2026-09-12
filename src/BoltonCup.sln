@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Timekeeper", "Bol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Persistence", "BoltonCup.Persistence\BoltonCup.Persistence.csproj", "{1377237B-AB2A-4512-842C-4A9E08C078A8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Integrations", "BoltonCup.Integrations\BoltonCup.Integrations.csproj", "{DD31C10A-CCFA-4231-968F-D68739F601B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -223,6 +225,18 @@ Global
 		{1377237B-AB2A-4512-842C-4A9E08C078A8}.Release|x64.Build.0 = Release|Any CPU
 		{1377237B-AB2A-4512-842C-4A9E08C078A8}.Release|x86.ActiveCfg = Release|Any CPU
 		{1377237B-AB2A-4512-842C-4A9E08C078A8}.Release|x86.Build.0 = Release|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Debug|x64.Build.0 = Debug|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Debug|x86.Build.0 = Debug|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Release|x64.ActiveCfg = Release|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Release|x64.Build.0 = Release|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Release|x86.ActiveCfg = Release|Any CPU
+		{DD31C10A-CCFA-4231-968F-D68739F601B7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

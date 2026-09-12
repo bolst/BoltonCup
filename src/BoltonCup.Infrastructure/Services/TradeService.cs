@@ -4,6 +4,8 @@ using BoltonCup.Core.Exceptions;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Persistence.Identity;
 using BoltonCup.Infrastructure.Settings;
+using BoltonCup.Integrations.Email;
+using BoltonCup.Integrations.Sms;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;

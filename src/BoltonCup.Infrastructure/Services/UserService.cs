@@ -6,6 +6,7 @@ using BoltonCup.Core.Exceptions;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Infrastructure.Exceptions;
 using BoltonCup.Infrastructure.Extensions;
+using BoltonCup.Integrations.Email;
 using BoltonCup.Persistence.Identity;
 using BoltonCup.Shared;
 using Microsoft.AspNetCore.Identity;
