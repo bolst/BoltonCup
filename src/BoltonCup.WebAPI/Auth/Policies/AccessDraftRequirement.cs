@@ -1,8 +1,7 @@
-using BoltonCup.Persistence.Data;
+using BoltonCup.Core;
 using BoltonCup.Application.Extensions;
 using BoltonCup.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using static BoltonCup.Persistence.Identity.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Auth;
@@ -17,7 +16,7 @@ public class AccessDraftRequirement : IAuthorizationRequirement
 {
 }
 /// <summary>Handles authorization for <see cref="AccessDraftRequirement"/> by verifying the user is an admin or a GM of the draft's tournament.</summary>
-public class DraftAccessHandler(BoltonCupDbContext _dbContext)
+public class DraftAccessHandler(IDraftService _drafts)
     : AuthorizationHandler<AccessDraftRequirement, int>
 {
     /// <inheritdoc/>
@@ -38,10 +37,7 @@ public class DraftAccessHandler(BoltonCupDbContext _dbContext)
             return;
         }
 
-        var isTournamentGm = await _dbContext.Drafts
-            .Where(d => d.Id == draftId)
-            .Where(d => d.Tournament.Teams.Any(t => t.GeneralManagers.Any(g => g.Id == accountId)))
-            .AnyAsync();
+        var isTournamentGm = await _drafts.CanAccessAsync(draftId, accountId);
 
         if (isTournamentGm)
         {

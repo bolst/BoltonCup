@@ -137,6 +137,9 @@ public class TeamService : ITeamService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public Task<bool> CanManageAsync(int teamId, int accountId, CancellationToken cancellationToken = default) => _dbContext.Teams
+            .AnyAsync(t => t.Id == teamId && t.GeneralManagers.Any(g => g.Id == accountId), cancellationToken);
+
     // A picked track is registered in the tournament's music library (so the fetcher downloads it) and the
     // team points at it; clearing the pick returns null and leaves any existing track row untouched.
     async Task<int?> ResolveTrackIdAsync(Team team, MusicTrack? song, CancellationToken cancellationToken)

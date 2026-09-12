@@ -22,4 +22,7 @@ public interface ITeamService
 
     /// <summary>Replaces the team's set of general managers with the given accounts, adding/removing memberships as needed.</summary>
     Task SetGeneralManagersAsync(int teamId, IReadOnlyCollection<int> accountIds, CancellationToken cancellationToken = default);
+
+    /// <summary>Whether the account is a GM of the team.</summary>
+    Task<bool> CanManageAsync(int teamId, int accountId, CancellationToken cancellationToken = default);
 }

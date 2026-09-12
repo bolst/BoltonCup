@@ -300,6 +300,15 @@ public class CustomRankingService(
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public Task<bool> CanAccessAsync(int rankingId, int accountId, CancellationToken cancellationToken = default) => _dbContext.CustomRankings
+            .AnyAsync(r => r.Id == rankingId
+                           && (r.AccountId == accountId
+                               || r.SharedWith.Any(s => s.SharedWithAccountId == accountId)),
+                cancellationToken);
+
+    public Task<bool> CanManageAsync(int rankingId, int accountId, CancellationToken cancellationToken = default) => _dbContext.CustomRankings
+            .AnyAsync(r => r.Id == rankingId && r.AccountId == accountId, cancellationToken);
+
     async Task<List<CustomRankingPlayer>> BuildSeededPlayersAsync(int tournamentId, CancellationToken cancellationToken)
     {
         var players = await LoadPoolWithStatsAsync(tournamentId, cancellationToken);

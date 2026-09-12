@@ -32,4 +32,10 @@ public interface ICustomRankingService
     Task AddShareAsync(int rankingId, int accountId, CancellationToken cancellationToken = default);
     Task RemoveShareAsync(int rankingId, int accountId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<RankingInviteCandidate>> SearchInvitableGmsAsync(int rankingId, string? query, int limit = 5, CancellationToken cancellationToken = default);
+
+    /// <summary>Whether the account can view the ranking (owner or a shared viewer).</summary>
+    Task<bool> CanAccessAsync(int rankingId, int accountId, CancellationToken cancellationToken = default);
+
+    /// <summary>Whether the account owns the ranking.</summary>
+    Task<bool> CanManageAsync(int rankingId, int accountId, CancellationToken cancellationToken = default);
 }

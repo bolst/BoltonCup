@@ -1,8 +1,6 @@
-using BoltonCup.Persistence.Data;
-using BoltonCup.Application.Extensions;
+using BoltonCup.Core;
 using BoltonCup.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using static BoltonCup.Persistence.Identity.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Auth;
@@ -17,7 +15,7 @@ public class ManageTeamRequirement : IAuthorizationRequirement
 {
 }
 /// <summary>Handles authorization for <see cref="ManageTeamRequirement"/> by verifying the user is an admin or the GM of the team.</summary>
-public class TeamManagerHandler(BoltonCupDbContext _dbContext)
+public class TeamManagerHandler(ITeamService _teams)
     : AuthorizationHandler<ManageTeamRequirement, int>
 {
     /// <inheritdoc/>
@@ -38,8 +36,7 @@ public class TeamManagerHandler(BoltonCupDbContext _dbContext)
             return;
         }
 
-        var isTeamGm = await _dbContext.Teams
-            .AnyAsync(t => t.Id == teamId && t.GeneralManagers.Any(g => g.Id == accountId));
+        var isTeamGm = await _teams.CanManageAsync(teamId, accountId);
 
         if (isTeamGm)
         {

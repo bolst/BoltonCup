@@ -42,6 +42,14 @@ public class DraftService(
             .OrderByDescending(d => d.CreatedAt)
             .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
 
+    public Task<bool> CanAccessAsync(int draftId, int accountId, CancellationToken cancellationToken = default) => _dbContext.Drafts
+            .Where(d => d.Id == draftId)
+            .Where(d => d.Tournament.Teams.Any(t => t.GeneralManagers.Any(g => g.Id == accountId)))
+            .AnyAsync(cancellationToken);
+
+    public Task<bool> CanManageAsync(int draftId, int accountId, CancellationToken cancellationToken = default) => _dbContext.Drafts
+            .AnyAsync(d => d.Id == draftId && d.DraftOwnerAccountId == accountId, cancellationToken);
+
     public async Task<int> CreateAsync(CreateDraftCommand command, CancellationToken cancellationToken = default)
     {
         if (await _dbContext.Tournaments.AllAsync(t => t.Id != command.TournamentId, cancellationToken))

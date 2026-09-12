@@ -1,9 +1,6 @@
-using BoltonCup.Persistence.Data;
-using BoltonCup.Application.Extensions;
+using BoltonCup.Core;
 using BoltonCup.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using static BoltonCup.Persistence.Identity.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Auth;
@@ -18,7 +15,7 @@ public class ManageRankingRequirement : IAuthorizationRequirement
 {
 }
 /// <summary>Handles <see cref="ManageRankingRequirement"/> by verifying the user is an admin or the ranking's owner.</summary>
-public class RankingManagerHandler(BoltonCupDbContext _dbContext)
+public class RankingManagerHandler(ICustomRankingService _rankings)
     : AuthorizationHandler<ManageRankingRequirement>
 {
     /// <inheritdoc/>
@@ -42,8 +39,7 @@ public class RankingManagerHandler(BoltonCupDbContext _dbContext)
             return;
         }
 
-        var isOwner = await _dbContext.CustomRankings
-            .AnyAsync(r => r.Id == rankingId && r.AccountId == accountId);
+        var isOwner = await _rankings.CanManageAsync(rankingId, accountId);
 
         if (isOwner)
         {

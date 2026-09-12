@@ -1,8 +1,6 @@
-using BoltonCup.Persistence.Data;
-using BoltonCup.Application.Extensions;
+using BoltonCup.Core;
 using BoltonCup.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using static BoltonCup.Persistence.Identity.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Auth;
@@ -17,7 +15,7 @@ public class ManageDraftRequirement : IAuthorizationRequirement
 {
 }
 /// <summary>Handles authorization for <see cref="ManageDraftRequirement"/> by verifying the user is an admin or the draft owner.</summary>
-public class DraftManagerHandler(BoltonCupDbContext _dbContext)
+public class DraftManagerHandler(IDraftService _drafts)
     : AuthorizationHandler<ManageDraftRequirement, int>
 {
     /// <inheritdoc/>
@@ -38,8 +36,7 @@ public class DraftManagerHandler(BoltonCupDbContext _dbContext)
             return;
         }
 
-        var isDraftOwner = await _dbContext.Drafts
-            .AnyAsync(d => d.Id == draftId && d.DraftOwnerAccountId == accountId);
+        var isDraftOwner = await _drafts.CanManageAsync(draftId, accountId);
 
         if (isDraftOwner)
         {

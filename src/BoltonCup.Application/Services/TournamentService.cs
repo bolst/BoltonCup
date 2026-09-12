@@ -51,6 +51,10 @@ public class TournamentService : ITournamentService
             )
             .FirstOrDefaultAsync(e => e.IsActive, cancellationToken: cancellationToken);
 
+    public async Task<Tournament?> GetFeaturedStatsAsync(CancellationToken cancellationToken = default) => await _dbContext.Tournaments
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.IsStatsFeatured, cancellationToken);
+
     public Task UpdateLogoAsync(int tournamentId, string tempKey, CancellationToken cancellationToken = default) => _storageService.UpdateAssetAsync<Tournament>(
             _dbContext,
             _assetKeyGenerator,

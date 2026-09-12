@@ -30,6 +30,12 @@ public interface IDraftService
     Task<bool> ToggleFavouriteAsync(int draftId, int playerId, int accountId, CancellationToken cancellationToken = default);
 
     Task<int> AssignPlayersToTeamsFromDraftAsync(int draftId, bool overwriteExisting, CancellationToken cancellationToken = default);
+
+    /// <summary>Whether the account is a GM of any team in the draft's tournament.</summary>
+    Task<bool> CanAccessAsync(int draftId, int accountId, CancellationToken cancellationToken = default);
+
+    /// <summary>Whether the account owns the draft.</summary>
+    Task<bool> CanManageAsync(int draftId, int accountId, CancellationToken cancellationToken = default);
 }
 
 

@@ -1,15 +1,12 @@
 using BoltonCup.Core;
-using BoltonCup.Persistence.Data;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.WebAPI.Controllers;
 
 /// <summary>Provides global system context including the active tournament and featured stats.</summary>
 public class SystemController(
-    BoltonCupDbContext _dbContext,
     ITournamentService _tournamentRepo,
     ISkaterStatService _skaterStatRepo,
     IGoalieStatService _goalieStatRepo,
@@ -42,7 +39,7 @@ public class SystemController(
 
     async Task<TournamentStatLeadersDto?> GetFeaturedStatsOrDefault()
     {
-        if (await _dbContext.Tournaments.FirstOrDefaultAsync(t => t.IsStatsFeatured) is not { } featuredStatsTournament)
+        if (await _tournamentRepo.GetFeaturedStatsAsync() is not { } featuredStatsTournament)
         {
             return null;
         }
