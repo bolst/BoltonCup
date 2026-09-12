@@ -11,7 +11,7 @@ using Stripe;
 
 namespace BoltonCup.Application.Services;
 
-public class BracketChallengeService(
+class BracketChallengeService(
     BoltonCupDbContext _dbContext,
     IStorageService _storageService,
     IAssetKeyGenerator _assetKeyGenerator,

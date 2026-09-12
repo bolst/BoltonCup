@@ -28,7 +28,7 @@ public interface IUserService
     Task<BoltonCupUser> CompleteUserAccountAsync(string userId, CreateAccountCommand command);
 }
 
-public class UserService(
+class UserService(
     BoltonCupDbContext _dbContext,
     UserManager<BoltonCupUser> _userManager,
     SignInManager<BoltonCupUser> _signInManager,

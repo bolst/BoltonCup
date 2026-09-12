@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
 
-public class StandingsService(BoltonCupDbContext _context) : IStandingsService
+class StandingsService(BoltonCupDbContext _context) : IStandingsService
 {
     public async Task<TournamentStandings> GetStandingsAsync(int tournamentId, CancellationToken cancellationToken = default)
     {

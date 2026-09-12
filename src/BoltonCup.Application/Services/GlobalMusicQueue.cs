@@ -9,7 +9,7 @@ namespace BoltonCup.Application.Services;
 /// <see cref="MusicQueueEngine"/>, and saves. Registered explicitly as scoped (its name ends in
 /// <c>Queue</c>, so the convention registrar leaves it alone).
 /// </summary>
-public class GlobalMusicQueue : IGlobalMusicQueue
+class GlobalMusicQueue : IGlobalMusicQueue
 {
     readonly BoltonCupDbContext _db;
     readonly Random _rng;

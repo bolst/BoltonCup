@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
 
-public class AccountService : IAccountService
+class AccountService : IAccountService
 {
     readonly BoltonCupDbContext _dbContext;
     readonly IStorageService _storageService;

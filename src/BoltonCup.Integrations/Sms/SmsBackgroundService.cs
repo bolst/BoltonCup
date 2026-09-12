@@ -1,6 +1,4 @@
 using BoltonCup.Core;
-using BoltonCup.Persistence.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -33,8 +31,8 @@ public class SmsBackgroundService : BackgroundService
 
                 using var scope = _serviceProvider.CreateScope();
                 var transport = scope.ServiceProvider.GetRequiredService<ISmsTransport>();
-                var dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<BoltonCupDbContext>>();
-                await ProcessSmsAsync(payload, transport, dbFactory, stoppingToken);
+                var smsLogService = scope.ServiceProvider.GetRequiredService<ISmsLogService>();
+                await ProcessSmsAsync(payload, transport, smsLogService, stoppingToken);
             }
             catch (OperationCanceledException)
             {
@@ -47,7 +45,7 @@ public class SmsBackgroundService : BackgroundService
         }
     }
 
-    async Task ProcessSmsAsync(SmsPayload payload, ISmsTransport transport, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
+    async Task ProcessSmsAsync(SmsPayload payload, ISmsTransport transport, ISmsLogService smsLogService, CancellationToken token)
     {
         var succeeded = false;
         string? error = null;
@@ -66,22 +64,14 @@ public class SmsBackgroundService : BackgroundService
             _logger.LogError(ex, "Failed to send SMS to {Phone}", payload.ToPhoneNumber);
         }
 
-        await WriteLogAsync(payload, succeeded, error, dbFactory, token);
+        await WriteLogAsync(payload, succeeded, error, smsLogService, token);
     }
 
-    async Task WriteLogAsync(SmsPayload payload, bool succeeded, string? error, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
+    async Task WriteLogAsync(SmsPayload payload, bool succeeded, string? error, ISmsLogService smsLogService, CancellationToken token)
     {
         try
         {
-            await using var db = await dbFactory.CreateDbContextAsync(token);
-            db.SmsLogs.Add(new SmsLog
-            {
-                Recipient = payload.ToPhoneNumber,
-                Body = payload.Body,
-                Succeeded = succeeded,
-                Error = error,
-            });
-            await db.SaveChangesAsync(token);
+            await smsLogService.LogAsync(payload.ToPhoneNumber, payload.Body, succeeded, error, token);
         }
         catch (Exception ex)
         {

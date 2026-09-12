@@ -7,7 +7,7 @@ namespace BoltonCup.Application.Services;
 
 
 
-public class PlayerService(BoltonCupDbContext _context) : IPlayerService
+class PlayerService(BoltonCupDbContext _context) : IPlayerService
 {
     public async Task<IPagedList<Player>> GetAllAsync(GetPlayersQuery query, CancellationToken cancellationToken = default) => await _context.Players
             .AsNoTracking()

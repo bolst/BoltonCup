@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
 
-public class CustomRankingService(
+class CustomRankingService(
     BoltonCupDbContext _dbContext
 ) : ICustomRankingService
 {

@@ -7,7 +7,7 @@ namespace BoltonCup.Application.Services;
 
 
 
-public class GoalieStatService(BoltonCupDbContext _context) : IGoalieStatService
+class GoalieStatService(BoltonCupDbContext _context) : IGoalieStatService
 {
     public async Task<IPagedList<GoalieStat>> GetAllAsync(GetGoalieStatsQuery query, CancellationToken cancellationToken = default) => await _context.GoalieStats
             .AsNoTracking()

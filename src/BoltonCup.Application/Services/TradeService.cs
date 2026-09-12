@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace BoltonCup.Application.Services;
 
-public class TradeService(
+class TradeService(
     BoltonCupDbContext _dbContext,
     IRosterValidator _rosterValidator,
     IEmailer _emailer,

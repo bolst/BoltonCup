@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
 
-public class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITournamentRegistrationService
+class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITournamentRegistrationService
 {
     public async Task<TournamentRegistration?> GetAsync(int tournamentId, int accountId,
         CancellationToken cancellationToken = default) => await _dbContext.TournamentRegistrations
@@ -92,6 +92,37 @@ public class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITou
         _dbContext.Players.Add(player);
         await _dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
+    }
+
+    public async Task<TournamentPaymentPreparation> PrepareTournamentPaymentAsync(int tournamentId, int accountId, bool isGoalie,
+        CancellationToken cancellationToken = default)
+    {
+        var tournament = await _dbContext.Tournaments
+                             .Include(p => p.Players)
+                             .SingleOrDefaultAsync(t => t.Id == tournamentId, cancellationToken)
+                         ?? throw new EntityNotFoundException(nameof(Tournament), tournamentId);
+
+        if (!tournament.IsRegistrationOpen)
+        {
+            throw new TournamentRegistrationClosedException(tournament.Id);
+        }
+
+        if ((isGoalie ? tournament.GoalieRegistrationFee : tournament.SkaterRegistrationFee) is not { } registrationFeeAmount)
+        {
+            throw new InvalidOperationException($"Tournament with ID {tournament.Id} does not have a registration fee.");
+        }
+
+        if (await _dbContext.Accounts.FindAsync([accountId], cancellationToken) is not { } account)
+        {
+            throw new EntityNotFoundException(nameof(Account), accountId);
+        }
+
+        if (tournament.Players.Any(x => x.AccountId == account.Id))
+        {
+            throw new AccountAlreadyInTournamentException(account.Id, tournament.Id);
+        }
+
+        return new TournamentPaymentPreparation(tournament.Id, account.Id, account.Email, registrationFeeAmount);
     }
 }
 

@@ -7,7 +7,7 @@ namespace BoltonCup.Application.Services;
 
 // A context per call, not a scoped one: callers include Blazor Server components that fire
 // overlapping operations from key events, which a circuit-scoped context cannot serve.
-public class TagService<TTag>(IDbContextFactory<BoltonCupDbContext> _dbContextFactory) : ITagService<TTag>
+class TagService<TTag>(IDbContextFactory<BoltonCupDbContext> _dbContextFactory) : ITagService<TTag>
     where TTag : EntityTag, new()
 {
     const string UniqueViolation = "23505";

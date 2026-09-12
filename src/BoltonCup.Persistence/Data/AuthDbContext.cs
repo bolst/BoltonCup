@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BoltonCup.Persistence.Data;
 
 // This context is ONLY for Identity tables
-public class AuthDbContext(DbContextOptions<AuthDbContext> options)
+class AuthDbContext(DbContextOptions<AuthDbContext> options)
     : IdentityDbContext<BoltonCupUser, IdentityRole, string>(options), IDataProtectionKeyContext
 {
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace BoltonCup.Admin.Imaging;
 
-public sealed class TeamRosterImageGenerator(
+sealed class TeamRosterImageGenerator(
     IDbContextFactory<BoltonCupDbContext> _dbContextFactory,
     IRosterImageRenderer _renderer,
     IStorageService _storageService,

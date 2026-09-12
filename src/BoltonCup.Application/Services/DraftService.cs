@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BoltonCup.Application.Services;
 
-public class DraftService(
+class DraftService(
     BoltonCupDbContext _dbContext,
     IConfiguration? _configuration = null
 ) : IDraftService

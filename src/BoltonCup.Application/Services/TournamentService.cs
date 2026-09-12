@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
 
-public class TournamentService : ITournamentService
+class TournamentService : ITournamentService
 {
     readonly BoltonCupDbContext _dbContext;
     readonly IStorageService _storageService;

@@ -24,7 +24,7 @@ public partial class ForeignColumn<T, TEntity> : Column<T>
     public EntityDataGrid<T> ParentGrid { get; set; } = null!;
 
     [Inject]
-    public IDbContextFactory<BoltonCupDbContext> DbContextFactory { get; set; } = null!;
+    internal IDbContextFactory<BoltonCupDbContext> DbContextFactory { get; set; } = null!;
 
     [Parameter]
     [EditorRequired]

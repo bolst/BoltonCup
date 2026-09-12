@@ -13,7 +13,7 @@ public interface IMasqueradeService
     Task<IReadOnlyList<MasqueradeUser>> SearchAsync(string? query, int limit = 5, CancellationToken cancellationToken = default);
 }
 
-public class MasqueradeService(
+class MasqueradeService(
     BoltonCupDbContext _dbContext,
     UserManager<BoltonCupUser> _userManager) : IMasqueradeService
 {

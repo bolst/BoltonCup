@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
 
-public class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITournamentPlayerInfoService
+class TournamentPlayerInfoService(BoltonCupDbContext _dbContext) : ITournamentPlayerInfoService
 {
     public async Task<TournamentPlayerInfoContext> GetAsync(int tournamentId, int accountId,
         CancellationToken cancellationToken = default)

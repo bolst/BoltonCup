@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
 
-public class GeneratedImageService(IDbContextFactory<BoltonCupDbContext> _dbContextFactory) : IGeneratedImageService
+class GeneratedImageService(IDbContextFactory<BoltonCupDbContext> _dbContextFactory) : IGeneratedImageService
 {
     public async Task<GeneratedImage> CreateAsync(string storageKey, string templateKey, string label,
         string contentType, CancellationToken cancellationToken = default)

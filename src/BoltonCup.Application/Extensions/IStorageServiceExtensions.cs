@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Extensions;
 
-public static class IStorageServiceExtensions
+static class IStorageServiceExtensions
 {
     public static async Task UpdateAssetAsync<TEntity>(
         this IStorageService storageService,

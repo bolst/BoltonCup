@@ -54,10 +54,10 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
     }
 
     [Inject]
-    public IDbContextFactory<BoltonCupDbContext> DbContextFactory { get; set; } = null!;
+    internal IDbContextFactory<BoltonCupDbContext> DbContextFactory { get; set; } = null!;
 
     [Inject]
-    public TournamentStateService TournamentState { get; set; } = null!;
+    internal TournamentStateService TournamentState { get; set; } = null!;
 
     protected override void OnInitialized()
     {

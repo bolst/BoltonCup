@@ -14,7 +14,7 @@ namespace BoltonCup.Admin.Services;
 /// and in-memory state in sync. Resolution precedence: URL query param → localStorage →
 /// active tournament → first tournament.
 /// </summary>
-public sealed class TournamentStateService : IDisposable
+sealed class TournamentStateService : IDisposable
 {
     const string StorageKey = "bc.admin.currentTournamentId";
     const string QueryParam = "tournament";

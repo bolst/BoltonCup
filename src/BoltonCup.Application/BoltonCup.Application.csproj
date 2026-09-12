@@ -18,4 +18,9 @@
       <ProjectReference Include="..\BoltonCup.Shared\BoltonCup.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <InternalsVisibleTo Include="BoltonCup.WebAPI.Tests" />
+      <InternalsVisibleTo Include="BoltonCup.Admin" />
+    </ItemGroup>
+
 </Project>

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BoltonCup.Application.Services;
 
-public class GameService(
+class GameService(
     BoltonCupDbContext _dbContext,
     IGlobalMusicQueue _queue,
     IMusicLibraryService _music,

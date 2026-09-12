@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BoltonCup.Persistence.Data;
 
-public class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
+class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     : DbContext(options)
 {
     public DbSet<Account> Accounts { get; set; }

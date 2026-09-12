@@ -1,6 +1,7 @@
 using BoltonCup.Persistence.Data;
 using BoltonCup.Persistence.Identity;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +11,15 @@ namespace BoltonCup.Persistence;
 
 public static class ServiceCollectionExtensions
 {
+    public static WebApplicationBuilder AddBoltonCupDataProtection(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddDataProtection()
+            .PersistKeysToDbContext<AuthDbContext>()
+            .SetApplicationName("BoltonCup.SharedAuth");
+
+        return builder;
+    }
+
     public static WebApplicationBuilder AddBoltonCupPersistence(this WebApplicationBuilder builder)
     {
         builder.Services

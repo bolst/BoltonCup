@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
 
-public class MusicLibraryService : IMusicLibraryService
+class MusicLibraryService : IMusicLibraryService
 {
     readonly BoltonCupDbContext _db;
     readonly IStorageService _storage;

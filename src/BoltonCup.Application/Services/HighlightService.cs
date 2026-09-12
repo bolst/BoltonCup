@@ -7,7 +7,7 @@ namespace BoltonCup.Application.Services;
 
 
 
-public class HighlightService(BoltonCupDbContext _context) : IHighlightService
+class HighlightService(BoltonCupDbContext _context) : IHighlightService
 {
     public async Task<IPagedList<Highlight>> GetAllAsync(GetHighlightsQuery query, CancellationToken cancellationToken = default) => await _context.Highlights
             .AsNoTracking()

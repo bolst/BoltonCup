@@ -11,7 +11,7 @@ namespace BoltonCup.Application.Services;
 /// The single place per-target-type search is configured, so a tag picker never needs
 /// search expressions passed in from the page.
 /// </summary>
-public class TagTargetSearchService(IDbContextFactory<BoltonCupDbContext> _dbContextFactory) : ITagTargetSearchService
+class TagTargetSearchService(IDbContextFactory<BoltonCupDbContext> _dbContextFactory) : ITagTargetSearchService
 {
     const int MaxResults = 10;
 

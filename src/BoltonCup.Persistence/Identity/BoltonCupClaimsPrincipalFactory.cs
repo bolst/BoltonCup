@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace BoltonCup.Persistence.Identity;
 
-public class BoltonCupClaimsPrincipalFactory(
+class BoltonCupClaimsPrincipalFactory(
     UserManager<BoltonCupUser> userManager,
     RoleManager<IdentityRole> roleManager,
     IOptions<IdentityOptions> optionsAccessor,

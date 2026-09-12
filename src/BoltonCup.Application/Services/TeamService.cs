@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
 
-public class TeamService : ITeamService
+class TeamService : ITeamService
 {
     readonly BoltonCupDbContext _dbContext;
     readonly IStorageService _storageService;

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
 
-public class InfoGuideService(BoltonCupDbContext _context) : IInfoGuideService
+class InfoGuideService(BoltonCupDbContext _context) : IInfoGuideService
 {
     public async Task<IPagedList<InfoGuide>> GetAllAsync(GetInfoGuidesQuery query, CancellationToken cancellationToken = default) => await _context.InfoGuides
             .AsNoTracking()

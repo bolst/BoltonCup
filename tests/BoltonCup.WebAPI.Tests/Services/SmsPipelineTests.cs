@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using BoltonCup.Application.Services;
+using BoltonCup.Core;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Integrations.Sms;
 using FluentAssertions;
@@ -23,6 +25,7 @@ public class SmsPipelineTests
         services.AddDbContextFactory<BoltonCupDbContext>(o => o
             .UseInMemoryDatabase(dbName)
             .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning)));
+        services.AddScoped<ISmsLogService, SmsLogService>();
         services.AddSingleton(transport);
         return services.BuildServiceProvider();
     }

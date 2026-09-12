@@ -1,4 +1,5 @@
 using BoltonCup.Application;
+using BoltonCup.Persistence;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Persistence.Identity;
 using BoltonCup.Shared;
@@ -7,7 +8,6 @@ using BoltonCup.WebAPI.Auth;
 using BoltonCup.WebAPI.Controllers;
 using BoltonCup.WebAPI.Hubs;
 using BoltonCup.WebAPI.Swagger;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -17,9 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Sentry
 builder.WebHost.UseSentry();
 
-builder.Services.AddDataProtection()
-    .PersistKeysToDbContext<AuthDbContext>()
-    .SetApplicationName("BoltonCup.SharedAuth");
+builder.AddBoltonCupDataProtection();
 
 builder.Services.AddIdentityApiEndpoints<BoltonCupUser>();
 

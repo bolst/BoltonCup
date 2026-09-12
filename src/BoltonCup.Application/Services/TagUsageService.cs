@@ -11,7 +11,7 @@ namespace BoltonCup.Application.Services;
 /// Discovers every mapped tag table from the EF model, so a newly taggable subject shows up
 /// here as soon as it is configured, with no change to this class or its callers.
 /// </summary>
-public class TagUsageService(IDbContextFactory<BoltonCupDbContext> _dbContextFactory) : ITagUsageService
+class TagUsageService(IDbContextFactory<BoltonCupDbContext> _dbContextFactory) : ITagUsageService
 {
     static readonly MethodInfo LoadMethod = typeof(TagUsageService)
         .GetMethod(nameof(LoadAsync), BindingFlags.NonPublic | BindingFlags.Static)!;

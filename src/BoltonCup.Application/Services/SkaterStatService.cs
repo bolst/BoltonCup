@@ -7,7 +7,7 @@ namespace BoltonCup.Application.Services;
 
 
 
-public class SkaterStatService(BoltonCupDbContext _context) : ISkaterStatService
+class SkaterStatService(BoltonCupDbContext _context) : ISkaterStatService
 {
     public async Task<IReadOnlyList<SkaterStat>> GetCareerStatsAsync(int tournamentId, int? teamId, CancellationToken cancellationToken = default)
     {

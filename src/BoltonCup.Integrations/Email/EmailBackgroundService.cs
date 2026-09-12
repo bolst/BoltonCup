@@ -1,6 +1,4 @@
 using BoltonCup.Core;
-using BoltonCup.Persistence.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -35,8 +33,8 @@ public class EmailBackgroundService : BackgroundService
                 using var scope = _serviceProvider.CreateScope();
                 var razorEngine = scope.ServiceProvider.GetRequiredService<IRazorLightEngine>();
                 var transport = scope.ServiceProvider.GetRequiredService<IEmailTransport>();
-                var dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<BoltonCupDbContext>>();
-                await ProcessEmailAsync(payload, razorEngine, transport, dbFactory, stoppingToken);
+                var emailLogService = scope.ServiceProvider.GetRequiredService<IEmailLogService>();
+                await ProcessEmailAsync(payload, razorEngine, transport, emailLogService, stoppingToken);
             }
             catch (OperationCanceledException)
             {
@@ -49,7 +47,7 @@ public class EmailBackgroundService : BackgroundService
         }
     }
 
-    async Task ProcessEmailAsync(EmailPayload payload, IRazorLightEngine razor, IEmailTransport transport, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
+    async Task ProcessEmailAsync(EmailPayload payload, IRazorLightEngine razor, IEmailTransport transport, IEmailLogService emailLogService, CancellationToken token)
     {
         var succeeded = false;
         string? error = null;
@@ -72,24 +70,14 @@ public class EmailBackgroundService : BackgroundService
             _logger.LogError(ex, "Failed to send email to {Email}", payload.Email);
         }
 
-        await WriteLogAsync(payload, succeeded, error, dbFactory, token);
+        await WriteLogAsync(payload, succeeded, error, emailLogService, token);
     }
 
-    async Task WriteLogAsync(EmailPayload payload, bool succeeded, string? error, IDbContextFactory<BoltonCupDbContext> dbFactory, CancellationToken token)
+    async Task WriteLogAsync(EmailPayload payload, bool succeeded, string? error, IEmailLogService emailLogService, CancellationToken token)
     {
         try
         {
-            await using var db = await dbFactory.CreateDbContextAsync(token);
-            db.EmailLogs.Add(new EmailLog
-            {
-                Recipient = payload.Email,
-                Subject = payload.Subject,
-                TemplateName = payload.TemplateName,
-                Succeeded = succeeded,
-                Error = error,
-                BroadcastId = payload.BroadcastId,
-            });
-            await db.SaveChangesAsync(token);
+            await emailLogService.LogAsync(payload.Email, payload.Subject, payload.TemplateName, succeeded, error, payload.BroadcastId, token);
         }
         catch (Exception ex)
         {

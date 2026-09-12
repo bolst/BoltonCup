@@ -12,7 +12,7 @@ namespace BoltonCup.Application.Services;
 /// tables so every process reads the same DB-backed data without a cache. Uses a short-lived context
 /// from the factory so it is safe to call from the Blazor Server Admin app as well as the API.
 /// </summary>
-public sealed class StatisticsRefreshService(IDbContextFactory<BoltonCupDbContext> _dbContextFactory)
+sealed class StatisticsRefreshService(IDbContextFactory<BoltonCupDbContext> _dbContextFactory)
     : IStatisticsRefreshService
 {
     public async Task RefreshAsync(CancellationToken cancellationToken = default)

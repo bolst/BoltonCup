@@ -4,12 +4,11 @@ using BoltonCup.Admin.Services;
 using BoltonCup.Common;
 using BoltonCup.Common.Imaging;
 using BoltonCup.Application;
-using BoltonCup.Persistence.Data;
+using BoltonCup.Persistence;
 using BoltonCup.Sdk;
 using BoltonCup.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using MudBlazor;
 using MudBlazor.Services;
@@ -20,9 +19,7 @@ var cultureInfo = new System.Globalization.CultureInfo("en-US");
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
-builder.Services.AddDataProtection()
-    .PersistKeysToDbContext<AuthDbContext>()
-    .SetApplicationName("BoltonCup.SharedAuth");
+builder.AddBoltonCupDataProtection();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
