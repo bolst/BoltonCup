@@ -16,6 +16,6 @@ fi
 echo "Adding migration '$MIGRATION_NAME' to $CONTEXT..."
 
 dotnet ef migrations add "$MIGRATION_NAME" \
-    --project ./BoltonCup.Persistence \
-    --startup-project ./BoltonCup.WebAPI \
+    --project ./BoltonCup.Persistence/src \
+    --startup-project ./BoltonCup.WebAPI/src \
     -c "$CONTEXT"

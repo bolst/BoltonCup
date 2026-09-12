@@ -12,28 +12,34 @@
 
         <!--github.com/RicoSuter/NSwag/issues/5301-->
         <WasmEnableStreamingResponse>false</WasmEnableStreamingResponse>
+
+        <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <NoWarn>1701;1702;8669</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.26" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.26" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.26" />
-        <PackageReference Include="MudBlazor" Version="9.4.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BoltonCup.Common\BoltonCup.Common.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Common\src\BoltonCup.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <_ContentIncludedByDefault Remove="wwwroot\css\app.css" />
-      <_ContentIncludedByDefault Remove="wwwroot\img\boltoncup.png" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+      <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Layout\MainLayout.razor" />
+      <AdditionalFiles Include="Components\Pages\Home.razor" />
     </ItemGroup>
 
 </Project>

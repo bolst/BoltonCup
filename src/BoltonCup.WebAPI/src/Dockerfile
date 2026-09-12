@@ -6,12 +6,12 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["BoltonCup.WebAPI/BoltonCup.WebAPI.csproj", "BoltonCup.WebAPI/"]
-COPY ["BoltonCup.Core/BoltonCup.Core.csproj", "BoltonCup.Core/"]
+COPY ["BoltonCup.WebAPI/src/BoltonCup.WebAPI.csproj", "BoltonCup.WebAPI/src/"]
+COPY ["BoltonCup.Core/src/BoltonCup.Core.csproj", "BoltonCup.Core/src/"]
 COPY ["BoltonCup.Infrastructure/BoltonCup.Infrastructure.csproj", "BoltonCup.Infrastructure/"]
-RUN dotnet restore "BoltonCup.WebAPI/BoltonCup.WebAPI.csproj"
+RUN dotnet restore "BoltonCup.WebAPI/src/BoltonCup.WebAPI.csproj"
 COPY . .
-WORKDIR "/src/BoltonCup.WebAPI"
+WORKDIR "/src/BoltonCup.WebAPI/src"
 RUN dotnet build "BoltonCup.WebAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish

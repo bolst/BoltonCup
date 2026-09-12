@@ -20,9 +20,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BoltonCup.Core\BoltonCup.Core.csproj" />
-      <ProjectReference Include="..\BoltonCup.Persistence\BoltonCup.Persistence.csproj" />
-      <ProjectReference Include="..\BoltonCup.Shared\BoltonCup.Shared.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Core\src\BoltonCup.Core.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Persistence\src\BoltonCup.Persistence.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Shared\src\BoltonCup.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

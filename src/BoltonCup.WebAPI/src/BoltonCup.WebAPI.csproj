@@ -35,13 +35,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BoltonCup.Core\BoltonCup.Core.csproj" />
-      <ProjectReference Include="..\BoltonCup.Application\BoltonCup.Application.csproj" />
-      <ProjectReference Include="..\BoltonCup.Shared\BoltonCup.Shared.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Core\src\BoltonCup.Core.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Application\src\BoltonCup.Application.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Shared\src\BoltonCup.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
+      <Content Include="..\..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
     </ItemGroup>

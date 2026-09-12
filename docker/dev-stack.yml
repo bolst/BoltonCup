@@ -22,7 +22,7 @@ services:
   auth:
     build:
       context: ../src
-      dockerfile: BoltonCup.Auth/Dockerfile
+      dockerfile: BoltonCup.Auth/src/Dockerfile
     ports:
       - "${AUTH_PORT:-7269}:443"
     volumes:
