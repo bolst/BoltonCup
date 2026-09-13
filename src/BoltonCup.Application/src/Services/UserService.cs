@@ -76,7 +76,7 @@ class UserService(
         }
 
         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        await _emailer.SendConfirmationCodeAsync(user, email, code);
+        await _emailer.SendConfirmationCodeAsync(email, code);
     }
 
 
@@ -89,7 +89,7 @@ class UserService(
         }
 
         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        await _emailer.SendConfirmationCodeAsync(user, email, code);
+        await _emailer.SendConfirmationCodeAsync(email, code);
     }
 
 
@@ -123,7 +123,7 @@ class UserService(
         }
 
         var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-        await _emailer.SendPasswordResetCodeAsync(user, email, code);
+        await _emailer.SendPasswordResetCodeAsync(email, code);
     }
 
 

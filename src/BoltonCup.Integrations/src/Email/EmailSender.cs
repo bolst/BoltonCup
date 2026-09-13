@@ -1,6 +1,5 @@
 using BoltonCup.Core;
 using BoltonCup.Integrations.Email.EmailTemplates;
-using BoltonCup.Persistence.Identity;
 using BoltonCup.Shared;
 using Markdig;
 
@@ -8,8 +7,8 @@ namespace BoltonCup.Integrations.Email;
 
 public interface IEmailer
 {
-    Task SendConfirmationCodeAsync(BoltonCupUser user, string email, string confirmationCode);
-    Task SendPasswordResetCodeAsync(BoltonCupUser user, string email, string resetCode);
+    Task SendConfirmationCodeAsync(string email, string confirmationCode);
+    Task SendPasswordResetCodeAsync(string email, string resetCode);
     Task SendBracketChallengeCredentialsAsync(Core.BracketChallenge.Event bracketChallenge, string email);
 
     /// <summary>
@@ -40,7 +39,7 @@ public class EmailSender(
     IAssetUrlResolver _urlResolver
 ) : IEmailer
 {
-    public async Task SendConfirmationCodeAsync(BoltonCupUser user, string email, string confirmationCode)
+    public async Task SendConfirmationCodeAsync(string email, string confirmationCode)
     {
         var model = new ConfirmationCodeViewModel
         {
@@ -56,7 +55,7 @@ public class EmailSender(
         await _queue.EnqueueAsync(payload);
     }
 
-    public async Task SendPasswordResetCodeAsync(BoltonCupUser user, string email, string resetCode)
+    public async Task SendPasswordResetCodeAsync(string email, string resetCode)
     {
         var model = new PasswordResetCodeViewModel
         {
