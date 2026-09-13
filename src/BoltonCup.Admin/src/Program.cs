@@ -4,7 +4,6 @@ using BoltonCup.Admin.Services;
 using BoltonCup.Common;
 using BoltonCup.Common.Imaging;
 using BoltonCup.Application;
-using BoltonCup.Persistence;
 using BoltonCup.Sdk;
 using BoltonCup.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -18,8 +17,6 @@ var builder = WebApplication.CreateBuilder(args);
 var cultureInfo = new System.Globalization.CultureInfo("en-US");
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-
-builder.AddBoltonCupDataProtection();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

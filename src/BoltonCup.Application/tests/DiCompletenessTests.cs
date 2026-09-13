@@ -1,5 +1,4 @@
 using BoltonCup.Core;
-using BoltonCup.Persistence;
 using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -31,7 +30,6 @@ public class DiCompletenessTests
         });
 
         // Mirrors BoltonCup.WebAPI/src/Program.cs's registration order.
-        builder.AddBoltonCupDataProtection();
         builder.AddBoltonCupApplication().AddBoltonCupAssetUrlResolver();
 
         return builder.Services.BuildServiceProvider();

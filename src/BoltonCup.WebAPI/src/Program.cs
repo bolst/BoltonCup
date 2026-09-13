@@ -1,6 +1,4 @@
 using BoltonCup.Application;
-using BoltonCup.Persistence;
-using BoltonCup.Persistence.Data;
 using BoltonCup.Persistence.Identity;
 using BoltonCup.Shared;
 using BoltonCup.WebAPI;
@@ -16,8 +14,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add Sentry
 builder.WebHost.UseSentry();
-
-builder.AddBoltonCupDataProtection();
 
 builder.Services.AddIdentityApiEndpoints<BoltonCupUser>();
 
@@ -87,7 +83,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-await app.Services.InitializeDbAsync(app.Configuration);
+await app.Services.InitializeBoltonCupDatabaseAsync(app.Configuration);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

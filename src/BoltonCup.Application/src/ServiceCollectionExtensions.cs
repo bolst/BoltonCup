@@ -3,6 +3,7 @@ using BoltonCup.Application.Services;
 using BoltonCup.Application.Settings;
 using BoltonCup.Integrations;
 using BoltonCup.Persistence;
+using BoltonCup.Persistence.Data;
 using BoltonCup.Shared;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,7 @@ public static class ServiceCollectionExtensions
 {
     public static WebApplicationBuilder AddBoltonCupApplication(this WebApplicationBuilder builder)
     {
+        builder.AddBoltonCupDataProtection();
         builder.AddBoltonCupPersistence();
         builder.AddBoltonCupIntegrations();
 
@@ -61,4 +63,7 @@ public static class ServiceCollectionExtensions
         builder.Services.AddSingleton<IAssetUrlResolver, AssetUrlResolver>(_ => new AssetUrlResolver(baseUrl!));
         return builder;
     }
+
+    public static Task InitializeBoltonCupDatabaseAsync(this IServiceProvider services, IConfiguration configuration) =>
+        services.InitializeDbAsync(configuration);
 }
