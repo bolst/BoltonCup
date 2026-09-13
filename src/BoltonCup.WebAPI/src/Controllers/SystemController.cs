@@ -1,0 +1,124 @@
+using BoltonCup.Core;
+using BoltonCup.WebAPI.Mapping;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace BoltonCup.WebAPI.Controllers;
+
+/// <summary>Provides global system context including the active tournament and featured stats.</summary>
+public class SystemController(
+    ITournamentService _tournamentRepo,
+    ISkaterStatService _skaterStatRepo,
+    IGoalieStatService _goalieStatRepo,
+    IMapper _mapper
+) : BoltonCupControllerBase
+{
+    /// <summary>Gets the contextual configuration of the system (e.g., active tournament and featured stats).</summary>
+    /// <remarks>
+    /// Gets the contextual configuration of the system (e.g., active tournament and featured stats).
+    /// </remarks>
+    [AllowAnonymous]
+    [HttpGet("context")]
+    [ResponseCache(Duration = 300)]
+    public async Task<ActionResult<SystemContextDto>> GetSystemContext()
+    {
+        var context = await GetOrCreateAsync(nameof(GetSystemContext), async () =>
+        {
+            var activeTournament = await _tournamentRepo.GetActiveAsync();
+            var featuredStats = await GetFeaturedStatsOrDefault();
+
+            return new SystemContextDto(
+                ActiveTournament: _mapper.ToDto(activeTournament),
+                FeaturedStats: featuredStats
+            );
+        });
+
+        return Ok(context);
+    }
+
+
+    async Task<TournamentStatLeadersDto?> GetFeaturedStatsOrDefault()
+    {
+        if (await _tournamentRepo.GetFeaturedStatsAsync() is not { } featuredStatsTournament)
+        {
+            return null;
+        }
+
+        var baseSkaterQuery = new GetSkaterStatsQuery
+        {
+            TournamentId = featuredStatsTournament.Id,
+            Size = 5,
+            Descending = true
+        };
+        var baseGoalieQuery = new GetGoalieStatsQuery
+        {
+            TournamentId = featuredStatsTournament.Id,
+            Size = 5
+        };
+
+        var points = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with
+        {
+            SortBy = nameof(SkaterStat.Points)
+        });
+        var goals = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with
+        {
+            SortBy = nameof(SkaterStat.Goals)
+        });
+        var pims = await _skaterStatRepo.GetAllAsync(baseSkaterQuery with
+        {
+            SortBy = nameof(SkaterStat.PenaltyMinutes)
+        });
+        var gaa = await _goalieStatRepo.GetAllAsync(baseGoalieQuery with
+        {
+            SortBy = nameof(GoalieStat.GoalsAgainstAverage)
+        });
+
+        return new TournamentStatLeadersDto
+        {
+            TournamentId = featuredStatsTournament.Id,
+            Title = featuredStatsTournament.FeaturedStatsLabel ?? featuredStatsTournament.Name,
+            StatLeaders =
+            [
+                _mapper.ToDto(
+                    "Points",
+                    points.Items,
+                    x => x.Points
+                ),
+                _mapper.ToDto(
+                    "Goals",
+                    goals.Items,
+                    x => x.Goals
+                ),
+                _mapper.ToDto(
+                    "PIM",
+                    pims.Items,
+                    x => x.PenaltyMinutes,
+                    "N0"
+                ),
+                _mapper.ToDto(
+                    "GAA",
+                    gaa.Items,
+                    x => x.GoalsAgainstAverage,
+                    "F2"
+                ),
+            ]
+        };
+    }
+}
+/// <summary>Contains the system-wide contextual data returned by the context endpoint.</summary>
+public record SystemContextDto(
+    TournamentSingleDto? ActiveTournament,
+    TournamentStatLeadersDto? FeaturedStats
+);
+/// <summary>Contains stat leader information for a featured tournament.</summary>
+public record TournamentStatLeadersDto
+{
+    /// <summary>The ID of the featured tournament.</summary>
+    public required int TournamentId { get; init; }
+
+    /// <summary>The display title for the featured stats section.</summary>
+    public required string Title { get; init; }
+
+    /// <summary>The list of stat leader categories.</summary>
+    public IEnumerable<PlayerStatLeadersDto> StatLeaders { get; init; } = [];
+}

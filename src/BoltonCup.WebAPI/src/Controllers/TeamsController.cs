@@ -1,0 +1,90 @@
+using BoltonCup.Core;
+using static BoltonCup.Shared.BoltonCupRole;
+using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
+using BoltonCup.WebAPI.Mapping;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace BoltonCup.WebAPI.Controllers;
+
+/// <summary>Manages team queries and team asset uploads.</summary>
+public class TeamsController(
+    ITeamService _teamService,
+    IAuthorizationService _authorizationService,
+    IMapper _mapper
+) : BoltonCupControllerBase
+{
+    /// <summary>Gets a paginated list of teams.</summary>
+    /// <remarks>
+    /// Gets a paginated list of teams.
+    /// </remarks>
+    [AllowAnonymous]
+    [HttpGet]
+    [ResponseCache(Duration = 300, VaryByQueryKeys = ["*"])]
+    public async Task<ActionResult<IPagedList<TeamDto>>> GetTeams([FromQuery] GetTeamsRequest request)
+    {
+        var teams = await GetOrCreateAsync($"{nameof(GetTeams)}:{request}", async () =>
+        {
+            var query = _mapper.ToQuery(request);
+            var result = await _teamService.GetAllAsync(query);
+            return _mapper.ToDtoList(result);
+        });
+        return Ok(teams);
+    }
+
+    /// <summary>Gets a single team by its ID.</summary>
+    /// <remarks>
+    /// Gets a single team by its ID.
+    /// </remarks>
+    [AllowAnonymous]
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<TeamSingleDto>> GetTeamById(int id)
+    {
+        var team = await _teamService.GetByIdAsync(id);
+        return OkOrNoContent(_mapper.ToDto(team));
+    }
+
+    /// <summary>Updates a team's logo using a pre-signed S3 key (admin only).</summary>
+    /// <remarks>
+    /// Updates a team's logo by accepting a pre-signed S3 key.
+    /// The client is responsible for uploading the image to S3 before calling this endpoint.
+    /// </remarks>
+    [Authorize(Roles = Admin)]
+    [HttpPut("{id:int}/logo")]
+    public async Task<ActionResult> UpdateTeamLogo(int id, string key)
+    {
+        await _teamService.UpdateLogoAsync(id, key);
+        return Ok();
+    }
+
+    /// <summary>Updates a team's banner using a pre-signed S3 key (admin only).</summary>
+    /// <remarks>
+    /// Updates a team's banner by accepting a pre-signed S3 key.
+    /// The client is responsible for uploading the image to S3 before calling this endpoint.
+    /// </remarks>
+    [Authorize(Roles = Admin)]
+    [HttpPut("{id:int}/banner")]
+    public async Task<ActionResult> UpdateTeamBanner(int id, string key)
+    {
+        await _teamService.UpdateBannerAsync(id, key);
+        return Ok();
+    }
+
+    /// <summary>Sets the team's goal, win and penalty songs (admin or the team's GM). A null song clears that selection.</summary>
+    [Authorize]
+    [HttpPut("{id:int}/songs")]
+    public async Task<ActionResult> UpdateTeamSongs(int id, [FromBody] UpdateTeamSongsRequest request)
+    {
+        var authorization = await _authorizationService.AuthorizeAsync(User, id, CanManageTeam);
+        if (!authorization.Succeeded)
+        {
+            return Forbid();
+        }
+
+        await _teamService.UpdateSongsAsync(id, ToTrack(request.GoalSong), ToTrack(request.WinSong), ToTrack(request.PenaltySong));
+        return Ok();
+    }
+
+    static MusicTrack? ToTrack(MusicTrackDto? dto)
+        => dto is null ? null : new MusicTrack(dto.Id, dto.Name, dto.Artist, dto.AlbumArtUrl);
+}

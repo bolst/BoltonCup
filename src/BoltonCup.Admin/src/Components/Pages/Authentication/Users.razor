@@ -1,0 +1,126 @@
+@page "/authentication/users"
+@using BoltonCup.Persistence.Identity
+@inject IDbContextFactory<AuthDbContext> DbContextFactory
+@inject IDialogService DialogService
+
+<EntityDataGrid @ref="_dataGrid" T="BoltonCupUser" DbContextFunc="async ct => await DbContextFactory.CreateDbContextAsync(ct)">
+    <Columns>
+        <PropertyColumn Title="Id" Property="x => x.Id" Editable="false" Hidden />
+        <PropertyColumn Title="Username" Property="x => x.UserName" Editable="false" />
+        <PropertyColumn Title="Email" Property="x => x.Email" Editable="false">
+            <CellTemplate>
+                <div class="mud-width-full d-flex flex-row justify-space-between gap-3">
+                    <MudText Typo="Typo.body2">@context.Item.Email</MudText>
+                    @if (!string.IsNullOrEmpty(context.Item.Email))
+                    {
+                        if (context.Item.EmailConfirmed)
+                        {
+                            <MudIcon Icon="@Icons.Material.Rounded.Check" Color="Color.Success" Size="Size.Small" />
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small" />
+                        }
+                    }
+                </div>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Phone" Property="x => x.PhoneNumber" Editable="false">
+            <CellTemplate>
+                <div class="d-flex flex-row justify-space-between">
+                    <MudText Typo="Typo.body2">@context.Item.PhoneNumber</MudText>
+                    @if (!string.IsNullOrEmpty(context.Item.PhoneNumber))
+                    {
+                        if (context.Item.PhoneNumberConfirmed)
+                        {
+                            <MudIcon Icon="@Icons.Material.Rounded.Check" Color="Color.Success" Size="Size.Small" />
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Rounded.Cancel" Color="Color.Error" Size="Size.Small" />
+                        }
+                    }
+                </div>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Account ID" Property="x => x.AccountId">
+            <EditTemplate>
+                <MudNumericField
+                    T="int?" Value="@context.Item.AccountId" ValueChanged="async v => { context.Item.AccountId = v; await _dataGrid.NotifyItemChangedAsync(context.Item); }"
+                    Margin="Margin.Dense" Variant="Variant.Text" Underline="false" Min="0"
+                    HideSpinButtons FullWidth
+                />
+            </EditTemplate>
+        </PropertyColumn>
+        <TemplateColumn Title="Roles" Sortable="false" Editable="false">
+            <CellTemplate>
+                <div class="d-flex flex-row align-center gap-2">
+                    @{
+                        var roles = GetRoles(context.Item.Id);
+                    }
+                    @if (roles.Count > 0)
+                    {
+                        <MudChipSet T="string" ReadOnly>
+                            @foreach (var role in roles)
+                            {
+                                <MudChip Text="@role" Color="Color.Primary" Variant="Variant.Text" Size="Size.Small" Label="true" />
+                            }
+                        </MudChipSet>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">No roles</MudText>
+                    }
+                    <MudSpacer />
+                    <MudTooltip Text="Manage roles">
+                        <MudIconButton OnClick="@(_ => OpenRolesDialog(context.Item))" Icon="@Icons.Material.Rounded.AdminPanelSettings" Size="Size.Small" />
+                    </MudTooltip>
+                </div>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</EntityDataGrid>
+
+
+@code {
+
+    private EntityDataGrid<BoltonCupUser> _dataGrid = null!;
+
+    private Dictionary<string, List<string>> _userRoles = new();
+
+    protected override Task OnInitializedAsync() => ReloadRolesAsync();
+
+    private async Task ReloadRolesAsync()
+    {
+        await using var ctx = await DbContextFactory.CreateDbContextAsync();
+        var pairs = await (from ur in ctx.UserRoles
+                           join r in ctx.Roles on ur.RoleId equals r.Id
+                           where r.Name != null
+                           select new { ur.UserId, RoleName = r.Name! })
+            .ToListAsync();
+
+        _userRoles = pairs
+            .GroupBy(x => x.UserId)
+            .ToDictionary(g => g.Key, g => g.Select(x => x.RoleName).OrderBy(n => n).ToList());
+    }
+
+    private List<string> GetRoles(string userId)
+        => _userRoles.TryGetValue(userId, out var roles) ? roles : [];
+
+    private async Task OpenRolesDialog(BoltonCupUser user)
+    {
+        var parameters = new DialogParameters<ManageUserRolesDialog>
+        {
+            { x => x.UserId, user.Id },
+            { x => x.UserLabel, user.Email ?? user.UserName },
+        };
+
+        var dialog = await DialogService.ShowAsync<ManageUserRolesDialog>("Manage Roles", parameters);
+        if (await dialog.Result is { Canceled: false })
+        {
+            await ReloadRolesAsync();
+            StateHasChanged();
+        }
+    }
+
+}

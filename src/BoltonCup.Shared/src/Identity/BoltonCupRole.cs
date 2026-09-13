@@ -1,0 +1,12 @@
+using System.Collections.Generic;
+
+namespace BoltonCup.Shared;
+
+public static class BoltonCupRole
+{
+    public const string User = "User";
+    public const string Admin = "Admin";
+    public const string Timekeeper = "Timekeeper";
+
+    public static IReadOnlyList<string> All = [User, Admin, Timekeeper];
+}

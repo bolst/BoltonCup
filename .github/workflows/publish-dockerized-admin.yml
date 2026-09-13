@@ -30,6 +30,6 @@ jobs:
       uses: docker/build-push-action@v7
       with:
         context: ./src
-        file: src/BoltonCup.Admin/Dockerfile
+        file: src/BoltonCup.Admin/src/Dockerfile
         push: true
         tags: bolst/boltoncup-admin:latest

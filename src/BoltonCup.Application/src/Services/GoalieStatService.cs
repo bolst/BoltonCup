@@ -1,0 +1,55 @@
+using BoltonCup.Persistence.Data;
+using BoltonCup.Core;
+using BoltonCup.Application.Extensions;
+using Microsoft.EntityFrameworkCore;
+
+namespace BoltonCup.Application.Services;
+
+
+
+class GoalieStatService(BoltonCupDbContext _context) : IGoalieStatService
+{
+    public async Task<IPagedList<GoalieStat>> GetAllAsync(GetGoalieStatsQuery query, CancellationToken cancellationToken = default) => await _context.GoalieStats
+            .AsNoTracking()
+            .ConditionalWhere(p => p.TournamentId == query.TournamentId, query.TournamentId.HasValue)
+            .ConditionalWhere(p => query.TeamIds!.Contains(p.TeamId), query.TeamIds?.Count > 0)
+            .ConditionalWhere(p => p.GameId == query.GameId, query.GameId.HasValue)
+            .OrderBy(x => x.AccountId)
+            .ThenByDescending(x => x.GameTime)
+            .GroupBy(x => x.AccountId)
+            .Select(g => new GoalieStat
+            {
+                PlayerId = g.First().PlayerId,
+                GoalsAgainst = g.Sum(x => x.GoalsAgainst),
+                ShotsAgainst = g.Sum(x => x.ShotsAgainst),
+                Saves = g.Sum(x => x.Saves),
+                Shutouts = g.Sum(x => x.Shutouts),
+                Wins = g.Sum(x => x.Wins),
+                SavePercentage = g.Sum(x => x.ShotsAgainst) == 0 ? 0 : g.Sum(x => x.Saves) / (double)g.Sum(x => x.ShotsAgainst),
+                GoalsAgainstAverage = g.Average(x => x.GoalsAgainstAverage),
+                GamesPlayed = g.Sum(x => x.GamesPlayed),
+                Goals = g.Sum(x => x.Goals),
+                Assists = g.Sum(x => x.Assists),
+                Points = g.Sum(x => x.Points),
+                PenaltyMinutes = g.Sum(x => x.PenaltyMinutes),
+                AccountId = g.Key,
+                FirstName = g.First().FirstName,
+                LastName = g.First().LastName,
+                Position = g.First().Position,
+                JerseyNumber = g.First().JerseyNumber,
+                Birthday = g.First().Birthday,
+                ProfilePicture = g.First().ProfilePicture,
+                TeamId = g.First().TeamId,
+                TeamName = g.First().TeamName,
+                TeamNameShort = g.First().TeamNameShort,
+                TeamAbbreviation = g.First().TeamAbbreviation,
+                TeamLogoUrl = g.First().TeamLogoUrl,
+            })
+            .ApplySorting(query, x => x
+                .OrderByDescending(p => p.Shutouts)
+                .ThenByDescending(p => p.Saves)
+                .ThenByDescending(p => p.Wins)
+                .ThenBy(p => p.GamesPlayed)
+            )
+            .ToPagedListAsync(query, cancellationToken: cancellationToken);
+}

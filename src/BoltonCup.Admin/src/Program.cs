@@ -1,0 +1,101 @@
+using BoltonCup.Admin.Components;
+using BoltonCup.Admin.Imaging;
+using BoltonCup.Admin.Services;
+using BoltonCup.Common;
+using BoltonCup.Common.Imaging;
+using BoltonCup.Application;
+using BoltonCup.Sdk;
+using BoltonCup.SessionStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server;
+using Microsoft.AspNetCore.Http.Extensions;
+using MudBlazor;
+using MudBlazor.Services;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var cultureInfo = new System.Globalization.CultureInfo("en-US");
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
+builder.Services.AddBoltonCupCommonServices(builder.Configuration);
+builder.Services.AddBoltonCupSessionStorage();
+builder.AddBoltonCupApplication();
+
+builder.Services.AddHttpClient();
+builder.Services
+    .AddSingleton<IRosterImageRenderer, RosterImageRenderer>()
+    .AddScoped<IImageTemplate, TeamRosterTemplate>()
+    .AddScoped<ITeamRosterImageGenerator, TeamRosterImageGenerator>();
+builder.Services
+    .AddScoped<TournamentStateService>();
+
+var configSection = builder.Configuration.GetSection(BoltonCupConfiguration.SectionName);
+var bcConfig = configSection.Get<BoltonCupConfiguration>()
+               ?? throw new ArgumentException("Missing Bolton Cup configuration.", nameof(BoltonCupConfiguration));
+
+builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
+builder.Services.AddHttpClient("BoltonCupApi")
+    .ConfigureHttpClient(client => client.BaseAddress = new Uri(bcConfig.ApiBaseUrl))
+    .AddTypedClient((http, _) => new BoltonCupApi(bcConfig.ApiBaseUrl, http));
+
+builder.Services.AddAuthentication("Identity.Application")
+    .AddCookie("Identity.Application", options =>
+    {
+        options.Cookie.Name = ".BoltonCup.Auth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        if (builder.Environment.IsProduction())
+        {
+            options.Cookie.Domain = ".boltoncup.ca";
+        }
+
+        options.ExpireTimeSpan = TimeSpan.FromDays(14);
+        options.SlidingExpiration = true;
+
+        options.Events.OnRedirectToLogin = context =>
+        {
+            var returnUrl = Uri.EscapeDataString(context.Request.GetEncodedUrl());
+            context.Response.Redirect($"{bcConfig.AuthBaseUrl}log-in-or-sign-up?returnUrl={returnUrl}");
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.Redirect($"{bcConfig.AuthBaseUrl}access-denied");
+            return Task.CompletedTask;
+        };
+    });
+builder.Services.AddAuthorization();
+
+builder.Services.AddMudServices();
+builder.Services.AddMudMarkdownServices();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    app.UseHsts();
+}
+
+app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseAntiforgery();
+
+app.MapStaticAssets();
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
+
+app.Run();

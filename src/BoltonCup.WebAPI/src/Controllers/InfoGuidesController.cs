@@ -1,0 +1,48 @@
+using BoltonCup.Core;
+using BoltonCup.WebAPI.Mapping;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace BoltonCup.WebAPI.Controllers;
+
+/// <summary>Provides read access to tournament info guides.</summary>
+public class InfoGuidesController(IInfoGuideService _infoGuides, IMapper _mapper) : BoltonCupControllerBase
+{
+    /// <summary>Gets a paginated list of info guides.</summary>
+    /// <remarks>
+    /// Gets a paginated list of info guides.
+    /// </remarks>
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<ActionResult<IPagedList<InfoGuideDto>>> GetInfoGuides([FromQuery] GetInfoGuidesRequest request)
+    {
+        var query = _mapper.ToQuery(request);
+        var guides = await _infoGuides.GetAllAsync(query);
+        return Ok(_mapper.ToDtoList(guides));
+    }
+
+    /// <summary>Gets a single info guide by its ID.</summary>
+    /// <remarks>
+    /// Gets a single info guide by its ID.
+    /// </remarks>
+    [AllowAnonymous]
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<InfoGuideSingleDto>> GetInfoGuideById(Guid id)
+    {
+        var guide = await _infoGuides.GetByIdAsync(id);
+        return OkOrNoContent(_mapper.ToDto(guide));
+    }
+
+    /// <summary>Gets an info guide by tournament ID.</summary>
+    /// <remarks>
+    /// Gets an info guide by tournament ID.
+    /// </remarks>
+    [AllowAnonymous]
+    [HttpGet("tournament/{tournamentId:int}")]
+    public async Task<ActionResult<InfoGuideSingleDto>> GetInfoGuideByTournamentId(int tournamentId)
+    {
+        var guide = await _infoGuides.GetByTournamentIdAsync(tournamentId);
+        return OkOrNoContent(_mapper.ToDto(guide));
+    }
+
+}

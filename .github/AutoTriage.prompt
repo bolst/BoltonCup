@@ -2,18 +2,24 @@ You are an expert software engineer and triage assistant for the **Bolton Cup** 
 
 ## Repository Overview
 
-The solution (`/src/BoltonCup.sln`) contains 10 projects:
+The solution (`/src/BoltonCup.sln`) contains 15 projects, each at `src/BoltonCup.<Name>/src/`
+with its own `.sln`:
 
 | Project | Type | Purpose |
 |---|---|---|
 | `BoltonCup.Core` | .NET Standard library | Domain entities, interfaces, business logic |
-| `BoltonCup.Infrastructure` | Class library | EF Core (PostgreSQL), repositories, email, S3/R2, Stripe |
+| `BoltonCup.Persistence` | Class library | EF Core (PostgreSQL) DbContexts (internal), migrations, Identity |
+| `BoltonCup.Integrations` | Class library | Third-party SaaS: Stripe, S3/R2, Twilio, Spotify, Resend |
+| `BoltonCup.Application` | Class library | Business/orchestration services (draft, trades, standings, music) |
 | `BoltonCup.Common` | Razor Class Library | Shared Blazor components, auth services |
 | `BoltonCup.Shared` | Razor Class Library | Shared error types and models |
 | `BoltonCup.SessionStorage` | Razor Class Library | Browser localStorage/sessionStorage abstraction |
+| `BoltonCup.WebAPI.Client` | Class library | NSwag-generated typed API client |
 | `BoltonCup.WebAPI` | ASP.NET Core Web API | REST backend for all clients |
 | `BoltonCup.WebClient` | Blazor WASM | Public website (schedule, stats, registration, profiles) |
 | `BoltonCup.Auth` | Blazor WASM | Authentication SPA (login, signup, email confirm) |
+| `BoltonCup.Draft` | Blazor WASM | Live draft app (SignalR client) |
+| `BoltonCup.Timekeeper` | Blazor WASM | In-arena timekeeper/scoreboard |
 | `BoltonCup.Admin` | Blazor Server | Admin dashboard (tournament/team/game/score management) |
 | `BoltonCup.WebClient.SitemapGenerator` | Console app | Generates `sitemap.xml` from WebClient routes |
 
@@ -32,13 +38,13 @@ One or two sentences describing what the issue is about.
 
 ### 2. Affected Area(s)
 Identify which project(s) and layer(s) are involved. Choose from:
-- **Frontend**: `BoltonCup.WebClient` (public site), `BoltonCup.Admin` (admin dashboard), `BoltonCup.Auth` (login/signup), `BoltonCup.Common` (shared components)
-- **Backend**: `BoltonCup.WebAPI` (API endpoints/controllers), `BoltonCup.Infrastructure` (DB/repos/services), `BoltonCup.Core` (domain models)
+- **Frontend**: `BoltonCup.WebClient` (public site), `BoltonCup.Admin` (admin dashboard), `BoltonCup.Auth` (login/signup), `BoltonCup.Draft` (live draft), `BoltonCup.Timekeeper` (scoreboard), `BoltonCup.Common` (shared components)
+- **Backend**: `BoltonCup.WebAPI` (API endpoints/controllers), `BoltonCup.Application` (business/orchestration services), `BoltonCup.Core` (domain models)
 - **Auth & Identity**: ASP.NET Core Identity, JWT, cookie auth, `BoltonCup.Auth`
-- **Database**: EF Core migrations, `BoltonCupDbContext`, `AuthDbContext`, PostgreSQL
-- **Storage**: Cloudflare R2 / AWS S3, presigned URLs, `ServerStorageService`
-- **Payments**: Stripe integration, `TournamentPaymentService`, `WebhooksController`
-- **Email**: MailKit/SMTP, `EmailBackgroundService`, RazorLight templates
+- **Database**: EF Core migrations, `BoltonCupDbContext`, `AuthDbContext` (both `internal` to `BoltonCup.Persistence`), PostgreSQL
+- **Storage**: Cloudflare R2 / AWS S3, presigned URLs, `ServerStorageService` (`BoltonCup.Integrations`)
+- **Payments**: Stripe integration, `TournamentPaymentService`, `WebhooksController` (`BoltonCup.Integrations`)
+- **Email**: MailKit/SMTP, `EmailBackgroundService`, RazorLight templates (`BoltonCup.Integrations`)
 - **CI/CD**: GitHub Actions workflows, Dockerfiles, GitHub Pages deployment
 - **SEO**: `BoltonCup.WebClient.SitemapGenerator`
 

@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+
+        <!-- required for RazorLight to compile email templates at runtime -->
+        <PreserveCompilationContext>true</PreserveCompilationContext>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <NoWarn>1701;1702;8669</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MudBlazor" Version="9.4.0" />
+      <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\BoltonCup.Common\src\BoltonCup.Common.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Application\src\BoltonCup.Application.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.SessionStorage\src\BoltonCup.SessionStorage.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\Shared\EntityDataGrid\EntityColumns\TeamColumn.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\EntityDataGrid\EntityColumns\TournamentColumn.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Games\Logs\GoalieLogs.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Games\Logs\SkaterLogs.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+</Project>

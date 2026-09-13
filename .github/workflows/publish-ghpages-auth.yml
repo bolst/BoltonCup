@@ -21,9 +21,9 @@ jobs:
       - name: Install .NET WASM Build Tools
         run: dotnet workload install wasm-tools-net8
       - name: Install dependencies
-        run: dotnet restore ./src/BoltonCup.Auth/BoltonCup.Auth.csproj
+        run: dotnet restore ./src/BoltonCup.Auth/src/BoltonCup.Auth.csproj
       - name: Publish csproj
-        run: dotnet publish ./src/BoltonCup.Auth/BoltonCup.Auth.csproj -c:Release -p:GHPages=true -o out/BoltonCupAuth --nologo --no-restore
+        run: dotnet publish ./src/BoltonCup.Auth/src/BoltonCup.Auth.csproj -c:Release -p:GHPages=true -o out/BoltonCupAuth --nologo --no-restore
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:

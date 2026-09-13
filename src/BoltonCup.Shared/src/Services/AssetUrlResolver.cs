@@ -1,0 +1,38 @@
+using System;
+
+namespace BoltonCup.Shared;
+
+public class AssetUrlResolver(string baseUrl) : IAssetUrlResolver
+{
+    readonly string _baseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl));
+
+    public string? GetFullUrl(string? s3Key)
+    {
+        if (string.IsNullOrEmpty(s3Key))
+        {
+            return null;
+        }
+
+        return $"{_baseUrl}{s3Key}";
+    }
+
+    public HighlightUrls? GetHighlightUrls(string? videoId)
+    {
+        if (string.IsNullOrEmpty(videoId))
+        {
+            return null;
+        }
+
+        return new HighlightUrls(
+            videoUrl: $"https://www.youtube.com/embed/{videoId}",
+            thumbnailUrl: $"https://img.youtube.com/vi/{videoId}/hqdefault.jpg"
+        );
+    }
+
+    public static class StaticKeys
+    {
+        public const string PlayerAvatar = "static/defaults/player-avatar.webp";
+        public const string PlayerBanner = "static/defaults/player-banner.jpg";
+        public const string Logo = "static/branding/boltoncup.png";
+    }
+}

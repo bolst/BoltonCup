@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
+      <PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\BoltonCup.Core\src\BoltonCup.Core.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Integrations\src\BoltonCup.Integrations.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Persistence\src\BoltonCup.Persistence.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Shared\src\BoltonCup.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <InternalsVisibleTo Include="BoltonCup.Application.Tests" />
+      <InternalsVisibleTo Include="BoltonCup.Admin" />
+    </ItemGroup>
+
+</Project>
