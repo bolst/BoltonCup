@@ -1,4 +1,5 @@
 using BoltonCup.Persistence.Identity;
+using BoltonCup.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

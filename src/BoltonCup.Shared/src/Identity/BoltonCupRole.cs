@@ -1,4 +1,6 @@
-namespace BoltonCup.Persistence.Identity;
+using System.Collections.Generic;
+
+namespace BoltonCup.Shared;
 
 public static class BoltonCupRole
 {

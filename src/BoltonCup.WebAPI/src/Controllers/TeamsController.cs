@@ -1,5 +1,5 @@
 using BoltonCup.Core;
-using static BoltonCup.Persistence.Identity.BoltonCupRole;
+using static BoltonCup.Shared.BoltonCupRole;
 using static BoltonCup.WebAPI.Auth.BoltonCupPolicy;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;

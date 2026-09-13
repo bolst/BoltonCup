@@ -1,8 +1,7 @@
 using BoltonCup.Core;
-using BoltonCup.Application.Extensions;
 using BoltonCup.Shared;
 using Microsoft.AspNetCore.Authorization;
-using static BoltonCup.Persistence.Identity.BoltonCupRole;
+using static BoltonCup.Shared.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Auth;
 

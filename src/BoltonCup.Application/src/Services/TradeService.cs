@@ -3,6 +3,7 @@ using BoltonCup.Core.Commands;
 using BoltonCup.Core.Exceptions;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Persistence.Identity;
+using BoltonCup.Shared;
 using BoltonCup.Application.Settings;
 using BoltonCup.Integrations.Email;
 using BoltonCup.Integrations.Sms;

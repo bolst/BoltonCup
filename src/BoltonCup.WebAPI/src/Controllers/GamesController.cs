@@ -2,7 +2,7 @@ using BoltonCup.Core;
 using BoltonCup.WebAPI.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static BoltonCup.Persistence.Identity.BoltonCupRole;
+using static BoltonCup.Shared.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Controllers;
 
