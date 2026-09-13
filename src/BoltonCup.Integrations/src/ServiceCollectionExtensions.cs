@@ -101,7 +101,10 @@ public static class ServiceCollectionExtensions
     {
         Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetRequiredSection("Stripe").GetValue<string>(nameof(StripeSettings.ApiKey));
         builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
-        return builder.Services.AddTransient<ITournamentPaymentService, TournamentPaymentService>();
+        return builder.Services
+            .AddTransient<ITournamentPaymentService, TournamentPaymentService>()
+            .AddTransient<IStripeEventConstructor, StripeEventConstructor>()
+            .AddTransient<IStripeWebhookProcessor, StripeWebhookProcessor>();
     }
 
     static IServiceCollection AddBoltonCupMusic(this WebApplicationBuilder builder)

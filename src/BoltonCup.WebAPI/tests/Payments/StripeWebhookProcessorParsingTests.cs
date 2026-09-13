@@ -1,16 +1,12 @@
-using BoltonCup.WebAPI.Mapping;
-using BoltonCup.Shared;
+using BoltonCup.Integrations.Payments;
 using FluentAssertions;
-using Moq;
 using Stripe;
 using Xunit;
 
 namespace BoltonCup.WebAPI.Tests.Mapping;
 
-public class StripeMapperTests
+public class StripeWebhookProcessorParsingTests
 {
-    readonly Mapper _mapper = new Mapper(new Mock<IAssetUrlResolver>().Object);
-
     static PaymentIntent BuildPaymentIntent(string id, Dictionary<string, string> metadata) => new PaymentIntent { Id = id, Metadata = metadata };
 
     // ---------------- TryParseTournamentPaymentCommand ----------------
@@ -24,7 +20,7 @@ public class StripeMapperTests
             ["TournamentId"] = "7"
         });
 
-        var success = _mapper.TryParseTournamentPaymentCommand(paymentIntent, out var command);
+        var success = StripeWebhookProcessor.TryParseTournamentPaymentCommand(paymentIntent, out var command);
 
         success.Should().BeTrue();
         command.AccountId.Should().Be(42);
@@ -36,7 +32,7 @@ public class StripeMapperTests
     public void TryParseTournamentPaymentCommand_MissingAccountId_ReturnsFalse()
     {
         var paymentIntent = BuildPaymentIntent("pi_x", new Dictionary<string, string> { ["TournamentId"] = "7" });
-        var success = _mapper.TryParseTournamentPaymentCommand(paymentIntent, out _);
+        var success = StripeWebhookProcessor.TryParseTournamentPaymentCommand(paymentIntent, out _);
         success.Should().BeFalse();
     }
 
@@ -44,7 +40,7 @@ public class StripeMapperTests
     public void TryParseTournamentPaymentCommand_MissingTournamentId_ReturnsFalse()
     {
         var paymentIntent = BuildPaymentIntent("pi_x", new Dictionary<string, string> { ["AccountId"] = "42" });
-        var success = _mapper.TryParseTournamentPaymentCommand(paymentIntent, out _);
+        var success = StripeWebhookProcessor.TryParseTournamentPaymentCommand(paymentIntent, out _);
         success.Should().BeFalse();
     }
 
@@ -61,7 +57,7 @@ public class StripeMapperTests
             ["AgreedToTOS"] = "true"
         });
 
-        var success = _mapper.TryParseBracketChallengePaymentCommand(paymentIntent, out var command);
+        var success = StripeWebhookProcessor.TryParseBracketChallengePaymentCommand(paymentIntent, out var command);
 
         success.Should().BeTrue();
         command.EventId.Should().Be(12);
@@ -88,7 +84,7 @@ public class StripeMapperTests
         metadata.Remove(keyToOmit);
 
         var paymentIntent = BuildPaymentIntent("pi_x", metadata);
-        var success = _mapper.TryParseBracketChallengePaymentCommand(paymentIntent, out _);
+        var success = StripeWebhookProcessor.TryParseBracketChallengePaymentCommand(paymentIntent, out _);
 
         success.Should().BeFalse();
     }

@@ -2,7 +2,6 @@ using System.Security.Claims;
 using BoltonCup.Core;
 using BoltonCup.Core.BracketChallenge;
 using BoltonCup.Core.Commands;
-using Stripe;
 using Account = BoltonCup.Core.Account;
 using Event = BoltonCup.Core.BracketChallenge.Event;
 
@@ -87,10 +86,6 @@ public interface IMapper
     // SkaterStat
     GetSkaterStatsQuery ToQuery(GetSkaterStatsRequest request);
     IPagedList<SkaterStatDto> ToDtoList(IPagedList<SkaterStat> skaters);
-
-    // Stripe
-    bool TryParseTournamentPaymentCommand(PaymentIntent paymentIntent, out ProcessTournamentPaymentIntentCommand command);
-    bool TryParseBracketChallengePaymentCommand(PaymentIntent paymentIntent, out ProcessBracketChallengePaymentIntentCommand command);
 
     // Team
     GetTeamsQuery ToQuery(GetTeamsRequest request);

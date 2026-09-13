@@ -7,7 +7,6 @@ using BoltonCup.WebAPI.Errors;
 using BoltonCup.WebAPI.Extensions;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
-using BoltonCup.WebAPI.Stripe;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -221,7 +220,6 @@ public static class ServiceCollectionExtensions
             .AddMappers()
             .AddExceptionHandlers()
             .AddSignalRServices()
-            .AddTransient<IStripeEventConstructor, StripeEventConstructor>()
             .AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
