@@ -7,7 +7,6 @@ using BoltonCup.Shared;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace BoltonCup.Application;
 
@@ -37,23 +36,18 @@ public static class ServiceCollectionExtensions
         return builder;
     }
 
-    // Registers all concrete classes ending with `suffix` against their matching interface (I<ClassName>)
-    // found in any loaded assembly. Skips classes with no matching interface.
+    // Registers all concrete classes ending with `suffix` against their matching interface (I<ClassName>).
+    // Skips classes with no matching interface.
     static void RegisterByConvention(IServiceCollection services, System.Reflection.Assembly implAssembly, string suffix)
     {
-        var interfaceAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-
         var concreteTypes = implAssembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith(suffix));
+            .Where(t => t is { IsClass: true, IsAbstract: false } && t.Name.EndsWith(suffix));
 
         foreach (var impl in concreteTypes)
         {
             var interfaceName = $"I{impl.Name}";
-            var serviceType = interfaceAssemblies
-                .SelectMany(a => { try { return a.GetTypes(); } catch { return []; } })
-                .FirstOrDefault(t => t.IsInterface && t.Name == interfaceName);
-
-            if (serviceType is not null)
+            var interfaces = impl.GetInterfaces();
+            if (interfaces.FirstOrDefault(i => i.Name == interfaceName) is { } serviceType)
             {
                 services.AddTransient(serviceType, impl);
             }
