@@ -46,6 +46,9 @@ public class NewsController(INewsPostService _news, IMapper _mapper) : BoltonCup
             return NoContent();
         }
 
+        // Slugs are stored lowercase; a capitalised link must still resolve.
+        slug = slug.Trim().ToLowerInvariant();
+
         // Misses are not cached: a post published moments after a lookup must appear immediately.
         if (Cache.Get<NewsPostSingleDto>(CacheKey(slug)) is { } cached)
         {
