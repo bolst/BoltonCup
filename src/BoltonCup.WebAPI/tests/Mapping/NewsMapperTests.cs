@@ -96,4 +96,63 @@ public class NewsMapperTests
     {
         _mapper.ToTagDto(new NewsPostTag { Id = 1 }).Should().BeNull();
     }
+
+    [Fact]
+    public void ToDto_NullCoverImage_ResolvesThroughUrlResolver()
+    {
+        _urls.Setup(u => u.GetFullUrl(null)).Returns((string?)null);
+        var post = new NewsPost { Id = 1, Title = "t", Slug = "t", CoverImage = null };
+
+        var dto = _mapper.ToDto(post)!;
+
+        dto.CoverImageUrl.Should().BeNull();
+        _urls.Verify(u => u.GetFullUrl(null), Times.Once);
+    }
+
+    [Fact]
+    public void ToDto_MixedTags_OrdersByTypeThenName()
+    {
+        var post = new NewsPost
+        {
+            Id = 1,
+            Title = "t",
+            Slug = "t",
+            Tags =
+            [
+                new NewsPostTag { Id = 1, TeamId = 2, Team = NewTeam(2, "Wolves") },
+                new NewsPostTag { Id = 2, LabelId = 5, Label = new TagLabel { Id = 5, Name = "Recap" } },
+                new NewsPostTag { Id = 3, TeamId = 1, Team = NewTeam(1, "Bears") },
+                new NewsPostTag { Id = 4, GameId = 9, Game = new Game { Id = 9, TournamentId = 1, GameTime = DateTime.UnixEpoch } },
+            ],
+        };
+
+        var dto = _mapper.ToDto(post)!;
+
+        dto.Tags.Select(t => (t.Type, t.Name)).Should().Equal(
+            (TagTargetType.Game, "Game 9"),
+            (TagTargetType.Team, "Bears"),
+            (TagTargetType.Team, "Wolves"),
+            (TagTargetType.Label, "Recap"));
+    }
+
+    [Fact]
+    public void ToDtoList_MapsItemsAndPreservesPaging()
+    {
+        var paged = new Mock<IPagedList<NewsPost>>();
+        paged.SetupGet(p => p.Items).Returns(
+        [
+            new NewsPost { Id = 1, Title = "A", Slug = "a", CoverImage = "cover.png" },
+            new NewsPost { Id = 2, Title = "B", Slug = "b", MarkdownContent = "hidden" },
+        ]);
+        paged.SetupGet(p => p.Total).Returns(7);
+        paged.SetupGet(p => p.Page).Returns(2);
+        paged.SetupGet(p => p.Size).Returns(2);
+
+        var dto = _mapper.ToDtoList(paged.Object);
+
+        dto.Items.Select(i => i.Slug).Should().Equal("a", "b");
+        dto.Items.First().CoverImageUrl.Should().Be("https://cdn/cover.png");
+        dto.Items.Should().AllBeOfType<NewsPostDto>();
+        (dto.Total, dto.Page, dto.Size).Should().Be((7, 2, 2));
+    }
 }

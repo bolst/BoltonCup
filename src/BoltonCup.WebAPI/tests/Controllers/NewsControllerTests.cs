@@ -95,4 +95,61 @@ public class NewsControllerTests
 
         result.Result.Should().BeOfType<NoContentResult>();
     }
+
+    [Fact]
+    public async Task GetNewsPostBySlug_RepeatedHit_IsServedFromCache()
+    {
+        var post = new NewsPost { Id = 1, Title = "Finals recap", Slug = "finals-recap", IsPublished = true };
+        _news.Setup(s => s.GetPublishedBySlugAsync("finals-recap", It.IsAny<CancellationToken>())).ReturnsAsync(post);
+        _mapper.Setup(m => m.ToDto(post)).Returns(new NewsPostSingleDto { Id = 1, Title = "Finals recap", Slug = "finals-recap", Tags = [] });
+
+        await _controller.GetNewsPostBySlug("finals-recap");
+        await _controller.GetNewsPostBySlug("finals-recap");
+
+        _news.Verify(s => s.GetPublishedBySlugAsync("finals-recap", It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetNewsPostBySlug_RepeatedMiss_IsNotCached()
+    {
+        _news.Setup(s => s.GetPublishedBySlugAsync("missing", It.IsAny<CancellationToken>())).ReturnsAsync((NewsPost?)null);
+        _mapper.Setup(m => m.ToDto((NewsPost?)null)).Returns((NewsPostSingleDto?)null);
+
+        await _controller.GetNewsPostBySlug("missing");
+        await _controller.GetNewsPostBySlug("missing");
+
+        _news.Verify(s => s.GetPublishedBySlugAsync("missing", It.IsAny<CancellationToken>()), Times.Exactly(2));
+    }
+
+    [Fact]
+    public async Task GetNewsPostBySlug_SlugTooLong_ReturnsNoContentWithoutCallingService()
+    {
+        var result = await _controller.GetNewsPostBySlug(new string('a', 101));
+
+        result.Result.Should().BeOfType<NoContentResult>();
+        _news.Verify(s => s.GetPublishedBySlugAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task GetNewsPostBySlug_SlugAtMaxLength_StillCallsService()
+    {
+        var slug = new string('a', 100);
+        _news.Setup(s => s.GetPublishedBySlugAsync(slug, It.IsAny<CancellationToken>())).ReturnsAsync((NewsPost?)null);
+        _mapper.Setup(m => m.ToDto((NewsPost?)null)).Returns((NewsPostSingleDto?)null);
+
+        await _controller.GetNewsPostBySlug(slug);
+
+        _news.Verify(s => s.GetPublishedBySlugAsync(slug, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetNewsPostBySlug_LowercasesIncomingSlug()
+    {
+        _news.Setup(s => s.GetPublishedBySlugAsync("opening-night", It.IsAny<CancellationToken>())).ReturnsAsync((NewsPost?)null);
+        _mapper.Setup(m => m.ToDto((NewsPost?)null)).Returns((NewsPostSingleDto?)null);
+
+        await _controller.GetNewsPostBySlug(" Opening-Night ");
+
+        _news.Verify(s => s.GetPublishedBySlugAsync("opening-night", It.IsAny<CancellationToken>()), Times.Once);
+    }
 }
