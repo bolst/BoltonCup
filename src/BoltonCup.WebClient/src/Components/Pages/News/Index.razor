@@ -39,7 +39,7 @@
             @Section(GameHighlightsLabel, _gameHighlights)
         }
 
-        @Section("All News", _allPosts)
+        @Section("All News", _allPosts.Skip(LatestCount))
 
         @if (_allPosts.Count < _total)
         {
@@ -71,7 +71,6 @@
     {
         try
         {
-            // throw new InvalidOperationException();
             var allTask = BoltonCupApi.GetNewsPostsAsync(page: 1, size: PageSize);
             var highlightsTask = BoltonCupApi.GetNewsPostsAsync(label: GameHighlightsLabel, page: 1, size: GameHighlightsCount);
             await Task.WhenAll(allTask, highlightsTask);
