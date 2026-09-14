@@ -315,6 +315,7 @@ class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
         {
             entity
                 .ToTable("news_posts")
+                .HasCheckConstraint("CK_news_posts_published_has_date", "NOT is_published OR published_at IS NOT NULL")
                 .HasKey(e => e.Id);
             entity
                 .HasIndex(e => e.Slug)
