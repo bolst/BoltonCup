@@ -122,13 +122,9 @@
 
         post.MarkdownContent = markdown;
         await dbContext.SaveChangesAsync();
+        // The live row is updated in place; a grid reload would orphan other pending edits.
         item.MarkdownContent = markdown;
         Snackbar.Add("Content saved.", Severity.Success);
-
-        if (_dataGrid is not null)
-        {
-            await _dataGrid.ReloadAsync();
-        }
     }
 
 }
