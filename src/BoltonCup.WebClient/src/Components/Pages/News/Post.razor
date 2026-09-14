@@ -45,7 +45,7 @@
             {
                 <MudText Typo="Typo.subtitle2" Class="mud-text-secondary">@_post.PublishedAt.Value.ToLocalTime().ToString("MMMM d, yyyy")</MudText>
             }
-            <NewsTagChips Tags="_post.Tags" />
+            @* <NewsTagChips Tags="_post.Tags" /> *@
         </div>
 
         <MarkdownView Value="@(_post.MarkdownContent ?? string.Empty)" />

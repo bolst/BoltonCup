@@ -18,7 +18,10 @@
             {
                 <MudText Typo="Typo.caption" Class="mud-text-secondary">@Post.PublishedAt.Value.ToLocalTime().ToString("MMMM d, yyyy")</MudText>
             }
-            <NewsTagChips Tags="Post.Tags" MaxVisible="3" />
+            @if (ShowTags)
+            {
+                <NewsTagChips Tags="Post.Tags" MaxVisible="3" />
+            }
         </MudCardContent>
     </MudCard>
 </MudLink>
@@ -30,6 +33,9 @@
 
     [Parameter]
     public bool Featured { get; set; }
+
+    [Parameter]
+    public bool ShowTags { get; set; }
 
     private string Href => $"/news/{Post.Slug}";
 
