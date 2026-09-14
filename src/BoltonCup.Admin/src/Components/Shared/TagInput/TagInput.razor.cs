@@ -1,3 +1,4 @@
+using BoltonCup.Admin.Services;
 using BoltonCup.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -44,7 +45,15 @@ public partial class TagInput<TTag> : ComponentBase, IDisposable
     [EditorRequired]
     public ITaggable<TTag> Subject { get; set; } = null!;
 
+    /// <summary>
+    /// Limits game, team and account suggestions to the Admin's current tournament. Tournament and
+    /// label targets stay global. Off for subjects that genuinely span tournaments.
+    /// </summary>
+    [Parameter]
+    public bool ScopeToTournament { get; set; } = true;
+
     [Inject] public ITagService<TTag> TagService { get; set; } = null!;
+    [Inject] internal TournamentStateService TournamentState { get; set; } = null!;
     [Inject] public ITagTargetSearchService TargetSearch { get; set; } = null!;
     [Inject] public IJSRuntime JS { get; set; } = null!;
     [Inject] public ISnackbar Snackbar { get; set; } = null!;
@@ -256,7 +265,8 @@ public partial class TagInput<TTag> : ComponentBase, IDisposable
                 .Select(t => TagTargets.GetTargetId(t, type)!.Value)
                 .ToList();
 
-            var results = await TargetSearch.SearchAsync(type, term, exclude, cts.Token);
+            int? tournamentId = ScopeToTournament ? (await TournamentState.GetCurrentAsync(cts.Token))?.Id : null;
+            var results = await TargetSearch.SearchAsync(type, term, exclude, tournamentId, cts.Token);
             return results.Select(r => new Option(r.Display, type, r.Id)).ToList();
         }
         catch (OperationCanceledException)
