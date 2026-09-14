@@ -20,6 +20,8 @@ class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<Game> Games { get; set; }
     public DbSet<Highlight> Highlights { get; set; }
     public DbSet<HighlightTag> HighlightTags { get; set; }
+    public DbSet<NewsPost> NewsPosts { get; set; }
+    public DbSet<NewsPostTag> NewsPostTags { get; set; }
     public DbSet<TagLabel> TagLabels { get; set; }
     public DbSet<GameStar> GameStars { get; set; }
     public DbSet<GameWarmupTrack> GameWarmupTracks { get; set; }
@@ -308,6 +310,27 @@ class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
         });
 
         modelBuilder.ConfigureTagTable<HighlightTag, Highlight>("highlight_tags", "highlight_id", h => h.Tags);
+
+        modelBuilder.Entity<NewsPost>(entity =>
+        {
+            entity
+                .ToTable("news_posts")
+                .HasKey(e => e.Id);
+            entity
+                .HasIndex(e => e.Slug)
+                .IsUnique();
+            entity.HasIndex(e => new { e.IsPublished, e.PublishedAt });
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.Title).HasColumnName("title");
+            entity.Property(e => e.Slug).HasColumnName("slug");
+            entity.Property(e => e.Summary).HasColumnName("summary");
+            entity.Property(e => e.MarkdownContent).HasColumnName("markdown_content");
+            entity.Property(e => e.CoverImage).HasColumnName("cover_image_key");
+            entity.Property(e => e.IsPublished).HasColumnName("is_published");
+            entity.Property(e => e.PublishedAt).HasColumnName("published_at");
+        });
+
+        modelBuilder.ConfigureTagTable<NewsPostTag, NewsPost>("news_post_tags", "news_post_id", p => p.Tags);
 
         modelBuilder.Entity<TagLabel>(entity =>
         {

@@ -1,0 +1,27 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+@if (Tags is { Count: > 0 })
+{
+    <div class="d-flex flex-row flex-wrap gap-1">
+        @foreach (var tag in Tags)
+        {
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Label="true" Color="@ChipColor(tag.Type)">@tag.Name</MudChip>
+        }
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public ICollection<Sdk.TagDto>? Tags { get; set; }
+
+    private static Color ChipColor(Sdk.TagTargetType type) => type switch
+    {
+        Sdk.TagTargetType.Label => Color.Primary,
+        Sdk.TagTargetType.Team => Color.Info,
+        Sdk.TagTargetType.Tournament => Color.Secondary,
+        Sdk.TagTargetType.Game => Color.Warning,
+        _ => Color.Default,
+    };
+
+}

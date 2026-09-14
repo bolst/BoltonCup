@@ -1,0 +1,113 @@
+@page "/news/{Slug}"
+@attribute [SitemapIgnore]
+@inject IBoltonCupApi BoltonCupApi
+@inject ILogger<Post> Logger
+
+<PageTitle>@(_post?.Title ?? "News") | Bolton Cup</PageTitle>
+@if (!string.IsNullOrWhiteSpace(_post?.Summary))
+{
+    <HeadContent>
+        <meta name="description" content="@_post.Summary">
+    </HeadContent>
+}
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
+    @if (_loading)
+    {
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="320px" Width="100%" Class="mb-4" />
+        <MudSkeleton SkeletonType="SkeletonType.Text" Width="60%" Height="48px" />
+        for (var i = 0; i < 10; i++)
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="100%" />
+        }
+    }
+    else if (_failed)
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-4">
+            This post could not be loaded right now. <MudLink Href="/news" Color="Color.Info">Back to news.</MudLink>
+        </MudAlert>
+    }
+    else if (_post is null)
+    {
+        <MudAlert Severity="Severity.Warning" Class="mt-4">
+            This post could not be found. <MudLink Href="/news" Color="Color.Info">Back to news.</MudLink>
+        </MudAlert>
+    }
+    else
+    {
+        if (!string.IsNullOrEmpty(_post.CoverImageUrl))
+        {
+            <MudImage Src="@_post.CoverImageUrl" Alt="@_post.Title" ObjectFit="ObjectFit.Cover" Fluid Class="rounded-lg mb-4" Style="max-height: 420px; width: 100%;" />
+        }
+        <MudText Typo="Typo.h3" Class="mb-2"><b>@_post.Title</b></MudText>
+        <div class="d-flex flex-row flex-wrap align-center gap-3 mb-6">
+            @if (_post.PublishedAt is not null)
+            {
+                <MudText Typo="Typo.subtitle2" Class="mud-text-secondary">@_post.PublishedAt.Value.ToLocalTime().ToString("MMMM d, yyyy")</MudText>
+            }
+            <NewsTagChips Tags="_post.Tags" />
+        </div>
+
+        <MarkdownView Value="@(_post.MarkdownContent ?? string.Empty)" />
+
+        <div class="mt-8">
+            <MudButton Href="/news" Variant="Variant.Text" StartIcon="@Icons.Material.Rounded.ArrowBack">All news</MudButton>
+        </div>
+    }
+</MudContainer>
+
+@code {
+
+    [Parameter]
+    public string Slug { get; set; } = string.Empty;
+
+    private Sdk.NewsPostSingleDto? _post;
+    private bool _loading = true;
+    private bool _failed;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_post is not null && _post.Slug == Slug)
+        {
+            return;
+        }
+
+        var slug = Slug;
+        _post = null;
+        _failed = false;
+        _loading = true;
+        // Yield so the skeleton replaces the previous post before the request completes.
+        await Task.Yield();
+
+        var loaded = await LoadAsync(slug);
+
+        // A slower response for an earlier slug must not overwrite the post now being viewed.
+        if (slug != Slug)
+        {
+            return;
+        }
+
+        _post = loaded;
+        _loading = false;
+    }
+
+    private async Task<Sdk.NewsPostSingleDto?> LoadAsync(string slug)
+    {
+        try
+        {
+            return await BoltonCupApi.GetNewsPostBySlugAsync(slug);
+        }
+        catch (Sdk.ApiException e) when (e.StatusCode is 204 or 404)
+        {
+            // OkOrNoContent answers an unknown slug with 204, which the generated client throws on.
+            return null;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to load news post {Slug}", slug);
+            _failed = true;
+            return null;
+        }
+    }
+
+}

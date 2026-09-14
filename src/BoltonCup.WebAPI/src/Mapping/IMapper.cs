@@ -77,6 +77,12 @@ public interface IMapper
     IPagedList<InfoGuideDto> ToDtoList(IPagedList<InfoGuide> guides);
     InfoGuideSingleDto? ToDto(InfoGuide? guide);
 
+    // News
+    GetNewsPostsQuery ToQuery(GetNewsPostsRequest request);
+    IPagedList<NewsPostDto> ToDtoList(IPagedList<NewsPost> posts);
+    NewsPostSingleDto? ToDto(NewsPost? post);
+    TagDto? ToTagDto(EntityTag tag);
+
     // Player
     GetPlayersQuery ToQuery(GetPlayersRequest request);
     IPagedList<PlayerDto> ToDtoList(IPagedList<Player> players);

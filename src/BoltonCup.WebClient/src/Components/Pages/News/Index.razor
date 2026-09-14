@@ -1,0 +1,128 @@
+@page "/news"
+@attribute [Sitemap(SitemapChangeFrequency.Weekly, Priority = 0.8f, LastModified = "2026-09-13")]
+@inject IBoltonCupApi BoltonCupApi
+@inject ILogger<Index> Logger
+@inject ISnackbar Snackbar
+
+<PageTitle>News | Bolton Cup</PageTitle>
+<HeadContent>
+    <meta name="description" content="News, game highlights and stories from the Bolton Cup.">
+</HeadContent>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="px-2 mt-6" Gutters="false">
+    @if (_loading)
+    {
+        <MudSkeleton SkeletonType="SkeletonType.Text" Width="220px" Height="40px" Class="mb-2" />
+        <MudGrid Spacing="3">
+            @for (var i = 0; i < 3; i++)
+            {
+                <MudItem xs="12" md="4">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="320px" Width="100%" />
+                </MudItem>
+            }
+        </MudGrid>
+    }
+    else if (_failed)
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-4">News could not be loaded right now. Please try again later.</MudAlert>
+    }
+    else if (_allPosts.Count == 0)
+    {
+        <MudText Typo="Typo.h5" Class="mt-8" Align="Align.Center">No news yet. Check back soon.</MudText>
+    }
+    else
+    {
+        @Section("Latest News", _allPosts.Take(LatestCount), featured: true)
+
+        @if (_gameHighlights.Count > 0)
+        {
+            @Section(GameHighlightsLabel, _gameHighlights)
+        }
+
+        @Section("All News", _allPosts)
+
+        @if (_allPosts.Count < _total)
+        {
+            <div class="d-flex justify-center my-6">
+                <MudButton OnClick="@LoadMoreAsync" Disabled="_loadingMore" Variant="Variant.Outlined" Color="Color.Primary">
+                    @(_loadingMore ? "Loading..." : "Load more")
+                </MudButton>
+            </div>
+        }
+    }
+</MudContainer>
+
+@code {
+
+    private const int PageSize = 12;
+    private const int LatestCount = 3;
+    private const int GameHighlightsCount = 6;
+    private const string GameHighlightsLabel = "Game Highlights";
+
+    private readonly List<Sdk.NewsPostDto> _allPosts = [];
+    private List<Sdk.NewsPostDto> _gameHighlights = [];
+    private int _total;
+    private int _page = 1;
+    private bool _loading = true;
+    private bool _loadingMore;
+    private bool _failed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // throw new InvalidOperationException();
+            var allTask = BoltonCupApi.GetNewsPostsAsync(page: 1, size: PageSize);
+            var highlightsTask = BoltonCupApi.GetNewsPostsAsync(label: GameHighlightsLabel, page: 1, size: GameHighlightsCount);
+            await Task.WhenAll(allTask, highlightsTask);
+
+            _allPosts.AddRange(allTask.Result.Items);
+            _total = allTask.Result.Total;
+            _gameHighlights = highlightsTask.Result.Items.ToList();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to load the news index");
+            _failed = true;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task LoadMoreAsync()
+    {
+        _loadingMore = true;
+        try
+        {
+            var next = await BoltonCupApi.GetNewsPostsAsync(page: _page + 1, size: PageSize);
+            _page++;
+            _allPosts.AddRange(next.Items);
+            _total = next.Total;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to load news page {Page}", _page + 1);
+            Snackbar.Add("Could not load more news. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _loadingMore = false;
+        }
+    }
+
+    private RenderFragment Section(string title, IEnumerable<Sdk.NewsPostDto> posts, bool featured = false) => __builder =>
+    {
+        <MudText Typo="Typo.h5" Class="mt-6 mb-2 ml-1"><b>@title</b></MudText>
+        <MudGrid Spacing="3">
+            @foreach (var post in posts)
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <NewsPostCard Post="post" Featured="featured" />
+                </MudItem>
+            }
+        </MudGrid>
+    };
+
+}

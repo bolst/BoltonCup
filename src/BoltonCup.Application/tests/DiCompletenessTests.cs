@@ -51,9 +51,11 @@ public class DiCompletenessTests
         Provider.GetService(coreInterface).Should().NotBeNull($"{coreInterface.Name} should be registered in DI");
     }
 
-    [Fact]
-    public void GenericTagService_ResolvesFromDi()
+    [Theory]
+    [InlineData(typeof(ITagService<HighlightTag>))]
+    [InlineData(typeof(ITagService<NewsPostTag>))]
+    public void GenericTagService_ResolvesFromDi(Type tagService)
     {
-        Provider.GetService(typeof(ITagService<HighlightTag>)).Should().NotBeNull();
+        Provider.GetService(tagService).Should().NotBeNull();
     }
 }
