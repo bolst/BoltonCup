@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BoltonCup.Application.Services;
 
 class NewsPostService(
-    BoltonCupDbContext _context,
+    IDbContextFactory<BoltonCupDbContext> _dbContextFactory,
     IStorageService _storageService,
     IAssetKeyGenerator _assetKeyGenerator) : INewsPostService
 {
@@ -14,7 +14,8 @@ class NewsPostService(
     {
         var label = string.IsNullOrWhiteSpace(query.Label) ? null : query.Label.Trim().ToLowerInvariant();
 
-        return await WithTags(_context.NewsPosts.AsNoTracking())
+        await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        return await WithTags(db.NewsPosts.AsNoTracking())
             // One query per collection keeps the wide post row from repeating once per tag.
             .AsSplitQuery()
             .Where(p => p.IsPublished)
@@ -27,8 +28,12 @@ class NewsPostService(
             .ToPagedListAsync(query, cancellationToken: cancellationToken);
     }
 
-    public async Task<NewsPost?> GetPublishedBySlugAsync(string slug, CancellationToken cancellationToken = default) => await WithTags(_context.NewsPosts.AsNoTracking())
+    public async Task<NewsPost?> GetPublishedBySlugAsync(string slug, CancellationToken cancellationToken = default)
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        return await WithTags(db.NewsPosts.AsNoTracking())
             .FirstOrDefaultAsync(p => p.IsPublished && p.Slug == slug, cancellationToken);
+    }
 
     public async Task<IReadOnlyList<string>> ReserveSlugsAsync(IReadOnlyList<SlugCandidate> candidates, CancellationToken cancellationToken = default)
     {
@@ -41,7 +46,8 @@ class NewsPostService(
         var bases = candidates.Select(c => c.Slug).Distinct().ToList();
 
         // Every slug that could collide with a base or one of its numbered variants, owned by someone else.
-        var taken = (await _context.NewsPosts
+        await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var taken = (await db.NewsPosts
                 .AsNoTracking()
                 .Where(p => !candidateIds.Contains(p.Id))
                 .Select(p => p.Slug)
@@ -65,14 +71,18 @@ class NewsPostService(
         return reserved;
     }
 
-    public Task UpdateCoverImageAsync(int id, string tempKey, CancellationToken cancellationToken = default) => _storageService.UpdateAssetAsync<NewsPost>(
-            _context,
+    public async Task UpdateCoverImageAsync(int id, string tempKey, CancellationToken cancellationToken = default)
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        await _storageService.UpdateAssetAsync<NewsPost>(
+            db,
             _assetKeyGenerator,
             p => p.Id == id,
             p => p.CoverImage,
             tempKey,
             id.ToString(),
             cancellationToken);
+    }
 
     // Every tag target the API renders a name for. Kept in one place so list and detail agree.
     static IQueryable<NewsPost> WithTags(IQueryable<NewsPost> posts) => posts

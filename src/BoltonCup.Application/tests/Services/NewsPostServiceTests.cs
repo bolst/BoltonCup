@@ -3,6 +3,7 @@ using BoltonCup.Persistence.Data;
 using BoltonCup.Application.Services;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
@@ -15,17 +16,20 @@ public class NewsPostServiceTests
     const int UntaggedPublishedId = 11;
     const int TaggedDraftId = 12;
 
-    static BoltonCupDbContext NewContext() =>
-        new(new DbContextOptionsBuilder<BoltonCupDbContext>()
-            .UseInMemoryDatabase($"news-{Guid.NewGuid()}")
-            .Options);
-
-    static NewsPostService NewService(BoltonCupDbContext db, IStorageService? storage = null, IAssetKeyGenerator? keys = null)
-        => new(db, storage ?? Mock.Of<IStorageService>(), keys ?? Mock.Of<IAssetKeyGenerator>());
-
-    static async Task<BoltonCupDbContext> SeedAsync()
+    static IDbContextFactory<BoltonCupDbContext> NewFactory()
     {
-        var db = NewContext();
+        var services = new ServiceCollection();
+        services.AddDbContextFactory<BoltonCupDbContext>(o => o.UseInMemoryDatabase($"news-{Guid.NewGuid()}"));
+        return services.BuildServiceProvider().GetRequiredService<IDbContextFactory<BoltonCupDbContext>>();
+    }
+
+    static NewsPostService NewService(IDbContextFactory<BoltonCupDbContext> factory, IStorageService? storage = null, IAssetKeyGenerator? keys = null)
+        => new(factory, storage ?? Mock.Of<IStorageService>(), keys ?? Mock.Of<IAssetKeyGenerator>());
+
+    static async Task<(IDbContextFactory<BoltonCupDbContext> Factory, BoltonCupDbContext Db)> SeedAsync()
+    {
+        var factory = NewFactory();
+        var db = await factory.CreateDbContextAsync();
         db.TagLabels.Add(new TagLabel { Id = LabelId, Name = "Game Highlights" });
         db.NewsPosts.AddRange(
             new NewsPost
@@ -54,15 +58,17 @@ public class NewsPostServiceTests
                 Tags = [new NewsPostTag { LabelId = LabelId }],
             });
         await db.SaveChangesAsync();
-        return db;
+        db.ChangeTracker.Clear();
+        return (factory, db);
     }
 
     [Fact]
     public async Task GetPublishedAsync_ExcludesDrafts_NewestFirst()
     {
-        await using var db = await SeedAsync();
+        var (factory, db) = await SeedAsync();
+        await using var _ = db;
 
-        var result = await NewService(db).GetPublishedAsync(new GetNewsPostsQuery());
+        var result = await NewService(factory).GetPublishedAsync(new GetNewsPostsQuery());
 
         result.Items.Select(p => p.Id).Should().Equal(UntaggedPublishedId, TaggedPublishedId);
         result.Total.Should().Be(2);
@@ -74,9 +80,10 @@ public class NewsPostServiceTests
     [InlineData("  GAME HIGHLIGHTS ")]
     public async Task GetPublishedAsync_LabelFilter_IsCaseAndWhitespaceInsensitive(string label)
     {
-        await using var db = await SeedAsync();
+        var (factory, db) = await SeedAsync();
+        await using var _ = db;
 
-        var result = await NewService(db).GetPublishedAsync(new GetNewsPostsQuery { Label = label });
+        var result = await NewService(factory).GetPublishedAsync(new GetNewsPostsQuery { Label = label });
 
         result.Items.Select(p => p.Id).Should().Equal(TaggedPublishedId);
     }
@@ -84,9 +91,10 @@ public class NewsPostServiceTests
     [Fact]
     public async Task GetPublishedAsync_BlankLabel_MeansNoFilter()
     {
-        await using var db = await SeedAsync();
+        var (factory, db) = await SeedAsync();
+        await using var _ = db;
 
-        var result = await NewService(db).GetPublishedAsync(new GetNewsPostsQuery { Label = "   " });
+        var result = await NewService(factory).GetPublishedAsync(new GetNewsPostsQuery { Label = "   " });
 
         result.Total.Should().Be(2);
     }
@@ -94,9 +102,10 @@ public class NewsPostServiceTests
     [Fact]
     public async Task GetPublishedAsync_LoadsLabelNavigation()
     {
-        await using var db = await SeedAsync();
+        var (factory, db) = await SeedAsync();
+        await using var _ = db;
 
-        var result = await NewService(db).GetPublishedAsync(new GetNewsPostsQuery { Label = "Game Highlights" });
+        var result = await NewService(factory).GetPublishedAsync(new GetNewsPostsQuery { Label = "Game Highlights" });
 
         result.Items.Single().Tags.Single().Label!.Name.Should().Be("Game Highlights");
     }
@@ -104,9 +113,10 @@ public class NewsPostServiceTests
     [Fact]
     public async Task GetPublishedBySlugAsync_ReturnsPublishedPost()
     {
-        await using var db = await SeedAsync();
+        var (factory, db) = await SeedAsync();
+        await using var _ = db;
 
-        var post = await NewService(db).GetPublishedBySlugAsync("older-tagged");
+        var post = await NewService(factory).GetPublishedBySlugAsync("older-tagged");
 
         post.Should().NotBeNull();
         post!.Id.Should().Be(TaggedPublishedId);
@@ -115,9 +125,10 @@ public class NewsPostServiceTests
     [Fact]
     public async Task GetPublishedBySlugAsync_IgnoresDrafts()
     {
-        await using var db = await SeedAsync();
+        var (factory, db) = await SeedAsync();
+        await using var _ = db;
 
-        var post = await NewService(db).GetPublishedBySlugAsync("draft");
+        var post = await NewService(factory).GetPublishedBySlugAsync("draft");
 
         post.Should().BeNull();
     }
@@ -125,13 +136,14 @@ public class NewsPostServiceTests
     [Fact]
     public async Task UpdateCoverImageAsync_CopiesAssetAndStoresFinalKey()
     {
-        await using var db = await SeedAsync();
+        var (factory, db) = await SeedAsync();
+        await using var _ = db;
         var storage = new Mock<IStorageService>();
         var keys = new Mock<IAssetKeyGenerator>();
         keys.Setup(k => k.GenerateFinalKey<NewsPost>(TaggedPublishedId.ToString(), "coverimage", ".png"))
             .Returns("media/newspost/10/coverimage/final.png");
 
-        await NewService(db, storage.Object, keys.Object).UpdateCoverImageAsync(TaggedPublishedId, "temp_uploads/abc.png");
+        await NewService(factory, storage.Object, keys.Object).UpdateCoverImageAsync(TaggedPublishedId, "temp_uploads/abc.png");
 
         storage.Verify(s => s.CopyAssetAsync("temp_uploads/abc.png", "media/newspost/10/coverimage/final.png", It.IsAny<CancellationToken>()), Times.Once);
         var post = await db.NewsPosts.AsNoTracking().SingleAsync(p => p.Id == TaggedPublishedId);
@@ -141,9 +153,10 @@ public class NewsPostServiceTests
     [Fact]
     public async Task ReserveSlugsAsync_KeepsFreeSlugs_AndSuffixesCollisions()
     {
-        await using var db = await SeedAsync();
+        var (factory, db) = await SeedAsync();
+        await using var _ = db;
 
-        var reserved = await NewsService(db).ReserveSlugsAsync(
+        var reserved = await NewsService(factory).ReserveSlugsAsync(
         [
             new SlugCandidate(0, "brand-new"),
             new SlugCandidate(0, "older-tagged"),
@@ -156,9 +169,10 @@ public class NewsPostServiceTests
     [Fact]
     public async Task ReserveSlugsAsync_LetsAPostKeepItsOwnSlug()
     {
-        await using var db = await SeedAsync();
+        var (factory, db) = await SeedAsync();
+        await using var _ = db;
 
-        var reserved = await NewsService(db).ReserveSlugsAsync(
+        var reserved = await NewsService(factory).ReserveSlugsAsync(
         [
             new SlugCandidate(TaggedPublishedId, "older-tagged"),
             new SlugCandidate(0, "older-tagged"),
@@ -170,14 +184,15 @@ public class NewsPostServiceTests
     [Fact]
     public async Task ReserveSlugsAsync_SkipsSuffixesAlreadyInUse()
     {
-        await using var db = await SeedAsync();
+        var (factory, db) = await SeedAsync();
+        await using var _ = db;
         db.NewsPosts.Add(new NewsPost { Id = 20, Title = "x", Slug = "older-tagged-2" });
         await db.SaveChangesAsync();
 
-        var reserved = await NewsService(db).ReserveSlugsAsync([new SlugCandidate(0, "older-tagged")]);
+        var reserved = await NewsService(factory).ReserveSlugsAsync([new SlugCandidate(0, "older-tagged")]);
 
         reserved.Should().Equal("older-tagged-3");
     }
 
-    static NewsPostService NewsService(BoltonCupDbContext db) => NewService(db);
+    static NewsPostService NewsService(IDbContextFactory<BoltonCupDbContext> factory) => NewService(factory);
 }
