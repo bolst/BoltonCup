@@ -4,10 +4,10 @@
 @inject ILogger<Post> Logger
 
 <PageTitle>@(_post?.Title ?? "News") | Bolton Cup</PageTitle>
-@if (!string.IsNullOrWhiteSpace(_post?.Summary))
+@if (!string.IsNullOrWhiteSpace(_post?.Title))
 {
     <HeadContent>
-        <meta name="description" content="@_post.Summary">
+        <meta name="description" content="@_post.Title">
     </HeadContent>
 }
 
@@ -35,11 +35,12 @@
     }
     else
     {
+        <MudText Typo="Typo.h3" HtmlTag="h1" Class="mb-2"><b>@_post.Title</b></MudText>
+        <MudText Typo="Typo.h6" HtmlTag="h2" Class="mb-2"><b>@_post.Summary</b></MudText>
         if (!string.IsNullOrEmpty(_post.CoverImageUrl))
         {
             <MudImage Src="@_post.CoverImageUrl" Alt="@_post.Title" ObjectFit="ObjectFit.Cover" Fluid Class="rounded-lg mb-4" Style="max-height: 420px; width: 100%;" />
         }
-        <MudText Typo="Typo.h3" HtmlTag="h1" Class="mb-2"><b>@_post.Title</b></MudText>
         <div class="d-flex flex-row flex-wrap align-center gap-3 mb-6">
             @if (_post.PublishedAt is not null)
             {
