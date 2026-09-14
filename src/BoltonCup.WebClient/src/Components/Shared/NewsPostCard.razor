@@ -17,10 +17,10 @@
         {
             <MudText Typo="Typo.body2">@Post.Summary</MudText>
         }
-        <NewsTagChips Tags="Post.Tags" />
+        <NewsTagChips Tags="Post.Tags" MaxVisible="3" />
     </MudCardContent>
     <MudCardActions>
-        <MudButton Href="@Href" Variant="Variant.Text" Color="Color.Primary">Read more</MudButton>
+        <MudButton Href="@Href" Variant="Variant.Text" Color="Color.Primary" aria-label="@($"Read more: {Post.Title}")">Read more</MudButton>
     </MudCardActions>
 </MudCard>
 
