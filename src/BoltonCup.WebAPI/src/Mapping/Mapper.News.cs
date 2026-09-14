@@ -55,7 +55,7 @@ public partial class Mapper
             TagTargetType.Team => tag.Team?.Name,
             TagTargetType.Tournament => tag.Tournament?.Name,
             TagTargetType.Account => tag.Account is null ? null : AccountName(tag.Account),
-            TagTargetType.Game => tag.Game is null ? null : $"{tag.Game.HomeTeam?.Name} vs {tag.Game.AwayTeam?.Name}",
+            TagTargetType.Game => tag.Game is { HomeTeam: not null, AwayTeam: not null } game ? $"{game.HomeTeam.Name} vs {game.AwayTeam.Name}" : null,
             _ => null,
         };
 
