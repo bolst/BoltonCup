@@ -79,7 +79,7 @@
         // Yield so the skeleton replaces the previous post before the request completes.
         await Task.Yield();
 
-        var loaded = await LoadAsync(slug);
+        var (post, failed) = await LoadAsync(slug);
 
         // A slower response for an earlier slug must not overwrite the post now being viewed.
         if (slug != Slug)
@@ -87,26 +87,27 @@
             return;
         }
 
-        _post = loaded;
+        _post = post;
+        _failed = failed;
         _loading = false;
     }
 
-    private async Task<Sdk.NewsPostSingleDto?> LoadAsync(string slug)
+    // Touches no component state so a superseded request cannot leak its outcome into the current one.
+    private async Task<(Sdk.NewsPostSingleDto? Post, bool Failed)> LoadAsync(string slug)
     {
         try
         {
-            return await BoltonCupApi.GetNewsPostBySlugAsync(slug);
+            return (await BoltonCupApi.GetNewsPostBySlugAsync(slug), false);
         }
         catch (Sdk.ApiException e) when (e.StatusCode is 204 or 404)
         {
             // OkOrNoContent answers an unknown slug with 204, which the generated client throws on.
-            return null;
+            return (null, false);
         }
         catch (Exception e)
         {
             Logger.LogError(e, "Failed to load news post {Slug}", slug);
-            _failed = true;
-            return null;
+            return (null, true);
         }
     }
 
