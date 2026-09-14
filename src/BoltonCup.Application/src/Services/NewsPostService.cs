@@ -16,8 +16,6 @@ class NewsPostService(
 
         await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
         return await WithTags(db.NewsPosts.AsNoTracking())
-            // One query per collection keeps the wide post row from repeating once per tag.
-            .AsSplitQuery()
             .Where(p => p.IsPublished)
             .ConditionalWhere(p => p.Tags.Any(t => t.Label != null && t.Label.Name.ToLower() == label), label is not null)
             .ApplySorting(
@@ -85,7 +83,9 @@ class NewsPostService(
     }
 
     // Every tag target the API renders a name for. Kept in one place so list and detail agree.
+    // Split so the wide post row (Markdown body included) is fetched once, not once per tag.
     static IQueryable<NewsPost> WithTags(IQueryable<NewsPost> posts) => posts
+        .AsSplitQuery()
         .Include(p => p.Tags).ThenInclude(t => t.Label)
         .Include(p => p.Tags).ThenInclude(t => t.Team)
         .Include(p => p.Tags).ThenInclude(t => t.Tournament)

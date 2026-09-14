@@ -194,5 +194,16 @@ public class NewsPostServiceTests
         reserved.Should().Equal("older-tagged-3");
     }
 
+    [Fact]
+    public async Task ReserveSlugsAsync_EmptyCandidates_ReturnsEmpty()
+    {
+        var (factory, db) = await SeedAsync();
+        await using var _ = db;
+
+        var reserved = await NewsService(factory).ReserveSlugsAsync([]);
+
+        reserved.Should().BeEmpty();
+    }
+
     static NewsPostService NewsService(IDbContextFactory<BoltonCupDbContext> factory) => NewService(factory);
 }
