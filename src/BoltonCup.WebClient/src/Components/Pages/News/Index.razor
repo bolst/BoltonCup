@@ -113,15 +113,18 @@
 
     private RenderFragment Section(string title, IEnumerable<Sdk.NewsPostDto> posts, bool featured = false) => __builder =>
     {
-        <MudText Typo="Typo.h5" Class="mt-6 mb-2 ml-1"><b>@title</b></MudText>
-        <MudGrid Spacing="3">
-            @foreach (var post in posts)
-            {
-                <MudItem xs="12" sm="6" md="4">
-                    <NewsPostCard Post="post" Featured="featured" />
-                </MudItem>
-            }
-        </MudGrid>
+        @if (posts.Any())
+        {
+            <MudText Typo="Typo.h5" Class="mt-6 mb-2 ml-1"><b>@title</b></MudText>
+            <MudGrid Spacing="3">
+                @foreach (var post in posts)
+                {
+                    <MudItem xs="12" sm="6" md="4">
+                        <NewsPostCard Post="post" Featured="featured" />
+                    </MudItem>
+                }
+            </MudGrid>
+        }
     };
 
 }

@@ -1,28 +1,27 @@
 @namespace BoltonCup.WebClient.Components.Shared
 
-<MudCard Class="mud-height-full d-flex flex-column" Elevation="0" Outlined>
-    @if (!string.IsNullOrEmpty(Post.CoverImageUrl))
-    {
-        <MudCardMedia Image="@Post.CoverImageUrl" Height="@(Featured ? 240 : 160)" />
-    }
-    <MudCardContent Class="flex-grow-1 d-flex flex-column gap-2">
-        <MudLink Href="@Href" Underline="Underline.None" Color="Color.Inherit">
-            <MudText Typo="@(Featured ? Typo.h5 : Typo.h6)"><b>@Post.Title</b></MudText>
-        </MudLink>
-        @if (Post.PublishedAt is not null)
+<MudLink Href="@Href" Underline="Underline.None" Color="Color.Inherit">
+    <MudCard Class="mud-height-full d-flex flex-column" Elevation="0" Outlined>
+        @if (!string.IsNullOrEmpty(Post.CoverImageUrl))
         {
-            <MudText Typo="Typo.caption" Class="mud-text-secondary">@Post.PublishedAt.Value.ToLocalTime().ToString("MMMM d, yyyy")</MudText>
+            <MudCardMedia Image="@Post.CoverImageUrl" Height="@(Featured ? 240 : 160)" />
         }
-        @if (!string.IsNullOrWhiteSpace(Post.Summary))
-        {
-            <MudText Typo="Typo.body2">@Post.Summary</MudText>
-        }
-        <NewsTagChips Tags="Post.Tags" MaxVisible="3" />
-    </MudCardContent>
-    <MudCardActions>
-        <MudButton Href="@Href" Variant="Variant.Text" Color="Color.Primary" aria-label="@($"Read more: {Post.Title}")">Read more</MudButton>
-    </MudCardActions>
-</MudCard>
+        <MudCardContent Class="flex-grow-1 d-flex flex-column gap-2">
+            <MudLink Href="@Href" Underline="Underline.Hover" Color="Color.Inherit">
+                <MudText Typo="@(Featured ? Typo.h5 : Typo.h6)"><b>@Post.Title</b></MudText>
+            </MudLink>
+            @if (!string.IsNullOrWhiteSpace(Post.Summary))
+            {
+                <MudText Typo="Typo.body2">@Post.Summary</MudText>
+            }
+            @if (Post.PublishedAt is not null)
+            {
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">@Post.PublishedAt.Value.ToLocalTime().ToString("MMMM d, yyyy")</MudText>
+            }
+            <NewsTagChips Tags="Post.Tags" MaxVisible="3" />
+        </MudCardContent>
+    </MudCard>
+</MudLink>
 
 @code {
 
