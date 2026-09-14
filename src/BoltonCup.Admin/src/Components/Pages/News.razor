@@ -2,6 +2,7 @@
 @inject INewsPostService NewsPostService
 @inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
 @inject ISnackbar Snackbar
+@inject ILogger<News> Logger
 
 <EntityDataGrid
     @ref="_dataGrid"
@@ -93,14 +94,23 @@
             return;
         }
 
-        await NewsPostService.UpdateCoverImageAsync(result.Item.Id, result.NewKey);
+        try
+        {
+            await NewsPostService.UpdateCoverImageAsync(result.Item.Id, result.NewKey);
 
-        // A later grid Save writes the row's scalars back, so the in-memory row must match the database.
-        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
-        result.Item.CoverImage = await dbContext.NewsPosts
-            .Where(p => p.Id == result.Item.Id)
-            .Select(p => p.CoverImage)
-            .FirstOrDefaultAsync();
+            // A later grid Save writes the row's scalars back, so the in-memory row must match the database.
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            result.Item.CoverImage = await dbContext.NewsPosts
+                .Where(p => p.Id == result.Item.Id)
+                .Select(p => p.CoverImage)
+                .FirstOrDefaultAsync();
+            Snackbar.Add("Cover image saved.", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to update cover image for news post {PostId}", result.Item.Id);
+            Snackbar.Add("The cover image could not be saved.", Severity.Error);
+        }
     }
 
     private async Task UpdateContent(NewsPost item, string? markdown)
@@ -112,19 +122,27 @@
             return;
         }
 
-        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
-        var post = await dbContext.NewsPosts.FirstOrDefaultAsync(p => p.Id == item.Id);
-        if (post is null)
+        try
         {
-            Snackbar.Add("This post no longer exists.", Severity.Error);
-            return;
-        }
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            var post = await dbContext.NewsPosts.FirstOrDefaultAsync(p => p.Id == item.Id);
+            if (post is null)
+            {
+                Snackbar.Add("This post no longer exists.", Severity.Error);
+                return;
+            }
 
-        post.MarkdownContent = markdown;
-        await dbContext.SaveChangesAsync();
-        // The live row is updated in place; a grid reload would orphan other pending edits.
-        item.MarkdownContent = markdown;
-        Snackbar.Add("Content saved.", Severity.Success);
+            post.MarkdownContent = markdown;
+            await dbContext.SaveChangesAsync();
+            // The live row is updated in place; a grid reload would orphan other pending edits.
+            item.MarkdownContent = markdown;
+            Snackbar.Add("Content saved.", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to save content for news post {PostId}", item.Id);
+            Snackbar.Add("The content could not be saved.", Severity.Error);
+        }
     }
 
 }
