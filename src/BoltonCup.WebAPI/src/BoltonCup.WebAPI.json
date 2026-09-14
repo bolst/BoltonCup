@@ -9644,6 +9644,8 @@
             "in": "query",
             "description": "When set, only posts tagged with a label of this name (case-insensitive).",
             "schema": {
+              "maxLength": 64,
+              "minLength": 0,
               "type": "string"
             }
           },
