@@ -1,9 +1,8 @@
 <MudAppBar Elevation="1" ToolBarClass="d-flex flex-row align-center">
-    <a href="/" style="height: 100%">
-        <BoltonCupLogo Height="64" />
-    </a>
-    
     <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+        <a href="/" style="height: 100%">
+            <BoltonCupLogo Height="64" />
+        </a>
         @foreach (var navLink in _navLinks)
         {
             <MudButton Href="@navLink.Href" Variant="Variant.Text" Color="Color.Inherit" Size="Size.Large">@navLink.Title</MudButton>
@@ -21,18 +20,25 @@
         <UserMenu />
     </MudHidden>
     <MudHidden Breakpoint="Breakpoint.MdAndUp">
-        <MudSpacer />
-        <MudIconButton OnClick="@OpenDrawer" Icon="@Icons.Material.Rounded.Menu" Variant="Variant.Text" Color="Color.Inherit" />
-        <MudDrawer @bind-Open="_drawerOpen" Anchor="Anchor.End" Elevation="1" Variant="DrawerVariant.Temporary" Width="Min(27rem, 100%)" >
+        <a href="/" style="height: 100%">
+            <BoltonCupLogo Height="56" />
+        </a>
+        <MudSpacer/>
+        @foreach (var navLink in MiniAppBarNavLinks)
+        {
+            <MudButton Class="pa-0" Href="@navLink.Href" Variant="Variant.Text" Color="Color.Inherit" Size="Size.Small">@navLink.Title</MudButton>
+        }
+        <MudIconButton Class="pl-4" OnClick="@OpenDrawer" Icon="@Icons.Material.Rounded.Menu" Variant="Variant.Text" Color="Color.Inherit" Size="Size.Small"/>
+        <MudDrawer @bind-Open="_drawerOpen" Anchor="Anchor.End" Elevation="1" Variant="DrawerVariant.Temporary" Width="Min(27rem, 100%)">
             <MudPaper Class="d-flex flex-row align-center px-2 border-solid border-b" Elevation="0" Width="100%" Height="64px" Square>
                 <a href="/" onclick="location.reload()" style="height: 100%">
-                    <BoltonCupLogo Height="64" />
+                    <BoltonCupLogo Height="64"/>
                 </a>
-                <MudSpacer />
-                <MudIconButton OnClick="@CloseDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit" />
+                <MudSpacer/>
+                <MudIconButton OnClick="@CloseDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit"/>
             </MudPaper>
             <MudNavMenu Class="mud-width-full" Color="Color.Primary" Margin="Margin.Normal" Rounded Bordered>
-                @foreach (var navLink in _navLinks)
+                @foreach (var navLink in MiniDrawerNavLinks)
                 {
                     @RenderNavLink(navLink)
                 }
@@ -46,8 +52,8 @@
                     </MudNavGroup>
                 }
             </MudNavMenu>
-            <MudSpacer />
-            <UserMenu EndIcon="@Icons.Material.Rounded.KeyboardArrowUp" OnItemClick="@CloseDrawer" Color="Color.Primary" Variant="Variant.Filled" />
+            <MudSpacer/>
+            <UserMenu EndIcon="@Icons.Material.Rounded.KeyboardArrowUp" OnItemClick="@CloseDrawer" Color="Color.Primary" Variant="Variant.Filled"/>
         </MudDrawer>
     </MudHidden>
 </MudAppBar>
@@ -55,28 +61,32 @@
 
 @code{
     
-    private readonly List<NavLinkItem> _navLinks =
+    private static readonly List<NavLinkItem> _navLinks =
     [
         new("Home", "/", Icons.Material.Rounded.Home, NavLinkMatch.All),
         new("Tournaments", "/tournaments", Icons.Material.Rounded.Stadium),
-        new("Schedule", "/schedule", Icons.Material.Rounded.CalendarMonth),
-        new("Stats", "/stats", Icons.Material.Rounded.QueryStats),
-        new("Standings", "/standings", Icons.Material.Rounded.Leaderboard),
+        new("Schedule", "/schedule", Icons.Material.Rounded.CalendarMonth, persistBreakpoints: true),
+        new("Stats", "/stats", Icons.Material.Rounded.QueryStats, persistBreakpoints: true),
+        new("Standings", "/standings", Icons.Material.Rounded.Leaderboard, persistBreakpoints: true),
         new("News", "/news", Icons.Material.Rounded.Newspaper),
         new("Teams", "/teams", Icons.Material.Rounded.Groups),
     ];
 
-    private readonly List<NavLinkItem> _moreNavLinks =
+    private static readonly List<NavLinkItem> _moreNavLinks =
     [
         new("Bracket Challenge", "/bracket-challenges", Icons.Material.Rounded.AccountTree)
     ];
     
     private bool _drawerOpen;
 
+    private static List<NavLinkItem> MiniDrawerNavLinks => _navLinks.Where(n => !n.persistBreakpoints).ToList();
+
+    private static List<NavLinkItem> MiniAppBarNavLinks => _navLinks.Where(n => n.persistBreakpoints).ToList();
+
     private void OpenDrawer() => _drawerOpen = true;
     private void CloseDrawer() => _drawerOpen = false;
 
-    public record NavLinkItem(string Title, string Href, string Icon, NavLinkMatch Match = NavLinkMatch.Prefix);
+    public record NavLinkItem(string Title, string Href, string Icon, NavLinkMatch Match = NavLinkMatch.Prefix, bool persistBreakpoints = false);
 
     private RenderFragment RenderNavLink(NavLinkItem navLink)
         => @<MudNavLink Class="px-2" Href="@navLink.Href" Icon="@navLink.Icon" Match="navLink.Match">@navLink.Title</MudNavLink>;
