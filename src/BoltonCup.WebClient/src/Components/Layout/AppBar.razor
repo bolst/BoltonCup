@@ -22,14 +22,14 @@
     </MudHidden>
     <MudHidden Breakpoint="Breakpoint.MdAndUp">
         <MudSpacer />
-        <MudIconButton OnClick="OpenDrawer" Icon="@Icons.Material.Rounded.Menu" Variant="Variant.Text" Color="Color.Inherit" />
-        <MudDrawer @bind-Open="_drawerOpen" Anchor="Anchor.End" Elevation="1" Variant="DrawerVariant.Temporary" Width="100%">
+        <MudIconButton OnClick="@OpenDrawer" Icon="@Icons.Material.Rounded.Menu" Variant="Variant.Text" Color="Color.Inherit" />
+        <MudDrawer @bind-Open="_drawerOpen" Anchor="Anchor.End" Elevation="1" Variant="DrawerVariant.Temporary" Width="Min(27rem, 100%)" >
             <MudPaper Class="d-flex flex-row align-center px-2 border-solid border-b" Elevation="0" Width="100%" Height="64px" Square>
                 <a href="/" onclick="location.reload()" style="height: 100%">
                     <BoltonCupLogo Height="64" />
                 </a>
                 <MudSpacer />
-                <MudIconButton OnClick="CloseDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit" />
+                <MudIconButton OnClick="@CloseDrawer" Icon="@Icons.Material.Rounded.Close" Variant="Variant.Text" Color="Color.Inherit" />
             </MudPaper>
             <MudNavMenu Class="mud-width-full" Color="Color.Primary" Margin="Margin.Normal" Rounded Bordered>
                 @foreach (var navLink in _navLinks)
@@ -47,7 +47,7 @@
                 }
             </MudNavMenu>
             <MudSpacer />
-            <UserMenu EndIcon="@Icons.Material.Rounded.KeyboardArrowUp" OnItemClick="CloseDrawer" Color="Color.Primary" Variant="Variant.Filled" />
+            <UserMenu EndIcon="@Icons.Material.Rounded.KeyboardArrowUp" OnItemClick="@CloseDrawer" Color="Color.Primary" Variant="Variant.Filled" />
         </MudDrawer>
     </MudHidden>
 </MudAppBar>
@@ -59,11 +59,11 @@
     [
         new("Home", "/", Icons.Material.Rounded.Home, NavLinkMatch.All),
         new("Tournaments", "/tournaments", Icons.Material.Rounded.Stadium),
-        new("Teams", "/teams", Icons.Material.Rounded.Groups),
         new("Schedule", "/schedule", Icons.Material.Rounded.CalendarMonth),
-        new("Standings", "/standings", Icons.Material.Rounded.Leaderboard),
         new("Stats", "/stats", Icons.Material.Rounded.QueryStats),
+        new("Standings", "/standings", Icons.Material.Rounded.Leaderboard),
         new("News", "/news", Icons.Material.Rounded.Newspaper),
+        new("Teams", "/teams", Icons.Material.Rounded.Groups),
     ];
 
     private readonly List<NavLinkItem> _moreNavLinks =
