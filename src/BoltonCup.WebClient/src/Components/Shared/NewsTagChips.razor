@@ -1,0 +1,41 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+@if (Tags is { Count: > 0 })
+{
+    <div class="d-flex flex-row flex-wrap gap-1">
+        @foreach (var tag in Visible)
+        {
+            <MudChip Value="@tag.Name" Size="Size.Small" Variant="Variant.Text" Label="true" Color="@ChipColor(tag.Type)">@tag.Name</MudChip>
+        }
+        @if (Hidden > 0)
+        {
+            <MudChip Value="@($"+{Hidden}")" Size="Size.Small" Variant="Variant.Text" Label="true" Color="Color.Default" title="@HiddenNames">+@Hidden</MudChip>
+        }
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public ICollection<Sdk.TagDto>? Tags { get; set; }
+
+    /// <summary>Cap on rendered chips; the remainder collapses into a single "+N" chip. Null shows all.</summary>
+    [Parameter]
+    public int? MaxVisible { get; set; }
+
+    private IEnumerable<Sdk.TagDto> Visible => MaxVisible is { } max ? Tags!.Take(max) : Tags!;
+
+    private int Hidden => MaxVisible is { } max ? Math.Max(0, Tags!.Count - max) : 0;
+
+    private string HiddenNames => string.Join(", ", Tags!.Skip(MaxVisible ?? 0).Select(t => t.Name));
+
+    private static Color ChipColor(Sdk.TagTargetType type) => type switch
+    {
+        Sdk.TagTargetType.Label => Color.Primary,
+        Sdk.TagTargetType.Team => Color.Info,
+        Sdk.TagTargetType.Tournament => Color.Secondary,
+        Sdk.TagTargetType.Game => Color.Warning,
+        _ => Color.Default,
+    };
+
+}

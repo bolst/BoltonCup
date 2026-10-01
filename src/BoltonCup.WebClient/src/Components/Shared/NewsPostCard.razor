@@ -1,0 +1,42 @@
+@namespace BoltonCup.WebClient.Components.Shared
+
+<MudLink Href="@Href" Underline="Underline.None" Color="Color.Inherit">
+    <MudCard Class="mud-height-full d-flex flex-column" Elevation="0" Outlined>
+        @if (!string.IsNullOrEmpty(Post.CoverImageUrl))
+        {
+            <MudCardMedia Image="@Post.CoverImageUrl" Height="@(Featured ? 240 : 160)" />
+        }
+        <MudCardContent Class="flex-grow-1 d-flex flex-column gap-2">
+            <MudLink Href="@Href" Underline="Underline.Hover" Color="Color.Inherit">
+                <MudText Typo="@(Featured ? Typo.h5 : Typo.h6)"><b>@Post.Title</b></MudText>
+            </MudLink>
+            @if (!string.IsNullOrWhiteSpace(Post.Summary))
+            {
+                <MudText Typo="Typo.body2">@Post.Summary</MudText>
+            }
+            @if (Post.PublishedAt is not null)
+            {
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">@Post.PublishedAt.Value.ToLocalTime().ToString("MMMM d, yyyy")</MudText>
+            }
+            @if (ShowTags)
+            {
+                <NewsTagChips Tags="Post.Tags" MaxVisible="3" />
+            }
+        </MudCardContent>
+    </MudCard>
+</MudLink>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required Sdk.NewsPostDto Post { get; set; }
+
+    [Parameter]
+    public bool Featured { get; set; }
+
+    [Parameter]
+    public bool ShowTags { get; set; }
+
+    private string Href => $"/news/{Post.Slug}";
+
+}

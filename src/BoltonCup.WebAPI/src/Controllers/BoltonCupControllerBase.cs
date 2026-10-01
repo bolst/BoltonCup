@@ -8,7 +8,7 @@ namespace BoltonCup.WebAPI.Controllers;
 [ApiController]
 public class BoltonCupControllerBase : ControllerBase
 {
-    IMemoryCache Cache => HttpContext.RequestServices.GetRequiredService<IMemoryCache>();
+    protected IMemoryCache Cache => HttpContext.RequestServices.GetRequiredService<IMemoryCache>();
 
     /// <summary>
     /// Gets a cached value by key, creating and caching it via <paramref name="factory"/> on a miss.

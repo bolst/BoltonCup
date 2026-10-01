@@ -1,0 +1,148 @@
+@page "/news"
+@inject INewsPostService NewsPostService
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject ISnackbar Snackbar
+@inject ILogger<News> Logger
+
+<EntityDataGrid
+    @ref="_dataGrid"
+    T="NewsPost"
+    NewItemFunc="NewItemFunc"
+    SearchBy="x => x.Title"
+    Include="@_includes"
+    Comparer="_comparer"
+    OnSave="PrepareForSave"
+    ColumnResizeMode="ResizeMode.Column">
+    <Columns>
+        <PropertyColumn Title="Id" Property="x => x.Id" Editable="false" />
+        <PropertyColumn Title="Title" Property="x => x.Title" Required />
+        <PropertyColumn Title="Slug" Property="x => x.Slug" Required="false" />
+        <PropertyColumn Title="Summary" Property="x => x.Summary" Required="false" />
+        <ImageColumn T="NewsPost" Title="Cover" Property="x => x.CoverImage" OnImageUploaded="@UpdateCoverImage" />
+        <BoolColumn Title="Published" Property="x => x.IsPublished" />
+        <DateTimePickerColumn Title="Published At" Property="x => x.PublishedAt" />
+        <TemplateColumn Title="Content">
+            <EditTemplate>
+                <MarkdownEditButton Markdown="@context.Item.MarkdownContent" OnSave="@(m => UpdateContent(context.Item, m))" Title="@context.Item.Title" />
+            </EditTemplate>
+        </TemplateColumn>
+    </Columns>
+    <ChildRowContent>
+        <div class="pa-2">
+            <TagInput TTag="NewsPostTag" Subject="context.Item" />
+        </div>
+    </ChildRowContent>
+</EntityDataGrid>
+
+@code {
+
+    private EntityDataGrid<NewsPost>? _dataGrid;
+    private static readonly NewsPostComparer _comparer = new();
+
+    private static readonly Func<IQueryable<NewsPost>, IQueryable<NewsPost>> _includes =
+        x => x
+            .Include(p => p.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.HomeTeam)
+            .Include(p => p.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.AwayTeam)
+            .Include(p => p.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.Tournament)
+            .Include(p => p.Tags).ThenInclude(t => t.Account)
+            .Include(p => p.Tags).ThenInclude(t => t.Team)
+            .Include(p => p.Tags).ThenInclude(t => t.Tournament)
+            .Include(p => p.Tags).ThenInclude(t => t.Label);
+
+    private Task<NewsPost?> NewItemFunc() => Task.FromResult<NewsPost?>(new NewsPost());
+
+    // Runs before the grid persists: slugs are derived here so a blank slug never reaches the
+    // unique index, and PublishedAt is stamped the first time a post is published. Edited posts
+    // go first so an existing permalink is never bumped aside by a new post with the same title.
+    private async Task PrepareForSave(ChangeTracker<NewsPost> tracker)
+    {
+        var posts = tracker.EditItems.Concat(tracker.NewItems).ToList();
+        if (posts.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var post in posts)
+        {
+            post.Title = post.Title.Trim();
+            post.Slug = SlugGenerator.Generate(string.IsNullOrWhiteSpace(post.Slug) ? post.Title : post.Slug);
+
+            if (post.IsPublished && post.PublishedAt is null)
+            {
+                post.PublishedAt = DateTime.UtcNow;
+            }
+        }
+
+        var candidates = posts.Select(p => new SlugCandidate(p.Id, p.Slug)).ToList();
+        var reserved = await NewsPostService.ReserveSlugsAsync(candidates);
+        for (var i = 0; i < posts.Count; i++)
+        {
+            posts[i].Slug = reserved[i];
+        }
+    }
+
+    private async Task UpdateCoverImage(ImageUploadResult<NewsPost> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey))
+        {
+            return;
+        }
+
+        if (result.Item.Id == 0)
+        {
+            Snackbar.Add("Save the post before uploading a cover image.", Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            await NewsPostService.UpdateCoverImageAsync(result.Item.Id, result.NewKey);
+
+            // A later grid Save writes the row's scalars back, so the in-memory row must match the database.
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            result.Item.CoverImage = await dbContext.NewsPosts
+                .Where(p => p.Id == result.Item.Id)
+                .Select(p => p.CoverImage)
+                .FirstOrDefaultAsync();
+            Snackbar.Add("Cover image saved.", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to update cover image for news post {PostId}", result.Item.Id);
+            Snackbar.Add("The cover image could not be saved.", Severity.Error);
+        }
+    }
+
+    private async Task UpdateContent(NewsPost item, string? markdown)
+    {
+        // An unsaved row is inserted by the grid's batch save, so the content just rides along.
+        if (item.Id == 0)
+        {
+            item.MarkdownContent = markdown;
+            return;
+        }
+
+        try
+        {
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            var post = await dbContext.NewsPosts.FirstOrDefaultAsync(p => p.Id == item.Id);
+            if (post is null)
+            {
+                Snackbar.Add("This post no longer exists.", Severity.Error);
+                return;
+            }
+
+            post.MarkdownContent = markdown;
+            await dbContext.SaveChangesAsync();
+            // The live row is updated in place; a grid reload would orphan other pending edits.
+            item.MarkdownContent = markdown;
+            Snackbar.Add("Content saved.", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to save content for news post {PostId}", item.Id);
+            Snackbar.Add("The content could not be saved.", Severity.Error);
+        }
+    }
+
+}

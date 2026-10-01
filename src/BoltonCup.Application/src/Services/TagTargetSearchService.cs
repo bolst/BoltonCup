@@ -19,6 +19,7 @@ class TagTargetSearchService(IDbContextFactory<BoltonCupDbContext> _dbContextFac
         TagTargetType type,
         string? term,
         IReadOnlyCollection<int> excludeIds,
+        int? tournamentId = null,
         CancellationToken cancellationToken = default)
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
@@ -28,17 +29,22 @@ class TagTargetSearchService(IDbContextFactory<BoltonCupDbContext> _dbContextFac
         return type switch
         {
             TagTargetType.Game => await QueryAsync(
-                db.Games.AsNoTracking().Include(g => g.HomeTeam).Include(g => g.AwayTeam),
+                db.Games.AsNoTracking()
+                    .Include(g => g.HomeTeam)
+                    .Include(g => g.AwayTeam)
+                    .ConditionalWhere(g => g.TournamentId == tournamentId, tournamentId.HasValue),
                 g => (g.HomeTeam != null ? g.HomeTeam.Name : " ") + ' ' + (g.AwayTeam != null ? g.AwayTeam.Name : " "),
                 g => g.Id, excludeIds, term, cancellationToken),
 
             TagTargetType.Account => await QueryAsync(
-                db.Accounts.AsNoTracking(),
+                db.Accounts.AsNoTracking()
+                    .ConditionalWhere(a => db.Players.Any(p => p.AccountId == a.Id && p.TournamentId == tournamentId), tournamentId.HasValue),
                 a => a.FirstName + ' ' + a.LastName,
                 a => a.Id, excludeIds, term, cancellationToken),
 
             TagTargetType.Team => await QueryAsync(
-                db.Teams.AsNoTracking(), t => t.Name, t => t.Id, excludeIds, term, cancellationToken),
+                db.Teams.AsNoTracking().ConditionalWhere(t => t.TournamentId == tournamentId, tournamentId.HasValue),
+                t => t.Name, t => t.Id, excludeIds, term, cancellationToken),
 
             TagTargetType.Tournament => await QueryAsync(
                 db.Tournaments.AsNoTracking(), t => t.Name, t => t.Id, excludeIds, term, cancellationToken),

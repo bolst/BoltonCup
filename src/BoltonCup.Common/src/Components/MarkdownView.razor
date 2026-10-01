@@ -1,11 +1,19 @@
 @namespace BoltonCup.Common.Components
 
-<MudMarkdown Value="@Value" Props="_props" />
+@using Markdig
+
+<MudMarkdown Value="@Value" Props="_props" MarkdownPipeline="_pipeline" />
 
 @code {
 
     [Parameter]
     public string Value { get; set; } = string.Empty;
+
+    // Admin-authored Markdown reaches anonymous visitors, so raw HTML would be a stored-XSS sink.
+    private static readonly MarkdownPipeline _pipeline = new MarkdownPipelineBuilder()
+        .UseAdvancedExtensions()
+        .DisableHtml()
+        .Build();
 
     private static readonly MudMarkdownProps _props = new()
     {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BoltonCup.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BoltonCup.Persistence.Migrations
 {
     [DbContext(typeof(BoltonCupDbContext))]
-    partial class BoltonCupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260914001823_AddNewsPosts")]
+    partial class AddNewsPosts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1521,10 +1524,7 @@ namespace BoltonCup.Persistence.Migrations
 
                     b.HasIndex("IsPublished", "PublishedAt");
 
-                    b.ToTable("news_posts", "core", t =>
-                        {
-                            t.HasCheckConstraint("CK_news_posts_published_has_date", "NOT is_published OR published_at IS NOT NULL");
-                        });
+                    b.ToTable("news_posts", "core");
                 });
 
             modelBuilder.Entity("BoltonCup.Core.NewsPostTag", b =>

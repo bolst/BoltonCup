@@ -7,6 +7,7 @@ using BoltonCup.Persistence.Data;
 using BoltonCup.Application.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using MudBlazor;
 using MudBlazor.State;
 using MudBlazor.Utilities;
@@ -58,6 +59,12 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
 
     [Inject]
     internal TournamentStateService TournamentState { get; set; } = null!;
+
+    [Inject]
+    internal ISnackbar Snackbar { get; set; } = null!;
+
+    [Inject]
+    internal ILogger<EntityDataGrid<T>> Logger { get; set; } = null!;
 
     protected override void OnInitialized()
     {
@@ -290,11 +297,43 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
             return;
         }
 
+        try
+        {
+            await PersistAsync();
+        }
+        catch (DbUpdateException e) when (IsUniqueViolation(e))
+        {
+            // Another writer took a unique value between OnSave and commit. OnSave re-derives
+            // anything it computes (slugs, for one), so a single retry resolves the common race.
+            try
+            {
+                await PersistAsync();
+            }
+            catch (DbUpdateException retry) when (IsUniqueViolation(retry))
+            {
+                Logger.LogWarning(retry, "Save hit a unique constraint twice; pending changes kept for the user");
+                Snackbar.Add("A value must be unique and is already in use. Adjust it and save again.", Severity.Error);
+                return;
+            }
+        }
+        catch (DbUpdateException e)
+        {
+            Logger.LogError(e, "Failed to save grid changes for {EntityType}", typeof(T).Name);
+            Snackbar.Add("Changes could not be saved.", Severity.Error);
+            return;
+        }
+
+        await _dataGrid.ReloadServerData();
+    }
+
+    async Task PersistAsync()
+    {
         await using var dbContext = await CreateDbContext();
         await OnSave.InvokeAsync(_changeTracker);
         await _changeTracker.SaveChangesAsync(dbContext);
-        await _dataGrid.ReloadServerData();
     }
+
+    static bool IsUniqueViolation(DbUpdateException e) => e.InnerException is PostgresException { SqlState: "23505" };
 
     public async Task RevertChangesAsync()
     {

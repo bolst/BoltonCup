@@ -9631,6 +9631,268 @@
         ]
       }
     },
+    "/api/news": {
+      "get": {
+        "tags": [
+          "News"
+        ],
+        "description": "Gets a paginated list of published news posts, newest first.\n\nGets a paginated list of published news posts, newest first. Pass `label` to keep only\nposts tagged with that label, e.g. `Game Highlights`.",
+        "operationId": "GetNewsPosts",
+        "parameters": [
+          {
+            "name": "Label",
+            "in": "query",
+            "description": "When set, only posts tagged with a label of this name (case-insensitive).",
+            "schema": {
+              "maxLength": 64,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "Gets or sets the 1-based page number to retrieve.",
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Size",
+            "in": "query",
+            "description": "Gets or sets the number of items per page.",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SortBy",
+            "in": "query",
+            "description": "Gets or sets the field name to sort results by.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Descending",
+            "in": "query",
+            "description": "Gets or sets whether to sort results in descending order.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsPostDtoIPagedList"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsPostDtoIPagedList"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsPostDtoIPagedList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/news/{slug}": {
+      "get": {
+        "tags": [
+          "News"
+        ],
+        "description": "Gets a single published news post by its URL slug.\n\nGets a single published news post by its URL slug.",
+        "operationId": "GetNewsPostBySlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsPostSingleDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsPostSingleDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsPostSingleDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/players": {
       "get": {
         "tags": [
@@ -16599,6 +16861,137 @@
         ],
         "type": "string"
       },
+      "NewsPostDto": {
+        "required": [
+          "id",
+          "slug",
+          "tags",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets the unique identifier of the post.",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "Gets the title of the post."
+          },
+          "slug": {
+            "type": "string",
+            "description": "Gets the URL slug of the post."
+          },
+          "summary": {
+            "type": "string",
+            "description": "Gets the short summary shown in lists.",
+            "nullable": true
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "description": "Gets the absolute URL of the cover image, if any.",
+            "nullable": true
+          },
+          "publishedAt": {
+            "type": "string",
+            "description": "Gets when the post was published (UTC).",
+            "format": "date-time",
+            "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagDto"
+            },
+            "description": "Gets the tags on the post: labels, teams, tournaments, games or accounts."
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a published news post in a list."
+      },
+      "NewsPostDtoIPagedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NewsPostDto"
+            },
+            "readOnly": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NewsPostSingleDto": {
+        "required": [
+          "id",
+          "slug",
+          "tags",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets the unique identifier of the post.",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "Gets the title of the post."
+          },
+          "slug": {
+            "type": "string",
+            "description": "Gets the URL slug of the post."
+          },
+          "summary": {
+            "type": "string",
+            "description": "Gets the short summary shown in lists.",
+            "nullable": true
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "description": "Gets the absolute URL of the cover image, if any.",
+            "nullable": true
+          },
+          "publishedAt": {
+            "type": "string",
+            "description": "Gets when the post was published (UTC).",
+            "format": "date-time",
+            "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagDto"
+            },
+            "description": "Gets the tags on the post: labels, teams, tournaments, games or accounts."
+          },
+          "markdownContent": {
+            "type": "string",
+            "description": "Gets the Markdown body of the post.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single news post, including its Markdown content."
+      },
       "PaymentBreakdown": {
         "type": "object",
         "properties": {
@@ -17940,6 +18333,51 @@
         },
         "additionalProperties": false,
         "description": "Contains the system-wide contextual data returned by the context endpoint."
+      },
+      "TagDto": {
+        "required": [
+          "id",
+          "name",
+          "targetId",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets the unique identifier of the tag row.",
+            "format": "int32"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TagTargetType"
+              }
+            ],
+            "description": "Gets the kind of entity this tag points at."
+          },
+          "targetId": {
+            "type": "integer",
+            "description": "Gets the identifier of the target entity.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Gets the display name of the target, e.g. a team name or label text."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A tag on a subject entity, resolved to a display name."
+      },
+      "TagTargetType": {
+        "enum": [
+          "Game",
+          "Account",
+          "Team",
+          "Tournament",
+          "Label"
+        ],
+        "type": "string"
       },
       "TeamBriefDto": {
         "type": "object",
@@ -19343,6 +19781,9 @@
     },
     {
       "name": "Music"
+    },
+    {
+      "name": "News"
     },
     {
       "name": "Players"
