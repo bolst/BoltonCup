@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "BoltonCup.WebClient",
   "resources": {
-    "hash": "sha256-WhI8N/ZXHnWziBt6jDfsohxHWTcAzyEfdcWVeBNauJk=",
+    "hash": "sha256-JElHtQvGWWmWmneF0r6q0A0rr0d3EQzBJ+ygNXyY8pg=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-sQY0gPyVGnnABVL1btej2CbERWILMK88Fii3a74lOWk="
     },
@@ -46,7 +46,7 @@
       "Microsoft.Extensions.Primitives.wasm": "sha256-P/lvQNtw5OGg/LmiJbGjChsT9rWxwajIHSkba1zjvP8=",
       "Microsoft.JSInterop.wasm": "sha256-dLzE60J/egMCJIoiprlz2RyciGLf0+jf6cCbhiTz+Dw=",
       "Microsoft.JSInterop.WebAssembly.wasm": "sha256-TplcIBSDaMIlHA+3iXNGfB8ku2SLcF+MCaXCrn+6fSw=",
-      "MudBlazor.wasm": "sha256-xTF+ffpwzZyNIkp+gsl/4PY/0QpMg2/shV3fxb4aTf4=",
+      "MudBlazor.wasm": "sha256-/VybQoB6GE8Yf++4LwX7eayjrUepmVXQT9im583LxO8=",
       "MudBlazor.Markdown.wasm": "sha256-E8B2H26EwPr6nYQi5cuubia/IFzZA5L1VVIZL7gsWmA=",
       "Sentry.wasm": "sha256-eVK/9gn+9k0tGLwL8TPpRwnFM6cZ1S37w121FacHPes=",
       "Sentry.AspNetCore.Blazor.WebAssembly.wasm": "sha256-hHhVsHFzIJ12vrmdVeVz7JBd+QKMXf7MWC3Zql7DJ3U=",
@@ -82,7 +82,7 @@
       "System.Runtime.InteropServices.wasm": "sha256-jQJir6eohbnAData2Ij16OEps3QmZm4ScL/QUwzwobk=",
       "System.Runtime.Numerics.wasm": "sha256-fqUnZQgUTh6kfWxiyOsCRP/2MYblReEazzv5ZTuxGKk=",
       "System.Runtime.Serialization.Primitives.wasm": "sha256-SLgeXiT/Gck7NxQphoJxVXMseSlM+lA5vKmU38XB9xI=",
-      "System.Runtime.wasm": "sha256-x/z86RP1xm9kdfRsH37O2kqGWQLMTcRNmP+ncf+n1Ns=",
+      "System.Runtime.wasm": "sha256-knqjCTVxYJMVMvCCfgF7amdaZ1hIFSP2y303LzI9SyQ=",
       "System.Security.Claims.wasm": "sha256-1JvY2rfM3U62FCpfrcNVNdqnvurR23mM0jQnRvPoCNQ=",
       "System.Security.Cryptography.wasm": "sha256-fs4+/UTJGGi9pX/bBrzS5gxgqiqA+vb+Uj1VrhfoH80=",
       "System.Text.Encodings.Web.wasm": "sha256-vgGDP1v1Tu+MtdMssIM8UejI0PWBxkDvdLbuA3lyWlk=",
@@ -92,11 +92,11 @@
       "System.wasm": "sha256-1luKvPmMGcjC9JPzmrtFC2En/NM4Qzkg7Syt5bEUqZY=",
       "netstandard.wasm": "sha256-EawLgZEh1B3KOMmyzy9/bnltzKqyNcqB3k90hhn2s1Q=",
       "System.Private.CoreLib.wasm": "sha256-GpxbKWVE9JiwH/KqGdRjFoC8lZ09iuCgHSs1GJHFPvY=",
-      "BoltonCup.Common.wasm": "sha256-/rGyW4TOhgn4LblW3AeCoDFcQEP4rTLNNcp7H/2nuUA=",
-      "BoltonCup.Core.wasm": "sha256-OwUy23mjfJXboo56mA21zDqJq0QLmoz+ixQzbDy55ow=",
-      "BoltonCup.Shared.wasm": "sha256-T7B5qZpLwOda0EK+vMTfdLeng1Vmlk329cj048916Mo=",
-      "BoltonCup.WebAPI.Client.wasm": "sha256-Ak1CIppeonWeM3dNHQThKCeS69zb1HHZmsd87pbAViM=",
-      "BoltonCup.WebClient.wasm": "sha256-wG2HHeIqRzT+QP39LtGEhAc7TEYtdn3AVqqXjQBHb5A="
+      "BoltonCup.Common.wasm": "sha256-g8rbP/fEPQzPTz+mGbQ6mKquVCm6TrrzTEGNHCnDlww=",
+      "BoltonCup.Core.wasm": "sha256-lHryDSl3QXAEof/Qpw0Mi34qKgIQqw5NuhKqX4dy8EI=",
+      "BoltonCup.Shared.wasm": "sha256-vVNUhUgiYcuQ28yDscoV3r5v2+NzpcJPBnktsIwWIYU=",
+      "BoltonCup.WebAPI.Client.wasm": "sha256-VwWWSa36QoSWAkRN/b0Af+U+6zjJG4O93t6yXwkux48=",
+      "BoltonCup.WebClient.wasm": "sha256-L1X5UFdka8S2T86yv1WznTBFuXNUEx18RbpcMNty4uk="
     }
   },
   "cacheBootResources": true,
