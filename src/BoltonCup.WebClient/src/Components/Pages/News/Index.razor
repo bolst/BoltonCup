@@ -1,5 +1,6 @@
 @page "/news"
-@attribute [Sitemap(SitemapChangeFrequency.Weekly, Priority = 0.8f, LastModified = "2026-09-13")]
+@* @attribute [Sitemap(SitemapChangeFrequency.Weekly, Priority = 0.8f, LastModified = "2026-09-13")] *@
+@attribute [SitemapIgnore]
 @inject IBoltonCupApi BoltonCupApi
 @inject ILogger<Index> Logger
 @inject ISnackbar Snackbar
