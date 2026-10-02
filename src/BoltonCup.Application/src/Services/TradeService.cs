@@ -19,7 +19,8 @@ class TradeService(
     IEmailer _emailer,
     ISmsSender _smsSender,
     UserManager<BoltonCupUser> _userManager,
-    IOptions<TradeNotificationSettings> _notificationOptions
+    IOptions<TradeNotificationSettings> _notificationOptions,
+    ITelemetry _telemetry
 ) : ITradeService
 {
     const string SiteBaseUrl = "https://boltoncup.ca";
@@ -136,6 +137,7 @@ class TradeService(
         _dbContext.Trades.Add(trade);
         await _dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
+        _telemetry.TrackEvent("trade.created", "trade.id", trade.Id, "tournament.id", command.TournamentId, "trade.proposing_team.id", command.ProposingTeamId, "trade.receiving_team.id", command.ReceivingTeamId);
 
         trade.ProposingTeam = proposingTeam;
         trade.ReceivingTeam = receivingTeam;
@@ -213,6 +215,7 @@ class TradeService(
         trade.RespondedByAccountId = accountId;
         trade.RespondedAt = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync(cancellationToken);
+        _telemetry.TrackEvent("trade.accepted", "trade.id", tradeId, "account.id", accountId);
 
         if (EmailEnabled)
         {
@@ -298,6 +301,7 @@ class TradeService(
         ReleasePlayers(trade);
         await _dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
+        _telemetry.TrackEvent("trade.approved", "trade.id", tradeId, "account.id", accountId);
 
         if (EmailEnabled)
         {

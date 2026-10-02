@@ -12,6 +12,7 @@ COPY ["BoltonCup.Application/src/BoltonCup.Application.csproj", "BoltonCup.Appli
 COPY ["BoltonCup.Shared/src/BoltonCup.Shared.csproj", "BoltonCup.Shared/src/"]
 COPY ["BoltonCup.Integrations/src/BoltonCup.Integrations.csproj", "BoltonCup.Integrations/src/"]
 COPY ["BoltonCup.Persistence/src/BoltonCup.Persistence.csproj", "BoltonCup.Persistence/src/"]
+COPY ["BoltonCup.Telemetry/src/BoltonCup.Telemetry.csproj", "BoltonCup.Telemetry/src/"]
 RUN dotnet restore "BoltonCup.WebAPI/src/BoltonCup.WebAPI.csproj"
 COPY . .
 WORKDIR "/src/BoltonCup.WebAPI/src"

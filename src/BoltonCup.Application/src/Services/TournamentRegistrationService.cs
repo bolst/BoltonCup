@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
 
-class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITournamentRegistrationService
+class TournamentRegistrationService(BoltonCupDbContext _dbContext, ITelemetry _telemetry) : ITournamentRegistrationService
 {
     public async Task<TournamentRegistration?> GetAsync(int tournamentId, int accountId,
         CancellationToken cancellationToken = default) => await _dbContext.TournamentRegistrations
@@ -92,6 +92,7 @@ class TournamentRegistrationService(BoltonCupDbContext _dbContext) : ITournament
         _dbContext.Players.Add(player);
         await _dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
+        _telemetry.TrackEvent("registration.completed", "tournament.id", tournamentId, "account.id", accountId);
     }
 
     public async Task<TournamentPaymentPreparation> PrepareTournamentPaymentAsync(int tournamentId, int accountId, bool isGoalie,

@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Diagnostics;
+using BoltonCup.Core;
 
 namespace BoltonCup.WebAPI.Errors;
 
 /// <summary>Handles known BoltonCup domain exceptions and converts them to structured problem-detail responses.</summary>
-public sealed class BoltonCupExceptionHandler(
-    ILogger<BoltonCupExceptionHandler> _logger,
-    IHub _sentryHub
-) : IExceptionHandler
+public sealed class BoltonCupExceptionHandler(ITelemetry _telemetry) : IExceptionHandler
 {
     /// <inheritdoc/>
     public async ValueTask<bool> TryHandleAsync(
@@ -19,17 +17,10 @@ public sealed class BoltonCupExceptionHandler(
             return false;
         }
 
-        _logger.LogWarning(exception, "Bolton Cup exception: {Type}", exception.GetType().Name);
-
-        // log to sentry
-        _sentryHub.CaptureException(exception, scope =>
-        {
-            scope.Level = SentryLevel.Warning;
-            scope.SetExtra("Problem.Type", problem.Type);
-            scope.SetExtra("Problem.Status", problem.Status);
-            scope.SetExtra("Problem.Title", problem.Title);
-            scope.SetExtra("Problem.Detail", problem.Detail);
-        });
+        _telemetry.TrackHandledException(exception,
+            "problem.type", problem.Type,
+            "problem.status", problem.Status,
+            "problem.title", problem.Title);
 
         context.Response.StatusCode = problem.Status ?? StatusCodes.Status500InternalServerError;
         await context.Response.WriteAsJsonAsync(problem, cancellationToken);

@@ -1,9 +1,11 @@
 using BoltonCup.Application;
 using BoltonCup.Persistence.Identity;
 using BoltonCup.Shared;
+using BoltonCup.Telemetry;
 using BoltonCup.WebAPI;
 using BoltonCup.WebAPI.Auth;
 using BoltonCup.WebAPI.Controllers;
+using BoltonCup.WebAPI.Errors;
 using BoltonCup.WebAPI.Hubs;
 using BoltonCup.WebAPI.Swagger;
 using Microsoft.OpenApi;
@@ -12,8 +14,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Sentry
-builder.WebHost.UseSentry();
+builder.AddBoltonCupTelemetry("boltoncup-webapi", exception => BoltonCupExceptionMappings.GetProblemDetails(exception) is not null);
 
 builder.Services.AddIdentityApiEndpoints<BoltonCupUser>();
 
@@ -83,6 +84,8 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+app.UseBoltonCupTelemetry();
+
 await app.Services.InitializeBoltonCupDatabaseAsync(app.Configuration);
 
 // Configure the HTTP request pipeline.
@@ -138,8 +141,5 @@ app.MapGet("/health", () => Results.Ok(new
     status = "healthy"
 }))
     .AllowAnonymous();
-
-// Sentry
-app.UseSentryTracing();
 
 app.Run();

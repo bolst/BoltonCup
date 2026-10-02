@@ -5,6 +5,7 @@ using BoltonCup.Core.Values;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Persistence.Identity;
 using BoltonCup.Application.Services;
+using BoltonCup.Application.Tests.Telemetry;
 using BoltonCup.Application.Settings;
 using BoltonCup.Integrations.Email;
 using BoltonCup.Integrations.Sms;
@@ -49,7 +50,7 @@ public class TradeServiceTests
         emailer = new Mock<IEmailer>();
         sms = new Mock<ISmsSender>();
         var options = Options.Create(new TradeNotificationSettings { EmailEnabled = emailEnabled });
-        return new TradeService(db, new RosterValidator(), emailer.Object, sms.Object, EmptyAdminUserManager(), options);
+        return new TradeService(db, new RosterValidator(), emailer.Object, sms.Object, EmptyAdminUserManager(), options, TestTelemetry.Instance);
     }
 
     /// <summary>Seeds a tournament with two teams (each with a GM) and N players per team.</summary>

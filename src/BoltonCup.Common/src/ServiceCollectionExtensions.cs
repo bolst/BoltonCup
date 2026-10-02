@@ -56,9 +56,9 @@ public static class ServiceCollectionExtensions
     {
         return logging.AddSentry(options =>
         {
-            options.Dsn = configuration["Sentry::Dsn"] ?? string.Empty;
+            options.Dsn = configuration["Sentry:Dsn"] ?? string.Empty;
             options.TracesSampleRate = 1.0;
-            if (configuration["BoltonCup::ApiBaseUrl"] is { } apiBaseUrl)
+            if (configuration["BoltonCup:ApiBaseUrl"] is { } apiBaseUrl)
             {
                 options.TracePropagationTargets.Add(apiBaseUrl);
             }
