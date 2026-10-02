@@ -30,7 +30,6 @@
         </PackageReference>
         <PackageReference Include="Microsoft.OpenApi" Version="2.4.1" />
         <PackageReference Include="Scalar.AspNetCore" Version="2.11.0" />
-        <PackageReference Include="Sentry.AspNetCore" Version="6.3.0" />
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.0.1" />
     </ItemGroup>
 
@@ -38,7 +37,18 @@
       <ProjectReference Include="..\..\BoltonCup.Core\src\BoltonCup.Core.csproj" />
       <ProjectReference Include="..\..\BoltonCup.Application\src\BoltonCup.Application.csproj" />
       <ProjectReference Include="..\..\BoltonCup.Shared\src\BoltonCup.Shared.csproj" />
+      <ProjectReference Include="..\..\BoltonCup.Telemetry\src\BoltonCup.Telemetry.csproj" />
     </ItemGroup>
+
+    <!--
+        BoltonCup.Telemetry hides Sentry's compile assets, but the SDK still flows Sentry's source generator,
+        whose output needs them.
+    -->
+    <Target Name="RemoveTransitiveSentryGenerator" BeforeTargets="CoreCompile">
+        <ItemGroup>
+            <Analyzer Remove="@(Analyzer)" Condition="'%(Analyzer.NuGetPackageId)' == 'Sentry'" />
+        </ItemGroup>
+    </Target>
 
     <ItemGroup>
       <Content Include="..\..\.dockerignore">

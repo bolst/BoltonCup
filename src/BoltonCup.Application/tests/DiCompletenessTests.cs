@@ -51,6 +51,12 @@ public class DiCompletenessTests
         Provider.GetService(coreInterface).Should().NotBeNull($"{coreInterface.Name} should be registered in DI");
     }
 
+    [Fact]
+    public void Telemetry_ResolvesFromDi()
+    {
+        Provider.GetService<ITelemetry>().Should().NotBeNull();
+    }
+
     [Theory]
     [InlineData(typeof(ITagService<HighlightTag>))]
     [InlineData(typeof(ITagService<NewsPostTag>))]

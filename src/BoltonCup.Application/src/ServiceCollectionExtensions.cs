@@ -1,6 +1,7 @@
 using BoltonCup.Core;
 using BoltonCup.Application.Services;
 using BoltonCup.Application.Settings;
+using BoltonCup.Application.Telemetry;
 using BoltonCup.Integrations;
 using BoltonCup.Persistence;
 using BoltonCup.Persistence.Data;
@@ -20,6 +21,7 @@ public static class ServiceCollectionExtensions
         builder.AddBoltonCupIntegrations();
 
         builder.Services.AddMemoryCache();
+        builder.Services.AddSingleton<ITelemetry, ActivityTelemetry>();
 
         RegisterByConvention(builder.Services, typeof(AccountService).Assembly, "Service");
 

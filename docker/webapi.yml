@@ -37,5 +37,10 @@ services:
       Twilio__FromPhoneNumber: ${TWILIO_FROM_PHONE_NUMBER:-}
       TradeNotifications__EmailEnabled: ${TRADE_NOTIFICATION_EMAILS_ENABLED:-false}
       Sentry__Dsn: ${SENTRY_DSN:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      BoltonCup__Telemetry__OtlpHeaders: ${OTLP_HEADERS:-}
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL:-grpc}
+      OTEL_TRACES_SAMPLER: ${OTEL_TRACES_SAMPLER:-parentbased_always_on}
+      OTEL_TRACES_SAMPLER_ARG: ${OTEL_TRACES_SAMPLER_ARG:-1.0}
       Spotify__ClientId: ${SPOTIFY_CLIENT_ID:-}
       Spotify__ClientSecret: ${SPOTIFY_CLIENT_SECRET:-}

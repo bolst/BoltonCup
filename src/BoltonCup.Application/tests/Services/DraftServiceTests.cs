@@ -3,9 +3,11 @@ using BoltonCup.Core.Commands;
 using BoltonCup.Core.Values;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Application.Services;
+using BoltonCup.Application.Tests.Telemetry;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Moq;
 using Xunit;
 
 namespace BoltonCup.Application.Tests.Services;
@@ -135,7 +137,7 @@ public class DraftServiceTests
     public async Task SetPlayerPoolAsync_ExcludingPlayers_RegeneratesPicksAndRounds()
     {
         var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 2, playerCount: 6, DraftStatus.Pending);
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
 
         var excluded = new[] { playerIds[4], playerIds[5] };
 
@@ -157,7 +159,7 @@ public class DraftServiceTests
         var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 2, playerCount: 6, DraftStatus.Pending);
         draft.DefaultCustomRankingId = 99;
         await db.SaveChangesAsync();
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
 
         var rankingsBefore = await db.PlayerDraftRankings
             .Where(r => r.DraftId == draft.Id)
@@ -179,7 +181,7 @@ public class DraftServiceTests
     public async Task SetPlayerPoolAsync_ReincludingPlayer_RestoresPickCount()
     {
         var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 2, playerCount: 6, DraftStatus.Pending);
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
 
         await service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(new[] { playerIds[5] }));
         await service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(Array.Empty<int>()));
@@ -194,7 +196,7 @@ public class DraftServiceTests
     public async Task SetPlayerPoolAsync_WhenNotPending_Throws()
     {
         var (db, draft, playerIds, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.InProgress);
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
 
         var act = () => service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(new[] { playerIds[0] }));
 
@@ -205,7 +207,7 @@ public class DraftServiceTests
     public async Task SetPlayerPoolAsync_WhenExcludingUnknownPlayer_Throws()
     {
         var (db, draft, _, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.Pending);
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
 
         var act = () => service.SetPlayerPoolAsync(draft.Id, new SetPlayerPoolCommand(new[] { 9999 }));
 
@@ -223,7 +225,7 @@ public class DraftServiceTests
         await MakePickAsync(db, picks[1], playerIds[1], isAuto: true);
         await MakePickAsync(db, picks[2], playerIds[2], isAuto: true);
 
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
         var state = await service.UndoLastPickAsync(draft.Id);
 
         var refreshedPicks = await db.DraftPicks.Where(p => p.DraftId == draft.Id).OrderBy(p => p.OverallPick).ToListAsync();
@@ -248,7 +250,7 @@ public class DraftServiceTests
         await MakePickAsync(db, picks[0], playerIds[0], isAuto: true);
         await MakePickAsync(db, picks[1], playerIds[1], isAuto: true);
 
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
         await service.UndoLastPickAsync(draft.Id);
 
         var made = await db.DraftPicks.Where(p => p.DraftId == draft.Id && p.PlayerId != null).ToListAsync();
@@ -264,7 +266,7 @@ public class DraftServiceTests
         await MakePickAsync(db, picks[0], playerIds[0], isAuto: false);
         await MakePickAsync(db, picks[1], playerIds[1], isAuto: true);
 
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
         await service.UndoLastPickAsync(draft.Id);
 
         var refreshed = await db.Drafts.SingleAsync(d => d.Id == draft.Id);
@@ -278,7 +280,7 @@ public class DraftServiceTests
     public async Task UndoLastPickAsync_WhenNoPicksMade_Throws()
     {
         var (db, draft, _, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.InProgress);
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
 
         var act = () => service.UndoLastPickAsync(draft.Id);
 
@@ -295,7 +297,7 @@ public class DraftServiceTests
         await MakePickAsync(db, picks[1], playerIds[1], isAuto: true);
         await MakePickAsync(db, picks[2], playerIds[2], isAuto: false);
 
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
         var state = await service.ResetDraftAsync(draft.Id);
 
         var made = await db.DraftPicks.Where(p => p.DraftId == draft.Id && p.PlayerId != null).ToListAsync();
@@ -319,7 +321,7 @@ public class DraftServiceTests
         await MakePickAsync(db, picks[0], playerIds[0], isAuto: false);
         await MakePickAsync(db, picks[1], playerIds[1], isAuto: false);
 
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
         await service.ResetDraftAsync(draft.Id);
 
         var refreshed = await db.Drafts.SingleAsync(d => d.Id == draft.Id);
@@ -333,7 +335,7 @@ public class DraftServiceTests
     public async Task ResetDraftAsync_WhenNoPicksMade_Throws()
     {
         var (db, draft, _, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.InProgress);
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
 
         var act = () => service.ResetDraftAsync(draft.Id);
 
@@ -346,7 +348,7 @@ public class DraftServiceTests
         var (db, draft, _, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.Pending);
         AddLateRegistrant(db, playerId: 5, accountId: 5);
         await db.SaveChangesAsync();
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
 
         await service.ReconcileDraftPoolAsync(draft.Id);
 
@@ -364,7 +366,7 @@ public class DraftServiceTests
         var (db, draft, _, _) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.InProgress);
         AddLateRegistrant(db, playerId: 5, accountId: 5);
         await db.SaveChangesAsync();
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
 
         await service.ReconcileDraftPoolAsync(draft.Id);
 
@@ -429,7 +431,7 @@ public class DraftServiceTests
         }
         await db.SaveChangesAsync();
 
-        var service = new DraftService(db);
+        var service = new DraftService(db, TestTelemetry.Instance);
         var draftId = await service.CreateAsync(new CreateDraftCommand(1, "Test Draft", null));
 
         var rankings = await db.PlayerDraftRankings.Where(r => r.DraftId == draftId).ToListAsync();
@@ -437,6 +439,24 @@ public class DraftServiceTests
         gmRanking.IsExcluded.Should().BeTrue();
         gmRanking.DraftRanking.Should().Be(rankings.Count); // GM sorted last
         rankings.Where(r => r.PlayerId != 3).Should().OnlyContain(r => !r.IsExcluded);
+    }
+
+    [Fact]
+    public async Task DraftPlayerAsync_WhenDraftNotInProgress_MarksPickOperationFailed()
+    {
+        var (db, draft, playerIds, teamIds) = await SeedDraftAsync(teamCount: 2, playerCount: 4, DraftStatus.Pending);
+        var operation = new Mock<IOperationScope>();
+        var telemetry = new Mock<ITelemetry>();
+        telemetry.Setup(t => t.StartOperation("draft.pick", It.IsAny<object?[]>()))
+            .Returns(operation.Object);
+        var service = new DraftService(db, telemetry.Object);
+
+        var act = () => service.DraftPlayerAsync(new DraftPlayerCommand(draft.Id, playerIds[0], teamIds[0], OverallPick: 1));
+
+        await act.Should().ThrowAsync<InvalidOperationException>();
+        operation.Verify(o => o.Fail(It.IsAny<InvalidOperationException>()), Times.Once);
+        operation.Verify(o => o.Dispose(), Times.Once);
+        telemetry.Verify(t => t.TrackEvent(It.IsAny<string>(), It.IsAny<object?[]>()), Times.Never);
     }
 
     static void AddLateRegistrant(BoltonCupDbContext db, int playerId, int accountId)

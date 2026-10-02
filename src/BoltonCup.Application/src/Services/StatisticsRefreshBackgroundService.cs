@@ -10,7 +10,11 @@ namespace BoltonCup.Application.Services;
 /// one) and then once every 24 hours as a safety net, since <see cref="IStatisticsRefreshService"/> is
 /// otherwise only refreshed on demand (game writes, the manual Admin trigger).
 /// </summary>
-public class StatisticsRefreshBackgroundService(IServiceProvider _serviceProvider, ILogger<StatisticsRefreshBackgroundService> _logger)
+public class StatisticsRefreshBackgroundService(
+    IServiceProvider _serviceProvider,
+    ITelemetry _telemetry,
+    ILogger<StatisticsRefreshBackgroundService> _logger
+)
     : BackgroundService
 {
     static readonly TimeSpan RefreshInterval = TimeSpan.FromDays(1);
@@ -21,6 +25,7 @@ public class StatisticsRefreshBackgroundService(IServiceProvider _serviceProvide
 
         do
         {
+            using var operation = _telemetry.StartOperation("statistics.refresh");
             try
             {
                 using var scope = _serviceProvider.CreateScope();
@@ -33,6 +38,7 @@ public class StatisticsRefreshBackgroundService(IServiceProvider _serviceProvide
             }
             catch (Exception ex)
             {
+                operation.Fail(ex);
                 _logger.LogError(ex, "Failed to refresh statistics.");
             }
         } while (await timer.WaitForNextTickAsync(stoppingToken));

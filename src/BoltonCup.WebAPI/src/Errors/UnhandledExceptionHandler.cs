@@ -1,14 +1,12 @@
 using Microsoft.AspNetCore.Diagnostics;
+using BoltonCup.Core;
 using BoltonCup.Shared;
 
 namespace BoltonCup.WebAPI.Errors;
 
 // we shall handle the unhandled
 /// <summary>Catches all unhandled exceptions and returns a generic 500 problem-detail response.</summary>
-public sealed class UnhandledExceptionHandler(
-    ILogger<UnhandledExceptionHandler> _logger,
-    IHub _sentryHub
-) : IExceptionHandler
+public sealed class UnhandledExceptionHandler(ITelemetry _telemetry) : IExceptionHandler
 {
     /// <inheritdoc/>
     public async ValueTask<bool> TryHandleAsync(
@@ -16,8 +14,6 @@ public sealed class UnhandledExceptionHandler(
         Exception exception,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "Unhandled exception");
-
         var problemDetails = new BoltonCupProblemDetails
         {
             Type = ErrorTypes.Unexpected,
@@ -26,12 +22,7 @@ public sealed class UnhandledExceptionHandler(
             Instance = context.TraceIdentifier
         };
 
-        // log to sentry
-        _sentryHub.CaptureException(exception, scope =>
-        {
-            scope.SetTag("ErrorType", problemDetails.Type);
-            scope.SetExtra("TraceIdentifier", context.TraceIdentifier);
-        });
+        _telemetry.TrackException(exception, "error.type", problemDetails.Type, "http.trace_identifier", context.TraceIdentifier);
 
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken);

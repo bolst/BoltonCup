@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <SentryImplicitUsings>false</SentryImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <!--
+        PrivateAssets="compile" lets the runtime assemblies flow to consumers while keeping vendor types off their
+        compile path, so only this project can reference OpenTelemetry or Sentry.
+    -->
+    <ItemGroup>
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.19.1" PrivateAssets="compile;contentfiles;analyzers;build;buildtransitive" />
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.19.1" PrivateAssets="compile;contentfiles;analyzers;build;buildtransitive" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.19.0" PrivateAssets="compile;contentfiles;analyzers;build;buildtransitive" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.19.0" PrivateAssets="compile;contentfiles;analyzers;build;buildtransitive" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.19.0" PrivateAssets="compile;contentfiles;analyzers;build;buildtransitive" />
+        <PackageReference Include="Sentry.AspNetCore" Version="6.11.1" PrivateAssets="compile;contentfiles;analyzers;build;buildtransitive" />
+        <PackageReference Include="Sentry.OpenTelemetry.Exporter" Version="6.11.1" PrivateAssets="compile;contentfiles;analyzers;build;buildtransitive" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\BoltonCup.Core\src\BoltonCup.Core.csproj" />
+        <ProjectReference Include="..\..\BoltonCup.Shared\src\BoltonCup.Shared.csproj" />
+    </ItemGroup>
+
+</Project>

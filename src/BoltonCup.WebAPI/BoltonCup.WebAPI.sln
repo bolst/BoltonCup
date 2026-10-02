@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Common", "..\Bolt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.WebAPI.Client", "..\BoltonCup.WebAPI.Client\src\BoltonCup.WebAPI.Client.csproj", "{CDFB63C6-B7EA-4BBB-A504-FEAA205B8374}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoltonCup.Telemetry", "..\BoltonCup.Telemetry\src\BoltonCup.Telemetry.csproj", "{5EAFFA35-A262-4E9C-AD2A-510F54C59063}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -139,6 +141,18 @@ Global
 		{CDFB63C6-B7EA-4BBB-A504-FEAA205B8374}.Release|x64.Build.0 = Release|Any CPU
 		{CDFB63C6-B7EA-4BBB-A504-FEAA205B8374}.Release|x86.ActiveCfg = Release|Any CPU
 		{CDFB63C6-B7EA-4BBB-A504-FEAA205B8374}.Release|x86.Build.0 = Release|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Debug|x64.Build.0 = Debug|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Debug|x86.Build.0 = Debug|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Release|x64.ActiveCfg = Release|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Release|x64.Build.0 = Release|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Release|x86.ActiveCfg = Release|Any CPU
+		{5EAFFA35-A262-4E9C-AD2A-510F54C59063}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

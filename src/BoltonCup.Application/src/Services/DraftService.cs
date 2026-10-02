@@ -13,6 +13,7 @@ namespace BoltonCup.Application.Services;
 
 class DraftService(
     BoltonCupDbContext _dbContext,
+    ITelemetry _telemetry,
     IConfiguration? _configuration = null
 ) : IDraftService
 {
@@ -376,6 +377,7 @@ class DraftService(
         currentPick?.ClockStartedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+        _telemetry.TrackEvent("draft.started", "draft.id", draftId);
     }
 
     public async Task PauseAsync(int draftId, CancellationToken cancellationToken = default)
@@ -391,6 +393,7 @@ class DraftService(
 
         draft.Status = DraftStatus.Paused;
         await _dbContext.SaveChangesAsync(cancellationToken);
+        _telemetry.TrackEvent("draft.paused", "draft.id", draftId);
     }
 
     public async Task EndAsync(int draftId, CancellationToken cancellationToken = default)
@@ -401,6 +404,7 @@ class DraftService(
 
         draft.Status = DraftStatus.Completed;
         await _dbContext.SaveChangesAsync(cancellationToken);
+        _telemetry.TrackEvent("draft.ended", "draft.id", draftId);
     }
 
     public Task DeleteAsync(int id, CancellationToken cancellationToken = default) => _dbContext.Drafts
@@ -551,7 +555,10 @@ class DraftService(
     }
 
 
-    public async Task<CurrentDraftStateWithPick> DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default)
+    public Task<CurrentDraftStateWithPick> DraftPlayerAsync(DraftPlayerCommand command, CancellationToken cancellationToken = default) =>
+        _telemetry.MeasureAsync("draft.pick", () => DraftPlayerCoreAsync(command, cancellationToken), "draft.id", command.DraftId);
+
+    async Task<CurrentDraftStateWithPick> DraftPlayerCoreAsync(DraftPlayerCommand command, CancellationToken cancellationToken)
     {
         var draft = await _dbContext.Drafts
                         .Include(d => d.DraftPicks)
@@ -605,6 +612,13 @@ class DraftService(
         {
             throw new InvalidOperationException("Draft pick version expired");
         }
+
+        _telemetry.TrackEvent("draft.player_picked",
+            "draft.id", command.DraftId,
+            "player.id", command.PlayerId,
+            "team.id", command.TeamId,
+            "draft.overall_pick", command.OverallPick,
+            "draft.auto_pick", command.IsAutoPick);
 
         DraftPick? nextPick = null;
         if (draft.Status != DraftStatus.Completed)
