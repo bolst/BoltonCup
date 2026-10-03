@@ -12,8 +12,8 @@ GLOBALS_FILE="boltoncup_globals_$DATE.sql"
 
 # Check if the destination directory exists
 if [ ! -d "$BACKUP_DIR" ]; then
-  echo "Error: Backup directory $BACKUP_DIR does not exist."
-  exit 1
+  echo "Creating backup directory $BACKUP_DIR"
+  mkdir $BACKUP_DIR
 fi
 
 # Dump cluster-level globals (roles, tablespaces) — required for full restore
