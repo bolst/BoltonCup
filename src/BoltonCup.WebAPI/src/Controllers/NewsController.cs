@@ -61,7 +61,7 @@ public class NewsController(INewsPostService _news, IMapper _mapper) : BoltonCup
             return NoContent();
         }
 
-        Cache.Set(CacheKey(slug), dto, TimeSpan.FromMinutes(5));
+        Cache.Set(CacheKey(slug), dto, DefaultCacheDuration);
         return Ok(dto);
     }
 

@@ -1,6 +1,12 @@
 @page "/teams"
+@using BoltonCup.Admin.Services
 @inject ITeamService TeamService
+@inject IFranchiseService FranchiseService
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject TournamentStateService TournamentState
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject ILogger<Teams> Logger
 
 <EntityDataGrid
     @ref="@_dataGrid"
@@ -8,11 +14,24 @@
     NewItemFunc="NewItemFunc"
     SearchBy="x => x.Name"
     TournamentFilter="id => x => x.TournamentId == id"
+    Include="@(x => x.Include(t => t.Franchise))"
     Comparer="_comparer">
     <Columns>
         <PropertyColumn Title="Team" Property="x => x.Name" />
         <PropertyColumn Title="Name (short)" Property="x => x.NameShort" />
         <PropertyColumn Title="Abbreviation" Property="x => x.Abbreviation" />
+        <TemplateColumn Title="Franchise" Sortable="false" Editable="false">
+            <CellTemplate>
+                <div class="d-flex flex-row align-center gap-1">
+                    <span>@(((Franchise?)context.Item.Franchise)?.Name ?? "—")</span>
+                    <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Info"
+                               Disabled="@(context.Item.Id == 0)"
+                               OnClick="@(() => MoveAsync(context.Item))">
+                        Move…
+                    </MudButton>
+                </div>
+            </CellTemplate>
+        </TemplateColumn>
         <ImageColumn T="Team" Title="Logo" Property="x => x.Logo" OnImageUploaded="UpdateTeamLogo" />
         <ImageColumn T="Team" Title="Banner" Property="x => x.Banner" OnImageUploaded="UpdateTeamBanner" />
         <ManyForeignColumn T="Team" TEntity="Account" Title="GMs" Property="x => x.GeneralManagers"
@@ -43,41 +62,143 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
+        {
             return;
+        }
 
         await _dataGrid.ExtendSortAsync("Tournament.StartDate", SortDirection.Descending, x => x.Tournament.StartDate);
     }
     
+    // The team copies the franchise's brand and references it by id only; the navigation stays null so the
+    // grid's save never inserts or attaches the franchise.
     private async Task<Team?> NewItemFunc()
     {
-        return new Team
+        var franchise = await PickFranchiseAsync("Pick a franchise for the new team", allowCreate: true, excludeFranchiseId: null);
+        if (franchise is null)
         {
-            Name = "Detroit Red Wings",
-            NameShort = "Red Wings",
-            Abbreviation = "DRW",
-            PrimaryColorHex = "#CE1126",
-            SecondaryColorHex = "#FFFFFF"
-        };
+            return null;
+        }
+
+        var tournament = await TournamentState.GetCurrentAsync();
+        return franchise.NewSeasonTeam(tournament?.Id);
+    }
+
+    async Task<Franchise?> PickFranchiseAsync(string title, bool allowCreate, int? excludeFranchiseId)
+    {
+        var dialog = await DialogService.ShowAsync<PickFranchiseDialog>(
+            title,
+            new DialogParameters<PickFranchiseDialog>
+            {
+                { x => x.AllowCreate, allowCreate },
+                { x => x.ExcludeFranchiseId, excludeFranchiseId },
+            });
+
+        var result = await dialog.Result;
+        if (result is null || result.Canceled)
+        {
+            return null;
+        }
+
+        return result.Data as Franchise;
+    }
+
+    async Task MoveAsync(Team team)
+    {
+        var target = await PickFranchiseAsync($"Move {team.Name} to franchise", allowCreate: false, excludeFranchiseId: team.FranchiseId);
+        if (target is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await FranchiseService.MoveTeamAsync(team.Id, target.Id);
+            ApplyToRow(team, t => SetFranchise(t, target.Id));
+            Snackbar.Add($"{team.Name} moved to {target.Name}. Public pages may not show this change right away.", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to move team {TeamId} to franchise {FranchiseId}", team.Id, target.Id);
+            Snackbar.Add($"{team.Name} could not be moved.", Severity.Error);
+        }
+
+        await _dataGrid.ReloadAsync();
+    }
+
+    // A later grid Save writes every scalar of a pending edit back, so the row and any pending copy of it must
+    // match what a direct service write just stored, or the Save silently reverts it.
+    void ApplyToRow(Team team, Action<Team> apply)
+    {
+        apply(team);
+        foreach (var pending in _dataGrid.PendingEdits.Where(t => t.Id == team.Id))
+        {
+            apply(pending);
+        }
+    }
+
+    // The navigation is cleared so the grid's save tracks the new id rather than the previously loaded franchise.
+    static void SetFranchise(Team team, int franchiseId)
+    {
+        team.FranchiseId = franchiseId;
+        team.Franchise = null!;
     }
 
     private async Task UpdateTeamLogo(ImageUploadResult<Team> result)
     {
-        if (string.IsNullOrEmpty(result.NewKey)) 
+        if (string.IsNullOrEmpty(result.NewKey))
+        {
             return;
-        await TeamService.UpdateLogoAsync(result.Item.Id, result.NewKey);
+        }
+
+        try
+        {
+            await TeamService.UpdateLogoAsync(result.Item.Id, result.NewKey);
+
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            var logo = await dbContext.Teams
+                .Where(t => t.Id == result.Item.Id)
+                .Select(t => t.Logo)
+                .FirstOrDefaultAsync();
+            ApplyToRow(result.Item, t => t.Logo = logo);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to update logo for team {TeamId}", result.Item.Id);
+            Snackbar.Add("The logo could not be saved.", Severity.Error);
+        }
     }
     
     private async Task UpdateTeamBanner(ImageUploadResult<Team> result)
     {
         if (string.IsNullOrEmpty(result.NewKey))
+        {
             return;
-        await TeamService.UpdateBannerAsync(result.Item.Id, result.NewKey);
+        }
+
+        try
+        {
+            await TeamService.UpdateBannerAsync(result.Item.Id, result.NewKey);
+
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            var banner = await dbContext.Teams
+                .Where(t => t.Id == result.Item.Id)
+                .Select(t => t.Banner)
+                .FirstOrDefaultAsync();
+            ApplyToRow(result.Item, t => t.Banner = banner);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to update banner for team {TeamId}", result.Item.Id);
+            Snackbar.Add("The banner could not be saved.", Severity.Error);
+        }
     }
 
     private async Task EditSongs(Team team)
     {
         if (team.TournamentId is not { } tournamentId)
+        {
             return;
+        }
 
         var dialog = await DialogService.ShowAsync<TeamSongsDialog>(
             $"Team songs — {team.Name}",
@@ -101,7 +222,10 @@
     {
         // A team must be saved before it has an id its GMs can reference.
         if (selection.Item.Id == 0)
+        {
             return;
+        }
+
         await TeamService.SetGeneralManagersAsync(
             selection.Item.Id,
             selection.Selected.Select(a => a.Id).ToList());

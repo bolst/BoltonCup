@@ -194,4 +194,53 @@ public class StandingsServiceTests
         Row(rows, 2).RegulationWins.Should().Be(0);
         Row(rows, 1).Rank.Should().BeLessThan(Row(rows, 2).Rank);
     }
+
+    [Fact]
+    public void Tiebreak_IgnoresInProgressAndOtherStageGames()
+    {
+        // A and B are level on points and A won their completed round-robin meeting. An in-progress round-robin
+        // game and a completed final (both won by B) must not reach the head-to-head mini-table; if they did, B's
+        // better goal differential would put it above A.
+        var teams = new[] { Team(1, "A"), Team(2, "B"), Team(3, "X"), Team(4, "Y") };
+        var games = new[]
+        {
+            Game(1, homeId: 1, awayId: 2, homeGoals: 1, awayGoals: 0),                                 // A beats B
+            Game(2, homeId: 4, awayId: 1, homeGoals: 5, awayGoals: 0),                                 // Y beats A
+            Game(3, homeId: 2, awayId: 3, homeGoals: 5, awayGoals: 0),                                 // B beats X
+            Game(4, homeId: 2, awayId: 1, homeGoals: 5, awayGoals: 0, state: GameState.InProgress),    // B leads A
+            Game(5, homeId: 2, awayId: 1, homeGoals: 3, awayGoals: 0, type: GameType.Finals),          // B wins final
+        };
+
+        var rows = StandingsService.Compute(teams, games, StandingsStage.RoundRobin, StandingsRules.Default);
+
+        Row(rows, 1).Points.Should().Be(2);
+        Row(rows, 2).Points.Should().Be(2);
+        Row(rows, 1).GamesPlayed.Should().Be(2);
+        Row(rows, 2).GamesPlayed.Should().Be(2);
+        Row(rows, 1).Rank.Should().BeLessThan(Row(rows, 2).Rank);
+    }
+
+    [Fact]
+    public void MixedFixture_ProducesExpectedTable()
+    {
+        var teams = new[] { Team(1, "A"), Team(2, "B"), Team(3, "C"), Team(4, "D") };
+        var games = new[]
+        {
+            Game(1, homeId: 1, awayId: 2, homeGoals: 3, awayGoals: 1),
+            Game(2, homeId: 3, awayId: 4, homeGoals: 2, awayGoals: 2),
+            Game(3, homeId: 1, awayId: 3, homeGoals: 1, awayGoals: 2, otSo: true),
+            Game(4, homeId: 2, awayId: 4, homeGoals: 4, awayGoals: 0),
+            Game(5, homeId: 4, awayId: 1, homeGoals: 0, awayGoals: 0),
+            Game(6, homeId: 2, awayId: 3, homeGoals: 1, awayGoals: 3),
+        };
+
+        var rows = StandingsService.Compute(teams, games, StandingsStage.RoundRobin, StandingsRules.Default);
+
+        rows.Select(r => r.TeamId).Should().Equal(3, 1, 2, 4);
+        rows.Select(r => r.Points).Should().Equal(5, 4, 2, 2);
+        Row(rows, 1).Should().Match<StandingRow>(r =>
+            r.Wins == 1 && r.OtSoLosses == 1 && r.Ties == 1 && r.GoalsFor == 4 && r.GoalsAgainst == 3);
+        Row(rows, 3).Should().Match<StandingRow>(r =>
+            r.Wins == 2 && r.RegulationWins == 1 && r.Ties == 1 && r.GoalsFor == 7 && r.GoalsAgainst == 4);
+    }
 }

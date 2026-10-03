@@ -116,7 +116,14 @@ else
                                 </ToolBarContent>
                                 <Columns>
                                     <PropertyColumn Property="x => x.Tournament.Name" Title="Tournament" CellStyle="width: 100px" />
-                                    <PropertyColumn Property="x => x.Team == null ? null : x.Team.Name" Title="Team" />
+                                    <PropertyColumn Property="x => x.Team == null ? null : x.Team.Name" Title="Team">
+                                        <CellTemplate>
+                                            @if (context.Item.Team is { } team)
+                                            {
+                                                <MudLink Href="@($"/teams/{team.Id}/roster")" Typo="Typo.body2" Underline="Underline.Hover">@team.Name</MudLink>
+                                            }
+                                        </CellTemplate>
+                                    </PropertyColumn>
                                     <PropertyColumn Property="x => x.GamesPlayed" Title="GP" CellStyle="width: 50px" />
                                     
                                     <PropertyColumn Property="x => x.Wins" Title="W" CellStyle="width: 50px" Hidden="!_player.IsGoalie" />

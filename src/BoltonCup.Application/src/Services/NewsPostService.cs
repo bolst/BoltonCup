@@ -40,33 +40,14 @@ class NewsPostService(
             return [];
         }
 
-        var candidateIds = candidates.Select(c => c.PostId).Where(id => id != 0).ToList();
-        var bases = candidates.Select(c => c.Slug).Distinct().ToList();
-
-        // Every slug that could collide with a base or one of its numbered variants, owned by someone else.
         await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-        var taken = (await db.NewsPosts
+        return await SlugReservation.ReserveAsync(
+            candidates,
+            ids => db.NewsPosts
                 .AsNoTracking()
-                .Where(p => !candidateIds.Contains(p.Id))
-                .Select(p => p.Slug)
-                .ToListAsync(cancellationToken))
-            .Where(slug => bases.Any(b => slug == b || slug.StartsWith(b + "-")))
-            .ToHashSet();
-
-        var reserved = new List<string>(candidates.Count);
-        foreach (var candidate in candidates)
-        {
-            var slug = candidate.Slug;
-            for (var suffix = 2; taken.Contains(slug); suffix++)
-            {
-                slug = SlugGenerator.WithSuffix(candidate.Slug, suffix);
-            }
-
-            taken.Add(slug);
-            reserved.Add(slug);
-        }
-
-        return reserved;
+                .Where(p => !ids.Contains(p.Id))
+                .Select(p => p.Slug),
+            cancellationToken);
     }
 
     public async Task UpdateCoverImageAsync(int id, string tempKey, CancellationToken cancellationToken = default)

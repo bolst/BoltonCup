@@ -738,6 +738,100 @@ namespace BoltonCup.Persistence.Migrations
                     b.ToTable("email_logs", "core");
                 });
 
+            modelBuilder.Entity("BoltonCup.Core.Franchise", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Abbreviation")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("abbreviation");
+
+                    b.Property<string>("Banner")
+                        .HasColumnType("text")
+                        .HasColumnName("banner_key");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now() AT TIME ZONE 'UTC'");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Logo")
+                        .HasColumnType("text")
+                        .HasColumnName("logo_key");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NameShort")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name_short");
+
+                    b.Property<string>("PrimaryColorHex")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("primary_hex");
+
+                    b.Property<string>("SecondaryColorHex")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("secondary_hex");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("slug");
+
+                    b.Property<string>("TertiaryColorHex")
+                        .HasColumnType("text")
+                        .HasColumnName("tertiary_hex");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("franchises", "core");
+                });
+
+            modelBuilder.Entity("BoltonCup.Core.FranchiseOwner", b =>
+                {
+                    b.Property<int>("FranchiseId")
+                        .HasColumnType("integer")
+                        .HasColumnName("franchise_id");
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("integer")
+                        .HasColumnName("account_id");
+
+                    b.HasKey("FranchiseId", "AccountId");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("franchise_owners", "core");
+                });
+
             modelBuilder.Entity("BoltonCup.Core.Gallery", b =>
                 {
                     b.Property<int>("Id")
@@ -2262,6 +2356,10 @@ namespace BoltonCup.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("created_by");
 
+                    b.Property<int>("FranchiseId")
+                        .HasColumnType("integer")
+                        .HasColumnName("franchise_id");
+
                     b.Property<int?>("GoalSongTrackId")
                         .HasColumnType("integer")
                         .HasColumnName("goal_song_track_id");
@@ -2315,6 +2413,8 @@ namespace BoltonCup.Persistence.Migrations
                         .HasColumnName("win_song_track_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FranchiseId");
 
                     b.HasIndex("GoalSongTrackId");
 
@@ -3188,6 +3288,25 @@ namespace BoltonCup.Persistence.Migrations
                     b.Navigation("Team");
                 });
 
+            modelBuilder.Entity("BoltonCup.Core.FranchiseOwner", b =>
+                {
+                    b.HasOne("BoltonCup.Core.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BoltonCup.Core.Franchise", "Franchise")
+                        .WithMany()
+                        .HasForeignKey("FranchiseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Franchise");
+                });
+
             modelBuilder.Entity("BoltonCup.Core.Game", b =>
                 {
                     b.HasOne("BoltonCup.Core.Team", "AwayTeam")
@@ -3573,6 +3692,12 @@ namespace BoltonCup.Persistence.Migrations
 
             modelBuilder.Entity("BoltonCup.Core.Team", b =>
                 {
+                    b.HasOne("BoltonCup.Core.Franchise", "Franchise")
+                        .WithMany("Teams")
+                        .HasForeignKey("FranchiseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("BoltonCup.Core.TournamentMusicTrack", "GoalSongTrack")
                         .WithMany()
                         .HasForeignKey("GoalSongTrackId")
@@ -3591,6 +3716,8 @@ namespace BoltonCup.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("WinSongTrackId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Franchise");
 
                     b.Navigation("GoalSongTrack");
 
@@ -3828,6 +3955,11 @@ namespace BoltonCup.Persistence.Migrations
                     b.Navigation("DraftOrders");
 
                     b.Navigation("DraftPicks");
+                });
+
+            modelBuilder.Entity("BoltonCup.Core.Franchise", b =>
+                {
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("BoltonCup.Core.Gallery", b =>

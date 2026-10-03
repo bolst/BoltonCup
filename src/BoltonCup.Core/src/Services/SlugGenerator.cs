@@ -7,13 +7,14 @@ namespace BoltonCup.Core;
 public static class SlugGenerator
 {
     const int MaxLength = 80;
-    const string Fallback = "post";
+    const string DefaultFallback = "post";
 
-    public static string Generate(string? text)
+    /// <summary>Returns the slug for <paramref name="text"/>, or <paramref name="fallback"/> when nothing usable remains.</summary>
+    public static string Generate(string? text, string fallback = DefaultFallback)
     {
         if (string.IsNullOrWhiteSpace(text))
         {
-            return Fallback;
+            return fallback;
         }
 
         var builder = new StringBuilder(text.Length);
@@ -48,7 +49,7 @@ public static class SlugGenerator
             slug = slug[..MaxLength].TrimEnd('-');
         }
 
-        return slug.Length == 0 ? Fallback : slug;
+        return slug.Length == 0 ? fallback : slug;
     }
 
     public static string WithSuffix(string slug, int suffix) => $"{slug}-{suffix}";

@@ -1,0 +1,285 @@
+@page "/franchises/{Slug}"
+@using BoltonCup.Core
+@inject IBoltonCupApi BoltonCupApi
+@inject ILogger<Franchise> Logger
+
+@if (_loading)
+{
+    <PageTitle>Franchise | Bolton Cup</PageTitle>
+
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="my-4" Gutters="false">
+        <div class="d-flex flex-row align-center gap-3">
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="220px" Height="40px" />
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="48px" Height="48px" />
+        </div>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Class="my-3" />
+        @for (var i = 0; i < 8; i++)
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="100%" Height="48px" />
+        }
+    </MudContainer>
+}
+else if (_failed)
+{
+    <PageTitle>Franchise | Bolton Cup</PageTitle>
+
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="my-4" Gutters="false">
+        <MudAlert Severity="Severity.Error" Class="mt-4">
+            This franchise could not be loaded right now. <MudLink Href="/franchises" Color="Color.Info">Back to franchises.</MudLink>
+        </MudAlert>
+    </MudContainer>
+}
+else if (_franchise is null)
+{
+    <PageTitle>Franchise not found | Bolton Cup</PageTitle>
+
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="my-4" Gutters="false">
+        <MudAlert Severity="Severity.Warning" Class="mt-4">
+            Franchise not found. <MudLink Href="/franchises" Color="Color.Info">Back to franchises.</MudLink>
+        </MudAlert>
+    </MudContainer>
+}
+else
+{
+    <PageTitle>@_franchise.Name | Bolton Cup</PageTitle>
+
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="my-4 px-1" Gutters="false">
+        <div class="d-flex flex-row align-center gap-3 mb-3">
+            <MudImage Src="@_franchise.LogoUrl" Alt="@_franchise.Name" Height="64" />
+            <MudText Typo="Typo.h4"><b>@_franchise.Name</b></MudText>
+        </div>
+
+        @if (_franchise.Owners.Count > 0)
+        {
+            <MudText Typo="Typo.h6" Class="mt-4 mb-1">Owners</MudText>
+            <div class="d-flex flex-row flex-wrap align-center gap-4">
+                @foreach (var owner in _franchise.Owners)
+                {
+                    <div class="d-flex flex-row align-center gap-2">
+                        <MudAvatar Size="Size.Medium">
+                            <MudImage Src="@owner.ProfilePictureUrl" Alt="@PersonName(owner.FirstName, owner.LastName)" />
+                        </MudAvatar>
+                        <MudText Typo="Typo.body1">@PersonName(owner.FirstName, owner.LastName)</MudText>
+                    </div>
+                }
+            </div>
+        }
+
+        <MudText Typo="Typo.h6" Class="mt-6 mb-1">Championships</MudText>
+        @if (_franchise.Titles.Count == 0)
+        {
+            <MudText Typo="Typo.body2" Color="Color.Secondary">No titles yet.</MudText>
+        }
+        else
+        {
+            <div class="d-flex flex-row flex-wrap gap-2">
+                @foreach (var title in _franchise.Titles)
+                {
+                    <MudChip T="string" Icon="@Icons.Material.Rounded.EmojiEvents" IconColor="Color.Warning" Variant="Variant.Outlined" Size="Size.Medium">
+                        @title.Name
+                    </MudChip>
+                }
+            </div>
+        }
+
+        <MudText Typo="Typo.h6" Class="mt-6 mb-1">All-time record</MudText>
+        <MudPaper Elevation="0" Outlined Class="pa-3">
+            <div class="d-flex flex-row flex-wrap justify-space-around gap-4">
+                @RecordStat("GP", _franchise.AllTime.GamesPlayed)
+                @RecordStat("W", _franchise.AllTime.Wins)
+                @RecordStat("L", _franchise.AllTime.Losses)
+                @RecordStat("T", _franchise.AllTime.Ties)
+                @RecordStat("GF", _franchise.AllTime.GoalsFor)
+                @RecordStat("GA", _franchise.AllTime.GoalsAgainst)
+            </div>
+        </MudPaper>
+        @if (_franchise.IntraFranchiseGames > 0)
+        {
+            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mt-1">
+                Includes @_franchise.IntraFranchiseGames @(_franchise.IntraFranchiseGames == 1 ? "game" : "games") played between two of this franchise's own teams. Each game counts once for each team.
+            </MudText>
+        }
+
+        <MudText Typo="Typo.h6" Class="mt-6 mb-1">Season history</MudText>
+        <MudTable T="Sdk.FranchiseSeasonDto"
+                  Items="_franchise.Seasons"
+                  Breakpoint="Breakpoint.None"
+                  Elevation="0"
+                  Striped
+                  Dense>
+            <HeaderContent>
+                <MudTh>Tournament</MudTh>
+                <MudTh>Team</MudTh>
+                <MudTh>Record</MudTh>
+                <MudTh>GM</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Tournament">@(context.Tournament?.Name ?? "Unnamed Tournament")</MudTd>
+                <MudTd DataLabel="Team">
+                    <div class="d-flex flex-row align-center gap-2">
+                        <MudImage Src="@context.LogoUrl" Alt="@context.Name" Height="28" />
+                        <MudLink Href="@($"/teams/{context.TeamId}/roster")" Typo="Typo.body2" Underline="Underline.Hover">@context.Name</MudLink>
+                        @if (context.IsChampion)
+                        {
+                            <ChampionIcon Size="Size.Small" />
+                        }
+                    </div>
+                </MudTd>
+                <MudTd DataLabel="Record">@RecordLabel(context.Record)</MudTd>
+                <MudTd DataLabel="GM" Style="min-width: 10rem">@GmNames(context)</MudTd>
+            </RowTemplate>
+        </MudTable>
+
+        @if (_franchise.SkaterLeaders.Count > 0)
+        {
+            <MudText Typo="Typo.h6" Class="mt-6 mb-1">Skater leaders</MudText>
+            <MudTable T="Sdk.FranchiseSkaterLeaderDto"
+                      Items="_franchise.SkaterLeaders"
+                      Breakpoint="Breakpoint.None"
+                      Elevation="0"
+                      Striped
+                      Dense>
+                <HeaderContent>
+                    <MudTh>Player</MudTh>
+                    <MudTh Class="num-cell">Seasons</MudTh>
+                    <MudTh Class="num-cell">GP</MudTh>
+                    <MudTh Class="num-cell">G</MudTh>
+                    <MudTh Class="num-cell">A</MudTh>
+                    <MudTh Class="num-cell">P</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Player">@PlayerCell(context.PlayerId, context.FirstName, context.LastName, context.ProfilePictureUrl)</MudTd>
+                    <MudTd DataLabel="Seasons" Class="num-cell">@context.Seasons</MudTd>
+                    <MudTd DataLabel="GP" Class="num-cell">@context.GamesPlayed</MudTd>
+                    <MudTd DataLabel="G" Class="num-cell">@context.Goals</MudTd>
+                    <MudTd DataLabel="A" Class="num-cell">@context.Assists</MudTd>
+                    <MudTd DataLabel="P" Class="num-cell"><b>@context.Points</b></MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+
+        @if (_franchise.GoalieLeaders.Count > 0)
+        {
+            <MudText Typo="Typo.h6" Class="mt-6 mb-1">Goalie leaders</MudText>
+            <MudTable T="Sdk.FranchiseGoalieLeaderDto"
+                      Items="_franchise.GoalieLeaders"
+                      Breakpoint="Breakpoint.None"
+                      Elevation="0"
+                      Striped
+                      Dense>
+                <HeaderContent>
+                    <MudTh>Player</MudTh>
+                    <MudTh Class="num-cell">Seasons</MudTh>
+                    <MudTh Class="num-cell">GP</MudTh>
+                    <MudTh Class="num-cell">W</MudTh>
+                    <MudTh Class="num-cell">SO</MudTh>
+                    @* <MudTh>SV%</MudTh> *@
+                    <MudTh Class="num-cell">GAA</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Player" Class="num-cell">@PlayerCell(context.PlayerId, context.FirstName, context.LastName, context.ProfilePictureUrl)</MudTd>
+                    <MudTd DataLabel="Seasons" Class="num-cell">@context.Seasons</MudTd>
+                    <MudTd DataLabel="GP" Class="num-cell">@context.GamesPlayed</MudTd>
+                    <MudTd DataLabel="W" Class="num-cell">@context.Wins</MudTd>
+                    <MudTd DataLabel="SO" Class="num-cell">@context.Shutouts</MudTd>
+                    @* <MudTd DataLabel="SV%">@context.SavePercentage.ToString("0.000")</MudTd> *@
+                    <MudTd DataLabel="GAA" Class="num-cell">@context.GoalsAgainstAverage.ToString("0.00")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudContainer>
+}
+
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required string Slug { get; set; }
+
+    string? _slug;
+
+    Sdk.FranchiseSingleDto? _franchise;
+    bool _loading = true;
+    bool _failed;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_slug == Slug)
+        {
+            return;
+        }
+
+        var slug = Slug;
+        _slug = slug;
+        _franchise = null;
+        _failed = false;
+        _loading = true;
+
+        var (franchise, failed) = await LoadAsync(slug);
+
+        // A slower response for an earlier slug must not overwrite the franchise now being viewed.
+        if (slug != Slug)
+        {
+            return;
+        }
+
+        _franchise = franchise;
+        _failed = failed;
+        _loading = false;
+    }
+
+    // Touches no component state so a superseded request cannot leak its outcome into the current one.
+    async Task<(Sdk.FranchiseSingleDto? Franchise, bool Failed)> LoadAsync(string slug)
+    {
+        try
+        {
+            return (await BoltonCupApi.GetFranchiseBySlugAsync(slug), false);
+        }
+        catch (Sdk.ApiException e) when (e.StatusCode is 204 or 404)
+        {
+            // An unknown slug is answered with 204, which the generated client throws on.
+            return (null, false);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to load franchise {Slug}", slug);
+            return (null, true);
+        }
+    }
+
+    RenderFragment RecordStat(string label, int value)
+    {
+        return @<div class="d-flex flex-column align-center">
+                   <MudText Typo="Typo.h5"><b>@value</b></MudText>
+                   <MudText Typo="Typo.caption">@label</MudText>
+               </div>;
+    }
+
+    RenderFragment PlayerCell(int id, string firstName, string lastName, string? pictureUrl)
+    {
+        var name = PersonName(firstName, lastName);
+        return @<div class="d-flex flex-row align-center gap-3">
+                   <MudAvatar Size="Size.Small">
+                       <MudImage Src="@pictureUrl" Alt="@name" />
+                   </MudAvatar>
+                   <MudLink Href="@($"/players/{id}")" Underline="Underline.Hover" Typo="Typo.body2"><b>@name</b></MudLink>
+               </div>;
+    }
+
+    static string PersonName(string? firstName, string? lastName)
+    {
+        return $"{firstName} {lastName}".Trim();
+    }
+
+    static string RecordLabel(Sdk.FranchiseRecordDto record)
+    {
+        return $"{record.Wins}-{record.Losses}-{record.Ties}";
+    }
+
+    static string GmNames(Sdk.FranchiseSeasonDto season)
+    {
+        return string.Join(", ", season.GeneralManagers.Select(gm => PersonName(gm.FirstName, gm.LastName)));
+    }
+
+}

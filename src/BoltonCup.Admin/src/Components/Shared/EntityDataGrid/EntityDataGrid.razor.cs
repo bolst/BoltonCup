@@ -368,6 +368,12 @@ public partial class EntityDataGrid<[DynamicallyAccessedMembers(DynamicallyAcces
         }
     }
 
+    /// <summary>Rows edited in the grid but not yet saved. Each is the row object as it was when edited.</summary>
+    public IReadOnlyCollection<T> PendingEdits => _changeTracker.EditItems;
+
+    /// <summary>Drops pending edits and deletes for matching rows, such as rows another action removed.</summary>
+    public void DiscardPendingChanges(Predicate<T> match) => _changeTracker.Discard(match);
+
     public void AddNewItem(T item) => _changeTracker.TrackNew(item);
 
     public void AddNewItems(IEnumerable<T> items) => _changeTracker.TrackNewRange(items);

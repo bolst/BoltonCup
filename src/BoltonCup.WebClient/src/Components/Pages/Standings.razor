@@ -53,10 +53,12 @@
     private const string PlayoffsType = "playoffs";
     private const string RoundRobinType = "roundrobin";
 
-    [Parameter, SupplyParameterFromQuery(Name = "tournament")]
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "tournament")]
     public int? TournamentQuery { get; set; }
 
-    [Parameter, SupplyParameterFromQuery(Name = "type")]
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "type")]
     public string? TypeQuery { get; set; }
 
     private List<Sdk.TournamentDto> _tournaments = [];

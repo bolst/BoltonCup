@@ -62,6 +62,12 @@ public sealed class ChangeTracker<T>
         NewItems.UnionWith(itemsHash);
     }
 
+    public void Discard(Predicate<T> match)
+    {
+        EditItems.RemoveWhere(match);
+        DeleteItems.RemoveWhere(match);
+    }
+
     public async Task SaveChangesAsync(DbContext dbContext)
     {
         var dbSet = dbContext.Set<T>();

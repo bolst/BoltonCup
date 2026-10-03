@@ -16,6 +16,8 @@ class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     public DbSet<Draft> Drafts { get; set; }
     public DbSet<DraftOrder> DraftOrders { get; set; }
     public DbSet<DraftPick> DraftPicks { get; set; }
+    public DbSet<Franchise> Franchises { get; set; }
+    public DbSet<FranchiseOwner> FranchiseOwners { get; set; }
     public DbSet<Gallery> Galleries { get; set; }
     public DbSet<Game> Games { get; set; }
     public DbSet<Highlight> Highlights { get; set; }
@@ -879,6 +881,39 @@ class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.TournamentActive).HasColumnName("tournament_active");
         });
 
+        modelBuilder.Entity<Franchise>(entity =>
+        {
+            entity
+                .ToTable("franchises")
+                .HasKey(e => e.Id);
+            entity
+                .HasIndex(e => e.Slug)
+                .IsUnique();
+            entity
+                .HasMany(e => e.Owners)
+                .WithMany(a => a.OwnedFranchises)
+                .UsingEntity<FranchiseOwner>(
+                    j => j.HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Cascade),
+                    j => j.HasOne(x => x.Franchise).WithMany().HasForeignKey(x => x.FranchiseId).OnDelete(DeleteBehavior.Cascade),
+                    j =>
+                    {
+                        j.ToTable("franchise_owners");
+                        j.HasKey(x => new { x.FranchiseId, x.AccountId });
+                        j.Property(x => x.FranchiseId).HasColumnName("franchise_id");
+                        j.Property(x => x.AccountId).HasColumnName("account_id");
+                    });
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.Slug).HasColumnName("slug");
+            entity.Property(e => e.NameShort).HasColumnName("name_short");
+            entity.Property(e => e.Abbreviation).HasColumnName("abbreviation");
+            entity.Property(e => e.Logo).HasColumnName("logo_key");
+            entity.Property(e => e.Banner).HasColumnName("banner_key");
+            entity.Property(e => e.PrimaryColorHex).HasColumnName("primary_hex");
+            entity.Property(e => e.SecondaryColorHex).HasColumnName("secondary_hex");
+            entity.Property(e => e.TertiaryColorHex).HasColumnName("tertiary_hex");
+        });
+
         modelBuilder.Entity<Team>(entity =>
         {
             entity
@@ -888,6 +923,13 @@ class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
                 .HasOne(e => e.Tournament)
                 .WithMany(e => e.Teams)
                 .HasForeignKey(e => e.TournamentId);
+            // Every season team belongs to exactly one franchise; a franchise with teams cannot be deleted.
+            entity
+                .HasOne(e => e.Franchise)
+                .WithMany(f => f.Teams)
+                .HasForeignKey(e => e.FranchiseId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
             entity
                 .HasMany(e => e.GeneralManagers)
                 .WithMany(a => a.ManagedTeams)
@@ -926,6 +968,7 @@ class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.NameShort).HasColumnName("name_short");
             entity.Property(e => e.Abbreviation).HasColumnName("abbreviation");
             entity.Property(e => e.TournamentId).HasColumnName("tournament_id");
+            entity.Property(e => e.FranchiseId).HasColumnName("franchise_id");
             entity.Property(e => e.Logo).HasColumnName("logo_key");
             entity.Property(e => e.Banner).HasColumnName("banner_key");
             entity.Property(e => e.PrimaryColorHex).HasColumnName("primary_hex");

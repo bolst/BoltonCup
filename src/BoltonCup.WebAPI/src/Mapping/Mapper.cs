@@ -66,7 +66,9 @@ public partial class Mapper : IMapper
         Banner = _urlResolver.GetFullUrl(team.Banner),
         PrimaryColorHex = team.PrimaryColorHex,
         SecondaryColorHex = team.SecondaryColorHex,
-        TertiaryColorHex = team.TertiaryColorHex
+        TertiaryColorHex = team.TertiaryColorHex,
+        FranchiseId = team.FranchiseId,
+        Franchise = ToFranchiseBriefDtoOrNull(team.Franchise),
     };
 
     TournamentBriefDto ToTournamentBriefDto(Tournament tournament) => new TournamentBriefDto
@@ -100,6 +102,8 @@ public partial class Mapper : IMapper
                 PrimaryColorHex = team.PrimaryColorHex,
                 SecondaryColorHex = team.SecondaryColorHex,
                 TertiaryColorHex = team.TertiaryColorHex,
+                FranchiseId = team.FranchiseId,
+                Franchise = ToFranchiseBriefDtoOrNull(team.Franchise),
                 GoalSongFileKey = team.GoalSongTrack?.AudioFileKey,
                 GoalSongOffsetSeconds = team.GoalSongTrack?.OffsetSeconds,
                 GoalSongTitle = team.GoalSongTrack?.Title,
