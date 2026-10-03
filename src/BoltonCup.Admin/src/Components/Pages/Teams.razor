@@ -43,7 +43,9 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
+        {
             return;
+        }
 
         await _dataGrid.ExtendSortAsync("Tournament.StartDate", SortDirection.Descending, x => x.Tournament.StartDate);
     }

@@ -71,7 +71,8 @@ else
 
 @code {
 
-    [Parameter, EditorRequired]
+    [Parameter]
+    [EditorRequired]
     public required int TeamId { get; set; }
 
     private int? _teamId;
@@ -97,7 +98,9 @@ else
     protected override async Task OnParametersSetAsync()
     {
         if (_teamId == TeamId)
+        {
             return;
+        }
         _teamId = TeamId;
         
         _team = await BoltonCupApi.GetTeamByIdAsync(TeamId);

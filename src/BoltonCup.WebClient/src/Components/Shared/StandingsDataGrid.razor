@@ -43,7 +43,8 @@
 </MudDataGrid>
 
 @code {
-    [Parameter, EditorRequired]
+    [Parameter]
+    [EditorRequired]
     public required IEnumerable<Sdk.StandingRowDto> Rows { get; set; }
 
     [Parameter]

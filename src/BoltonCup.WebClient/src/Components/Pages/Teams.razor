@@ -80,7 +80,9 @@
     private RenderFragment DateRangeChip(DateRange? dateRange) => builder =>
     {
         if (dateRange is null)
+        {
             return;
+        }
         
         var text = string.Empty;
         int? month = null;
@@ -92,7 +94,9 @@
         if (dateRange.End.HasValue)
         {
             if (!string.IsNullOrEmpty(text))
+            {
                 text += " - ";
+            }
             var format = dateRange.End.Value.Month == month
                 ? "dd"
                 : "MMM dd";
