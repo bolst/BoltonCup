@@ -53,27 +53,28 @@ class StandingsService(BoltonCupDbContext _context) : IStandingsService
                 continue;
             }
 
-            var homeGoals = game.Goals.Count(g => g.TeamId == homeId);
-            var awayGoals = game.Goals.Count(g => g.TeamId == awayId);
-            var isOtSo = game.Goals.Any(g => g.Period >= 4);
+            if (GameResult.For(game, homeId) is not { } homeResult || GameResult.For(game, awayId) is not { } awayResult)
+            {
+                continue;
+            }
 
-            ApplyResult(home, homeGoals, awayGoals, isOtSo, rules);
-            ApplyResult(away, awayGoals, homeGoals, isOtSo, rules);
+            ApplyResult(home, homeResult, rules);
+            ApplyResult(away, awayResult, rules);
         }
 
         return Rank(rows.Values, stageGames, rules);
     }
 
-    static void ApplyResult(StandingRow row, int goalsFor, int goalsAgainst, bool isOtSo, StandingsRules rules)
+    static void ApplyResult(StandingRow row, GameResult result, StandingsRules rules)
     {
         row.GamesPlayed++;
-        row.GoalsFor += goalsFor;
-        row.GoalsAgainst += goalsAgainst;
+        row.GoalsFor += result.GoalsFor;
+        row.GoalsAgainst += result.GoalsAgainst;
 
-        if (goalsFor > goalsAgainst)
+        if (result.IsWin)
         {
             row.Wins++;
-            if (isOtSo)
+            if (result.IsOtSo)
             {
                 row.Points += rules.OtSoWin;
             }
@@ -83,9 +84,9 @@ class StandingsService(BoltonCupDbContext _context) : IStandingsService
                 row.Points += rules.RegulationWin;
             }
         }
-        else if (goalsFor < goalsAgainst)
+        else if (result.IsLoss)
         {
-            if (isOtSo)
+            if (result.IsOtSo)
             {
                 row.OtSoLosses++;
                 row.Points += rules.OtSoLoss;
@@ -154,19 +155,20 @@ class StandingsService(BoltonCupDbContext _context) : IStandingsService
                 continue;
             }
 
-            var homeGoals = game.Goals.Count(g => g.TeamId == homeId);
-            var awayGoals = game.Goals.Count(g => g.TeamId == awayId);
-            var isOtSo = game.Goals.Any(g => g.Period >= 4);
+            if (GameResult.For(game, homeId) is not { } homeResult || GameResult.For(game, awayId) is not { } awayResult)
+            {
+                continue;
+            }
 
-            points[homeId] += PointsFor(homeGoals, awayGoals, isOtSo, rules);
-            points[awayId] += PointsFor(awayGoals, homeGoals, isOtSo, rules);
+            points[homeId] += PointsFor(homeResult, rules);
+            points[awayId] += PointsFor(awayResult, rules);
         }
 
         return points;
     }
 
-    static int PointsFor(int goalsFor, int goalsAgainst, bool isOtSo, StandingsRules rules)
-        => goalsFor > goalsAgainst ? (isOtSo ? rules.OtSoWin : rules.RegulationWin)
-            : goalsFor < goalsAgainst ? (isOtSo ? rules.OtSoLoss : rules.RegulationLoss)
+    static int PointsFor(GameResult result, StandingsRules rules)
+        => result.IsWin ? (result.IsOtSo ? rules.OtSoWin : rules.RegulationWin)
+            : result.IsLoss ? (result.IsOtSo ? rules.OtSoLoss : rules.RegulationLoss)
             : rules.Tie;
 }

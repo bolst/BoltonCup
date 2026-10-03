@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace BoltonCup.Core;
 
 public class Team : EntityBase
@@ -7,6 +9,7 @@ public class Team : EntityBase
     public required string NameShort { get; set; }
     public required string Abbreviation { get; set; }
     public int? TournamentId { get; set; }
+    public int FranchiseId { get; set; }
     public string? Logo { get; set; }
     public string? Banner { get; set; }
     public required string PrimaryColorHex { get; set; }
@@ -23,6 +26,7 @@ public class Team : EntityBase
     public int? PenaltySongTrackId { get; set; }
 
     public Tournament Tournament { get; set; } = null!;
+    public Franchise Franchise { get; set; } = null!;
     public ICollection<Account> GeneralManagers { get; set; } = [];
     public TournamentMusicTrack? GoalSongTrack { get; set; }
     public TournamentMusicTrack? WinSongTrack { get; set; }
@@ -47,8 +51,9 @@ public class TeamComparer : IEqualityComparer<Team>
             return true;
         }
 
-        return item1 is not null && item2 is not null && item1.Id == item2.Id;
+        // Unsaved rows all have Id 0, so only reference identity distinguishes them.
+        return item1 is not null && item2 is not null && item1.Id != 0 && item1.Id == item2.Id;
     }
 
-    public int GetHashCode(Team item) => item.Id;
+    public int GetHashCode(Team item) => item.Id == 0 ? RuntimeHelpers.GetHashCode(item) : item.Id;
 }

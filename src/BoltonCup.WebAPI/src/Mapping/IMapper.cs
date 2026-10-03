@@ -93,6 +93,10 @@ public interface IMapper
     GetSkaterStatsQuery ToQuery(GetSkaterStatsRequest request);
     IPagedList<SkaterStatDto> ToDtoList(IPagedList<SkaterStat> skaters);
 
+    // Franchise
+    IReadOnlyList<FranchiseDto> ToDtoList(IReadOnlyList<FranchiseSummary> franchises);
+    FranchiseSingleDto? ToDto(FranchiseDetail? franchise);
+
     // Team
     GetTeamsQuery ToQuery(GetTeamsRequest request);
     IPagedList<TeamDto> ToDtoList(IPagedList<Team> teams);

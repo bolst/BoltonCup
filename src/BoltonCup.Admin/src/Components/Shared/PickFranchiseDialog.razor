@@ -1,0 +1,188 @@
+@using BoltonCup.Core.Commands
+@inject IFranchiseService FranchiseService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject ILogger<PickFranchiseDialog> Logger
+
+<MudDialog ContentClass="pa-0">
+    <DialogContent>
+        <div class="px-6 pb-3" style="min-width: 420px;">
+            <MudTextField @bind-Value="_search" Placeholder="Search franchises" FullWidth
+                          Immediate Clearable Variant="Variant.Outlined" Margin="Margin.Dense"
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Rounded.Search" />
+        </div>
+
+        <MudTable T="FranchiseSummary" Items="_franchises" Filter="Matches" Dense Hover Loading="_loading"
+                  Elevation="0" FixedHeader Height="320px" Breakpoint="Breakpoint.None"
+                  Class="mud-width-full" HeaderClass="gray lighten-2" Square>
+            <HeaderContent>
+                <MudTh Style="min-width: 10rem">Name</MudTh>
+                <MudTh>Abbr.</MudTh>
+                <MudTh>Seasons</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">
+                    <div class="d-flex align-center gap-2">
+                        <BoltonCupImage Src="@context.Franchise.Logo" Width="32" />
+                        <MudLink Color="Color.Info" Underline="Underline.Always" OnClick="@(() => Select(context.Franchise))">@context.Franchise.Name</MudLink>
+                    </div>
+                </MudTd>
+                <MudTd DataLabel="Abbr.">@context.Franchise.Abbreviation</MudTd>
+                <MudTd DataLabel="Seasons">@context.SeasonCount</MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText Typo="Typo.body2" Class="pa-4">No franchises match.</MudText>
+            </NoRecordsContent>
+        </MudTable>
+
+        @if (AllowCreate)
+        {
+            <MudDivider />
+            <div class="px-6 py-3">
+                <MudText Typo="Typo.subtitle2" Class="mb-2">Or create a new franchise</MudText>
+                <MudStack Spacing="2">
+                    <MudTextField @bind-Value="_name" Label="Name" Required Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <MudStack Row Spacing="2">
+                        <MudTextField @bind-Value="_nameShort" Label="Name (short)" Required Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        <MudTextField @bind-Value="_abbreviation" Label="Abbreviation" Required Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    </MudStack>
+                    <MudStack Row Spacing="4" AlignItems="AlignItems.Center">
+                        <div>
+                            <MudText Typo="Typo.caption">Primary</MudText>
+                            <SimpleColorPicker Text="@_primaryColorHex" TextChanged="@(c => _primaryColorHex = c ?? DefaultPrimaryColorHex)" Width="80px" />
+                        </div>
+                        <div>
+                            <MudText Typo="Typo.caption">Secondary</MudText>
+                            <SimpleColorPicker Text="@_secondaryColorHex" TextChanged="@(c => _secondaryColorHex = c ?? DefaultSecondaryColorHex)" Width="80px" />
+                        </div>
+                        <div>
+                            <MudText Typo="Typo.caption">Tertiary</MudText>
+                            <SimpleColorPicker Text="@_tertiaryColorHex" TextChanged="@(c => _tertiaryColorHex = c)" Width="80px" />
+                        </div>
+                    </MudStack>
+                </MudStack>
+            </div>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_saving">Cancel</MudButton>
+        @if (AllowCreate)
+        {
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateAsync" Disabled="_saving">
+                @(_saving ? "Creating…" : "Create franchise")
+            </MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+    const string DefaultPrimaryColorHex = "#000000";
+    const string DefaultSecondaryColorHex = "#FFFFFF";
+
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    /// <summary>When false, the dialog only picks an existing franchise (used by "Move…").</summary>
+    [Parameter]
+    public bool AllowCreate { get; set; } = true;
+
+    /// <summary>A franchise to leave out of the list, such as the team's current franchise.</summary>
+    [Parameter]
+    public int? ExcludeFranchiseId { get; set; }
+
+    IReadOnlyList<FranchiseSummary> _franchises = [];
+    bool _loading = true;
+    bool _saving;
+    string? _search;
+
+    string _name = string.Empty;
+    string _nameShort = string.Empty;
+    string _abbreviation = string.Empty;
+    string _primaryColorHex = DefaultPrimaryColorHex;
+    string _secondaryColorHex = DefaultSecondaryColorHex;
+    string? _tertiaryColorHex;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _franchises = (await FranchiseService.GetAllAsync())
+                .Where(s => s.Franchise.Id != ExcludeFranchiseId)
+                .OrderBy(s => s.Franchise.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to load franchises");
+            Snackbar.Add("Franchises could not be loaded.", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    bool Matches(FranchiseSummary summary)
+    {
+        if (string.IsNullOrWhiteSpace(_search))
+        {
+            return true;
+        }
+
+        var franchise = summary.Franchise;
+        return franchise.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)
+               || franchise.NameShort.Contains(_search, StringComparison.OrdinalIgnoreCase)
+               || franchise.Abbreviation.Contains(_search, StringComparison.OrdinalIgnoreCase);
+    }
+
+    void Select(Franchise franchise) => Dialog.Close(DialogResult.Ok(franchise));
+
+    // The franchise is saved here, before the dialog closes, so the caller always gets a real id.
+    async Task CreateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_name) || string.IsNullOrWhiteSpace(_nameShort) || string.IsNullOrWhiteSpace(_abbreviation))
+        {
+            Snackbar.Add("Name, short name and abbreviation are required.", Severity.Warning);
+            return;
+        }
+
+        var name = _name.Trim();
+        if (_franchises.Any(s => string.Equals(s.Franchise.Name, name, StringComparison.OrdinalIgnoreCase)))
+        {
+            var confirmed = await DialogService.ShowMessageBoxAsync(
+                "Duplicate franchise name",
+                $"A franchise named \"{name}\" already exists. Pick it from the list to keep one history, or create a second franchise with the same name.",
+                yesText: "Create anyway",
+                cancelText: "Go back");
+            if (confirmed is not true)
+            {
+                return;
+            }
+        }
+
+        _saving = true;
+        try
+        {
+            var franchise = await FranchiseService.CreateAsync(new CreateFranchiseCommand(
+                name,
+                _nameShort.Trim(),
+                _abbreviation.Trim(),
+                _primaryColorHex,
+                _secondaryColorHex,
+                string.IsNullOrWhiteSpace(_tertiaryColorHex) ? null : _tertiaryColorHex));
+            Snackbar.Add($"Franchise \"{franchise.Name}\" created.", Severity.Success);
+            Dialog.Close(DialogResult.Ok(franchise));
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to create franchise");
+            Snackbar.Add("The franchise could not be created.", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    void Cancel() => Dialog.Cancel();
+}

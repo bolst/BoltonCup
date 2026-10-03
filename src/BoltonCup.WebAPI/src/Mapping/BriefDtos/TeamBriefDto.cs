@@ -21,6 +21,10 @@ public record TeamBriefDto
     public string? SecondaryColorHex { get; set; }
     /// <summary>Gets or sets the tertiary color hex code.</summary>
     public string? TertiaryColorHex { get; set; }
+    /// <summary>Gets or sets the ID of the franchise this team belongs to.</summary>
+    public required int FranchiseId { get; set; }
+    /// <summary>Gets or sets the franchise this team belongs to. Null when the franchise was not loaded.</summary>
+    public FranchiseBriefDto? Franchise { get; set; }
 }
 /// <summary>Brief summary of a team with their goal count for a specific game.</summary>
 public record TeamInGameDto : TeamBriefDto

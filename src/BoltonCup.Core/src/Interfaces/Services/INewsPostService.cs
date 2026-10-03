@@ -1,8 +1,5 @@
 namespace BoltonCup.Core;
 
-/// <summary>A post (0 when unsaved) and the slug it would like to use.</summary>
-public sealed record SlugCandidate(int PostId, string Slug);
-
 public interface INewsPostService
 {
     /// <summary>Published posts, newest first.</summary>

@@ -1,0 +1,127 @@
+@inject IFranchiseService FranchiseService
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject ISnackbar Snackbar
+@inject ILogger<MergeFranchiseDialog> Logger
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="3" Style="min-width: 420px;">
+            <MudSelect T="Franchise"
+                       Label="Merge into"
+                       Value="_target"
+                       ValueChanged="@(f => _target = f)"
+                       ToStringFunc="@(f => f?.Name)"
+                       Disabled="_loading"
+                       Variant="Variant.Outlined"
+                       Dense>
+                @foreach (var franchise in _targets)
+                {
+                    <MudSelectItem T="Franchise" Value="franchise">@franchise.Name</MudSelectItem>
+                }
+            </MudSelect>
+
+            @if (_target is not null)
+            {
+                <MudAlert Severity="Severity.Warning" Dense>
+                    @_sourceTeamCount @(_sourceTeamCount == 1 ? "team moves" : "teams move") to @_target.Name;
+                    @OwnersCarriedOverText(); @_target.Name branding is kept; @Source.Name is deleted.
+                    Public pages may not show this change right away.
+                </MudAlert>
+            }
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Disabled="_saving">Cancel</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="MergeAsync" Disabled="@(_saving || _target is null)">
+            @(_saving ? "Merging…" : "Merge")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter]
+    [EditorRequired]
+    public Franchise Source { get; set; } = null!;
+
+    IReadOnlyList<Franchise> _targets = [];
+    int _sourceTeamCount;
+    Dictionary<int, List<Account>> _ownersByFranchise = [];
+    Franchise? _target;
+    bool _loading = true;
+    bool _saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var summaries = await FranchiseService.GetAllAsync();
+            _sourceTeamCount = summaries.FirstOrDefault(s => s.Franchise.Id == Source.Id)?.SeasonCount ?? 0;
+            _targets = summaries
+                .Select(s => s.Franchise)
+                .Where(f => f.Id != Source.Id)
+                .OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            _ownersByFranchise = await dbContext.Franchises
+                .AsNoTracking()
+                .Include(f => f.Owners)
+                .ToDictionaryAsync(f => f.Id, f => f.Owners.ToList());
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to load merge targets for franchise {FranchiseId}", Source.Id);
+            Snackbar.Add("Franchises could not be loaded.", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    string OwnersCarriedOverText()
+    {
+        var targetOwnerIds = _ownersByFranchise.GetValueOrDefault(_target!.Id, []).Select(o => o.Id).ToHashSet();
+        var carriedOver = _ownersByFranchise.GetValueOrDefault(Source.Id, [])
+            .Where(o => !targetOwnerIds.Contains(o.Id))
+            .Select(o => o.ToString())
+            .ToList();
+
+        if (carriedOver.Count == 0)
+        {
+            return "no owners carry over";
+        }
+
+        return $"{string.Join(", ", carriedOver)} {(carriedOver.Count == 1 ? "becomes an owner" : "become owners")} of {_target.Name}";
+    }
+
+    async Task MergeAsync()
+    {
+        if (_target is null)
+        {
+            return;
+        }
+
+        _saving = true;
+        try
+        {
+            await FranchiseService.MergeAsync(Source.Id, _target.Id);
+            Snackbar.Add($"{Source.Name} merged into {_target.Name}.", Severity.Success);
+            Dialog.Close(DialogResult.Ok(true));
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to merge franchise {SourceId} into {TargetId}", Source.Id, _target.Id);
+            Snackbar.Add("The franchises could not be merged.", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    void Cancel() => Dialog.Cancel();
+}

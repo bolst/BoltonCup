@@ -49,6 +49,10 @@
                             </div>
                             <div class="d-flex flex-row align-center">
                                 <MudButton Href="@($"/teams/{team.Id}/roster")">Roster</MudButton>
+                                @if (team.Franchise is not null)
+                                {
+                                    <MudButton Href="@($"/franchises/{team.Franchise.Slug}")">Franchise</MudButton>
+                                }
                                 @* <MudButton Href="@($"/schedule?team={team.Id}")">Schedule</MudButton> *@
                             </div>
                         </div>

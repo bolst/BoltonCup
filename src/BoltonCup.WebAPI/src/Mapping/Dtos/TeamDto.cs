@@ -13,6 +13,10 @@ public record TeamDto
     public required string Abbreviation { get; init; }
     /// <summary>Gets the tournament this team participates in.</summary>
     public TournamentBriefDto? Tournament { get; init; }
+    /// <summary>Gets the ID of the franchise this team belongs to.</summary>
+    public required int FranchiseId { get; init; }
+    /// <summary>Gets the franchise this team belongs to. Null when the franchise was not loaded.</summary>
+    public FranchiseBriefDto? Franchise { get; init; }
     /// <summary>Gets the URL of the team logo.</summary>
     public string? LogoUrl { get; init; }
     /// <summary>Gets the URL of the team banner image.</summary>

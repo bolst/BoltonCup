@@ -1,0 +1,271 @@
+@page "/franchises"
+@inject IFranchiseService FranchiseService
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject ILogger<Franchises> Logger
+
+<EntityDataGrid
+    @ref="@_dataGrid"
+    T="Franchise"
+    NewItemFunc="NewItemFunc"
+    SearchBy="x => x.Name"
+    Comparer="_comparer"
+    OnSave="PrepareForSave"
+    NoDeleting>
+    <ToolbarContent>
+        <MudText Typo="Typo.caption" Class="mud-text-secondary mx-2">Public pages may not show this change right away.</MudText>
+    </ToolbarContent>
+    <Columns>
+        <PropertyColumn Title="Id" Property="x => x.Id" Editable="false" />
+        <PropertyColumn Title="Franchise" Property="x => x.Name" />
+        <PropertyColumn Title="Slug" Property="x => x.Slug" Required="false" />
+        <PropertyColumn Title="Name (short)" Property="x => x.NameShort" />
+        <PropertyColumn Title="Abbreviation" Property="x => x.Abbreviation" />
+        <ImageColumn T="Franchise" Title="Logo" Property="x => x.Logo" OnImageUploaded="UpdateLogo" />
+        <ImageColumn T="Franchise" Title="Banner" Property="x => x.Banner" OnImageUploaded="UpdateBanner" />
+        <ManyForeignColumn T="Franchise" TEntity="Account" Title="Owners" Property="x => x.Owners"
+                           EqualityComparer="new AccountComparer()" ImageSrcFunc="a => a.Avatar"
+                           SearchBy="a => a.FirstName + ' ' + a.LastName"
+                           OnSelectionChanged="UpdateOwners" />
+        <ColorPickerColumn Title="Primary" Property="x => x.PrimaryColorHex" />
+        <ColorPickerColumn Title="Secondary" Property="x => x.SecondaryColorHex" />
+        <ColorPickerColumn Title="Tertiary" Property="x => x.TertiaryColorHex" />
+        <TemplateColumn Title="Seasons" Sortable="false" Editable="false">
+            <CellTemplate>
+                @SeasonCount(context.Item)
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Actions" Sortable="false" Editable="false">
+            <CellTemplate>
+                <div class="d-flex flex-row gap-1">
+                    <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Info"
+                               Disabled="@(context.Item.Id == 0)"
+                               OnClick="@(() => MergeAsync(context.Item))">
+                        Merge into…
+                    </MudButton>
+                    <MudTooltip Text="@(SeasonCount(context.Item) > 0 ? "Move or merge its teams first" : string.Empty)">
+                        <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Error"
+                                   Disabled="@(context.Item.Id == 0 || !_seasonCountsLoaded || SeasonCount(context.Item) > 0)"
+                                   OnClick="@(() => DeleteAsync(context.Item))">
+                            Delete
+                        </MudButton>
+                    </MudTooltip>
+                </div>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</EntityDataGrid>
+
+@code {
+
+    EntityDataGrid<Franchise> _dataGrid = null!;
+    readonly FranchiseComparer _comparer = new FranchiseComparer();
+    Dictionary<int, int> _seasonCounts = [];
+    bool _seasonCountsLoaded;
+
+    protected override Task OnInitializedAsync() => LoadSeasonCountsAsync();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await _dataGrid.ExtendSortAsync("Name", SortDirection.Ascending, x => x.Name);
+    }
+
+    Task<Franchise?> NewItemFunc() => Task.FromResult<Franchise?>(new Franchise
+    {
+        Name = "New franchise",
+        NameShort = "New",
+        Abbreviation = "NEW",
+        PrimaryColorHex = "#000000",
+        SecondaryColorHex = "#FFFFFF",
+    });
+
+    // Runs before the grid persists: slugs are derived here so a blank slug never reaches the unique index.
+    // Edited franchises go first so an existing permalink is never bumped aside by a new franchise with the same name.
+    async Task PrepareForSave(ChangeTracker<Franchise> tracker)
+    {
+        var franchises = tracker.EditItems.Concat(tracker.NewItems).ToList();
+        if (franchises.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var franchise in franchises)
+        {
+            franchise.Name = franchise.Name.Trim();
+            franchise.Slug = SlugGenerator.Generate(
+                string.IsNullOrWhiteSpace(franchise.Slug) ? franchise.Name : franchise.Slug,
+                Franchise.SlugFallback);
+        }
+
+        var candidates = franchises.Select(f => new SlugCandidate(f.Id, f.Slug)).ToList();
+        var reserved = await FranchiseService.ReserveSlugsAsync(candidates);
+        for (var i = 0; i < franchises.Count; i++)
+        {
+            franchises[i].Slug = reserved[i];
+        }
+    }
+
+    int SeasonCount(Franchise franchise) => _seasonCounts.GetValueOrDefault(franchise.Id);
+
+    // Loaded once and after each merge or delete, not on every grid reload or search keystroke.
+    async Task LoadSeasonCountsAsync()
+    {
+        try
+        {
+            var summaries = await FranchiseService.GetAllAsync();
+            _seasonCounts = summaries.ToDictionary(s => s.Franchise.Id, s => s.SeasonCount);
+            _seasonCountsLoaded = true;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to load franchise season counts");
+            Snackbar.Add("Season counts could not be loaded.", Severity.Error);
+        }
+    }
+
+    async Task UpdateLogo(ImageUploadResult<Franchise> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey))
+        {
+            return;
+        }
+
+        if (result.Item.Id == 0)
+        {
+            Snackbar.Add("Save the franchise before uploading a logo.", Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            await FranchiseService.UpdateLogoAsync(result.Item.Id, result.NewKey);
+
+            // A later grid Save writes the row's scalars back, so the in-memory row must match the database.
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            result.Item.Logo = await dbContext.Franchises
+                .Where(f => f.Id == result.Item.Id)
+                .Select(f => f.Logo)
+                .FirstOrDefaultAsync();
+            foreach (var pending in _dataGrid.PendingEdits.Where(f => f.Id == result.Item.Id))
+            {
+                pending.Logo = result.Item.Logo;
+            }
+            Snackbar.Add("Logo saved.", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to update logo for franchise {FranchiseId}", result.Item.Id);
+            Snackbar.Add("The logo could not be saved.", Severity.Error);
+        }
+    }
+
+    async Task UpdateBanner(ImageUploadResult<Franchise> result)
+    {
+        if (string.IsNullOrEmpty(result.NewKey))
+        {
+            return;
+        }
+
+        if (result.Item.Id == 0)
+        {
+            Snackbar.Add("Save the franchise before uploading a banner.", Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            await FranchiseService.UpdateBannerAsync(result.Item.Id, result.NewKey);
+
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            result.Item.Banner = await dbContext.Franchises
+                .Where(f => f.Id == result.Item.Id)
+                .Select(f => f.Banner)
+                .FirstOrDefaultAsync();
+            foreach (var pending in _dataGrid.PendingEdits.Where(f => f.Id == result.Item.Id))
+            {
+                pending.Banner = result.Item.Banner;
+            }
+            Snackbar.Add("Banner saved.", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to update banner for franchise {FranchiseId}", result.Item.Id);
+            Snackbar.Add("The banner could not be saved.", Severity.Error);
+        }
+    }
+
+    async Task UpdateOwners(ManyForeignSelection<Franchise, Account> selection)
+    {
+        // An unsaved franchise has no id yet; the grid's save inserts its owners with it.
+        if (selection.Item.Id == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            await FranchiseService.SetOwnersAsync(
+                selection.Item.Id,
+                selection.Selected.Select(a => a.Id).ToList());
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to set owners for franchise {FranchiseId}", selection.Item.Id);
+            Snackbar.Add("Owners could not be saved.", Severity.Error);
+        }
+    }
+
+    async Task MergeAsync(Franchise franchise)
+    {
+        var dialog = await DialogService.ShowAsync<MergeFranchiseDialog>(
+            $"Merge {franchise.Name}",
+            new DialogParameters<MergeFranchiseDialog>
+            {
+                { x => x.Source, franchise },
+            });
+
+        var result = await dialog.Result;
+        if (result?.Data is true)
+        {
+            // The source no longer exists, so a queued edit of it could never be saved.
+            _dataGrid.DiscardPendingChanges(f => f.Id == franchise.Id);
+            await LoadSeasonCountsAsync();
+            await _dataGrid.ReloadAsync();
+        }
+    }
+
+    async Task DeleteAsync(Franchise franchise)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Delete franchise",
+            $"Delete {franchise.Name}? Public pages may not show this change right away.",
+            yesText: "Delete",
+            cancelText: "Cancel");
+        if (confirmed is not true)
+        {
+            return;
+        }
+
+        try
+        {
+            await FranchiseService.DeleteAsync(franchise.Id);
+            _dataGrid.DiscardPendingChanges(f => f.Id == franchise.Id);
+            Snackbar.Add($"{franchise.Name} deleted.", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to delete franchise {FranchiseId}", franchise.Id);
+            Snackbar.Add($"{franchise.Name} could not be deleted. Move or merge its teams first.", Severity.Error);
+        }
+
+        await LoadSeasonCountsAsync();
+        await _dataGrid.ReloadAsync();
+    }
+
+}

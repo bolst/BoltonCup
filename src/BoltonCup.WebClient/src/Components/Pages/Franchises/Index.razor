@@ -1,0 +1,94 @@
+@page "/franchises"
+@inject IBoltonCupApi BoltonCupApi
+@inject ILogger<Index> Logger
+
+<PageTitle>Franchises | Bolton Cup</PageTitle>
+<HeadContent>
+    <meta name="description" content="Every Bolton Cup franchise, ranked by championships.">
+</HeadContent>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="px-1" Gutters="false">
+    <div class="mud-width-full d-flex flex-row gap-3 align-center mt-6 mb-1 ml-2">
+        @if (_loading)
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="220px" Height="40px" />
+        }
+        else
+        {
+            <MudText Typo="Typo.h5"><b>Franchises</b></MudText>
+        }
+    </div>
+    @if (_failed)
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-4">Franchises could not be loaded right now. Please try again later.</MudAlert>
+    }
+    <MudGrid Spacing="3">
+        @if (_loading)
+        {
+            @for (var i = 0; i < 4; i++)
+            {
+                <MudItem xs="12" md="6">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100px" Width="100%" />
+                </MudItem>
+            }
+        }
+        else
+        {
+            @foreach (var franchise in _franchises)
+            {
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="d-flex flex-row align-center gap-3 px-1 py-8" Width="100%" Height="100px" Elevation="0" Outlined>
+                        <div class="d-flex align-center justify-center mud-full-height" style="width: 120px">
+                            <MudImage Src="@franchise.LogoUrl" Alt="@franchise.Name" Height="80" />
+                        </div>
+                        <div class="d-flex flex-column align-start justify-space-between">
+                            <MudText Typo="Typo.h6"><b>@franchise.Name</b></MudText>
+                            <div class="d-flex flex-row align-center gap-1">
+                                @if (franchise.TitleCount > 0)
+                                {
+                                    <ChampionIcon Size="Size.Small" />
+                                }
+                                <MudText Typo="Typo.body2">@TitleLabel(franchise.TitleCount)</MudText>
+                                <MudButton Href="@($"/franchises/{franchise.Slug}")">View</MudButton>
+                            </div>
+                        </div>
+                    </MudPaper>
+                </MudItem>
+            }
+        }
+    </MudGrid>
+</MudContainer>
+
+
+@code {
+
+    List<Sdk.FranchiseDto> _franchises = [];
+    bool _loading = true;
+    bool _failed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var franchises = await BoltonCupApi.GetFranchisesAsync();
+            _franchises = franchises
+                .Where(f => f.SeasonCount > 0)
+                .ToList();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to load franchises");
+            _failed = true;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    static string TitleLabel(int titleCount)
+    {
+        return titleCount == 1 ? "1 title" : $"{titleCount} titles";
+    }
+
+}

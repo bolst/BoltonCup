@@ -6467,6 +6467,227 @@
         ]
       }
     },
+    "/api/franchises": {
+      "get": {
+        "tags": [
+          "Franchises"
+        ],
+        "description": "Gets all franchises with their title and season counts.\n\nGets all franchises with their current brand, title count and season count, sorted by titles descending,\nthen by name. Results are cached.",
+        "operationId": "GetFranchises",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FranchiseDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FranchiseDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FranchiseDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/franchises/{slug}": {
+      "get": {
+        "tags": [
+          "Franchises"
+        ],
+        "description": "Gets a single franchise by its URL slug.\n\nGets a single franchise with its owners, titles, all-time record, season history and skater and goalie\nleaders. Returns no content when no franchise has this slug.",
+        "operationId": "GetFranchiseBySlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FranchiseSingleDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FranchiseSingleDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FranchiseSingleDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/games": {
       "get": {
         "tags": [
@@ -15619,6 +15840,512 @@
         "additionalProperties": false,
         "description": "Request payload for initiating a forgot-password flow."
       },
+      "FranchiseBriefDto": {
+        "required": [
+          "abbreviation",
+          "id",
+          "name",
+          "nameShort",
+          "primaryColorHex",
+          "secondaryColorHex",
+          "slug"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets the franchise ID.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Gets the full franchise name."
+          },
+          "slug": {
+            "type": "string",
+            "description": "Gets the URL slug that identifies the franchise's page."
+          },
+          "nameShort": {
+            "type": "string",
+            "description": "Gets the short franchise name."
+          },
+          "abbreviation": {
+            "type": "string",
+            "description": "Gets the franchise abbreviation."
+          },
+          "logoUrl": {
+            "type": "string",
+            "description": "Gets the URL of the franchise logo.",
+            "nullable": true
+          },
+          "primaryColorHex": {
+            "type": "string",
+            "description": "Gets the primary color hex code."
+          },
+          "secondaryColorHex": {
+            "type": "string",
+            "description": "Gets the secondary color hex code."
+          },
+          "tertiaryColorHex": {
+            "type": "string",
+            "description": "Gets the tertiary color hex code.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Brief summary of a franchise and its current brand."
+      },
+      "FranchiseDto": {
+        "required": [
+          "abbreviation",
+          "id",
+          "name",
+          "nameShort",
+          "primaryColorHex",
+          "seasonCount",
+          "secondaryColorHex",
+          "slug",
+          "titleCount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets the franchise ID.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Gets the full franchise name."
+          },
+          "slug": {
+            "type": "string",
+            "description": "Gets the URL slug that identifies the franchise's page."
+          },
+          "nameShort": {
+            "type": "string",
+            "description": "Gets the short franchise name."
+          },
+          "abbreviation": {
+            "type": "string",
+            "description": "Gets the franchise abbreviation."
+          },
+          "logoUrl": {
+            "type": "string",
+            "description": "Gets the URL of the franchise logo.",
+            "nullable": true
+          },
+          "primaryColorHex": {
+            "type": "string",
+            "description": "Gets the primary color hex code."
+          },
+          "secondaryColorHex": {
+            "type": "string",
+            "description": "Gets the secondary color hex code."
+          },
+          "tertiaryColorHex": {
+            "type": "string",
+            "description": "Gets the tertiary color hex code.",
+            "nullable": true
+          },
+          "titleCount": {
+            "type": "integer",
+            "description": "Gets the number of tournaments won by any team of this franchise.",
+            "format": "int32"
+          },
+          "seasonCount": {
+            "type": "integer",
+            "description": "Gets the number of seasons (team rows) this franchise has played.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a franchise in a list, with its title and season counts."
+      },
+      "FranchiseGoalieLeaderDto": {
+        "required": [
+          "accountId",
+          "firstName",
+          "gamesPlayed",
+          "goalsAgainstAverage",
+          "lastName",
+          "savePercentage",
+          "saves",
+          "seasons",
+          "shotsAgainst",
+          "shutouts",
+          "wins"
+        ],
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "description": "Gets the account ID of the goalie.",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Gets the first name of the goalie."
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Gets the last name of the goalie."
+          },
+          "profilePictureUrl": {
+            "type": "string",
+            "description": "Gets the URL of the goalie's profile picture.",
+            "nullable": true
+          },
+          "seasons": {
+            "type": "integer",
+            "description": "Gets the number of seasons the goalie played for the franchise.",
+            "format": "int32"
+          },
+          "gamesPlayed": {
+            "type": "integer",
+            "description": "Gets the number of games played.",
+            "format": "int32"
+          },
+          "wins": {
+            "type": "integer",
+            "description": "Gets the number of wins.",
+            "format": "int32"
+          },
+          "shutouts": {
+            "type": "integer",
+            "description": "Gets the number of shutouts.",
+            "format": "int32"
+          },
+          "saves": {
+            "type": "integer",
+            "description": "Gets the number of saves.",
+            "format": "int32"
+          },
+          "shotsAgainst": {
+            "type": "integer",
+            "description": "Gets the number of shots against.",
+            "format": "int32"
+          },
+          "savePercentage": {
+            "type": "number",
+            "description": "Gets the save percentage (saves divided by shots against); 0 when no shots were faced.",
+            "format": "double"
+          },
+          "goalsAgainstAverage": {
+            "type": "number",
+            "description": "Gets the goals-against average: goals against per game played, unweighted by minutes.",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a goalie's totals across every season played for a franchise."
+      },
+      "FranchiseOwnerDto": {
+        "required": [
+          "accountId"
+        ],
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "description": "Gets the account ID of the owner.",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Gets the first name of the owner.",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Gets the last name of the owner.",
+            "nullable": true
+          },
+          "profilePictureUrl": {
+            "type": "string",
+            "description": "Gets the URL of the owner's profile picture.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing an owner of a franchise."
+      },
+      "FranchiseRecordDto": {
+        "required": [
+          "gamesPlayed",
+          "goalsAgainst",
+          "goalsFor",
+          "losses",
+          "ties",
+          "wins"
+        ],
+        "type": "object",
+        "properties": {
+          "gamesPlayed": {
+            "type": "integer",
+            "description": "Gets the number of completed games played.",
+            "format": "int32"
+          },
+          "wins": {
+            "type": "integer",
+            "description": "Gets the number of wins.",
+            "format": "int32"
+          },
+          "losses": {
+            "type": "integer",
+            "description": "Gets the number of losses, including overtime and shootout losses.",
+            "format": "int32"
+          },
+          "ties": {
+            "type": "integer",
+            "description": "Gets the number of ties.",
+            "format": "int32"
+          },
+          "goalsFor": {
+            "type": "integer",
+            "description": "Gets the number of goals scored.",
+            "format": "int32"
+          },
+          "goalsAgainst": {
+            "type": "integer",
+            "description": "Gets the number of goals conceded.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Win/loss totals over completed games. Losses include overtime and shootout losses; a forfeit (completed 0–0)\ncounts as a tie."
+      },
+      "FranchiseSeasonDto": {
+        "required": [
+          "generalManagers",
+          "isChampion",
+          "name",
+          "record",
+          "teamId"
+        ],
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "description": "Gets the ID of the team that played this season.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Gets the team name as played that season."
+          },
+          "logoUrl": {
+            "type": "string",
+            "description": "Gets the URL of the team logo as played that season.",
+            "nullable": true
+          },
+          "tournament": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ],
+            "description": "Gets the tournament of this season; null when the team has no tournament.",
+            "nullable": true
+          },
+          "record": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FranchiseRecordDto"
+              }
+            ],
+            "description": "Gets the team's record for this season."
+          },
+          "generalManagers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamGmDto"
+            },
+            "description": "Gets the team's general managers that season."
+          },
+          "isChampion": {
+            "type": "boolean",
+            "description": "Gets whether this team won its tournament."
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing one season of a franchise, with the team's as-played brand."
+      },
+      "FranchiseSingleDto": {
+        "required": [
+          "abbreviation",
+          "allTime",
+          "goalieLeaders",
+          "id",
+          "intraFranchiseGames",
+          "name",
+          "nameShort",
+          "owners",
+          "primaryColorHex",
+          "seasons",
+          "secondaryColorHex",
+          "skaterLeaders",
+          "slug",
+          "titles"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets the franchise ID.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Gets the full franchise name."
+          },
+          "slug": {
+            "type": "string",
+            "description": "Gets the URL slug that identifies the franchise's page."
+          },
+          "nameShort": {
+            "type": "string",
+            "description": "Gets the short franchise name."
+          },
+          "abbreviation": {
+            "type": "string",
+            "description": "Gets the franchise abbreviation."
+          },
+          "logoUrl": {
+            "type": "string",
+            "description": "Gets the URL of the franchise logo.",
+            "nullable": true
+          },
+          "primaryColorHex": {
+            "type": "string",
+            "description": "Gets the primary color hex code."
+          },
+          "secondaryColorHex": {
+            "type": "string",
+            "description": "Gets the secondary color hex code."
+          },
+          "tertiaryColorHex": {
+            "type": "string",
+            "description": "Gets the tertiary color hex code.",
+            "nullable": true
+          },
+          "bannerUrl": {
+            "type": "string",
+            "description": "Gets the URL of the franchise banner image.",
+            "nullable": true
+          },
+          "owners": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FranchiseOwnerDto"
+            },
+            "description": "Gets the franchise's owners."
+          },
+          "titles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TournamentBriefDto"
+            },
+            "description": "Gets the tournaments won by any team of this franchise, oldest first."
+          },
+          "allTime": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FranchiseRecordDto"
+              }
+            ],
+            "description": "Gets the all-time record: the sum of BoltonCup.WebAPI.Mapping.FranchiseSingleDto.Seasons. A game between two teams of this franchise counts\nonce for each side."
+          },
+          "intraFranchiseGames": {
+            "type": "integer",
+            "description": "Gets the number of completed games played between two teams of this franchise.",
+            "format": "int32"
+          },
+          "seasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FranchiseSeasonDto"
+            },
+            "description": "Gets the franchise's seasons, newest first, each with its as-played team brand."
+          },
+          "skaterLeaders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FranchiseSkaterLeaderDto"
+            },
+            "description": "Gets the top skaters across all seasons, sorted by points, then goals, then fewest games played."
+          },
+          "goalieLeaders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FranchiseGoalieLeaderDto"
+            },
+            "description": "Gets the top goalies (at least two games played), sorted by wins, then goals-against average."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Detailed DTO for a single franchise: owners, titles, all-time record, season history and leaders."
+      },
+      "FranchiseSkaterLeaderDto": {
+        "required": [
+          "accountId",
+          "assists",
+          "firstName",
+          "gamesPlayed",
+          "goals",
+          "lastName",
+          "points",
+          "seasons"
+        ],
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "integer",
+            "description": "Gets the account ID of the skater.",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Gets the first name of the skater."
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Gets the last name of the skater."
+          },
+          "profilePictureUrl": {
+            "type": "string",
+            "description": "Gets the URL of the skater's profile picture.",
+            "nullable": true
+          },
+          "seasons": {
+            "type": "integer",
+            "description": "Gets the number of seasons the skater played for the franchise.",
+            "format": "int32"
+          },
+          "gamesPlayed": {
+            "type": "integer",
+            "description": "Gets the number of games played.",
+            "format": "int32"
+          },
+          "goals": {
+            "type": "integer",
+            "description": "Gets the number of goals.",
+            "format": "int32"
+          },
+          "assists": {
+            "type": "integer",
+            "description": "Gets the number of assists.",
+            "format": "int32"
+          },
+          "points": {
+            "type": "integer",
+            "description": "Gets the number of points.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a skater's totals across every season played for a franchise."
+      },
       "GalleryBriefDto": {
         "type": "object",
         "properties": {
@@ -18380,6 +19107,9 @@
         "type": "string"
       },
       "TeamBriefDto": {
+        "required": [
+          "franchiseId"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -18426,6 +19156,20 @@
             "type": "string",
             "description": "Gets or sets the tertiary color hex code.",
             "nullable": true
+          },
+          "franchiseId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the franchise this team belongs to.",
+            "format": "int32"
+          },
+          "franchise": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FranchiseBriefDto"
+              }
+            ],
+            "description": "Gets or sets the franchise this team belongs to. Null when the franchise was not loaded.",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -18434,6 +19178,7 @@
       "TeamDto": {
         "required": [
           "abbreviation",
+          "franchiseId",
           "id",
           "name",
           "nameShort",
@@ -18466,6 +19211,20 @@
               }
             ],
             "description": "Gets the tournament this team participates in.",
+            "nullable": true
+          },
+          "franchiseId": {
+            "type": "integer",
+            "description": "Gets the ID of the franchise this team belongs to.",
+            "format": "int32"
+          },
+          "franchise": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FranchiseBriefDto"
+              }
+            ],
+            "description": "Gets the franchise this team belongs to. Null when the franchise was not loaded.",
             "nullable": true
           },
           "logoUrl": {
@@ -18576,6 +19335,9 @@
         "description": "DTO representing a general manager of a team."
       },
       "TeamInGameDto": {
+        "required": [
+          "franchiseId"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -18621,6 +19383,20 @@
           "tertiaryColorHex": {
             "type": "string",
             "description": "Gets or sets the tertiary color hex code.",
+            "nullable": true
+          },
+          "franchiseId": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the franchise this team belongs to.",
+            "format": "int32"
+          },
+          "franchise": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FranchiseBriefDto"
+              }
+            ],
+            "description": "Gets or sets the franchise this team belongs to. Null when the franchise was not loaded.",
             "nullable": true
           },
           "goals": {
@@ -18683,6 +19459,7 @@
       "TeamSingleDto": {
         "required": [
           "abbreviation",
+          "franchiseId",
           "id",
           "name",
           "nameShort",
@@ -18716,6 +19493,20 @@
               }
             ],
             "description": "Gets the tournament this team participates in.",
+            "nullable": true
+          },
+          "franchiseId": {
+            "type": "integer",
+            "description": "Gets the ID of the franchise this team belongs to.",
+            "format": "int32"
+          },
+          "franchise": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FranchiseBriefDto"
+              }
+            ],
+            "description": "Gets the franchise this team belongs to. Null when the franchise was not loaded.",
             "nullable": true
           },
           "logoUrl": {
@@ -19763,6 +20554,9 @@
     },
     {
       "name": "Drafts"
+    },
+    {
+      "name": "Franchises"
     },
     {
       "name": "Games"

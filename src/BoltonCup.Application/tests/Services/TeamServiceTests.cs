@@ -2,6 +2,7 @@ using BoltonCup.Core;
 using BoltonCup.Core.Exceptions;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Application.Services;
+using BoltonCup.Application.Tests.Helpers;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -13,6 +14,7 @@ public class TeamServiceTests
 {
     const int TournamentId = 1;
     const int TeamId = 10;
+    const int FranchiseId = 100;
 
     static BoltonCupDbContext NewContext() =>
         new(new DbContextOptionsBuilder<BoltonCupDbContext>()
@@ -147,13 +149,71 @@ public class TeamServiceTests
         await act.Should().ThrowAsync<EntityNotFoundException>();
     }
 
+    [Fact]
+    public async Task GetById_IncludesFranchise()
+    {
+        await using var db = await SeedAsync();
+        var service = NewService(db);
+
+        var team = await service.GetByIdAsync(TeamId);
+
+        team!.FranchiseId.Should().Be(FranchiseId);
+        team.Franchise.Should().NotBeNull();
+        team.Franchise.Name.Should().Be("Test Franchise");
+    }
+
+    const int GmId = 1;
+    const int OwnerId = 2;
+
+    [Fact]
+    public async Task CanManage_Owner_False()
+    {
+        await using var db = await SeedOwnershipAsync();
+        var service = NewService(db);
+
+        (await service.CanManageAsync(TeamId, OwnerId)).Should().BeFalse();
+        (await service.CanManageAsync(TeamId, GmId)).Should().BeTrue();
+    }
+
+    static async Task<BoltonCupDbContext> SeedOwnershipAsync()
+    {
+        var db = await SeedAsync();
+        var accounts = new[] { GmId, OwnerId }.ToDictionary(id => id, id => new Account
+        {
+            Id = id,
+            FirstName = "First",
+            LastName = $"Last{id}",
+            Email = $"user{id}@test.com",
+            Birthday = new DateTime(1990, 1, 1),
+        });
+        db.Accounts.AddRange(accounts.Values);
+
+        var franchise = await db.Franchises.SingleAsync(f => f.Id == FranchiseId);
+        franchise.Owners.Add(accounts[OwnerId]);
+        var team = await db.Teams.SingleAsync(t => t.Id == TeamId);
+        team.GeneralManagers.Add(accounts[GmId]);
+
+        await db.SaveChangesAsync();
+        return db;
+    }
+
     static async Task<BoltonCupDbContext> SeedAsync()
     {
         var db = NewContext();
         db.Tournaments.Add(new Tournament { Id = TournamentId, Name = "Test Cup" });
+        db.Franchises.Add(new Franchise
+        {
+            Id = FranchiseId,
+            Name = "Test Franchise",
+            NameShort = "Test",
+            Abbreviation = "TST",
+            PrimaryColorHex = "#000000",
+            SecondaryColorHex = "#ffffff",
+        });
         db.Teams.Add(new Team
         {
             Id = TeamId,
+            FranchiseId = FranchiseId,
             TournamentId = TournamentId,
             Name = "Test Team",
             NameShort = "Test",
