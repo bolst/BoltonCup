@@ -61,3 +61,6 @@ fi
 #     - Under Filename, browse to and select boltoncup_db_backup_TIMESTAMP.dump
 #     - Under the "Restore options" tab, enable "Pre-data", "Data", and "Post-data"
 #     - Click Restore
+
+# Example crontab
+#   0 3 * * * /opt/BoltonCup/tools/db_backup.sh >> /var/log/boltoncup-backup.log 2>&1
