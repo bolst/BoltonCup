@@ -42,14 +42,13 @@
                             <MudImage Src="@franchise.LogoUrl" Alt="@franchise.Name" Height="80" />
                         </div>
                         <div class="d-flex flex-column align-start justify-space-between">
-                            <MudText Typo="Typo.h6"><b>@franchise.Name</b></MudText>
+                            <MudLink Href="@($"/franchises/{franchise.Slug}")" Typo="Typo.h6" Underline="Underline.Hover" EndIcon="@Icons.Material.Rounded.ArrowOutward" Color="Color.Default"><b>@franchise.Name</b></MudLink>
                             <div class="d-flex flex-row align-center gap-1">
                                 @if (franchise.TitleCount > 0)
                                 {
                                     <ChampionIcon Size="Size.Small" />
                                 }
                                 <MudText Typo="Typo.body2">@TitleLabel(franchise.TitleCount)</MudText>
-                                <MudButton Href="@($"/franchises/{franchise.Slug}")">View</MudButton>
                             </div>
                         </div>
                     </MudPaper>

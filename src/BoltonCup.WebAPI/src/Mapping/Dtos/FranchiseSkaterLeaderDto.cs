@@ -5,6 +5,8 @@ public record FranchiseSkaterLeaderDto
 {
     /// <summary>Gets the account ID of the skater.</summary>
     public required int AccountId { get; init; }
+    /// <summary>Gets the latest player ID of the skater.</summary>
+    public required int PlayerId { get; init; }
     /// <summary>Gets the first name of the skater.</summary>
     public required string FirstName { get; init; }
     /// <summary>Gets the last name of the skater.</summary>

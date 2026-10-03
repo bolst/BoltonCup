@@ -15969,6 +15969,7 @@
           "gamesPlayed",
           "goalsAgainstAverage",
           "lastName",
+          "playerId",
           "savePercentage",
           "saves",
           "seasons",
@@ -15981,6 +15982,11 @@
           "accountId": {
             "type": "integer",
             "description": "Gets the account ID of the goalie.",
+            "format": "int32"
+          },
+          "playerId": {
+            "type": "integer",
+            "description": "Gets the latest player ID of the goalie.",
             "format": "int32"
           },
           "firstName": {
@@ -16294,6 +16300,7 @@
           "gamesPlayed",
           "goals",
           "lastName",
+          "playerId",
           "points",
           "seasons"
         ],
@@ -16302,6 +16309,11 @@
           "accountId": {
             "type": "integer",
             "description": "Gets the account ID of the skater.",
+            "format": "int32"
+          },
+          "playerId": {
+            "type": "integer",
+            "description": "Gets the latest player ID of the skater.",
             "format": "int32"
           },
           "firstName": {

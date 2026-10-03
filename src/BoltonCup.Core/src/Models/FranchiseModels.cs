@@ -47,6 +47,7 @@ public sealed record FranchiseSeason(
 /// <summary>A skater's totals across every season played for a franchise.</summary>
 public sealed record FranchiseSkaterLeader(
     int AccountId,
+    int PlayerId,
     string FirstName,
     string LastName,
     string? ProfilePicture,
@@ -62,6 +63,7 @@ public sealed record FranchiseSkaterLeader(
 /// </summary>
 public sealed record FranchiseGoalieLeader(
     int AccountId,
+    int PlayerId,
     string FirstName,
     string LastName,
     string? ProfilePicture,

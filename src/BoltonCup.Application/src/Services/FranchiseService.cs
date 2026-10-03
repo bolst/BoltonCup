@@ -89,14 +89,14 @@ sealed class FranchiseService(
             .AsNoTracking()
             .Where(s => teamIds.Contains(s.TeamId))
             .Select(s => new SkaterRow(
-                s.AccountId, s.FirstName, s.LastName, s.ProfilePicture, s.GameTime, s.TournamentId,
+                s.AccountId, s.PlayerId, s.FirstName, s.LastName, s.ProfilePicture, s.GameTime, s.TournamentId,
                 s.GamesPlayed, s.Goals, s.Assists, s.Points))
             .ToListAsync(cancellationToken);
         var goalieRows = await db.GoalieStats
             .AsNoTracking()
             .Where(s => teamIds.Contains(s.TeamId))
             .Select(s => new GoalieRow(
-                s.AccountId, s.FirstName, s.LastName, s.ProfilePicture, s.GameTime, s.TournamentId,
+                s.AccountId, s.PlayerId, s.FirstName, s.LastName, s.ProfilePicture, s.GameTime, s.TournamentId,
                 s.GamesPlayed, s.Wins, s.Shutouts, s.Saves, s.ShotsAgainst, s.GoalsAgainst))
             .ToListAsync(cancellationToken);
 
@@ -131,13 +131,11 @@ sealed class FranchiseService(
     }
 
     // Only the stat columns the leader boards read, so the wide stat views are not fetched in full.
-    sealed record SkaterRow(
-        int AccountId, string FirstName, string LastName, string? ProfilePicture, DateTime GameTime, int TournamentId,
-        int GamesPlayed, int Goals, int Assists, int Points);
+    sealed record SkaterRow(int AccountId, int PlayerId, string FirstName, string LastName, string? ProfilePicture, DateTime GameTime, 
+                            int TournamentId, int GamesPlayed, int Goals, int Assists, int Points);
 
-    sealed record GoalieRow(
-        int AccountId, string FirstName, string LastName, string? ProfilePicture, DateTime GameTime, int TournamentId,
-        int GamesPlayed, int Wins, int Shutouts, int Saves, int ShotsAgainst, int GoalsAgainst);
+    sealed record GoalieRow(int AccountId, int PlayerId, string FirstName, string LastName, string? ProfilePicture, DateTime GameTime, 
+                            int TournamentId, int GamesPlayed, int Wins, int Shutouts, int Saves, int ShotsAgainst, int GoalsAgainst);
 
     // Name and picture come from each player's most recent row, so a renamed account shows its latest name.
     static IReadOnlyList<FranchiseSkaterLeader> BuildSkaterLeaders(IEnumerable<SkaterRow> rows) => rows
@@ -147,6 +145,7 @@ sealed class FranchiseService(
             var latest = g.MaxBy(s => s.GameTime)!;
             return new FranchiseSkaterLeader(
                 g.Key,
+                latest.PlayerId,
                 latest.FirstName,
                 latest.LastName,
                 latest.ProfilePicture,
@@ -174,6 +173,7 @@ sealed class FranchiseService(
             var goalsAgainst = g.Sum(s => s.GoalsAgainst);
             return new FranchiseGoalieLeader(
                 g.Key,
+                latest.PlayerId,
                 latest.FirstName,
                 latest.LastName,
                 latest.ProfilePicture,

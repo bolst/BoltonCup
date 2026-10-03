@@ -235,7 +235,7 @@ public class FranchiseServiceTests
 
         leaders.Select(l => l.AccountId).Should().Equal(4, 3, 1, 2);
         var one = leaders.Single(l => l.AccountId == 1);
-        one.Should().Be(new FranchiseSkaterLeader(1, "First1", "Married", null, Seasons: 2, GamesPlayed: 3, Goals: 3, Assists: 1, Points: 4));
+        one.Should().Be(new FranchiseSkaterLeader(1, 1, "First1", "Married", null, Seasons: 2, GamesPlayed: 3, Goals: 3, Assists: 1, Points: 4));
     }
 
     [Fact]

@@ -1,4 +1,5 @@
 @page "/franchises/{Slug}"
+@using BoltonCup.Core
 @inject IBoltonCupApi BoltonCupApi
 @inject ILogger<Franchise> Logger
 
@@ -64,7 +65,7 @@ else
             </div>
         }
 
-        <MudText Typo="Typo.h6" Class="mt-6 mb-1">Trophy case</MudText>
+        <MudText Typo="Typo.h6" Class="mt-6 mb-1">Championships</MudText>
         @if (_franchise.Titles.Count == 0)
         {
             <MudText Typo="Typo.body2" Color="Color.Secondary">No titles yet.</MudText>
@@ -117,7 +118,7 @@ else
                 <MudTd DataLabel="Team">
                     <div class="d-flex flex-row align-center gap-2">
                         <MudImage Src="@context.LogoUrl" Alt="@context.Name" Height="28" />
-                        <span>@context.Name</span>
+                        <MudLink Href="@($"/teams/{context.TeamId}/roster")" Typo="Typo.body2" Underline="Underline.Hover">@context.Name</MudLink>
                         @if (context.IsChampion)
                         {
                             <ChampionIcon Size="Size.Small" />
@@ -125,7 +126,7 @@ else
                     </div>
                 </MudTd>
                 <MudTd DataLabel="Record">@RecordLabel(context.Record)</MudTd>
-                <MudTd DataLabel="GM">@GmNames(context)</MudTd>
+                <MudTd DataLabel="GM" Style="min-width: 10rem">@GmNames(context)</MudTd>
             </RowTemplate>
         </MudTable>
 
@@ -140,19 +141,19 @@ else
                       Dense>
                 <HeaderContent>
                     <MudTh>Player</MudTh>
-                    <MudTh>Seasons</MudTh>
-                    <MudTh>GP</MudTh>
-                    <MudTh>G</MudTh>
-                    <MudTh>A</MudTh>
-                    <MudTh>PTS</MudTh>
+                    <MudTh Class="num-cell">Seasons</MudTh>
+                    <MudTh Class="num-cell">GP</MudTh>
+                    <MudTh Class="num-cell">G</MudTh>
+                    <MudTh Class="num-cell">A</MudTh>
+                    <MudTh Class="num-cell">P</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Player">@PlayerCell(context.FirstName, context.LastName, context.ProfilePictureUrl)</MudTd>
-                    <MudTd DataLabel="Seasons">@context.Seasons</MudTd>
-                    <MudTd DataLabel="GP">@context.GamesPlayed</MudTd>
-                    <MudTd DataLabel="G">@context.Goals</MudTd>
-                    <MudTd DataLabel="A">@context.Assists</MudTd>
-                    <MudTd DataLabel="PTS"><b>@context.Points</b></MudTd>
+                    <MudTd DataLabel="Player">@PlayerCell(context.PlayerId, context.FirstName, context.LastName, context.ProfilePictureUrl)</MudTd>
+                    <MudTd DataLabel="Seasons" Class="num-cell">@context.Seasons</MudTd>
+                    <MudTd DataLabel="GP" Class="num-cell">@context.GamesPlayed</MudTd>
+                    <MudTd DataLabel="G" Class="num-cell">@context.Goals</MudTd>
+                    <MudTd DataLabel="A" Class="num-cell">@context.Assists</MudTd>
+                    <MudTd DataLabel="P" Class="num-cell"><b>@context.Points</b></MudTd>
                 </RowTemplate>
             </MudTable>
         }
@@ -168,21 +169,21 @@ else
                       Dense>
                 <HeaderContent>
                     <MudTh>Player</MudTh>
-                    <MudTh>Seasons</MudTh>
-                    <MudTh>GP</MudTh>
-                    <MudTh>W</MudTh>
-                    <MudTh>SO</MudTh>
-                    <MudTh>SV%</MudTh>
-                    <MudTh>GAA</MudTh>
+                    <MudTh Class="num-cell">Seasons</MudTh>
+                    <MudTh Class="num-cell">GP</MudTh>
+                    <MudTh Class="num-cell">W</MudTh>
+                    <MudTh Class="num-cell">SO</MudTh>
+                    @* <MudTh>SV%</MudTh> *@
+                    <MudTh Class="num-cell">GAA</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Player">@PlayerCell(context.FirstName, context.LastName, context.ProfilePictureUrl)</MudTd>
-                    <MudTd DataLabel="Seasons">@context.Seasons</MudTd>
-                    <MudTd DataLabel="GP">@context.GamesPlayed</MudTd>
-                    <MudTd DataLabel="W">@context.Wins</MudTd>
-                    <MudTd DataLabel="SO">@context.Shutouts</MudTd>
-                    <MudTd DataLabel="SV%">@context.SavePercentage.ToString("0.000")</MudTd>
-                    <MudTd DataLabel="GAA">@context.GoalsAgainstAverage.ToString("0.00")</MudTd>
+                    <MudTd DataLabel="Player" Class="num-cell">@PlayerCell(context.PlayerId, context.FirstName, context.LastName, context.ProfilePictureUrl)</MudTd>
+                    <MudTd DataLabel="Seasons" Class="num-cell">@context.Seasons</MudTd>
+                    <MudTd DataLabel="GP" Class="num-cell">@context.GamesPlayed</MudTd>
+                    <MudTd DataLabel="W" Class="num-cell">@context.Wins</MudTd>
+                    <MudTd DataLabel="SO" Class="num-cell">@context.Shutouts</MudTd>
+                    @* <MudTd DataLabel="SV%">@context.SavePercentage.ToString("0.000")</MudTd> *@
+                    <MudTd DataLabel="GAA" Class="num-cell">@context.GoalsAgainstAverage.ToString("0.00")</MudTd>
                 </RowTemplate>
             </MudTable>
         }
@@ -247,42 +248,24 @@ else
         }
     }
 
-    RenderFragment RecordStat(string label, int value) => builder =>
+    RenderFragment RecordStat(string label, int value)
     {
-        builder.OpenElement(0, "div");
-        builder.AddAttribute(1, "class", "d-flex flex-column align-center");
-        builder.OpenComponent<MudText>(2);
-        builder.AddAttribute(3, "Typo", Typo.h5);
-        builder.AddAttribute(4, "ChildContent", (RenderFragment)(b => b.AddContent(5, value)));
-        builder.CloseComponent();
-        builder.OpenComponent<MudText>(6);
-        builder.AddAttribute(7, "Typo", Typo.caption);
-        builder.AddAttribute(8, "Color", Color.Secondary);
-        builder.AddAttribute(9, "ChildContent", (RenderFragment)(b => b.AddContent(10, label)));
-        builder.CloseComponent();
-        builder.CloseElement();
-    };
+        return @<div class="d-flex flex-column align-center">
+                   <MudText Typo="Typo.h5"><b>@value</b></MudText>
+                   <MudText Typo="Typo.caption">@label</MudText>
+               </div>;
+    }
 
-    RenderFragment PlayerCell(string firstName, string lastName, string? pictureUrl) => builder =>
+    RenderFragment PlayerCell(int id, string firstName, string lastName, string? pictureUrl)
     {
         var name = PersonName(firstName, lastName);
-        builder.OpenElement(0, "div");
-        builder.AddAttribute(1, "class", "d-flex flex-row align-center gap-3");
-        builder.OpenComponent<MudAvatar>(2);
-        builder.AddAttribute(3, "Size", Size.Small);
-        builder.AddAttribute(4, "ChildContent", (RenderFragment)(b =>
-        {
-            b.OpenComponent<MudImage>(5);
-            b.AddAttribute(6, "Src", pictureUrl);
-            b.AddAttribute(7, "Alt", name);
-            b.CloseComponent();
-        }));
-        builder.CloseComponent();
-        builder.OpenElement(8, "b");
-        builder.AddContent(9, name);
-        builder.CloseElement();
-        builder.CloseElement();
-    };
+        return @<div class="d-flex flex-row align-center gap-3">
+                   <MudAvatar Size="Size.Small">
+                       <MudImage Src="@pictureUrl" Alt="@name" />
+                   </MudAvatar>
+                   <MudLink Href="@($"/players/{id}")" Underline="Underline.Hover" Typo="Typo.body2"><b>@name</b></MudLink>
+               </div>;
+    }
 
     static string PersonName(string? firstName, string? lastName)
     {

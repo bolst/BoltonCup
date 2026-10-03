@@ -97,8 +97,8 @@ public class FranchiseMapperTests
             AllTime = new FranchiseRecord(10, 6, 3, 1, 40, 25),
             IntraFranchiseGames = 1,
             Seasons = [new FranchiseSeason(team, tournament, new FranchiseRecord(5, 4, 1, 0, 20, 10), [NewAccount(2)], IsChampion: true)],
-            SkaterLeaders = [new FranchiseSkaterLeader(11, "Sk", "Ater", "avatars/11.png", 2, 8, 5, 6, 11)],
-            GoalieLeaders = [new FranchiseGoalieLeader(12, "Go", "Alie", null, 1, 4, 3, 1, 90, 100, 0.9, 2.5)],
+            SkaterLeaders = [new FranchiseSkaterLeader(11, 111, "Sk", "Ater", "avatars/11.png", 2, 8, 5, 6, 11)],
+            GoalieLeaders = [new FranchiseGoalieLeader(12, 112, "Go", "Alie", null, 1, 4, 3, 1, 90, 100, 0.9, 2.5)],
         };
 
         var dto = _mapper.ToDto(detail)!;
@@ -132,6 +132,7 @@ public class FranchiseMapperTests
         skater.Should().Be(new FranchiseSkaterLeaderDto
         {
             AccountId = 11,
+            PlayerId = 111,
             FirstName = "Sk",
             LastName = "Ater",
             ProfilePictureUrl = "https://cdn/avatars/11.png",

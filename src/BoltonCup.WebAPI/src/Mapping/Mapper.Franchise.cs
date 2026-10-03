@@ -58,6 +58,7 @@ public partial class Mapper
                     .Select(l => new FranchiseSkaterLeaderDto
                     {
                         AccountId = l.AccountId,
+                        PlayerId = l.PlayerId,
                         FirstName = l.FirstName,
                         LastName = l.LastName,
                         ProfilePictureUrl = _urlResolver.GetFullUrl(l.ProfilePicture),
@@ -72,6 +73,7 @@ public partial class Mapper
                     .Select(l => new FranchiseGoalieLeaderDto
                     {
                         AccountId = l.AccountId,
+                        PlayerId = l.PlayerId,
                         FirstName = l.FirstName,
                         LastName = l.LastName,
                         ProfilePictureUrl = _urlResolver.GetFullUrl(l.ProfilePicture),
