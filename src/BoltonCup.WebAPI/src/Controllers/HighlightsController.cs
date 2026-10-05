@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary> Provides read access to highlights. </summary>
 public class HighlightsController(
     IHighlightService _highlights,
     IMapper _mapper
