@@ -1,0 +1,178 @@
+@page "/albums/{Slug}"
+@attribute [SitemapIgnore]
+@inject IBoltonCupApi BoltonCupApi
+@inject ILogger<Album> Logger
+
+<PageTitle>@(_album?.Title ?? "Album") | Bolton Cup</PageTitle>
+@if (!string.IsNullOrWhiteSpace(_album?.Title))
+{
+    <HeadContent>
+        <meta name="description" content="@_album.Title">
+    </HeadContent>
+}
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
+    @if (_loading)
+    {
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="320px" Width="100%" Class="mb-4" />
+        <MudSkeleton SkeletonType="SkeletonType.Text" Width="60%" Height="48px" />
+        for (var i = 0; i < 4; i++)
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="100%" />
+        }
+    }
+    else if (_failed)
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-4">
+            This album could not be loaded right now. <MudLink Href="/albums" Color="Color.Info">Back to albums.</MudLink>
+        </MudAlert>
+    }
+    else if (_album is null)
+    {
+        <MudAlert Severity="Severity.Warning" Class="mt-4">
+            This album could not be found. <MudLink Href="/albums" Color="Color.Info">Back to albums.</MudLink>
+        </MudAlert>
+    }
+    else
+    {
+        <MudText Typo="Typo.h5" HtmlTag="h1" Class="mb-4"><b>@_album.Title</b></MudText>
+
+        @if (_album.Images.Count > 0)
+        {
+            <div class="d-flex justify-end mb-2">
+                <MudToggleGroup T="bool" Value="_showGrid" ValueChanged="@(v => _showGrid = v)"
+                                Size="Size.Small" Color="Color.Primary" CheckMark="false">
+                    <MudToggleItem Value="false">
+                        <MudIcon Icon="@Icons.Material.Rounded.ViewCarousel" Size="Size.Small" Class="mr-1" /> Slideshow
+                    </MudToggleItem>
+                    <MudToggleItem Value="true">
+                        <MudIcon Icon="@Icons.Material.Rounded.GridView" Size="Size.Small" Class="mr-1" /> Grid
+                    </MudToggleItem>
+                </MudToggleGroup>
+            </div>
+
+            @if (_showGrid)
+            {
+                <MudGrid Spacing="1" Class="mb-2">
+                    @foreach (var (image, index) in _album.Images.Select((image, index) => (image, index)))
+                    {
+                        <MudItem xs="4">
+                            <img src="@image.Url"
+                                 alt="@($"{_album.Title}, photo {index + 1} of {_album.Images.Count}")"
+                                 loading="lazy"
+                                 class="rounded"
+                                 style="display: block; width: 100%; aspect-ratio: 1; object-fit: cover; cursor: pointer; background-color: black;"
+                                 @onclick="() => OpenInSlideshow(index)" />
+                        </MudItem>
+                    }
+                </MudGrid>
+            }
+            else
+            {
+                <div class="rounded-lg mb-2" style="position: relative; overflow: hidden; background-color: black; height: clamp(300px, min(70vh, 125vw), 680px);">
+                    <MudCarousel @bind-SelectedIndex="_selectedIndex"
+                                 TData="Sdk.AlbumImageDto"
+                                 Style="height: 100%"
+                                 ArrowsColor="Color.Tertiary"
+                                 ShowArrows="true"
+                                 ShowBullets="false"
+                                 AutoCycle="false">
+                        @foreach (var (image, index) in _album.Images.Select((image, index) => (image, index)))
+                        {
+                            <MudCarouselItem Transition="Transition.Slide" Color="Color.Transparent">
+                                <div style="position: relative; width: 100%; height: 100%; overflow: hidden;">
+                                    <div style="position: absolute; inset: 0; background-image: url('@image.Url'); background-size: cover; background-position: center; filter: blur(24px) brightness(0.5); transform: scale(1.15);"></div>
+                                    <img style="position: relative; display: block; width: 100%; height: 100%; object-fit: contain;" src="@image.Url" alt="@($"{_album.Title}, photo {index + 1} of {_album.Images.Count}")" />
+                                </div>
+                            </MudCarouselItem>
+                        }
+                    </MudCarousel>
+                    <span style="position: absolute; right: 8px; bottom: 8px; z-index: 3; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; color: white; background-color: rgba(0, 0, 0, 0.5);">@(_selectedIndex + 1) / @_album.Images.Count</span>
+                </div>
+            }
+        }
+
+        @if (!string.IsNullOrWhiteSpace(_album.Source))
+        {
+            <MudText Typo="Typo.caption" Class="mud-text-secondary mb-1">@_album.Source</MudText>
+        }
+
+        <MudText Typo="Typo.subtitle2" Class="mud-text-secondary mb-4">@_album.OccurredAt.ToLocalTime().ToString("MMMM d, yyyy")</MudText>
+
+        @if (!string.IsNullOrWhiteSpace(_album.Description))
+        {
+            <MudText Typo="Typo.body1" Style="white-space: pre-line;">@_album.Description</MudText>
+        }
+
+        <div class="my-8">
+            <MudButton Href="/albums" Variant="Variant.Text" StartIcon="@Icons.Material.Rounded.ArrowBack">All albums</MudButton>
+        </div>
+    }
+</MudContainer>
+
+@code {
+
+    [Parameter]
+    public string Slug { get; set; } = string.Empty;
+
+    Sdk.AlbumSingleDto? _album;
+    bool _loading = true;
+    bool _failed;
+    int _selectedIndex;
+    bool _showGrid;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_album is not null && _album.Slug == Slug)
+        {
+            return;
+        }
+
+        var slug = Slug;
+        _album = null;
+        _failed = false;
+        _loading = true;
+        _selectedIndex = 0;
+        _showGrid = false;
+        // Yield so the skeleton replaces the previous album before the request completes.
+        await Task.Yield();
+
+        var (album, failed) = await LoadAsync(slug);
+
+        // A slower response for an earlier slug must not overwrite the album now being viewed.
+        if (slug != Slug)
+        {
+            return;
+        }
+
+        _album = album;
+        _failed = failed;
+        _loading = false;
+    }
+
+    void OpenInSlideshow(int index)
+    {
+        _selectedIndex = index;
+        _showGrid = false;
+    }
+
+    // Touches no component state so a superseded request cannot leak its outcome into the current one.
+    async Task<(Sdk.AlbumSingleDto? Album, bool Failed)> LoadAsync(string slug)
+    {
+        try
+        {
+            return (await BoltonCupApi.GetAlbumBySlugAsync(slug), false);
+        }
+        catch (Sdk.ApiException e) when (e.StatusCode is 204 or 404)
+        {
+            // OkOrNoContent answers an unknown slug with 204, which the generated client throws on.
+            return (null, false);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to load album {Slug}", slug);
+            return (null, true);
+        }
+    }
+
+}

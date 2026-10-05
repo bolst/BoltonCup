@@ -32,6 +32,8 @@ builder.Services
     .AddScoped<ITeamRosterImageGenerator, TeamRosterImageGenerator>();
 builder.Services
     .AddScoped<TournamentStateService>();
+builder.Services
+    .AddTransient<AlbumZipImporter>();
 
 var configSection = builder.Configuration.GetSection(BoltonCupConfiguration.SectionName);
 var bcConfig = configSection.Get<BoltonCupConfiguration>()

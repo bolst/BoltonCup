@@ -1,0 +1,123 @@
+@page "/albums"
+@attribute [SitemapIgnore]
+@inject IBoltonCupApi BoltonCupApi
+@inject ILogger<Index> Logger
+
+<PageTitle>Albums | Bolton Cup</PageTitle>
+<HeadContent>
+    <meta name="description" content="Photo albums from the Bolton Cup.">
+</HeadContent>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="px-2 mt-6" Gutters="false">
+    @if (_loading)
+    {
+        <MudSkeleton SkeletonType="SkeletonType.Text" Width="220px" Height="40px" Class="mb-2" />
+        <MudGrid Spacing="3">
+            @for (var i = 0; i < 3; i++)
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="320px" Width="100%" />
+                </MudItem>
+            }
+        </MudGrid>
+    }
+    else if (_failed)
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-4">Albums could not be loaded right now. Please try again later.</MudAlert>
+    }
+    else if (_albums.Count == 0)
+    {
+        <MudText Typo="Typo.h5" Class="mt-8" Align="Align.Center">No albums yet. Check back soon.</MudText>
+    }
+    else
+    {
+        @foreach (var group in _tournamentGroups)
+        {
+            <MudText Typo="Typo.h5" HtmlTag="h2" Class="mb-3"><b>@group.Name</b></MudText>
+            <MudGrid Spacing="3" Class="mb-8">
+                @foreach (var album in group.Albums)
+                {
+                    <MudItem xs="12" sm="6" md="4">
+                        <AlbumCard Album="album" />
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+
+        @if (_otherAlbums.Count > 0)
+        {
+            <MudText Typo="Typo.h5" HtmlTag="h2" Class="mb-3"><b>All Albums</b></MudText>
+            <MudGrid Spacing="3" Class="mb-8">
+                @foreach (var album in _otherAlbums)
+                {
+                    <MudItem xs="12" sm="6" md="4">
+                        <AlbumCard Album="album" />
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+    }
+</MudContainer>
+
+@code {
+
+    // Grouping needs every album up front, so pages are fetched at the API's maximum size.
+    const int PageSize = 100;
+
+    record TournamentGroup(string Name, IReadOnlyList<Sdk.AlbumDto> Albums);
+
+    readonly List<Sdk.AlbumDto> _albums = [];
+    IReadOnlyList<TournamentGroup> _tournamentGroups = [];
+    IReadOnlyList<Sdk.AlbumDto> _otherAlbums = [];
+    bool _loading = true;
+    bool _failed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadAllAlbumsAsync();
+            GroupByTournament();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to load the albums index");
+            _failed = true;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    async Task LoadAllAlbumsAsync()
+    {
+        for (var page = 1; ; page++)
+        {
+            var result = await BoltonCupApi.GetAlbumsAsync(page: page, size: PageSize);
+            _albums.AddRange(result.Items);
+            if (result.Items.Count == 0 || _albums.Count >= result.Total)
+            {
+                return;
+            }
+        }
+    }
+
+    // Albums arrive newest first, so groups ordered by first appearance put the latest tournament on top.
+    // An album tagged with several tournaments appears under each of them.
+    void GroupByTournament()
+    {
+        _tournamentGroups = _albums
+            .SelectMany(album => album.Tags
+                .Where(tag => tag.Type == Sdk.TagTargetType.Tournament)
+                .Select(tag => (tag.TargetId, tag.Name, Album: album)))
+            .GroupBy(x => x.TargetId)
+            .Select(g => new TournamentGroup(g.First().Name, g.Select(x => x.Album).Distinct().ToList()))
+            .ToList();
+
+        _otherAlbums = _albums
+            .Where(album => album.Tags.All(tag => tag.Type != Sdk.TagTargetType.Tournament))
+            .ToList();
+    }
+
+}

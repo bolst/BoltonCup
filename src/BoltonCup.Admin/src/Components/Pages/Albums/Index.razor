@@ -1,0 +1,85 @@
+@page "/albums"
+@inject IAlbumService AlbumService
+
+<EntityDataGrid
+    @ref="_dataGrid"
+    T="Album"
+    NewItemFunc="NewItemFunc"
+    SearchBy="x => x.Title"
+    Include="@_includes"
+    Comparer="_comparer"
+    OnSave="PrepareForSave"
+    ColumnResizeMode="ResizeMode.Column">
+    <Columns>
+        <PropertyColumn Title="Id" Property="x => x.Id" Editable="false" />
+        <PropertyColumn Title="Title" Property="x => x.Title" Required />
+        <PropertyColumn Title="Slug" Property="x => x.Slug" Required="false" />
+        <PropertyColumn Title="Source" Property="x => x.Source" Required="false" />
+        <PropertyColumn Title="Description" Property="x => x.Description" Required="false" />
+        <DateTimePickerColumn Title="Occurred At" Property="x => x.OccurredAt" />
+        <BoolColumn Title="Published" Property="x => x.IsPublished" />
+        <TemplateColumn Title="Manage" Sortable="false" Editable="false">
+            <CellTemplate>
+                <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary"
+                           Disabled="@(context.Item.Id == 0)"
+                           Href="@($"/albums/{context.Item.Id}")">
+                    Manage
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <ChildRowContent>
+        <div class="pa-2">
+            <TagInput TTag="AlbumTag" Subject="context.Item" />
+        </div>
+    </ChildRowContent>
+</EntityDataGrid>
+
+@code {
+
+    EntityDataGrid<Album>? _dataGrid;
+    static readonly AlbumComparer _comparer = new();
+
+    static readonly Func<IQueryable<Album>, IQueryable<Album>> _includes =
+        x => x
+            .Include(a => a.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.HomeTeam)
+            .Include(a => a.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.AwayTeam)
+            .Include(a => a.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.Tournament)
+            .Include(a => a.Tags).ThenInclude(t => t.Account)
+            .Include(a => a.Tags).ThenInclude(t => t.Team)
+            .Include(a => a.Tags).ThenInclude(t => t.Tournament)
+            .Include(a => a.Tags).ThenInclude(t => t.Label);
+
+    Task<Album?> NewItemFunc() => Task.FromResult<Album?>(new Album());
+
+    // Runs before the grid persists: slugs are derived here so a blank slug never reaches the
+    // unique index, and PublishedAt is stamped the first time an album is published. Edited albums
+    // go first so an existing permalink is never bumped aside by a new album with the same title.
+    async Task PrepareForSave(ChangeTracker<Album> tracker)
+    {
+        var albums = tracker.EditItems.Concat(tracker.NewItems).ToList();
+        if (albums.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var album in albums)
+        {
+            album.Title = album.Title.Trim();
+            album.Slug = SlugGenerator.Generate(string.IsNullOrWhiteSpace(album.Slug) ? album.Title : album.Slug);
+
+            if (album.IsPublished && album.PublishedAt is null)
+            {
+                album.PublishedAt = DateTime.UtcNow;
+            }
+        }
+
+        var candidates = albums.Select(a => new SlugCandidate(a.Id, a.Slug)).ToList();
+        var reserved = await AlbumService.ReserveSlugsAsync(candidates);
+        for (var i = 0; i < albums.Count; i++)
+        {
+            albums[i].Slug = reserved[i];
+        }
+    }
+
+}

@@ -18,19 +18,26 @@ public class AssetFileUploader : IAssetFileUploader
 
     public async Task<string> UploadAsync(IBrowserFile file, bool resize = true, long? maxFileSize = null, CancellationToken cancellationToken = default)
     {
-        var ext = resize ? ".webp" : Path.GetExtension(file.Name);
-        var mime = resize ? "image/webp" : file.ContentType;
+        await using var fileStream = file.OpenReadStream(maxFileSize ?? MaxFileSize, cancellationToken);
+
+        Stream uploadStream = fileStream;
+        var ext = Path.GetExtension(file.Name);
+        var mime = file.ContentType;
+        if (resize)
+        {
+            var result = await ImageResizer.ResizeAsync(fileStream);
+            uploadStream = result.Content;
+            if (result.Converted)
+            {
+                ext = ".webp";
+                mime = "image/webp";
+            }
+        }
+
         var upload = await _storageService.GenerateUploadCredentialsAsync(ext, mime, cancellationToken);
         if (upload is null)
         {
             throw new InvalidOperationException("Failed to generate pre-signed URL for upload.");
-        }
-
-        await using var fileStream = file.OpenReadStream(maxFileSize ?? MaxFileSize, cancellationToken);
-        var uploadStream = fileStream;
-        if (resize)
-        {
-            uploadStream = await ImageResizer.ResizeAsync(fileStream);
         }
 
         using var content = new StreamContent(uploadStream);

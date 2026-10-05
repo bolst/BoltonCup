@@ -60,6 +60,8 @@ public class DiCompletenessTests
     [Theory]
     [InlineData(typeof(ITagService<HighlightTag>))]
     [InlineData(typeof(ITagService<NewsPostTag>))]
+    [InlineData(typeof(ITagService<AlbumTag>))]
+    [InlineData(typeof(ITagService<AlbumImageTag>))]
     public void GenericTagService_ResolvesFromDi(Type tagService)
     {
         Provider.GetService(tagService).Should().NotBeNull();
