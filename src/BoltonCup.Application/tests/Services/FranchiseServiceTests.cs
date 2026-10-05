@@ -634,7 +634,7 @@ public class FranchiseServiceTests
         attributes.Should().NotBeNull();
         var keys = attributes!.Where((_, i) => i % 2 == 0).Cast<string>().ToList();
         keys.Should().OnlyContain(k => k.EndsWith(".id") || k.EndsWith(".count"));
-        var pairs = keys.Select((k, i) => (k, attributes[i * 2 + 1])).ToDictionary(p => p.k, p => p.Item2);
+        var pairs = keys.Select((k, i) => (k, attributes?[i * 2 + 1])).ToDictionary(p => p.k, p => p.Item2);
         pairs.Should().Contain(new KeyValuePair<string, object?>("franchise.source.id", 1));
         pairs.Should().Contain(new KeyValuePair<string, object?>("franchise.target.id", 2));
         pairs.Should().Contain(new KeyValuePair<string, object?>("team.count", 2));
@@ -663,7 +663,7 @@ public class FranchiseServiceTests
         attributes.Should().NotBeNull();
         var keys = attributes!.Where((_, i) => i % 2 == 0).Cast<string>().ToList();
         keys.Should().OnlyContain(k => k.EndsWith(".id") || k.EndsWith(".ids") || k.EndsWith(".count"));
-        var pairs = keys.Select((k, i) => (k, attributes[i * 2 + 1])).ToDictionary(p => p.k, p => p.Item2);
+        var pairs = keys.Select((k, i) => (k, attributes?[i * 2 + 1])).ToDictionary(p => p.k, p => p.Item2);
         pairs["franchise.id"].Should().Be(1);
         pairs["owner.count"].Should().Be(2);
         pairs["owner.added.ids"].Should().BeEquivalentTo(new[] { 3 });

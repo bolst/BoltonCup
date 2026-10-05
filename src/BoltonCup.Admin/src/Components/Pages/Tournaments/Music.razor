@@ -62,8 +62,7 @@
             <MudTd Style="text-align:right">
                 <MudIconButton Icon="@Icons.Material.Rounded.PlayArrow" Size="Size.Small" Color="Color.Primary"
                                Href="@PreviewUrl(context)" Target="_blank"
-                               Disabled="@string.IsNullOrEmpty(context.AudioFileKey)"
-                               Title="@(context.OffsetSeconds > 0 ? $"Play in new tab (from {context.OffsetSeconds}s)" : "Play in new tab")" />
+                               Disabled="@string.IsNullOrEmpty(context.AudioFileKey)" />
                 <MudIconButton Icon="@Icons.Material.Rounded.Edit" Size="Size.Small" OnClick="@(() => EditTrack(context))" />
                 <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Small" OnClick="@(() => DeleteTrack(context))" />
             </MudTd>
@@ -124,8 +123,9 @@
                             }
                             else
                             {
-                                <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Text"
-                                         Title="@($"Requested by {context.RequestedByName}")">Player</MudChip>
+                                <MudTooltip Text="@($"Requested by {context.RequestedByName}")">
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Text">Player</MudChip>
+                                </MudTooltip>
                             }
                         </MudTd>
                         <MudTd DataLabel="Base pool">
@@ -142,8 +142,7 @@
                         <MudTd Style="text-align:right">
                             @if (context.Status != MusicTrackStatus.Cancelled)
                             {
-                                <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Small"
-                                               Title="Remove from queue" OnClick="@(() => CancelQueueItem(context))" />
+                                <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Small" OnClick="@(() => CancelQueueItem(context))" />
                             }
                         </MudTd>
                     </RowTemplate>

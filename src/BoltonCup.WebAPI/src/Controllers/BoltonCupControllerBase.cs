@@ -8,8 +8,14 @@ namespace BoltonCup.WebAPI.Controllers;
 [ApiController]
 public class BoltonCupControllerBase : ControllerBase
 {
+    /// <summary>
+    /// The default cache duration.
+    /// </summary>
     protected static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(5);
 
+    /// <summary>
+    /// The cache service.
+    /// </summary>
     protected IMemoryCache Cache => HttpContext.RequestServices.GetRequiredService<IMemoryCache>();
 
     /// <summary>

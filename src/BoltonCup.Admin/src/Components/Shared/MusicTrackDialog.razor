@@ -65,7 +65,7 @@
 
             <MudTextField @bind-Value="_offsetSeconds" Label="Start offset (seconds)" InputType="InputType.Number"
                           HelperText="Skip the intro: playback starts this many seconds in. Leave empty to play from the start."
-                          Variant="Variant.Outlined" Min="0" />
+                          Variant="Variant.Outlined" />
 
             <MudSwitch @bind-Value="_isInBasePool" Color="Color.Primary" Label="Plays in every game (base pool)" />
         </MudStack>
@@ -107,7 +107,7 @@
     {
         if (Track is not null)
         {
-            _title = Track.Title;
+            _title = Track.Title ?? string.Empty;
             _artist = Track.Artist;
             _trackId = Track.TrackId;
             _albumArtUrl = Track.AlbumArtUrl;

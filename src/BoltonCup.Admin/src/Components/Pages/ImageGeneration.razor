@@ -220,10 +220,13 @@
     private async Task OnReordered(List<RosterPlayerOption> list, int refIndex,
         MudItemDropInfo<RosterPlayerOption> info)
     {
-        list.Remove(info.Item);
-        list.Insert(Math.Clamp(info.IndexInZone, 0, list.Count), info.Item);
-        _dropRefs[refIndex]?.Refresh();
-        await UpdatePreviewAsync();
+        if (info.Item is { } item)
+        {
+            list.Remove(item);
+            list.Insert(Math.Clamp(info.IndexInZone, 0, list.Count), item);
+            _dropRefs[refIndex]?.Refresh();
+            await UpdatePreviewAsync();
+        }
     }
 
     private RenderFragment RosterList(string title, List<RosterPlayerOption> list, int refIndex) => __builder =>

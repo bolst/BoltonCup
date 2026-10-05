@@ -51,6 +51,8 @@ class TagTargetSearchService(IDbContextFactory<BoltonCupDbContext> _dbContextFac
 
             TagTargetType.Label => await QueryAsync(
                 db.TagLabels.AsNoTracking(), l => l.Name, l => l.Id, excludeIds, term, cancellationToken),
+
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }
 

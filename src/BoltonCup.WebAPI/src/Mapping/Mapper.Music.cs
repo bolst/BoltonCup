@@ -3,6 +3,8 @@ using BoltonCup.Core.Commands;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+#pragma warning disable CS1591 // Disable warning for missing XML comments
+
 public partial class Mapper
 {
     // ---------- Music ----------
@@ -25,8 +27,8 @@ public partial class Mapper
     static PlaylistTrackDto ToPlaylistTrackDto(TournamentMusicTrack t) => new PlaylistTrackDto
     {
         MusicTrackId = t.Id,
-        FileKey = t.AudioFileKey,
-        Title = t.Title,
+        FileKey = t.AudioFileKey ?? string.Empty,
+        Title = t.Title ?? string.Empty,
         Artist = t.Artist,
         AlbumArtUrl = t.AlbumArtUrl,
         DurationMs = t.DurationMs,
@@ -44,7 +46,7 @@ public partial class Mapper
         FileKey = track.AudioFileKey ?? string.Empty,
         TrackId = track.TrackId,
         ProviderType = track.ProviderType,
-        Title = track.Title,
+        Title = track.Title ?? string.Empty,
         Artist = track.Artist,
         AlbumArtUrl = track.AlbumArtUrl,
         DurationMs = track.DurationMs,

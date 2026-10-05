@@ -5,6 +5,8 @@ using BoltonCup.Shared;
 
 namespace BoltonCup.WebAPI.Mapping;
 
+#pragma warning disable CS1591 // Disable warning for missing XML comments
+
 public partial class Mapper
 {
     // ---------- CustomRanking ----------

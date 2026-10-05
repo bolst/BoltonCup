@@ -6,6 +6,7 @@ using static BoltonCup.Shared.BoltonCupRole;
 
 namespace BoltonCup.WebAPI.Controllers;
 
+/// <summary>Manages game data.</summary>
 public class GamesController(
     IGameService _games,
     IHighlightService _highlights,
