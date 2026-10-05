@@ -13,6 +13,11 @@ public interface IMapper
 {
     // Account
     AccountDto? ToDto(Account? account, ClaimsPrincipal claims);
+
+    // Album
+    GetAlbumsQuery ToQuery(GetAlbumsRequest request);
+    IPagedList<AlbumDto> ToDtoList(IPagedList<Album> albums);
+    AlbumSingleDto? ToDto(Album? album);
     ICollection<AccountTournamentDto> ToAccountTournamentDtoList(Account? account);
     CreateAccountCommand ToCommand(CompleteUserAccountRequest request, ClaimsPrincipal claims);
     UpdateAccountCommand ToCommand(UpdateAccountRequest request, ClaimsPrincipal claims);

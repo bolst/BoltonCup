@@ -1,0 +1,300 @@
+@page "/albums/{Id:int}"
+@using BoltonCup.Admin.Services
+@inject IDbContextFactory<BoltonCupDbContext> DbContextFactory
+@inject IAlbumService AlbumService
+@inject AlbumZipImporter ZipImporter
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject ILogger<Detail> Logger
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4" Spacing="2">
+    <MudIconButton Icon="@Icons.Material.Rounded.ArrowBack" Href="/albums" />
+    <MudText Typo="Typo.h4">@(_album?.Title ?? "Album")</MudText>
+</MudStack>
+
+@if (_album is null)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else
+{
+    <MudPaper Class="pa-4 mb-4 d-flex flex-row align-center gap-4">
+        <MudFileUpload T="IBrowserFile" FilesChanged="UploadZipAsync" Accept=".zip">
+            <CustomContent>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@context.OpenFilePickerAsync"
+                           StartIcon="@Icons.Material.Filled.CloudUpload" Disabled="_importing">
+                    Import zip
+                </MudButton>
+            </CustomContent>
+        </MudFileUpload>
+
+        @if (_importing)
+        {
+            <div style="min-width: 280px;">
+                <MudProgressLinear Color="Color.Primary" Value="@_importProgressPercent" />
+                <MudText Typo="Typo.caption">@_importProgressText</MudText>
+            </div>
+        }
+
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ApplyAlbumTagsAsync" Disabled="_applyingTags">
+            Apply album tags to images
+        </MudButton>
+    </MudPaper>
+
+    @if (_importError is not null)
+    {
+        <MudAlert Severity="Severity.Error" Class="mb-4" ShowCloseIcon="true" CloseIconClicked="@(() => _importError = null)">
+            <MudText Typo="Typo.subtitle2">The zip was not imported.</MudText>
+            <MudText Typo="Typo.body2">@_importError</MudText>
+        </MudAlert>
+    }
+
+    @if (_importResult is not null)
+    {
+        <MudAlert Severity="@(_importResult.Failures.Count == 0 ? Severity.Success : Severity.Warning)"
+                  Class="mb-4"
+                  ShowCloseIcon="true"
+                  CloseIconClicked="@(() => _importResult = null)">
+            <MudText Typo="Typo.subtitle2">
+                Imported @_importResult.Imported image(s)@(_importResult.Failures.Count == 0 ? "." : $"; {_importResult.Failures.Count} file(s) were not imported:")
+            </MudText>
+            @if (_importResult.Failures.Count > 0)
+            {
+                <MudSimpleTable Dense="true" Hover="true" Style="max-height: 320px; overflow-y: auto; background: transparent;" Class="mt-2">
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var failure in _importResult.Failures)
+                        {
+                            <tr>
+                                <td style="word-break: break-all;">@failure.FileName</td>
+                                <td>@failure.Reason</td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            }
+        </MudAlert>
+    }
+
+    <MudGrid>
+        @foreach (var image in _images)
+        {
+            <MudItem xs="12" sm="6" md="4" lg="3">
+                <MudCard>
+                    <MudCardContent>
+                        <BoltonCupImage Src="@image.Key" Height="200" ObjectFit="ObjectFit.Cover"/>
+                    </MudCardContent>
+                    <MudCardActions Class="d-flex flex-column align-stretch gap-1 pa-2">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                            <MudIconButton Icon="@Icons.Material.Rounded.ArrowUpward" Size="Size.Small"
+                                           Disabled="@(image == _images[0])"
+                                           OnClick="@(() => MoveImageAsync(image, -1))"/>
+                            <MudIconButton Icon="@Icons.Material.Rounded.ArrowDownward" Size="Size.Small"
+                                           Disabled="@(image == _images[^1])"
+                                           OnClick="@(() => MoveImageAsync(image, 1))"/>
+                            <MudIconButton Icon="@(_album.CoverImageId == image.Id ? Icons.Material.Filled.Star : Icons.Material.Rounded.StarBorder)"
+                                           Color="@(_album.CoverImageId == image.Id ? Color.Warning : Color.Default)"
+                                           Size="Size.Small"
+                                           Title="Set as cover"
+                                           OnClick="@(() => SetCoverAsync(image))"/>
+                            <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Small"
+                                           OnClick="@(() => DeleteImageAsync(image))"/>
+                        </MudStack>
+                        <TagInput TTag="AlbumImageTag" Subject="image"/>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    Album? _album;
+    List<AlbumImage> _images = [];
+    bool _importing;
+    bool _applyingTags;
+    AlbumImportProgress? _importProgress;
+    AlbumImportResult? _importResult;
+    string? _importError;
+
+    double _importProgressPercent => _importProgress is null || _importProgress.Total == 0
+        ? 0
+        : 100.0 * _importProgress.Done / _importProgress.Total;
+
+    string _importProgressText => _importProgress switch
+    {
+        null => "Starting upload…",
+        { Stage: AlbumImportStage.Uploading } p => $"Uploading {FormatGigabytes(p.Done)} of {FormatGigabytes(p.Total)} GB. Keep this tab open.",
+        var p => $"Importing image {p.Done} of {p.Total}",
+    };
+
+    static string FormatGigabytes(long bytes) => (bytes / (1024d * 1024 * 1024)).ToString("0.00");
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    async Task LoadAsync()
+    {
+        await using var db = await DbContextFactory.CreateDbContextAsync();
+        _album = await db.Albums
+            .AsSplitQuery()
+            .Include(a => a.Images.OrderBy(i => i.SortOrder).ThenBy(i => i.Id)).ThenInclude(i => i.Tags).ThenInclude(t => t.Label)
+            .Include(a => a.Images.OrderBy(i => i.SortOrder).ThenBy(i => i.Id)).ThenInclude(i => i.Tags).ThenInclude(t => t.Team)
+            .Include(a => a.Images.OrderBy(i => i.SortOrder).ThenBy(i => i.Id)).ThenInclude(i => i.Tags).ThenInclude(t => t.Tournament)
+            .Include(a => a.Images.OrderBy(i => i.SortOrder).ThenBy(i => i.Id)).ThenInclude(i => i.Tags).ThenInclude(t => t.Account)
+            .Include(a => a.Images.OrderBy(i => i.SortOrder).ThenBy(i => i.Id)).ThenInclude(i => i.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.HomeTeam)
+            .Include(a => a.Images.OrderBy(i => i.SortOrder).ThenBy(i => i.Id)).ThenInclude(i => i.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.AwayTeam)
+            .FirstOrDefaultAsync(a => a.Id == Id);
+
+        _images = _album?.Images.OrderBy(i => i.SortOrder).ThenBy(i => i.Id).ToList() ?? [];
+    }
+
+    async Task UploadZipAsync(IBrowserFile? file)
+    {
+        if (file is null || _album is null)
+        {
+            return;
+        }
+
+        _importing = true;
+        _importProgress = null;
+        _importResult = null;
+        _importError = null;
+        StateHasChanged();
+
+        try
+        {
+            var progress = new Progress<AlbumImportProgress>(p =>
+            {
+                _importProgress = p;
+                InvokeAsync(StateHasChanged);
+            });
+
+            _importResult = await ZipImporter.ImportAsync(_album.Id, file, progress);
+            await LoadAsync();
+        }
+        catch (AlbumImportException e)
+        {
+            _importError = e.Message;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to import album zip for album {AlbumId}", _album.Id);
+            _importError = "Something went wrong on the server. Any images imported before the error are kept. Try again; if it keeps failing, ask a developer to check the logs.";
+            await LoadAsync();
+        }
+        finally
+        {
+            _importing = false;
+            StateHasChanged();
+        }
+    }
+
+    async Task ApplyAlbumTagsAsync()
+    {
+        if (_album is null)
+        {
+            return;
+        }
+
+        _applyingTags = true;
+        StateHasChanged();
+
+        try
+        {
+            var added = await AlbumService.ApplyAlbumTagsToImagesAsync(_album.Id);
+            await LoadAsync();
+            Snackbar.Add($"Added {added} tag(s) to the album's images.", Severity.Success);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to apply album tags to images for album {AlbumId}", _album.Id);
+            Snackbar.Add("The album tags could not be applied.", Severity.Error);
+        }
+        finally
+        {
+            _applyingTags = false;
+            StateHasChanged();
+        }
+    }
+
+    async Task SetCoverAsync(AlbumImage image)
+    {
+        if (_album is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var newCoverId = _album.CoverImageId == image.Id ? null : (int?)image.Id;
+            await AlbumService.SetCoverImageAsync(_album.Id, newCoverId);
+            _album.CoverImageId = newCoverId;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to set cover image for album {AlbumId}", _album.Id);
+            Snackbar.Add("The cover image could not be set.", Severity.Error);
+        }
+    }
+
+    async Task DeleteImageAsync(AlbumImage image)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Delete image?", "This removes the image from the album. The underlying file is not deleted.", yesText: "Delete", cancelText: "Cancel");
+
+        if (confirmed != true)
+        {
+            return;
+        }
+
+        try
+        {
+            await AlbumService.DeleteImageAsync(image.Id);
+            await LoadAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to delete album image {ImageId}", image.Id);
+            Snackbar.Add("The image could not be deleted.", Severity.Error);
+        }
+    }
+
+    async Task MoveImageAsync(AlbumImage image, int direction)
+    {
+        if (_album is null)
+        {
+            return;
+        }
+
+        var index = _images.IndexOf(image);
+        var newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= _images.Count)
+        {
+            return;
+        }
+
+        _images.RemoveAt(index);
+        _images.Insert(newIndex, image);
+
+        try
+        {
+            await AlbumService.ReorderImagesAsync(_album.Id, _images.Select(i => i.Id).ToList());
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to reorder images for album {AlbumId}", _album.Id);
+            Snackbar.Add("The image order could not be saved.", Severity.Error);
+            await LoadAsync();
+        }
+    }
+
+}

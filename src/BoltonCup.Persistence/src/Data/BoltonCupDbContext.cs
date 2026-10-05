@@ -11,6 +11,10 @@ class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
     : DbContext(options)
 {
     public DbSet<Account> Accounts { get; set; }
+    public DbSet<Album> Albums { get; set; }
+    public DbSet<AlbumImage> AlbumImages { get; set; }
+    public DbSet<AlbumTag> AlbumTags { get; set; }
+    public DbSet<AlbumImageTag> AlbumImageTags { get; set; }
     public DbSet<Core.BracketChallenge.Event> BracketChallenges { get; set; }
     public DbSet<Core.BracketChallenge.Registration> BracketChallengeRegistrations { get; set; }
     public DbSet<Draft> Drafts { get; set; }
@@ -333,6 +337,51 @@ class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
         });
 
         modelBuilder.ConfigureTagTable<NewsPostTag, NewsPost>("news_post_tags", "news_post_id", p => p.Tags);
+
+        modelBuilder.Entity<Album>(entity =>
+        {
+            entity
+                .ToTable("albums", t => t.HasCheckConstraint("CK_albums_published_has_date", "NOT is_published OR published_at IS NOT NULL"))
+                .HasKey(e => e.Id);
+            entity
+                .HasIndex(e => e.Slug)
+                .IsUnique();
+            entity.HasIndex(e => new { e.IsPublished, e.OccurredAt });
+            entity
+                .HasOne(e => e.CoverImage)
+                .WithMany()
+                .HasForeignKey(e => e.CoverImageId)
+                .OnDelete(DeleteBehavior.SetNull);
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.Title).HasColumnName("title");
+            entity.Property(e => e.Slug).HasColumnName("slug");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.Source).HasColumnName("source");
+            entity.Property(e => e.OccurredAt).HasColumnName("occurred_at");
+            entity.Property(e => e.IsPublished).HasColumnName("is_published");
+            entity.Property(e => e.PublishedAt).HasColumnName("published_at");
+            entity.Property(e => e.CoverImageId).HasColumnName("cover_image_id");
+        });
+
+        modelBuilder.Entity<AlbumImage>(entity =>
+        {
+            entity
+                .ToTable("album_images")
+                .HasKey(e => e.Id);
+            entity
+                .HasOne(e => e.Album)
+                .WithMany(a => a.Images)
+                .HasForeignKey(e => e.AlbumId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => new { e.AlbumId, e.SortOrder });
+            entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(e => e.AlbumId).HasColumnName("album_id");
+            entity.Property(e => e.Key).HasColumnName("key").IsRequired();
+            entity.Property(e => e.SortOrder).HasColumnName("sort_order");
+        });
+
+        modelBuilder.ConfigureTagTable<AlbumTag, Album>("album_tags", "album_id", a => a.Tags);
+        modelBuilder.ConfigureTagTable<AlbumImageTag, AlbumImage>("album_image_tags", "album_image_id", i => i.Tags);
 
         modelBuilder.Entity<TagLabel>(entity =>
         {
