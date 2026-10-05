@@ -72,7 +72,7 @@ public class TournamentPaymentMapperTests
     [Fact]
     public void ToCommand_NullPosition_MapsCorrectly()
     {
-        var request = new CreateTournamentPaymentIntentRequest { Position = null };
+        var request = new CreateTournamentPaymentIntentRequest { Position = null! };
 
         var command = _mapper.ToCommand(tournamentId: 1, accountId: 2, request);
 

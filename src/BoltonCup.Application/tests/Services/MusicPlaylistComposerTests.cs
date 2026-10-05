@@ -100,7 +100,7 @@ public class MusicPlaylistComposerTests
             Track("base1", null, basePool: true),
         };
 
-        var result = Keys(MusicPlaylistComposer.Compose(Reqs(null, "", "  ", "A"), library));
+        var result = Keys(MusicPlaylistComposer.Compose(Reqs(null, string.Empty, "  ", "A"), library));
 
         result.Should().Equal("reqA", "base1");
     }
@@ -151,6 +151,6 @@ public class MusicPlaylistComposerTests
         result.Should().Equal("base1");
     }
 
-    static List<string> Keys(IEnumerable<TournamentMusicTrack> tracks)
+    static List<string?> Keys(IEnumerable<TournamentMusicTrack> tracks)
         => tracks.Select(t => t.AudioFileKey).ToList();
 }

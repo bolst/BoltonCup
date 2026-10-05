@@ -63,7 +63,7 @@
             .ToListAsync();
     }
 
-    private static string ToLabel(TournamentMusicTrack? track)
+    private static string? ToLabel(TournamentMusicTrack? track)
         => track is null ? string.Empty
             : string.IsNullOrWhiteSpace(track.Artist) ? track.Title : $"{track.Artist} – {track.Title}";
 

@@ -34,6 +34,7 @@ public static class MusicPlaylistComposer
             if (!string.IsNullOrWhiteSpace(trackId)
                 && byKey.TryGetValue(Key(provider, trackId), out var track)
                 && !IsExcluded(track)
+                && track.AudioFileKey != null
                 && seen.Add(track.AudioFileKey))
             {
                 result.Add(track);
@@ -42,7 +43,7 @@ public static class MusicPlaylistComposer
 
         foreach (var track in library.Where(t => t.IsInBasePool))
         {
-            if (!IsExcluded(track) && seen.Add(track.AudioFileKey))
+            if (!IsExcluded(track) && track.AudioFileKey != null && seen.Add(track.AudioFileKey))
             {
                 result.Add(track);
             }
