@@ -84,10 +84,10 @@ else
     <MudGrid>
         @foreach (var image in _images)
         {
-            <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudItem xs="12" sm="6" md="4">
                 <MudCard>
                     <MudCardContent>
-                        <BoltonCupImage Src="@image.Key" Height="200" ObjectFit="ObjectFit.Cover"/>
+                        <BoltonCupImage Src="@image.Key" Height="320" ObjectFit="ObjectFit.Cover"/>
                     </MudCardContent>
                     <MudCardActions Class="d-flex flex-column align-stretch gap-1 pa-2">
                         <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
