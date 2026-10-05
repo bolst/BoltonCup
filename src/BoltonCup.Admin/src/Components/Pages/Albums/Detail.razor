@@ -92,17 +92,21 @@ else
                     <MudCardActions Class="d-flex flex-column align-stretch gap-1 pa-2">
                         <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
                             <MudIconButton Icon="@Icons.Material.Rounded.ArrowUpward" Size="Size.Small"
+                                           tabindex="-1"
                                            Disabled="@(image == _images[0])"
                                            OnClick="@(() => MoveImageAsync(image, -1))"/>
                             <MudIconButton Icon="@Icons.Material.Rounded.ArrowDownward" Size="Size.Small"
+                                           tabindex="-1"
                                            Disabled="@(image == _images[^1])"
                                            OnClick="@(() => MoveImageAsync(image, 1))"/>
                             <MudIconButton Icon="@(_album.CoverImageId == image.Id ? Icons.Material.Filled.Star : Icons.Material.Rounded.StarBorder)"
                                            Color="@(_album.CoverImageId == image.Id ? Color.Warning : Color.Default)"
                                            Size="Size.Small"
+                                           tabindex="-1"
                                            Title="Set as cover"
                                            OnClick="@(() => SetCoverAsync(image))"/>
                             <MudIconButton Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Small"
+                                           tabindex="-1"
                                            OnClick="@(() => DeleteImageAsync(image))"/>
                         </MudStack>
                         <TagInput TTag="AlbumImageTag" Subject="image"/>
