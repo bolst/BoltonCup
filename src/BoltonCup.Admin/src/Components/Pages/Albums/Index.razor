@@ -50,7 +50,7 @@
             .Include(a => a.Tags).ThenInclude(t => t.Tournament)
             .Include(a => a.Tags).ThenInclude(t => t.Label);
 
-    Task<Album?> NewItemFunc() => Task.FromResult<Album?>(new Album());
+    Task<Album?> NewItemFunc() => Task.FromResult<Album?>(new Album { OccurredAt = DateTime.UtcNow });
 
     // Runs before the grid persists: slugs are derived here so a blank slug never reaches the
     // unique index, and PublishedAt is stamped the first time an album is published. Edited albums
