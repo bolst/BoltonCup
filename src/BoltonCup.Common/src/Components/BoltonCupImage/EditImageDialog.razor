@@ -36,7 +36,7 @@
                 @if (_hasGallery)
                 {
                     <MudText Typo="Typo.body2" Class="mt-2">or&hellip;</MudText>
-                    <MudButton Variant="Variant.Text" Color="Color.Primary" Disabled="_loading" OnClick="@(() => _view = DialogView.Gallery)">
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Disabled="_loading" OnClick="@ShowGallery">
                         Pick from your gallery
                     </MudButton>
                 }
@@ -45,7 +45,7 @@
             {
                 <TaggedImagePicker
                     Filter="GalleryFilter"
-                    SelectedImageId="@_picked?.Id"
+                    SelectedImageId="@_galleryChoice?.Id"
                     OnSelected="@OnImagePicked"
                     InitialPage="@_firstPage"
                     PageSize="@PageSize"
@@ -60,7 +60,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="@Cancel" Disabled="_loading">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="@Submit" Disabled="_loading">OK</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@Submit" Disabled="@SubmitDisabled">OK</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -92,8 +92,11 @@
     bool _hasGallery;
     Sdk.AlbumImageDtoIPagedList? _firstPage;
     Sdk.AlbumImageDto? _picked;
+    Sdk.AlbumImageDto? _galleryChoice;
 
     string? PreviewSrc => _picked?.Url ?? AssetUrlResolver.GetFullUrl(_src);
+
+    bool SubmitDisabled => _loading || (_view == DialogView.Gallery && _galleryChoice is null);
 
     ImageTagFilter GalleryFilter => TagFilter ?? throw new InvalidOperationException("Gallery view requires a TagFilter.");
 
@@ -159,16 +162,31 @@
         }
     }
 
-    void OnImagePicked(Sdk.AlbumImageDto image)
+    void ShowGallery()
     {
-        _picked = image;
+        _galleryChoice = _picked;
+        _view = DialogView.Gallery;
+    }
+
+    void OnImagePicked(Sdk.AlbumImageDto image) => _galleryChoice = image;
+
+    void ConfirmGalleryChoice()
+    {
+        _picked = _galleryChoice;
         _uploadFilename = null;
+        _view = DialogView.Upload;
     }
 
     void Cancel() => DialogInstance.Close();
 
     async Task Submit()
     {
+        if (_view == DialogView.Gallery)
+        {
+            ConfirmGalleryChoice();
+            return;
+        }
+
         if (_picked is null)
         {
             DialogInstance.Close(_src);

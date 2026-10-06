@@ -1,0 +1,15 @@
+.tagged-image-picker ::deep .tagged-image-tile {
+    cursor: pointer;
+    border-radius: 8px;
+    outline: 3px solid transparent;
+    outline-offset: 2px;
+    transition: outline-color .2s ease, opacity .2s ease;
+}
+
+.tagged-image-picker ::deep .tagged-image-tile:hover {
+    opacity: .85;
+}
+
+.tagged-image-picker ::deep .tagged-image-tile--selected {
+    outline-color: var(--mud-palette-primary);
+}
