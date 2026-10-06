@@ -28,4 +28,13 @@ public interface IAlbumService
 
     /// <summary>Copies each album tag onto every image that does not already carry it. Returns the number of tags added.</summary>
     Task<int> ApplyAlbumTagsToImagesAsync(int albumId, CancellationToken cancellationToken = default);
+
+    /// <summary>Images in published albums carrying the given tag, newest album first.</summary>
+    Task<IPagedList<AlbumImage>> GetPublishedImagesByTagAsync(GetAlbumImagesQuery query, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Copies the image to a new temp key and returns it. Returns null when the image does not
+    /// exist or its album is not published.
+    /// </summary>
+    Task<string?> StagePublishedImageAsync(int imageId, CancellationToken cancellationToken = default);
 }

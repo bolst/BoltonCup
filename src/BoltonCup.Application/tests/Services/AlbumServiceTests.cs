@@ -23,8 +23,8 @@ public class AlbumServiceTests
         return services.BuildServiceProvider().GetRequiredService<IDbContextFactory<BoltonCupDbContext>>();
     }
 
-    static AlbumService NewService(IDbContextFactory<BoltonCupDbContext> factory, IStorageService? storage = null, IAssetKeyGenerator? keys = null)
-        => new(factory, storage ?? Mock.Of<IStorageService>(), keys ?? Mock.Of<IAssetKeyGenerator>());
+    static AlbumService NewService(IDbContextFactory<BoltonCupDbContext> factory, IStorageService? storage = null, IAssetKeyGenerator? keys = null, IAssetStager? stager = null)
+        => new(factory, storage ?? Mock.Of<IStorageService>(), keys ?? Mock.Of<IAssetKeyGenerator>(), stager ?? Mock.Of<IAssetStager>());
 
     static async Task<(IDbContextFactory<BoltonCupDbContext> Factory, BoltonCupDbContext Db)> SeedAsync()
     {
@@ -261,5 +261,182 @@ public class AlbumServiceTests
         ]);
 
         reserved.Should().Equal("brand-new", "older-tagged-2");
+    }
+
+    const int TargetId = 50;
+
+    static async Task<(IDbContextFactory<BoltonCupDbContext> Factory, BoltonCupDbContext Db)> SeedTaggedImagesAsync()
+    {
+        var factory = NewFactory();
+        var db = await factory.CreateDbContextAsync();
+        db.Albums.AddRange(
+            new Album
+            {
+                Id = 40,
+                Title = "Newer",
+                Slug = "newer",
+                IsPublished = true,
+                OccurredAt = new DateTime(2026, 3, 1, 0, 0, 0, DateTimeKind.Utc),
+                Images =
+                [
+                    new AlbumImage
+                    {
+                        Id = 400,
+                        Key = "media/album/40/images/newer.webp",
+                        SortOrder = 1,
+                        Tags = [new AlbumImageTag { AccountId = TargetId }],
+                    },
+                    new AlbumImage
+                    {
+                        Id = 401,
+                        Key = "media/album/40/images/untagged.webp",
+                        SortOrder = 2,
+                    },
+                ],
+            },
+            new Album
+            {
+                Id = 41,
+                Title = "Older",
+                Slug = "older",
+                IsPublished = true,
+                OccurredAt = new DateTime(2026, 2, 1, 0, 0, 0, DateTimeKind.Utc),
+                Images =
+                [
+                    new AlbumImage
+                    {
+                        Id = 410,
+                        Key = "media/album/41/images/older.webp",
+                        SortOrder = 1,
+                        Tags = [new AlbumImageTag { AccountId = TargetId }],
+                    },
+                    new AlbumImage
+                    {
+                        Id = 411,
+                        Key = "media/album/41/images/team.webp",
+                        SortOrder = 2,
+                        Tags = [new AlbumImageTag { TeamId = TargetId }],
+                    },
+                    new AlbumImage
+                    {
+                        Id = 412,
+                        Key = "media/album/41/images/label.webp",
+                        SortOrder = 3,
+                        Tags = [new AlbumImageTag { LabelId = TargetId }],
+                    },
+                ],
+            },
+            new Album
+            {
+                Id = 42,
+                Title = "Draft",
+                Slug = "draft-images",
+                IsPublished = false,
+                Images =
+                [
+                    new AlbumImage
+                    {
+                        Id = 420,
+                        Key = "media/album/42/images/draft.webp",
+                        SortOrder = 1,
+                        Tags = [new AlbumImageTag { AccountId = TargetId }],
+                    },
+                ],
+            });
+        await db.SaveChangesAsync();
+        db.ChangeTracker.Clear();
+        return (factory, db);
+    }
+
+    [Theory]
+    [InlineData(TagTargetType.Account, 400, 410)]
+    [InlineData(TagTargetType.Team, 411)]
+    [InlineData(TagTargetType.Label, 412)]
+    public async Task GetPublishedImagesByTagAsync_FiltersByTagType(TagTargetType type, params int[] expectedIds)
+    {
+        var (factory, db) = await SeedTaggedImagesAsync();
+        await using var _ = db;
+
+        var result = await NewService(factory).GetPublishedImagesByTagAsync(new GetAlbumImagesQuery { TagType = type, TargetId = TargetId });
+
+        result.Items.Select(i => i.Id).Should().Equal(expectedIds);
+    }
+
+    [Fact]
+    public async Task GetPublishedImagesByTagAsync_ExcludesUnpublishedAlbums()
+    {
+        var (factory, db) = await SeedTaggedImagesAsync();
+        await using var _ = db;
+
+        var result = await NewService(factory).GetPublishedImagesByTagAsync(new GetAlbumImagesQuery { TagType = TagTargetType.Account, TargetId = TargetId });
+
+        result.Items.Select(i => i.Id).Should().NotContain(420);
+    }
+
+    [Fact]
+    public async Task GetPublishedImagesByTagAsync_OrdersByNewestAlbumThenSortOrder()
+    {
+        var (factory, db) = await SeedTaggedImagesAsync();
+        await using var _ = db;
+
+        var result = await NewService(factory).GetPublishedImagesByTagAsync(new GetAlbumImagesQuery
+        {
+            TagType = TagTargetType.Account,
+            TargetId = TargetId,
+        });
+
+        result.Items.Select(i => i.Id).Should().Equal(400, 410);
+    }
+
+    [Fact]
+    public async Task GetPublishedImagesByTagAsync_Paginates()
+    {
+        var (factory, db) = await SeedTaggedImagesAsync();
+        await using var _ = db;
+        var service = NewService(factory);
+
+        var page1 = await service.GetPublishedImagesByTagAsync(new GetAlbumImagesQuery { TagType = TagTargetType.Account, TargetId = TargetId, Page = 1, Size = 1 });
+        var page2 = await service.GetPublishedImagesByTagAsync(new GetAlbumImagesQuery { TagType = TagTargetType.Account, TargetId = TargetId, Page = 2, Size = 1 });
+
+        page1.Total.Should().Be(2);
+        page1.Items.Select(i => i.Id).Should().Equal(400);
+        page2.Items.Select(i => i.Id).Should().Equal(410);
+    }
+
+    [Fact]
+    public async Task StagePublishedImageAsync_ReturnsNull_WhenImageMissing()
+    {
+        var (factory, db) = await SeedTaggedImagesAsync();
+        await using var _ = db;
+
+        var key = await NewService(factory).StagePublishedImageAsync(999);
+
+        key.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task StagePublishedImageAsync_ReturnsNull_WhenAlbumUnpublished()
+    {
+        var (factory, db) = await SeedTaggedImagesAsync();
+        await using var _ = db;
+
+        var key = await NewService(factory).StagePublishedImageAsync(420);
+
+        key.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task StagePublishedImageAsync_CopiesPublishedImageToTempKey()
+    {
+        var (factory, db) = await SeedTaggedImagesAsync();
+        await using var _ = db;
+        var stager = new Mock<IAssetStager>();
+        stager.Setup(s => s.CopyToTempAsync("media/album/40/images/newer.webp", It.IsAny<CancellationToken>()))
+            .ReturnsAsync("temp_uploads/new-key.webp");
+
+        var key = await NewService(factory, stager: stager.Object).StagePublishedImageAsync(400);
+
+        key.Should().Be("temp_uploads/new-key.webp");
+        stager.Verify(s => s.CopyToTempAsync("media/album/40/images/newer.webp", It.IsAny<CancellationToken>()), Times.Once);
     }
 }

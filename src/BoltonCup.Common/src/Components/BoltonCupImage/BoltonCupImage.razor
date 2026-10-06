@@ -52,6 +52,9 @@ else
     [Parameter]
     public bool Avatar { get; set; }
 
+    [Parameter]
+    public ImageTagFilter? TagFilter { get; set; }
+
     private string? _src;
     
     private readonly ParameterState<string?> _srcState;
@@ -88,6 +91,7 @@ else
         var dialog = await DialogService.ShowAsync<EditImageDialog>("Edit Image", new DialogParameters<EditImageDialog>
         {
             { x => x.Src, _src },
+            { x => x.TagFilter, TagFilter },
         });
         var result = await dialog.Result;
         if (result?.Data is string newSrc)

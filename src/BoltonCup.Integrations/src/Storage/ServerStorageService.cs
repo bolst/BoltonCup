@@ -5,7 +5,7 @@ using BoltonCup.Core;
 namespace BoltonCup.Integrations.Storage;
 
 public class ServerStorageService(IAmazonS3 _s3Client, IAssetKeyGenerator _keyGenerator)
-    : IStorageService
+    : IStorageService, IAssetStager
 {
     const string _bucketName = "bolton-cup-assets";
 
@@ -47,4 +47,17 @@ public class ServerStorageService(IAmazonS3 _s3Client, IAssetKeyGenerator _keyGe
             ContentType = contentType,
             DisablePayloadSigning = true,
         }, cancellationToken);
+
+    public async Task<string> CopyToTempAsync(string sourceKey, CancellationToken cancellationToken = default)
+    {
+        var tempKey = _keyGenerator.GenerateTempKey(Path.GetExtension(sourceKey));
+        await _s3Client.CopyObjectAsync(new CopyObjectRequest
+        {
+            SourceKey = sourceKey,
+            SourceBucket = _bucketName,
+            DestinationKey = tempKey,
+            DestinationBucket = _bucketName,
+        }, cancellationToken);
+        return tempKey;
+    }
 }

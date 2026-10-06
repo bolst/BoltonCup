@@ -33,10 +33,10 @@ else
     <MudContainer Class="pb-4" MaxWidth="MaxWidth.Large">
         <MudContainer MaxWidth="MaxWidth.Medium" Gutters="false">
             <div class="action-shot-container d-flex flex-row align-end">
-                <BoltonCupImage Src="@_accountInfo.Banner" SrcChanged="UpdateBanner" Class="action-shot" ObjectFit="ObjectFit.Cover" Editable/>
+                <BoltonCupImage Src="@_accountInfo.Banner" SrcChanged="UpdateBanner" Class="action-shot" ObjectFit="ObjectFit.Cover" TagFilter="_imageTagFilter" Editable/>
             </div>
             <div class="d-flex flex-column align-center gap-3 mt-n20">
-                <BoltonCupImage Src="@_accountInfo.Avatar" SrcChanged="UpdateAvatar" Height="160" Avatar Editable/>
+                <BoltonCupImage Src="@_accountInfo.Avatar" SrcChanged="UpdateAvatar" Height="160" TagFilter="_imageTagFilter" Avatar Editable/>
             </div>
         </MudContainer>
 
@@ -57,11 +57,16 @@ else
 @code {
     
     private AccountDto? _accountInfo;
+    private ImageTagFilter? _imageTagFilter;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         _accountInfo = await BoltonCupApi.GetMeAsync();
+        if (_accountInfo?.Id is { } accountId)
+        {
+            _imageTagFilter = new ImageTagFilter(TagTargetType.Account, accountId);
+        }
     }
     
     private async Task UpdateBanner(string? newSrc)

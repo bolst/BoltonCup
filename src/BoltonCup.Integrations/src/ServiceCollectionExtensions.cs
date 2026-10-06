@@ -94,7 +94,8 @@ public static class ServiceCollectionExtensions
         return builder.Services
             .AddSingleton<IAmazonS3>(_ => new AmazonS3Client(s3Credentials, s3Config))
             .AddSingleton<IAssetKeyGenerator, AssetKeyGenerator>()
-            .Replace(ServiceDescriptor.Singleton<IStorageService, ServerStorageService>());
+            .Replace(ServiceDescriptor.Singleton<IStorageService, ServerStorageService>())
+            .AddSingleton<IAssetStager>(sp => (IAssetStager)sp.GetRequiredService<IStorageService>());
     }
 
     static IServiceCollection AddBoltonCupPayments(this WebApplicationBuilder builder)
