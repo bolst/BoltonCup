@@ -34,3 +34,19 @@
 .edit-image-container:hover .overlay-container[b-i9fl17iq53] {
     opacity: 1;
 }
+/* _content/BoltonCup.Common/Components/BoltonCupImage/TaggedImagePicker.razor.rz.scp.css */
+.tagged-image-picker[b-z8y7qg1v07]  .tagged-image-tile {
+    cursor: pointer;
+    border-radius: 8px;
+    outline: 3px solid transparent;
+    outline-offset: 2px;
+    transition: outline-color .2s ease, opacity .2s ease;
+}
+
+.tagged-image-picker[b-z8y7qg1v07]  .tagged-image-tile:hover {
+    opacity: .85;
+}
+
+.tagged-image-picker[b-z8y7qg1v07]  .tagged-image-tile--selected {
+    outline-color: var(--mud-palette-primary);
+}
