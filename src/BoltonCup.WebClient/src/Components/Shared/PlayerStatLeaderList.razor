@@ -9,7 +9,7 @@
             {
                 <div class="d-flex flex-row align-center gap-3">
                     <MudAvatar Size="Size.Large">
-                        <MudImage Src="@_selectedPlayer.ProfilePicture" Alt="@_selectedPlayer.FullName" Height="80" Width="80"/>
+                        <MudImage ObjectFit="ObjectFit.Cover" Src="@_selectedPlayer.ProfilePicture" Alt="@_selectedPlayer.FullName" Height="80" Width="80"/>
                     </MudAvatar>
                     <div class="d-flex flex-column align-start justify-space-evenly">
                         <MudText Typo="Typo.subtitle2" Color="Color.Info"><b>@PlayerStatLeaders?.Title</b></MudText>

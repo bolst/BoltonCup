@@ -8,7 +8,8 @@ namespace BoltonCup.Application.Services;
 class AlbumService(
     IDbContextFactory<BoltonCupDbContext> _dbContextFactory,
     IStorageService _storageService,
-    IAssetKeyGenerator _assetKeyGenerator) : IAlbumService
+    IAssetKeyGenerator _assetKeyGenerator,
+    IAssetStager _assetStager) : IAlbumService
 {
     public async Task<IPagedList<Album>> GetPublishedAsync(GetAlbumsQuery query, CancellationToken cancellationToken = default)
     {
@@ -170,6 +171,50 @@ class AlbumService(
         await db.SaveChangesAsync(cancellationToken);
         return added;
     }
+
+    public async Task<IPagedList<AlbumImage>> GetPublishedImagesByTagAsync(GetAlbumImagesQuery query, CancellationToken cancellationToken = default)
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        return await ApplyTagFilter(WithImageTags(db.AlbumImages.AsNoTracking()), query.TagType, query.TargetId)
+            .Where(i => i.Album.IsPublished)
+            .ApplySorting(
+                query,
+                x => x
+                    .OrderByDescending(i => i.Album.OccurredAt)
+                    .ThenBy(i => i.SortOrder)
+                    .ThenBy(i => i.Id))
+            .ToPagedListAsync(query, cancellationToken: cancellationToken);
+    }
+
+    public async Task<string?> StagePublishedImageAsync(int imageId, CancellationToken cancellationToken = default)
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var key = await db.AlbumImages
+            .Where(i => i.Id == imageId && i.Album.IsPublished)
+            .Select(i => i.Key)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return key is null ? null : await _assetStager.CopyToTempAsync(key, cancellationToken);
+    }
+
+    static IQueryable<AlbumImage> ApplyTagFilter(IQueryable<AlbumImage> images, TagTargetType type, int targetId) => type switch
+    {
+        TagTargetType.Game => images.Where(i => i.Tags.Any(t => t.GameId == targetId)),
+        TagTargetType.Account => images.Where(i => i.Tags.Any(t => t.AccountId == targetId)),
+        TagTargetType.Team => images.Where(i => i.Tags.Any(t => t.TeamId == targetId)),
+        TagTargetType.Tournament => images.Where(i => i.Tags.Any(t => t.TournamentId == targetId)),
+        TagTargetType.Label => images.Where(i => i.Tags.Any(t => t.LabelId == targetId)),
+        _ => throw new ArgumentOutOfRangeException(nameof(type), type, "No tag target is declared for this type."),
+    };
+
+    static IQueryable<AlbumImage> WithImageTags(IQueryable<AlbumImage> images) => images
+        .AsSplitQuery()
+        .Include(i => i.Tags).ThenInclude(t => t.Label)
+        .Include(i => i.Tags).ThenInclude(t => t.Team)
+        .Include(i => i.Tags).ThenInclude(t => t.Tournament)
+        .Include(i => i.Tags).ThenInclude(t => t.Account)
+        .Include(i => i.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.HomeTeam)
+        .Include(i => i.Tags).ThenInclude(t => t.Game).ThenInclude(g => g!.AwayTeam);
 
     static IQueryable<Album> WithTags(IQueryable<Album> albums) => albums
         .AsSplitQuery()

@@ -18,6 +18,8 @@ public interface IMapper
     GetAlbumsQuery ToQuery(GetAlbumsRequest request);
     IPagedList<AlbumDto> ToDtoList(IPagedList<Album> albums);
     AlbumSingleDto? ToDto(Album? album);
+    GetAlbumImagesQuery ToQuery(GetAlbumImagesRequest request);
+    IPagedList<AlbumImageDto> ToDtoList(IPagedList<AlbumImage> images);
     ICollection<AccountTournamentDto> ToAccountTournamentDtoList(Account? account);
     CreateAccountCommand ToCommand(CompleteUserAccountRequest request, ClaimsPrincipal claims);
     UpdateAccountCommand ToCommand(UpdateAccountRequest request, ClaimsPrincipal claims);

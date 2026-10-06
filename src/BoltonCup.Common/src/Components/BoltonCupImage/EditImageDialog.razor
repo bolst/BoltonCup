@@ -3,6 +3,7 @@
 @inject ISnackbar Snackbar
 @inject IAssetFileUploader AssetFileUploader
 @inject Shared.IAssetUrlResolver AssetUrlResolver
+@inject IBoltonCupApi BoltonCupApi
 
 <MudDialog>
     <TitleContent>
@@ -10,64 +11,132 @@
     </TitleContent>
     <DialogContent>
         <div class="mud-width-full d-flex flex-column align-center justify-center">
-            <MudImage Src="@AssetUrlResolver.GetFullUrl(_src)" Width="300" />
-            <MudFileUpload T="IBrowserFile" FilesChanged="FilesChanged" Accept=".png, .jpg, .webp, .svg">
-                <CustomContent>
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Primary"
-                               OnClick="@context.OpenFilePickerAsync"
-                               StartIcon="@Icons.Material.Filled.CloudUpload"
-                               Disabled="_loading">
-                        @if (string.IsNullOrEmpty(_uploadFilename))
-                        {
-                            <MudText Typo="Typo.button">Upload</MudText>
-                        }
-                        else
-                        {
-                            <MudText Typo="Typo.button">@_uploadFilename</MudText>
-                        }
+            @if (_view == DialogView.Upload)
+            {
+                <MudImage Src="@PreviewSrc" Width="300" />
+                <MudFileUpload T="IBrowserFile" FilesChanged="FilesChanged" Accept=".png, .jpg, .webp, .svg">
+                    <CustomContent>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   OnClick="@context.OpenFilePickerAsync"
+                                   StartIcon="@Icons.Material.Filled.CloudUpload"
+                                   Disabled="_loading">
+                            @if (string.IsNullOrEmpty(_uploadFilename))
+                            {
+                                <MudText Typo="Typo.button">Upload</MudText>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.button">@_uploadFilename</MudText>
+                            }
+                        </MudButton>
+                    </CustomContent>
+                </MudFileUpload>
+
+                @if (_hasGallery)
+                {
+                    <MudText Typo="Typo.body2" Class="mt-2">or&hellip;</MudText>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Disabled="_loading" OnClick="@(() => _view = DialogView.Gallery)">
+                        Pick from your gallery
                     </MudButton>
-                </CustomContent>
-            </MudFileUpload>
+                }
+            }
+            else
+            {
+                <TaggedImagePicker
+                    Filter="GalleryFilter"
+                    SelectedImageId="@_picked?.Id"
+                    OnSelected="@OnImagePicked"
+                    InitialPage="@_firstPage"
+                    PageSize="@PageSize"
+                    Disabled="@_loading" />
+
+                <MudText Typo="Typo.body2" Class="mt-2">or&hellip;</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" Disabled="_loading" OnClick="@(() => _view = DialogView.Upload)">
+                    Upload your own image
+                </MudButton>
+            }
         </div>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel" Disabled="_loading">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit" Disabled="_loading">OK</MudButton>
+        <MudButton OnClick="@Cancel" Disabled="_loading">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@Submit" Disabled="_loading">OK</MudButton>
     </DialogActions>
 </MudDialog>
 
 
 
 @code {
-    
-    // TODO: use ephemeral s3 bucket
+
+    enum DialogView
+    {
+        Upload,
+        Gallery,
+    }
+
+    const int PageSize = 4;
 
     [CascadingParameter]
     public IMudDialogInstance DialogInstance { get; set; } = null!;
-    
+
     [Parameter]
     public string? Src { get; set; }
 
-    private bool _loading;
-    private string? _src;
-    private string? _uploadFilename;
+    [Parameter]
+    public ImageTagFilter? TagFilter { get; set; }
+
+    bool _loading;
+    string? _src;
+    string? _uploadFilename;
+    DialogView _view = DialogView.Upload;
+    bool _hasGallery;
+    Sdk.AlbumImageDtoIPagedList? _firstPage;
+    Sdk.AlbumImageDto? _picked;
+
+    string? PreviewSrc => _picked?.Url ?? AssetUrlResolver.GetFullUrl(_src);
+
+    ImageTagFilter GalleryFilter => TagFilter ?? throw new InvalidOperationException("Gallery view requires a TagFilter.");
 
     protected override void OnParametersSet()
     {
         _src ??= Src;
     }
 
-    private async Task FilesChanged(IBrowserFile? file)
+    protected override async Task OnInitializedAsync()
+    {
+        if (TagFilter is null)
+        {
+            return;
+        }
+
+        try
+        {
+            _firstPage = await BoltonCupApi.GetAlbumImagesAsync(TagFilter.Type, TagFilter.TargetId, page: 1, size: PageSize);
+            _hasGallery = _firstPage.Total > 0;
+            if (_hasGallery)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception)
+        {
+            _hasGallery = false;
+        }
+    }
+
+    async Task FilesChanged(IBrowserFile? file)
     {
         if (file is null)
+        {
             return;
+        }
+
         if (!file.ContentType.StartsWith("image/"))
         {
             Snackbar.Add($"{file.Name} is not an image.", Severity.Error);
             return;
         }
-        
+
         _loading = true;
         StateHasChanged();
 
@@ -76,6 +145,7 @@
             var tempKey = await AssetFileUploader.UploadAsync(file);
             _src = tempKey;
             _uploadFilename = file.Name;
+            _picked = null;
         }
         catch (Exception e)
         {
@@ -88,12 +158,40 @@
             StateHasChanged();
         }
     }
-    
-    private void Cancel() => DialogInstance.Close();
 
-    private void Submit()
+    void OnImagePicked(Sdk.AlbumImageDto image)
     {
-        DialogInstance.Close(_src);
+        _picked = image;
+        _uploadFilename = null;
+    }
+
+    void Cancel() => DialogInstance.Close();
+
+    async Task Submit()
+    {
+        if (_picked is null)
+        {
+            DialogInstance.Close(_src);
+            return;
+        }
+
+        _loading = true;
+        StateHasChanged();
+
+        try
+        {
+            var tempKey = await BoltonCupApi.StageAlbumImageAsync(_picked.Id);
+            DialogInstance.Close(tempKey);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Could not use that image right now.", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
     }
 
 }

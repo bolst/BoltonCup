@@ -145,4 +145,39 @@ public class AlbumMapperTests
         query.SortBy.Should().Be("title");
         query.Descending.Should().BeTrue();
     }
+
+    [Fact]
+    public void ToQuery_MapsAlbumImagesRequest()
+    {
+        var request = new GetAlbumImagesRequest { TagType = TagTargetType.Account, TagTargetId = 7, Page = 2, Size = 10, SortBy = "id", Descending = true };
+
+        var query = _mapper.ToQuery(request);
+
+        query.TagType.Should().Be(TagTargetType.Account);
+        query.TargetId.Should().Be(7);
+        query.Page.Should().Be(2);
+        query.Size.Should().Be(10);
+        query.SortBy.Should().Be("id");
+        query.Descending.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ToDtoList_MapsAlbumImages_PreservesPaging()
+    {
+        _urls.Setup(u => u.GetFullUrl(It.IsAny<string?>())).Returns<string?>(k => k is null ? null : $"https://cdn/{k}");
+        var paged = new Mock<IPagedList<AlbumImage>>();
+        paged.SetupGet(p => p.Items).Returns(
+        [
+            new AlbumImage { Id = 1, Key = "a.webp", Tags = [] },
+            new AlbumImage { Id = 2, Key = "b.webp", Tags = [] },
+        ]);
+        paged.SetupGet(p => p.Total).Returns(5);
+        paged.SetupGet(p => p.Page).Returns(1);
+        paged.SetupGet(p => p.Size).Returns(2);
+
+        var dto = _mapper.ToDtoList(paged.Object);
+
+        dto.Items.Select(i => i.Url).Should().Equal("https://cdn/a.webp", "https://cdn/b.webp");
+        (dto.Total, dto.Page, dto.Size).Should().Be((5, 1, 2));
+    }
 }

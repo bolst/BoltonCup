@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using BoltonCup.Core;
 using BoltonCup.WebAPI.Controllers;
 using BoltonCup.WebAPI.Mapping;
@@ -114,5 +115,79 @@ public class AlbumsControllerTests
         await _controller.GetAlbumBySlug(" Opening-Night ");
 
         _albums.Verify(s => s.GetPublishedBySlugAsync("opening-night", It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetAlbumImages_CallsServiceAndMapper_ReturnsOk()
+    {
+        var request = new GetAlbumImagesRequest { TagType = TagTargetType.Account, TagTargetId = 7, Page = 1, Size = 12 };
+        _mapper.Setup(m => m.ToQuery(request)).Returns(new GetAlbumImagesQuery { TagType = TagTargetType.Account, TargetId = 7, Page = 1, Size = 12 });
+        _albums.Setup(s => s.GetPublishedImagesByTagAsync(It.IsAny<GetAlbumImagesQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(Mock.Of<IPagedList<AlbumImage>>());
+        _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<AlbumImage>>())).Returns(Mock.Of<IPagedList<AlbumImageDto>>());
+
+        var result = await _controller.GetAlbumImages(request);
+
+        result.Result.Should().BeOfType<OkObjectResult>();
+        _albums.Verify(s => s.GetPublishedImagesByTagAsync(It.IsAny<GetAlbumImagesQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetAlbumImages_RepeatedRequest_IsServedFromCache()
+    {
+        var request = new GetAlbumImagesRequest { TagType = TagTargetType.Account, TagTargetId = 7, Page = 1, Size = 12 };
+        _mapper.Setup(m => m.ToQuery(It.IsAny<GetAlbumImagesRequest>())).Returns(new GetAlbumImagesQuery());
+        _albums.Setup(s => s.GetPublishedImagesByTagAsync(It.IsAny<GetAlbumImagesQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(Mock.Of<IPagedList<AlbumImage>>());
+        _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<AlbumImage>>())).Returns(Mock.Of<IPagedList<AlbumImageDto>>());
+
+        await _controller.GetAlbumImages(request);
+        await _controller.GetAlbumImages(request);
+
+        _albums.Verify(s => s.GetPublishedImagesByTagAsync(It.IsAny<GetAlbumImagesQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetAlbumImages_DifferentSort_IsNotServedFromCache()
+    {
+        var request = new GetAlbumImagesRequest { TagType = TagTargetType.Account, TagTargetId = 7, Page = 1, Size = 12 };
+        _mapper.Setup(m => m.ToQuery(It.IsAny<GetAlbumImagesRequest>())).Returns(new GetAlbumImagesQuery());
+        _albums.Setup(s => s.GetPublishedImagesByTagAsync(It.IsAny<GetAlbumImagesQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(Mock.Of<IPagedList<AlbumImage>>());
+        _mapper.Setup(m => m.ToDtoList(It.IsAny<IPagedList<AlbumImage>>())).Returns(Mock.Of<IPagedList<AlbumImageDto>>());
+
+        await _controller.GetAlbumImages(request);
+        await _controller.GetAlbumImages(request with { SortBy = "Id", Descending = true });
+
+        _albums.Verify(s => s.GetPublishedImagesByTagAsync(It.IsAny<GetAlbumImagesQuery>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+    }
+
+    [Fact]
+    public void GetAlbumImagesRequest_UndefinedTagType_FailsValidation()
+    {
+        var request = new GetAlbumImagesRequest { TagType = (TagTargetType)99, TagTargetId = 1 };
+        var results = new List<ValidationResult>();
+
+        var isValid = Validator.TryValidateObject(request, new ValidationContext(request), results, validateAllProperties: true);
+
+        isValid.Should().BeFalse();
+        results.Should().ContainSingle(r => r.MemberNames.Contains(nameof(GetAlbumImagesRequest.TagType)));
+    }
+
+    [Fact]
+    public async Task StageAlbumImage_WhenStaged_ReturnsOkWithTempKey()
+    {
+        _albums.Setup(s => s.StagePublishedImageAsync(5, It.IsAny<CancellationToken>())).ReturnsAsync("temp_uploads/abc.webp");
+
+        var result = await _controller.StageAlbumImage(5);
+
+        result.Result.Should().BeOfType<OkObjectResult>().Which.Value.Should().Be("temp_uploads/abc.webp");
+    }
+
+    [Fact]
+    public async Task StageAlbumImage_WhenMissingOrUnpublished_ReturnsNotFound()
+    {
+        _albums.Setup(s => s.StagePublishedImageAsync(5, It.IsAny<CancellationToken>())).ReturnsAsync((string?)null);
+
+        var result = await _controller.StageAlbumImage(5);
+
+        result.Result.Should().BeOfType<NotFoundResult>();
     }
 }

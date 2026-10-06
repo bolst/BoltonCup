@@ -7,12 +7,12 @@
 
 @if (!Editable)
 {
-    <MudImage Class="@Classname" Src="@AssetUrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" ObjectFit="ObjectFit" />
+    <MudImage Class="@Classname" Src="@AssetUrlResolver.GetFullUrl(_src)" Height="@RenderHeight" Width="@RenderWidth" ObjectFit="RenderObjectFit" />
 }
 else
 {
     <div class="edit-image-container" @onclick="OnClick">
-        <MudImage Class="@Classname" Src="@AssetUrlResolver.GetFullUrl(_src)" Height="@Height" Width="@Width" ObjectFit="ObjectFit" />
+        <MudImage Class="@Classname" Src="@AssetUrlResolver.GetFullUrl(_src)" Height="@RenderHeight" Width="@RenderWidth" ObjectFit="RenderObjectFit" />
         <div class="@OverlayClassname">
             <MudIcon Icon="@Icons.Material.Filled.Edit" />
         </div>
@@ -52,9 +52,18 @@ else
     [Parameter]
     public bool Avatar { get; set; }
 
+    [Parameter]
+    public ImageTagFilter? TagFilter { get; set; }
+
     private string? _src;
     
     private readonly ParameterState<string?> _srcState;
+
+    int? RenderWidth => Avatar ? Width ?? Height : Width;
+
+    int? RenderHeight => Avatar ? Height ?? Width : Height;
+
+    ObjectFit RenderObjectFit => Avatar ? ObjectFit.Cover : ObjectFit;
 
     private string Classname => new CssBuilder()
         .AddClass(Class)
@@ -88,6 +97,7 @@ else
         var dialog = await DialogService.ShowAsync<EditImageDialog>("Edit Image", new DialogParameters<EditImageDialog>
         {
             { x => x.Src, _src },
+            { x => x.TagFilter, TagFilter },
         });
         var result = await dialog.Result;
         if (result?.Data is string newSrc)

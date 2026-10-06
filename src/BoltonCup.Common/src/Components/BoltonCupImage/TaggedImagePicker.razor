@@ -1,0 +1,119 @@
+@namespace BoltonCup.Common.Components
+@inject IBoltonCupApi BoltonCupApi
+@inject ISnackbar Snackbar
+
+<div class="d-flex flex-column gap-2">
+    <MudGrid Spacing="2">
+        @if (_loading)
+        {
+            @for (var i = 0; i < PageSize; i++)
+            {
+                <MudItem xs="6">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100px" Width="100%" />
+                </MudItem>
+            }
+        }
+        else
+        {
+            @foreach (var image in _page?.Items ?? [])
+            {
+                <MudItem xs="6" Class="d-flex justify-center">
+                    <MudImage
+                        Src="@image.Url"
+                        Height="160"
+                        Width="160"
+                        ObjectFit="ObjectFit.Cover"
+                        Class="@TileClassname(image)"
+                        @onclick="() => SelectAsync(image)" />
+                </MudItem>
+            }
+        }
+    </MudGrid>
+
+    @if (PageCount > 1)
+    {
+        <MudPagination Count="@PageCount" Selected="@_pageNumber" SelectedChanged="OnPageChangedAsync" Disabled="@(_loading || Disabled)" />
+    }
+</div>
+
+
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public ImageTagFilter Filter { get; set; } = null!;
+
+    [Parameter]
+    public int? SelectedImageId { get; set; }
+
+    [Parameter]
+    public EventCallback<Sdk.AlbumImageDto> OnSelected { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public Sdk.AlbumImageDtoIPagedList? InitialPage { get; set; }
+
+    [Parameter]
+    public int PageSize { get; set; } = 12;
+
+    Sdk.AlbumImageDtoIPagedList? _page;
+    int _pageNumber = 1;
+    bool _loading;
+
+    int PageCount => _page is null ? 1 : Math.Max(1, (int)Math.Ceiling(_page.Total / (double)PageSize));
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (InitialPage is not null)
+        {
+            _page = InitialPage;
+            return;
+        }
+
+        await LoadPageAsync(1);
+    }
+
+    async Task OnPageChangedAsync(int page)
+    {
+        await LoadPageAsync(page);
+    }
+
+    async Task LoadPageAsync(int page)
+    {
+        _loading = true;
+        StateHasChanged();
+
+        try
+        {
+            _page = await BoltonCupApi.GetAlbumImagesAsync(Filter.Type, Filter.TargetId, page: page, size: PageSize);
+            _pageNumber = page;
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Could not load the gallery right now.", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    async Task SelectAsync(Sdk.AlbumImageDto image)
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        await OnSelected.InvokeAsync(image);
+    }
+
+    string TileClassname(Sdk.AlbumImageDto image) => image.Id == SelectedImageId
+        ? "tagged-image-tile tagged-image-tile--selected"
+        : "tagged-image-tile";
+
+}

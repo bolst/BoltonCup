@@ -47,7 +47,7 @@ else
                         <div class="d-flex flex-row align-center justify-space-evenly gap-6">
                             <div class="d-flex flex-column align-center gap-2">
                                 <MudAvatar Style="width: 100px; height: 100px">
-                                    <MudImage Src="@_player.ProfilePicture" Alt="@_player.FullName"/>
+                                    <MudImage ObjectFit="ObjectFit.Cover" Src="@_player.ProfilePicture" Alt="@_player.FullName"/>
                                 </MudAvatar>
                             </div>
                             @InfoItems(_player)
@@ -63,7 +63,7 @@ else
             <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
                 <div class="d-flex flex-column align-center gap-3 mt-n20">
                     <MudAvatar Style="width: 160px; height: 160px">
-                        <MudImage Src="@_player.ProfilePicture" Alt="@_player.FullName"/>
+                        <MudImage ObjectFit="ObjectFit.Cover" Src="@_player.ProfilePicture" Alt="@_player.FullName"/>
                     </MudAvatar>
                     <MudText Typo="Typo.h4"><b>@_player.FullName.ToUpper()</b></MudText>
                     <div class="d-flex flex-row align-center gap-3">

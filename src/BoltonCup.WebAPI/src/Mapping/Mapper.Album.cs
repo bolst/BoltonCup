@@ -48,4 +48,16 @@ public partial class Mapper
         Url = _urlResolver.GetFullUrl(image.Key) ?? string.Empty,
         Tags = ToTagDtos(image.Tags),
     };
+
+    public GetAlbumImagesQuery ToQuery(GetAlbumImagesRequest request) => new GetAlbumImagesQuery
+    {
+        TagType = request.TagType,
+        TargetId = request.TagTargetId,
+        Page = request.Page,
+        Size = request.Size,
+        SortBy = request.SortBy,
+        Descending = request.Descending,
+    };
+
+    public IPagedList<AlbumImageDto> ToDtoList(IPagedList<AlbumImage> images) => images.ProjectTo(ToDto);
 }
