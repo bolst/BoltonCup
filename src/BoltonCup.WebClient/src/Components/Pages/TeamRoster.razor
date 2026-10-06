@@ -63,7 +63,7 @@ else
                 <MudTd DataLabel="Player">
                     <div class="d-flex flex-row align-center justify-start gap-3">
                         <MudAvatar>
-                            <MudImage Src="@context.ProfilePicture" Alt="@context.FullName"/>
+                            <MudImage ObjectFit="ObjectFit.Cover" Src="@context.ProfilePicture" Alt="@context.FullName"/>
                         </MudAvatar>
                         <PlayerLink Player="context" />
                         @if (!string.IsNullOrEmpty(context.CaptaincyTag))
