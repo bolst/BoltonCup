@@ -1,0 +1,99 @@
+.scores-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tournament-picker {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 2px;
+    height: 36px;
+    padding: 0 4px;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 4px;
+    max-width: 100%;
+}
+
+.picker-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    color: var(--mud-palette-text-primary);
+}
+
+.picker-arrow:hover {
+    background-color: var(--mud-palette-action-default-hover);
+}
+
+.picker-arrow.disabled {
+    color: var(--mud-palette-text-disabled);
+    pointer-events: none;
+}
+
+.tournament-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tournament-name img {
+    height: 22px;
+    width: 22px;
+    object-fit: contain;
+}
+
+.day-strip {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 1px;
+}
+
+.day-strip::-webkit-scrollbar {
+    display: none;
+}
+
+.day-tile {
+    flex: 0 0 96px;
+    height: 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 4px;
+    color: var(--mud-palette-text-primary);
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: border-color 0.15s ease;
+}
+
+.day-tile:hover {
+    border-color: var(--mud-palette-text-secondary);
+}
+
+.day-tile.selected {
+    border-color: var(--mud-palette-info);
+    box-shadow: inset 0 0 0 1px var(--mud-palette-info);
+}
+
+.day-tile-top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.day-tile-count {
+    font-weight: 600;
+}

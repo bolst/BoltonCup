@@ -3,7 +3,9 @@ using BoltonCup.Core.Commands;
 using BoltonCup.Core.Exceptions;
 using BoltonCup.Persistence.Data;
 using BoltonCup.Application.Extensions;
+using BoltonCup.Shared;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace BoltonCup.Application.Services;
@@ -13,8 +15,13 @@ class GameService(
     IGlobalMusicQueue _queue,
     IMusicLibraryService _music,
     IStatisticsRefreshService _stats,
+    TimeProvider _timeProvider,
+    IMemoryCache _cache,
     ILogger<GameService> _logger) : IGameService
 {
+    const string GameDaysCacheKey = "games:scores:days";
+    static readonly TimeSpan GameDaysCacheDuration = TimeSpan.FromMinutes(5);
+
     public async Task<IPagedList<Game>> GetAllAsync(GetGamesQuery query, CancellationToken cancellationToken = default) => await _dbContext.Games
             .AsNoTracking()
             .Include(p => p.Tournament)
@@ -64,6 +71,108 @@ class GameService(
                 .ThenInclude(p => p.Account)
             .Include(p => p.Referees)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken: cancellationToken);
+
+    public async Task<GameScores> GetScoresAsync(GetScoresQuery query, CancellationToken cancellationToken = default)
+    {
+        var now = _timeProvider.GetUtcNow();
+        var zone = EasternTime.GetTimeZone();
+        var days = await GetGameDaysAsync(zone, cancellationToken);
+
+        var gameDates = days
+            .Select(d => d.Date)
+            .Distinct()
+            .ToList();
+        var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(now, zone).DateTime);
+        var date = query.Date ?? PickDefaultDate(gameDates, today);
+        var previousDate = gameDates
+            .Where(d => d < date)
+            .Select(d => (DateOnly?)d)
+            .LastOrDefault();
+        var nextDate = FirstAfter(gameDates, date);
+
+        var dayStartUtc = TimeZoneInfo.ConvertTimeToUtc(date.ToDateTime(TimeOnly.MinValue), zone);
+        var dayEndUtc = TimeZoneInfo.ConvertTimeToUtc(date.AddDays(1).ToDateTime(TimeOnly.MinValue), zone);
+
+        var games = await _dbContext.Games
+            .AsNoTracking()
+            .Include(p => p.Tournament)
+            .Include(p => p.HomeTeam)
+            .Include(p => p.AwayTeam)
+            .Include(p => p.Goals)
+                .ThenInclude(g => g.Scorer)
+                .ThenInclude(p => p.Account)
+            .Include(p => p.Goals)
+                .ThenInclude(g => g.Assist1Player)
+                .ThenInclude(p => p!.Account)
+            .Include(p => p.Goals)
+                .ThenInclude(g => g.Assist2Player)
+                .ThenInclude(p => p!.Account)
+            .Where(p => p.GameTime >= dayStartUtc && p.GameTime < dayEndUtc)
+            .OrderBy(p => p.GameTime)
+            .ToListAsync(cancellationToken);
+
+        return new GameScores(
+            Date: date,
+            PreviousDate: previousDate,
+            NextDate: nextDate,
+            Days: days,
+            Games: games);
+    }
+
+    // Every scores request (and every live poll) needs the full day index, so cache it briefly.
+    // A game added or rescheduled can take up to GameDaysCacheDuration to show in the date strip.
+    async Task<IReadOnlyList<GameDay>> GetGameDaysAsync(TimeZoneInfo zone, CancellationToken cancellationToken)
+    {
+        if (_cache.TryGetValue(GameDaysCacheKey, out IReadOnlyList<GameDay>? cached) && cached is not null)
+        {
+            return cached;
+        }
+
+        // Time zones cannot be converted in SQL, so bucket the (small) schedule into days in memory.
+        var schedule = await _dbContext.Games
+            .AsNoTracking()
+            .Select(g => new
+            {
+                g.GameTime,
+                g.TournamentId,
+                TournamentName = g.Tournament.Name,
+                TournamentLogo = g.Tournament.Logo,
+            })
+            .ToListAsync(cancellationToken);
+
+        var days = schedule
+            .GroupBy(g => (Date: ToEasternDate(g.GameTime, zone), g.TournamentId, g.TournamentName, g.TournamentLogo))
+            .Select(group => new GameDay(group.Key.Date, group.Key.TournamentId, group.Key.TournamentName, group.Key.TournamentLogo, group.Count()))
+            .OrderBy(d => d.Date)
+            .ThenBy(d => d.TournamentId)
+            .ToList();
+        _cache.Set(GameDaysCacheKey, (IReadOnlyList<GameDay>)days, GameDaysCacheDuration);
+        return days;
+    }
+
+    static DateOnly ToEasternDate(DateTime gameTime, TimeZoneInfo zone)
+    {
+        var utc = gameTime.Kind == DateTimeKind.Unspecified
+            ? DateTime.SpecifyKind(gameTime, DateTimeKind.Utc)
+            : gameTime.ToUniversalTime();
+        return DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(utc, zone));
+    }
+
+    // Today if it has games, else the next game day, else the latest past game day.
+    static DateOnly PickDefaultDate(IReadOnlyList<DateOnly> gameDates, DateOnly today)
+    {
+        if (gameDates.Count == 0 || gameDates.Contains(today))
+        {
+            return today;
+        }
+
+        return FirstAfter(gameDates, today) ?? gameDates[^1];
+    }
+
+    static DateOnly? FirstAfter(IEnumerable<DateOnly> sortedDates, DateOnly date) => sortedDates
+            .Where(d => d > date)
+            .Select(d => (DateOnly?)d)
+            .FirstOrDefault();
 
     public async Task UpdateStateAsync(UpdateGameStateCommand command, CancellationToken cancellationToken = default)
     {

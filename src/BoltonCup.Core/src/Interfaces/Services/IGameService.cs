@@ -6,6 +6,7 @@ public interface IGameService
 {
     Task<IPagedList<Game>> GetAllAsync(GetGamesQuery query, CancellationToken cancellationToken = default);
     Task<Game?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<GameScores> GetScoresAsync(GetScoresQuery query, CancellationToken cancellationToken = default);
 
     Task UpdateStateAsync(UpdateGameStateCommand command, CancellationToken cancellationToken = default);
 

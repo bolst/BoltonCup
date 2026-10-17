@@ -7393,6 +7393,118 @@
         }
       }
     },
+    "/api/games/scores": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Gets one Eastern-time day of games with their goals and scoreboard status, plus the index of every game day\nacross all tournaments. A game is final when completed, live while in progress, and upcoming otherwise. Without\na date, the API picks today if it has games, else the next game day, else the latest past game day.",
+        "operationId": "GetScores",
+        "parameters": [
+          {
+            "name": "Date",
+            "in": "query",
+            "description": "Gets or sets the Eastern-time day to show. When omitted, the API picks today, else the next game day, else the latest past game day.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameScoresDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameScoresDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameScoresDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoltonCupProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/games/{id}": {
       "get": {
         "tags": [
@@ -17153,6 +17265,43 @@
         "additionalProperties": false,
         "description": "DTO representing a player's availability for a single game."
       },
+      "GameDayDto": {
+        "required": [
+          "date",
+          "gameCount",
+          "tournamentId",
+          "tournamentName"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Gets the Eastern-time day.",
+            "format": "date"
+          },
+          "tournamentId": {
+            "type": "integer",
+            "description": "Gets the tournament ID.",
+            "format": "int32"
+          },
+          "tournamentName": {
+            "type": "string",
+            "description": "Gets the tournament name."
+          },
+          "tournamentLogo": {
+            "type": "string",
+            "description": "Gets the URL of the tournament logo.",
+            "nullable": true
+          },
+          "gameCount": {
+            "type": "integer",
+            "description": "Gets the number of games the tournament plays on this day.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a tournament's games on one Eastern-time day."
+      },
       "GameDto": {
         "required": [
           "gameState",
@@ -17399,6 +17548,159 @@
         },
         "additionalProperties": false,
         "description": "The computed music playlist for a game: ordered playable tracks plus unplayable (missing) requests."
+      },
+      "GameScoreDto": {
+        "required": [
+          "gameState",
+          "gameTime",
+          "goals",
+          "id",
+          "status",
+          "tournament"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets the game ID.",
+            "format": "int32"
+          },
+          "gameTime": {
+            "type": "string",
+            "description": "Gets the scheduled game time.",
+            "format": "date-time"
+          },
+          "tournament": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TournamentBriefDto"
+              }
+            ],
+            "description": "Gets the tournament this game belongs to."
+          },
+          "gameType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameType"
+              }
+            ],
+            "description": "Gets the type of game (e.g. regular season, playoff)."
+          },
+          "gameState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameState"
+              }
+            ],
+            "description": "Gets the current state of the game."
+          },
+          "venue": {
+            "type": "string",
+            "description": "Gets the venue where the game is played.",
+            "nullable": true
+          },
+          "rink": {
+            "type": "string",
+            "description": "Gets the rink where the game is played.",
+            "nullable": true
+          },
+          "homeTeam": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamInGameDto"
+              }
+            ],
+            "description": "Gets the home team with their goal count.",
+            "nullable": true
+          },
+          "awayTeam": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TeamInGameDto"
+              }
+            ],
+            "description": "Gets the away team with their goal count.",
+            "nullable": true
+          },
+          "homeTeamPlaceholder": {
+            "type": "string",
+            "description": "Gets the placeholder label for the home side when no team is assigned (e.g. \"1st\", \"Winner of SF1\").",
+            "nullable": true
+          },
+          "awayTeamPlaceholder": {
+            "type": "string",
+            "description": "Gets the placeholder label for the away side when no team is assigned (e.g. \"4th\", \"Winner of SF2\").",
+            "nullable": true
+          },
+          "goals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalBriefDto"
+            },
+            "description": "Gets the goals scored in the game, in the order they were scored."
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GameScoreStatus"
+              }
+            ],
+            "description": "Gets the scoreboard status: final when completed, live while in progress, otherwise upcoming."
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing a game on the scoreboard, with its goals and live status."
+      },
+      "GameScoreStatus": {
+        "enum": [
+          "Upcoming",
+          "Live",
+          "Final"
+        ],
+        "type": "string"
+      },
+      "GameScoresDto": {
+        "required": [
+          "date",
+          "days",
+          "games"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Gets the Eastern-time day shown.",
+            "format": "date"
+          },
+          "previousDate": {
+            "type": "string",
+            "description": "Gets the closest earlier game day, if any.",
+            "format": "date",
+            "nullable": true
+          },
+          "nextDate": {
+            "type": "string",
+            "description": "Gets the closest later game day, if any.",
+            "format": "date",
+            "nullable": true
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameDayDto"
+            },
+            "description": "Gets every game day across all tournaments, in date order, one entry per tournament per day."
+          },
+          "games": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameScoreDto"
+            },
+            "description": "Gets the games on the day shown, in start-time order."
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO representing one day of scores and the index of every game day."
       },
       "GameSingleDto": {
         "required": [

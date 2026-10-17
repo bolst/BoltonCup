@@ -28,6 +28,19 @@ public class GamesController(
     }
 
     /// <remarks>
+    /// Gets one Eastern-time day of games with their goals and scoreboard status, plus the index of every game day
+    /// across all tournaments. A game is final when completed, live while in progress, and upcoming otherwise. Without
+    /// a date, the API picks today if it has games, else the next game day, else the latest past game day.
+    /// </remarks>
+    [AllowAnonymous]
+    [HttpGet("scores")]
+    public async Task<ActionResult<GameScoresDto>> GetScores([FromQuery] GetScoresRequest request)
+    {
+        var scores = await _games.GetScoresAsync(_mapper.ToQuery(request));
+        return Ok(_mapper.ToDto(scores));
+    }
+
+    /// <remarks>
     /// Gets a single game by its ID.
     /// </remarks>
     [AllowAnonymous]
