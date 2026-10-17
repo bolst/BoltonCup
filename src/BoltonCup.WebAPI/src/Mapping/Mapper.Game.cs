@@ -35,6 +35,52 @@ public partial class Mapper
         AwayTeamPlaceholder = game.AwayTeamPlaceholder,
     });
 
+    public GetScoresQuery ToQuery(GetScoresRequest request) => new GetScoresQuery(request.Date);
+
+    public GameScoresDto ToDto(GameScores scores) => new GameScoresDto
+    {
+        Date = scores.Date,
+        PreviousDate = scores.PreviousDate,
+        NextDate = scores.NextDate,
+        Days = scores.Days
+            .Select(day => new GameDayDto
+            {
+                Date = day.Date,
+                TournamentId = day.TournamentId,
+                TournamentName = day.TournamentName,
+                TournamentLogo = _urlResolver.GetFullUrl(day.TournamentLogo),
+                GameCount = day.GameCount,
+            })
+            .ToList(),
+        Games = scores.Games
+            .Select(ToGameScoreDto)
+            .ToList(),
+    };
+
+    GameScoreDto ToGameScoreDto(Game game)
+    {
+        return new GameScoreDto
+        {
+            Id = game.Id,
+            Tournament = ToTournamentBriefDto(game.Tournament),
+            GameTime = game.GameTime,
+            GameType = game.GameType,
+            GameState = game.GameState,
+            Venue = game.Venue,
+            Rink = game.Rink,
+            HomeTeam = ToTeamInGameDto(game, home: true),
+            AwayTeam = ToTeamInGameDto(game, home: false),
+            HomeTeamPlaceholder = game.HomeTeamPlaceholder,
+            AwayTeamPlaceholder = game.AwayTeamPlaceholder,
+            Goals = game.Goals
+                .Select(ToGoalBriefDto)
+                .OrderBy(g => g.Period)
+                .ThenByDescending(g => g.TimeRemaining)
+                .ToList(),
+            Status = game.GetScoreStatus(),
+        };
+    }
+
     public GameSingleDto? ToDto(Game? game, IReadOnlyList<SkaterStat> homeStats, IReadOnlyList<SkaterStat> awayStats, IReadOnlyList<Highlight> highlights) => game is null
             ? null
             : new GameSingleDto

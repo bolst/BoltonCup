@@ -1,0 +1,189 @@
+@page "/scores/{Date?}"
+@using System.Globalization
+@using BoltonCup.Sdk
+@inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Nav
+@implements IAsyncDisposable
+@attribute [Sitemap("/scores", SitemapChangeFrequency.Daily, LastModified = "2026-10-16")]
+
+<PageTitle>Scores | Bolton Cup</PageTitle>
+<HeadContent>
+    <meta name="description" content="Bolton Cup scores by day, with final results, live games and upcoming start times.">
+</HeadContent>
+
+<div class="scores-page">
+    <BackgroundContainer Class="scores-background">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="scores-panel">
+            <h1 class="scores-title">Scores</h1>
+            @if (_loadFailed)
+            {
+                <div class="scores-message">
+                    <span>Scores could not be loaded.</span>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Info" Size="Size.Small" OnClick="RetryAsync">Try again</MudButton>
+                </div>
+            }
+            else if (_scores is null)
+            {
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="240px" Height="36px" />
+                <div class="d-flex gap-2 mt-5">
+                    @for (var i = 0; i < 3; i++)
+                    {
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="96px" Height="64px" />
+                    }
+                </div>
+                <MudSkeleton SkeletonType="SkeletonType.Text" Width="280px" Height="36px" Class="mt-4" />
+                <div class="score-grid mt-4">
+                    @for (var i = 0; i < 3; i++)
+                    {
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="220px" />
+                    }
+                </div>
+            }
+            else
+            {
+                <ScoresDateStrip Scores="_scores" />
+                <h2 class="scores-day">@DayHeading</h2>
+                @if (_scores.Games.Count == 0)
+                {
+                    <div class="scores-message">No games on this day.</div>
+                }
+                else
+                {
+                    <div class="score-grid">
+                        @foreach (var game in _scores.Games)
+                        {
+                            <ScoreCard @key="game.Id" Game="game" />
+                        }
+                    </div>
+                }
+            }
+        </MudContainer>
+    </BackgroundContainer>
+</div>
+
+@code {
+
+    const string DateFormat = "yyyy-MM-dd";
+    static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(30);
+
+    [Parameter]
+    public string? Date { get; set; }
+
+    GameScoresDto? _scores;
+    DateOnly? _shownDate;
+    DateOnly? _requestedDate;
+    bool _loadFailed;
+    CancellationTokenSource? _pollCts;
+
+    string DayHeading => _shownDate!.Value.ToString("dddd, MMMM d", CultureInfo.CurrentCulture);
+
+    bool HasUnfinishedGames => _scores?.Games.Any(g => g.Status != GameScoreStatus.Final) == true;
+
+    static readonly TimeSpan StartWatchWindow = TimeSpan.FromHours(3);
+
+    // Refetch only when a card can change: a game is live, or an upcoming game is due to be started by the timekeeper.
+    bool CanChange => _scores?.Games.Any(g => g.Status == GameScoreStatus.Live || IsDueToStart(g)) == true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var requestedDate = DateOnly.TryParseExact(Date, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed)
+            ? parsed
+            : (DateOnly?)null;
+
+        // The URL rewrite below re-sets parameters with the date already shown; skip the reload.
+        if (_scores is not null && requestedDate is not null && requestedDate == _shownDate)
+        {
+            return;
+        }
+
+        _requestedDate = requestedDate;
+        await LoadAsync();
+    }
+
+    async Task RetryAsync()
+    {
+        _loadFailed = false;
+        await LoadAsync();
+    }
+
+    async Task LoadAsync()
+    {
+        StopPolling();
+        try
+        {
+            _scores = await BoltonCupApi.GetScoresAsync(ToDateTimeOffset(_requestedDate));
+        }
+        catch (Exception)
+        {
+            _scores = null;
+            _loadFailed = true;
+            return;
+        }
+
+        _shownDate = ToDateOnly(_scores.Date);
+        if (_requestedDate != _shownDate)
+        {
+            Nav.NavigateTo($"/scores/{_shownDate.Value.ToString(DateFormat, CultureInfo.InvariantCulture)}", replace: true);
+        }
+
+        if (HasUnfinishedGames)
+        {
+            _pollCts = new CancellationTokenSource();
+            _ = PollAsync(_shownDate.Value, _pollCts.Token);
+        }
+    }
+
+    async Task PollAsync(DateOnly date, CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(PollInterval);
+        try
+        {
+            while (HasUnfinishedGames && await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                if (!CanChange)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    _scores = await BoltonCupApi.GetScoresAsync(ToDateTimeOffset(date), cancellationToken);
+                    await InvokeAsync(StateHasChanged);
+                }
+                catch (Exception e) when (e is not OperationCanceledException)
+                {
+                    // Keep the last scores on screen and try again on the next tick.
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    void StopPolling()
+    {
+        _pollCts?.Cancel();
+        _pollCts?.Dispose();
+        _pollCts = null;
+    }
+
+    static bool IsDueToStart(GameScoreDto game)
+    {
+        var sinceStart = DateTime.UtcNow - game.GameTime.ToUniversalTime();
+        return game.Status == GameScoreStatus.Upcoming && sinceStart >= TimeSpan.Zero && sinceStart < StartWatchWindow;
+    }
+
+    static DateOnly ToDateOnly(DateTimeOffset date) => DateOnly.FromDateTime(date.DateTime);
+
+    static DateTimeOffset? ToDateTimeOffset(DateOnly? date) => date is null
+        ? null
+        : new DateTimeOffset(date.Value.ToDateTime(TimeOnly.MinValue));
+
+    public ValueTask DisposeAsync()
+    {
+        StopPolling();
+        return ValueTask.CompletedTask;
+    }
+
+}

@@ -1,0 +1,260 @@
+@using BoltonCup.Common
+@using BoltonCup.Sdk
+@namespace BoltonCup.WebClient.Components.Shared
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<article class="score-card">
+    <header class="score-card-header">
+        @StatusChip()
+        @GameTypeLink()
+    </header>
+
+    <div class="team-rows">
+        @TeamRow(Game.AwayTeam, Game.AwayTeamPlaceholder)
+        @TeamRow(Game.HomeTeam, Game.HomeTeamPlaceholder)
+    </div>
+
+    @if (Game.Status == GameScoreStatus.Upcoming)
+    {
+        <div class="card-section">
+            <span class="section-label">Venue</span>
+            <div class="venue-tile">
+                <MudIcon Icon="@Icons.Material.Rounded.Stadium" Size="Size.Small" />
+                <span>@VenueLabel</span>
+            </div>
+        </div>
+    }
+    else if (Game.Goals.Count > 0)
+    {
+        <div class="card-section" @ref="_carouselRef">
+            <span class="section-label">Goals</span>
+            <div class="goal-track" data-track>
+                @foreach (var goal in ScoredGoals)
+                {
+                    <div class="goal-tile">
+                        <img class="goal-avatar" src="@goal.Goal.Scorer.ProfilePicture" alt="" style="@($"background-color: {TeamColor(goal.Goal.TeamId)}")" />
+                        <div class="goal-text">
+                            <div class="goal-scorer">
+                                <PlayerLink Player="@goal.Goal.Scorer" Typo="Typo.body2" />
+                                @if (goal.Goal.IsEmptyNetGoal)
+                                {
+                                    <span class="goal-tag">EN</span>
+                                }
+                            </div>
+                            <div class="goal-assists">@Assists(goal.Goal)</div>
+                            <div class="goal-score">
+                                <span class="@(goal.Goal.TeamId == Game.AwayTeam?.Id ? "scoring-team" : null)">@Game.AwayTeam?.Abbreviation @goal.AwayScore</span>
+                                -
+                                <span class="@(goal.Goal.TeamId == Game.HomeTeam?.Id ? "scoring-team" : null)">@Game.HomeTeam?.Abbreviation @goal.HomeScore</span>
+                                (@goal.Goal.PeriodAbbreviation - @goal.Goal.TimeString)
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (Game.Goals.Count > 1)
+            {
+                <div class="goal-pager">
+                    <button type="button" class="pager-arrow" data-prev aria-label="Previous goal">
+                        <MudIcon Icon="@Icons.Material.Rounded.ChevronLeft" Size="Size.Small" />
+                    </button>
+                    @for (var i = 0; i < Game.Goals.Count; i++)
+                    {
+                        <span class="@(i == 0 ? "pager-dash active" : "pager-dash")" data-dash></span>
+                    }
+                    <button type="button" class="pager-arrow" data-next aria-label="Next goal">
+                        <MudIcon Icon="@Icons.Material.Rounded.ChevronRight" Size="Size.Small" />
+                    </button>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card-section">
+            <span class="section-label">Goals</span>
+            <span class="no-goals">No goals yet</span>
+        </div>
+    }
+
+    <footer class="score-card-footer">
+        @if (Game.HomeTeam is null || Game.AwayTeam is null)
+        {
+            <span class="card-button disabled">Gamecenter</span>
+        }
+        else
+        {
+            <a class="card-button" href="@($"/games/{Game.Id}")">Gamecenter</a>
+        }
+    </footer>
+</article>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required GameScoreDto Game { get; set; }
+
+    ElementReference _carouselRef;
+    IJSObjectReference? _module;
+    int _wiredGoalCount;
+
+    TeamInGameDto? Winner
+    {
+        get
+        {
+            if (Game is not { Status: GameScoreStatus.Final, HomeTeam: not null, AwayTeam: not null })
+            {
+                return null;
+            }
+
+            if (Game.HomeTeam.Goals == Game.AwayTeam.Goals)
+            {
+                return null;
+            }
+
+            return Game.HomeTeam.Goals > Game.AwayTeam.Goals ? Game.HomeTeam : Game.AwayTeam;
+        }
+    }
+
+    // Period 4 is overtime and period 5 a shootout, as in the Gamecenter linescore.
+    string FinalLabel
+    {
+        get
+        {
+            var lastPeriod = Game.Goals.Count == 0 ? 0 : Game.Goals.Max(g => g.Period);
+            return lastPeriod switch
+            {
+                4 => "Final/OT",
+                5 => "Final/SO",
+                _ => "Final",
+            };
+        }
+    }
+
+    string VenueLabel => string.IsNullOrEmpty(Game.Rink) ? Game.Venue ?? string.Empty :$"{Game.Venue} · {Game.Rink}";
+
+    IEnumerable<ScoredGoal> ScoredGoals
+    {
+        get
+        {
+            var home = 0;
+            var away = 0;
+            foreach (var goal in Game.Goals)
+            {
+                if (goal.TeamId == Game.HomeTeam?.Id)
+                {
+                    home++;
+                }
+                else
+                {
+                    away++;
+                }
+                yield return new ScoredGoal(goal, home, away);
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Game.Goals.Count < 2 || Game.Goals.Count == _wiredGoalCount)
+        {
+            return;
+        }
+
+        _wiredGoalCount = Game.Goals.Count;
+        _module ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Components/Shared/Scores/ScoreCard.razor.js?v=1.0");
+        await _module.InvokeVoidAsync("initCarousel", _carouselRef);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is not null)
+        {
+            await _module.DisposeAsync();
+        }
+    }
+
+    RenderFragment StatusChip() => Game.Status switch
+    {
+        GameScoreStatus.Final => @<span class="status-chip">@FinalLabel</span>,
+        GameScoreStatus.Live => @<span class="status-chip live"><span class="live-dot"></span>Live</span>,
+        _ => @<span class="status-chip">@Game.GameTime.ToEstString("h:mm tt") ET</span>,
+    };
+
+    RenderFragment GameTypeLink()
+    {
+        if (Game.GameType == GameType.RoundRobin)
+        {
+            return _ => { };
+        }
+
+        var label = Game.GameType switch
+        {
+            GameType.QuarterFinals => "Quarterfinals",
+            GameType.SemiFinals => "Semifinals",
+            GameType.FifthPlaceFinals => "Finals (5th)",
+            GameType.ThirdPlaceFinals => "Finals (3rd)",
+            GameType.Finals => "Finals",
+            _ => string.Empty,
+        };
+        var href = $"/standings?type=playoffs&tournament={Game.Tournament.Id}";
+        return @<a class="game-type-link" href="@href">@label</a>;
+    }
+
+    RenderFragment TeamRow(TeamInGameDto? team, string? placeholder)
+    {
+        var showScore = Game.Status != GameScoreStatus.Upcoming && team is not null;
+        var isLoser = Winner is not null && team?.Id != Winner.Id;
+        return @<div class="@(isLoser ? "team-row loser" : "team-row")">
+                    @if (team is not null)
+                    {
+                        <img class="team-logo" src="@team.Logo" alt="@team.Abbreviation" />
+                        <div class="team-text">
+                            <span class="team-name">@team.NameShort</span>
+                            @if (!string.IsNullOrEmpty(placeholder))
+                            {
+                                <span class="team-sub">@placeholder</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="team-logo empty"></span>
+                        <div class="team-text">
+                            <span class="team-name">@(placeholder ?? "TBD")</span>
+                        </div>
+                    }
+                    @if (showScore)
+                    {
+                        <span class="team-score">@team!.Goals</span>
+                    }
+                </div>;
+    }
+
+    string TeamColor(int teamId)
+    {
+        var team = teamId == Game.HomeTeam?.Id ? Game.HomeTeam : Game.AwayTeam;
+        return string.IsNullOrEmpty(team?.PrimaryColorHex) ? "var(--mud-palette-background-gray)" : team.PrimaryColorHex;
+    }
+
+    static string ShortName(PlayerBriefDto player) => string.IsNullOrEmpty(player.FirstName)
+        ? player.LastName
+        : $"{player.FirstName[..1]}. {player.LastName}";
+
+    static string Assists(GoalBriefDto goal)
+    {
+        if (goal.PrimaryAssist is null)
+        {
+            return "Unassisted";
+        }
+
+        return goal.SecondaryAssist is null
+            ? ShortName(goal.PrimaryAssist)
+            : $"{ShortName(goal.PrimaryAssist)}, {ShortName(goal.SecondaryAssist)}";
+    }
+
+    record ScoredGoal(GoalBriefDto Goal, int HomeScore, int AwayScore);
+
+}

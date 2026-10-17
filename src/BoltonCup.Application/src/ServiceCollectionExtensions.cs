@@ -9,6 +9,7 @@ using BoltonCup.Shared;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace BoltonCup.Application;
 
@@ -22,6 +23,7 @@ public static class ServiceCollectionExtensions
 
         builder.Services.AddMemoryCache();
         builder.Services.AddSingleton<ITelemetry, ActivityTelemetry>();
+        builder.Services.TryAddSingleton(TimeProvider.System);
 
         RegisterByConvention(builder.Services, typeof(AccountService).Assembly, "Service");
 

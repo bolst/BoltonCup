@@ -46,4 +46,29 @@ public class GamesControllerTests
         ok.Value.Should().BeSameAs(dto);
         _music.Verify(m => m.GetGamePlaylistAsync(42, It.IsAny<CancellationToken>()), Times.Once);
     }
+
+    [Fact]
+    public async Task GetScores_MapsRequestToQuery_AndReturnsMappedDto()
+    {
+        var date = new DateOnly(2026, 10, 15);
+        var request = new GetScoresRequest { Date = date };
+        var query = new GetScoresQuery(date);
+        var serviceResult = new GameScores(date, null, null, [], []);
+        var dto = new GameScoresDto
+        {
+            Date = date,
+            Days = [],
+            Games = [],
+        };
+
+        _mapper.Setup(m => m.ToQuery(request)).Returns(query);
+        _games.Setup(g => g.GetScoresAsync(query, It.IsAny<CancellationToken>())).ReturnsAsync(serviceResult);
+        _mapper.Setup(m => m.ToDto(serviceResult)).Returns(dto);
+
+        var result = await _controller.GetScores(request);
+
+        var ok = result.Result.Should().BeOfType<OkObjectResult>().Subject;
+        ok.Value.Should().BeSameAs(dto);
+        _games.Verify(g => g.GetScoresAsync(query, It.IsAny<CancellationToken>()), Times.Once);
+    }
 }

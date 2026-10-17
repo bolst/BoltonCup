@@ -1,18 +1,10 @@
+using BoltonCup.Shared;
+
 namespace BoltonCup.Common;
 
 public static class DateTimeExtensions
 {
-    public static TimeZoneInfo GetEasternTimeZone()
-    {
-        try
-        {
-            return TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
-        }
-        catch (TimeZoneNotFoundException)
-        {
-            return TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-        }
-    }
+    public static TimeZoneInfo GetEasternTimeZone() => EasternTime.GetTimeZone();
 
     public static DateTime ConvertEstToUtc(this DateTime dateTime)
     {
