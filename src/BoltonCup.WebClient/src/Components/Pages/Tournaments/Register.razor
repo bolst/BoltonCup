@@ -1,6 +1,9 @@
 @page "/tournaments/{TournamentId:int}/register"
+@page "/tournaments/{TournamentId:int}/{Slug}/register"
+@attribute [SitemapIgnore]
 @attribute [Authorize]
 @inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
 
 <PageTitle>Register | Bolton Cup</PageTitle>
 
@@ -24,7 +27,7 @@
             
         if (_tournament.IsRegistrationOpen)
         {
-            <TournamentRegistrationForm TournamentId="_tournament.Id" IsPlayerInfoOpen="_tournament.IsPlayerInfoOpen" />
+            <TournamentRegistrationForm TournamentId="_tournament.Id" TournamentName="@_tournament.Name" IsPlayerInfoOpen="_tournament.IsPlayerInfoOpen" />
         }
         else
         {
@@ -53,6 +56,9 @@
     [Parameter]
     public int TournamentId { get; set; }
 
+    [Parameter]
+    public string? Slug { get; set; }
+
     private Sdk.TournamentSingleDto? _tournament;
 
     private bool _infoDrawerOpen;
@@ -60,7 +66,10 @@
     protected override async Task OnParametersSetAsync()
     {
         if (_tournament?.Id != TournamentId)
+        {
             _tournament = await BoltonCupApi.GetTournamentByIdAsync(TournamentId);
+            Navigation.RedirectToCanonical(PageUrls.TournamentRegister(_tournament.Id, _tournament.Name));
+        }
     }
 
     private void ShowTournamentInformation()

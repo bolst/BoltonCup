@@ -1,5 +1,8 @@
 @page "/players/{PlayerId:int}"
+@page "/players/{PlayerId:int}/{Slug}"
+@attribute [SitemapIgnore]
 @inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
 
 @if (_player is null)
 {
@@ -120,7 +123,7 @@ else
                                         <CellTemplate>
                                             @if (context.Item.Team is { } team)
                                             {
-                                                <MudLink Href="@($"/teams/{team.Id}/roster")" Typo="Typo.body2" Underline="Underline.Hover">@team.Name</MudLink>
+                                                <MudLink Href="@PageUrls.TeamRoster(team.Id, team.Name)" Typo="Typo.body2" Underline="Underline.Hover">@team.Name</MudLink>
                                             }
                                         </CellTemplate>
                                     </PropertyColumn>
@@ -195,6 +198,9 @@ else
     [EditorRequired]
     public required int PlayerId { get; set; }
 
+    [Parameter]
+    public string? Slug { get; set; }
+
     private int? _playerId;
 
     private Sdk.PlayerSingleDto? _player;
@@ -210,6 +216,7 @@ else
         _highlights = null;
 
         _player = await BoltonCupApi.GetPlayerByIdAsync(PlayerId);
+        Navigation.RedirectToCanonical(PageUrls.Player(_player.Id, _player.FullName));
         _last5Games = _player.GameByGame
             .OrderByDescending(p => p.Game.GameTime)
             .Take(5);

@@ -118,7 +118,7 @@ else
                 <MudTd DataLabel="Team">
                     <div class="d-flex flex-row align-center gap-2">
                         <MudImage Src="@context.LogoUrl" Alt="@context.Name" Height="28" />
-                        <MudLink Href="@($"/teams/{context.TeamId}/roster")" Typo="Typo.body2" Underline="Underline.Hover">@context.Name</MudLink>
+                        <MudLink Href="@PageUrls.TeamRoster(context.TeamId, context.Name)" Typo="Typo.body2" Underline="Underline.Hover">@context.Name</MudLink>
                         @if (context.IsChampion)
                         {
                             <ChampionIcon Size="Size.Small" />
@@ -263,7 +263,7 @@ else
                    <MudAvatar Size="Size.Small">
                        <MudImage ObjectFit="ObjectFit.Cover" Src="@pictureUrl" Alt="@name" />
                    </MudAvatar>
-                   <MudLink Href="@($"/players/{id}")" Underline="Underline.Hover" Typo="Typo.body2"><b>@name</b></MudLink>
+                   <MudLink Href="@PageUrls.Player(id, $"{firstName} {lastName}")" Underline="Underline.Hover" Typo="Typo.body2"><b>@name</b></MudLink>
                </div>;
     }
 

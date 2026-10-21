@@ -16,6 +16,10 @@
     [Parameter]
     public int? PlayerId { get; set; }
 
+    /// <summary>The full name used in the URL slug when <see cref="Label"/> is abbreviated.</summary>
+    [Parameter]
+    public string? FullName { get; set; }
+
     [Parameter]
     public Typo Typo { get; set; } = Typo.body2;
 
@@ -23,7 +27,7 @@
     private string? _label => Player is not null ? _playerLabel : Label;
     
     private string? _link => _playerId is not null 
-        ? $"/players/{_playerId}" 
+        ? PageUrls.Player(_playerId.Value, Player?.FullName ?? FullName ?? Label)
         : null;
 
     private string? _playerLabel => ToStringFunc is not null

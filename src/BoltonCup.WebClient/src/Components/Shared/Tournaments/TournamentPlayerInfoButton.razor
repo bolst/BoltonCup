@@ -2,7 +2,7 @@
 
 @if (IsPlayerInfoOpen)
 {
-    <MudButton Href="@($"/tournaments/{TournamentId}/player-info")" Color="Color.Secondary" Variant="Variant.Filled"
+    <MudButton Href="@PageUrls.TournamentPlayerInfo(TournamentId, TournamentName)" Color="Color.Secondary" Variant="Variant.Filled"
                Size="Size" StartIcon="@Icons.Material.Rounded.Edit" FullWidth="FullWidth">
         Edit my player info
     </MudButton>
@@ -13,6 +13,9 @@
     [Parameter]
     [EditorRequired]
     public int TournamentId { get; set; }
+
+    [Parameter]
+    public string? TournamentName { get; set; }
 
     [Parameter]
     public bool IsPlayerInfoOpen { get; set; }

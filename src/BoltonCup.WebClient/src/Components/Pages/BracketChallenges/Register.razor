@@ -1,7 +1,10 @@
 @page "/bracket-challenges/{BracketChallengeId:int}/register"
+@page "/bracket-challenges/{BracketChallengeId:int}/{Slug}/register"
+@attribute [SitemapIgnore]
 @using System.ComponentModel.DataAnnotations
 @using System.Security.Claims
 @inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
 
 <PageTitle>Bracket Challenge Registration | Bolton Cup</PageTitle>
 
@@ -104,6 +107,9 @@
     [Parameter]
     public required int BracketChallengeId { get; set; }
 
+    [Parameter]
+    public string? Slug { get; set; }
+
     private Sdk.BracketChallengeSingleDto? _bracketChallenge;
     
     private readonly BracketChallengeUserInfoModel _userInfoModel = new();
@@ -121,6 +127,7 @@
         if (_bracketChallenge?.Id != BracketChallengeId)
         {
             _bracketChallenge = await BoltonCupApi.GetBracketChallengeByIdAsync(BracketChallengeId);
+            Navigation.RedirectToCanonical(PageUrls.BracketChallengeRegister(_bracketChallenge.Id, _bracketChallenge.Title));
 
             if (_currentStep != 0 || !string.IsNullOrEmpty(_userInfoModel.Email))
                 return;
