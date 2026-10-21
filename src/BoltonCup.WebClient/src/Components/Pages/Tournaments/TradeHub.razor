@@ -1,6 +1,9 @@
 @page "/tournaments/{TournamentId:int}/trade-hub"
+@page "/tournaments/{TournamentId:int}/{Slug}/trade-hub"
+@attribute [SitemapIgnore]
 @attribute [Authorize]
 @inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 
@@ -171,6 +174,9 @@
     [Parameter]
     public int TournamentId { get; set; }
 
+    [Parameter]
+    public string? Slug { get; set; }
+
     [CascadingParameter]
     private Task<AuthenticationState>? AuthState { get; set; }
 
@@ -220,6 +226,7 @@
         }
 
         _tournament = await BoltonCupApi.GetTournamentByIdAsync(TournamentId);
+        Navigation.RedirectToCanonical(PageUrls.TournamentTradeHub(_tournament.Id, _tournament.Name));
         _teams = (await BoltonCupApi.GetTeamsAsync(tournamentId: TournamentId, size: 100)).Items.ToList();
         _gmAccountIds = _teams.SelectMany(t => t.GeneralManagers.Select(g => g.AccountId)).ToHashSet();
         _myTeam = _accountId is { } myId ? _teams.FirstOrDefault(t => t.GeneralManagers.Any(g => g.AccountId == myId)) : null;

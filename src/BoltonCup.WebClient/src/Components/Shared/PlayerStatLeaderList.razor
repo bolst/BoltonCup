@@ -50,7 +50,7 @@
     private PlayerStatDto? _selectedPlayer;
     
     private string? SelectedPlayerHref => _selectedPlayer is not null 
-        ? $"/players/{_selectedPlayer.PlayerId}"
+        ? PageUrls.Player(_selectedPlayer.PlayerId, _selectedPlayer.FullName)
         : null;
 
     private ICollection<PlayerStatDto> _playerStats = [];

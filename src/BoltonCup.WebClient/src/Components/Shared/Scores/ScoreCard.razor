@@ -85,7 +85,7 @@
         }
         else
         {
-            <a class="card-button" href="@($"/games/{Game.Id}")">Gamecenter</a>
+            <a class="card-button" href="@PageUrls.Game(Game.Id, Game.AwayTeam?.Abbreviation, Game.HomeTeam?.Abbreviation)">Gamecenter</a>
         }
     </footer>
 </article>

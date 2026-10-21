@@ -33,11 +33,11 @@
                         <div class="d-flex flex-row align-center gap-3 flex-wrap">
                             <MudButton
                                 Color="Color.Secondary"
-                                Href="@($"/tournaments/{tournament.Id}/register")"
+                                Href="@PageUrls.TournamentRegister(tournament.Id, tournament.Name)"
                                 Disabled="!tournament.IsRegistrationOpen">@registerText</MudButton>
                             <MudButton 
                                 Color="Color.Primary"
-                                Href="@($"/tournaments/{tournament.Id}/information")">Information</MudButton>
+                                Href="@PageUrls.TournamentInformation(tournament.Id, tournament.Name)">Information</MudButton>
                             
                             @if (tournament.Gallery is not null)
                             {

@@ -42,7 +42,7 @@ else
                 {
                     <tr>
                         <td>@forward.JerseyNumber</td>
-                        <td><PlayerLink PlayerId="@forward.PlayerId" Label="@GetFormattedPlayerName(forward.FirstName, forward.LastName)" /></td>
+                        <td><PlayerLink PlayerId="@forward.PlayerId" FullName="@($"{forward.FirstName} {forward.LastName}")" Label="@GetFormattedPlayerName(forward.FirstName, forward.LastName)" /></td>
 
                         <td>@forward.Goals</td>
                         <td>@forward.Assists</td>
@@ -66,7 +66,7 @@ else
                 {
                     <tr>
                         <td>@defense.JerseyNumber</td>
-                        <td><PlayerLink PlayerId="@defense.PlayerId" Label="@GetFormattedPlayerName(defense.FirstName, defense.LastName)" /></td>
+                        <td><PlayerLink PlayerId="@defense.PlayerId" FullName="@($"{defense.FirstName} {defense.LastName}")" Label="@GetFormattedPlayerName(defense.FirstName, defense.LastName)" /></td>
 
                         <td>@defense.Goals</td>
                         <td>@defense.Assists</td>
@@ -90,7 +90,7 @@ else
                 {
                     <tr>
                         <td>@goalie.JerseyNumber</td>
-                        <td><PlayerLink PlayerId="@goalie.PlayerId" Label="@GetFormattedPlayerName(goalie.FirstName, goalie.LastName)" /></td>
+                        <td><PlayerLink PlayerId="@goalie.PlayerId" FullName="@($"{goalie.FirstName} {goalie.LastName}")" Label="@GetFormattedPlayerName(goalie.FirstName, goalie.LastName)" /></td>
                         <td>@goalie.GoalsAgainst</td>
                         <td>
                             @if (goalie.Wins > 0)

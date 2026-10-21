@@ -30,7 +30,7 @@
                                     <MudImage ObjectFit="ObjectFit.Cover" Src="@context.AwayLeader.ProfilePicture" Alt="@context.AwayLeader.FullName"/>
                                 </MudAvatar>
                             </MudHidden>
-                            <MudLink Href="@($"/players/{context.AwayLeader.PlayerId}")" Underline="Underline.None">
+                            <MudLink Href="@PageUrls.Player(context.AwayLeader.PlayerId, context.AwayLeader.FullName)" Underline="Underline.None">
                                 <div class="d-flex flex-column align-start">
                                     <MudText Typo="Typo.caption">@context.AwayLeader.FirstName</MudText>
                                     <MudText Typo="Typo.h6" Style="line-height: 1rem">@context.AwayLeader.LastName</MudText>
@@ -53,7 +53,7 @@
                                     <MudImage ObjectFit="ObjectFit.Cover" Src="@context.HomeLeader.ProfilePicture" Alt="@context.HomeLeader.FullName"/>
                                 </MudAvatar>
                             </MudHidden>
-                            <MudLink Href="@($"/players/{context.HomeLeader.PlayerId}")" Underline="Underline.None">
+                            <MudLink Href="@PageUrls.Player(context.HomeLeader.PlayerId, context.HomeLeader.FullName)" Underline="Underline.None">
                                 <div class="d-flex flex-column align-end">
                                     <MudText Typo="Typo.caption">@context.HomeLeader.FirstName</MudText>
                                     <MudText Typo="Typo.h6" Style="line-height: 1rem">@context.HomeLeader.LastName</MudText>

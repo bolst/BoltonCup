@@ -36,7 +36,7 @@
                         <div class="d-flex flex-row align-center gap-3 flex-wrap">
                             <MudButton
                                 Color="Color.Secondary"
-                                Href="@($"/bracket-challenges/{bracketChallenge.Id}/register")"
+                                Href="@PageUrls.BracketChallengeRegister(bracketChallenge.Id, bracketChallenge.Title)"
                                 Disabled="!bracketChallenge.IsOpen">@registerText</MudButton>
                         </div>
                     </div>

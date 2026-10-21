@@ -10,7 +10,7 @@
                 <MudText>You are already registered for this tournament.</MudText>
             </MudAlert>
             <div class="d-flex justify-center mt-4">
-                <TournamentPlayerInfoButton TournamentId="TournamentId" IsPlayerInfoOpen="IsPlayerInfoOpen" />
+                <TournamentPlayerInfoButton TournamentId="TournamentId" TournamentName="@TournamentName" IsPlayerInfoOpen="IsPlayerInfoOpen" />
             </div>
         }
         else
@@ -42,7 +42,7 @@
                                 </div>
                             </MudAlert>
                             <div class="d-flex justify-center mt-4">
-                                <TournamentPlayerInfoButton TournamentId="TournamentId" IsPlayerInfoOpen="IsPlayerInfoOpen" />
+                                <TournamentPlayerInfoButton TournamentId="TournamentId" TournamentName="@TournamentName" IsPlayerInfoOpen="IsPlayerInfoOpen" />
                             </div>
                         </MudStep>
                     </ChildContent>
@@ -67,6 +67,9 @@
     [Parameter]
     [EditorRequired]
     public int TournamentId { get; set; }
+
+    [Parameter]
+    public string? TournamentName { get; set; }
 
     [Parameter]
     public bool IsPlayerInfoOpen { get; set; }

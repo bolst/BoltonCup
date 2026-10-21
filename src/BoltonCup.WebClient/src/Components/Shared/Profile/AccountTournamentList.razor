@@ -11,13 +11,13 @@
             <MudText Typo="Typo.subtitle1">@GetTournamentDateLabel(tournament)</MudText>
             @if (_userTournaments.All(t => t.Tournament.Id != tournament.Id))
             {
-                <MudButton Href="@($"/tournaments/{tournament.Id}/register")" Color="Color.Primary" Variant="Variant.Filled" Size="Size.Large" Disabled="!tournament.IsRegistrationOpen" FullWidth>
+                <MudButton Href="@PageUrls.TournamentRegister(tournament.Id, tournament.Name)" Color="Color.Primary" Variant="Variant.Filled" Size="Size.Large" Disabled="!tournament.IsRegistrationOpen" FullWidth>
                     Register now
                 </MudButton>
             }
             else
             {
-                <TournamentPlayerInfoButton TournamentId="tournament.Id" IsPlayerInfoOpen="tournament.IsPlayerInfoOpen" FullWidth Size="Size.Large" />
+                <TournamentPlayerInfoButton TournamentId="tournament.Id" TournamentName="@tournament.Name" IsPlayerInfoOpen="tournament.IsPlayerInfoOpen" FullWidth Size="Size.Large" />
             }
         </MudPaper>
     }
@@ -43,7 +43,7 @@
 
                     @if (player.Tournament.IsPlayerInfoOpen)
                     {
-                        <MudButton Href="@($"/tournaments/{player.Tournament.Id}/player-info")"
+                        <MudButton Href="@PageUrls.TournamentPlayerInfo(player.Tournament.Id, player.Tournament.Name)"
                                    Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
                             Edit Player Info
                         </MudButton>
@@ -51,7 +51,7 @@
 
                     @if (player.Tournament.IsTradingOpen && (_isAdmin || _gmTournamentIds.Contains(player.Tournament.Id)))
                     {
-                        <MudButton Href="@($"/tournaments/{player.Tournament.Id}/trade-hub")"
+                        <MudButton Href="@PageUrls.TournamentTradeHub(player.Tournament.Id, player.Tournament.Name)"
                                    Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
                             Trade Hub
                         </MudButton>

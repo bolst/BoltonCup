@@ -102,7 +102,7 @@
             <MudTd>
                 <MudButtonGroup OverrideStyles="false">
                     <MudBadge Color="Color.Error" Visible="@(context.GameState == GameState.InProgress)" Dot>
-                        <MudButton Href="@($"/games/{context.Id}")" StartIcon="@Icons.Material.Filled.SportsHockey" IconColor="Color.Info" Color="Color.Info" Disabled="@(context.HomeTeam is null || context.AwayTeam is null)">Gamecenter</MudButton>
+                        <MudButton Href="@PageUrls.Game(context.Id, context.AwayTeam?.Abbreviation, context.HomeTeam?.Abbreviation)" StartIcon="@Icons.Material.Filled.SportsHockey" IconColor="Color.Info" Color="Color.Info" Disabled="@(context.HomeTeam is null || context.AwayTeam is null)">Gamecenter</MudButton>
                     </MudBadge>
                 </MudButtonGroup>
             </MudTd>
@@ -113,7 +113,7 @@
                     <div style="width: 36px"></div>
                     @GameScoreText(context)
                     <MudMenu Style="width: 36px" Icon="@Icons.Material.Rounded.MoreVert" AnchorOrigin="Origin.CenterLeft" TransformOrigin="Origin.CenterRight" Color="Color.Info" Size="Size.Small" Dense>
-                        <MudMenuItem Href="@($"/games/{context.Id}")" Icon="@Icons.Material.Filled.SportsHockey" IconColor="Color.Info" Disabled="@(context.HomeTeam is null || context.AwayTeam is null)">Gamecenter</MudMenuItem>
+                        <MudMenuItem Href="@PageUrls.Game(context.Id, context.AwayTeam?.Abbreviation, context.HomeTeam?.Abbreviation)" Icon="@Icons.Material.Filled.SportsHockey" IconColor="Color.Info" Disabled="@(context.HomeTeam is null || context.AwayTeam is null)">Gamecenter</MudMenuItem>
                     </MudMenu>
                 </div>
                 @MatchupCell(context)

@@ -1,5 +1,8 @@
 @page "/teams/{TeamId:int}/roster"
+@page "/teams/{TeamId:int}/{Slug}/roster"
+@attribute [SitemapIgnore]
 @inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
 
 @if (_team is null)
 {
@@ -90,6 +93,9 @@ else
     [EditorRequired]
     public required int TeamId { get; set; }
 
+    [Parameter]
+    public string? Slug { get; set; }
+
     private int? _teamId;
     
     private Sdk.TeamSingleDto? _team;
@@ -119,6 +125,7 @@ else
         _teamId = TeamId;
         
         _team = await BoltonCupApi.GetTeamByIdAsync(TeamId);
+        Navigation.RedirectToCanonical(PageUrls.TeamRoster(_team.Id, _team.Name));
         _players = _team.Players
             .OrderBy(p => p.Position switch
             {

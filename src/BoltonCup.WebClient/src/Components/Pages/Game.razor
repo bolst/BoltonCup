@@ -1,6 +1,9 @@
 @page "/games/{GameId:int}"
+@page "/games/{GameId:int}/{Slug}"
+@attribute [SitemapIgnore]
 @using BoltonCup.Sdk
 @inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
 
 @if (_game is { AwayTeam: not null, HomeTeam: not null })
 {
@@ -153,6 +156,9 @@
     [Parameter]
     [EditorRequired]
     public required int GameId { get; set; }
+
+    [Parameter]
+    public string? Slug { get; set; }
     
     private int? _gameId;
 
@@ -170,6 +176,7 @@
 
         _loading = true;
         _game = await BoltonCupApi.GetGameByIdAsync(GameId);
+        Navigation.RedirectToCanonical(PageUrls.Game(_game.Id, _game.AwayTeam?.Abbreviation, _game.HomeTeam?.Abbreviation));
         _loading = false;
         StateHasChanged();
     }

@@ -1,6 +1,9 @@
 @page "/tournaments/{TournamentId:int}/player-info"
+@page "/tournaments/{TournamentId:int}/{Slug}/player-info"
+@attribute [SitemapIgnore]
 @attribute [Authorize]
 @inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
 
 <PageTitle>Player Info | Bolton Cup</PageTitle>
 
@@ -37,6 +40,9 @@
     [Parameter]
     public int TournamentId { get; set; }
 
+    [Parameter]
+    public string? Slug { get; set; }
+
     private int? _tournamentId;
     private Sdk.TournamentSingleDto? _tournament;
 
@@ -46,6 +52,7 @@
         {
             _tournamentId = TournamentId;
             _tournament = await BoltonCupApi.GetTournamentByIdAsync(TournamentId);
+            Navigation.RedirectToCanonical(PageUrls.TournamentPlayerInfo(_tournament.Id, _tournament.Name));
             await InvokeAsync(StateHasChanged);
         }
     }

@@ -1,5 +1,8 @@
 @page "/tournaments/{TournamentId:int}/information"
+@page "/tournaments/{TournamentId:int}/{Slug}/information"
+@attribute [SitemapIgnore]
 @inject IBoltonCupApi BoltonCupApi
+@inject NavigationManager Navigation
 
 <PageTitle>Info | Bolton Cup</PageTitle>
 
@@ -20,7 +23,7 @@
 
         if (_infoGuide.Tournament?.IsRegistrationOpen ?? false)
         {
-            <MudAlert Severity="Severity.Normal">Registration for @_infoGuide.Tournament.Name is live! <MudLink Color="Color.Info" Typo="Typo.body2" Href="@($"/tournaments/{_infoGuide.TournamentId}/register")"><b>Register now.</b></MudLink></MudAlert>
+            <MudAlert Severity="Severity.Normal">Registration for @_infoGuide.Tournament.Name is live! <MudLink Color="Color.Info" Typo="Typo.body2" Href="@PageUrls.TournamentRegister(TournamentId, _infoGuide.Tournament?.Name)"><b>Register now.</b></MudLink></MudAlert>
         }
         
         <MarkdownView Value="@_infoGuide.MarkdownContent" />
@@ -31,13 +34,19 @@
 
     [Parameter]
     public int TournamentId { get; set; }
+
+    [Parameter]
+    public string? Slug { get; set; }
     
     private Sdk.InfoGuideSingleDto? _infoGuide;
 
     protected override async Task OnParametersSetAsync()
     {
         if (TournamentId != _infoGuide?.TournamentId)
+        {
             _infoGuide = await BoltonCupApi.GetInfoGuideByTournamentIdAsync(TournamentId);
+            Navigation.RedirectToCanonical(PageUrls.TournamentInformation(TournamentId, _infoGuide.Tournament?.Name));
+        }
     }
 
 }

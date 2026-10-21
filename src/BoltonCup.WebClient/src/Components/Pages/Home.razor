@@ -34,7 +34,7 @@
                     {
                         <MudAlert Severity="Severity.Error" Variant="Variant.Filled">
                             Registration for @tournament.Name is live!
-                            <MudLink Underline="Underline.Always" Typo="Typo.body2" Href="@($"/tournaments/{tournament.Id}/register")">
+                            <MudLink Underline="Underline.Always" Typo="Typo.body2" Href="@PageUrls.TournamentRegister(tournament.Id, tournament.Name)">
                                 <b>Register now.</b>
                             </MudLink>
                         </MudAlert>
