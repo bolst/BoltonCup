@@ -1,4 +1,5 @@
 @page "/schedule"
+@inject NavigationManager Navigation
 @attribute [Sitemap(SitemapChangeFrequency.Yearly, LastModified = "2026-02-01")]
 
 <PageTitle>Schedule | Bolton Cup</PageTitle>
@@ -7,5 +8,26 @@
 </HeadContent>
 
 <MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
-    <ScheduleDataGrid />
+    <ScheduleDataGrid Query="@(new ScheduleFilterQuery(TournamentQuery, TeamQuery))" QueryChanged="@OnQueryChanged" />
 </MudContainer>
+
+@code {
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "tournament")]
+    public int? TournamentQuery { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "team")]
+    public int? TeamQuery { get; set; }
+
+    void OnQueryChanged(ScheduleFilterQuery query)
+    {
+        var uri = Navigation.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["tournament"] = query.TournamentId,
+            ["team"] = query.TeamId,
+        });
+        Navigation.NavigateTo(uri, replace: true);
+    }
+}
