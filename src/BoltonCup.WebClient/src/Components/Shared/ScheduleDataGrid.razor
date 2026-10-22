@@ -15,123 +15,132 @@
 }
 
 <div @ref="_containerRef">
-<MudTable
-    @ref="_dataGrid"
-    T="Sdk.GameDto"
-    ServerData="ServerReload"
-    GroupBy="_groupDefinition"
-    Breakpoint="Breakpoint.None"
-    RowsPerPage="25"
-    Elevation="0"
-    Striped>
-    <ToolBarContent>
-        <div class="d-flex flex-row align-center gap-3 flex-wrap">
-            <FilterToolbarField
-                T="Sdk.TournamentDto?" Label="Tournament"
-                Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="@_dataGrid.ReloadServerData"
-                ToStringFunc="x => x?.Name">
-                <TournamentFilter/>
-            </FilterToolbarField>
+    @if (_filtersReady)
+    {
+        <MudTable
+            @ref="_dataGrid"
+            T="Sdk.GameDto"
+            ServerData="ServerReload"
+            GroupBy="_groupDefinition"
+            Breakpoint="Breakpoint.None"
+            RowsPerPage="25"
+            Elevation="0"
+            Striped>
+            <ToolBarContent>
+                <div class="d-flex flex-row align-center gap-3 flex-wrap">
+                    <FilterToolbarField
+                        T="Sdk.TournamentDto?" Label="Tournament"
+                        Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="ApplyFiltersAsync"
+                        ToStringFunc="x => x?.Name">
+                        <TournamentFilter/>
+                    </FilterToolbarField>
 
-            <FilterToolbarField
-                T="Sdk.TeamDto?" Label="Team"
-                @bind-Value="@_filter.Team" OnApplyClicked="@_dataGrid.ReloadServerData"
-                ToStringFunc="x => x?.Name" Disabled="@(_filter.Tournament?.Id is null)">
-                <TeamFilter TournamentId="@_filter.Tournament?.Id"/>
-            </FilterToolbarField>
-        </div>
-    </ToolBarContent>
-    <GroupHeaderTemplate>
-            @switch (context.Key)
-            {
-                case TournamentGroupKey key:
-                    <MudTh colspan="5">
-                        <div data-tournament-sentinel="@key.TournamentName" data-tournament-logo="@key.TournamentLogo" style="height: 0; overflow: hidden;"></div>
-                        <div class="d-flex flex-row align-center gap-1">
-                            <MudText Typo="Typo.h6"><b>@key.TournamentName</b></MudText>
-                            @if (!string.IsNullOrEmpty(key.TournamentLogo))
-                            {
-                                <MudImage Src="@key.TournamentLogo" Height="48" />
-                            }
-                        </div>
-                    </MudTh>
-                    break;
-                case GameDayGroupKey key:
-                    <MudTh colspan="5">
-                        <MudText Typo="Typo.h6"><b>@key.GameTime</b></MudText>
-                    </MudTh>
-                    break;
-                case GameStateGroupKey key:
-                    <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-                        <MudTh>
-                            <div class="mud-width-full d-flex justify-center align-center">
-                                <div style="width: 100px">&nbsp;</div>
-                                <b>Matchup</b>
+                    <FilterToolbarField
+                        T="Sdk.TeamDto?" Label="Team"
+                        @bind-Value="@_filter.Team" OnApplyClicked="@ApplyFiltersAsync"
+                        ToStringFunc="x => x?.Name" Disabled="@(_filter.Tournament?.Id is null)">
+                        <TeamFilter TournamentId="@_filter.Tournament?.Id"/>
+                    </FilterToolbarField>
+                </div>
+            </ToolBarContent>
+            <GroupHeaderTemplate>
+                    @switch (context.Key)
+                    {
+                        case TournamentGroupKey key:
+                            <MudTh colspan="5">
+                                <div data-tournament-sentinel="@key.TournamentName" data-tournament-logo="@key.TournamentLogo" style="height: 0; overflow: hidden;"></div>
+                                <div class="d-flex flex-row align-center gap-1">
+                                    <MudText Typo="Typo.h6"><b>@key.TournamentName</b></MudText>
+                                    @if (!string.IsNullOrEmpty(key.TournamentLogo))
+                                    {
+                                        <MudImage Src="@key.TournamentLogo" Height="48" />
+                                    }
+                                </div>
+                            </MudTh>
+                            break;
+                        case GameDayGroupKey key:
+                            <MudTh colspan="5">
+                                <MudText Typo="Typo.h6"><b>@key.GameTime</b></MudText>
+                            </MudTh>
+                            break;
+                        case GameStateGroupKey key:
+                            <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+                                <MudTh>
+                                    <div class="mud-width-full d-flex justify-center align-center">
+                                        <div style="width: 100px">&nbsp;</div>
+                                        <b>Matchup</b>
+                                    </div>
+                                </MudTh>
+                                <MudTh><b>@key.DetailHeaderName</b></MudTh>
+                                <MudTh><b>Location</b></MudTh>
+                                <MudTh></MudTh>
+                            </MudHidden>
+                            break;    
+                    }
+            </GroupHeaderTemplate>
+            <RowTemplate>
+                <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+                    <MudTd DataLabel="Matchup" Class="pa-2" Style="@(context.GameType != GameType.RoundRobin ? "border-left: 4px solid var(--mud-palette-warning);" : string.Empty)">
+                        <div style="position: relative; display: flex; align-items: center; justify-content: center; min-height: 64px;">
+                            @MatchupCell(context)
+                            <div style="position: absolute; bottom: -8px; left: 0; right: 0; display: flex; justify-content: center;">
+                                @GameTypeLink(context)
                             </div>
-                        </MudTh>
-                        <MudTh><b>@key.DetailHeaderName</b></MudTh>
-                        <MudTh><b>Location</b></MudTh>
-                        <MudTh></MudTh>
-                    </MudHidden>
-                    break;    
-            }
-    </GroupHeaderTemplate>
-    <RowTemplate>
-        <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-            <MudTd DataLabel="Matchup" Class="pa-2" Style="@(context.GameType != GameType.RoundRobin ? "border-left: 4px solid var(--mud-palette-warning);" : string.Empty)">
-                <div style="position: relative; display: flex; align-items: center; justify-content: center; min-height: 64px;">
-                    @MatchupCell(context)
-                    <div style="position: absolute; bottom: -8px; left: 0; right: 0; display: flex; justify-content: center;">
-                        @GameTypeLink(context)
+                        </div>
+                    </MudTd>
+                    @switch (context.GameState)
+                    {
+                        case GameState.Pending:
+                            <MudTd DataLabel="Time"><b>@context.GameTime.ToLocalTime().ToString("hh:mm tt")</b></MudTd>
+                            break;
+                        case GameState.InProgress:
+                            <MudTd DataLabel="Score">@GameScoreText(context)</MudTd>
+                            break;
+                        case GameState.Completed:
+                            <MudTd DataLabel="Result">@GameScoreText(context)</MudTd>
+                            break;
+                    }
+                    <MudTd DataLabel="Location"><MudText Typo="Typo.body1">@context.Venue <b>(@context.Rink)</b></MudText></MudTd>
+                    <MudTd>
+                        <MudButtonGroup OverrideStyles="false">
+                            <MudBadge Color="Color.Error" Visible="@(context.GameState == GameState.InProgress)" Dot>
+                                <MudButton Href="@PageUrls.Game(context.Id, context.AwayTeam?.Abbreviation, context.HomeTeam?.Abbreviation)" StartIcon="@Icons.Material.Filled.SportsHockey" IconColor="Color.Info" Color="Color.Info" Disabled="@(context.HomeTeam is null || context.AwayTeam is null)">Gamecenter</MudButton>
+                            </MudBadge>
+                        </MudButtonGroup>
+                    </MudTd>
+                </MudHidden>
+                <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
+                    <div class="d-flex flex-column align-center mud-width-full py-2 gap-3 border-b mud-border-lines-default" style="@(context.GameType != GameType.RoundRobin ? "border-left: 4px solid var(--mud-palette-warning); padding-left: 8px;" : "")">
+                        <div class="d-flex flex-row align-center justify-space-between mud-width-full">
+                            <div style="width: 36px"></div>
+                            @GameScoreText(context)
+                            <MudMenu Style="width: 36px" Icon="@Icons.Material.Rounded.MoreVert" AnchorOrigin="Origin.CenterLeft" TransformOrigin="Origin.CenterRight" Color="Color.Info" Size="Size.Small" Dense>
+                                <MudMenuItem Href="@PageUrls.Game(context.Id, context.AwayTeam?.Abbreviation, context.HomeTeam?.Abbreviation)" Icon="@Icons.Material.Filled.SportsHockey" IconColor="Color.Info" Disabled="@(context.HomeTeam is null || context.AwayTeam is null)">Gamecenter</MudMenuItem>
+                            </MudMenu>
+                        </div>
+                        @MatchupCell(context)
+                        <div class="d-flex flex-column align-center gap-1">
+                            <MudText Typo="Typo.caption"><b>@context.GameTime.ToLocalTime().ToString("hh:mm tt")</b></MudText>
+                            <MudText>@context.Venue <b>(@context.Rink)</b></MudText>
+                            @GameTypeLink(context)
+                        </div>
                     </div>
-                </div>
-            </MudTd>
-            @switch (context.GameState)
-            {
-                case GameState.Pending:
-                    <MudTd DataLabel="Time"><b>@context.GameTime.ToLocalTime().ToString("hh:mm tt")</b></MudTd>
-                    break;
-                case GameState.InProgress:
-                    <MudTd DataLabel="Score">@GameScoreText(context)</MudTd>
-                    break;
-                case GameState.Completed:
-                    <MudTd DataLabel="Result">@GameScoreText(context)</MudTd>
-                    break;
-            }
-            <MudTd DataLabel="Location"><MudText Typo="Typo.body1">@context.Venue <b>(@context.Rink)</b></MudText></MudTd>
-            <MudTd>
-                <MudButtonGroup OverrideStyles="false">
-                    <MudBadge Color="Color.Error" Visible="@(context.GameState == GameState.InProgress)" Dot>
-                        <MudButton Href="@PageUrls.Game(context.Id, context.AwayTeam?.Abbreviation, context.HomeTeam?.Abbreviation)" StartIcon="@Icons.Material.Filled.SportsHockey" IconColor="Color.Info" Color="Color.Info" Disabled="@(context.HomeTeam is null || context.AwayTeam is null)">Gamecenter</MudButton>
-                    </MudBadge>
-                </MudButtonGroup>
-            </MudTd>
-        </MudHidden>
-        <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert>
-            <div class="d-flex flex-column align-center mud-width-full py-2 gap-3 border-b mud-border-lines-default" style="@(context.GameType != GameType.RoundRobin ? "border-left: 4px solid var(--mud-palette-warning); padding-left: 8px;" : "")">
-                <div class="d-flex flex-row align-center justify-space-between mud-width-full">
-                    <div style="width: 36px"></div>
-                    @GameScoreText(context)
-                    <MudMenu Style="width: 36px" Icon="@Icons.Material.Rounded.MoreVert" AnchorOrigin="Origin.CenterLeft" TransformOrigin="Origin.CenterRight" Color="Color.Info" Size="Size.Small" Dense>
-                        <MudMenuItem Href="@PageUrls.Game(context.Id, context.AwayTeam?.Abbreviation, context.HomeTeam?.Abbreviation)" Icon="@Icons.Material.Filled.SportsHockey" IconColor="Color.Info" Disabled="@(context.HomeTeam is null || context.AwayTeam is null)">Gamecenter</MudMenuItem>
-                    </MudMenu>
-                </div>
-                @MatchupCell(context)
-                <div class="d-flex flex-column align-center gap-1">
-                    <MudText Typo="Typo.caption"><b>@context.GameTime.ToLocalTime().ToString("hh:mm tt")</b></MudText>
-                    <MudText>@context.Venue <b>(@context.Rink)</b></MudText>
-                    @GameTypeLink(context)
-                </div>
-            </div>
-        </MudHidden>
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager HideRowsPerPage/>
-    </PagerContent>
-</MudTable>
+                </MudHidden>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager HideRowsPerPage/>
+            </PagerContent>
+        </MudTable>
+    }
 </div>
 
 @code {
+
+    [Parameter]
+    public ScheduleFilterQuery Query { get; set; } = new ScheduleFilterQuery(null, null);
+
+    [Parameter]
+    public EventCallback<ScheduleFilterQuery> QueryChanged { get; set; }
 
     private MudTable<Sdk.GameDto> _dataGrid = null!;
     private ElementReference _containerRef;
@@ -142,6 +151,12 @@
     private string? _stickyTournamentLogo;
 
     private readonly ScheduleFilterModel _filter = new();
+    ScheduleFilterQuery? _receivedQuery;
+    ScheduleFilterQuery? _appliedQuery;
+    int _resolveGeneration;
+    bool _filtersReady;
+
+    ScheduleFilterQuery CurrentQuery => new ScheduleFilterQuery(_filter.Tournament?.Id, _filter.Team?.Id);
 
     private readonly TableGroupDefinition<Sdk.GameDto> _groupDefinition = new()
     {
@@ -180,6 +195,46 @@
         };
     }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        // A parent re-render can repeat a stale Query before the new URL arrives; act only on a new value.
+        if (Query == _receivedQuery)
+        {
+            return;
+        }
+
+        _receivedQuery = Query;
+        if (Query == _appliedQuery)
+        {
+            return;
+        }
+
+        var generation = ++_resolveGeneration;
+        var tournament = await BoltonCupApi.FindTournamentAsync(Query.TournamentId);
+        var team = tournament is not null && Query.TeamId is { } teamId
+            ? (await BoltonCupApi.FindTeamsAsync(tournament.Id, [teamId])).FirstOrDefault()
+            : null;
+        if (generation != _resolveGeneration)
+        {
+            return;
+        }
+
+        _filter.Tournament = tournament;
+        _filter.Team = team;
+        _appliedQuery = CurrentQuery;
+
+        if (_filtersReady && _dataGrid is not null)
+        {
+            await _dataGrid.ReloadServerData();
+        }
+        _filtersReady = true;
+
+        if (_appliedQuery != Query)
+        {
+            await QueryChanged.InvokeAsync(_appliedQuery);
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -215,11 +270,24 @@
         _dotNetRef?.Dispose();
     }
 
-    private Task OnFilterTournamentChange(Sdk.TournamentDto? tournament)
+    void OnFilterTournamentChange(Sdk.TournamentDto? tournament)
     {
         _filter.Tournament = tournament;
         _filter.Team = null;
-        return _dataGrid.ReloadServerData();
+    }
+
+    async Task ApplyFiltersAsync()
+    {
+        var query = CurrentQuery;
+        if (query == _appliedQuery)
+        {
+            return;
+        }
+
+        _resolveGeneration++;
+        _appliedQuery = query;
+        await QueryChanged.InvokeAsync(query);
+        await _dataGrid.ReloadServerData();
     }
 
     private RenderFragment MatchupCell(Sdk.GameDto context)

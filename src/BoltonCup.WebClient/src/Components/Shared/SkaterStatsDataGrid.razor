@@ -1,76 +1,135 @@
 @namespace BoltonCup.WebClient.Components.Shared
 
+@using BoltonCup.Sdk
+@using Position = BoltonCup.Core.Values.Position
 @inject IBoltonCupApi BoltonCupApi
 
-<MudDataGrid
-    @ref="_dataGrid"
-    T="Sdk.SkaterStatDto"
-    Class="filter-datagrid"
-    ServerData="ServerReload"
-    Breakpoint="Breakpoint.None"
-    RowStyle="height: 50px"
-    RowsPerPage="50"
-    Elevation="0"
-    ShowColumnOptions="false"
-    AllowUnsorted
-    Striped
-    Dense>
-    <ToolBarContent>
-        <div class="d-flex flex-row align-center gap-3 flex-wrap">
-            <FilterToolbarField
-                T="string?" Label="Position"
-                @bind-Value="@_filter.Position" OnApplyClicked="@_dataGrid.ReloadServerData">
-                <PositionFilter/>
-            </FilterToolbarField>
-            
-            <FilterToolbarField
-                T="Sdk.TournamentDto?" Label="Tournament"
-                Value="@_filter.Tournament" ValueChanged="OnFilterTournamentChange" OnApplyClicked="@_dataGrid.ReloadServerData"
-                ToStringFunc="x => x?.Name">
-                <TournamentFilter/>
-            </FilterToolbarField>
-            
-            <FilterToolbarField
-                T="IReadOnlyCollection<Sdk.TeamDto>?" Label="Team"
-                @bind-Value="@_filter.Teams" OnApplyClicked="@_dataGrid.ReloadServerData"
-                ToStringFunc="@TeamListToStringFunc" Disabled="@(_filter.Tournament?.Id is null)">
-                <TeamsFilter TournamentId="@_filter.Tournament?.Id" />
-            </FilterToolbarField>
-        </div>
-    </ToolBarContent>
-    <Columns>
-        <PropertyColumn Property="x => x.FullName" Title="Player" Sortable="false" StickyLeft>
-            <CellTemplate>
-                <PlayerLink Label="@context.Item.FullName" PlayerId="context.Item.PlayerId" />
-            </CellTemplate>
-        </PropertyColumn>
-        <PropertyColumn Property="x => x.TeamName" Title="Team" Hidden="@(_filter.Tournament is null)">
-            <CellTemplate>
-                <div class="d-flex flex-row align-center justify-space-evenly">
-                    <MudText Typo="Typo.body2">@context.Item.TeamAbbreviation</MudText>
-                    <MudImage Src="@context.Item.TeamLogoUrl" Height="24" Alt="@context.Item.TeamName"/>
-                </div>
-            </CellTemplate>
-        </PropertyColumn>
-        <PropertyColumn Property="x => x.Position" Title="Position"/>
-        <PropertyColumn Property="x => x.GamesPlayed" Title="GP" CellStyle="@_dataCellStyle"/>
-        <PropertyColumn Property="x => x.Goals" Title="G" CellStyle="@_dataCellStyle"/>
-        <PropertyColumn Property="x => x.Assists" Title="A" CellStyle="@_dataCellStyle"/>
-        <PropertyColumn Property="x => x.Points" Title="P" CellStyle="@_dataCellStyle" InitialDirection="SortDirection.Descending" />
-        <PropertyColumn Property="x => x.PenaltyMinutes" Title="PIM" CellStyle="@_dataCellStyle" />
-        <PropertyColumn Property="x => x.PointsPerGame" Title="P/GP" CellStyle="@_dataCellStyle" Sortable="false" />
-    </Columns>
-    <PagerContent>
-        <MudDataGridPager T="Sdk.SkaterStatDto" PageSizeSelector="false"/>
-    </PagerContent>
-</MudDataGrid>
+@if (_filtersReady)
+{
+    <MudDataGrid
+        @ref="_dataGrid"
+        T="Sdk.SkaterStatDto"
+        Class="filter-datagrid"
+        ServerData="ServerReload"
+        Breakpoint="Breakpoint.None"
+        RowStyle="height: 50px"
+        RowsPerPage="50"
+        Elevation="0"
+        ShowColumnOptions="false"
+        AllowUnsorted
+        Striped
+        Dense>
+        <ToolBarContent>
+            <div class="d-flex flex-row align-center gap-3 flex-wrap">
+                <FilterToolbarField
+                    T="string?" Label="Position"
+                    @bind-Value="@_filter.Position" OnApplyClicked="@ApplyFiltersAsync">
+                    <PositionFilter/>
+                </FilterToolbarField>
+                
+                <FilterToolbarField
+                    T="Sdk.TournamentDto?" Label="Tournament"
+                    Value="@_filter.Tournament" ValueChanged="@OnFilterTournamentChange" OnApplyClicked="ApplyFiltersAsync"
+                    ToStringFunc="x => x?.Name">
+                    <TournamentFilter/>
+                </FilterToolbarField>
+                
+                <FilterToolbarField
+                    T="IReadOnlyCollection<Sdk.TeamDto>?" Label="Team"
+                    @bind-Value="@_filter.Teams" OnApplyClicked="@ApplyFiltersAsync"
+                    ToStringFunc="@TeamListToStringFunc" Disabled="@(_filter.Tournament?.Id is null)">
+                    <TeamsFilter TournamentId="@_filter.Tournament?.Id" />
+                </FilterToolbarField>
+            </div>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.FullName" Title="Player" Sortable="false" StickyLeft>
+                <CellTemplate>
+                    <PlayerLink Label="@context.Item.FullName" PlayerId="context.Item.PlayerId" />
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.TeamName" Title="Team" Hidden="@(_filter.Tournament is null)">
+                <CellTemplate>
+                    <div class="d-flex flex-row align-center justify-space-evenly">
+                        <MudText Typo="Typo.body2">@context.Item.TeamAbbreviation</MudText>
+                        <MudImage Src="@context.Item.TeamLogoUrl" Height="24" Alt="@context.Item.TeamName"/>
+                    </div>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Position" Title="Position"/>
+            <PropertyColumn Property="x => x.GamesPlayed" Title="GP" CellStyle="@_dataCellStyle"/>
+            <PropertyColumn Property="x => x.Goals" Title="G" CellStyle="@_dataCellStyle"/>
+            <PropertyColumn Property="x => x.Assists" Title="A" CellStyle="@_dataCellStyle"/>
+            <PropertyColumn Property="x => x.Points" Title="P" CellStyle="@_dataCellStyle" InitialDirection="SortDirection.Descending" />
+            <PropertyColumn Property="x => x.PenaltyMinutes" Title="PIM" CellStyle="@_dataCellStyle" />
+            <PropertyColumn Property="x => x.PointsPerGame" Title="P/GP" CellStyle="@_dataCellStyle" Sortable="false" />
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="Sdk.SkaterStatDto" PageSizeSelector="false"/>
+        </PagerContent>
+    </MudDataGrid>
+}
 
 @code {
+
+    [Parameter]
+    public StatsFilterQuery Query { get; set; } = StatsFilterQuery.Empty;
+
+    [Parameter]
+    public EventCallback<StatsFilterQuery> QueryChanged { get; set; }
 
     private MudDataGrid<Sdk.SkaterStatDto> _dataGrid = null!;
     private const string _dataCellStyle = "max-width: 30px";
 
     private readonly SkaterStatsFilterModel _filter = new();
+    StatsFilterQuery? _receivedQuery;
+    StatsFilterQuery? _appliedQuery;
+    int _resolveGeneration;
+    bool _filtersReady;
+
+    StatsFilterQuery CurrentQuery => new StatsFilterQuery(_filter.Tournament?.Id, _filter.Teams?.Select(x => x.Id).ToList() ?? [], _filter.Position);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // A parent re-render can repeat a stale Query before the new URL arrives; act only on a new value.
+        if (_receivedQuery is not null && Query.Matches(_receivedQuery))
+        {
+            return;
+        }
+
+        _receivedQuery = Query;
+        if (_appliedQuery is not null && Query.Matches(_appliedQuery))
+        {
+            return;
+        }
+
+        var generation = ++_resolveGeneration;
+        var position = Query.Position?.ToLowerInvariant();
+        var tournament = await BoltonCupApi.FindTournamentAsync(Query.TournamentId);
+        var teams = tournament is not null && Query.TeamIds.Count > 0
+            ? await BoltonCupApi.FindTeamsAsync(tournament.Id, Query.TeamIds)
+            : null;
+        if (generation != _resolveGeneration)
+        {
+            return;
+        }
+
+        _filter.Position = position is Position.Forward or Position.Defense ? position : null;
+        _filter.Tournament = tournament;
+        _filter.Teams = teams;
+        _appliedQuery = CurrentQuery;
+
+        if (_filtersReady && _dataGrid is not null)
+        {
+            await _dataGrid.ReloadServerData();
+        }
+        _filtersReady = true;
+
+        if (!_appliedQuery.Matches(Query))
+        {
+            await QueryChanged.InvokeAsync(_appliedQuery);
+        }
+    }
 
     private async Task<GridData<Sdk.SkaterStatDto>> ServerReload(GridState<Sdk.SkaterStatDto> state, CancellationToken cancellationToken)
     {
@@ -100,20 +159,36 @@
         };
     }
     
-    private Task OnFilterTournamentChange(Sdk.TournamentDto? tournament)
+    void OnFilterTournamentChange(Sdk.TournamentDto? tournament)
     {
         _filter.Tournament = tournament;
         _filter.Teams = null;
-        return _dataGrid.ReloadServerData();
     }
 
-    private string? TeamListToStringFunc(IReadOnlyCollection<Sdk.TeamDto>? teams)
+    async Task ApplyFiltersAsync()
+    {
+        var query = CurrentQuery;
+        if (_appliedQuery is not null && query.Matches(_appliedQuery))
+        {
+            return;
+        }
+
+        _resolveGeneration++;
+        _appliedQuery = query;
+        await QueryChanged.InvokeAsync(query);
+        await _dataGrid.ReloadServerData();
+    }
+
+    private static string? TeamListToStringFunc(IReadOnlyCollection<Sdk.TeamDto>? teams)
     {
         if (teams?.Count is null or 0)
+        {
             return null;
-
+        }
         if (teams.Count <= 3)
+        {
             return string.Join(", ", teams.Select(x => x.NameShort));
+        }
 
         return $"{teams.First().NameShort} and {teams.Count - 1} more";
     }

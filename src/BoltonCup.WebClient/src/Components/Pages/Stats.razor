@@ -1,4 +1,5 @@
 @page "/stats"
+@inject NavigationManager Navigation
 @attribute [Sitemap(SitemapChangeFrequency.Yearly, LastModified = "2026-02-01")]
 
 <PageTitle>Statistics | Bolton Cup</PageTitle>
@@ -8,12 +9,70 @@
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="my-4" Gutters="false">
     <MudText Typo="Typo.h6" Class="ml-4">Statistics</MudText>
-    <MudTabs Rounded KeepPanelsAlive>
+    <MudTabs Rounded KeepPanelsAlive ActivePanelIndex="@_activeTabIndex" ActivePanelIndexChanged="@OnTabChanged">
         <MudTabPanel Text="Skaters">
-            <SkaterStatsDataGrid />
+            <SkaterStatsDataGrid Query="@_query" QueryChanged="@OnQueryChanged" />
         </MudTabPanel>
         <MudTabPanel Text="Goalies">
-            <GoalieStatsDataGrid />
+            <GoalieStatsDataGrid Query="@_query" QueryChanged="@OnQueryChanged" />
         </MudTabPanel>
     </MudTabs>
 </MudContainer>
+
+@code {
+
+    const string SkatersType = "skaters";
+    const string GoaliesType = "goalies";
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "type")]
+    public string? TypeQuery { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "tournament")]
+    public int? TournamentQuery { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "team")]
+    public int[]? TeamQuery { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "position")]
+    public string? PositionQuery { get; set; }
+
+    StatsFilterQuery _query = StatsFilterQuery.Empty;
+    int _activeTabIndex;
+
+    protected override void OnParametersSet()
+    {
+        _activeTabIndex = string.Equals(TypeQuery, GoaliesType, StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+
+        var query = new StatsFilterQuery(TournamentQuery, TeamQuery ?? [], PositionQuery);
+        if (!query.Matches(_query))
+        {
+            _query = query;
+        }
+    }
+
+    void OnQueryChanged(StatsFilterQuery query) => NavigateTo(query, _activeTabIndex);
+
+    void OnTabChanged(int index)
+    {
+        if (index != _activeTabIndex)
+        {
+            NavigateTo(_query, index);
+        }
+    }
+
+    void NavigateTo(StatsFilterQuery query, int tabIndex)
+    {
+        var uri = Navigation.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["type"] = tabIndex == 1 ? GoaliesType : SkatersType,
+            ["tournament"] = query.TournamentId,
+            ["team"] = query.TeamIds.Count > 0 ? query.TeamIds.ToArray() : null,
+            ["position"] = query.Position,
+        });
+        Navigation.NavigateTo(uri, replace: true);
+    }
+}
