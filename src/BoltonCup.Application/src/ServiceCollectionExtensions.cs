@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         builder.Services.AddTransient(typeof(ITagService<>), typeof(TagService<>));
 
         builder.Services.AddSingleton<IRosterValidator, RosterValidator>();
+        builder.Services.AddTransient<CodeAttemptGuard>();
         builder.Services.AddHostedService<StatisticsRefreshBackgroundService>();
 
         // The shared music rotation is DB-backed; register explicitly (name ends in Queue, not Service).

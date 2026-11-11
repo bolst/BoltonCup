@@ -2287,7 +2287,7 @@
         "tags": [
           "Auth"
         ],
-        "description": "Signs the current user out and optionally redirects to a return URL.",
+        "description": "Signs the current user out and optionally redirects to a Bolton Cup return URL.",
         "operationId": "Logout",
         "parameters": [
           {

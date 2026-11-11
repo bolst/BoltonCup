@@ -34,6 +34,7 @@ class UserService(
     SignInManager<BoltonCupUser> _signInManager,
     IAccountService _accountService,
     IEmailer _emailer,
+    CodeAttemptGuard _codeAttemptGuard,
     ILogger<UserService> _logger) : IUserService
 {
 
@@ -51,6 +52,11 @@ class UserService(
     public async Task LoginAsync(string email, string password, bool persist, bool lockoutOnFailure = false)
     {
         var result = await _signInManager.PasswordSignInAsync(email, password, persist, lockoutOnFailure);
+
+        if (result.IsLockedOut)
+        {
+            throw new AccountLockedOutException();
+        }
 
         if (result == SignInResult.Failed)
         {
@@ -101,16 +107,7 @@ class UserService(
             throw new InvalidCredentialsException();
         }
 
-        var isValidToken = await _userManager.VerifyUserTokenAsync(
-                   user: user,
-                   tokenProvider: _userManager.Options.Tokens.PasswordResetTokenProvider,
-                   purpose: UserManager<BoltonCupUser>.ResetPasswordTokenPurpose,
-                   token: code
-                );
-        if (!isValidToken)
-        {
-            throw new InvalidCredentialsException();
-        }
+        await CheckPasswordResetCodeAsync(user, code);
     }
 
 
@@ -134,6 +131,8 @@ class UserService(
         {
             throw new InvalidCredentialsException();
         }
+
+        await CheckPasswordResetCodeAsync(user, code);
 
         if (await _userManager.ResetPasswordAsync(user, code, newPassword) is { Succeeded: false } result)
         {
@@ -161,6 +160,19 @@ class UserService(
         {
             throw new InvalidCredentialsException();
         }
+
+        await _codeAttemptGuard.ConsumeAttemptAsync(user, CodePurpose.EmailConfirmation);
+        var isValidCode = await _userManager.VerifyUserTokenAsync(
+            user,
+            _userManager.Options.Tokens.EmailConfirmationTokenProvider,
+            UserManager<BoltonCupUser>.ConfirmEmailTokenPurpose,
+            code);
+        if (!isValidCode)
+        {
+            throw new InvalidCredentialsException();
+        }
+
+        await _codeAttemptGuard.ClearAsync(user, CodePurpose.EmailConfirmation);
 
         if (await _userManager.ConfirmEmailAsync(user, code) is { Succeeded: false })
         {
@@ -191,5 +203,22 @@ class UserService(
         await _userManager.UpdateAsync(user);
 
         return user;
+    }
+
+    // Consumes an attempt before checking so parallel or repeated guesses cannot exceed the per-user cap.
+    async Task CheckPasswordResetCodeAsync(BoltonCupUser user, string code)
+    {
+        await _codeAttemptGuard.ConsumeAttemptAsync(user, CodePurpose.PasswordReset);
+        var isValidCode = await _userManager.VerifyUserTokenAsync(
+            user,
+            _userManager.Options.Tokens.PasswordResetTokenProvider,
+            UserManager<BoltonCupUser>.ResetPasswordTokenPurpose,
+            code);
+        if (!isValidCode)
+        {
+            throw new InvalidCredentialsException();
+        }
+
+        await _codeAttemptGuard.ClearAsync(user, CodePurpose.PasswordReset);
     }
 }

@@ -164,6 +164,7 @@ public static class ServiceCollectionExtensions
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
                 options.GlobalLimiter = GlobalRateLimiter.Create();
                 options.AddPolicy<string, StrictEmailCheckPolicy>(nameof(StrictEmailCheckPolicy));
+                options.AddPolicy<string, CodeCheckPolicy>(nameof(CodeCheckPolicy));
 
                 options.OnRejected = (context, cancellationToken) =>
                     RateLimitResponder.WriteResponseAsync(context, cancellationToken: cancellationToken);

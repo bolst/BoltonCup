@@ -2,7 +2,9 @@ using BoltonCup.Auth.Extensions;
 using BoltonCup.Auth.Models;
 using BoltonCup.Common;
 using BoltonCup.Sdk;
+using BoltonCup.Shared;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace BoltonCup.Auth.Services;
@@ -10,7 +12,8 @@ namespace BoltonCup.Auth.Services;
 public class AuthSessionStateService(
     NavigationManager _navigation,
     IBoltonCupApi _api,
-    IOptions<BoltonCupConfiguration> _config
+    IOptions<BoltonCupConfiguration> _config,
+    IWebAssemblyHostEnvironment _hostEnvironment
 )
 {
     AuthSessionContext _internalContext { get; set; } = new();
@@ -33,7 +36,8 @@ public class AuthSessionStateService(
 
     public void NavigateToReturnUrlOrDefault()
     {
-        var returnUrl = _navigation.GetReturnUrl() ?? _config.Value.WebBaseUrl;
+        var returnUrl = _navigation.GetReturnUrl(ReturnUrlPolicy.DefaultRootDomain, _hostEnvironment.IsDevelopment())
+            ?? _config.Value.WebBaseUrl;
         _navigation.NavigateTo(returnUrl, forceLoad: true);
     }
 

@@ -1,5 +1,6 @@
 using BoltonCup.Persistence.Identity;
 using BoltonCup.Application.Services;
+using BoltonCup.Shared;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +18,8 @@ public class AuthController(
     IUserService _userService,
     IMapper _mapper,
     UserManager<BoltonCupUser> _userManager,
-    SignInManager<BoltonCupUser> _signInManager
+    SignInManager<BoltonCupUser> _signInManager,
+    IHostEnvironment _environment
 ) : BoltonCupControllerBase
 {
     /// <summary>Returns the currently authenticated user's identity information.</summary>
@@ -61,6 +63,7 @@ public class AuthController(
     /// <summary>Verifies a password reset code without applying the reset.</summary>
     [AllowAnonymous]
     [HttpPost("verifyPasswordResetCode")]
+    [EnableRateLimiting(nameof(CodeCheckPolicy))]
     public async Task<ActionResult> VerifyPasswordResetCode([FromBody] VerifyPasswordResetCodeRequest request)
     {
         await _userService.VerifyPasswordResetCodeAsync(request.Email, request.Code);
@@ -79,6 +82,7 @@ public class AuthController(
     /// <summary>Resets the user's password using a valid reset code.</summary>
     [AllowAnonymous]
     [HttpPost("resetPassword")]
+    [EnableRateLimiting(nameof(CodeCheckPolicy))]
     public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
         await _userService.ResetPasswordAsync(request.Email, request.ResetCode, request.NewPassword);
@@ -88,20 +92,31 @@ public class AuthController(
     /// <summary>Confirms the user's email address using the code sent during registration.</summary>
     [AllowAnonymous]
     [HttpPost("confirmEmail")]
+    [EnableRateLimiting(nameof(CodeCheckPolicy))]
     public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
     {
         await _userService.ConfirmEmailAsync(request.Email, request.Code);
         return Ok();
     }
 
-    /// <summary>Signs the current user out and optionally redirects to a return URL.</summary>
+    /// <summary>Signs the current user out and optionally redirects to a Bolton Cup return URL.</summary>
     [Authorize]
     [HttpPost("logout")]
     public async Task<IResult> Logout([FromQuery] string? returnUrl = null)
     {
         await _signInManager.SignOutAsync();
-        return !string.IsNullOrWhiteSpace(returnUrl)
-            ? Results.Redirect(returnUrl)
+        if (!Uri.TryCreate($"{Request.Scheme}://{Request.Host}/", UriKind.Absolute, out var requestBaseUri))
+        {
+            return Results.Ok();
+        }
+
+        var safeReturnUrl = ReturnUrlPolicy.Sanitize(
+            returnUrl,
+            requestBaseUri,
+            ReturnUrlPolicy.DefaultRootDomain,
+            _environment.IsDevelopment());
+        return safeReturnUrl is not null
+            ? Results.Redirect(safeReturnUrl)
             : Results.Ok();
     }
 
