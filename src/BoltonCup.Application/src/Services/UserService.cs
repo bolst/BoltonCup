@@ -149,6 +149,7 @@ class UserService(
         {
             user.EmailConfirmed = true;
             await _userManager.UpdateAsync(user);
+            await LinkExistingAccountAsync(user);
         }
     }
 
@@ -179,12 +180,7 @@ class UserService(
             throw new InvalidCredentialsException();
         }
 
-        // if a user already has an account, join it to them
-        if (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == user.Email) is { } account)
-        {
-            user.AccountId = account.Id;
-            await _userManager.UpdateAsync(user);
-        }
+        await LinkExistingAccountAsync(user);
     }
 
 
@@ -203,6 +199,29 @@ class UserService(
         await _userManager.UpdateAsync(user);
 
         return user;
+    }
+
+    // Joins an existing account by email, unless the user already has one or another user owns it.
+    async Task LinkExistingAccountAsync(BoltonCupUser user)
+    {
+        if (user.AccountId is not null || user.Email is null)
+        {
+            return;
+        }
+
+        var email = user.Email.ToLowerInvariant();
+        if (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email.ToLower() == email) is not { } account)
+        {
+            return;
+        }
+
+        if (await _userManager.Users.AnyAsync(u => u.AccountId == account.Id))
+        {
+            return;
+        }
+
+        user.AccountId = account.Id;
+        await _userManager.UpdateAsync(user);
     }
 
     // Consumes an attempt before checking so parallel or repeated guesses cannot exceed the per-user cap.
