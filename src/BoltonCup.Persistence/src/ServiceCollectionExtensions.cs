@@ -43,6 +43,9 @@ public static class ServiceCollectionExtensions
         options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
         options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
         options.SignIn.RequireConfirmedAccount = true;
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.MaxFailedAccessAttempts = 10;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
     }
 }
 
