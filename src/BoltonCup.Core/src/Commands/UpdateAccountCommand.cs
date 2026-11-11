@@ -9,5 +9,6 @@ public sealed record UpdateAccountCommand(
     string? PreferredBeer,
     int? HeightFeet,
     int? HeightInches,
-    int? Weight
+    int? Weight,
+    string? Hometown
 );

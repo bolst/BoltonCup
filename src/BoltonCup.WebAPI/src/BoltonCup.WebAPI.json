@@ -14857,6 +14857,11 @@
             "description": "Gets or sets the account holder's weight.",
             "format": "int32",
             "nullable": true
+          },
+          "hometown": {
+            "type": "string",
+            "description": "Gets or sets the account holder's hometown.",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -21250,6 +21255,11 @@
             "type": "integer",
             "description": "Gets or sets the user's weight in pounds.",
             "format": "int32",
+            "nullable": true
+          },
+          "hometown": {
+            "type": "string",
+            "description": "Gets or sets the user's hometown, suggested as \"City, Province\" (e.g., \"Windsor, ON\").",
             "nullable": true
           }
         },

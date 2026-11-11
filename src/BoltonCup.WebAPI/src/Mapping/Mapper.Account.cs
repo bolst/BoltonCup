@@ -33,7 +33,8 @@ public partial class Mapper
             PreferredBeer = account.PreferredBeer,
             HeightFeet = account.HeightFeet,
             HeightInches = account.HeightInches,
-            Weight = account.Weight
+            Weight = account.Weight,
+            Hometown = account.Hometown
         };
     }
 
@@ -79,7 +80,8 @@ public partial class Mapper
             PreferredBeer: request.PreferredBeer,
             HeightFeet: feet,
             HeightInches: inches,
-            Weight: request.Weight
+            Weight: request.Weight,
+            Hometown: request.Hometown
         );
     }
 

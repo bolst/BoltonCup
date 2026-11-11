@@ -31,4 +31,6 @@ public class AccountDto
     public int? HeightInches { get; set; }
     /// <summary>Gets or sets the account holder's weight.</summary>
     public int? Weight { get; set; }
+    /// <summary>Gets or sets the account holder's hometown.</summary>
+    public string? Hometown { get; set; }
 }

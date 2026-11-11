@@ -25,6 +25,7 @@
             </div>
             <AccountInfoTextField @bind-Value="@_updateRequest.FirstName" Label="First name" Disabled="!_editable" />
             <AccountInfoTextField @bind-Value="@_updateRequest.LastName" Label="Last name" Disabled="!_editable" />
+            <AccountInfoTextField @bind-Value="@_updateRequest.Hometown" Label="Hometown" HelperText="@(_editable ? "For example: Windsor, ON" : null)" Disabled="!_editable" />
             <AccountInfoTextField @bind-Value="@_updateRequest.Height" Label="Height" Disabled="!_editable" Mask="@_heightMask" ErrorText="Enter a valid height." />
             <AccountInfoIntField @bind-Value="@_updateRequest.Weight" Label="Weight" Disabled="!_editable" Min="0" ErrorText="Enter a valid weight." />
             <AccountInfoTextField @bind-Value="@_updateRequest.PreferredBeer" Label="Preferred beer" Disabled="!_editable" />
@@ -138,6 +139,7 @@
         _updateRequest.PreferredBeer = _accountInfo.PreferredBeer;
         _updateRequest.Height = _accountInfo.HeightFeet is null ? null : $"{_accountInfo.HeightFeet}'{_accountInfo.HeightInches ?? 0}";
         _updateRequest.Weight = _accountInfo.Weight;
+        _updateRequest.Hometown = _accountInfo.Hometown;
     }
 
     private async Task<bool> TryUpdateAccountInfo()

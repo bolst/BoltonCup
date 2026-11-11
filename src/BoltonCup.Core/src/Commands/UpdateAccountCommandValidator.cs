@@ -28,6 +28,11 @@ public class UpdateAccountCommandValidator : AbstractValidator<UpdateAccountComm
             .MaximumLength(100)
             .When(x => !string.IsNullOrWhiteSpace(x.PreferredBeer))
             .WithMessage("What kind of beer has over 100 characters in its name? Use a shorter one.");
+
+        RuleFor(x => x.Hometown)
+            .MaximumLength(50)
+            .When(x => !string.IsNullOrWhiteSpace(x.Hometown))
+            .WithMessage("Hometown cannot exceed 50 characters.");
     }
 
     bool BeAValidAge(DateTime birthday)

@@ -68,6 +68,7 @@ class AccountService : IAccountService
         account.HeightFeet = command.HeightFeet;
         account.HeightInches = command.HeightInches;
         account.Weight = command.Weight;
+        account.Hometown = string.IsNullOrWhiteSpace(command.Hometown) ? null : command.Hometown.Trim();
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }

@@ -26,6 +26,9 @@ public record UpdateAccountRequest
 
     /// <summary>Gets or sets the user's weight in pounds.</summary>
     public int? Weight { get; set; }
+
+    /// <summary>Gets or sets the user's hometown, suggested as "City, Province" (e.g., "Windsor, ON").</summary>
+    public string? Hometown { get; set; }
 }
 /// <summary>Validates an <see cref="UpdateAccountRequest"/>.</summary>
 public class UpdateAccountRequestValidator : AbstractValidator<UpdateAccountRequest>
@@ -74,5 +77,8 @@ public class UpdateAccountRequestValidator : AbstractValidator<UpdateAccountRequ
 
         RuleFor(x => x.Weight)
             .InclusiveBetween(0, 1000).WithMessage("Weight must be between 0 and 1000");
+
+        RuleFor(x => x.Hometown)
+            .MaximumLength(50).WithMessage("Hometown cannot exceed 50 characters.");
     }
 }
