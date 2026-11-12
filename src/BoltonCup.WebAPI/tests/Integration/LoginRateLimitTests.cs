@@ -1,11 +1,12 @@
 using System.Net;
 using System.Text;
+using BoltonCup.WebAPI.RateLimiting;
 using FluentAssertions;
 using Xunit;
 
 namespace BoltonCup.WebAPI.Tests.Integration;
 
-// LoginPolicy allows 20 login requests/minute per IP. An empty body fails model validation, so requests never
+// LoginPolicy allows PermitLimit login requests per minute per IP. An empty body fails model validation, so requests never
 // reach the database.
 public class LoginRateLimitTests : IClassFixture<TestWebApplicationFactory>
 {
@@ -22,12 +23,12 @@ public class LoginRateLimitTests : IClassFixture<TestWebApplicationFactory>
         using var client = _factory.CreateClient();
 
         HttpResponseMessage? lastResponse = null;
-        for (var i = 0; i < 21; i++)
+        for (var i = 0; i <= LoginPolicy.PermitLimit; i++)
         {
             lastResponse?.Dispose();
             using var content = new StringContent("{}", Encoding.UTF8, "application/json");
             lastResponse = await client.PostAsync("/api/auth/login", content);
-            if (i < 20)
+            if (i < LoginPolicy.PermitLimit)
             {
                 lastResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
