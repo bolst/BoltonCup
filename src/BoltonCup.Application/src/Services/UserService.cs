@@ -12,6 +12,7 @@ using BoltonCup.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace BoltonCup.Application.Services;
 
@@ -213,39 +214,50 @@ class UserService(
     {
         var user = await _userManager.FindByIdAsync(userId)
             ?? throw new EntityNotFoundException("User", userId);
-        if (user.AccountId.HasValue)
-        {
-            return user;
-        }
-
-        var accountId = await _accountService.CreateAsync(command);
-        user.AccountId = accountId;
-        await _userManager.UpdateAsync(user);
+        await _accountService.CreateAsync(userId, command);
 
         return user;
     }
 
-    // Joins an existing account by email, unless the user already has one or another user owns it.
-    async Task LinkExistingAccountAsync(BoltonCupUser user)
+    // Joins the unowned account with the user's email, unless the user already owns an account. Returns whether it
+    // linked. Internal so tests can race two users, which the public, email-keyed methods can't express.
+    internal async Task<bool> LinkExistingAccountAsync(BoltonCupUser user)
     {
-        if (user.AccountId is not null || user.Email is null)
+        if (user.Email is null)
         {
-            return;
+            return false;
         }
 
         var email = user.Email.ToLowerInvariant();
-        if (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email.ToLower() == email) is not { } account)
+        var candidateId = await _dbContext.Accounts
+            .Where(a => a.Email.ToLower() == email && a.UserId == null)
+            .OrderBy(a => a.Id)
+            .Select(a => (int?)a.Id)
+            .FirstOrDefaultAsync();
+        if (candidateId is null)
         {
-            return;
+            return false;
         }
 
-        if (await _userManager.Users.AnyAsync(u => u.AccountId == account.Id))
+        // Postgres re-checks user_id IS NULL under the row lock, so of two parallel claims only one updates the row.
+        try
         {
-            return;
-        }
+            var linkedRows = await _dbContext.Accounts
+                .Where(a => a.Id == candidateId
+                    && a.UserId == null
+                    && !_dbContext.Accounts.Any(owned => owned.UserId == user.Id))
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(a => a.UserId, user.Id)
+                    .SetProperty(a => a.LastModified, DateTime.UtcNow));
 
-        user.AccountId = account.Id;
-        await _userManager.UpdateAsync(user);
+            return linkedRows == 1;
+        }
+        catch (PostgresException e) when (e.SqlState == PostgresErrorCodes.UniqueViolation)
+        {
+            // The ownership subquery reads the statement's snapshot, so an account the user created in parallel
+            // surfaces here, at the unique index, instead.
+            return false;
+        }
     }
 
     // Consumes an attempt before checking so parallel or repeated guesses cannot exceed the per-user cap.

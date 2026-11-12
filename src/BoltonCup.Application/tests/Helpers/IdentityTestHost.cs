@@ -35,7 +35,11 @@ sealed class IdentityTestHost : IDisposable
     /// Runs after the defaults, so it can add an extra <see cref="IUserValidator{TUser}"/> or replace
     /// <see cref="UserManager{TUser}"/> with a subclass.
     /// </param>
-    public IdentityTestHost(Action<IServiceCollection>? configureServices = null)
+    /// <param name="postgresConnectionString">
+    /// Runs both contexts on this database (see <see cref="PostgresFixture"/>) with the real account service, instead of
+    /// InMemory with <see cref="AccountService"/>.
+    /// </param>
+    public IdentityTestHost(Action<IServiceCollection>? configureServices = null, string? postgresConnectionString = null)
     {
         Emailer
             .Setup(e => e.SendPasswordResetCodeAsync(It.IsAny<string>(), It.IsAny<string>()))
@@ -51,16 +55,29 @@ sealed class IdentityTestHost : IDisposable
         services.AddLogging();
         services.AddHttpContextAccessor();
         services.AddAuthentication().AddIdentityCookies();
-        services.AddDbContext<AuthDbContext>(o => o.UseInMemoryDatabase($"{databaseName}-auth"));
-        services.AddDbContext<BoltonCupDbContext>(o => o.UseInMemoryDatabase($"{databaseName}-app"));
+        if (postgresConnectionString is null)
+        {
+            services.AddDbContext<AuthDbContext>(o => o.UseInMemoryDatabase($"{databaseName}-auth"));
+            services.AddDbContext<BoltonCupDbContext>(o => o.UseInMemoryDatabase($"{databaseName}-app"));
+            services.AddSingleton(AccountService.Object);
+        }
+        else
+        {
+            services.AddDbContext<AuthDbContext>(o => o.UseNpgsql(postgresConnectionString));
+            services.AddDbContext<BoltonCupDbContext>(o => o.UseNpgsql(postgresConnectionString));
+            services.AddSingleton(Mock.Of<IStorageService>());
+            services.AddSingleton(Mock.Of<IAssetKeyGenerator>());
+            services.AddScoped<IAccountService, BoltonCup.Application.Services.AccountService>();
+        }
+
         services
             .AddIdentityCore<BoltonCupUser>(BoltonCup.Persistence.ServiceCollectionExtensions.ConfigureIdentity)
             .AddRoles<IdentityRole>()
             .AddSignInManager()
             .AddEntityFrameworkStores<AuthDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            .AddClaimsPrincipalFactory<BoltonCupClaimsPrincipalFactory>();
         services.AddSingleton(Emailer.Object);
-        services.AddSingleton(AccountService.Object);
         services.AddSingleton(Telemetry.Object);
         services.AddScoped(sp => new CodeAttemptGuard(sp.GetRequiredService<UserManager<BoltonCupUser>>(), Clock, sp.GetRequiredService<ILogger<CodeAttemptGuard>>()));
         services.AddScoped<IUserService, UserService>();
@@ -74,19 +91,22 @@ sealed class IdentityTestHost : IDisposable
     }
 
     public IServiceProvider Services => _scope.ServiceProvider;
+
+    /// <summary>A separate scope, for acting as a parallel request or reading what the store saved.</summary>
+    public IServiceScope CreateScope() => _provider.CreateScope();
     public IUserService UserService => Services.GetRequiredService<IUserService>();
     public UserManager<BoltonCupUser> UserManager => Services.GetRequiredService<UserManager<BoltonCupUser>>();
     public SignInManager<BoltonCupUser> SignInManager => Services.GetRequiredService<SignInManager<BoltonCupUser>>();
     public BoltonCupDbContext Db => Services.GetRequiredService<BoltonCupDbContext>();
 
-    public async Task<BoltonCupUser> CreateUserAsync(string email, bool emailConfirmed = true, int? accountId = null)
+    /// <param name="userName">Defaults to the email, as registration does.</param>
+    public async Task<BoltonCupUser> CreateUserAsync(string email, bool emailConfirmed = true, string? userName = null)
     {
         var user = new BoltonCupUser
         {
-            UserName = email,
+            UserName = userName ?? email,
             Email = email,
             EmailConfirmed = emailConfirmed,
-            AccountId = accountId,
         };
         var result = await UserManager.CreateAsync(user, Password);
         if (!result.Succeeded)
