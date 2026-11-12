@@ -110,11 +110,18 @@ namespace BoltonCup.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("previous_team_logo_key");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("text")
+                        .HasColumnName("user_id");
+
                     b.Property<int?>("Weight")
                         .HasColumnType("integer")
                         .HasColumnName("weight");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("accounts", "core");
                 });

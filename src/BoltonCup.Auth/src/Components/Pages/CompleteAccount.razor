@@ -165,11 +165,20 @@ else
 
     private async Task OnSubmit(EditContext _)
     {
+        // A second click can land before the disabled button re-renders.
+        if (_formDisabled)
+        {
+            return;
+        }
+
+        _formDisabled = true;
         _birthdayError = null;
-        
+        var submitted = false;
+
         try
         {
             await BoltonCupApi.CompleteMyAccountAsync(_model);
+            submitted = true;
             Navigation.NavigateTo($"{BcConfig.Value.WebBaseUrl}profile");
         }
         catch (ApiException<BoltonCupValidationProblemDetails> e)
@@ -182,6 +191,11 @@ else
             _messageStore?.AddApiErrorResponse(_model, e.Result);
             _editContext?.NotifyValidationStateChanged();
             Snackbar.Add("Please fix the invalid fields.", Severity.Error);
+        }
+        finally
+        {
+            // Stays disabled after success, while the page navigates away.
+            _formDisabled = submitted;
         }
     }
 
