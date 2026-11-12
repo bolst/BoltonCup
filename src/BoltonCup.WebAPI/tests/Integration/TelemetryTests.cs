@@ -1,6 +1,5 @@
 using BoltonCup.Core;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -8,11 +7,11 @@ using Xunit;
 
 namespace BoltonCup.WebAPI.Tests.Integration;
 
-public class TelemetryTests : IClassFixture<WebApplicationFactory<Program>>
+public class TelemetryTests : IClassFixture<TestWebApplicationFactory>
 {
-    readonly WebApplicationFactory<Program> _factory;
+    readonly TestWebApplicationFactory _factory;
 
-    public TelemetryTests(WebApplicationFactory<Program> factory)
+    public TelemetryTests(TestWebApplicationFactory factory)
     {
         _factory = factory;
     }
