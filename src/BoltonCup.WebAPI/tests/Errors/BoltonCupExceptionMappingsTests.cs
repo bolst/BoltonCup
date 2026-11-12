@@ -28,14 +28,4 @@ public class BoltonCupExceptionMappingsTests
         problem.Type.Should().Be(ErrorTypes.Auth.LockedOut);
         problem.Detail.Should().Be("Too many attempts. Try again later or reset your password.");
     }
-
-    [Fact]
-    public void AttemptNotRecordedException_MapsTo429()
-    {
-        var problem = BoltonCupExceptionMappings.GetProblemDetails(new AttemptNotRecordedException());
-
-        problem!.Status.Should().Be(StatusCodes.Status429TooManyRequests);
-        problem.Type.Should().Be(ErrorTypes.Auth.AttemptNotRecorded);
-        problem.Detail.Should().Be("Something went wrong. Please try again.");
-    }
 }

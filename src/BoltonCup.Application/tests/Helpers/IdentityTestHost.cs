@@ -23,7 +23,6 @@ sealed class IdentityTestHost : IDisposable
     readonly ServiceProvider _provider;
     readonly IServiceScope _scope;
 
-    public MutableTimeProvider Clock { get; } = new(new DateTimeOffset(2026, 1, 1, 12, 0, 0, TimeSpan.Zero));
     public Mock<IEmailer> Emailer { get; } = new();
     public Mock<IAccountService> AccountService { get; } = new();
     public Mock<ITelemetry> Telemetry { get; } = new();
@@ -79,7 +78,6 @@ sealed class IdentityTestHost : IDisposable
             .AddClaimsPrincipalFactory<BoltonCupClaimsPrincipalFactory>();
         services.AddSingleton(Emailer.Object);
         services.AddSingleton(Telemetry.Object);
-        services.AddScoped(sp => new CodeAttemptGuard(sp.GetRequiredService<UserManager<BoltonCupUser>>(), Clock, sp.GetRequiredService<ILogger<CodeAttemptGuard>>()));
         services.AddScoped<IUserService, UserService>();
         configureServices?.Invoke(services);
 
@@ -122,13 +120,4 @@ sealed class IdentityTestHost : IDisposable
         _scope.Dispose();
         _provider.Dispose();
     }
-}
-
-sealed class MutableTimeProvider(DateTimeOffset start) : TimeProvider
-{
-    DateTimeOffset _now = start;
-
-    public override DateTimeOffset GetUtcNow() => _now;
-
-    public void Advance(TimeSpan by) => _now += by;
 }

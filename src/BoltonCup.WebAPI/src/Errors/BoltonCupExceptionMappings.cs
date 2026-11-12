@@ -55,12 +55,6 @@ public static class BoltonCupExceptionMappings
             ErrorType: ErrorTypes.Auth.LockedOut,
             Title: "Account locked out."
         ),
-        new(
-            ExceptionType: typeof(AttemptNotRecordedException),
-            StatusCode: StatusCodes.Status429TooManyRequests,
-            ErrorType: ErrorTypes.Auth.AttemptNotRecorded,
-            Title: "Attempt not recorded."
-        ),
 
         // Tournaments
         new(

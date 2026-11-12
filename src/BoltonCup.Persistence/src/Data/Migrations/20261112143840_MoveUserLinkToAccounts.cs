@@ -78,13 +78,18 @@ namespace BoltonCup.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // Hand-written: new code links only through user_id, so copy those links back for the old code.
+            // Hand-written: new code links only through user_id, so copy those links back for the old code. If
+            // DropUserAccountId is still applied there is nowhere to copy them, so refuse rather than drop them.
             migrationBuilder.Sql("""
                 DO $$
                 BEGIN
                     IF NOT EXISTS (
                         SELECT 1 FROM information_schema.columns
                         WHERE table_schema = 'auth' AND table_name = 'AspNetUsers' AND column_name = 'AccountId') THEN
+                        IF EXISTS (SELECT 1 FROM core.accounts WHERE user_id IS NOT NULL) THEN
+                            RAISE EXCEPTION 'auth."AspNetUsers" has no AccountId to copy links back to. Roll back the auth migration DropUserAccountId first, then rerun.';
+                        END IF;
+
                         RETURN;
                     END IF;
 

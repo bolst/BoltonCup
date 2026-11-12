@@ -4,8 +4,16 @@ on:
   push:
     branches:
       - main
+    # Every project the image builds, so a change to any of them is tested and deployed.
     paths:
       - 'src/BoltonCup.WebAPI/**'
+      - 'src/BoltonCup.Application/**'
+      - 'src/BoltonCup.Core/**'
+      - 'src/BoltonCup.Integrations/**'
+      - 'src/BoltonCup.Persistence/**'
+      - 'src/BoltonCup.Shared/**'
+      - 'src/BoltonCup.Telemetry/**'
+      - '.github/workflows/publish-dockerized-webapi.yml'
       - 'docker/webapi.yml'
       - 'docker/postgres.yml'
       - 'tools/prepare_host.sh'

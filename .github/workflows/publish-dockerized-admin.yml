@@ -4,8 +4,19 @@ on:
   push:
     branches:
       - main
+    # Every project the image builds, so a change to any of them is deployed.
     paths:
       - 'src/BoltonCup.Admin/**'
+      - 'src/BoltonCup.Application/**'
+      - 'src/BoltonCup.Common/**'
+      - 'src/BoltonCup.Core/**'
+      - 'src/BoltonCup.Integrations/**'
+      - 'src/BoltonCup.Persistence/**'
+      - 'src/BoltonCup.SessionStorage/**'
+      - 'src/BoltonCup.Shared/**'
+      - 'src/BoltonCup.WebAPI.Client/**'
+      - 'src/BoltonCup.WebAPI/src/BoltonCup.WebAPI.json'
+      - '.github/workflows/publish-dockerized-admin.yml'
   workflow_dispatch:
 
 jobs:

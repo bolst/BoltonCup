@@ -37,15 +37,11 @@ class MasqueradeService(BoltonCupDbContext _dbContext) : IMasqueradeService
             .Select(a => new { a.Id, a.UserId, a.FirstName, a.LastName, a.Email })
             .ToListAsync(cancellationToken);
 
-        var results = accounts.Select(account =>
-        {
-            var name = $"{account.FirstName} {account.LastName}".Trim();
-            return new MasqueradeUser(account.UserId!, account.Id, string.IsNullOrEmpty(name) ? account.Email : name, account.Email);
-        });
-
-        return results
-            .OrderBy(r => r.Name)
-            .Take(limit)
+        return accounts.Select(account =>
+            {
+                var name = $"{account.FirstName} {account.LastName}".Trim();
+                return new MasqueradeUser(account.UserId!, account.Id, string.IsNullOrEmpty(name) ? account.Email : name, account.Email);
+            })
             .ToList();
     }
 }

@@ -11,7 +11,8 @@ namespace BoltonCup.Persistence.Migrations.Auth
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             // Hand-written: copy links the old code made after MoveUserLinkToAccounts ran, refuse to drop any it can't
-            // carry over, then drop the column.
+            // carry over, then drop the column. Running this before MoveUserLinkToAccounts would drop every link, so it
+            // refuses that too.
             migrationBuilder.Sql("""
                 DO $$
                 DECLARE
@@ -19,6 +20,12 @@ namespace BoltonCup.Persistence.Migrations.Auth
                 BEGIN
                     IF to_regclass('core.accounts') IS NULL THEN
                         RETURN;
+                    END IF;
+
+                    IF NOT EXISTS (
+                        SELECT 1 FROM information_schema.columns
+                        WHERE table_schema = 'core' AND table_name = 'accounts' AND column_name = 'user_id') THEN
+                        RAISE EXCEPTION 'core.accounts has no user_id yet. Apply the core migrations (./update_db.sh) first, then rerun.';
                     END IF;
 
                     UPDATE core.accounts a
@@ -45,7 +52,7 @@ namespace BoltonCup.Persistence.Migrations.Auth
                 table: "AspNetUsers");
 
             // Hand-written: a deleted user frees their account, and user_id can only name a real user. EF can't model a
-            // key into the auth schema. Whichever of this and DropUserAccountId runs second adds it.
+            // key into the auth schema. Whichever of this and MoveUserLinkToAccounts runs second adds it.
             migrationBuilder.Sql("""
                 DO $$
                 BEGIN
@@ -74,11 +81,14 @@ namespace BoltonCup.Persistence.Migrations.Auth
                 type: "integer",
                 nullable: true);
 
-            // Hand-written: restore the links so code that reads this column works again.
+            // Hand-written: restore the links so code that reads this column works again. Without user_id, the core
+            // migration's Down has already copied them back.
             migrationBuilder.Sql("""
                 DO $$
                 BEGIN
-                    IF to_regclass('core.accounts') IS NULL THEN
+                    IF NOT EXISTS (
+                        SELECT 1 FROM information_schema.columns
+                        WHERE table_schema = 'core' AND table_name = 'accounts' AND column_name = 'user_id') THEN
                         RETURN;
                     END IF;
 
