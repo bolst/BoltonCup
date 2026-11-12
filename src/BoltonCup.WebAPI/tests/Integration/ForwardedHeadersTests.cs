@@ -1,6 +1,5 @@
 using System.Net;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
 namespace BoltonCup.WebAPI.Tests.Integration;
@@ -10,11 +9,11 @@ namespace BoltonCup.WebAPI.Tests.Integration;
 // is still captured into HttpContext.Items before this middleware runs, specifically so the
 // admin API-key network check can't be spoofed by these headers - that capture isn't observable
 // over HTTP without a diagnostic endpoint, so this only asserts the pipeline stays healthy.
-public class ForwardedHeadersTests : IClassFixture<WebApplicationFactory<Program>>
+public class ForwardedHeadersTests : IClassFixture<TestWebApplicationFactory>
 {
-    readonly WebApplicationFactory<Program> _factory;
+    readonly TestWebApplicationFactory _factory;
 
-    public ForwardedHeadersTests(WebApplicationFactory<Program> factory)
+    public ForwardedHeadersTests(TestWebApplicationFactory factory)
     {
         _factory = factory;
     }

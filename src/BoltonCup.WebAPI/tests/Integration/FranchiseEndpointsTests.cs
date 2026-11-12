@@ -1,16 +1,15 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
 namespace BoltonCup.WebAPI.Tests.Integration;
 
-public class FranchiseEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
+public class FranchiseEndpointsTests : IClassFixture<TestWebApplicationFactory>
 {
-    readonly WebApplicationFactory<Program> _factory;
+    readonly TestWebApplicationFactory _factory;
 
-    public FranchiseEndpointsTests(WebApplicationFactory<Program> factory)
+    public FranchiseEndpointsTests(TestWebApplicationFactory factory)
     {
         _factory = factory;
     }
