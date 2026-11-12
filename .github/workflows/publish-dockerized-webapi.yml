@@ -71,25 +71,23 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # Ships the compose file and host prep script with the image, so the host never runs a stale copy.
-    - name: Copy deploy files
-      uses: appleboy/scp-action@v1
-      with:
-        host: ${{ secrets.DEPLOY_HOST }}
-        username: root
-        key: ${{ secrets.DEPLOY_SSH_KEY }}
-        source: docker/webapi.yml,docker/postgres.yml,tools/prepare_host.sh,tools/check_compose_config.py
-        target: /opt/BoltonCup
-
+    # One SSH connection copies the deploy files and deploys: the host's ufw LIMIT rule blocks an IP after 6
+    # connections in 30 seconds, and scp-action opens one per step.
     - name: Deploy
-      uses: appleboy/ssh-action@v1
-      with:
-        host: ${{ secrets.DEPLOY_HOST }}
-        username: root
-        key: ${{ secrets.DEPLOY_SSH_KEY }}
-        script: |
-          set -e
-          cd /opt/BoltonCup
-          bash tools/prepare_host.sh .env
-          docker compose -f ./docker/webapi.yml --env-file .env --profile edge pull
-          docker compose -f ./docker/webapi.yml --env-file .env --profile edge up -d
+      env:
+        DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      run: |
+        set -euo pipefail
+        key="$(mktemp)"
+        trap 'rm -f "$key"' EXIT
+        printf '%s\n' "$DEPLOY_SSH_KEY" > "$key"
+        tar -czf - docker/webapi.yml docker/postgres.yml tools/prepare_host.sh tools/check_compose_config.py \
+          | ssh -i "$key" -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=30 "root@$DEPLOY_HOST" '
+              set -e
+              cd /opt/BoltonCup
+              tar -xzf - --no-same-owner
+              bash tools/prepare_host.sh .env
+              docker compose -f ./docker/webapi.yml --env-file .env --profile edge pull
+              docker compose -f ./docker/webapi.yml --env-file .env --profile edge up -d
+            '
