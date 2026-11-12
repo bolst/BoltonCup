@@ -19,7 +19,6 @@ namespace BoltonCup.Shared
             public const string PasswordResetFailed = Base + "/password-reset-failed";
             public const string TooManyAttempts = Base + "/too-many-attempts";
             public const string LockedOut = Base + "/locked-out";
-            public const string AttemptNotRecorded = Base + "/attempt-not-recorded";
         }
 
 

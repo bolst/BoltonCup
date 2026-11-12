@@ -43,9 +43,8 @@ public static class ServiceCollectionExtensions
         options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
         options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
         options.SignIn.RequireConfirmedAccount = true;
-        options.Lockout.AllowedForNewUsers = true;
-        options.Lockout.MaxFailedAccessAttempts = 10;
-        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+        // Wrong guesses are capped per caller in the API, so a stranger can't lock someone out.
+        options.Lockout.AllowedForNewUsers = false;
     }
 }
 

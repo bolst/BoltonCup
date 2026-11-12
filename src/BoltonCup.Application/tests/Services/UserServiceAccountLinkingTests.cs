@@ -147,6 +147,18 @@ public class UserServiceAccountLinkingTests(PostgresFixture postgres) : IAsyncLi
     }
 
     [Fact]
+    public async Task ResetPassword_LinksConfirmedUserWithoutAnAccount()
+    {
+        var account = await AddAccountAsync(Email);
+        var user = await _host.CreateUserAsync(Email);
+        await _host.UserService.ForgotPasswordAsync(Email);
+
+        await _host.UserService.ResetPasswordAsync(Email, _host.SentCodes[Email], IdentityTestHost.Password + "2");
+
+        (await OwnedAccountIdAsync(user.Id)).Should().Be(account.Id);
+    }
+
+    [Fact]
     public async Task LinkExistingAccount_TwoUsersInParallel_OnlyOneLinksTheAccount()
     {
         // Not reachable through registration today (usernames are emails); change-email will make it so.
@@ -204,6 +216,18 @@ public class UserServiceAccountLinkingTests(PostgresFixture postgres) : IAsyncLi
     {
         var user = await _host.CreateUserAsync(Email);
         var existing = await AddAccountAsync(Email, user.Id);
+
+        await _host.UserService.CompleteUserAccountAsync(user.Id, NewAccountCommand());
+
+        (await OwnedAccountIdAsync(user.Id)).Should().Be(existing.Id);
+        (await _host.Db.Accounts.CountAsync()).Should().Be(1);
+    }
+
+    [Fact]
+    public async Task CompleteUserAccount_UnownedAccountWithTheirEmail_ClaimsItInsteadOfCreating()
+    {
+        var existing = await AddAccountAsync("Player@Example.com");
+        var user = await _host.CreateUserAsync(Email);
 
         await _host.UserService.CompleteUserAccountAsync(user.Id, NewAccountCommand());
 

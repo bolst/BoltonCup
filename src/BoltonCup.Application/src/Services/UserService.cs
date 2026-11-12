@@ -35,7 +35,6 @@ class UserService(
     SignInManager<BoltonCupUser> _signInManager,
     IAccountService _accountService,
     IEmailer _emailer,
-    CodeAttemptGuard _codeAttemptGuard,
     ITelemetry _telemetry,
     ILogger<UserService> _logger) : IUserService
 {
@@ -58,7 +57,7 @@ class UserService(
             throw new InvalidCredentialsException();
         }
 
-        var result = await _signInManager.PasswordSignInAsync(user, password, persist, lockoutOnFailure: true);
+        var result = await _signInManager.PasswordSignInAsync(user, password, persist, lockoutOnFailure: false);
 
         if (result.IsLockedOut)
         {
@@ -143,6 +142,9 @@ class UserService(
 
         await CheckPasswordResetCodeAsync(user, code);
 
+        // The code proves control of the email. ResetPasswordAsync saves the whole user, so the confirmation lands
+        // with the new password or not at all.
+        user.EmailConfirmed = true;
         if (await _userManager.ResetPasswordAsync(user, code, newPassword) is { Succeeded: false } result)
         {
             _logger.LogWarning(
@@ -152,30 +154,7 @@ class UserService(
             throw new PasswordResetFailedException(result);
         }
 
-        // The reset code proves control of the email: lift any login lockout a stranger caused and confirm the account.
-        var wasLockedOut = await _userManager.IsLockedOutAsync(user);
-        var wasUnconfirmed = !user.EmailConfirmed;
-        user.LockoutEnd = null;
-        user.AccessFailedCount = 0;
-        user.EmailConfirmed = true;
-        if (await _userManager.UpdateAsync(user) is { Succeeded: false } updateResult)
-        {
-            _logger.LogWarning(
-                "Could not clear lockout or confirm email after reset for user {UserId}: {ErrorCodes}",
-                user.Id,
-                string.Join(", ", updateResult.Errors.Select(e => e.Code)));
-            return;
-        }
-
-        if (wasLockedOut)
-        {
-            _telemetry.TrackEvent("auth.lockout_cleared_by_reset", "user.id", user.Id);
-        }
-
-        if (wasUnconfirmed)
-        {
-            await LinkExistingAccountAsync(user);
-        }
+        await LinkExistingAccountAsync(user);
     }
 
 
@@ -186,19 +165,6 @@ class UserService(
         {
             throw new InvalidCredentialsException();
         }
-
-        await _codeAttemptGuard.ConsumeAttemptAsync(user, CodePurpose.EmailConfirmation);
-        var isValidCode = await _userManager.VerifyUserTokenAsync(
-            user,
-            _userManager.Options.Tokens.EmailConfirmationTokenProvider,
-            UserManager<BoltonCupUser>.ConfirmEmailTokenPurpose,
-            code);
-        if (!isValidCode)
-        {
-            throw new InvalidCredentialsException();
-        }
-
-        await _codeAttemptGuard.ClearAsync(user, CodePurpose.EmailConfirmation);
 
         if (await _userManager.ConfirmEmailAsync(user, code) is { Succeeded: false })
         {
@@ -214,7 +180,13 @@ class UserService(
     {
         var user = await _userManager.FindByIdAsync(userId)
             ?? throw new EntityNotFoundException("User", userId);
-        await _accountService.CreateAsync(userId, command);
+
+        // An account made for this email before the user signed up (by an admin, or under the old case-sensitive
+        // matching) is theirs; claim it instead of making a second one.
+        if (!await LinkExistingAccountAsync(user))
+        {
+            await _accountService.CreateAsync(userId, command);
+        }
 
         return user;
     }
@@ -260,10 +232,8 @@ class UserService(
         }
     }
 
-    // Consumes an attempt before checking so parallel or repeated guesses cannot exceed the per-user cap.
     async Task CheckPasswordResetCodeAsync(BoltonCupUser user, string code)
     {
-        await _codeAttemptGuard.ConsumeAttemptAsync(user, CodePurpose.PasswordReset);
         var isValidCode = await _userManager.VerifyUserTokenAsync(
             user,
             _userManager.Options.Tokens.PasswordResetTokenProvider,
@@ -273,7 +243,5 @@ class UserService(
         {
             throw new InvalidCredentialsException();
         }
-
-        await _codeAttemptGuard.ClearAsync(user, CodePurpose.PasswordReset);
     }
 }

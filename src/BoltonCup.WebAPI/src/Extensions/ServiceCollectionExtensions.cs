@@ -151,6 +151,7 @@ public static class ServiceCollectionExtensions
     static IServiceCollection AddRateLimitingServices(this IServiceCollection services)
     {
         return services
+            .AddSingleton<AuthAttemptLimiter>()
             .AddRateLimiter(options =>
             {
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
