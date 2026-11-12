@@ -1,17 +1,16 @@
 using System.Net;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
 namespace BoltonCup.WebAPI.Tests.Integration;
 
 // GlobalRateLimiter allows 100 requests/minute per user-or-IP (sliding window); requests beyond
 // that are rejected by RateLimitResponder with a 429 + BoltonCupProblemDetails body.
-public class RateLimiterTests : IClassFixture<WebApplicationFactory<Program>>
+public class RateLimiterTests : IClassFixture<TestWebApplicationFactory>
 {
-    readonly WebApplicationFactory<Program> _factory;
+    readonly TestWebApplicationFactory _factory;
 
-    public RateLimiterTests(WebApplicationFactory<Program> factory)
+    public RateLimiterTests(TestWebApplicationFactory factory)
     {
         _factory = factory;
     }
