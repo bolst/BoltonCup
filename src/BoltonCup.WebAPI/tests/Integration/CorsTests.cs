@@ -1,14 +1,13 @@
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
 namespace BoltonCup.WebAPI.Tests.Integration;
 
-public class CorsTests : IClassFixture<WebApplicationFactory<Program>>
+public class CorsTests : IClassFixture<TestWebApplicationFactory>
 {
-    readonly WebApplicationFactory<Program> _factory;
+    readonly TestWebApplicationFactory _factory;
 
-    public CorsTests(WebApplicationFactory<Program> factory)
+    public CorsTests(TestWebApplicationFactory factory)
     {
         _factory = factory;
     }

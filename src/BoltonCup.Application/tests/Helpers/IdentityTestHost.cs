@@ -26,6 +26,7 @@ sealed class IdentityTestHost : IDisposable
     public MutableTimeProvider Clock { get; } = new(new DateTimeOffset(2026, 1, 1, 12, 0, 0, TimeSpan.Zero));
     public Mock<IEmailer> Emailer { get; } = new();
     public Mock<IAccountService> AccountService { get; } = new();
+    public Mock<ITelemetry> Telemetry { get; } = new();
 
     /// <summary>The last code sent to each address, by any of the code emails.</summary>
     public Dictionary<string, string> SentCodes { get; } = new(StringComparer.OrdinalIgnoreCase);
@@ -77,6 +78,7 @@ sealed class IdentityTestHost : IDisposable
             .AddDefaultTokenProviders()
             .AddClaimsPrincipalFactory<BoltonCupClaimsPrincipalFactory>();
         services.AddSingleton(Emailer.Object);
+        services.AddSingleton(Telemetry.Object);
         services.AddScoped(sp => new CodeAttemptGuard(sp.GetRequiredService<UserManager<BoltonCupUser>>(), Clock, sp.GetRequiredService<ILogger<CodeAttemptGuard>>()));
         services.AddScoped<IUserService, UserService>();
         configureServices?.Invoke(services);

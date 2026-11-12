@@ -19,7 +19,7 @@ namespace BoltonCup.Application.Services;
 public interface IUserService
 {
     Task<Account?> GetMyAccountAsync(ClaimsPrincipal claimsPrincipal);
-    Task LoginAsync(string email, string password, bool persist, bool lockoutOnFailure = false);
+    Task LoginAsync(string email, string password, bool persist);
     Task RegisterAsync(string email, string password);
     Task ResendConfirmationEmailAsync(string email);
     Task VerifyPasswordResetCodeAsync(string email, string code);
@@ -36,6 +36,7 @@ class UserService(
     IAccountService _accountService,
     IEmailer _emailer,
     CodeAttemptGuard _codeAttemptGuard,
+    ITelemetry _telemetry,
     ILogger<UserService> _logger) : IUserService
 {
 
@@ -50,12 +51,19 @@ class UserService(
     }
 
 
-    public async Task LoginAsync(string email, string password, bool persist, bool lockoutOnFailure = false)
+    public async Task LoginAsync(string email, string password, bool persist)
     {
-        var result = await _signInManager.PasswordSignInAsync(email, password, persist, lockoutOnFailure);
+        if (await _userManager.FindByNameAsync(email) is not { } user)
+        {
+            throw new InvalidCredentialsException();
+        }
+
+        var result = await _signInManager.PasswordSignInAsync(user, password, persist, lockoutOnFailure: true);
 
         if (result.IsLockedOut)
         {
+            _logger.LogWarning("Login blocked by lockout for user {UserId}", user.Id);
+            _telemetry.TrackEvent("auth.login_locked_out", "user.id", user.Id);
             throw new AccountLockedOutException();
         }
 
@@ -144,12 +152,28 @@ class UserService(
             throw new PasswordResetFailedException(result);
         }
 
-        // a user could only get here if they got the code via email
-        // thus, confirm their account if needed
-        if (!user.EmailConfirmed)
+        // The reset code proves control of the email: lift any login lockout a stranger caused and confirm the account.
+        var wasLockedOut = await _userManager.IsLockedOutAsync(user);
+        var wasUnconfirmed = !user.EmailConfirmed;
+        user.LockoutEnd = null;
+        user.AccessFailedCount = 0;
+        user.EmailConfirmed = true;
+        if (await _userManager.UpdateAsync(user) is { Succeeded: false } updateResult)
         {
-            user.EmailConfirmed = true;
-            await _userManager.UpdateAsync(user);
+            _logger.LogWarning(
+                "Could not clear lockout or confirm email after reset for user {UserId}: {ErrorCodes}",
+                user.Id,
+                string.Join(", ", updateResult.Errors.Select(e => e.Code)));
+            return;
+        }
+
+        if (wasLockedOut)
+        {
+            _telemetry.TrackEvent("auth.lockout_cleared_by_reset", "user.id", user.Id);
+        }
+
+        if (wasUnconfirmed)
+        {
             await LinkExistingAccountAsync(user);
         }
     }
