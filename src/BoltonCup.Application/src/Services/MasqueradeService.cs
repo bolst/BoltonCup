@@ -1,6 +1,4 @@
 using BoltonCup.Persistence.Data;
-using BoltonCup.Persistence.Identity;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BoltonCup.Application.Services;
@@ -13,9 +11,7 @@ public interface IMasqueradeService
     Task<IReadOnlyList<MasqueradeUser>> SearchAsync(string? query, int limit = 5, CancellationToken cancellationToken = default);
 }
 
-class MasqueradeService(
-    BoltonCupDbContext _dbContext,
-    UserManager<BoltonCupUser> _userManager) : IMasqueradeService
+class MasqueradeService(BoltonCupDbContext _dbContext) : IMasqueradeService
 {
     public async Task<IReadOnlyList<MasqueradeUser>> SearchAsync(string? query, int limit = 5, CancellationToken cancellationToken = default)
     {
@@ -23,8 +19,10 @@ class MasqueradeService(
         var hasQuery = !string.IsNullOrEmpty(query);
         var pattern = $"%{query}%";
 
-        // Match accounts (which hold names) by name or email.
-        var accountsQuery = _dbContext.Accounts.AsNoTracking();
+        // Match accounts (which hold names) by name or email. Only accounts a user owns can be masqueraded as.
+        var accountsQuery = _dbContext.Accounts
+            .AsNoTracking()
+            .Where(a => a.UserId != null);
         if (hasQuery)
         {
             accountsQuery = accountsQuery.Where(a =>
@@ -32,31 +30,18 @@ class MasqueradeService(
                 || EF.Functions.ILike(a.Email, pattern));
         }
 
-        var accountById = await accountsQuery
+        var accounts = await accountsQuery
             .OrderBy(a => a.FirstName)
             .ThenBy(a => a.LastName)
             .Take(limit)
-            .Select(a => new { a.Id, a.FirstName, a.LastName, a.Email })
-            .ToDictionaryAsync(a => a.Id, cancellationToken);
-
-        // Identity users linked to the matched accounts (only users can be masqueraded as).
-        var usersByAccount = await _userManager.Users
-            .Where(u => u.AccountId != null && accountById.Keys.Contains(u.AccountId.Value))
-            .Select(u => new { u.Id, u.AccountId, u.Email })
+            .Select(a => new { a.Id, a.UserId, a.FirstName, a.LastName, a.Email })
             .ToListAsync(cancellationToken);
 
-        var results = new Dictionary<string, MasqueradeUser>();
-        foreach (var user in usersByAccount)
-        {
-            var account = accountById[user.AccountId!.Value];
-            var name = $"{account.FirstName} {account.LastName}".Trim();
-            var email = account.Email;
-            results[user.Id] = new MasqueradeUser(user.Id, user.AccountId, string.IsNullOrEmpty(name) ? email : name, email);
-        }
-
-        return results.Values
-            .OrderBy(r => r.Name)
-            .Take(limit)
+        return accounts.Select(account =>
+            {
+                var name = $"{account.FirstName} {account.LastName}".Trim();
+                return new MasqueradeUser(account.UserId!, account.Id, string.IsNullOrEmpty(name) ? account.Email : name, account.Email);
+            })
             .ToList();
     }
 }

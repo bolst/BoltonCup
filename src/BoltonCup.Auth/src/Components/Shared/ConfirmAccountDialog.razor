@@ -83,6 +83,10 @@
             _messageStore?.Add(() => _model.Code, "That code is incorrect.");
             _editContext?.NotifyValidationStateChanged();
         }
+        catch (ApiException e) when (e.IsTooManyRequests())
+        {
+            Snackbar.Add(e.GetTooManyRequestsMessage(), Severity.Warning);
+        }
         finally
         {
             _isSubmitting = false;
@@ -103,6 +107,10 @@
             });
             await delayTask;
             Snackbar.Add($"An email with a code has been sent to {Context.Email}.", Severity.Success);
+        }
+        catch (ApiException e) when (e.IsTooManyRequests())
+        {
+            Snackbar.Add(e.GetTooManyRequestsMessage(), Severity.Warning);
         }
         finally
         {

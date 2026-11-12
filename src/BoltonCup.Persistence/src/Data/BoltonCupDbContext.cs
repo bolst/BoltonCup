@@ -86,6 +86,8 @@ class BoltonCupDbContext(DbContextOptions<BoltonCupDbContext> options)
             entity.Property(e => e.Weight).HasColumnName("weight");
             entity.Property(e => e.Hometown).HasColumnName("hometown");
             entity.Property(e => e.PreviousTeamLogo).HasColumnName("previous_team_logo_key");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.HasIndex(e => e.UserId).IsUnique();
         });
 
         modelBuilder.Entity<Core.BracketChallenge.Event>(entity =>

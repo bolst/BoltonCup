@@ -5,7 +5,8 @@
     @ref="_dataGrid" 
     T="Account" 
     SearchBy="x => x.FirstName + ' ' + x.LastName"
-    Comparer="_comparer">
+    Comparer="_comparer"
+    OnSave="PrepareForSave">
     <Columns>
         <PropertyColumn Title="Id" Property="x => x.Id" Editable="false"/>
         <PropertyColumn Title="First" Property="x => x.FirstName"/>
@@ -24,6 +25,7 @@
         </PropertyColumn>
         <PropertyColumn Title="Beer" Property="x => x.PreferredBeer" />
         <PropertyColumn Title="Hometown" Property="x => x.Hometown" Required="false" Editable="true" />
+        <PropertyColumn Title="User ID" Property="x => x.UserId" Required="false" Editable="true" />
         <ImageColumn T="Account" Title="Prev. Team Logo" Property="x => x.PreviousTeamLogo" OnImageUploaded="UpdatePreviousTeamLogo" />
     </Columns>
 </EntityDataGrid>
@@ -41,6 +43,15 @@
 
         await _dataGrid.ExtendSortAsync("LastName", SortDirection.Ascending, x => x.LastName);
         await _dataGrid.ExtendSortAsync("FirstName", SortDirection.Ascending, x => x.FirstName);
+    }
+
+    // A cleared cell saves "", and two of those would collide on the unique user_id index.
+    void PrepareForSave(ChangeTracker<Account> changes)
+    {
+        foreach (var account in changes.NewItems.Concat(changes.EditItems))
+        {
+            account.UserId = string.IsNullOrWhiteSpace(account.UserId) ? null : account.UserId.Trim();
+        }
     }
 
     private async Task UpdateAvatar(ImageUploadResult<Account> result)

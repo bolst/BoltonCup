@@ -1,5 +1,7 @@
 using BoltonCup.Persistence.Identity;
+using BoltonCup.Application.Exceptions;
 using BoltonCup.Application.Services;
+using BoltonCup.Shared;
 using BoltonCup.WebAPI.Mapping;
 using BoltonCup.WebAPI.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +19,9 @@ public class AuthController(
     IUserService _userService,
     IMapper _mapper,
     UserManager<BoltonCupUser> _userManager,
-    SignInManager<BoltonCupUser> _signInManager
+    SignInManager<BoltonCupUser> _signInManager,
+    AuthAttemptLimiter _attemptLimiter,
+    IHostEnvironment _environment
 ) : BoltonCupControllerBase
 {
     /// <summary>Returns the currently authenticated user's identity information.</summary>
@@ -34,8 +38,10 @@ public class AuthController(
     /// <summary>Authenticates a user with email and password.</summary>
     [AllowAnonymous]
     [HttpPost("login")]
+    [EnableRateLimiting(nameof(LoginPolicy))]
     public async Task<ActionResult> Login([FromBody] LoginRequest request)
     {
+        ThrowIfAttemptsSpent(AuthAttemptKind.Login, request.Email);
         await _userService.LoginAsync(request.Email, request.Password, request.Persist);
         return Ok();
     }
@@ -61,8 +67,10 @@ public class AuthController(
     /// <summary>Verifies a password reset code without applying the reset.</summary>
     [AllowAnonymous]
     [HttpPost("verifyPasswordResetCode")]
+    [EnableRateLimiting(nameof(CodeCheckPolicy))]
     public async Task<ActionResult> VerifyPasswordResetCode([FromBody] VerifyPasswordResetCodeRequest request)
     {
+        ThrowIfAttemptsSpent(AuthAttemptKind.PasswordResetCode, request.Email);
         await _userService.VerifyPasswordResetCodeAsync(request.Email, request.Code);
         return Ok();
     }
@@ -79,8 +87,10 @@ public class AuthController(
     /// <summary>Resets the user's password using a valid reset code.</summary>
     [AllowAnonymous]
     [HttpPost("resetPassword")]
+    [EnableRateLimiting(nameof(CodeCheckPolicy))]
     public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
+        ThrowIfAttemptsSpent(AuthAttemptKind.PasswordResetCode, request.Email);
         await _userService.ResetPasswordAsync(request.Email, request.ResetCode, request.NewPassword);
         return Ok();
     }
@@ -88,20 +98,32 @@ public class AuthController(
     /// <summary>Confirms the user's email address using the code sent during registration.</summary>
     [AllowAnonymous]
     [HttpPost("confirmEmail")]
+    [EnableRateLimiting(nameof(CodeCheckPolicy))]
     public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
     {
+        ThrowIfAttemptsSpent(AuthAttemptKind.EmailConfirmationCode, request.Email);
         await _userService.ConfirmEmailAsync(request.Email, request.Code);
         return Ok();
     }
 
-    /// <summary>Signs the current user out and optionally redirects to a return URL.</summary>
+    /// <summary>Signs the current user out and optionally redirects to a Bolton Cup return URL.</summary>
     [Authorize]
     [HttpPost("logout")]
     public async Task<IResult> Logout([FromQuery] string? returnUrl = null)
     {
         await _signInManager.SignOutAsync();
-        return !string.IsNullOrWhiteSpace(returnUrl)
-            ? Results.Redirect(returnUrl)
+        if (!Uri.TryCreate($"{Request.Scheme}://{Request.Host}/", UriKind.Absolute, out var requestBaseUri))
+        {
+            return Results.Ok();
+        }
+
+        var safeReturnUrl = ReturnUrlPolicy.Sanitize(
+            returnUrl,
+            requestBaseUri,
+            ReturnUrlPolicy.DefaultRootDomain,
+            _environment.IsDevelopment());
+        return safeReturnUrl is not null
+            ? Results.Redirect(safeReturnUrl)
             : Results.Ok();
     }
 
@@ -110,6 +132,19 @@ public class AuthController(
     [HttpPost("continue")]
     [EnableRateLimiting(nameof(StrictEmailCheckPolicy))]
     public async Task<ActionResult<bool>> CheckUserAsync([FromBody] CheckUserRequest request) => await _userManager.FindByEmailAsync(request.Email) is not null;
+
+    // Counted before the check, so parallel guesses can't exceed the budget.
+    void ThrowIfAttemptsSpent(AuthAttemptKind kind, string email)
+    {
+        if (_attemptLimiter.TryAcquire(kind, email, HttpContext.Connection.RemoteIpAddress))
+        {
+            return;
+        }
+
+        throw kind == AuthAttemptKind.Login
+            ? new AccountLockedOutException()
+            : new TooManyAttemptsException();
+    }
 }
 /// <summary>Request payload for verifying a password reset code.</summary>
 public record VerifyPasswordResetCodeRequest(string Email, string Code);

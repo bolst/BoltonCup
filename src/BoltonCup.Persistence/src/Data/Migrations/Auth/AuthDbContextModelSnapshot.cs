@@ -18,7 +18,7 @@ namespace BoltonCup.Persistence.Migrations.Auth
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("auth")
-                .HasAnnotation("ProductVersion", "10.0.7")
+                .HasAnnotation("ProductVersion", "10.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -29,9 +29,6 @@ namespace BoltonCup.Persistence.Migrations.Auth
                         .HasColumnType("text");
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("AccountId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ConcurrencyStamp")

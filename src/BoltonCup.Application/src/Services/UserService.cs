@@ -12,13 +12,14 @@ using BoltonCup.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace BoltonCup.Application.Services;
 
 public interface IUserService
 {
     Task<Account?> GetMyAccountAsync(ClaimsPrincipal claimsPrincipal);
-    Task LoginAsync(string email, string password, bool persist, bool lockoutOnFailure = false);
+    Task LoginAsync(string email, string password, bool persist);
     Task RegisterAsync(string email, string password);
     Task ResendConfirmationEmailAsync(string email);
     Task VerifyPasswordResetCodeAsync(string email, string code);
@@ -34,6 +35,7 @@ class UserService(
     SignInManager<BoltonCupUser> _signInManager,
     IAccountService _accountService,
     IEmailer _emailer,
+    ITelemetry _telemetry,
     ILogger<UserService> _logger) : IUserService
 {
 
@@ -48,9 +50,21 @@ class UserService(
     }
 
 
-    public async Task LoginAsync(string email, string password, bool persist, bool lockoutOnFailure = false)
+    public async Task LoginAsync(string email, string password, bool persist)
     {
-        var result = await _signInManager.PasswordSignInAsync(email, password, persist, lockoutOnFailure);
+        if (await _userManager.FindByNameAsync(email) is not { } user)
+        {
+            throw new InvalidCredentialsException();
+        }
+
+        var result = await _signInManager.PasswordSignInAsync(user, password, persist, lockoutOnFailure: false);
+
+        if (result.IsLockedOut)
+        {
+            _logger.LogWarning("Login blocked by lockout for user {UserId}", user.Id);
+            _telemetry.TrackEvent("auth.login_locked_out", "user.id", user.Id);
+            throw new AccountLockedOutException();
+        }
 
         if (result == SignInResult.Failed)
         {
@@ -101,16 +115,7 @@ class UserService(
             throw new InvalidCredentialsException();
         }
 
-        var isValidToken = await _userManager.VerifyUserTokenAsync(
-                   user: user,
-                   tokenProvider: _userManager.Options.Tokens.PasswordResetTokenProvider,
-                   purpose: UserManager<BoltonCupUser>.ResetPasswordTokenPurpose,
-                   token: code
-                );
-        if (!isValidToken)
-        {
-            throw new InvalidCredentialsException();
-        }
+        await CheckPasswordResetCodeAsync(user, code);
     }
 
 
@@ -135,6 +140,11 @@ class UserService(
             throw new InvalidCredentialsException();
         }
 
+        await CheckPasswordResetCodeAsync(user, code);
+
+        // The code proves control of the email. ResetPasswordAsync saves the whole user, so the confirmation lands
+        // with the new password or not at all.
+        user.EmailConfirmed = true;
         if (await _userManager.ResetPasswordAsync(user, code, newPassword) is { Succeeded: false } result)
         {
             _logger.LogWarning(
@@ -144,13 +154,7 @@ class UserService(
             throw new PasswordResetFailedException(result);
         }
 
-        // a user could only get here if they got the code via email
-        // thus, confirm their account if needed
-        if (!user.EmailConfirmed)
-        {
-            user.EmailConfirmed = true;
-            await _userManager.UpdateAsync(user);
-        }
+        await LinkExistingAccountAsync(user);
     }
 
 
@@ -167,12 +171,7 @@ class UserService(
             throw new InvalidCredentialsException();
         }
 
-        // if a user already has an account, join it to them
-        if (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Email == user.Email) is { } account)
-        {
-            user.AccountId = account.Id;
-            await _userManager.UpdateAsync(user);
-        }
+        await LinkExistingAccountAsync(user);
     }
 
 
@@ -181,15 +180,68 @@ class UserService(
     {
         var user = await _userManager.FindByIdAsync(userId)
             ?? throw new EntityNotFoundException("User", userId);
-        if (user.AccountId.HasValue)
+
+        // An account made for this email before the user signed up (by an admin, or under the old case-sensitive
+        // matching) is theirs; claim it instead of making a second one.
+        if (!await LinkExistingAccountAsync(user))
         {
-            return user;
+            await _accountService.CreateAsync(userId, command);
         }
 
-        var accountId = await _accountService.CreateAsync(command);
-        user.AccountId = accountId;
-        await _userManager.UpdateAsync(user);
-
         return user;
+    }
+
+    // Joins the unowned account with the user's email, unless the user already owns an account. Returns whether it
+    // linked. Internal so tests can race two users, which the public, email-keyed methods can't express.
+    internal async Task<bool> LinkExistingAccountAsync(BoltonCupUser user)
+    {
+        if (user.Email is null)
+        {
+            return false;
+        }
+
+        var email = user.Email.ToLowerInvariant();
+        var candidateId = await _dbContext.Accounts
+            .Where(a => a.Email.ToLower() == email && a.UserId == null)
+            .OrderBy(a => a.Id)
+            .Select(a => (int?)a.Id)
+            .FirstOrDefaultAsync();
+        if (candidateId is null)
+        {
+            return false;
+        }
+
+        // Postgres re-checks user_id IS NULL under the row lock, so of two parallel claims only one updates the row.
+        try
+        {
+            var linkedRows = await _dbContext.Accounts
+                .Where(a => a.Id == candidateId
+                    && a.UserId == null
+                    && !_dbContext.Accounts.Any(owned => owned.UserId == user.Id))
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(a => a.UserId, user.Id)
+                    .SetProperty(a => a.LastModified, DateTime.UtcNow));
+
+            return linkedRows == 1;
+        }
+        catch (PostgresException e) when (e.SqlState == PostgresErrorCodes.UniqueViolation)
+        {
+            // The ownership subquery reads the statement's snapshot, so an account the user created in parallel
+            // surfaces here, at the unique index, instead.
+            return false;
+        }
+    }
+
+    async Task CheckPasswordResetCodeAsync(BoltonCupUser user, string code)
+    {
+        var isValidCode = await _userManager.VerifyUserTokenAsync(
+            user,
+            _userManager.Options.Tokens.PasswordResetTokenProvider,
+            UserManager<BoltonCupUser>.ResetPasswordTokenPurpose,
+            code);
+        if (!isValidCode)
+        {
+            throw new InvalidCredentialsException();
+        }
     }
 }

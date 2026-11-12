@@ -18,6 +18,9 @@ public class Account : EntityBase
     public string? Hometown { get; set; }
     public string? PreviousTeamLogo { get; set; }
 
+    /// <summary>The Identity user who owns this account, if any.</summary>
+    public string? UserId { get; set; }
+
     public ICollection<Player> Players { get; set; } = [];
     public ICollection<Team> ManagedTeams { get; set; } = [];
     public ICollection<Franchise> OwnedFranchises { get; set; } = [];

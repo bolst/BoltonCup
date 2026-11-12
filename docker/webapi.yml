@@ -2,8 +2,13 @@
 #
 # Usage:
 #   cp .env.example .env       # then fill in CONNECTION_STRING + secrets
-#   docker compose up -d
-#   docker compose down
+#   tools/prepare_host.sh .env # checks the config and starts Postgres; CI runs it on every deploy
+#   docker compose -f docker/webapi.yml --env-file .env --profile edge up -d
+#
+# Trust model: nothing is published on a public interface. The edge proxy (cloudflared) reaches the
+# API over the private boltoncup-edge network from a fixed address, and only that address may set
+# X-Forwarded-For. To change edge provider, replace the cloudflared service with another proxy that
+# uses the same ipv4_address (e.g. Caddy publishing 443) - the API config stays the same.
 
 services:
   webapi:
@@ -11,11 +16,18 @@ services:
     container_name: boltoncup-webapi-1
     restart: unless-stopped
     ports:
-      - "${WEBAPI_PORT:-8080}:8080"
+      # Set WEBAPI_BIND to the host's tailnet IP in prod so admin tools reach it; never 0.0.0.0.
+      - "${WEBAPI_BIND:-127.0.0.1}:${WEBAPI_PORT:-8080}:8080"
+    networks:
+      - edge
+      - db
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       Logging__LogLevel__Microsoft.EntityFrameworkCore.Database.Command: Warning
       BoltonCup__ConnectionString: ${CONNECTION_STRING:?required}
+      # Only the edge proxy may set the client IP and scheme via forwarded headers. MUST equal
+      # cloudflared's ipv4_address below; tools/prepare_host.sh fails the deploy if they differ.
+      BoltonCup__ForwardedHeaders__KnownNetworks__0: 10.203.0.2/32
       BoltonCup__AdminEmail: ${ADMIN_EMAIL:-}
       BoltonCup__Authentication__AdminApiKey: ${ADMIN_API_KEY:-}
       BoltonCup__Authentication__AdminAccountId: ${ADMIN_ACCOUNT_ID:-}
@@ -44,3 +56,32 @@ services:
       OTEL_TRACES_SAMPLER_ARG: ${OTEL_TRACES_SAMPLER_ARG:-1.0}
       Spotify__ClientId: ${SPOTIFY_CLIENT_ID:-}
       Spotify__ClientSecret: ${SPOTIFY_CLIENT_SECRET:-}
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.10.3
+    container_name: boltoncup-cloudflared-1
+    restart: unless-stopped
+    profiles: [edge]
+    command: tunnel --no-autoupdate run
+    environment:
+      # Token of a remotely managed tunnel whose public hostname points at http://webapi:8080.
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
+    networks:
+      edge:
+        ipv4_address: 10.203.0.2
+    depends_on:
+      - webapi
+
+networks:
+  edge:
+    name: boltoncup-edge
+    ipam:
+      config:
+        # Outside Docker's default pools (172.17-31.x, 192.168.x), so it can't collide with auto-assigned networks.
+        - subnet: 10.203.0.0/24
+          # Dynamic addresses come from the upper half, so cloudflared's fixed 10.203.0.2 is never taken.
+          ip_range: 10.203.0.128/25
+  # Created by docker/postgres.yml; tools/prepare_host.sh starts it before the API.
+  db:
+    name: boltoncup-db
+    external: true

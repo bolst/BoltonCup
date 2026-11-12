@@ -35,24 +35,33 @@ class AccountService : IAccountService
             .Include(a => a.ManagedTeams)
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken: cancellationToken);
 
-    public async Task<int> CreateAsync(CreateAccountCommand command, CancellationToken cancellationToken = default)
+    public async Task<int> CreateAsync(string userId, CreateAccountCommand command, CancellationToken cancellationToken = default)
     {
-        var newAccount = new Account
-        {
-            FirstName = command.FirstName,
-            LastName = command.LastName,
-            Email = command.Email,
-            Birthday = command.Birthday,
-            HighestLevel = command.HighestLevel,
-            PreferredBeer = command.PreferredBeer,
-            HeightFeet = command.HeightFeet,
-            HeightInches = command.HeightInches,
-            Weight = command.Weight,
-        };
-        _dbContext.Accounts.Add(newAccount);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        // Raw SQL skips the DateTimeWithKindConverter, and Npgsql writes timestamptz only from UTC values.
+        var birthday = DateTime.SpecifyKind(command.Birthday, DateTimeKind.Utc);
 
-        return newAccount.Id;
+        // The unique index on user_id makes the losing insert a no-op, so a second account is never created.
+        var insertedIds = await _dbContext.Database
+            .SqlQuery<int>($"""
+                INSERT INTO core.accounts
+                    (first_name, last_name, email, birthday, highest_level, preferred_beer,
+                     height_feet, height_inches, weight, user_id)
+                VALUES
+                    ({command.FirstName}, {command.LastName}, {command.Email}, {birthday}, {command.HighestLevel},
+                     {command.PreferredBeer}, {command.HeightFeet}, {command.HeightInches}, {command.Weight}, {userId})
+                ON CONFLICT (user_id) DO NOTHING
+                RETURNING id AS "Value"
+                """)
+            .ToListAsync(cancellationToken);
+        if (insertedIds.Count > 0)
+        {
+            return insertedIds[0];
+        }
+
+        return await _dbContext.Accounts
+            .Where(a => a.UserId == userId)
+            .Select(a => a.Id)
+            .SingleAsync(cancellationToken);
     }
 
     public async Task UpdateAsync(UpdateAccountCommand command, CancellationToken cancellationToken = default)

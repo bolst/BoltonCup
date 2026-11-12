@@ -23,12 +23,7 @@ public static class ServiceCollectionExtensions
     public static WebApplicationBuilder AddBoltonCupPersistence(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddIdentityCore<BoltonCupUser>(options =>
-            {
-                options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
-                options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
-                options.SignIn.RequireConfirmedAccount = true;
-            })
+            .AddIdentityCore<BoltonCupUser>(ConfigureIdentity)
             .AddRoles<IdentityRole>()
             .AddSignInManager()
             .AddEntityFrameworkStores<AuthDbContext>()
@@ -41,6 +36,15 @@ public static class ServiceCollectionExtensions
             .AddDbContextFactory<AuthDbContext>(options => options.UseNpgsql(connectionString));
 
         return builder;
+    }
+
+    internal static void ConfigureIdentity(IdentityOptions options)
+    {
+        options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
+        options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
+        options.SignIn.RequireConfirmedAccount = true;
+        // Wrong guesses are capped per caller in the API, so a stranger can't lock someone out.
+        options.Lockout.AllowedForNewUsers = false;
     }
 }
 

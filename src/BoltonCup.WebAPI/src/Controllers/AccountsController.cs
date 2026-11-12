@@ -31,6 +31,12 @@ public class AccountsController(
             return Unauthorized("ID claim is missing.");
         }
 
+        // RefreshSignInAsync would drop the masquerade claims.
+        if (User.HasClaim(c => c.Type == BoltonCupClaimTypes.OriginalUserId))
+        {
+            return Forbid();
+        }
+
         var command = _mapper.ToCommand(request, User);
         var user = await _userService.CompleteUserAccountAsync(userId, command);
         await _signInManager.RefreshSignInAsync(user);

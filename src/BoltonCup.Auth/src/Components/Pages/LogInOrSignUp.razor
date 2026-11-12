@@ -1,5 +1,6 @@
 @page "/log-in-or-sign-up"
 @inject AuthSessionStateService AuthSessionState
+@inject ISnackbar Snackbar
 
 <AutoEditForm T="LogInOrSignUpFormModel" EditContext="_editContext" OnValidSubmit="OnSubmit" Title="Log in or sign up" />
 
@@ -14,9 +15,16 @@
         _editContext = new EditContext(_model);
     }
 
-    private Task OnSubmit(EditContext _)
+    async Task OnSubmit(EditContext _)
     {
-        return AuthSessionState.LogInOrSignUpAsync(_model);
+        try
+        {
+            await AuthSessionState.LogInOrSignUpAsync(_model);
+        }
+        catch (ApiException e) when (e.IsTooManyRequests())
+        {
+            Snackbar.Add(e.GetTooManyRequestsMessage(), Severity.Warning);
+        }
     }
 
 }

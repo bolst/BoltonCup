@@ -18,14 +18,17 @@ class BoltonCupClaimsPrincipalFactory(
     {
         var identity = await base.GenerateClaimsAsync(user);
 
-        var accountIdStr = user.AccountId?.ToString();
-        if (!string.IsNullOrEmpty(accountIdStr))
+        var accountIdLookup = await dbContext.Accounts
+            .Where(a => a.UserId == user.Id)
+            .Select(a => (int?)a.Id)
+            .FirstOrDefaultAsync();
+        if (accountIdLookup is { } accountId)
         {
-            identity.AddClaim(new Claim(BoltonCupClaimTypes.AccountId, accountIdStr));
+            identity.AddClaim(new Claim(BoltonCupClaimTypes.AccountId, accountId.ToString()));
 
             // add team GM claim(s)
             var gmTournaments = await dbContext.Teams
-                .Where(t => t.GeneralManagers.Any(g => g.Id == user.AccountId))
+                .Where(t => t.GeneralManagers.Any(g => g.Id == accountId))
                 .GroupBy(t => t.TournamentId)
                 .ToListAsync();
             foreach (var tournament in gmTournaments)
@@ -34,7 +37,7 @@ class BoltonCupClaimsPrincipalFactory(
                 {
                     identity.AddClaim(new Claim(BoltonCupClaimTypes.TournamentGm, tournamentId.ToString()));
                 }
-
+                
                 identity.AddClaims(
                     tournament.Select(team => new Claim(BoltonCupClaimTypes.TeamGm, team.Id.ToString())).ToArray()
                 );

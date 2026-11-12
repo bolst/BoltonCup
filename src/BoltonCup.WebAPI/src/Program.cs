@@ -104,8 +104,6 @@ if (app.Environment.IsDevelopment())
     );
 }
 
-app.UseHttpsRedirection();
-
 // Capture the true socket peer before UseForwardedHeaders rewrites RemoteIpAddress, so the
 // admin-API-key network check (ApiKeyAuthenticationHandler) can't be spoofed via X-Forwarded-For.
 app.Use(async (context, next) =>
@@ -115,6 +113,7 @@ app.Use(async (context, next) =>
 });
 
 app.UseForwardedHeaders();
+app.UseHttpsRedirection();
 app.UseCors();
 app.UseRateLimiter();
 
