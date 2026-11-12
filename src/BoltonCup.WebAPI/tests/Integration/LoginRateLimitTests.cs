@@ -1,18 +1,17 @@
 using System.Net;
 using System.Text;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
 namespace BoltonCup.WebAPI.Tests.Integration;
 
 // LoginPolicy allows 20 login requests/minute per IP. An empty body fails model validation, so requests never
 // reach the database.
-public class LoginRateLimitTests : IClassFixture<WebApplicationFactory<Program>>
+public class LoginRateLimitTests : IClassFixture<TestWebApplicationFactory>
 {
-    readonly WebApplicationFactory<Program> _factory;
+    readonly TestWebApplicationFactory _factory;
 
-    public LoginRateLimitTests(WebApplicationFactory<Program> factory)
+    public LoginRateLimitTests(TestWebApplicationFactory factory)
     {
         _factory = factory;
     }
