@@ -151,14 +151,6 @@ public static class ServiceCollectionExtensions
     static IServiceCollection AddRateLimitingServices(this IServiceCollection services)
     {
         return services
-            .Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders =
-                    Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
-                    Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
-                options.KnownIPNetworks.Clear();
-                options.KnownProxies.Clear();
-            })
             .AddRateLimiter(options =>
             {
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -169,6 +161,17 @@ public static class ServiceCollectionExtensions
                 options.OnRejected = (context, cancellationToken) =>
                     RateLimitResponder.WriteResponseAsync(context, cancellationToken: cancellationToken);
             });
+    }
+
+    static IServiceCollection AddForwardedHeadersServices(this IServiceCollection services)
+    {
+        services
+            .AddOptions<ForwardedHeadersOptions>()
+            .Configure<IConfiguration>((options, configuration) => TrustedProxyPolicy.Apply(
+                options,
+                configuration.GetSection(TrustedProxyPolicy.KnownNetworksPath).Get<string[]>()))
+            .ValidateOnStart();
+        return services;
     }
 
     static IServiceCollection AddMappers(this IServiceCollection services)
@@ -216,6 +219,7 @@ public static class ServiceCollectionExtensions
             .AddAuthServices()
             .AddFluentValidationServices()
             .AddCorsServices()
+            .AddForwardedHeadersServices()
             .AddRateLimitingServices()
             .AddRouting(options => options.LowercaseUrls = true)
             .AddMappers()

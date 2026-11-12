@@ -1,9 +1,12 @@
 # BoltonCup PostgreSQL (standalone)
 #
 # Usage:
-#   docker compose -f Docker/postgres.yml up -d
-#   docker compose -f Docker/postgres.yml down
-#   docker compose -f Docker/postgres.yml down -v   # also deletes the data volume
+#   docker compose -f docker/postgres.yml --env-file .env up -d   # also creates the boltoncup-db network
+#   docker compose -f docker/postgres.yml down
+#   docker compose -f docker/postgres.yml down -v     # also deletes the data volume
+#
+# The WebAPI reaches Postgres as Server=postgres over boltoncup-db. The published port is only for
+# tools off the host (Admin, psql): set POSTGRES_BIND to the host's tailnet IP, never 0.0.0.0.
 
 services:
   postgres:
@@ -17,7 +20,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_BIND:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bcadmin} -d ${POSTGRES_DB:-boltoncup}"]
       interval: 5s
@@ -26,3 +31,7 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  db:
+    name: boltoncup-db

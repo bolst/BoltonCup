@@ -6,6 +6,10 @@ on:
       - main
     paths:
       - 'src/BoltonCup.WebAPI/**'
+      - 'docker/webapi.yml'
+      - 'docker/postgres.yml'
+      - 'tools/prepare_host.sh'
+      - 'tools/check_compose_config.py'
   workflow_dispatch:
 
 jobs:
@@ -57,13 +61,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Deploy to Droplet
+    - uses: actions/checkout@v4
+
+    # Ships the compose file and host prep script with the image, so the host never runs a stale copy.
+    - name: Copy deploy files
+      uses: appleboy/scp-action@v1
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: root
+        key: ${{ secrets.DEPLOY_SSH_KEY }}
+        source: docker/webapi.yml,docker/postgres.yml,tools/prepare_host.sh,tools/check_compose_config.py
+        target: /opt/BoltonCup
+
+    - name: Deploy
       uses: appleboy/ssh-action@v1
       with:
         host: ${{ secrets.DEPLOY_HOST }}
         username: root
         key: ${{ secrets.DEPLOY_SSH_KEY }}
         script: |
+          set -e
           cd /opt/BoltonCup
-          docker compose -f ./docker/webapi.yml --env-file .env pull
-          docker compose -f ./docker/webapi.yml --env-file .env up -d
+          bash tools/prepare_host.sh .env
+          docker compose -f ./docker/webapi.yml --env-file .env --profile edge pull
+          docker compose -f ./docker/webapi.yml --env-file .env --profile edge up -d
