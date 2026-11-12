@@ -26,7 +26,7 @@ public class BoltonCupExceptionMappingsTests
 
         problem!.Status.Should().Be(StatusCodes.Status429TooManyRequests);
         problem.Type.Should().Be(ErrorTypes.Auth.LockedOut);
-        problem.Detail.Should().Be("Too many attempts. Try again in a few minutes.");
+        problem.Detail.Should().Be("Too many attempts. Try again later or reset your password.");
     }
 
     [Fact]

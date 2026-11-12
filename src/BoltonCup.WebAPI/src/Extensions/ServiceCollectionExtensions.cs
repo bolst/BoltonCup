@@ -157,6 +157,7 @@ public static class ServiceCollectionExtensions
                 options.GlobalLimiter = GlobalRateLimiter.Create();
                 options.AddPolicy<string, StrictEmailCheckPolicy>(nameof(StrictEmailCheckPolicy));
                 options.AddPolicy<string, CodeCheckPolicy>(nameof(CodeCheckPolicy));
+                options.AddPolicy<string, LoginPolicy>(nameof(LoginPolicy));
 
                 options.OnRejected = (context, cancellationToken) =>
                     RateLimitResponder.WriteResponseAsync(context, cancellationToken: cancellationToken);

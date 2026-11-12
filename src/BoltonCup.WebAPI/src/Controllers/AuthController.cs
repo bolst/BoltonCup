@@ -36,6 +36,7 @@ public class AuthController(
     /// <summary>Authenticates a user with email and password.</summary>
     [AllowAnonymous]
     [HttpPost("login")]
+    [EnableRateLimiting(nameof(LoginPolicy))]
     public async Task<ActionResult> Login([FromBody] LoginRequest request)
     {
         await _userService.LoginAsync(request.Email, request.Password, request.Persist);
