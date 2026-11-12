@@ -6,6 +6,10 @@
 #
 # Usage:
 #   docker compose -f docker/webapi.yml -f docker/dev-stack.yml up -d
+#
+# The cloudflared edge service stays off (it is in the "edge" profile). The API joins the external
+# boltoncup-db network: start docker/postgres.yml first, or run `docker network create boltoncup-db`
+# once if you use a database elsewhere.
 
 services:
   webapi:
